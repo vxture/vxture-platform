@@ -1670,7 +1670,8 @@
     "title": {
       "upgrade": "升级套餐",
       "renew": "续费订阅",
-      "addon": "购买加油包"
+      "addon": "购买加油包",
+      "subscribe": "订阅套餐"
     },
     "hint": {
       "none": "当前产品尚未订阅——在下方选择套餐即可开通。",
@@ -1722,9 +1723,38 @@
     "actions": {
       "switchTo": "切换到此套餐",
       "processing": "处理中…",
-      "backToSubscription": "返回订阅总览"
+      "backToSubscription": "返回订阅总览",
+      "subscribe": "订阅",
+      "renew": "续费",
+      "upgrade": "升级",
+      "activateFree": "免费开通",
+      "contactSales": "联系销售",
+      "refresh": "刷新状态"
     },
     "upgradeFailed": "套餐变更失败——请重试或联系支持。",
-    "moreSection": "更多"
+    "moreSection": "更多",
+    "cycleToggle": {
+      "monthly": "月付",
+      "yearly": "年付"
+    },
+    "pending": {
+      "title": "订单待确认",
+      "orderNo": "订单号",
+      "amount": "应付金额",
+      "awaiting": "订单已生成。请按下方信息汇款并在备注填写订单号；财务确认到账后自动开通。",
+      "bankTitle": "线下汇款信息",
+      "accountName": "收款户名",
+      "bankName": "开户行",
+      "accountNo": "账号",
+      "reference": "汇款备注",
+      "referenceHint": "务必填写订单号，便于核销",
+      "configPending": "收款账户信息待配置，请联系客服获取汇款方式。",
+      "cancel": "取消订单",
+      "cancelling": "取消中…"
+    },
+    "orderCreated": "订单已创建，等待财务确认收款。",
+    "orderFailed": "下单失败，请稍后重试或联系支持。",
+    "cancelOrderFailed": "取消订单失败，请稍后重试。",
+    "myOrdersEmpty": "暂无订单。"
   }
 }
