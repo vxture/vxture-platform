@@ -1670,7 +1670,8 @@
     "title": {
       "upgrade": "Upgrade plan",
       "renew": "Renew subscription",
-      "addon": "Buy add-on pack"
+      "addon": "Buy add-on pack",
+      "subscribe": "Subscribe"
     },
     "hint": {
       "none": "No subscription for this product yet - pick a plan below to get started.",
@@ -1722,9 +1723,38 @@
     "actions": {
       "switchTo": "Switch to this plan",
       "processing": "Processing...",
-      "backToSubscription": "Back to subscription overview"
+      "backToSubscription": "Back to subscription overview",
+      "subscribe": "Subscribe",
+      "renew": "Renew",
+      "upgrade": "Upgrade",
+      "activateFree": "Activate free",
+      "contactSales": "Contact sales",
+      "refresh": "Refresh"
     },
     "upgradeFailed": "Plan change failed - please retry or contact support.",
-    "moreSection": "More"
+    "moreSection": "More",
+    "cycleToggle": {
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "pending": {
+      "title": "Order awaiting confirmation",
+      "orderNo": "Order No.",
+      "amount": "Amount due",
+      "awaiting": "Order created. Transfer the amount below and put the order number in the reference; it activates automatically once finance confirms receipt.",
+      "bankTitle": "Offline transfer details",
+      "accountName": "Account name",
+      "bankName": "Bank",
+      "accountNo": "Account no.",
+      "reference": "Reference",
+      "referenceHint": "Include the order number for reconciliation.",
+      "configPending": "Bank details not configured — please contact support for transfer instructions.",
+      "cancel": "Cancel order",
+      "cancelling": "Cancelling…"
+    },
+    "orderCreated": "Order created; awaiting finance confirmation.",
+    "orderFailed": "Failed to place the order. Please retry or contact support.",
+    "cancelOrderFailed": "Failed to cancel the order. Please retry.",
+    "myOrdersEmpty": "No orders yet."
   }
 }

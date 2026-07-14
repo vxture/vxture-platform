@@ -1,19 +1,17 @@
 "use client";
 
 /**
- * SubscribePage — the product→console conversion deep-link landing
- * (product_200 §3.2; fault-tolerance contract arda_303 §2.2).
+ * SubscribePage — the product→console conversion deep-link landing +
+ * ordering surface (product_200 §3.2; product_320 §4.4).
  *
- * Entry: /subscribe?product=..&intent=upgrade|renew|addon[&target_tier][&metric]
- * Products link here as their ONLY conversion exit; all commercial decisions
- * render on this side. Contract behaviors implemented here:
- *  1. unknown intent/product → degrade to the subscription home, context kept
- *     (server already logged the stray value as a vocabulary-evolution signal);
- *  2. known intent + invalid params → proceed, invalid param ignored
- *     (target_tier merely loses its preselection);
- *  3. state-aware primary action (never subscribed → subscribe; trialing →
- *     convert; active w/o auto-renew → renew; lapsed → renew; overdue →
- *     settle once the payment plane emits it).
+ * Entry: /subscribe?product=..&intent=subscribe|upgrade|renew|addon[&target_tier][&metric]
+ * Fault-tolerance (arda_303 §2.2): unknown intent/product → degrade to the
+ * subscription home. State machine (product_320):
+ *  - a pending offline order exists → awaiting-confirmation panel (order no +
+ *    transfer instructions + cancel);
+ *  - otherwise the plan ladder with a month/year toggle: free → activate now,
+ *    paid → subscribe/renew (new) or upgrade (from a live sub), enterprise
+ *    (no price rows) → contact sales.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -23,7 +21,8 @@ import { Badge, Button, PageHeader } from "@vxture/design-system";
 import { useRouter } from "@/lib/i18n/navigation";
 import { PageSection } from "@/layout/shell";
 import {
-  executeSubscriptionUpgrade,
+  cancelSubscriptionOrder,
+  createSubscriptionOrder,
   fetchSubscribeContext,
   type SubscribeContext,
   type SubscribePlanOption,
@@ -39,6 +38,9 @@ const STATUS_KEYS = new Set([
   "cancelled",
 ]);
 
+type Cycle = "month" | "year";
+const CYCLES: Cycle[] = ["month", "year"];
+
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
   try {
@@ -48,11 +50,18 @@ function formatDate(iso: string | null): string {
   }
 }
 
-function formatPrice(price: SubscribePlanPrice): string {
-  const amount = Number.parseFloat(price.price);
-  const value = Number.isFinite(amount) ? amount.toLocaleString() : price.price;
-  const prefix = price.currency === "CNY" ? "¥" : `${price.currency} `;
+function formatMoney(amount: string, currency: string): string {
+  const n = Number.parseFloat(amount);
+  const value = Number.isFinite(n) ? n.toLocaleString() : amount;
+  const prefix = currency === "CNY" ? "¥" : `${currency} `;
   return `${prefix}${value}`;
+}
+
+function priceForCycle(
+  plan: SubscribePlanOption,
+  cycle: Cycle,
+): SubscribePlanPrice | undefined {
+  return plan.prices.find((p) => p.cycleUnit === cycle && p.cycleCount === 1);
 }
 
 export function SubscribePage() {
@@ -72,17 +81,15 @@ export function SubscribePage() {
 
   const [ctx, setCtx] = useState<SubscribeContext | null>(null);
   const [loading, setLoading] = useState(true);
-  const [busyPlan, setBusyPlan] = useState<string | null>(null);
+  const [cycle, setCycle] = useState<Cycle>("year"); // 默认年付（更省）
+  const [busy, setBusy] = useState<string | null>(null); // planVersionId | "cancel"
   const [error, setError] = useState<string | null>(null);
-  const [upgraded, setUpgraded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     void fetchSubscribeContext(query).then((result) => {
       if (cancelled) return;
-      // Degrade rule (arda_303 §2.2 #1): unknown intent, unknown product, or a
-      // failed fetch all land on the subscription home instead of an error —
-      // a stale deep link costs one navigation, never a dead end.
+      // Degrade (arda_303 §2.2 #1): unknown intent/product/failed fetch → home.
       if (!result || result.intent === null || result.product === null) {
         router.replace("/subscription");
         return;
@@ -103,33 +110,140 @@ export function SubscribePage() {
     );
   }
 
-  const { intent, product, targetTier, metric, current, plans } = ctx;
-  // The effect already degrades these cases; this narrows the types for render.
+  const { intent, product, targetTier, metric, current, pendingOrder, plans } =
+    ctx;
   if (intent === null || product === null) return null;
 
-  // State-aware primary hint (rule #3): what the user most likely came to do.
+  async function reload() {
+    const fresh = await fetchSubscribeContext(query);
+    if (fresh) setCtx(fresh);
+  }
+
+  // ── 待支付订单面板 ────────────────────────────────────────────────────────
+  if (pendingOrder) {
+    const onCancel = async () => {
+      setBusy("cancel");
+      setError(null);
+      try {
+        await cancelSubscriptionOrder(pendingOrder.orderId);
+        await reload();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : t("cancelOrderFailed"));
+      } finally {
+        setBusy(null);
+      }
+    };
+    return (
+      <div className="vx-page-stack">
+        <PageHeader
+          eyebrow={product.name}
+          title={t("pending.title")}
+          description={t("pending.awaiting")}
+        />
+        <PageSection title={t("pending.title")}>
+          <div className="vx-subscription-panel">
+            <div className="vx-detail-grid">
+              <div>
+                <span>{t("pending.orderNo")}</span>
+                <strong>{pendingOrder.orderNo}</strong>
+              </div>
+              <div>
+                <span>{t("plansSection")}</span>
+                <strong>
+                  {pendingOrder.planCode}
+                  {pendingOrder.tier ? ` · ${pendingOrder.tier}` : ""}
+                </strong>
+              </div>
+              <div>
+                <span>{t("pending.amount")}</span>
+                <strong>
+                  {formatMoney(pendingOrder.amount, pendingOrder.currency)} /{" "}
+                  {t(`cycle.${pendingOrder.cycleUnit}`)}
+                </strong>
+              </div>
+            </div>
+          </div>
+        </PageSection>
+        <PageSection title={t("pending.bankTitle")} tone="muted">
+          {/* 汇款账户来自服务端配置；context 不透传敏感账户，仅展示占位提示 + 订单号备注 */}
+          <p className="vx-empty-hint">{t("pending.configPending")}</p>
+          <p className="vx-empty-hint">
+            {t("pending.reference")}：<strong>{pendingOrder.orderNo}</strong>（
+            {t("pending.referenceHint")}）
+          </p>
+        </PageSection>
+        {error ? <p className="vx-empty-hint">{error}</p> : null}
+        <PageSection title={t("moreSection")} tone="muted">
+          <div className="vx-detail-actions">
+            <Button
+              variant="outline"
+              disabled={busy !== null}
+              onClick={() => void reload()}
+            >
+              {t("actions.refresh")}
+            </Button>
+            <Button disabled={busy !== null} onClick={() => void onCancel()}>
+              {busy === "cancel"
+                ? t("pending.cancelling")
+                : t("pending.cancel")}
+            </Button>
+          </div>
+        </PageSection>
+      </div>
+    );
+  }
+
   const stateKey = (() => {
     if (!current) return "none";
     if (current.status === "active" && !current.autoRenew) return "renewOff";
     return STATUS_KEYS.has(current.status) ? current.status : "none";
   })();
 
-  const onUpgrade = async (plan: SubscribePlanOption) => {
-    if (!current) return;
-    setBusyPlan(plan.planVersionId);
+  const isLive = current?.status === "active" || current?.status === "trialing";
+
+  const onSelect = async (plan: SubscribePlanOption) => {
+    setBusy(plan.planVersionId);
     setError(null);
+    const orderIntent: "new" | "renew" | "upgrade" = !current
+      ? "new"
+      : isLive
+        ? "upgrade"
+        : "renew";
     try {
-      await executeSubscriptionUpgrade(
-        current.subscriptionId,
-        plan.planVersionId,
-      );
-      setUpgraded(true);
-      router.replace("/subscription");
-    } catch {
-      setError(t("upgradeFailed"));
-      setBusyPlan(null);
+      const result = await createSubscriptionOrder({
+        productCode: product.code,
+        planVersionId: plan.planVersionId,
+        cycleUnit: cycle,
+        intent: orderIntent,
+        ...(orderIntent === "upgrade" && current
+          ? { upgradeOfSubscriptionId: current.subscriptionId }
+          : {}),
+      });
+      if (result.status === "active") {
+        router.replace("/subscription"); // free 即时开通
+        return;
+      }
+      await reload(); // pending order 生成 → 渲染待支付面板
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("orderFailed"));
+      setBusy(null);
     }
   };
+
+  const contactSales = () => {
+    window.location.href = `mailto:sales@vxture.com?subject=${encodeURIComponent(
+      `${product.name} 企业版咨询`,
+    )}`;
+  };
+
+  const planButtonLabel = (isFree: boolean) =>
+    isFree
+      ? t("actions.activateFree")
+      : !current
+        ? t("actions.subscribe")
+        : isLive
+          ? t("actions.upgrade")
+          : t("actions.renew");
 
   return (
     <div className="vx-page-stack">
@@ -145,13 +259,7 @@ export function SubscribePage() {
             <div className="vx-stack-sm">
               <div className="vx-inline-between">
                 <strong>{current.planCode}</strong>
-                <Badge
-                  className={
-                    current.status === "active" || current.status === "trialing"
-                      ? "vx-badge-positive"
-                      : undefined
-                  }
-                >
+                <Badge className={isLive ? "vx-badge-positive" : undefined}>
                   {STATUS_KEYS.has(current.status)
                     ? t(`status.${current.status}`)
                     : current.status}
@@ -201,72 +309,88 @@ export function SubscribePage() {
       ) : null}
 
       <PageSection title={t("plansSection")}>
-        {plans.length === 0 ? (
-          <p className="vx-empty-hint">{t("noPlans")}</p>
-        ) : (
-          <div className="vx-stack-sm">
-            {plans.map((plan) => {
-              const isCurrent =
-                current !== null &&
-                plan.planVersionId === current.planVersionId;
-              const isTarget = targetTier !== null && plan.tier === targetTier;
-              return (
-                <div key={plan.planId} className="vx-subscription-panel">
-                  <div className="vx-inline-between">
-                    <div className="vx-stack-sm">
-                      <div className="vx-inline-between">
-                        <strong>{plan.planName}</strong>
-                        <Badge>{plan.tier}</Badge>
-                        {isCurrent ? (
-                          <Badge>{t("badges.current")}</Badge>
-                        ) : null}
-                        {isTarget && !isCurrent ? (
-                          <Badge className="vx-badge-positive">
-                            {t("badges.recommended")}
-                          </Badge>
+        <div className="vx-stack-sm">
+          <div className="vx-detail-actions">
+            {CYCLES.map((c) => (
+              <Button
+                key={c}
+                variant={cycle === c ? "default" : "outline"}
+                onClick={() => setCycle(c)}
+              >
+                {t(`cycleToggle.${c === "month" ? "monthly" : "yearly"}`)}
+              </Button>
+            ))}
+          </div>
+
+          {plans.length === 0 ? (
+            <p className="vx-empty-hint">{t("noPlans")}</p>
+          ) : (
+            <div className="vx-stack-sm">
+              {plans.map((plan) => {
+                const isCurrent =
+                  current !== null &&
+                  plan.planVersionId === current.planVersionId;
+                const isTarget =
+                  targetTier !== null && plan.tier === targetTier;
+                const isEnterprise = plan.prices.length === 0;
+                const price = priceForCycle(plan, cycle);
+                const isFree = price
+                  ? Number.parseFloat(price.price) <= 0
+                  : false;
+                return (
+                  <div key={plan.planId} className="vx-subscription-panel">
+                    <div className="vx-inline-between">
+                      <div className="vx-stack-sm">
+                        <div className="vx-inline-between">
+                          <strong>{plan.planName}</strong>
+                          <Badge>{plan.tier}</Badge>
+                          {isCurrent ? (
+                            <Badge>{t("badges.current")}</Badge>
+                          ) : null}
+                          {isTarget && !isCurrent ? (
+                            <Badge className="vx-badge-positive">
+                              {t("badges.recommended")}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <span>
+                          {isEnterprise
+                            ? t("actions.contactSales")
+                            : price
+                              ? `${formatMoney(price.price, price.currency)} / ${t(
+                                  `cycle.${price.cycleUnit}`,
+                                )}`
+                              : t("pricePending")}
+                        </span>
+                      </div>
+                      <div className="vx-detail-actions">
+                        {isCurrent ? null : isEnterprise ? (
+                          <Button variant="outline" onClick={contactSales}>
+                            {t("actions.contactSales")}
+                          </Button>
+                        ) : price ? (
+                          <Button
+                            disabled={busy !== null}
+                            onClick={() => void onSelect(plan)}
+                          >
+                            {busy === plan.planVersionId
+                              ? t("actions.processing")
+                              : planButtonLabel(isFree)}
+                          </Button>
                         ) : null}
                       </div>
-                      <span>
-                        {plan.prices.length > 0
-                          ? plan.prices
-                              .map(
-                                (price) =>
-                                  `${formatPrice(price)} / ${
-                                    price.cycleCount > 1
-                                      ? `${price.cycleCount}×`
-                                      : ""
-                                  }${t(`cycle.${price.cycleUnit}`)}`,
-                              )
-                              .join(" · ")
-                          : t("pricePending")}
-                      </span>
-                    </div>
-                    <div className="vx-detail-actions">
-                      {current && !isCurrent ? (
-                        <Button
-                          disabled={busyPlan !== null || upgraded}
-                          onClick={() => void onUpgrade(plan)}
-                        >
-                          {busyPlan === plan.planVersionId
-                            ? t("actions.processing")
-                            : t("actions.switchTo")}
-                        </Button>
-                      ) : null}
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {!current ? (
-          <p className="vx-empty-hint">{t("contactToSubscribe")}</p>
-        ) : null}
-        {error ? <p className="vx-empty-hint">{error}</p> : null}
+                );
+              })}
+            </div>
+          )}
+          {error ? <p className="vx-empty-hint">{error}</p> : null}
+        </div>
       </PageSection>
 
       <PageSection title={t("moreSection")} tone="muted">
-        <Button onClick={() => router.push("/subscription")}>
+        <Button variant="outline" onClick={() => router.push("/subscription")}>
           {t("actions.backToSubscription")}
         </Button>
       </PageSection>

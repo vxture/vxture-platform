@@ -490,13 +490,62 @@ export interface SubscribeCurrent {
   autoRenew: boolean;
 }
 
+export interface PendingOrderSummary {
+  orderId: string;
+  orderNo: string;
+  billNo: string | null;
+  planCode: string;
+  tier: string | null;
+  cycleUnit: string;
+  amount: string;
+  currency: string;
+  createdAt: string;
+}
+
 export interface SubscribeContext {
-  intent: "upgrade" | "renew" | "addon" | null;
+  intent: "subscribe" | "upgrade" | "renew" | "addon" | null;
   product: { code: string; name: string } | null;
   targetTier: string | null;
   metric: string | null;
   current: SubscribeCurrent | null;
+  pendingOrder: PendingOrderSummary | null;
   plans: SubscribePlanOption[];
+}
+
+export interface OfflinePaymentInstructions {
+  method: "bank_transfer";
+  accountName: string;
+  bankName: string;
+  accountNo: string;
+  reference: string;
+}
+
+export interface CreateOrderResult {
+  status: "pending_payment" | "active";
+  orderId: string | null;
+  orderNo: string | null;
+  billNo: string | null;
+  amount: string | null;
+  currency: string;
+  planCode: string;
+  cycleUnit: string | null;
+  paymentInstructions: OfflinePaymentInstructions | null;
+  subscriptionId: string | null;
+}
+
+export interface MyOrder {
+  orderId: string;
+  orderNo: string;
+  billNo: string | null;
+  planCode: string;
+  planName: string;
+  tier: string | null;
+  cycleUnit: string;
+  amount: string;
+  currency: string;
+  orderStatus: "pending" | "confirmed" | "closed";
+  createdAt: string;
+  confirmedAt: string | null;
 }
 
 export async function fetchSubscribeContext(params: {
@@ -516,27 +565,74 @@ export async function fetchSubscribeContext(params: {
   );
 }
 
-/** Upgrade the current subscription to a plan's locked version (deep-link flow). */
-export async function executeSubscriptionUpgrade(
-  subscriptionId: string,
-  planVersionId: string,
-): Promise<void> {
+async function extractErrorMessage(
+  response: Response,
+  fallback: string,
+): Promise<string> {
+  try {
+    const b = (await response.json()) as { message?: string | string[] };
+    if (Array.isArray(b.message)) return b.message[0] ?? fallback;
+    if (typeof b.message === "string") return b.message;
+  } catch {
+    /* non-JSON */
+  }
+  return fallback;
+}
+
+/**
+ * Create a subscription order (product_320). Free tier activates instantly
+ * (status="active"); paid tiers create a pending offline order (status=
+ * "pending_payment") returning the order no + bank-transfer instructions.
+ */
+export async function createSubscriptionOrder(body: {
+  productCode: string;
+  planVersionId: string;
+  cycleUnit: "month" | "year";
+  intent: "new" | "renew" | "upgrade";
+  upgradeOfSubscriptionId?: string;
+}): Promise<CreateOrderResult> {
   const response = await fetch(
-    `${DEFAULT_BFF_URL}${CONSOLE_API_PREFIX}/api/subscription/actions`,
+    `${DEFAULT_BFF_URL}${CONSOLE_API_PREFIX}/api/subscription/orders`,
     {
       method: "POST",
       credentials: "include",
       cache: "no-store",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        subscriptionId,
-        action: "upgrade",
-        planId: planVersionId,
-      }),
+      body: JSON.stringify(body),
     },
   );
   if (!response.ok) {
-    throw new ConsoleBffError("Subscription upgrade failed", response.status);
+    throw new ConsoleBffError(
+      await extractErrorMessage(response, "下单失败"),
+      response.status,
+    );
+  }
+  return (await response.json()) as CreateOrderResult;
+}
+
+export async function fetchMyOrders(): Promise<MyOrder[]> {
+  return readJson<MyOrder[]>("/api/subscription/orders", []);
+}
+
+export async function cancelSubscriptionOrder(
+  orderId: string,
+  reason?: string,
+): Promise<void> {
+  const response = await fetch(
+    `${DEFAULT_BFF_URL}${CONSOLE_API_PREFIX}/api/subscription/orders/${encodeURIComponent(orderId)}/cancel`,
+    {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reason ? { reason } : {}),
+    },
+  );
+  if (!response.ok) {
+    throw new ConsoleBffError(
+      await extractErrorMessage(response, "取消订单失败"),
+      response.status,
+    );
   }
 }
 
