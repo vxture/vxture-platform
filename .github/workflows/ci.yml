@@ -292,6 +292,9 @@ jobs:
           path: services/model/platform/coverage/
 
       - name: SonarQube Scan
+        # 暂非阻塞：新仓库 vxture-platform 尚未在 SonarCloud 侧绑定项目（scan 返回 403）。
+        # 在 SonarCloud 导入本仓库建项目 + 更新 sonar-project.properties 后，移除本行恢复硬门禁。
+        continue-on-error: true
         uses: SonarSource/sonarqube-scan-action@v7
         with:
           skipSignatureVerification: false
