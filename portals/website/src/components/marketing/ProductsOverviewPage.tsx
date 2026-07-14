@@ -10,7 +10,7 @@
  * 端点，作为后续项；本版卡片统一呈现「可试用」+ 订阅/申请演示/产品介绍。
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button, Icon } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -19,6 +19,10 @@ import {
   buildConsoleEntryUrl,
   buildConsoleSubscribeUrl,
 } from "@/lib/console-entry";
+import {
+  fetchProductSubscriptions,
+  type ProductSubscriptionState,
+} from "@/api/subscription.api";
 import { useAuthStore } from "@/stores/auth.store";
 import AnimatedHeroBg from "./AnimatedHeroBg";
 
@@ -58,12 +62,6 @@ type Cycle = "monthly" | "yearly";
  * 订阅态 subscribed 需 website-bff /api/me/product-subscriptions（后续项）；暂缺 → false。
  */
 
-// per-product 订阅态查询点位（预埋）。接入 website-bff /api/me/product-subscriptions
-// 后在此按 code 返回真实订阅态；当前统一 false（登录用户暂按未订阅呈现）。
-function isSubscribed(_code: string): boolean {
-  return false;
-}
-
 const PRIMARY_BTN =
   "inline-flex h-10 items-center justify-center rounded-md bg-vx-gray-900 px-4 text-sm font-semibold text-vx-white transition hover:bg-vx-brand-600 dark:bg-vx-brand-600 dark:hover:bg-vx-brand-500";
 const OUTLINE_BTN =
@@ -79,6 +77,29 @@ export default function ProductsOverviewPage() {
   const products = t.raw("catalog.items") as ProductCard[];
   const plans = t.raw("pricing.plans") as PricingPlan[];
   const [cycle, setCycle] = useState<Cycle>("yearly");
+  // 登录租户各产品订阅态（code → state）；未登录为空 → 卡片按未登录/未订阅呈现。
+  const [subs, setSubs] = useState<Map<string, ProductSubscriptionState>>(
+    () => new Map(),
+  );
+
+  useEffect(() => {
+    if (!hasSession) {
+      setSubs(new Map());
+      return;
+    }
+    let cancelled = false;
+    void fetchProductSubscriptions()
+      .then((list) => {
+        if (cancelled) return;
+        setSubs(new Map(list.map((s) => [s.productCode, s])));
+      })
+      .catch(() => {
+        if (!cancelled) setSubs(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasSession]);
 
   return (
     <div className="vx-page-surface">
@@ -112,7 +133,8 @@ export default function ProductsOverviewPage() {
               const loggedOutVisible = product.loggedOutVisible !== false;
               // 未登录 + 配置为不可见 → 隐藏该卡（登录后一律可见）。
               if (!hasSession && !loggedOutVisible) return null;
-              const subscribed = available && isSubscribed(product.code);
+              const subscribed =
+                available && subs.get(product.code)?.subscribed === true;
               return (
                 <article
                   key={product.code}

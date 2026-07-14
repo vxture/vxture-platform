@@ -24,6 +24,8 @@ import { SessionAggregator } from "./aggregators/session.aggregator";
 import { AuthMiddleware } from "./middleware/auth.middleware";
 import { HealthRouter } from "./routers/health.router";
 import { MeRouter } from "./routers/me.router";
+import { ProductSubscriptionsRouter } from "./routers/product-subscriptions.router";
+import { websiteBffPoolProvider } from "./providers/pg-pool.provider";
 import { OidcRpModule } from "./oidc/oidc-rp.module";
 
 @Module({
@@ -35,8 +37,8 @@ import { OidcRpModule } from "./oidc/oidc-rp.module";
     OrganizationModule,
     OidcRpModule,
   ],
-  controllers: [HealthRouter, MeRouter],
-  providers: [WebsiteAuthService, SessionAggregator],
+  controllers: [HealthRouter, MeRouter, ProductSubscriptionsRouter],
+  providers: [WebsiteAuthService, SessionAggregator, websiteBffPoolProvider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
