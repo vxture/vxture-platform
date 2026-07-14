@@ -1,0 +1,6 @@
+.admin-placeholder-page,
+.vx-products-page,
+.vx-tenant-management-page {
+  width: 100%;
+  max-width: none;
+}

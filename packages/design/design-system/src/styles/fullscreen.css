@@ -1,0 +1,61 @@
+/**
+ * fullscreen.css - 全屏系统样式
+ * @package @vxture/design-system
+ *
+ * 功能：定义全屏系统的 CSS 样式
+ *
+ * @copyright Vxture Team
+ * @layer Presentation
+ * @category Styles
+ */
+
+/* ─── 全屏容器基础样式 ──────────────────────────────────────────────────────── */
+
+.vx-fullscreen-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Pseudo 全屏激活状态 ────────────────────────────────────────────────────── */
+
+.vx-fullscreen-active {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  width: var(--vx-fullscreen-viewport-width);
+  height: var(--vx-fullscreen-viewport-height);
+  background: var(--vx-color-background);
+  overflow: hidden;
+  /* 隐藏滚动条 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  /* 进入/退出过渡 */
+  transition: var(--vx-fullscreen-transition);
+}
+
+.vx-fullscreen-active::-webkit-scrollbar {
+  display: none;
+}
+
+.vx-fullscreen-active .vx-fullscreen-container {
+  width: var(--vx-fullscreen-viewport-width);
+  height: var(--vx-fullscreen-viewport-height);
+}
+
+/* ─── 退出过渡状态 ───────────────────────────────────────────────────────────── */
+
+.vx-fullscreen-active.vx-fullscreen-exiting {
+  opacity: 0;
+}
+
+/* ─── 原生全屏（Fullscreen API）样式 ────────────────────────────────────────── */
+
+:fullscreen {
+  background: var(--vx-color-background);
+}
+
+:-webkit-full-screen {
+  background: var(--vx-color-background);
+}

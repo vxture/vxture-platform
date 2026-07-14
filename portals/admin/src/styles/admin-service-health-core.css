@@ -1,0 +1,159 @@
+.vx-service-health-page {
+  --service-blue: var(--vx-color-auth-accent);
+  --service-green: var(--vx-color-success-600);
+  --service-amber: var(--vx-color-warning-600);
+  --service-rose: var(--vx-color-danger);
+  --service-indigo: var(--vx-color-indigo-600);
+  width: 100%;
+  max-width: none;
+  gap: var(--vx-admin-service-health-page-gap);
+  cursor: default;
+}
+
+.vx-service-health-page * {
+  cursor: default;
+}
+
+.vx-service-health-page button,
+.vx-service-health-page select {
+  cursor: pointer;
+}
+
+.vx-service-health-page input {
+  cursor: text;
+}
+
+.vx-service-health-page .vx-page-header.admin-overview-heading {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--vx-admin-service-health-header-gap);
+  margin-bottom: 0;
+}
+
+.vx-service-health-page .vx-page-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--vx-admin-service-health-page-header-gap);
+}
+
+.vx-service-health-page .vx-page-header__title-row .vx-badge {
+  min-height: var(--vx-admin-service-health-pill-min-height);
+  border-color: color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
+  color: var(--vx-color-auth-accent);
+}
+
+.vx-service-health-status--healthy {
+  --service-tone: var(--service-green);
+  --service-soft: color-mix(in srgb, var(--vx-color-success) 10%, transparent);
+  --service-border: color-mix(in srgb, var(--vx-color-success) 22%, transparent);
+  --service-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vx-color-success-surface) 72%, transparent),
+    color-mix(in srgb, var(--vx-color-white) 54%, transparent)
+  );
+}
+
+.vx-service-health-status--degraded {
+  --service-tone: var(--service-amber);
+  --service-soft: color-mix(in srgb, var(--vx-color-warning-600) 12%, transparent);
+  --service-border: color-mix(in srgb, var(--vx-color-warning-600) 24%, transparent);
+  --service-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vx-color-warning-surface) 78%, transparent),
+    color-mix(in srgb, var(--vx-color-white) 54%, transparent)
+  );
+}
+
+.vx-service-health-status--offline {
+  --service-tone: var(--service-rose);
+  --service-soft: color-mix(in srgb, var(--vx-color-danger) 10%, transparent);
+  --service-border: color-mix(in srgb, var(--vx-color-danger) 22%, transparent);
+  --service-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vx-color-danger-surface) 78%, transparent),
+    color-mix(in srgb, var(--vx-color-white) 54%, transparent)
+  );
+}
+
+.vx-service-health-status--stopping {
+  --service-tone: var(--service-indigo);
+  --service-soft: color-mix(in srgb, var(--vx-color-indigo-600) 10%, transparent);
+  --service-border: color-mix(in srgb, var(--vx-color-indigo-600) 22%, transparent);
+  --service-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vx-color-brand-100) 78%, transparent),
+    color-mix(in srgb, var(--vx-color-white) 54%, transparent)
+  );
+}
+
+.vx-service-health-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--vx-admin-service-health-summary-gap);
+}
+
+.vx-service-health-summary__item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: var(--vx-admin-service-health-summary-item-grid);
+  align-items: center;
+  gap: var(--vx-admin-service-health-summary-item-gap);
+  padding: var(--vx-admin-service-health-summary-item-padding-y) var(--vx-admin-service-health-summary-item-padding-x);
+  border: var(--vx-admin-service-health-border-width) solid var(--service-border);
+  border-top: var(--vx-admin-service-health-border-width-strong) solid var(--service-tone);
+  border-radius: var(--vx-radius-lg);
+  background: var(--service-bg);
+}
+
+.vx-service-health-summary__icon {
+  width: var(--vx-admin-service-health-icon-size);
+  height: var(--vx-admin-service-health-icon-size);
+  display: inline-grid;
+  place-items: center;
+  color: var(--service-tone);
+}
+
+.vx-service-health-summary__item > div {
+  min-width: 0;
+  display: grid;
+  gap: var(--vx-admin-service-health-copy-gap);
+}
+
+.vx-service-health-summary__item div > span {
+  overflow: hidden;
+  color: var(--vx-color-text-muted);
+  font-size: var(--vx-admin-caption-size);
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vx-service-health-summary__value-line {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--vx-admin-service-health-value-gap);
+  flex-wrap: nowrap;
+}
+
+.vx-service-health-summary__value-line strong {
+  color: var(--service-tone);
+  font-size: var(--vx-admin-service-health-value-size);
+  font-weight: 760;
+  line-height: 1;
+}
+
+.vx-service-health-summary__value-line em {
+  min-height: var(--vx-admin-service-health-pill-min-height);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--vx-admin-service-health-pill-padding-x);
+  border-radius: var(--vx-radius-lg);
+  background: var(--service-soft);
+  color: var(--service-tone);
+  font-size: var(--vx-admin-caption-size);
+  font-style: normal;
+  font-weight: 820;
+  white-space: nowrap;
+}

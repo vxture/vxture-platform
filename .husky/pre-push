@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# Block direct push to protected branches — use a PR instead.
+# To bypass in an emergency: git push --no-verify
+
+while IFS=' ' read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/beta|refs/heads/develop)
+      branch=$(echo "$remote_ref" | sed 's|refs/heads/||')
+      echo ""
+      echo "✗  Direct push to '$branch' is not allowed."
+      echo "   Create a feature/fix branch and open a Pull Request."
+      echo "   Emergency bypass: git push --no-verify"
+      echo ""
+      exit 1
+      ;;
+  esac
+done

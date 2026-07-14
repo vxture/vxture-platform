@@ -1,0 +1,115 @@
+{
+  "hero": {
+    "eyebrow": "Product 01 / Data Intelligence Foundation",
+    "title": "Unified Data Intelligence Platform",
+    "description": "A governable data intelligence foundation that brings multi-source data, business knowledge, and AI reasoning into one product for government and enterprise scenarios.",
+    "imageAlt": "Unified Data Intelligence Platform interface",
+    "primaryAction": "Request trial",
+    "secondaryAction": "View capabilities",
+    "highlights": [
+      "Multi-source data access",
+      "Knowledge graph modeling",
+      "Intelligent analytics"
+    ],
+    "metrics": [
+      {
+        "value": "30+",
+        "label": "Data source adapters"
+      },
+      {
+        "value": "4 layers",
+        "label": "Governance and semantic model"
+      },
+      {
+        "value": "Minutes",
+        "label": "Insight generation"
+      }
+    ]
+  },
+  "capabilities": {
+    "eyebrow": "Core Capabilities",
+    "title": "An integrated product from data access to intelligent applications",
+    "description": "This first version is intentionally drafted as editable product content, ready to be replaced with real modules, terminology, and business metrics later.",
+    "items": [
+      {
+        "title": "Data access and governance",
+        "description": "Connect databases, files, APIs, and business systems with standardization, quality checks, and permission isolation.",
+        "points": [
+          "Connector management",
+          "Quality rules",
+          "Security classification"
+        ]
+      },
+      {
+        "title": "Semantic modeling and knowledge graph",
+        "description": "Build a semantic layer around entities, relationships, metrics, and events so teams share one business language.",
+        "points": [
+          "Ontology modeling",
+          "Entity relationships",
+          "Metric definitions"
+        ]
+      },
+      {
+        "title": "Intelligent analytics and Q&A",
+        "description": "Generate conclusions for operations and governance scenarios, with natural-language retrieval and traceable explanations.",
+        "points": ["AI Q&A", "Root-cause analysis", "Report generation"]
+      },
+      {
+        "title": "Application orchestration",
+        "description": "Package data capabilities as reusable services for dashboards, workflow collaboration, and agent workspaces.",
+        "points": [
+          "Service orchestration",
+          "Permission audit",
+          "Operations monitoring"
+        ]
+      }
+    ]
+  },
+  "workflow": {
+    "eyebrow": "Product Path",
+    "title": "Four steps to an operational data intelligence loop",
+    "description": "The product does not only display data. It connects data assets, business knowledge, analysis workflows, and application delivery into a loop that can keep evolving.",
+    "steps": [
+      {
+        "title": "Connect",
+        "description": "Bring together structured, unstructured, and API data."
+      },
+      {
+        "title": "Model",
+        "description": "Define entities, relationships, metrics, and rules."
+      },
+      {
+        "title": "Analyze",
+        "description": "Generate insights, alerts, reports, and explanations."
+      },
+      {
+        "title": "Operate",
+        "description": "Serve the business through apps, APIs, and agents."
+      }
+    ]
+  },
+  "scenarios": {
+    "eyebrow": "Use Cases",
+    "title": "Designed first for complex government and enterprise data scenarios",
+    "description": "This first page focuses on platform capabilities. Later, it can be split into multiple product detail pages by industry or module.",
+    "items": [
+      {
+        "title": "Data governance and asset inventory",
+        "description": "Build a unified catalog, quality rules, lineage, and security classification so data is findable, trusted, and reusable."
+      },
+      {
+        "title": "Integrated analysis and command",
+        "description": "Connect events, resources, locations, and operational metrics to support analysis, alerts, and dispatch decisions."
+      },
+      {
+        "title": "Business analytics and operational efficiency",
+        "description": "Generate dashboards, insights, and automation suggestions across metrics, customer touchpoints, and service workflows."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Use this page as the first product placeholder",
+    "description": "The content is intentionally editable. The structure is ready for real modules, cases, pricing, and demo entry points.",
+    "action": "Open console"
+  }
+}

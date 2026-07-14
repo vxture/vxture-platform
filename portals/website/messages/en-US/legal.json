@@ -1,0 +1,230 @@
+{
+  "eyebrow": "Vxture Policy Center",
+  "breadcrumbLabel": "Policy navigation",
+  "updatedAt": "Updated: {date}",
+  "index": {
+    "title": "Policy Center",
+    "description": "This center brings together the core policies for the Vxture website, console, agent services, model access, and related APIs. Please review them before registering, subscribing, integrating, or using the services."
+  },
+  "policies": {
+    "terms": {
+      "label": "Terms of Service",
+      "title": "Vxture Terms of Service",
+      "summary": "Rules covering accounts, tenants, subscriptions, AI outputs, third-party models, acceptable use, and service suspension.",
+      "updatedAt": "2026-05-05",
+      "notice": "These terms are product policy text and do not constitute legal advice. Enterprise customers may have different terms under a written agreement.",
+      "sections": [
+        {
+          "heading": "1. Service scope",
+          "body": [
+            "Vxture provides a website, console, agent workspace, model access, knowledge bases, APIs, dashboards, and related operational services. Available capabilities depend on your account, tenant, subscription plan, and enabled modules.",
+            "We may update service capabilities, model providers, product names, interfaces, and technical implementation over time. Material changes will be communicated through the website, console, email, or other reasonable channels."
+          ]
+        },
+        {
+          "heading": "2. Accounts and tenants",
+          "body": [
+            "The website and console share the same tenant-user account system. Admin is a platform management surface and may only be accessed by internal platform administrator accounts. Third-party accounts are not permitted for admin login.",
+            "You are responsible for protecting accounts, passwords, tokens, API keys, and tenant administrator privileges. Actions initiated through your account may be treated as actions by you or your authorized personnel."
+          ]
+        },
+        {
+          "heading": "3. AI outputs and responsibility",
+          "body": [
+            "AI outputs may be inaccurate, incomplete, outdated, or similar to outputs provided to other users. You should independently verify outputs and must not rely on them as the sole basis for legal, medical, financial, safety, or other professional decisions.",
+            "You are responsible for ensuring that prompts, uploaded files, knowledge base content, tool calls, automated workflows, and final use cases are lawful and compliant."
+          ]
+        },
+        {
+          "heading": "4. Prohibited uses",
+          "body": [
+            "You may not use Vxture for illegal activity, fraud, infringement, harassment, hate, malware, unauthorized access, circumvention of security controls, bulk collection of personal data, or other conduct that harms others.",
+            "You may not mislead others into believing AI-generated content has been human-reviewed, officially endorsed, or established as fact unless you have completed appropriate verification and disclosure."
+          ]
+        },
+        {
+          "heading": "5. Subscriptions, billing, and suspension",
+          "body": [
+            "Subscription, quota, pricing, renewal, overdue payment, refund, and invoice terms are governed by the purchase page, order, contract, or console records.",
+            "If there is non-payment, abuse, security risk, or policy violation, we may restrict, suspend, or terminate the relevant account, tenant, API key, or service."
+          ]
+        },
+        {
+          "heading": "6. Third-party services",
+          "body": [
+            "Some features may call third-party model providers, cloud services, email, payment, analytics, or security vendors. Their availability, limits, and policies may affect parts of Vxture.",
+            "You may not remove, obscure, or misuse third-party model, open-source, trademark, or copyright notices."
+          ]
+        }
+      ]
+    },
+    "privacy": {
+      "label": "Privacy Policy",
+      "title": "Vxture Privacy Policy",
+      "summary": "How we handle account information, tenant data, prompts, files, knowledge bases, logs, cookies, and third-party processors.",
+      "updatedAt": "2026-05-05",
+      "notice": "By default, we do not use your customer data to train Vxture or third-party foundation models unless you expressly authorize it or a written agreement says otherwise.",
+      "sections": [
+        {
+          "heading": "1. Information we process",
+          "body": [
+            "We may process account information, contact details, login records, tenant profiles, subscription information, payment status, support requests, device information, and browser information.",
+            "When you use AI features, we may process prompts, conversation history, uploaded files, knowledge snippets, tool-call parameters, model responses, and related audit logs."
+          ]
+        },
+        {
+          "heading": "2. Purposes",
+          "body": [
+            "We use this information to provide the services, authenticate users, isolate tenants, process billing, manage risk and security, support customers, improve products, maintain compliance records, and troubleshoot incidents.",
+            "We aim to process data according to the minimum-necessary principle and reduce risk through permission controls, access auditing, encryption in transit, and logical isolation."
+          ]
+        },
+        {
+          "heading": "3. AI data and model training",
+          "body": [
+            "Your prompts, files, knowledge bases, business data, and outputs are used by default only to provide requested services, debug issues, manage risk, and support audits.",
+            "Unless you explicitly opt in, sign a separate authorization, or agree otherwise in an enterprise contract, we do not use customer data to train Vxture or third-party foundation models."
+          ]
+        },
+        {
+          "heading": "4. Third-party processors",
+          "body": [
+            "To provide the services, we may use model providers, cloud infrastructure, email services, payment services, analytics tools, security tools, and customer support systems.",
+            "When a third party processes your data, we transfer only what is necessary for the service and require appropriate confidentiality, security, and compliance obligations."
+          ]
+        },
+        {
+          "heading": "5. Retention and deletion",
+          "body": [
+            "We retain data based on service needs, contract requirements, legal obligations, and security audit requirements. You may request access, correction, export, or deletion of your personal information.",
+            "Enterprise tenant data deletion may need to be initiated by a tenant administrator and may be subject to backup, audit, finance, and legal retention periods."
+          ]
+        },
+        {
+          "heading": "6. Cookies and similar technologies",
+          "body": [
+            "We use necessary cookies for login, security, language preferences, and session state. We may also use analytics cookies to improve the product experience.",
+            "For more detail, please read the Cookie Policy."
+          ]
+        }
+      ]
+    },
+    "copyright": {
+      "label": "Copyright Policy",
+      "title": "Vxture Copyright Policy",
+      "summary": "Rules for uploaded content, generated content, copyright complaints, counter-notices, and repeat infringement.",
+      "updatedAt": "2026-05-05",
+      "notice": "Do not upload, process, or generate content that you are not authorized to use.",
+      "sections": [
+        {
+          "heading": "1. Rights in user content",
+          "body": [
+            "You retain rights in your prompts, uploaded files, knowledge base content, and outputs for which you lawfully hold rights.",
+            "You must ensure that you have lawful rights to use, upload, process, transform, retrieve, and display that content."
+          ]
+        },
+        {
+          "heading": "2. Generated content",
+          "body": [
+            "AI-generated content may be similar to outputs provided to other users and may include facts, references, or expressions that require additional verification.",
+            "Before publishing, commercially using, or distributing outputs, you should review copyright, trademark, publicity, privacy, and factual accuracy."
+          ]
+        },
+        {
+          "heading": "3. Complaint materials",
+          "body": [
+            "Rights holders may submit copyright complaints to support@vxture.com. A complaint should include rights-holder information, a description of the work, the allegedly infringing location, contact details, a good-faith statement, and an authorization statement.",
+            "After receiving a valid complaint, we may restrict access, remove content, suspend an account, or refer the matter to the relevant tenant administrator depending on applicable law, platform policy, and the circumstances."
+          ]
+        },
+        {
+          "heading": "4. Counter-notices and appeals",
+          "body": [
+            "If you believe content was wrongly removed or restricted, you may submit a counter-notice explaining your identity, the content location, your rights basis, and a good-faith statement.",
+            "We may request additional materials and, where appropriate, leave the dispute to the relevant parties or authorities."
+          ]
+        },
+        {
+          "heading": "5. Repeat infringement",
+          "body": [
+            "For accounts, tenants, or API keys that repeatedly infringe or clearly abuse the service, we may restrict, suspend, or terminate access."
+          ]
+        }
+      ]
+    },
+    "brand": {
+      "label": "Brand Policy",
+      "title": "Vxture Brand Policy",
+      "summary": "Guidelines for using the Vxture name, logo, screenshots, partner language, Powered by references, and third-party model brands.",
+      "updatedAt": "2026-05-05",
+      "notice": "Without written permission, you may not imply that Vxture endorses your product, service, content, or company.",
+      "sections": [
+        {
+          "heading": "1. Acceptable use",
+          "body": [
+            "You may truthfully state that your product or workflow uses, integrates with, or connects to Vxture, such as “Built with Vxture” or “Integrated with Vxture.”",
+            "Media, research, tutorials, and case studies may reference the Vxture name if the reference is accurate, clear, neutral, and not misleading."
+          ]
+        },
+        {
+          "heading": "2. Prohibited use",
+          "body": [
+            "You may not use Vxture, Vxture Studio, or confusingly similar terms as the primary name of your product, company, domain, social media account, or app-store listing.",
+            "You may not modify, stretch, redraw, obscure, combine, or create confusingly similar versions of the Vxture logo."
+          ]
+        },
+        {
+          "heading": "3. Screenshots and interfaces",
+          "body": [
+            "When showing product screenshots, avoid exposing real customer data, keys, personal information, unpublished model configurations, or internal management screens.",
+            "For marketing materials, press releases, or large events using screenshots, logos, or co-branding, contact partner@vxture.com in advance."
+          ]
+        },
+        {
+          "heading": "4. Third-party brands",
+          "body": [
+            "Vxture may integrate third-party models or services such as OpenAI, Doubao, Qwen, Claude, and Gemini. You may not imply that those third parties endorse your product or content.",
+            "When using third-party names, trademarks, or model identifiers, you must also follow the brand and usage policies of the relevant rights holders."
+          ]
+        }
+      ]
+    },
+    "cookies": {
+      "label": "Cookie Policy",
+      "title": "Vxture Cookie Policy",
+      "summary": "How we use necessary cookies, preference cookies, analytics cookies, third-party cookies, and user controls.",
+      "updatedAt": "2026-05-05",
+      "notice": "Disabling necessary cookies may prevent login, sessions, security checks, or language preferences from working properly.",
+      "sections": [
+        {
+          "heading": "1. Cookie categories",
+          "body": [
+            "Necessary cookies support login sessions, security protections, CSRF protections, language preferences, and service stability.",
+            "Preference cookies remember theme, language, region, and interface settings. Analytics cookies help us understand page visits and feature usage so we can improve the product."
+          ]
+        },
+        {
+          "heading": "2. Third-party cookies",
+          "body": [
+            "We may use cloud security, analytics, customer support, payment, or content delivery services, and those services may set their own cookies or similar identifiers.",
+            "If we enable advertising or remarketing cookies in the future, we will provide additional notice and consent controls where appropriate."
+          ]
+        },
+        {
+          "heading": "3. Controls",
+          "body": [
+            "You can delete or block cookies through your browser settings and may manage optional cookies through preference controls we provide.",
+            "If you disable cookies, some features may not be able to log you in, maintain a session, or remember preferences."
+          ]
+        },
+        {
+          "heading": "4. Retention",
+          "body": [
+            "Session cookies usually expire when the browser session ends or when you log out. Persistent cookies expire after a set period or when you manually delete them.",
+            "Security, audit, and compliance records may be retained in backend logs according to the Privacy Policy and legal requirements."
+          ]
+        }
+      ]
+    }
+  }
+}

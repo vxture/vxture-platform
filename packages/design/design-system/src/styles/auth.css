@@ -1,0 +1,16 @@
+/**
+ * auth.css - DS auth style pack entry.
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ */
+
+@import "./tokens.css";
+@import "./auth-page-shell.css";
+@import "./auth-header-locale.css";
+@import "./auth-visual-panel.css";
+@import "./auth-fields-controls.css";
+@import "./auth-actions-social.css";
+@import "./auth-tabs-footer-dark.css";
+@import "./auth-signup.css";
+@import "./auth-responsive-motion.css";

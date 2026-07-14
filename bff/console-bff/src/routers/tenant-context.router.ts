@@ -1,0 +1,39 @@
+import {
+  Controller,
+  Get,
+  Inject,
+  Req,
+  UnauthorizedException,
+} from "@nestjs/common";
+import type { Request } from "express";
+import { SessionAggregator } from "../aggregators/session.aggregator";
+import type { RequestContext } from "../types/console.types";
+
+@Controller("api/tenant-context")
+export class TenantContextRouter {
+  constructor(
+    @Inject(SessionAggregator)
+    private readonly sessionAggregator: SessionAggregator,
+  ) {}
+
+  @Get()
+  async getTenantContext(@Req() req: Request & RequestContext) {
+    if (!req.user) {
+      throw new UnauthorizedException("No active session");
+    }
+    if (!req.tenant) {
+      throw new UnauthorizedException("Tenant context is required");
+    }
+
+    return req.tenant;
+  }
+
+  @Get("options")
+  async getTenantOptions(@Req() req: Request & RequestContext) {
+    if (!req.user) {
+      throw new UnauthorizedException("No active session");
+    }
+
+    return this.sessionAggregator.getTenantContexts(req.user.id);
+  }
+}

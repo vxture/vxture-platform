@@ -1,0 +1,216 @@
+{
+  "title": "Best Practices",
+  "subtitle": "Real-world cases showing digital transformation results",
+  "tagline": "Best Practices, Industry Benchmarks",
+  "ui": {
+    "viewDetails": "View Details",
+    "prev": "Prev",
+    "next": "Next",
+    "filterBy": "Filter by",
+    "search": "Search cases...",
+    "noResults": "No matching cases found",
+    "clearFilters": "Clear Filters",
+    "overview": "Project Overview",
+    "highlights": "Key Highlights"
+  },
+  "filters": {
+    "all": "All"
+  },
+  "categories": {
+    "geo": "Geological Hazards",
+    "public": "Public Safety",
+    "emergency": "Emergency Management"
+  },
+  "items": {
+    "case-intro-01": {
+      "title": "Geological Disaster Management Platform",
+      "subtitle": "Knowledge Graph-based Geological Disaster Monitoring & Early Warning System",
+      "description": "This system integrates multi-source meteorological, geographical, and seismic data, building complex disaster correlation models through knowledge graph technology to achieve real-time monitoring, risk assessment, and intelligent early warning of natural disasters.",
+      "tags": ["Data Fusion", "Ontology Modeling", "Business Analytics"],
+      "cover": { "alt": "Geological Disaster Management Platform" },
+      "customer": "Provincial Department of Natural Resources"
+    },
+    "case-intro-02": {
+      "title": "Intelligent Emergency Command Platform",
+      "subtitle": "AI-based Emergency Command Decision Support System",
+      "description": "This system uses artificial intelligence technology to automate and intelligentize the emergency command process. By analyzing, predicting, and evaluating emergencies, it provides scientific decision support for commanders, including pre-plan management, resource scheduling, and visualization modules.",
+      "tags": [
+        "Emergency Management",
+        "Data Integration",
+        "Intelligent Decision"
+      ],
+      "cover": { "alt": "Intelligent Emergency Command Platform" },
+      "customer": "Provincial Emergency Department"
+    },
+    "case-intro-03": {
+      "title": "Public Safety Intelligence Analysis",
+      "subtitle": "Big Data-based Public Safety Risk Analysis Platform",
+      "description": "This platform integrates data from public security, transportation, fire protection, and other departments, building a public safety risk assessment model through big data analysis technology to monitor urban security situations in real time and provide early warning and disposal recommendations.",
+      "tags": ["Fusion Analysis", "Dynamic Assessment", "Event Response"],
+      "cover": { "alt": "Public Safety Intelligence Analysis" },
+      "customer": "Municipal Public Security Bureau"
+    },
+    "case-intro-04": {
+      "title": "Ecological Environment Monitoring System",
+      "subtitle": "IoT-based Ecological Environment Monitoring and Management Platform",
+      "description": "This system deploys IoT sensing devices to collect air, water, and soil environmental data in real time. Using big data analysis and AI technology, it achieves monitoring, early warning, and management of environmental quality, supporting data visualization, trend analysis, and anomaly detection.",
+      "tags": ["Environmental Protection", "IoT", "Data Analysis"],
+      "cover": { "alt": "Ecological Environment Monitoring System" },
+      "customer": "Provincial Ecology and Environment Department"
+    },
+    "case-intro-05": {
+      "title": "Transportation System Simulation Platform",
+      "subtitle": "Digital Twin-based Transportation System Simulation and Optimization",
+      "description": "This platform uses digital twin technology to build a virtual model of the urban transportation system. By simulating traffic flow, optimizing traffic signals, and predicting congestion, it achieves intelligent management of the transportation system.",
+      "tags": ["Traffic Management", "Digital Twin", "Simulation Optimization"],
+      "cover": { "alt": "Transportation System Simulation Platform" },
+      "customer": "Municipal Transportation Bureau"
+    },
+    "case-intro-06": {
+      "title": "Smart Healthcare Solution",
+      "subtitle": "AI-based Smart Healthcare Service Platform",
+      "description": "This platform integrates hospital information systems, electronic medical records, and medical device data resources. Through AI technology, it achieves intelligent diagnosis, health management, and telemedicine, improving medical service efficiency and reducing costs.",
+      "tags": [
+        "Smart Healthcare",
+        "Artificial Intelligence",
+        "Health Management"
+      ],
+      "cover": { "alt": "Smart Healthcare Solution" },
+      "customer": "Municipal Health Commission"
+    }
+  },
+  "page": {
+    "hero": {
+      "eyebrow": "Best Practices",
+      "title": "Best Practices",
+      "description": "Present repeatable delivery patterns from real industry scenarios across business needs, technical architecture, and customer feedback. Every practice is built on LLMs, agents, intelligent data, and digital twins to move complex operations from visualization to closed-loop intelligence.",
+      "imageAlt": "Public safety intelligence analysis platform",
+      "primaryAction": "Open Console",
+      "secondaryAction": "View Practices",
+      "panelTitle": "Practice Assets",
+      "highlights": [
+        "Business Needs",
+        "Technical Architecture",
+        "Customer Feedback",
+        "Repeatable Delivery"
+      ],
+      "metrics": [
+        { "value": "4", "label": "Core intelligent technologies" },
+        { "value": "3", "label": "Representative industry practices" },
+        { "value": "Loop", "label": "Value validation from need to feedback" }
+      ]
+    },
+    "capabilities": {
+      "eyebrow": "Technology Foundation",
+      "title": "Unified technology foundation",
+      "description": "These practices go beyond single-point systems. Intelligent data governance, LLM reasoning, multi-agent collaboration, and digital twin simulation turn industry experience into reusable capabilities.",
+      "items": [
+        {
+          "icon": "sparkles",
+          "title": "LLMs",
+          "description": "Enable natural-language retrieval, event summaries, plan generation, report drafting, and assisted assessment for business users."
+        },
+        {
+          "icon": "agent",
+          "title": "Agents",
+          "description": "Break monitoring, assessment, dispatch, notification, review, and post-event analysis into cooperating task agents."
+        },
+        {
+          "icon": "database",
+          "title": "Intelligent Data",
+          "description": "Integrate heterogeneous data, build ontologies, connect knowledge, govern quality, and serve trusted indicators."
+        },
+        {
+          "icon": "cube",
+          "title": "Digital Twins",
+          "description": "Map objects, spaces, devices, events, and resources into interactive scenes for awareness, simulation, and forward-looking decisions."
+        }
+      ]
+    },
+    "dimensions": {
+      "eyebrow": "Description Framework",
+      "title": "Describe each practice in three dimensions",
+      "description": "Each case is organized around business pull, technical delivery, and customer validation, making it easy to enrich with real project material later.",
+      "items": [
+        {
+          "icon": "building-library",
+          "title": "Business Needs",
+          "description": "Clarify the management pain points, collaboration challenges, response pressure, and value targets."
+        },
+        {
+          "icon": "workflow",
+          "title": "Technical Architecture",
+          "description": "Explain how LLMs, agents, intelligent data, and digital twins combine into a deployable system."
+        },
+        {
+          "icon": "chat-circle",
+          "title": "Customer Feedback",
+          "description": "Summarize efficiency gains, better decisions, and organizational changes from the customer viewpoint."
+        }
+      ]
+    },
+    "practices": {
+      "eyebrow": "Representative Cases",
+      "title": "Representative best practices",
+      "description": "Start with three practice templates aligned with the existing case summaries and the intelligent technology stack, then expand them into detail pages later.",
+      "demandLabel": "Business Needs",
+      "architectureLabel": "Technical Architecture",
+      "evaluationLabel": "Customer Feedback",
+      "items": [
+        {
+          "image": "/images/casessection/case-intro-02.jpg",
+          "imageAlt": "Emergency command and dispatch platform",
+          "customer": "Provincial Emergency Department",
+          "title": "Emergency Command and Dispatch Platform",
+          "subtitle": "Integrated command practice from incident assessment to resource dispatch",
+          "demand": "The customer needed to quickly consolidate cross-agency information after incidents, unify situation, plans, teams, supplies, and field feedback, and reduce delays caused by manual relay.",
+          "architecture": "An intelligent data base connects emergency, weather, traffic, video, and IoT data. A digital twin presents the live situation. The LLM handles summaries, risk assessment, and plan matching. Dispatch agents track teams, supplies, notices, and acknowledgements.",
+          "evaluation": "The customer noted that information once scattered across departments is now compressed into one situation map and one task chain, helping commanders judge faster and track whether actions are actually executed.",
+          "technologies": [
+            "LLM Assessment",
+            "Dispatch Agents",
+            "Intelligent Data Fusion",
+            "Digital Twin Situation"
+          ]
+        },
+        {
+          "image": "/images/casessection/case-intro-03.jpg",
+          "imageAlt": "Public safety intelligence analysis",
+          "customer": "Municipal Public Security Bureau",
+          "title": "Public Safety Intelligence Analysis",
+          "subtitle": "Urban risk discovery driven by multi-agency data fusion",
+          "demand": "The customer needed to fuse public security, traffic, fire, and public service data to continuously identify urban safety risks and support key-area control, large-event protection, and incident response.",
+          "architecture": "The intelligent data platform builds a relationship graph across people, vehicles, places, events, and risk sources. The LLM turns unstructured intelligence into searchable clues. Analysis agents generate risk briefs. The digital twin map shows spatial distribution and impact range.",
+          "evaluation": "The customer valued that cross-agency intelligence no longer depends only on manual comparison. The system actively highlights risk clues and turns complex relationships into command-level conclusions.",
+          "technologies": [
+            "LLM Intelligence Summary",
+            "Risk Analysis Agents",
+            "Intelligent Data Graph",
+            "Urban Digital Twin"
+          ]
+        },
+        {
+          "image": "/images/casessection/case-intro-01.jpg",
+          "imageAlt": "Geological disaster management platform",
+          "customer": "Provincial Department of Natural Resources",
+          "title": "Geological Disaster Management Platform",
+          "subtitle": "Intelligent management practice for disaster monitoring and early warning",
+          "demand": "The customer needed to integrate weather, geography, seismic, hazard-site, and patrol data for continuous monitoring, graded warning, and assisted response, improving disaster prevention and mitigation.",
+          "architecture": "Intelligent data governance unifies multi-source disaster data and builds risk indicators. The LLM explains warning causes and response suggestions. Patrol agents track hazard-site tasks. The digital twin supports terrain, risk-site, and impact simulation.",
+          "evaluation": "The customer said risk identification is shifting from experience-only judgment to data-and-model-driven decisions. Field staff can understand warning evidence, while management can better prioritize patrol and remediation work.",
+          "technologies": [
+            "Disaster LLM",
+            "Patrol Agents",
+            "Intelligent Data Governance",
+            "Risk Twin Simulation"
+          ]
+        }
+      ]
+    },
+    "cta": {
+      "title": "Turn best practices into industry templates",
+      "description": "Each practice can later become a detail page with project background, delivery process, system screenshots, key metrics, and customer voice, forming complete case assets for external presentation.",
+      "action": "Open Console"
+    }
+  }
+}

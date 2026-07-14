@@ -1,0 +1,27 @@
+{
+  "name": "@vxture/service-billing",
+  "version": "0.1.0",
+  "private": true,
+  "description": "计费管理服务 - 账单生成、支付处理、发票管理",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0",
+    "@vxture/shared": "workspace:*",
+    "@vxture/core-api": "workspace:*",
+    "@vxture/core-utils": "workspace:*",
+    "class-validator": "^0.14.0",
+    "pg": "^8.13.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.11",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

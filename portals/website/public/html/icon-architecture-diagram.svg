@@ -1,0 +1,139 @@
+<svg viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+
+  <!-- Background -->
+  <rect width="720" height="520" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="360" y="32" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2328">Icon System Architecture</text>
+  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#636c76">@vxture/design-system</text>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- Layer 1: Business -->
+  <!-- ═══════════════════════════════════════ -->
+  <rect x="30" y="62" width="660" height="80" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="50" y="80" font-size="9" font-weight="700" fill="#16a34a" letter-spacing="1">BUSINESS LAYER</text>
+  <text x="50" y="97" font-size="12" font-weight="600" fill="#1f2328">website / app（任意业务包）</text>
+  <text x="50" y="114" font-size="11" fill="#424950">只写：</text>
+  <rect x="104" y="102" width="260" height="22" rx="5" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="234" y="117" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d" font-family="monospace">&lt;Icon name="agent" size="lg" weight="duotone" /&gt;</text>
+  <text x="50" y="134" font-size="10" fill="#636c76">import { Icon } from '@vxture/design-system'   ← 唯一入口，不直接碰 Phosphor</text>
+
+  <!-- Arrow 1 -->
+  <line x1="360" y1="142" x2="360" y2="164" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="355,164 365,164 360,171" fill="#d0d7de"/>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- Layer 2: design-system — outer box -->
+  <!-- ═══════════════════════════════════════ -->
+  <rect x="30" y="172" width="660" height="220" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="50" y="190" font-size="9" font-weight="700" fill="#2563eb" letter-spacing="1">DESIGN-SYSTEM LAYER　　packages/design-system/src/icons/</text>
+
+  <!-- File: index.ts -->
+  <rect x="50" y="198" width="115" height="52" rx="7" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="107.5" y="216" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">index.ts</text>
+  <text x="107.5" y="230" text-anchor="middle" font-size="9" fill="#636c76">统一导出入口</text>
+  <text x="107.5" y="242" text-anchor="middle" font-size="9" fill="#636c76">控制对外 API 面</text>
+
+  <!-- File: icon-dictionary.ts -->
+  <rect x="175" y="198" width="125" height="52" rx="7" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="237.5" y="216" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">icon-dictionary.ts</text>
+  <text x="237.5" y="230" text-anchor="middle" font-size="9" fill="#636c76">IconName 来源</text>
+  <text x="237.5" y="242" text-anchor="middle" font-size="9" fill="#636c76">语义化名称数组</text>
+
+  <!-- File: types.ts -->
+  <rect x="310" y="198" width="115" height="52" rx="7" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="367.5" y="216" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">types.ts</text>
+  <text x="367.5" y="230" text-anchor="middle" font-size="9" fill="#636c76">IconProps / IconSize</text>
+  <text x="367.5" y="242" text-anchor="middle" font-size="9" fill="#636c76">仅类型定义</text>
+
+  <!-- File: Icon.tsx — highlighted -->
+  <rect x="435" y="195" width="135" height="58" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="502.5" y="214" text-anchor="middle" font-size="12" font-weight="700" fill="#1d4ed8">Icon.tsx</text>
+  <text x="502.5" y="228" text-anchor="middle" font-size="9" fill="#1e40af">⭐ 对外唯一渲染组件</text>
+  <text x="502.5" y="242" text-anchor="middle" font-size="9" fill="#1e40af">表达式 fallback 降级</text>
+  <text x="502.5" y="252" text-anchor="middle" font-size="9" fill="#1e40af">无运行时校验</text>
+
+  <!-- File: icon-registry.ts — highlighted -->
+  <rect x="580" y="195" width="100" height="58" rx="7" fill="#fef9c3" stroke="#eab308" stroke-width="2"/>
+  <text x="630" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#854d0e">icon-registry.ts</text>
+  <text x="630" y="228" text-anchor="middle" font-size="9" fill="#854d0e">⭐ 唯一 import Phosphor</text>
+  <text x="630" y="242" text-anchor="middle" font-size="9" fill="#854d0e">'agent' → Robot</text>
+  <text x="630" y="252" text-anchor="middle" font-size="9" fill="#854d0e">satisfies 约束</text>
+
+  <!-- Internal arrows between files -->
+  <!-- index → Icon -->
+  <line x1="165" y1="224" x2="435" y2="224" stroke="#93c5fd" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="431,220 439,224 431,228" fill="#93c5fd"/>
+  <!-- index → icon-dictionary -->
+  <line x1="165" y1="218" x2="175" y2="218" stroke="#93c5fd" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="171,214 179,218 171,222" fill="#93c5fd"/>
+  <!-- index → types -->
+  <line x1="165" y1="230" x2="310" y2="230" stroke="#93c5fd" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="306,226 314,230 306,234" fill="#93c5fd"/>
+  <!-- Icon → icon-registry -->
+  <line x1="570" y1="224" x2="580" y2="224" stroke="#3b82f6" stroke-width="1.5"/>
+  <polygon points="576,220 584,224 576,228" fill="#3b82f6"/>
+  <!-- Icon → icon.dictionary (下方弯线) -->
+  <path d="M502.5,253 Q502.5,275 237.5,275 Q175,275 175,250" fill="none" stroke="#93c5fd" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="171,246 175,254 179,246" fill="#93c5fd"/>
+  <!-- icon-registry → icon.dictionary -->
+  <line x1="590" y1="195" x2="290" y2="195" stroke="#eab308" stroke-width="1" stroke-dasharray="3,3"/>
+  <polygon points="294,191 286,195 294,199" fill="#eab308"/>
+
+  <!-- Fallback box -->
+  <rect x="50" y="262" width="600" height="92" rx="7" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="278" font-size="9" font-weight="700" fill="#636c76" letter-spacing="1">FALLBACK 机制（Icon.tsx 内部）</text>
+  <!-- Step 1 -->
+  <rect x="68" y="285" width="120" height="28" rx="5" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="128" y="296" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">① 编译时</text>
+  <text x="128" y="308" text-anchor="middle" font-size="9" fill="#15803d">TS 类型报错拦截</text>
+  <!-- Arrow -->
+  <line x1="188" y1="299" x2="203" y2="299" stroke="#d0d7de" stroke-width="1"/>
+  <polygon points="200,295 207,299 200,303" fill="#d0d7de"/>
+  <!-- Step 2 -->
+  <rect x="205" y="285" width="140" height="28" rx="5" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
+  <text x="275" y="296" text-anchor="middle" font-size="9" font-weight="600" fill="#854d0e">② 运行时（动态）</text>
+  <text x="275" y="308" text-anchor="middle" font-size="9" fill="#854d0e">直接表达式查找</text>
+  <!-- Arrow -->
+  <line x1="345" y1="299" x2="360" y2="299" stroke="#d0d7de" stroke-width="1"/>
+  <polygon points="357,295 364,299 357,303" fill="#d0d7de"/>
+  <!-- Step 3 -->
+  <rect x="362" y="285" width="120" height="28" rx="5" fill="#fff7ed" stroke="#fdba74" stroke-width="1"/>
+  <text x="422" y="296" text-anchor="middle" font-size="9" font-weight="600" fill="#c2410c">③ fallback prop</text>
+  <text x="422" y="308" text-anchor="middle" font-size="9" fill="#c2410c">降级到指定图标</text>
+  <!-- Arrow -->
+  <line x1="482" y1="299" x2="497" y2="299" stroke="#d0d7de" stroke-width="1"/>
+  <polygon points="494,295 501,299 494,303" fill="#d0d7de"/>
+  <!-- Step 4 -->
+  <rect x="499" y="285" width="101" height="28" rx="5" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="549.5" y="296" text-anchor="middle" font-size="9" font-weight="600" fill="#dc2626">④ 兜底</text>
+  <text x="549.5" y="308" text-anchor="middle" font-size="9" fill="#dc2626">Placeholder 永不抛异常</text>
+
+  <!-- Arrow 2: DS → Phosphor -->
+  <line x1="360" y1="354" x2="360" y2="376" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="355,376 365,376 360,383" fill="#d0d7de"/>
+  <text x="395" y="369" font-size="10" fill="#636c76">仅 icon-registry.ts 引用</text>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- Layer 3: Phosphor -->
+  <!-- ═══════════════════════════════════════ -->
+  <rect x="30" y="386" width="660" height="64" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="50" y="404" font-size="9" font-weight="700" fill="#c2410c" letter-spacing="1">EXTERNAL LIBRARY</text>
+  <text x="50" y="420" font-size="12" font-weight="600" fill="#1f2328">@phosphor-icons/react</text>
+  <text x="50" y="436" font-size="11" fill="#636c76">1400+ SVG 图标组件，6种粗细。业务层完全不感知此库。</text>
+
+  <!-- Legend -->
+  <rect x="30" y="460" width="11" height="11" rx="2" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="47" y="470" font-size="10" fill="#636c76">核心文件</text>
+  <rect x="115" y="460" width="11" height="11" rx="2" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/>
+  <text x="132" y="470" font-size="10" fill="#636c76">唯一接触外部库的文件</text>
+  <rect x="285" y="460" width="11" height="11" rx="2" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="302" y="470" font-size="10" fill="#636c76">内部文件</text>
+  <line x1="420" y1="466" x2="438" y2="466" stroke="#3b82f6" stroke-width="1.5"/>
+  <polygon points="435,462 443,466 435,470" fill="#3b82f6"/>
+  <text x="448" y="470" font-size="10" fill="#636c76">内部调用</text>
+  <line x1="520" y1="466" x2="538" y2="466" stroke="#d0d7de" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="535,462 543,466 535,470" fill="#d0d7de"/>
+  <text x="548" y="470" font-size="10" fill="#636c76">类型引用</text>
+
+</svg>

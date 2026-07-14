@@ -1,0 +1,69 @@
+.vx-tenant-tabs {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--vx-admin-management-space-05r);
+  flex: 1 1 auto;
+  overflow-x: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  scrollbar-width: none;
+}
+
+.vx-tenant-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.vx-tenant-tab-panel {
+  min-width: 0;
+  padding-top: 0;
+}
+
+.vx-tenant-tab-grid {
+  display: grid;
+  gap: var(--vx-admin-management-space-15r);
+}
+
+.vx-tenant-tab-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vx-tenant-tab-grid--info {
+  grid-template-columns: 1fr;
+}
+
+.vx-tenant-tabs button {
+  position: relative;
+  min-height: var(--vx-admin-management-size-275r);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vx-admin-management-space-05r);
+  padding: 0 var(--vx-admin-management-space-0375r);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--tenant-muted);
+  cursor: pointer;
+  font-size: var(--vx-admin-meta-size);
+  font-weight: 780;
+  white-space: nowrap;
+}
+
+.vx-tenant-tabs button.is-active {
+  background: transparent;
+  color: var(--tenant-blue);
+}
+
+.vx-tenant-tabs button.is-active::after {
+  position: absolute;
+  right: var(--vx-admin-management-space-025r);
+  bottom: 0;
+  left: var(--vx-admin-management-space-025r);
+  height: var(--vx-admin-management-size-2p);
+  border-radius: var(--vx-radius-full);
+  background: var(--tenant-blue);
+  content: "";
+}

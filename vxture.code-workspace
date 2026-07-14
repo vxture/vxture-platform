@@ -1,0 +1,179 @@
+{
+  "folders": [
+    {
+      "name": "vxture-root",
+      "path": ".",
+    },
+
+    // ── Frontends · 门户 ───────────────────────────────────────────────
+    {
+      "name": "portals/website",
+      "path": "portals/website",
+    },
+    {
+      "name": "portals/console",
+      "path": "portals/console",
+    },
+    {
+      "name": "portals/admin",
+      "path": "portals/admin",
+    },
+    {
+      "name": "portals/accounts",
+      "path": "portals/accounts",
+    },
+
+    // ── Identity 域 · 库 + IdP 边缘应用 ────────────────────────────────
+    {
+      "name": "services/identity/account",
+      "path": "services/identity/account",
+    },
+    {
+      "name": "services/identity/iam",
+      "path": "services/identity/iam",
+    },
+    {
+      "name": "services/identity/organization",
+      "path": "services/identity/organization",
+    },
+    {
+      "name": "bff/auth-bff (identity IdP)",
+      "path": "bff/auth-bff",
+    },
+
+    // ── BFF · 边缘应用 ─────────────────────────────────────────────────
+    {
+      "name": "bff/gateway-bff",
+      "path": "bff/gateway-bff",
+    },
+    {
+      "name": "bff/website-bff",
+      "path": "bff/website-bff",
+    },
+    {
+      "name": "bff/console-bff",
+      "path": "bff/console-bff",
+    },
+    {
+      "name": "bff/admin-bff",
+      "path": "bff/admin-bff",
+    },
+    {
+      "name": "bff/varda-bff",
+      "path": "bff/varda-bff",
+    },
+    {
+      "name": "bff/agent-template-bff",
+      "path": "bff/agent-template-bff",
+    },
+
+    // ── Commerce 域 ────────────────────────────────────────────────────
+    {
+      "name": "services/commerce/billing",
+      "path": "services/commerce/billing",
+    },
+    {
+      "name": "services/commerce/subscription",
+      "path": "services/commerce/subscription",
+    },
+    {
+      "name": "services/commerce/provisioning",
+      "path": "services/commerce/provisioning",
+    },
+
+    // ── Model 域 ───────────────────────────────────────────────────────
+    {
+      "name": "services/model/platform",
+      "path": "services/model/platform",
+    },
+
+    // ── Notification 域 ────────────────────────────────────────────────
+    {
+      "name": "services/notification/mail",
+      "path": "services/notification/mail",
+    },
+    {
+      "name": "services/notification/sms",
+      "path": "services/notification/sms",
+    },
+
+    // ── Support 域 ─────────────────────────────────────────────────────
+    {
+      "name": "services/support/ticket",
+      "path": "services/support/ticket",
+    },
+    {
+      "name": "services/support/workers",
+      "path": "services/support/workers",
+    },
+
+    // ── Agents ─────────────────────────────────────────────────────────
+    {
+      "name": "agent-studio",
+      "path": "agent-studio",
+    },
+    {
+      "name": "agent-server",
+      "path": "agent-server",
+    },
+
+    // ── 共享包 ─────────────────────────────────────────────────────────
+    {
+      "name": "packages/core",
+      "path": "packages/core",
+    },
+    {
+      "name": "packages/platform",
+      "path": "packages/platform",
+    },
+    {
+      "name": "packages/shared",
+      "path": "packages/shared/shared",
+    },
+    {
+      "name": "packages/ai/model-runtime-client",
+      "path": "packages/ai/model-runtime-client",
+    },
+    {
+      "name": "packages/design-system",
+      "path": "packages/design/design-system",
+    },
+
+    // ── 工具 ───────────────────────────────────────────────────────────
+    {
+      "name": "tools/dev-panel",
+      "path": "tools/dev-panel",
+    },
+  ],
+  "settings": {
+    "#js/ts.locale": "zh-CN",
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact",
+      "typescript": "typescriptreact",
+    },
+    "terminal.integrated.fontFamily": "monospace",
+    "terminal.integrated.fontSize": 14,
+    "json.validate.enable": true,
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/.next": true,
+      "**/.venv": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+    },
+    "files.exclude": {
+      "**/.next": true,
+      "**/.venv": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+    },
+    "search.useGlobalIgnoreFiles": true,
+    "claudeCode.autosave": true,
+    "claudeCode.respectGitIgnore": true,
+    "claudeCode.usePythonEnvironment": true,
+    "cSpell.words": ["ASVS", "bytea", "cfaccess", "Dypnsapi", "otpauth", "PNVS", "TOTP", "uidx"],
+  },
+  "extensions": {
+    "recommendations": [],
+  },
+}

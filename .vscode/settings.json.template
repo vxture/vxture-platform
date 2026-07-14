@@ -1,0 +1,7 @@
+{
+  // 个人/平台特定的设置示例（请复制为 .vscode/settings.json 并按需修改）
+  "terminal.integrated.env.windows": {
+    "CHCP": "65001"
+  },
+  "python.pythonPath": "${workspaceFolder}/.venv/Scripts/python.exe"
+}

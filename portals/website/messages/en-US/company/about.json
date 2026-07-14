@@ -1,0 +1,104 @@
+{
+  "hero": {
+    "eyebrow": "About Vxture",
+    "title": "About Us",
+    "description": "We focus on building industry LLMs and business agents. Around each customer's real workflows, data conditions, and collaboration patterns, we provide close consulting, design, development, and delivery services to co-create business agents that solve concrete operational pain points.",
+    "imageAlt": "Light blue technology collaboration background",
+    "primaryAction": "Open Console",
+    "secondaryAction": "View Positioning",
+    "panelTitle": "Current Positioning",
+    "panelDescription": "Vxture is not only a tool provider or a generic model provider. We combine industry knowledge, intelligent data, model engineering, and agent orchestration to help organizations bring AI into specific roles, workflows, and scenarios.",
+    "highlights": [
+      "Industry LLMs",
+      "Business Agents",
+      "Close Service",
+      "Customer Co-creation"
+    ]
+  },
+  "positioning": {
+    "eyebrow": "Positioning",
+    "title": "We focus on problems that happen in real business operations",
+    "description": "Many AI projects struggle to land not because models are weak, but because they do not enter the details of business workflows, data definitions, and organizational collaboration. We start from concrete scenarios and turn capabilities into reusable business agents that can keep improving.",
+    "items": [
+      {
+        "icon": "building-library",
+        "title": "Go deep into industry scenarios",
+        "description": "We first understand goals, roles, process bottlenecks, and risk constraints, then identify where models and agents can assist."
+      },
+      {
+        "icon": "agent",
+        "title": "Build super business agents",
+        "description": "Each agent is designed around a clear business responsibility so it can read data, call tools, collaborate with people, and produce results in the workflow."
+      },
+      {
+        "icon": "users",
+        "title": "Co-create with customer teams",
+        "description": "We work with customer teams to clarify requirements, validate prototypes, connect systems, train knowledge, and improve continuously from usage feedback."
+      }
+    ]
+  },
+  "method": {
+    "eyebrow": "How We Work",
+    "title": "A practical path from scenario to agent",
+    "description": "We prefer starting with one clear pain point, building a small verifiable loop first, then expanding to more roles and processes.",
+    "steps": [
+      {
+        "title": "Identify business pain points",
+        "description": "Map high-frequency tasks, collaboration gaps, information search cost, and decision pressure to define the agent's responsibility boundary."
+      },
+      {
+        "title": "Prepare data and knowledge",
+        "description": "Connect business systems, documents, metrics, knowledge bases, and historical cases to create traceable intelligent data context."
+      },
+      {
+        "title": "Design the model and tool chain",
+        "description": "Combine LLMs, retrieval, rules, workflows, and business tools so the agent can complete tasks, not only answer questions."
+      },
+      {
+        "title": "Iterate into production",
+        "description": "Through pilots, evaluation, feedback, and operation, we embed agents into real workflows rather than keeping them in demo environments."
+      }
+    ]
+  },
+  "capabilities": {
+    "eyebrow": "Core Capabilities",
+    "title": "What we provide",
+    "description": "Our capabilities focus on industry LLMs and agent delivery, covering both technical implementation and business usability.",
+    "items": [
+      {
+        "icon": "sparkles",
+        "title": "Industry LLM applications",
+        "description": "Build professional Q&A, assessment, generation, and explanation capabilities using domain corpus, knowledge bases, and business rules."
+      },
+      {
+        "icon": "workflow",
+        "title": "Agent orchestration",
+        "description": "Design task breakdown, tool calling, access control, human confirmation, and result tracking so agents can enter real workflows."
+      },
+      {
+        "icon": "database",
+        "title": "Intelligent data foundation",
+        "description": "Organize data assets, knowledge structures, metric definitions, and quality rules to provide trusted context for models and agents."
+      },
+      {
+        "icon": "cube",
+        "title": "Digital twin and simulation",
+        "description": "For scenarios involving space, equipment, resources, and event simulation, combine digital twins with clearer situation and decision support."
+      }
+    ]
+  },
+  "principles": {
+    "eyebrow": "Principles",
+    "title": "Our basic principles",
+    "items": [
+      "Avoid over-promising. Validate real value first, then expand scope.",
+      "Stay close to customer systems and bring agents into existing workflows where possible.",
+      "Deliver more than pages: data, knowledge, permissions, and operations matter."
+    ]
+  },
+  "cta": {
+    "title": "Start co-creation from one business pain point",
+    "description": "Choose one scenario such as contract review, business analysis, emergency command, data governance, or an industry-specific workflow, then build the first usable, measurable, and iterative business agent.",
+    "action": "Open Console"
+  }
+}

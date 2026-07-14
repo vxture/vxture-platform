@@ -1,0 +1,56 @@
+# syntax=docker/dockerfile:1
+# Dockerfile.nestjs — NestJS BFF 通用 Dockerfile（esbuild 单文件，无 Prisma）
+# 构建参数：
+#   SERVICE_PATH    服务相对路径，如 bff/auth-bff
+#   PACKAGE_FILTER  pnpm 包名，如 @vxture/bff-auth
+#
+# 用法（从 repo 根目录执行）：
+#   docker build -f deploy/docker/Dockerfile.nestjs \
+#     --build-arg SERVICE_PATH=bff/auth-bff \
+#     --build-arg PACKAGE_FILTER=@vxture/bff-auth \
+#     -t ghcr.io/vxture/bff-auth:latest .
+
+ARG NODE_VERSION=24
+
+# ── 构建层 ────────────────────────────────────────────────────────────────────
+FROM node:${NODE_VERSION}-alpine AS builder
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
+
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json ./
+COPY packages/ packages/
+COPY services/ services/
+COPY bff/ bff/
+COPY agent-server/ agent-server/
+COPY portals/ portals/
+COPY agent-studio/ agent-studio/
+COPY business/ business/
+# tools/dev-panel is excluded from build context (dev-only) but pnpm needs it as workspace stub
+RUN mkdir -p tools/dev-panel && echo '{"name":"@vxture/dev-panel","version":"0.0.0"}' > tools/dev-panel/package.json
+
+# B7: pnpm store 走 BuildKit cache mount —— 源码改动触发 install 重跑时依赖从持久
+# store 取（downloaded 0）。esbuild 单文件打包无标准编译缓存目录，故仅缓存依赖层。
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --store-dir /pnpm/store
+
+ARG PACKAGE_FILTER
+# 各 BFF 的 build 脚本内部会先调用 pnpm -w build:backend-deps，无需额外步骤
+RUN pnpm --filter ${PACKAGE_FILTER} build
+
+# ── 运行层（单文件，无 node_modules）────────────────────────────────────────
+FROM node:${NODE_VERSION}-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN apk add --no-cache curl \
+  && addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nodeapp
+
+ARG SERVICE_PATH
+COPY --from=builder --chown=nodeapp:nodejs /repo/${SERVICE_PATH}/dist/main.cjs ./
+
+USER nodeapp
+
+CMD ["node", "main.cjs"]

@@ -1,0 +1,71 @@
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from "@nestjs/common";
+import { VxConfigModule } from "@vxture/core-config";
+import { MailModule } from "@vxture/core-mail";
+import { AccountModule } from "@vxture/service-account";
+import { IamModule } from "@vxture/service-iam";
+import { OrganizationModule } from "@vxture/service-organization";
+import { BillingModule } from "@vxture/service-billing";
+import { SubscriptionModule } from "@vxture/service-subscription";
+import { SmsModule } from "@vxture/service-sms";
+import { OidcRpModule } from "./oidc/oidc-rp.module";
+import { ConsoleAuthService } from "./auth/auth.service";
+import { SessionAggregator } from "./aggregators/session.aggregator";
+import { PhoneChangeService } from "./services/phone-change.service";
+import { EmailChangeService } from "./services/email-change.service";
+import { AuthMiddleware } from "./middleware/auth.middleware";
+import { PermissionMiddleware } from "./middleware/permission.middleware";
+import { TenantMiddleware } from "./middleware/tenant.middleware";
+import { ApplicationsRouter } from "./routers/applications.router";
+import { ModelPlatformRouter } from "./routers/model-platform.router";
+import { BillingRouter } from "./routers/billing.router";
+import { CapabilitiesRouter } from "./routers/capabilities.router";
+import { HealthRouter } from "./routers/health.router";
+import { IamRouter } from "./routers/iam.router";
+import { MeRouter } from "./routers/me.router";
+import { SubscriptionRouter } from "./routers/subscription.router";
+import { TenantContextRouter } from "./routers/tenant-context.router";
+
+@Module({
+  imports: [
+    VxConfigModule.register({
+      domains: ["app", "auth", "database", "redis", "platform"],
+    }),
+    MailModule,
+    AccountModule,
+    IamModule,
+    OrganizationModule,
+    BillingModule,
+    SubscriptionModule,
+    SmsModule,
+    OidcRpModule,
+  ],
+  controllers: [
+    ApplicationsRouter,
+    HealthRouter,
+    MeRouter,
+    CapabilitiesRouter,
+    TenantContextRouter,
+    IamRouter,
+    SubscriptionRouter,
+    BillingRouter,
+    ModelPlatformRouter,
+  ],
+  providers: [
+    ConsoleAuthService,
+    SessionAggregator,
+    PhoneChangeService,
+    EmailChangeService,
+  ],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware, TenantMiddleware, PermissionMiddleware)
+      .forRoutes({ path: "api/*path", method: RequestMethod.ALL });
+  }
+}

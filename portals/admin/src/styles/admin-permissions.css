@@ -1,0 +1,6 @@
+/* Admin permissions style entry. Keep concrete rules in admin-permissions-* modules. */
+
+@import "./admin-permissions-core.css";
+@import "./admin-permissions-tree.css";
+@import "./admin-permissions-tree-node.css";
+@import "./admin-permissions-dialog.css";

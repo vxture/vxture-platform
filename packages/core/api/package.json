@@ -1,0 +1,47 @@
+{
+  "name": "@vxture/core-api",
+  "version": "1.2.2",
+  "description": "Vxture platform — unified HTTP client infrastructure",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsup",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vxture/shared": "workspace:*",
+    "form-data": "^4.0.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/axios": "^4.0.0",
+    "axios": "^1.7.0"
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/axios": "^4.0.0",
+    "@types/node": "^24.0.0",
+    "@swc/core": "^1.10.0",
+    "axios": "^1.7.0",
+    "reflect-metadata": "^0.2.0",
+    "rimraf": "^6.0.1",
+    "rxjs": "^7.8.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

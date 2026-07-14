@@ -1,0 +1,8 @@
+/* Console style entry (import-only wrapper).
+ * console-base: console-portal base + loading styles (relocated out of the DS).
+ * shell-template: shared shell visual system, single source of truth in the
+ * design system, consumed identically by console and admin. console-base loads
+ * first so the shared shell app.css body chrome still wins. See
+ * @vxture/design-system/styles/shell-template.css. */
+@import "./console-base.css";
+@import "@vxture/design-system/styles/shell-template.css";

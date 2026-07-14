@@ -1,0 +1,83 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 30_appoidc.sql — schema appoidc（Vxture 作 IdP，向业务/应用/域名 outbound 发身份）
+-- 设计权威：docs/design/data_identity_200_schema.md §7
+-- 域内 FK 内联（oidc_consents.client_id → oidc_clients.client_id，同 schema）；
+-- 跨 schema FK（oidc_consents.user_id→account.users / oidc_clients.product_id→product.products）
+-- 一律见 90_cross_schema_fk.sql（铁律一，裸列 + 注释，本文件不内联）。
+-- 表序 = 域内依赖序：oidc_clients → signing_keys → oidc_consents。
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- OIDC 出站客户端注册（应用 → 平台）。身份接入方 = oidc_client，≠ product.application ≠ agent。
+-- client_id 是 OIDC 协议客户端标识（域内关联键，见 oidc_consents），非 *_no/*_code 可视码。
+-- product_id 跨 schema→product.products（真 FK，NULL=平台级客户端；见 90）。
+-- realm 客户/员工绝对隔离（铁律七）；back_channel_logout_uri 在 back_channel 参与时必填。
+CREATE TABLE appoidc.oidc_clients (
+    id                        uuid         PRIMARY KEY DEFAULT gen_random_uuid(),
+    client_id                 varchar(64)  NOT NULL,                     -- OIDC 协议客户端标识，域内关联键
+    client_secret_hash        varchar(255),                             -- 机密客户端；public client 可空
+    realm                     varchar(16)  NOT NULL DEFAULT 'customer',
+    product_id                uuid,                                     -- 跨 schema→product.products（90），NULL=平台级
+    release_channel           varchar(16)  NOT NULL DEFAULT 'stable',
+    name                      varchar(96),
+    display_name              varchar(128),                             -- 授权页展示名（补齐，铁律四）
+    logo_url                  varchar(512),                             -- 授权页展示 logo（补齐，铁律四）
+    redirect_uris             text[]       NOT NULL,
+    post_logout_redirect_uris text[]       NOT NULL DEFAULT '{}',       -- 登出回跳白名单（补齐，铁律四）
+    allowed_scopes            text[]       NOT NULL DEFAULT '{}',       -- 允许申请的 scope 白名单（补齐，铁律四）
+    access_token_ttl          int          NOT NULL DEFAULT 900,        -- access_token 有效期(秒)（补齐，铁律四）
+    refresh_token_ttl         int          NOT NULL DEFAULT 2592000,    -- refresh_token 有效期(秒)（补齐，铁律四）
+    pkce_required             boolean      NOT NULL DEFAULT true,
+    slo_participation         varchar(32)  NOT NULL DEFAULT 'none',     -- none/back_channel/front_channel
+    back_channel_logout_uri   varchar(512),
+    status                    varchar(32)  NOT NULL DEFAULT 'active',
+    created_at                timestamptz  NOT NULL DEFAULT now(),
+    updated_at                timestamptz  NOT NULL DEFAULT now(),
+    CONSTRAINT uq_oidc_clients_client_id       UNIQUE (client_id),
+    CONSTRAINT chk_oidc_clients_realm          CHECK (realm IN ('customer','workforce')),
+    CONSTRAINT chk_oidc_clients_release_channel CHECK (release_channel IN ('stable','beta','canary')),
+    CONSTRAINT chk_oidc_clients_slo            CHECK (slo_participation IN ('none','back_channel','front_channel')),
+    CONSTRAINT chk_oidc_clients_status         CHECK (status IN ('active','disabled')),
+    -- back_channel 参与时 back_channel_logout_uri 必填（§7.1）
+    CONSTRAINT chk_oidc_clients_bclo_uri
+        CHECK (slo_participation <> 'back_channel' OR back_channel_logout_uri IS NOT NULL)
+);
+CREATE INDEX idx_oidc_clients_realm      ON appoidc.oidc_clients (realm);
+CREATE INDEX idx_oidc_clients_product_id ON appoidc.oidc_clients (product_id);
+CREATE INDEX idx_oidc_clients_status     ON appoidc.oidc_clients (status);
+
+-- RS256 签名公钥 / 元数据（私钥不落库，进 secret manager）。kid 为自然主键（协议内公开标识）。
+-- 状态机 next→active→retiring→retired；部分唯一索引保同一时刻至多一把 active（平滑轮换）。
+CREATE TABLE appoidc.signing_keys (
+    kid          varchar(64)  PRIMARY KEY,
+    algorithm    varchar(16)  NOT NULL DEFAULT 'RS256',
+    public_jwk   jsonb        NOT NULL,                                 -- 仅公钥
+    status       varchar(16)  NOT NULL DEFAULT 'next',
+    activated_at timestamptz,
+    retiring_at  timestamptz,
+    retired_at   timestamptz,
+    created_at   timestamptz  NOT NULL DEFAULT now(),
+    CONSTRAINT chk_signing_keys_status CHECK (status IN ('next','active','retiring','retired'))
+);
+CREATE INDEX idx_signing_keys_status ON appoidc.signing_keys (status);
+-- 至多一把 active（status='active' 的行全同值 → 唯一索引锁定单行）
+CREATE UNIQUE INDEX uq_signing_keys_one_active ON appoidc.signing_keys (status) WHERE status = 'active';
+
+-- 用户对客户端的授权 grant（行业缺口补齐，对齐 Hydra consent / Auth0 grant）。
+-- user_id 跨 schema→account.users（真 FK，见 90）；client_id 域内 FK→oidc_clients（同 schema，内联）。
+-- 授权码 / access_token 明细走 Redis 短存不入库，本表只留持久化 consent。
+CREATE TABLE appoidc.oidc_consents (
+    id          uuid         PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     uuid         NOT NULL,                                  -- 跨 schema→account.users（90）
+    client_id   varchar(64)  NOT NULL
+                 REFERENCES appoidc.oidc_clients(client_id) ON DELETE CASCADE,  -- 域内 FK
+    scopes      text[]       NOT NULL,                                  -- 用户已授权的 scope 集合
+    granted_at  timestamptz  NOT NULL DEFAULT now(),
+    revoked_at  timestamptz,
+    created_at  timestamptz  NOT NULL DEFAULT now(),
+    updated_at  timestamptz  NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_oidc_consents_user_id   ON appoidc.oidc_consents (user_id);
+CREATE INDEX idx_oidc_consents_client_id ON appoidc.oidc_consents (client_id);
+-- 每 (user, client) 至多一条未撤销 consent（§7.3）
+CREATE UNIQUE INDEX uq_oidc_consents_user_client_active
+    ON appoidc.oidc_consents (user_id, client_id) WHERE revoked_at IS NULL;

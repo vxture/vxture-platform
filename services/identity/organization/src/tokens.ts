@@ -1,0 +1,2 @@
+export const ORG_PG_POOL = Symbol("ORG_PG_POOL");
+export const ORGANIZATION_REPOSITORY = Symbol("ORGANIZATION_REPOSITORY");

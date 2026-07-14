@@ -1,0 +1,1564 @@
+{
+  "shell": {
+    "loading": {
+      "label": "Loading"
+    },
+    "featureBoards": "Feature boards",
+    "searchPlaceholder": "Search tenants, users, orders, settings…",
+    "help": "Help",
+    "notifications": "Alerts",
+    "settings": "System settings",
+    "assistant": "Varda · Platform assistant",
+    "userMenu": "User menu",
+    "profile": "Profile",
+    "verifyUnknown": "Unverified",
+    "missingPhone": "No phone",
+    "missingEmail": "No email",
+    "prefsTitle": "Preferences",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "densityCompact": "Compact",
+    "densityDefault": "Default",
+    "densityComfy": "Comfortable",
+    "fontSmall": "Small",
+    "fontDefault": "Default",
+    "fontLarge": "Large",
+    "switchUser": "Switch user",
+    "signOut": "Sign out",
+    "slotRole": "Role",
+    "slotLevel": "Level",
+    "slotLocked": "Badge · locked",
+    "metricCard": {
+      "title": "Platform health",
+      "meta": "Availability 99.2%"
+    },
+    "sidebar": {
+      "expandNav": "Expand navigation",
+      "collapseNav": "Collapse navigation",
+      "expandAllGroups": "Expand all groups",
+      "collapseAllGroups": "Collapse all groups"
+    }
+  },
+  "role": {
+    "platform_architect": "Platform Architect",
+    "security_governance_officer": "Security Governance Officer",
+    "system_operations_controller": "System Operations Controller",
+    "tenant_operations_manager": "Tenant Operations Manager",
+    "support_response_officer": "Support Response Officer",
+    "observer": "Observer",
+    "description": {
+      "platform_architect": "Owns platform architecture, global configuration, and high-risk authorization boundaries.",
+      "security_governance_officer": "Owns security governance, audit review, and control policy oversight.",
+      "system_operations_controller": "Owns runtime operations, service reliability, and system control actions.",
+      "tenant_operations_manager": "Owns tenant lifecycle operations, account governance, and business-side handling.",
+      "support_response_officer": "Owns support response, ticket handling, and customer-facing issue coordination.",
+      "observer": "Read-only role for beta, demo, review, and observation scenarios."
+    }
+  },
+  "header": {
+    "brandName": "vxture studio",
+    "brandHome": "vxture studio home",
+    "title": "Intelligent Operations Hub",
+    "searchPlaceholder": "Search models, releases, and configuration",
+    "workspace": "Workspace",
+    "switchWorkspace": "Switch workspace",
+    "platformMode": "Platform",
+    "tenantMode": "Tenant",
+    "appLauncher": "App launcher",
+    "featureOverview": "Feature overview",
+    "quickPreferences": "Quick preferences",
+    "workspaceActions": "Workspace actions",
+    "help": "Help",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "toggleTheme": "Toggle theme",
+    "toggleLanguage": "Toggle language",
+    "selectLanguage": "Select language",
+    "language": {
+      "title": "Select language"
+    },
+    "fullscreen": {
+      "enter": "Enter fullscreen",
+      "exit": "Exit fullscreen"
+    },
+    "theme": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "switchTo": "Switch to {theme}"
+    },
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation",
+    "collapseNavigation": "Collapse navigation",
+    "userMenu": {
+      "open": "Open user menu",
+      "unnamed": "Unnamed user",
+      "switchUser": "Switch user",
+      "signOut": "Sign out",
+      "badges": {
+        "personal": "Personal verified",
+        "organization": "Organization verified"
+      },
+      "settings": {
+        "title": "Display preferences",
+        "labels": {
+          "locale": "Language",
+          "theme": "Theme",
+          "density": "Interface density",
+          "fontSize": "Font size"
+        },
+        "hints": {
+          "locale": "Change the display language for the admin portal.",
+          "theme": "Choose light, dark, or system appearance.",
+          "density": "Adjust spacing for compact or comfortable workflows.",
+          "fontSize": "Adjust text size for reading comfort."
+        },
+        "theme": {
+          "system": "System",
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "density": {
+          "compact": "Compact",
+          "default": "Default",
+          "comfortable": "Comfortable"
+        },
+        "fontSize": {
+          "small": "Small",
+          "default": "Default",
+          "large": "Large"
+        }
+      }
+    },
+    "tenantType": {
+      "individual": "Personal",
+      "company": "Organization"
+    }
+  },
+  "navigation": {
+    "fallback": "Platform Operations",
+    "sections": {
+      "overview": "Overview",
+      "tenantsAccounts": "Tenant Accounts",
+      "productsPlans": "Product System",
+      "subscriptionsTransactions": "Subscription Transactions",
+      "commercialAnalysis": "Commercial Analysis",
+      "capabilitiesServices": "Model Skills",
+      "financeSettlement": "Finance Settlement",
+      "supportCompliance": "Customer Service",
+      "autonomyOverview": "Platform Overview",
+      "identityAccess": "Identity Access",
+      "platformResources": "Platform Resource",
+      "runtimeOps": "Runtime Ops",
+      "securityAudit": "Security Audit",
+      "systemSetting": "System Settings",
+      "notificationCenter": "Notification Center"
+    },
+    "items": {
+      "platformOverview": {
+        "label": "Operation Overview",
+        "description": "Core operating metrics, key trends across business domains, and platform health."
+      },
+      "opsTodos": {
+        "label": "Ops Todos",
+        "description": "Reviews, alerts, and operating tasks that need manual handling."
+      },
+      "tenants": {
+        "label": "Tenant Profile",
+        "description": "Manage tenant profiles, status, lifecycle, and operating notes."
+      },
+      "accounts": {
+        "label": "Account System",
+        "description": "Search accounts across tenants and manage status, security, and contacts."
+      },
+      "verifications": {
+        "label": "Identity Verification",
+        "description": "Review organization credentials, approvals, rejections, and rechecks."
+      },
+      "adminRoles": {
+        "label": "Platform Roles",
+        "description": "Maintain platform autonomy roles, role status, and role authorization."
+      },
+      "servicePlans": {
+        "label": "Service Plans",
+        "description": "Manage Free, Pro, and Enterprise service plans with quotas, prices, and sales scope."
+      },
+      "productSolutions": {
+        "label": "Solutions",
+        "description": "Compose capabilities into industry scenarios and define solution boundaries."
+      },
+      "products": {
+        "label": "Product Capabilities",
+        "description": "Manage composable, grantable, and metered platform, agent, model, and integration capabilities."
+      },
+      "promotions": {
+        "label": "Marketing Offers",
+        "description": "Configure coupon and discount campaigns with product, plan, and redemption rules."
+      },
+      "commerceOverview": {
+        "label": "Commercial Overview",
+        "description": "Operating metrics and risk snapshots across subscriptions, orders, payments, billing, invoices, usage, and promotions."
+      },
+      "subscriptions": {
+        "label": "Subscription Management",
+        "description": "Operate tenant service entitlement instances, renewals, suspensions, cancellations, and quota risks."
+      },
+      "orders": {
+        "label": "Orders",
+        "description": "Search order lists and details, track payment status, and handle exceptions."
+      },
+      "usageMetering": {
+        "label": "Usage Billing",
+        "description": "Review usage by tenant, product, and plan, and maintain metering rules and alerts."
+      },
+      "promotionRedemptions": {
+        "label": "Promotion Usage",
+        "description": "Review coupon usage, discount redemption statistics, and related orders."
+      },
+      "serviceMonitor": {
+        "label": "Service Monitoring",
+        "description": "Review response time, error rate, availability, and alert rules."
+      },
+      "modelPlatform": {
+        "label": "Model Platform",
+        "description": "Maintain LLM providers, API keys, rate limits, timeouts, and endpoints."
+      },
+      "modelGrants": {
+        "label": "Model Authorization",
+        "description": "Configure model access, quotas, and routing priority by product, tenant, and plan."
+      },
+      "skills": {
+        "label": "Skill Market",
+        "description": "Register and manage callable agent skills, endpoints, publishing, and runtime status."
+      },
+      "billing": {
+        "label": "Billing Center",
+        "description": "Manage bill generation, receivables confirmation, exceptions, and offline invoice entries."
+      },
+      "payments": {
+        "label": "Payments",
+        "description": "Review online and offline payment ledgers, reconciliation, bill links, and notable flows."
+      },
+      "invoices": {
+        "label": "Invoices",
+        "description": "Track offline invoice registration, delivery, reversals, voiding, and bill links."
+      },
+      "tickets": {
+        "label": "Ticket Center",
+        "description": "Handle user tickets, manual assignment, status flow, and feedback closure."
+      },
+      "announcements": {
+        "label": "Messages",
+        "description": "Publish platform announcements and targeted notices, and review delivery history."
+      },
+      "auditLogs": {
+        "label": "Audit Logs",
+        "description": "Trace key admin operations by operator, time, and target."
+      },
+      "platformAutonomy": {
+        "label": "Platform Overview",
+        "description": "Show platform autonomy health, key metrics, risks, and governance entries."
+      },
+      "platformAdmins": {
+        "label": "Platform Users",
+        "description": "Manage internal platform autonomy users, not tenant end users."
+      },
+      "adminPermissions": {
+        "label": "Permission Policy",
+        "description": "Manage platform autonomy permissions, groups, policy bindings, and authorization scope."
+      },
+      "platformSecrets": {
+        "label": "Secret Store",
+        "description": "Manage platform-level secrets, credentials, service tokens, and sensitive config references."
+      },
+      "platformJobs": {
+        "label": "Job Scheduler",
+        "description": "Manage platform background jobs, async queues, executions, failed retries, and schedule status."
+      },
+      "maintenanceWindows": {
+        "label": "Maintenance Windows",
+        "description": "Declare and manage platform maintenance windows: schedule, run, complete or cancel, and reconcile actual end time."
+      },
+      "approvalCenter": {
+        "label": "Approval Center",
+        "description": "Handle sensitive operation approvals, permission requests, secret requests, and high-risk change confirmations."
+      },
+      "riskRecords": {
+        "label": "Risk Records",
+        "description": "Manage tenant risk assessments: create, follow up, review, and tag."
+      },
+      "complianceEvents": {
+        "label": "Compliance Events",
+        "description": "Track platform and tenant compliance events: assign handlers, resolve or dismiss, and keep evidence."
+      },
+      "systemParameters": {
+        "label": "System Parameters",
+        "description": "Planned module for platform parameters, defaults, runtime parameters, and global policy parameters."
+      },
+      "dataDictionaries": {
+        "label": "Data Dictionaries",
+        "description": "Planned module for system dictionaries, enum items, business options, and configurable static data."
+      },
+      "featureToggles": {
+        "label": "Feature Toggles",
+        "description": "Planned module for feature flags, rollout switches, experiment switches, and risk isolation switches."
+      },
+      "notificationChannels": {
+        "label": "Notification Channels",
+        "description": "Planned module for platform notification channels, template bindings, and sending configuration."
+      },
+      "notificationLogs": {
+        "label": "Sending Records",
+        "description": "Planned module for platform notification sending records, receipts, and failed retries."
+      }
+    }
+  },
+  "preferences": {
+    "title": "Display preferences",
+    "locale": {
+      "label": "Language",
+      "zh-CN": "简体中文",
+      "en-US": "English (US)"
+    },
+    "density": {
+      "label": "Density",
+      "compact": "Compact",
+      "default": "Default",
+      "comfortable": "Comfortable"
+    },
+    "theme": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "switchTo": "Switch to {theme}"
+    }
+  },
+  "sidebar": {
+    "eyebrow": "Vxture Console",
+    "title": "Console",
+    "description": "Self-service account, tenant, member, and subscription management",
+    "ariaLabel": "Console navigation",
+    "footer": {
+      "label": "Status",
+      "value": "Self-service platform"
+    },
+    "workspaceMode": {
+      "platform": "Platform workspace",
+      "tenant": "Tenant workspace"
+    },
+    "sections": {
+      "workspace": "Workspace",
+      "accountTenant": "Account & Tenant",
+      "membersPermissions": "Members & Permissions",
+      "subscriptionBilling": "Subscription & Billing",
+      "advancedSettings": "Advanced Settings"
+    },
+    "items": {
+      "overview": {
+        "label": "Data Overview",
+        "description": "Tenant status, subscription expiry, usage, and quick entries"
+      },
+      "todos": {
+        "label": "Todo Items",
+        "description": "Key actions waiting for the current tenant"
+      },
+      "profile": {
+        "label": "Profile",
+        "description": "Avatar, name, password, phone, and email binding"
+      },
+      "personalTenant": {
+        "label": "My Tenant",
+        "description": "Personal tenant information, visible for personal tenants"
+      },
+      "organization": {
+        "label": "Organization Info",
+        "description": "Organization name, logo, bio, verification, and locale"
+      },
+      "members": {
+        "label": "Member Management",
+        "description": "Invites, access review, and team membership"
+      },
+      "roles": {
+        "label": "Role Management",
+        "description": "Tenant roles such as admin, member, and readonly"
+      },
+      "invitations": {
+        "label": "Invitation Records",
+        "description": "Pending and historical workspace invitations"
+      },
+      "subscription": {
+        "label": "Service Subscription",
+        "description": "Plan details, upgrade, and downgrade entry"
+      },
+      "billing": {
+        "label": "Billing Records",
+        "description": "Historical bills and invoice downloads"
+      },
+      "quotas": {
+        "label": "Usage Quotas",
+        "description": "Resource progress for API calls, storage, and more"
+      },
+      "modelPlatform": {
+        "label": "Model Platform",
+        "description": "Online models, private models, and endpoints"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "description": "Email and in-console notification preferences"
+      },
+      "security": {
+        "label": "Security Settings",
+        "description": "Login logs, device management, and future controls"
+      },
+      "tenantSettings": {
+        "label": "Tenant Settings",
+        "description": "Language, timezone, and dangerous tenant cancellation"
+      }
+    }
+  },
+  "routes": {
+    "dashboard": "Dashboard",
+    "todos": "Todo Items",
+    "profile": "Profile",
+    "personalTenant": "My Tenant",
+    "organization": "Organization Info",
+    "members": "Members",
+    "roles": "Roles & Permissions",
+    "invitations": "Invitation Records",
+    "subscription": "Subscription",
+    "billing": "Billing",
+    "quotas": "Quotas",
+    "modelPlatform": "Model Platform",
+    "notifications": "Notifications",
+    "security": "Security Settings",
+    "settings": "Tenant Settings",
+    "tenantSettings": "Tenant Settings"
+  },
+  "login": {
+    "hero": {
+      "eyebrow": "Unified access",
+      "title": "Sign in to Vxture Admin.",
+      "description": "Access models, skills, third-party agents, and platform supply-side capabilities from one controlled entry point.",
+      "signals": {
+        "capability": "Capability-aware navigation",
+        "tenant": "Platform permission loading",
+        "session": "Admin BFF session gateway"
+      }
+    },
+    "card": {
+      "eyebrow": "Admin login",
+      "title": "Sign in",
+      "description": "Use your account to continue to the platform operations portal."
+    },
+    "form": {
+      "passwordLogin": "Password",
+      "phoneLogin": "Code login",
+      "account": "Account",
+      "accountPlaceholder": "username / email / phone",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberLogin": "Remember login",
+      "phone": "Phone",
+      "phonePlaceholder": "Enter the phone bound to your admin account",
+      "code": "Verification code",
+      "codePlaceholder": "Enter the 6-digit code",
+      "sendCode": "Get code",
+      "sendingCode": "Sending...",
+      "retryCode": "Retry in {seconds}s",
+      "securityVerifying": "Security check... {seconds}s",
+      "forgotPassword": "Forgot password?",
+      "forgetMe": "Forget me",
+      "humanVerification": "Security verification",
+      "dragToVerify": "Drag the puzzle piece to verify",
+      "closeVerification": "Close security verification",
+      "verificationPassed": "Verified",
+      "acceptPrefix": "I have read and agree to the ",
+      "terms": "User Agreement",
+      "acceptJoiner": " and ",
+      "privacy": "Privacy Policy",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "register": "Contact an administrator"
+    },
+    "errors": {
+      "required": "Account and password are required.",
+      "terms": "Please agree to the User Agreement and Privacy Policy first.",
+      "humanVerification": "Please complete the human verification.",
+      "invalid": "Unable to sign in with the current credentials.",
+      "phoneInvalid": "Enter a valid mainland China phone number.",
+      "codeInvalid": "Enter the 6-digit verification code.",
+      "phoneCodeInvalid": "The code is invalid or expired. Request a new one.",
+      "unavailable": "The Admin login service is unavailable. Start admin-bff first.",
+      "tooManyAttempts": "Too many attempts. Please try again later.",
+      "captchaUnavailable": "The captcha service is temporarily unavailable. Please try again later."
+    },
+    "footer": {
+      "copyright": "© 2026 vxture.ai. All rights reserved.",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy"
+    }
+  },
+  "dashboard": {
+    "eyebrow": "Overview",
+    "title": "Account and tenant console",
+    "description": "A self-service entry for users and tenants to manage members, subscriptions, billing, quotas, and security posture.",
+    "createAction": "Create management item",
+    "stats": {
+      "plan": {
+        "label": "Current plan",
+        "value": "Growth",
+        "hint": "Renews on May 18, 2026 with pooled workspace billing."
+      },
+      "quota": {
+        "label": "Quota health",
+        "value": "78%",
+        "hint": "Inference remains healthy, but GPU tuning is approaching alert range."
+      },
+      "reminders": {
+        "label": "Open reminders",
+        "value": "3",
+        "hint": "One invoice, one invite, and one quota threshold need review."
+      }
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "description": "Guide frequent management actions without flooding the page with primary buttons.",
+      "addMember": {
+        "label": "Add member",
+        "description": "Invite operators, workspace owners, and readonly reviewers."
+      },
+      "reviewSubscription": {
+        "label": "Review subscription",
+        "description": "Inspect plan details, renewal timing, and quota pool pressure."
+      },
+      "adjustQuotas": {
+        "label": "Adjust quotas",
+        "description": "Rebalance shared limits before overage costs increase."
+      }
+    },
+    "signals": {
+      "title": "Signals",
+      "description": "Keep the dashboard concise: only what needs attention now.",
+      "badge": "Today",
+      "billing": {
+        "title": "Billing follow-up",
+        "description": "An invoice for model overage is due within 5 days."
+      },
+      "quota": {
+        "title": "Quota hotspot",
+        "description": "Fine-tune GPU hours are nearing the configured monthly cap."
+      },
+      "access": {
+        "title": "Access hygiene",
+        "description": "Two invited members have not accepted access yet."
+      }
+    },
+    "invoices": {
+      "title": "Recent invoices",
+      "description": "Subscription and overage charges stay secondary to plan status.",
+      "headers": {
+        "invoice": "Invoice",
+        "date": "Date",
+        "scope": "Scope",
+        "status": "Status",
+        "amount": "Amount"
+      }
+    },
+    "quotas": {
+      "title": "Quota posture",
+      "description": "Usage remains visible, but not as an oversized ops dashboard.",
+      "headers": {
+        "pool": "Pool",
+        "usage": "Usage",
+        "share": "Share",
+        "status": "Status"
+      }
+    }
+  },
+  "settings": {
+    "eyebrow": "Advanced settings",
+    "title": "Tenant settings",
+    "description": "Configure tenant-level policies, access controls, security constraints, and audit rules.",
+    "save": "Save changes",
+    "reset": "Restore defaults",
+    "backend": {
+      "pending": "Backend pending"
+    },
+    "summary": {
+      "title": "Tenant settings overview",
+      "scope": "Scope",
+      "scopeValue": "Tenant policy",
+      "enabled": "Enabled",
+      "enabledValue": "{count}",
+      "profile": "Profile fields",
+      "profileValue": "Managed elsewhere"
+    },
+    "general": {
+      "title": "General settings",
+      "count": "{count} groups"
+    },
+    "table": {
+      "policy": "Policy",
+      "state": "State",
+      "value": "Setting"
+    },
+    "states": {
+      "enabled": "Enabled",
+      "disabled": "Off"
+    },
+    "sections": {
+      "access": {
+        "title": "Access entry",
+        "count": "{count} items"
+      },
+      "security": {
+        "title": "Security policy",
+        "count": "{count} items"
+      },
+      "data": {
+        "title": "Data & audit",
+        "count": "{count} items"
+      }
+    },
+    "rows": {
+      "inviteApproval": {
+        "title": "Invite approval",
+        "hint": "Member invitations require admin confirmation before joining the tenant."
+      },
+      "externalMembers": {
+        "title": "External members",
+        "hint": "Allow accounts outside the organization domain to join this tenant."
+      },
+      "defaultRole": {
+        "title": "Default role",
+        "hint": "Initial role granted to a member after accepting an invitation."
+      },
+      "mfaRequired": {
+        "title": "Require MFA",
+        "hint": "Require additional verification when members sign in to the console."
+      },
+      "trustedDeviceReview": {
+        "title": "New device review",
+        "hint": "Record first-time device sign-ins for later review."
+      },
+      "sessionTimeout": {
+        "title": "Session lifetime",
+        "hint": "Maximum time a console session can stay signed in."
+      },
+      "auditRetention": {
+        "title": "Audit retention",
+        "hint": "How long tenant operation logs are retained by the platform."
+      },
+      "exportApproval": {
+        "title": "Export approval",
+        "hint": "Require confirmation before exporting members, billing, or audit data."
+      },
+      "apiKeyCreation": {
+        "title": "API key self-service",
+        "hint": "Allow members to create integration access keys by themselves."
+      }
+    },
+    "options": {
+      "defaultRole": {
+        "readonly": "Readonly",
+        "member": "Member",
+        "admin": "Admin"
+      },
+      "sessionTimeout": {
+        "8h": "8 hours",
+        "24h": "24 hours",
+        "7d": "7 days"
+      },
+      "auditRetention": {
+        "90": "90 days",
+        "180": "180 days",
+        "365": "365 days"
+      }
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "count": "High-risk action",
+      "confirmRequired": "Confirmation required",
+      "cancelTenant": {
+        "title": "Cancel tenant",
+        "confirmHint": "Requires secondary confirmation and the current tenant name before execution.",
+        "action": "Cancel tenant"
+      }
+    },
+    "feedback": {
+      "saved": "Tenant settings were saved to local frontend state and will sync to the server after backend support lands.",
+      "reset": "Tenant settings restored to default policy."
+    }
+  },
+  "notificationsPage": {
+    "header": {
+      "eyebrow": "Personal settings",
+      "title": "Notifications",
+      "description": "Subscriptions enabled"
+    },
+    "actions": {
+      "save": "Save preferences",
+      "reset": "Restore defaults"
+    },
+    "backend": {
+      "pending": "Backend pending"
+    },
+    "preference": {
+      "label": "Notification preference",
+      "enabled": "Subscriptions enabled"
+    },
+    "summary": {
+      "title": "Notification subscription overview",
+      "topics": "Topics",
+      "topicsValue": "{enabled}/{total}",
+      "inboxDefault": "Inbox by default",
+      "emailValue": "Email {count}",
+      "smsValue": "SMS {count}"
+    },
+    "channels": {
+      "title": "Base reminder channels",
+      "short": {
+        "inbox": "Inbox",
+        "email": "Email",
+        "sms": "SMS"
+      },
+      "items": {
+        "inbox": {
+          "title": "Inbox"
+        },
+        "email": {
+          "title": "Email"
+        },
+        "sms": {
+          "title": "SMS"
+        }
+      }
+    },
+    "topics": {
+      "title": "Subscription topics",
+      "count": "{count} items",
+      "groupCount": "{count} items",
+      "policyLocked": "Policy locked",
+      "policyLockedDescription": "This reminder is locked by platform policy and cannot be turned off by the current user.",
+      "toggleLabel": "{topic} - {channel}",
+      "subscribed": "Subscribed",
+      "unsubscribed": "Not subscribed",
+      "columns": {
+        "topic": "Topic",
+        "status": "Status"
+      },
+      "items": {
+        "account": {
+          "title": "Account activity"
+        },
+        "security": {
+          "title": "Security risk"
+        },
+        "subscription": {
+          "title": "Subscription"
+        },
+        "billing": {
+          "title": "Billing & invoices"
+        },
+        "usage": {
+          "title": "Usage & quotas"
+        },
+        "product": {
+          "title": "Product & system"
+        }
+      }
+    },
+    "groups": {
+      "identity": "Account & security",
+      "commerce": "Subscription & usage",
+      "system": "Product & system"
+    },
+    "feedback": {
+      "saved": "Notification preferences were saved to local frontend state and will sync to the server after backend support lands.",
+      "reset": "Notification preferences restored to defaults."
+    }
+  },
+  "profilePage": {
+    "header": {
+      "eyebrow": "Account center",
+      "title": "Profile",
+      "description": "Manage your avatar, display name, contact details, and account credentials in one place."
+    },
+    "common": {
+      "empty": "--",
+      "loading": "Loading..."
+    },
+    "summary": {
+      "defaultRole": "Console user",
+      "avatar": "Avatar",
+      "email": "Email",
+      "phone": "Phone",
+      "updatedAt": "Updated",
+      "customAvatar": "Custom avatar",
+      "defaultAvatar": "Default avatar"
+    },
+    "sections": {
+      "profile": {
+        "title": "Profile",
+        "description": "Used for identity display across the console, collaboration lists, and notifications."
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Used for notifications, account recovery, and localized display."
+      },
+      "security": {
+        "title": "Security credentials",
+        "description": "Your password is used only for sign-in verification and is never shown here."
+      },
+      "connectedAccounts": {
+        "title": "Identity providers",
+        "description": "Third-party identity providers are disabled for the internal admin portal."
+      }
+    },
+    "fields": {
+      "displayName": "Display name",
+      "username": "Username",
+      "avatarUrl": "Avatar URL",
+      "headline": "Headline",
+      "bio": "Bio",
+      "email": "Email",
+      "phone": "Phone",
+      "timezone": "Timezone",
+      "language": "Language",
+      "password": "Password",
+      "updatedAt": "Profile updated",
+      "currentPassword": "Current password",
+      "nextPassword": "New password",
+      "confirmPassword": "Confirm new password"
+    },
+    "language": {
+      "zhCN": "简体中文",
+      "enUS": "English (US)"
+    },
+    "security": {
+      "passwordSet": "Set"
+    },
+    "avatar": {
+      "alt": "{name} avatar",
+      "edit": "Edit avatar",
+      "previewAlt": "{name} avatar preview",
+      "customPreview": "Using custom avatar",
+      "defaultPreview": "Using default avatar"
+    },
+    "actions": {
+      "editProfile": "Edit profile",
+      "clearAvatar": "Clear avatar",
+      "edit": "Edit",
+      "changePassword": "Change password",
+      "cancel": "Cancel",
+      "save": "Save",
+      "clear": "Clear",
+      "updatePassword": "Update password"
+    },
+    "dialogs": {
+      "profile": {
+        "title": "Edit profile",
+        "description": "The avatar preview updates with the URL and syncs to your console identity after saving."
+      },
+      "contact": {
+        "title": "Edit contact",
+        "description": "Keep contact details accurate for notifications and account recovery."
+      },
+      "password": {
+        "title": "Change password",
+        "description": "Use a new password with at least 6 characters."
+      }
+    },
+    "placeholders": {
+      "avatarUrl": "https://example.com/avatar.png",
+      "headline": "Example: Platform admin / Operations lead",
+      "bio": "Briefly describe your role or collaboration preference.",
+      "timezone": "Example: Asia/Shanghai"
+    },
+    "feedback": {
+      "noProfile": "No profile was found.",
+      "loadError": "Failed to load your profile. Please try again later.",
+      "profileSaved": "Profile updated.",
+      "profileSaveError": "Could not save the profile. Please try again later.",
+      "contactSaved": "Contact details updated.",
+      "contactSaveError": "Could not save contact details. Please try again later.",
+      "passwordSaved": "Password updated.",
+      "passwordSaveError": "Password update failed. Check the current password and try again.",
+      "passwordMismatch": "The two new password entries do not match.",
+      "passwordTooShort": "The new password must contain at least 6 characters.",
+      "avatarCleared": "Avatar cleared.",
+      "avatarClearError": "Could not clear the avatar. Please try again later.",
+      "connectedAccountBound": "{provider} connected.",
+      "connectedAccountUnbound": "{provider} disconnected."
+    },
+    "connectedAccounts": {
+      "summary": "{count} / {total} connected",
+      "providers": {
+        "wechat": {
+          "name": "Reserved",
+          "description": "Third-party identity is disabled for the internal admin portal."
+        },
+        "dingtalk": {
+          "name": "Reserved",
+          "description": "Third-party identity is disabled for the internal admin portal."
+        },
+        "feishu": {
+          "name": "Reserved",
+          "description": "Third-party identity is disabled for the internal admin portal."
+        },
+        "google": {
+          "name": "Reserved",
+          "description": "Third-party identity is disabled for the internal admin portal."
+        }
+      },
+      "fields": {
+        "account": "Account",
+        "connectedAt": "Connected at"
+      },
+      "status": {
+        "connected": "Connected",
+        "disconnected": "Not connected",
+        "unavailable": "Unavailable"
+      },
+      "actions": {
+        "bind": "Connect",
+        "rebind": "Reconnect",
+        "unbind": "Disconnect",
+        "confirmUnbind": "Disconnect"
+      },
+      "dialogs": {
+        "unbindTitle": "Disconnect account",
+        "unbindDescription": "Disconnect this account from {provider}? You will not be able to use this method to sign in until it is connected again."
+      }
+    }
+  },
+  "organizationPage": {
+    "header": {
+      "eyebrow": "Tenant center",
+      "title": "Organization",
+      "description": "The organization is the current tenant for now. Review the logo, verification state, contact address, and localization settings."
+    },
+    "common": {
+      "empty": "--",
+      "loading": "Loading..."
+    },
+    "summary": {
+      "organization": "Organization",
+      "logo": "Logo",
+      "tenant": "Tenant",
+      "scope": "Scope",
+      "verified": "Verification",
+      "updatedAt": "Updated",
+      "customLogo": "Custom logo",
+      "defaultLogo": "Default logo",
+      "orgEqualsTenant": "Organization is tenant"
+    },
+    "sections": {
+      "foundation": {
+        "title": "Foundation",
+        "description": "Organization and tenant are treated as one entity; multiple tenants under one organization are not modeled yet."
+      },
+      "status": {
+        "title": "Verification & status",
+        "description": "Shows tenant operating state, business verification, and review details."
+      },
+      "contact": {
+        "title": "Contact & address",
+        "description": "Used for operational contact, domain ownership, and registered address display."
+      },
+      "localization": {
+        "title": "Localization",
+        "description": "Controls the default language, timezone, and basic profile attachments."
+      }
+    },
+    "fields": {
+      "organizationName": "Organization name",
+      "companyName": "Company name",
+      "tenantCode": "Tenant code",
+      "tenantType": "Tenant type",
+      "industryScale": "Industry / scale",
+      "description": "Description",
+      "tenantStatus": "Tenant status",
+      "verifiedStatus": "Verification status",
+      "unifiedSocialCreditCode": "Unified social credit code",
+      "verifiedAt": "Verified at",
+      "rejectedReason": "Rejected reason",
+      "contactName": "Contact",
+      "contactPhone": "Phone",
+      "contactEmail": "Email",
+      "primaryDomain": "Primary domain",
+      "location": "Location",
+      "address": "Address",
+      "postalCode": "Postal code",
+      "language": "Language",
+      "timeZone": "Timezone",
+      "businessLicenseUrl": "Business license",
+      "logoUrl": "Logo URL",
+      "updatedAt": "Last updated"
+    },
+    "actions": {
+      "editLogo": "Edit logo",
+      "clearLogo": "Clear logo",
+      "uploadLogo": "Upload logo",
+      "cancel": "Cancel",
+      "save": "Save",
+      "clear": "Clear"
+    },
+    "tenantType": {
+      "company": "Organization",
+      "individual": "Personal"
+    },
+    "status": {
+      "tenant": {
+        "trial": "Trial",
+        "active": "Active",
+        "suspended": "Suspended",
+        "cancelled": "Cancelled"
+      },
+      "verified": {
+        "unverified": "Unverified",
+        "pending": "Pending",
+        "verified": "Verified",
+        "rejected": "Rejected"
+      }
+    },
+    "logo": {
+      "alt": "{name} organization logo",
+      "edit": "Edit organization logo",
+      "previewAlt": "{name} organization logo preview",
+      "customPreview": "Using custom logo",
+      "defaultPreview": "Using default logo"
+    },
+    "dialogs": {
+      "logo": {
+        "title": "Edit organization logo",
+        "description": "Upload an image or paste a logo URL. Saving updates the current organization page.",
+        "uploadHint": "Use a 1:1 PNG or JPG under 5MB. This is saved locally until the organization profile API is connected."
+      }
+    },
+    "placeholders": {
+      "logoUrl": "https://example.com/logo.png"
+    },
+    "feedback": {
+      "noProfile": "No organization profile was found.",
+      "loadError": "Failed to load organization profile. Please try again later.",
+      "logoSaved": "Organization logo updated.",
+      "logoCleared": "Organization logo cleared.",
+      "logoFileTypeError": "Choose an image file.",
+      "logoFileSizeError": "Logo image must be under 5MB.",
+      "logoReadError": "Could not read the logo image. Choose another file."
+    }
+  },
+  "membersPage": {
+    "header": {
+      "eyebrow": "Tenant management",
+      "title": "Members",
+      "description": "Manage tenant members, roles, and access status.",
+      "addMember": "Add member",
+      "inviteMember": "Invite member"
+    },
+    "table": {
+      "toolbarTitle": "{count} members",
+      "countHint": "{total} total, {active} active, {invited} invited, {suspended} suspended",
+      "searchPlaceholder": "Search by name, email, or role",
+      "searchAriaLabel": "Search members",
+      "filterAriaLabel": "Member status filters",
+      "memberTitle": "{name}, {username}, {phone}, {email}, {role}, {team}, {status}",
+      "statusTitle": "Current status: {status}",
+      "avatarAlt": "{name} avatar",
+      "emptyPhone": "Not set",
+      "primaryOwner": "Primary owner",
+      "selectPage": "Select members on this page",
+      "selectMember": "Select {name}",
+      "columns": {
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "lastActive": "Last active"
+      }
+    },
+    "status": {
+      "Active": "Active",
+      "Invited": "Invited",
+      "Suspended": "Suspended"
+    },
+    "filters": {
+      "all": "All members",
+      "active": "Active",
+      "invited": "Invited",
+      "suspended": "Suspended"
+    },
+    "empty": {
+      "loadingTitle": "Loading members...",
+      "loadingDescription": "Reading workspace members from the console BFF.",
+      "title": "No members match the current filters.",
+      "description": "Try widening the status scope or searching by another field.",
+      "resetFilters": "Reset filters"
+    },
+    "actions": {
+      "menuLabel": "Member actions for {name}",
+      "edit": "Edit user",
+      "disableInvite": "Disable user",
+      "disableMember": "Disable user",
+      "enableMember": "Enable user",
+      "resetPassword": "Reset password",
+      "unlink": "Unlink"
+    },
+    "bulk": {
+      "selected": "{count} selected",
+      "disable": "Disable selected",
+      "enable": "Enable selected",
+      "unlink": "Unlink selected"
+    },
+    "pagination": {
+      "summary": "Page {page} / {totalPages}, {total} total",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "dialogs": {
+      "create": {
+        "title": "Add member"
+      },
+      "invite": {
+        "title": "Invite member"
+      },
+      "edit": {
+        "title": "Edit member"
+      },
+      "reset": {
+        "title": "Reset password",
+        "description": "Set a new temporary password for {name}."
+      },
+      "unlink": {
+        "title": "Unlink member",
+        "description": "Unlink {name} from the current tenant? This will not delete the user account."
+      },
+      "bulkUnlink": {
+        "title": "Unlink selected members",
+        "description": "Unlink {count} selected members from the current tenant? This will not delete user accounts."
+      },
+      "fields": {
+        "email": "Email",
+        "nickname": "Nickname",
+        "teamRemark": "Team remark",
+        "role": "Role",
+        "defaultRole": "Default member",
+        "nextPassword": "New temporary password"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "create": "Create member",
+        "sendInvite": "Send invite",
+        "save": "Save",
+        "resetPassword": "Reset password",
+        "unlink": "Unlink"
+      }
+    },
+    "feedback": {
+      "createSuccess": "Member created.",
+      "inviteSuccess": "Member invitation created.",
+      "updateSuccess": "Member profile updated.",
+      "resetPasswordSuccess": "{name}'s password has been reset.",
+      "unlinkSuccess": "Member association unlinked.",
+      "bulkDisabled": "{count} members disabled.",
+      "bulkEnabled": "{count} members enabled.",
+      "bulkUnlinkSuccess": "{count} member associations unlinked.",
+      "memberDisabled": "Member disabled.",
+      "memberEnabled": "Member enabled.",
+      "createError": "Could not create the member. Try again later.",
+      "inviteError": "Could not create the invitation. Try again later.",
+      "updateError": "Could not save the member profile. Try again later.",
+      "resetPasswordError": "Could not reset the password. Try again later.",
+      "resetPasswordLength": "The new temporary password must contain at least 6 characters.",
+      "unlinkError": "Could not unlink the member association. Try again later.",
+      "bulkDisableError": "Could not disable the selected members. Try again later.",
+      "bulkEnableError": "Could not enable the selected members. Try again later.",
+      "bulkUnlinkError": "Could not unlink the selected members. Try again later.",
+      "memberDisableError": "Could not disable the member. Try again later.",
+      "memberEnableError": "Could not enable the member. Try again later."
+    }
+  },
+  "rolesPage": {
+    "header": {
+      "eyebrow": "Tenant management",
+      "title": "Roles & permissions",
+      "description": "Manage tenant role definitions, status, and permission bindings.",
+      "create": "Create role"
+    },
+    "toolbar": {
+      "count": "{count} roles",
+      "countHint": "{total} total, {active} active, {disabled} disabled, {system} system, {custom} custom",
+      "searchPlaceholder": "Search by role, code, or permission",
+      "searchAriaLabel": "Search roles",
+      "filterAriaLabel": "Role filters"
+    },
+    "filters": {
+      "all": "All roles",
+      "active": "Active",
+      "disabled": "Disabled",
+      "system": "System",
+      "custom": "Custom"
+    },
+    "list": {
+      "noDescription": "No description",
+      "noPermissions": "No permissions assigned",
+      "permissionCount": "{count} permissions",
+      "roleTitle": "{name}, {code}, {status}, {type}, {permissions} permissions",
+      "selectPage": "Select roles on this page",
+      "selectRole": "Select {name}",
+      "columns": {
+        "name": "Role",
+        "code": "Role code",
+        "status": "Status",
+        "type": "Type",
+        "permissions": "Permissions",
+        "description": "Description"
+      }
+    },
+    "type": {
+      "system": "System role",
+      "custom": "Custom role",
+      "systemIcon": "System role",
+      "customIcon": "Custom role"
+    },
+    "actions": {
+      "menuLabel": "Role actions for {name}",
+      "edit": "Edit role",
+      "enable": "Enable role",
+      "disable": "Disable role",
+      "delete": "Delete role"
+    },
+    "bulk": {
+      "selected": "{count} roles selected",
+      "disable": "Disable selected",
+      "enable": "Enable selected",
+      "delete": "Delete selected"
+    },
+    "pagination": {
+      "summary": "Page {page} / {totalPages}, {total} total",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "dialog": {
+      "createTitle": "Create role",
+      "editTitle": "Edit role",
+      "deleteTitle": "Delete role",
+      "deleteDescription": "Delete {name}? System roles cannot be deleted. Custom role permission bindings will be removed.",
+      "bulkDeleteTitle": "Delete selected roles",
+      "bulkDeleteDescription": "Delete {count} selected custom roles? System roles will be ignored.",
+      "fields": {
+        "code": "Role code",
+        "name": "Role name",
+        "description": "Description",
+        "status": "Status"
+      },
+      "permissionsTitle": "Select permissions",
+      "permissionsDescription": "Click tags to toggle permission bindings.",
+      "cancel": "Cancel",
+      "create": "Create role",
+      "save": "Save",
+      "delete": "Delete"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "empty": {
+      "loadingTitle": "Loading roles...",
+      "loadingDescription": "Reading tenant roles and permissions from the console BFF.",
+      "title": "No roles match the current filters.",
+      "description": "Try widening the filter scope or searching by another field.",
+      "resetFilters": "Reset filters"
+    },
+    "feedback": {
+      "loadError": "Failed to load role data. Please try again later.",
+      "createSuccess": "Role created.",
+      "createError": "Role creation failed. Please try again later.",
+      "updateSuccess": "Role updated.",
+      "updateError": "Role update failed. Please try again later.",
+      "enableSuccess": "Role enabled.",
+      "enableError": "Role enable failed. Please try again later.",
+      "disableSuccess": "Role disabled.",
+      "disableError": "Role disable failed. Please try again later.",
+      "deleteSuccess": "Role deleted.",
+      "deleteError": "Role delete failed. Please try again later.",
+      "bulkDisabled": "{count} roles disabled.",
+      "bulkEnabled": "{count} roles enabled.",
+      "bulkDeleted": "{count} custom roles deleted.",
+      "bulkDisableError": "Bulk disable failed. Please try again later.",
+      "bulkEnableError": "Bulk enable failed. Please try again later.",
+      "bulkDeleteError": "Bulk delete failed. Please try again later."
+    }
+  },
+  "modelPlatformPage": {
+    "header": {
+      "eyebrow": "Model Platform",
+      "title": "Model Platform",
+      "description": "Manage online models, private models, endpoints, protocols, capability tags, and non-sensitive configuration.",
+      "badge": "Production keys pending"
+    },
+    "summary": {
+      "ariaLabel": "Model platform summary",
+      "models": "Registered models",
+      "modelsValue": "{active} / {total} active",
+      "privateModels": "Private models",
+      "onlineModels": "Online models"
+    },
+    "providers": {
+      "doubao": "Doubao",
+      "claude": "Claude",
+      "private": "Private",
+      "custom": "Custom"
+    },
+    "filters": {
+      "all": "All models",
+      "active": "Active",
+      "inactive": "Inactive",
+      "online": "Online",
+      "private": "Private"
+    },
+    "actions": {
+      "addModel": "Add model",
+      "modelMenu": "Model actions for {name}",
+      "editModel": "Edit model",
+      "copyModelCode": "Copy code",
+      "enableModel": "Enable model",
+      "disableModel": "Disable model",
+      "deleteModel": "Delete model"
+    },
+    "table": {
+      "searchPlaceholder": "Search by model, provider, endpoint, or capability",
+      "searchAriaLabel": "Search models",
+      "filterAriaLabel": "Model filters",
+      "toolbarTitle": "{count} models",
+      "columns": {
+        "model": "Model",
+        "provider": "Provider",
+        "capabilities": "Capabilities",
+        "endpoint": "Endpoint",
+        "key": "Key env",
+        "status": "Status"
+      }
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "pagination": {
+      "summary": "Page {page} / {totalPages}, {total} models",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "dialogs": {
+      "createModel": {
+        "title": "Add model"
+      },
+      "editModel": {
+        "title": "Edit model"
+      },
+      "fields": {
+        "modelName": "Model name",
+        "modelCode": "Model code",
+        "provider": "Provider",
+        "protocol": "Protocol",
+        "endpointUrl": "Endpoint URL",
+        "keyReference": "Key reference",
+        "capabilities": "Capabilities, comma separated",
+        "config": "Non-sensitive config JSON"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save"
+      }
+    },
+    "empty": {
+      "loadingTitle": "Loading models...",
+      "loadingDescription": "Reading model access configuration from Model Platform.",
+      "title": "No models match the current filters.",
+      "description": "Try widening the filters or adding an online/private model.",
+      "resetFilters": "Reset filters"
+    },
+    "feedback": {
+      "loadError": "Failed to load model data. Check whether Model Platform is running.",
+      "modelCreated": "Model created.",
+      "modelUpdated": "Model updated.",
+      "modelEnabled": "Model enabled.",
+      "modelDisabled": "Model disabled.",
+      "modelSaveError": "Model save failed. Check endpoint, capability tags, and config JSON.",
+      "modelStateError": "Model state update failed. Please try again later.",
+      "modelDeleted": "Model deleted.",
+      "modelDeleteError": "Model deletion failed. Please try again later.",
+      "modelCodeCopied": "Model code copied.",
+      "copyError": "Copy failed. Copy the model code manually.",
+      "deleteConfirm": "Delete {name}? This disables the model and invalidates related grants."
+    }
+  },
+  "modelGrantsPage": {
+    "header": {
+      "eyebrow": "Model Platform",
+      "title": "Model Authorization",
+      "description": "Configure model authorization, cycle quota, and routing priority by product and agent; versions belong to product releases.",
+      "badge": "Product policy"
+    },
+    "summary": {
+      "ariaLabel": "Model authorization summary",
+      "policies": "Product policies",
+      "policiesValue": "{usable} / {total} usable",
+      "products": "Covered products",
+      "undefinedPolicies": "Undefined policies"
+    },
+    "filters": {
+      "all": "All policies",
+      "product": "Product policies",
+      "defaults": "Default policies",
+      "undefined": "Undefined",
+      "usable": "With quota",
+      "zeroQuota": "Zero quota",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "addGrant": "Add tenant override",
+      "grantMenu": "Grant actions",
+      "editGrant": "Edit override",
+      "enableGrant": "Enable override",
+      "disableGrant": "Disable override"
+    },
+    "policyTable": {
+      "searchPlaceholder": "Search by product, policy, agent, model, or note",
+      "searchAriaLabel": "Search model authorization",
+      "filterAriaLabel": "Policy filters",
+      "toolbarTitle": "{count} policies",
+      "unlimited": "Unlimited",
+      "undefinedModel": "No model defined",
+      "defaultDeny": "Default deny",
+      "region": {
+        "domestic": "Domestic",
+        "international": "International",
+        "none": "Default scope"
+      },
+      "columns": {
+        "scope": "Policy scope",
+        "agent": "Agent",
+        "model": "Model",
+        "quota": "Cycle quota",
+        "priority": "Priority",
+        "status": "Status"
+      }
+    },
+    "overrides": {
+      "title": "Tenant overrides",
+      "description": "For gray release, customization, and temporary overrides. Normal traffic should use product model authorization above.",
+      "count": "{count} overrides"
+    },
+    "table": {
+      "allAgents": "All agents",
+      "permanent": "Permanent",
+      "columns": {
+        "model": "Model",
+        "tenant": "Tenant",
+        "agent": "Agent",
+        "priority": "Priority",
+        "expires": "Expires",
+        "status": "Status"
+      }
+    },
+    "status": {
+      "usable": "With quota",
+      "zeroQuota": "Zero quota",
+      "undefined": "Undefined",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "pagination": {
+      "policySummary": "Page {page} / {totalPages}, {total} policies",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "dialogs": {
+      "createGrant": {
+        "title": "Add grant"
+      },
+      "editGrant": {
+        "title": "Edit grant"
+      },
+      "fields": {
+        "grantModel": "Grant model",
+        "tenantId": "Tenant ID",
+        "agentId": "Agent scope",
+        "priority": "Priority, lower value wins",
+        "reason": "Grant reason",
+        "expiresAt": "Expiration date",
+        "grantActive": "Enable override now"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "save": "Save"
+      }
+    },
+    "empty": {
+      "loadingTitle": "Loading policies...",
+      "loadingDescription": "Reading product model authorization and Model Platform tenant overrides.",
+      "policyTitle": "No policies match the current filters.",
+      "policyDescription": "Try widening the filters or checking product-level model authorization.",
+      "overrideTitle": "No tenant overrides yet.",
+      "overrideDescription": "Product model authorization is currently used directly. Add overrides for gray release or customization.",
+      "resetFilters": "Reset filters"
+    },
+    "feedback": {
+      "loadError": "Failed to load policy data. Check whether Admin BFF and Model Platform are running.",
+      "grantCreated": "Tenant override created.",
+      "grantUpdated": "Tenant override updated.",
+      "grantEnabled": "Tenant override enabled.",
+      "grantDisabled": "Tenant override disabled.",
+      "grantSaveError": "Tenant override save failed. Check tenant, model, and priority.",
+      "grantStateError": "Tenant override state update failed. Please try again later."
+    }
+  },
+  "drawer": {
+    "close": "Close",
+    "openCenter": "Open message center",
+    "notifications": {
+      "title": "Message center",
+      "markAllRead": "Mark all read",
+      "items": {
+        "audit": {
+          "title": "High-risk action awaiting approval",
+          "meta": "Approval center · 12 min ago"
+        },
+        "service": {
+          "title": "Service availability below threshold",
+          "meta": "Service monitor · 1 hour ago"
+        },
+        "ticket": {
+          "title": "6 new tickets pending",
+          "meta": "Ticket center · Today"
+        }
+      }
+    },
+    "settings": {
+      "title": "System settings",
+      "rows": {
+        "theme": {
+          "label": "Default theme",
+          "value": "System"
+        },
+        "density": {
+          "label": "Density",
+          "value": "Default"
+        },
+        "sessionTimeout": {
+          "label": "Session timeout",
+          "value": "30 min"
+        },
+        "auditRetention": {
+          "label": "Audit retention",
+          "value": "180 days"
+        }
+      }
+    }
+  }
+}

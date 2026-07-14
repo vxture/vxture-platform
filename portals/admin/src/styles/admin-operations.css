@@ -1,0 +1,8 @@
+/* Admin operations style entry. Keep concrete rules in admin-operations-* modules. */
+
+@import "./admin-operations-controls.css";
+@import "./admin-operations-audit.css";
+@import "./admin-operations-announcements.css";
+@import "./admin-operations-skills.css";
+@import "./admin-operations-dialog.css";
+@import "./admin-operations-tickets.css";

@@ -1,0 +1,213 @@
+# 安全规范
+
+> 更新：2026-05-14
+
+本文档定义平台的安全约束、Secrets 管理规则和各层安全边界。
+
+---
+
+## 1. Secrets 管理
+
+### 1.1 命名规范
+
+```
+# 格式：SCREAMING_SNAKE_CASE
+JWT_SECRET
+JWT_REFRESH_SECRET
+AUTH_INTERNAL_TOKEN
+DINGTALK_APP_SECRET
+DATABASE_URL
+```
+
+### 1.2 禁止项
+
+```
+❌ 禁止提交任何 .env 文件到 git（.gitignore 已覆盖）
+❌ 禁止在代码注释中写入真实密钥
+❌ 禁止在日志中打印 token / secret / password
+❌ 禁止在 URL query string 中传递 token（用 Cookie 或 Header）
+```
+
+### 1.3 Secrets 存放位置
+
+| 环境     | Secrets 存放                                                                                               |
+| -------- | ---------------------------------------------------------------------------------------------------------- |
+| 本地开发 | `runtime/`（不提交，已 gitignore）                                                                         |
+| CI/CD    | GitHub Actions Secrets（前端构建变量与镜像发布凭据）                                                       |
+| 生产     | `/srv/vxture/runtime/secrets/platform.env`、`platform-mail.env` 与服务专属 `.env.<service>`（`chmod 600`） |
+
+### 1.4 密钥强度要求
+
+| Secret                | 最小长度     | 生成方式                  |
+| --------------------- | ------------ | ------------------------- |
+| `JWT_SECRET`          | 64 字符      | `openssl rand -base64 48` |
+| `JWT_REFRESH_SECRET`  | 64 字符      | 与 `JWT_SECRET` 不同值    |
+| `AUTH_INTERNAL_TOKEN` | 32 字符      | `openssl rand -hex 16`    |
+| OAuth App Secret      | 由提供商决定 | 不自定义                  |
+
+---
+
+## 2. JWT 安全约束
+
+### 2.1 签发规则（仅 auth-bff）
+
+```
+✅ access token：由 `JWT_ACCESS_EXPIRES_IN` 配置，生产默认 8 小时
+✅ refresh token：由 `JWT_REFRESH_EXPIRES_IN` 配置，生产默认 30 天
+✅ jti：crypto.randomUUID()（每次签发唯一）
+✅ 签发后 access token 存入 HttpOnly Cookie
+❌ 禁止在 response body 中返回 token（防止 XSS 读取）
+❌ 禁止使用 HS256 以外的算法（对称密钥，内网服务间足够）
+```
+
+### 2.2 Cookie 安全属性
+
+```
+HttpOnly: true          # JS 无法读取，防 XSS 窃取
+Secure: true            # 仅 HTTPS 传输（生产）
+SameSite: Lax           # 防 CSRF，允许顶层 GET 跳转
+Domain: .vxture.com     # 跨子域共享（admin/console/api）
+```
+
+### 2.3 Token 吊销（fail-closed）
+
+```typescript
+// Redis 不可用时必须拒绝请求，禁止退化为"无状态验证"
+if (!redis.isConnected()) {
+  throw new ServiceUnavailableException("Auth service unavailable");
+}
+```
+
+黑名单 key 格式：`blacklist:jti:{jti}`，TTL = access token 剩余有效期。
+
+### 2.4 跨域 Token（crossdomain）
+
+- TTL：30 秒（一次性使用）
+- Redis `GETDEL` 原子操作：取即删，防止重放攻击
+- 生成方：auth-bff；消费方：目标 BFF
+
+---
+
+## 3. 内部服务鉴权
+
+BFF 之间或 BFF → agent-server 的内部调用，使用 Header 鉴权：
+
+```
+Header：x-vxture-internal-auth: {AUTH_INTERNAL_TOKEN}
+```
+
+接收方必须在入口中间件校验此 Header，拒绝不合法请求。
+
+```typescript
+// ✅ 正确
+if (req.headers["x-vxture-internal-auth"] !== process.env.AUTH_INTERNAL_TOKEN) {
+  throw new UnauthorizedException();
+}
+
+// ❌ 错误：相信调用方来自内网就不校验
+```
+
+---
+
+## 4. 各层安全边界
+
+### Portal 层（portals/_ / agent-studio/_）
+
+```
+✅ 所有 API 调用通过 gateway-bff 或直连专属 BFF
+✅ 不存储任何凭证（JWT 在 Cookie 中，JS 不可读）
+❌ 禁止从前端直接调用 service 层或 core 层 HTTP 接口
+❌ 禁止在前端代码中硬编码 API key / secret
+```
+
+### BFF 层
+
+```
+✅ 每个请求必须验证 JWT 有效性（签名 + 过期 + 黑名单）
+✅ console-bff 必须提取并校验 tenantId（只允许访问自己的租户）
+✅ admin-bff 必须校验 userType === 'operator'
+❌ 禁止从 request body / query 读取 tenantId 覆盖 JWT 中的值
+❌ 禁止跳过 AuthGuard 的任何 endpoint（/health 除外）
+```
+
+### agent-server 层
+
+```
+✅ 入口必须校验 x-vxture-internal-auth（拒绝外部直连）
+✅ CallerContext 必须二次校验 surface × userType 合法性
+✅ console surface 工具必须以 ctx.tenantId 过滤数据
+❌ 禁止接受前端传入的 allowedTools 覆盖白名单
+```
+
+### Service / Core 层
+
+```
+✅ 数据库查询使用 Prisma 参数化查询（不拼接 SQL 字符串）
+✅ 敏感字段（password）使用 bcrypt 哈希存储（cost ≥ 12）
+❌ 禁止在 service 层 log 中输出用户密码、token、完整手机号
+```
+
+---
+
+## 5. CORS 策略
+
+```
+允许来源：
+  - https://vxture.com
+  - https://*.vxture.com
+  - https://ruyin.ai
+  - http://localhost:* （仅 NODE_ENV=development）
+
+允许方法：GET, POST, PUT, DELETE, PATCH, OPTIONS
+允许 Headers：Content-Type, Authorization, X-Varda-Surface
+Credentials：true（Cookie 跨域传递）
+```
+
+---
+
+## 6. 数据安全
+
+### SQL 注入防护
+
+全平台使用 Prisma，自动参数化查询。禁止使用 `$queryRawUnsafe`：
+
+```typescript
+// ✅ 安全
+await prisma.user.findMany({ where: { email: userInput } });
+
+// ❌ 危险
+await prisma.$queryRawUnsafe(
+  `SELECT * FROM "User" WHERE email = '${userInput}'`,
+);
+```
+
+### 敏感数据日志过滤
+
+```typescript
+// logger 配置中屏蔽敏感字段
+const REDACTED_KEYS = [
+  "password",
+  "token",
+  "secret",
+  "authorization",
+  "cookie",
+];
+```
+
+### 个人信息处理
+
+- 手机号存储：加密存储或仅存最后 4 位（按合规要求）
+- 邮箱：明文存储，但日志中缩写显示（`u***@example.com`）
+
+---
+
+## 7. 安全检查清单（每次 PR）
+
+```
+□ 没有新的 .env 文件被提交
+□ 没有 API key / secret 出现在代码中
+□ 新增的 BFF endpoint 都经过了 AuthGuard
+□ 新增的 service 方法没有拼接 SQL 字符串
+□ 新增的日志没有打印敏感字段
+□ 新增的内部接口有 x-vxture-internal-auth 校验
+```

@@ -1,0 +1,6 @@
+{
+  "name": "@vxture/workers",
+  "version": "0.0.0",
+  "private": true,
+  "description": "异步任务处理"
+}

@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icon System Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  /* ── Light Theme (default) ── */
+  :root {
+    --bg: transparent;
+    --surface: #ffffff;
+    --surface2: #f6f8fa;
+    --border: #d0d7de;
+    --accent: #0969da;
+    --accent2: #cf222e;
+    --accent3: #1a7f37;
+    --accent4: #9a6700;
+    --text: #1f2328;
+    --text-dim: #636c76;
+    --text-mid: #424950;
+  }
+
+  /* ── Dark Theme ── */
+  [data-theme="dark"] {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #22222e;
+    --accent: #6e5bff;
+    --accent2: #ff5b8d;
+    --accent3: #5bffc8;
+    --accent4: #ffb85b;
+    --text: #e8e8f0;
+    --text-dim: #6b6b80;
+    --text-mid: #9999b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    transition: background 0.25s, color 0.25s;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px 48px;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .header-label {
+    font-size: 15px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--text) 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    margin-top: 10px;
+    color: var(--text-mid);
+    font-size: 17px;
+    
+    line-height: 1.7;
+  }
+
+  /* ── Layout ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── Layer Cards ── */
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .layer {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .layer-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .layer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .layer-title {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .layer-pkg {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .layer-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── File Cards ── */
+  .file-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .file-card:hover { border-color: var(--text-dim); }
+
+  .file-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .file-icon {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .file-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+
+  .file-path {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    letter-spacing: 0.2px;
+  }
+
+  .file-desc {
+    font-size: 15px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    padding-left: 34px;
+  }
+
+  /* ── Functions ── */
+  .fn-list {
+    margin-top: 10px;
+    padding-left: 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 15px;
+  }
+
+  .fn-name {
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  [data-theme="dark"] .fn-name {
+    color: #5bffc8;
+  }
+
+  .fn-desc {
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ── Layer colors ── */
+  .layer-phosphor .layer-dot { background: #9a6700; }
+  .layer-phosphor .layer-title { color: #9a6700; }
+  .layer-phosphor { background: linear-gradient(180deg, rgba(154,103,0,0.05) 0%, transparent 60%); }
+
+  .layer-ds .layer-dot { background: var(--accent); }
+  .layer-ds .layer-title { color: var(--accent); }
+  .layer-ds { background: linear-gradient(180deg, rgba(9,105,218,0.05) 0%, transparent 60%); }
+
+  .layer-business .layer-dot { background: var(--accent3); }
+  .layer-business .layer-title { color: var(--accent3); }
+  .layer-business { background: linear-gradient(180deg, rgba(26,127,55,0.05) 0%, transparent 60%); }
+
+  [data-theme="dark"] .flow-node.business {
+    background: rgba(91,255,200,0.1);
+    border: 1px solid rgba(91,255,200,0.3);
+    color: #5bffc8;
+  }
+  [data-theme="dark"] .flow-node.ds-node {
+    background: rgba(110,91,255,0.1);
+    border: 1px solid rgba(110,91,255,0.3);
+    color: #6e5bff;
+  }
+  [data-theme="dark"] .flow-node.external {
+    background: rgba(255,159,91,0.1);
+    border: 1px solid rgba(255,159,91,0.3);
+    color: #ff9f5b;
+  }
+  [data-theme="dark"] .flow-node.dom {
+    background: rgba(255,91,141,0.1);
+    border: 1px solid rgba(255,91,141,0.3);
+    color: #ff5b8d;
+  }
+  [data-theme="dark"] .layer-phosphor .layer-dot { background: #ff9f5b; }
+  [data-theme="dark"] .layer-phosphor .layer-title { color: #ff9f5b; }
+  [data-theme="dark"] .layer-phosphor { background: linear-gradient(180deg, rgba(255,159,91,0.04) 0%, transparent 60%); }
+  [data-theme="dark"] .layer-ds { background: linear-gradient(180deg, rgba(110,91,255,0.05) 0%, transparent 60%); }
+  [data-theme="dark"] .layer-business { background: linear-gradient(180deg, rgba(91,255,200,0.04) 0%, transparent 60%); }
+
+  /* ── Theme Toggle Button ── */
+  .theme-toggle {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px 6px 10px;
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text-mid);
+    transition: all 0.2s;
+    z-index: var(--vx-z-sticky, 100);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .theme-toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* ── Right Panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 24px;
+  }
+
+  /* ── Flow diagram ── */
+  .flow-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .flow-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .flow-body {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .flow-node {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+  }
+
+  .flow-node.business {
+    background: rgba(26,127,55,0.08);
+    border: 1px solid rgba(26,127,55,0.25);
+    color: var(--accent3);
+  }
+  .flow-node.ds-node {
+    background: rgba(9,105,218,0.08);
+    border: 1px solid rgba(9,105,218,0.25);
+    color: var(--accent);
+  }
+  .flow-node.external {
+    background: rgba(154,103,0,0.08);
+    border: 1px solid rgba(154,103,0,0.25);
+    color: #ff9f5b;
+  }
+  .flow-node.dom {
+    background: rgba(207,34,46,0.07);
+    border: 1px solid rgba(207,34,46,0.22);
+    color: var(--accent2);
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .flow-arrow-line {
+    width: 1px;
+    height: 14px;
+    background: var(--border);
+  }
+
+  .flow-arrow-label {
+    font-size: 15px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    background: var(--surface);
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    margin: 2px 0;
+  }
+
+  .flow-arrow-head {
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--border);
+  }
+
+  /* ── Fallback card ── */
+  .fallback-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .fallback-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .fallback-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fb-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .fb-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .fb-num.ok { background: rgba(26,127,55,0.1); color: var(--accent3); border: 1px solid rgba(26,127,55,0.25); }
+  .fb-num.warn { background: rgba(154,103,0,0.1); color: var(--accent4); border: 1px solid rgba(154,103,0,0.25); }
+  .fb-num.err { background: rgba(207,34,46,0.1); color: var(--accent2); border: 1px solid rgba(207,34,46,0.25); }
+  [data-theme="dark"] .fb-num.ok { background: rgba(91,255,200,0.15); color: #5bffc8; border: 1px solid rgba(91,255,200,0.3); }
+  [data-theme="dark"] .fb-num.warn { background: rgba(255,184,91,0.15); color: #ffb85b; border: 1px solid rgba(255,184,91,0.3); }
+  [data-theme="dark"] .fb-num.err { background: rgba(255,91,141,0.15); color: #ff5b8d; border: 1px solid rgba(255,91,141,0.3); }
+
+  .fb-text { color: var(--text-mid); }
+  .fb-text strong { color: var(--text); font-weight: 500; }
+  .fb-text code {
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── Export badge ── */
+  .export-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .export-badge.pub {
+    background: rgba(9,105,218,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(9,105,218,0.25);
+  }
+  [data-theme="dark"] .export-badge.pub {
+    background: rgba(110,91,255,0.15);
+    color: #6e5bff;
+    border: 1px solid rgba(110,91,255,0.3);
+  }
+  .export-badge.int {
+    background: rgba(107,107,128,0.15);
+    color: var(--text-dim);
+    border: 1px solid rgba(107,107,128,0.2);
+  }
+
+  /* ── Connector arrows between layers ── */
+  .layer-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  .connector-line {
+    flex: 1;
+    max-width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ── Deps card ── */
+  .panel-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .deps-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .deps-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .deps-body {
+    padding: 14px 16px;
+  }
+  .dep-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .dep-row:last-child { border-bottom: none; }
+  .dep-from { color: var(--accent3); min-width: 100px; font-size: 14px; font-weight: 500; }
+  .dep-arrow { color: var(--text-dim); }
+  .dep-to { color: var(--accent); font-size: 14px; font-weight: 500; }
+  [data-theme="dark"] .dep-from { color: #5bffc8; }
+  .dep-note { margin-left: auto; color: var(--text-dim); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+  <span class="theme-toggle-icon">☀️</span>
+  <span id="themeBtnLabel">Light</span>
+</button>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    const btn = document.getElementById('themeBtn');
+    const label = document.getElementById('themeBtnLabel');
+    if (isDark) {
+      html.removeAttribute('data-theme');
+      btn.querySelector('.theme-toggle-icon').textContent = '☀️';
+      label.textContent = 'Light';
+    } else {
+      html.setAttribute('data-theme', 'dark');
+      btn.querySelector('.theme-toggle-icon').textContent = '🌙';
+      label.textContent = 'Dark';
+    }
+  }
+
+  const collapseState = {};
+  function toggleCollapse(id) {
+    const el = document.getElementById(id);
+    const chevron = document.getElementById(id + '-chevron');
+    const isOpen = collapseState[id];
+    if (isOpen) {
+      el.style.maxHeight = '0';
+      chevron.textContent = '▼ 展开';
+      collapseState[id] = false;
+    } else {
+      el.style.maxHeight = el.scrollHeight + 'px';
+      chevron.textContent = '▲ 收起';
+      collapseState[id] = true;
+    }
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[id$="-chevron"]').forEach(chevron => {
+      const id = chevron.id.replace('-chevron', '');
+      collapseState[id] = false;
+    });
+  });
+</script>
+
+<div class="header">
+  <div class="header-label">Design System · Architecture Docs</div>
+  <h1>Icon System Architecture</h1>
+  <p>@vxture/design-system 图标系统文件结构、函数职责与调用关系全览</p>
+</div>
+
+<div class="main-grid">
+
+  <!-- ── Left: Layer Cards ── -->
+  <div class="layers">
+
+    <!-- Layer 1: Business -->
+    <div class="layer layer-business">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">Business Layer &nbsp;·&nbsp; 业务应用层</div>
+        <div class="layer-pkg">@vxture/website · @vxture/app</div>
+      </div>
+      <div class="layer-body">
+
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📄</div>
+            <div>
+              <div class="file-name">FeaturesSection.tsx <span class="export-badge int">internal</span></div>
+              <div class="file-path">src/presentation/components/sections/FeaturesSection.tsx</div>
+            </div>
+          </div>
+          <div class="file-desc">业务页面组件，从 JSON 数据中读取语义化图标名（如 "chart"），直接传给 &lt;Icon&gt; 渲染。<br>
+          <strong>不再依赖任何中间 mapper</strong>，业务层唯一的图标入口就是 design-system 的 &lt;Icon&gt;。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">JSX</span>
+              <span class="fn-desc">&lt;Icon name={feature.icon} size="xl" weight="duotone" /&gt; — 直接调用，无中间层</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="layer-connector">
+      <div class="connector-line"></div>
+      <span>import { Icon } from '@vxture/design-system'</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Layer 2: Design System -->
+    <div class="layer layer-ds">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">Design System Layer &nbsp;·&nbsp; 图标系统核心</div>
+        <div class="layer-pkg">@vxture/design-system</div>
+      </div>
+      <div class="layer-body">
+
+        <!-- icon-dictionary.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📖</div>
+            <div>
+              <div class="file-name">icon-dictionary.ts <span class="export-badge pub">public</span></div>
+              <div class="file-path">packages/design-system/src/icons/icon-dictionary.ts</div>
+            </div>
+          </div>
+          <div class="file-desc">语义化图标名称字典，定义所有可用图标的名称集合，是整个系统类型安全的唯一来源。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">iconDictionary</span>
+              <span class="fn-desc">as const 数组：['home', 'arrow-left', 'chart', 'agent', ...] 共 60+ 图标名称</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">IconName</span>
+              <span class="fn-desc">从 iconDictionary 推导：(typeof iconDictionary)[number]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- types.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">🏷️</div>
+            <div>
+              <div class="file-name">types.ts <span class="export-badge int">internal</span></div>
+              <div class="file-path">packages/design-system/src/icons/types.ts</div>
+            </div>
+          </div>
+          <div class="file-desc">仅包含类型定义文件，从 icon-dictionary 导入 IconName，不包含任何运行时代码。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">IconWeight</span>
+              <span class="fn-desc">联合类型：thin | light | regular | bold | fill | duotone（Phosphor 6种粗细）</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">IconSize</span>
+              <span class="fn-desc">语义尺寸枚举：xs | sm | md | lg | xl，也接受 number 直接传像素值</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">IconProps</span>
+              <span class="fn-desc">&lt;Icon&gt; 组件的 props interface，包含 name / size / weight / color / className / fallback</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- icon-registry.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">🗺️</div>
+            <div>
+              <div class="file-name">icon-registry.ts <span class="export-badge int">internal</span></div>
+              <div class="file-path">packages/design-system/src/icons/icon-registry.ts</div>
+            </div>
+          </div>
+          <div class="file-desc">
+            <strong>图标注册中心</strong>，也是系统中<strong>唯一直接 import Phosphor</strong> 的文件。
+            维护语义化名称 → Phosphor 组件的映射表，新增图标需同时更新 icon-dictionary.ts。
+            按业务分类组织（导航 / 操作 / 数据 / 云服务 / 状态 / 用户 / 文件）。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">iconRegistry</span>
+              <span class="fn-desc">const 对象：{ 'chart': ChartBar, 'agent': Robot, 'placeholder': Question, ... } 共 60+ 条目</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">satisfies Record&lt;IconName, React.ComponentType&lt;any&gt;&gt;</span>
+              <span class="fn-desc">确保 registry 与 dictionary 严格一致，缺失或多余 key 都会 TS 报错</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icon.tsx -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">⚛️</div>
+            <div>
+              <div class="file-name">Icon.tsx <span class="export-badge pub">public</span></div>
+              <div class="file-path">packages/design-system/src/icons/Icon.tsx</div>
+            </div>
+          </div>
+          <div class="file-desc">
+            <strong>唯一对外的渲染组件</strong>，业务层只需引用此组件。
+            负责尺寸映射、表达式 fallback 降级，无运行时校验，永不抛出异常。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">sizeMap</span>
+              <span class="fn-desc">语义尺寸 → px 映射：{ xs:12, sm:16, md:20, lg:24, xl:32 }</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">Placeholder</span>
+              <span class="fn-desc">最终兜底占位组件，name 和 fallback 都无效时渲染</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">Icon()</span>
+              <span class="fn-desc">主组件：解析 size → 表达式查找 iconRegistry → fallback → 渲染，无 if/else 分支</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- index.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📦</div>
+            <div>
+              <div class="file-name">index.ts <span class="export-badge pub">public</span></div>
+              <div class="file-path">packages/design-system/src/icons/index.ts</div>
+            </div>
+          </div>
+          <div class="file-desc">模块统一导出入口。控制对外暴露的 API 面，业务层 import 的所有内容均来自这里。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">export Icon</span>
+              <span class="fn-desc">渲染组件，业务层主要使用的入口</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">export types</span>
+              <span class="fn-desc">IconName / IconProps，供业务层做类型标注</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="layer-connector">
+      <div class="connector-line"></div>
+      <span>import { ChartBar, Robot, ... } from '@phosphor-icons/react'</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Layer 3: Phosphor -->
+    <div class="layer layer-phosphor">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">External Library &nbsp;·&nbsp; 第三方图标库</div>
+        <div class="layer-pkg">@phosphor-icons/react</div>
+      </div>
+      <div class="layer-body">
+
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📚</div>
+            <div>
+              <div class="file-name">@phosphor-icons/react</div>
+              <div class="file-path">node_modules/@phosphor-icons/react</div>
+            </div>
+          </div>
+          <div class="file-desc">
+            外部图标库，提供 1400+ SVG 图标 React 组件，支持 6种粗细变体。
+            <strong>仅被 icon-registry.ts 直接引用</strong>，业务层完全不感知此库的存在。
+            未来替换图标库只需修改 icon-registry.ts 一个文件。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">ChartBar, Robot...</span>
+              <span class="fn-desc">各类图标 React 组件，接受 size / weight / color / className props</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Right Panel ── -->
+  <div class="right-panel">
+
+    <!-- Call Flow -->
+    <div class="flow-card">
+      <div class="flow-header">调用流程 · Call Flow</div>
+      <div class="flow-body">
+
+        <div class="flow-node business">业务组件<br><small style="opacity:0.7">FeaturesSection.tsx</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">&lt;Icon name="chart" /&gt;</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+
+        <div class="flow-node ds-node">Icon.tsx<br><small style="opacity:0.7">解析 size · 表达式查找</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">iconRegistry[name] ?? fallback ?? Placeholder</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+
+        <div class="flow-node ds-node">icon-registry.ts<br><small style="opacity:0.7">查找 Phosphor 组件</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">iconRegistry["chart"] → ChartBar</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+
+        <div class="flow-node external">&lt;ChartBar /&gt;<br><small style="opacity:0.7">@phosphor-icons/react</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">render SVG</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+
+        <div class="flow-node dom">DOM 图标输出</div>
+
+      </div>
+    </div>
+
+    <!-- Fallback Flow -->
+    <div class="fallback-card">
+      <div class="fallback-header">未匹配降级策略 · Fallback</div>
+      <div class="fallback-body">
+
+        <div class="fb-step">
+          <div class="fb-num ok">1</div>
+          <div class="fb-text"><strong>编译时</strong><br>name 类型不匹配 → TS 直接报错，开发阶段拦截</div>
+        </div>
+
+        <div class="fb-step">
+          <div class="fb-num warn">2</div>
+          <div class="fb-text"><strong>运行时（动态数据）</strong><br>若 name 不存在 → 使用表达式直接 fallback，无 <code>console.warn</code></div>
+        </div>
+
+        <div class="fb-step">
+          <div class="fb-num warn">3</div>
+          <div class="fb-text"><strong>降级到 fallback prop</strong><br>渲染 <code>&lt;Icon fallback="placeholder" /&gt;</code> 指定的图标</div>
+        </div>
+
+        <div class="fb-step">
+          <div class="fb-num err">4</div>
+          <div class="fb-text"><strong>兜底保障</strong><br>fallback 也无效时 → 渲染 <code>Placeholder</code> 占位组件，永不抛出异常</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Deps -->
+    <div class="deps-card">
+      <div class="deps-header">依赖关系 · Dependencies</div>
+      <div class="deps-body">
+        <div class="dep-row">
+          <span class="dep-from">FeaturesSection</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">Icon.tsx</span>
+          <span class="dep-note">唯一入口</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">Icon.tsx</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">icon-registry.ts</span>
+          <span class="dep-note">查找组件</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">Icon.tsx</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">types.ts</span>
+          <span class="dep-note">类型引用</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">icon-registry.ts</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">Phosphor</span>
+          <span class="dep-note">唯一外部依赖</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">icon-registry.ts</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">icon-dictionary.ts</span>
+          <span class="dep-note">类型约束</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">index.ts</span>
+          <span class="dep-arrow">→</span>
+          <span class="dep-to">全部导出</span>
+          <span class="dep-note">API 边界</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Icon Registry -->
+    <div class="panel-card">
+      <div class="panel-header collapsible" onclick="toggleCollapse('icon-registry')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;">
+        <span>图标清单 · Registry</span>
+        <span class="chevron" id="icon-registry-chevron" style="font-size:11px;color:var(--text-dim);transition:transform 0.2s;">▼ 展开</span>
+      </div>
+      <div id="icon-registry" style="overflow:hidden;transition:max-height 0.3s ease;max-height:0">
+        <div style="display:flex;flex-direction:column">
+
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">导航 · Navigation</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🏠</span>
+            <span class="dep-to">home</span>
+            <span class="dep-note">首页 · House</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">←</span>
+            <span class="dep-to" style="color:var(--text-mid)">arrow-left</span>
+            <span class="dep-note">返回 · ArrowLeft</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">☰</span>
+            <span class="dep-to" style="color:var(--text-mid)">menu</span>
+            <span class="dep-note">菜单 · List</span>
+          </div>
+
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);border-top:1px solid var(--border);margin-top:4px">操作 · Action</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🔍</span>
+            <span class="dep-to" style="color:var(--text-mid)">search</span>
+            <span class="dep-note">搜索 · MagnifyingGlass</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">⚙️</span>
+            <span class="dep-to" style="color:var(--text-mid)">settings</span>
+            <span class="dep-note">设置 · Gear</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">✏️</span>
+            <span class="dep-to" style="color:var(--text-mid)">edit</span>
+            <span class="dep-note">编辑 · PencilSimple</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🗑️</span>
+            <span class="dep-to" style="color:var(--text-mid)">delete</span>
+            <span class="dep-note">删除 · Trash</span>
+          </div>
+
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);border-top:1px solid var(--border);margin-top:4px">平台 · Platform</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🤖</span>
+            <span class="dep-to" style="color:var(--text-mid)">agent</span>
+            <span class="dep-note">智能体 · Robot</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">⚡</span>
+            <span class="dep-to" style="color:var(--text-mid)">trigger</span>
+            <span class="dep-note">触发器 · Lightning</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">☁️</span>
+            <span class="dep-to" style="color:var(--text-mid)">cloud</span>
+            <span class="dep-note">云服务 · Cloud</span>
+          </div>
+
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);border-top:1px solid var(--border);margin-top:4px">状态 · Status</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">✅</span>
+            <span class="dep-to" style="color:var(--accent3)">success</span>
+            <span class="dep-note">成功 · CheckCircle</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">❌</span>
+            <span class="dep-to" style="color:var(--accent2)">error</span>
+            <span class="dep-note">错误 · XCircle</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px;border-bottom:none">
+            <span style="font-size:13px">⚠️</span>
+            <span class="dep-to" style="color:var(--accent4)">warning</span>
+            <span class="dep-note">警告 · Warning</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

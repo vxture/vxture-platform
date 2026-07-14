@@ -1,0 +1,10 @@
+@import "@vxture/design-system/styles/globals.css";
+@import "@vxture/design-system/styles/brands/vxture.css";
+@import "@vxture/agent-studio-varda/styles/chat.css";
+@import "@vxture/agent-studio-varda/styles/tool.css";
+
+/* Console templates design — verbatim shell visual system (loaded after DS so
+ * the template's .app/.vxh/.sidebar/.assistant chrome and ergonomic aliases win).
+ * Phosphor icon font is loaded via <link> in app/layout.tsx (CSS @import would
+ * violate "@import must precede all rules" once inlined after DS rules). */
+@import "../styles/console-template.css";

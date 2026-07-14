@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Component System Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  /* ── Light Theme (default) ── */
+  :root {
+    --bg: transparent;
+    --surface: #ffffff;
+    --surface2: #f6f8fa;
+    --border: #d0d7de;
+    --accent: #0969da;
+    --accent2: #cf222e;
+    --accent3: #1a7f37;
+    --accent4: #9a6700;
+    --text: #1f2328;
+    --text-dim: #636c76;
+    --text-mid: #424950;
+  }
+
+  /* ── Dark Theme ── */
+  [data-theme="dark"] {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #22222e;
+    --accent: #6e5bff;
+    --accent2: #ff5b8d;
+    --accent3: #5bffc8;
+    --accent4: #ffb85b;
+    --text: #e8e8f0;
+    --text-dim: #6b6b80;
+    --text-mid: #9999b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    transition: background 0.25s, color 0.25s;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px 48px;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .header-label {
+    font-size: 15px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--text) 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    margin-top: 10px;
+    color: var(--text-mid);
+    font-size: 17px;
+    
+    line-height: 1.7;
+  }
+
+  /* ── Layout ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── Layer Cards ── */
+  .layers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .layer {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .layer-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .layer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .layer-title {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .layer-pkg {
+    margin-left: auto;
+    font-size: 14px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .layer-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── File Cards ── */
+  .file-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .file-card:hover { border-color: var(--text-dim); }
+
+  .file-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .file-icon {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .file-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+
+  .file-path {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    letter-spacing: 0.2px;
+  }
+
+  .file-desc {
+    font-size: 15px;
+    color: var(--text-mid);
+    line-height: 1.7;
+    padding-left: 34px;
+  }
+
+  /* ── Functions ── */
+  .fn-list {
+    margin-top: 10px;
+    padding-left: 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fn-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 15px;
+  }
+
+  .fn-name {
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  [data-theme="dark"] .fn-name {
+    color: #5bffc8;
+  }
+
+  .fn-desc {
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ── Layer colors ── */
+  .layer-phosphor .layer-dot { background: #9a6700; }
+  .layer-phosphor .layer-title { color: #9a6700; }
+  .layer-phosphor { background: linear-gradient(180deg, rgba(154,103,0,0.05) 0%, transparent 60%); }
+
+  .layer-ds .layer-dot { background: var(--accent); }
+  .layer-ds .layer-title { color: var(--accent); }
+  .layer-ds { background: linear-gradient(180deg, rgba(9,105,218,0.05) 0%, transparent 60%); }
+
+  .layer-business .layer-dot { background: var(--accent3); }
+  .layer-business .layer-title { color: var(--accent3); }
+  .layer-business { background: linear-gradient(180deg, rgba(26,127,55,0.05) 0%, transparent 60%); }
+
+  [data-theme="dark"] .flow-node.business {
+    background: rgba(91,255,200,0.1);
+    border: 1px solid rgba(91,255,200,0.3);
+    color: #5bffc8;
+  }
+  [data-theme="dark"] .flow-node.ds-node {
+    background: rgba(110,91,255,0.1);
+    border: 1px solid rgba(110,91,255,0.3);
+    color: #6e5bff;
+  }
+  [data-theme="dark"] .flow-node.external {
+    background: rgba(255,159,91,0.1);
+    border: 1px solid rgba(255,159,91,0.3);
+    color: #ff9f5b;
+  }
+  [data-theme="dark"] .flow-node.dom {
+    background: rgba(255,91,141,0.1);
+    border: 1px solid rgba(255,91,141,0.3);
+    color: #ff5b8d;
+  }
+  [data-theme="dark"] .layer-phosphor .layer-dot { background: #ff9f5b; }
+  [data-theme="dark"] .layer-phosphor .layer-title { color: #ff9f5b; }
+  [data-theme="dark"] .layer-phosphor { background: linear-gradient(180deg, rgba(255,159,91,0.04) 0%, transparent 60%); }
+  [data-theme="dark"] .layer-ds { background: linear-gradient(180deg, rgba(110,91,255,0.05) 0%, transparent 60%); }
+  [data-theme="dark"] .layer-business { background: linear-gradient(180deg, rgba(91,255,200,0.04) 0%, transparent 60%); }
+
+  /* ── Theme Toggle Button ── */
+  .theme-toggle {
+    position: fixed;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px 6px 10px;
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text-mid);
+    transition: all 0.2s;
+    z-index: var(--vx-z-sticky, 100);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .theme-toggle-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* ── Right Panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 24px;
+  }
+
+  /* ── Flow diagram ── */
+  .flow-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .flow-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .flow-body {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .flow-node {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+  }
+
+  .flow-node.business {
+    background: rgba(26,127,55,0.08);
+    border: 1px solid rgba(26,127,55,0.25);
+    color: var(--accent3);
+  }
+  .flow-node.ds-node {
+    background: rgba(9,105,218,0.08);
+    border: 1px solid rgba(9,105,218,0.25);
+    color: var(--accent);
+  }
+  .flow-node.external {
+    background: rgba(154,103,0,0.08);
+    border: 1px solid rgba(154,103,0,0.25);
+    color: #ff9f5b;
+  }
+  .flow-node.dom {
+    background: rgba(207,34,46,0.07);
+    border: 1px solid rgba(207,34,46,0.22);
+    color: var(--accent2);
+  }
+
+  .flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    gap: 0;
+  }
+
+  .flow-arrow-line {
+    width: 1px;
+    height: 14px;
+    background: var(--border);
+  }
+
+  .flow-arrow-label {
+    font-size: 15px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    background: var(--surface);
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    margin: 2px 0;
+  }
+
+  .flow-arrow-head {
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--border);
+  }
+
+  /* ── Fallback card ── */
+  .fallback-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .fallback-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .fallback-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fb-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .fb-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .fb-num.ok { background: rgba(26,127,55,0.1); color: var(--accent3); border: 1px solid rgba(26,127,55,0.25); }
+  .fb-num.warn { background: rgba(154,103,0,0.1); color: var(--accent4); border: 1px solid rgba(154,103,0,0.25); }
+  .fb-num.err { background: rgba(207,34,46,0.1); color: var(--accent2); border: 1px solid rgba(207,34,46,0.25); }
+  [data-theme="dark"] .fb-num.ok { background: rgba(91,255,200,0.15); color: #5bffc8; border: 1px solid rgba(91,255,200,0.3); }
+  [data-theme="dark"] .fb-num.warn { background: rgba(255,184,91,0.15); color: #ffb85b; border: 1px solid rgba(255,184,91,0.3); }
+  [data-theme="dark"] .fb-num.err { background: rgba(255,91,141,0.15); color: #ff5b8d; border: 1px solid rgba(255,91,141,0.3); }
+
+  .fb-text { color: var(--text-mid); }
+  .fb-text strong { color: var(--text); font-weight: 500; }
+  .fb-text code {
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent);
+    font-size: 14px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── Export badge ── */
+  .export-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .export-badge.pub {
+    background: rgba(9,105,218,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(9,105,218,0.25);
+  }
+  [data-theme="dark"] .export-badge.pub {
+    background: rgba(110,91,255,0.15);
+    color: #6e5bff;
+    border: 1px solid rgba(110,91,255,0.3);
+  }
+  .export-badge.int {
+    background: rgba(107,107,128,0.15);
+    color: var(--text-dim);
+    border: 1px solid rgba(107,107,128,0.2);
+  }
+
+  /* ── Connector arrows between layers ── */
+  .layer-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+  .connector-line {
+    flex: 1;
+    max-width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ── Deps card ── */
+  .deps-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .deps-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .deps-body {
+    padding: 14px 16px;
+  }
+  .dep-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .dep-row:last-child { border-bottom: none; }
+  .dep-from { color: var(--accent3); min-width: 100px; font-size: 14px; font-weight: 500; }
+  .dep-arrow { color: var(--text-dim); }
+  .dep-to { color: var(--accent); font-size: 14px; font-weight: 500; }
+  [data-theme="dark"] .dep-from { color: #5bffc8; }
+  .dep-note { margin-left: auto; color: var(--text-dim); font-size: 13px; }
+
+
+  /* ── Component-specific ── */
+  .panel-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .flow-body {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .flow-node {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+  }
+  .flow-node small { display: block; font-size: 13px; opacity: 0.7; margin-top: 2px; font-weight: 400; }
+  .flow-node.n-business { background: rgba(26,127,55,0.08);  border: 1px solid rgba(26,127,55,0.25);  color: var(--accent3); }
+  .flow-node.n-ds       { background: rgba(9,105,218,0.08);  border: 1px solid rgba(9,105,218,0.25);  color: var(--accent); }
+  .flow-node.n-radix    { background: rgba(109,40,217,0.08); border: 1px solid rgba(109,40,217,0.25); color: #6d28d9; }
+  .flow-node.n-dom      { background: rgba(207,34,46,0.07);  border: 1px solid rgba(207,34,46,0.2);   color: var(--accent2); }
+  [data-theme="dark"] .flow-node.n-business { background: rgba(91,255,200,0.08);  border-color: rgba(91,255,200,0.25);  color: #5bffc8; }
+  [data-theme="dark"] .flow-node.n-ds       { background: rgba(110,91,255,0.08); border-color: rgba(110,91,255,0.25); color: #6e5bff; }
+  [data-theme="dark"] .flow-node.n-radix    { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.25); color: #a78bfa; }
+  [data-theme="dark"] .flow-node.n-dom      { background: rgba(255,91,141,0.08);  border-color: rgba(255,91,141,0.25);  color: #ff5b8d; }
+  .props-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .props-table th {
+    text-align: left; padding: 7px 10px;
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  .props-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .props-table tr:last-child td { border-bottom: none; }
+  .props-table td:first-child { color: var(--accent); font-weight: 600; font-size: 14px; }
+  [data-theme="dark"] .props-table td:first-child { color: #5bffc8; }
+  .props-table td:nth-child(2) { color: var(--accent4); font-size: 14px; }
+  [data-theme="dark"] .props-table td:nth-child(2) { color: #ffb85b; }
+  .variants-grid { display: flex; flex-direction: column; gap: 6px; }
+  .variant-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+  .variant-row:last-child { border-bottom: none; }
+  .variant-name { font-weight: 600; color: var(--accent); min-width: 80px; font-size: 15px; }
+  [data-theme="dark"] .variant-name { color: #6e5bff; }
+  .variant-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .variant-desc { color: var(--text-mid); font-size: 15px; }
+  .badge {
+    display: inline-flex; align-items: center;
+    font-size: 12px; padding: 2px 7px; border-radius: 4px;
+    margin-left: 7px; vertical-align: middle; font-weight: 500;
+  }
+  .badge-pub  { background: rgba(9,105,218,0.1);  color: var(--accent);  border: 1px solid rgba(9,105,218,0.2); }
+  .badge-int  { background: rgba(99,108,118,0.1); color: var(--text-dim);border: 1px solid rgba(99,108,118,0.2);}
+  .badge-type { background: rgba(26,127,55,0.1);  color: var(--accent3); border: 1px solid rgba(26,127,55,0.2); }
+  [data-theme="dark"] .badge-pub  { color: #6e5bff; border-color: rgba(110,91,255,0.3); background: rgba(110,91,255,0.12); }
+  [data-theme="dark"] .badge-type { color: #5bffc8; border-color: rgba(91,255,200,0.3); background: rgba(91,255,200,0.1); }
+  .layer-radix .layer-dot  { background: #9a6700; }
+  .layer-radix .layer-title{ color: #9a6700; }
+  .layer-radix { background: linear-gradient(180deg, rgba(154,103,0,0.05) 0%, transparent 60%); }
+  [data-theme="dark"] .layer-radix .layer-dot  { background: #ffb85b; }
+  [data-theme="dark"] .layer-radix .layer-title{ color: #ffb85b; }
+  [data-theme="dark"] .layer-radix { background: linear-gradient(180deg, rgba(255,184,91,0.04) 0%, transparent 60%); }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+  <span class="theme-toggle-icon">☀️</span>
+  <span id="themeBtnLabel">Light</span>
+</button>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html[isDark ? 'removeAttribute' : 'setAttribute']('data-theme', 'dark');
+    document.getElementById('themeBtn').querySelector('.theme-toggle-icon').textContent = isDark ? '☀️' : '🌙';
+    document.getElementById('themeBtnLabel').textContent = isDark ? 'Light' : 'Dark';
+  }
+
+  // 折叠/展开
+  const collapseState = {};
+  function toggleCollapse(id, headerEl) {
+    const el = document.getElementById(id);
+    const chevron = document.getElementById(id + '-chevron');
+    const isOpen = collapseState[id];
+    if (isOpen) {
+      el.style.maxHeight = '0';
+      chevron.textContent = '▼ 展开';
+      collapseState[id] = false;
+    } else {
+      el.style.maxHeight = el.scrollHeight + 'px';
+      chevron.textContent = '▲ 收起';
+      collapseState[id] = true;
+    }
+  }
+  // 初始化所有折叠面板为收起状态
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[id$="-chevron"]').forEach(chevron => {
+      const id = chevron.id.replace('-chevron', '');
+      collapseState[id] = false;
+      chevron.textContent = '▼ 展开';
+    });
+  });
+</script>
+
+<div class="header">
+  <div class="header-label">Design System · Component System</div>
+  <h1>Component System Architecture</h1>
+  <p>@vxture/design-system 组件系统的设计架构、文件结构与调用关系全览。<br>所有组件底层基于 <strong>Shadcn/ui -> Radix UI Primitives</strong> 封装，统一行为与无障碍，业务层只感知 design-system 的组件 API。<br><br>以下以 <strong>Button</strong> 为例说明每个层级的职责与实现方式，其他组件（Input、Modal、Select 等）遵循相同结构。</p>
+</div>
+
+<div class="main-grid">
+
+  <!-- ── Left: Layers ── -->
+  <div class="layers">
+
+    <!-- Business Layer -->
+    <div class="layer layer-business">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">Business Layer · 业务应用层</div>
+        <div class="layer-pkg">@vxture/website · @vxture/app</div>
+      </div>
+      <div class="layer-body">
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📄</div>
+            <div>
+              <div class="file-name">AgentToolbar.tsx <span class="badge badge-int">internal</span> <span class="badge" style="background:rgba(154,103,0,0.1);color:var(--accent4);border:1px solid rgba(154,103,0,0.2);font-size:11px">示例：Button 使用</span></div>
+              <div class="file-path">src/presentation/components/agent/AgentToolbar.tsx</div>
+            </div>
+          </div>
+          <div class="file-desc">
+            业务组件示例。直接从 design-system 导入 <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:13px;border:1px solid var(--border)">&lt;Button&gt;</code>，
+            传入语义化的 <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:13px;border:1px solid var(--border)">variant</code> 和 <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:13px;border:1px solid var(--border)">size</code>，
+            不关心任何样式实现细节。支持传入 Icon 组合使用。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">JSX 使用</span>
+              <span class="fn-desc">&lt;Button variant="primary" size="md" leftIcon="agent"&gt;启动智能体&lt;/Button&gt;</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">JSX 使用</span>
+              <span class="fn-desc">&lt;Button variant="ghost" size="sm" loading={isRunning} /&gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer-connector">
+      <div class="connector-line"></div>
+      <span>import { Button, Input, Modal, ... } from '@vxture/design-system'</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Design System Layer -->
+    <div class="layer layer-ds">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">Design System Layer · 组件系统核心</div>
+        <div class="layer-pkg">@vxture/design-system</div>
+      </div>
+      <div class="layer-body">
+
+        <!-- types.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">🏷️</div>
+            <div>
+              <div class="file-name">types.ts <span class="badge badge-pub">public</span> <span class="badge badge-type">types only</span></div>
+              <div class="file-path">packages/design-system/src/button/types.ts  <em style="color:var(--text-dim);font-style:normal;font-size:11px">— 每个组件均有同级 types.ts</em></div>
+            </div>
+          </div>
+          <div class="file-desc">每个组件的 TypeScript 类型定义独立存放。以 Button 为例：所有变体和尺寸以联合类型约束，避免业务层传入非法值。其他组件（Input、Modal 等）在各自目录下有相同结构的 types.ts。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">ButtonVariant</span>
+              <span class="fn-desc">'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' — 按钮视觉变体</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">ButtonSize</span>
+              <span class="fn-desc">'xs' | 'sm' | 'md' | 'lg' — 尺寸规格，对应具体 padding/font-size</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">ButtonProps</span>
+              <span class="fn-desc">完整 props interface，继承原生 &lt;button&gt; 属性，扩展 variant / size / loading / leftIcon / rightIcon / fullWidth</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- buttonStyles.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">🎨</div>
+            <div>
+              <div class="file-name">buttonStyles.ts <span class="badge badge-int">internal</span></div>
+              <div class="file-path">packages/design-system/src/button/buttonStyles.ts  <em style="color:var(--text-dim);font-style:normal;font-size:11px">— 对应各组件的 styles 文件</em></div>
+            </div>
+          </div>
+          <div class="file-desc">
+            每个组件有独立的样式配置文件。使用 <strong>class-variance-authority (cva)</strong> 管理变体与尺寸的 Tailwind 类名组合，样式与渲染逻辑分离。所有组件遵循此模式：buttonStyles / inputStyles / modalStyles...
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">buttonVariants()</span>
+              <span class="fn-desc">cva 函数，根据 variant + size 组合返回对应 className 字符串。Button.tsx 调用此函数生成最终类名</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">sizeConfig</span>
+              <span class="fn-desc">尺寸 → padding/font/icon-size 的映射对象，确保尺寸规格统一</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Button.tsx -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">⚛️</div>
+            <div>
+              <div class="file-name">Button.tsx <span class="badge badge-pub">public</span></div>
+              <div class="file-path">packages/design-system/src/[component]/[Component].tsx  <em style="color:var(--text-dim);font-style:normal;font-size:11px">— 每个组件的渲染入口</em></div>
+            </div>
+          </div>
+          <div class="file-desc">
+            <strong>对外唯一渲染组件</strong>。封装 shadcn/ui 的 Button 组件，处理 loading 状态、图标插槽、disabled 逻辑，将 shadcn 实现细节对业务层完全屏蔽。底层由 Radix Slot + Tailwind + cva 支撑。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">Button()</span>
+              <span class="fn-desc">主组件：合并 className → 处理 loading → 渲染 leftIcon/rightIcon → 通过 Radix Slot 输出 DOM</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">renderIcon()</span>
+              <span class="fn-desc">内部函数，将 IconName 传给 &lt;Icon&gt; 组件，自动匹配当前 size 对应的图标尺寸</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">LoadingSpinner</span>
+              <span class="fn-desc">内部子组件，loading=true 时替换 leftIcon 位置，使用 &lt;Icon name="loading" /&gt; 旋转动画</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- index.ts -->
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📦</div>
+            <div>
+              <div class="file-name">index.ts <span class="badge badge-pub">public</span></div>
+              <div class="file-path">packages/design-system/src/index.ts  <em style="color:var(--text-dim);font-style:normal;font-size:11px">— 设计系统统一导出入口</em></div>
+            </div>
+          </div>
+          <div class="file-desc">设计系统统一导出入口，汇总所有组件的对外 API。内部实现（styles、primitives）不导出，业务层只通过此文件访问所有组件与类型。</div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">export *</span>
+              <span class="fn-desc">Button / Input / Modal / Select / Icon / ... 所有组件统一从此导出</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">export types</span>
+              <span class="fn-desc">所有组件的 Props 类型，供业务层做类型标注，如 ButtonProps / InputProps / ModalProps</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="layer-connector">
+      <div class="connector-line"></div>
+      <span>shadcn/ui 组件源码 copy 进 design-system，底层依赖 @radix-ui + Tailwind</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Radix Layer -->
+    <div class="layer layer-radix">
+      <div class="layer-header">
+        <div class="layer-dot"></div>
+        <div class="layer-title">External Library · 第三方基础库</div>
+        <div class="layer-pkg">shadcn/ui + @radix-ui/react-slot</div>
+      </div>
+      <div class="layer-body">
+        <div class="file-card">
+          <div class="file-card-top">
+            <div class="file-icon">📚</div>
+            <div>
+              <div class="file-name">shadcn/ui <span class="badge badge-pub">当前选型</span></div>
+              <div class="file-path">components/ui/  ·  底层 @radix-ui/react-slot + Tailwind + cva</div>
+            </div>
+          </div>
+          <div class="file-desc">
+            Radix UI 提供的 <strong>Slot primitive</strong>。核心能力是将 Button 的 props（样式、事件）合并到子组件上，
+            实现 <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-size:13px;border:1px solid var(--border)">asChild</code> 模式——
+            让 Button 渲染为 &lt;a&gt; 或其他元素，而不改变任何 API。无样式、无副作用，仅提供行为。
+          </div>
+          <div class="fn-list">
+            <div class="fn-item">
+              <span class="fn-name">npx shadcn add</span>
+              <span class="fn-desc">按需安装组件，源码落地到 design-system/src/components/ui/</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">Lyra 风格</span>
+              <span class="fn-desc">方正锐利，深色模式出色，科技感强，匹配云服务/智能体平台定位</span>
+            </div>
+            <div class="fn-item">
+              <span class="fn-name">asChild / Slot</span>
+              <span class="fn-desc">底层 Radix Slot 支持多态渲染，如 &lt;Button asChild&gt;&lt;a&gt;...&lt;/a&gt;&lt;/Button&gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Right Panel ── -->
+  <div class="right-panel">
+
+    <!-- Call Flow -->
+    <div class="panel-card">
+      <div class="panel-header">调用流程 · 以 Button 为例</div>
+      <div class="flow-body">
+        <div class="flow-node n-business">业务组件<small>AgentToolbar.tsx</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">&lt;Button variant="primary" /&gt;</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+        <div class="flow-node n-ds">Button.tsx<small>合并样式 · 处理状态</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">buttonVariants({ variant, size })</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+        <div class="flow-node n-ds">buttonStyles.ts<small>返回 className 字符串</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">Slot / &lt;button&gt;</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+        <div class="flow-node n-radix">shadcn/ui Button<small>Radix Slot · Tailwind · cva</small></div>
+        <div class="flow-arrow">
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-label">render DOM</div>
+          <div class="flow-arrow-line"></div>
+          <div class="flow-arrow-head"></div>
+        </div>
+        <div class="flow-node n-dom">DOM 输出</div>
+      </div>
+    </div>
+
+    <!-- Props -->
+    <div class="panel-card">
+      <div class="panel-header">组件参数</div>
+      <div class="panel-body" style="padding:0">
+        <table class="props-table">
+          <thead>
+            <tr>
+              <th>Prop</th>
+              <th>Type</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>variant</td><td>ButtonVariant</td><td>视觉变体，默认 primary</td></tr>
+            <tr><td>size</td><td>ButtonSize</td><td>尺寸规格，默认 md</td></tr>
+            <tr><td>loading</td><td>boolean</td><td>加载态，自动禁用并显示 spinner</td></tr>
+            <tr><td>leftIcon</td><td>IconName</td><td>左侧图标，来自 icon 系统</td></tr>
+            <tr><td>rightIcon</td><td>IconName</td><td>右侧图标</td></tr>
+            <tr><td>fullWidth</td><td>boolean</td><td>宽度撑满父容器</td></tr>
+            <tr><td>asChild</td><td>boolean</td><td>多态渲染，如渲染为 &lt;a&gt;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Deps -->
+    <div class="panel-card">
+      <div class="panel-header">依赖关系</div>
+      <div class="panel-body">
+        <div class="dep-row">
+          <span class="dep-from">AgentToolbar</span>
+          <span class="dep-arr">→</span>
+          <span class="dep-to">Button.tsx</span>
+          <span class="dep-note">唯一入口</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">Button.tsx</span>
+          <span class="dep-arr">→</span>
+          <span class="dep-to">buttonStyles.ts</span>
+          <span class="dep-note">样式计算</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">Button.tsx</span>
+          <span class="dep-arr">→</span>
+          <span class="dep-to">Icon.tsx</span>
+          <span class="dep-note">图标插槽</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">Button.tsx</span>
+          <span class="dep-arr">→</span>
+          <span class="dep-to">shadcn/ui</span>
+          <span class="dep-note">源码在 repo</span>
+        </div>
+        <div class="dep-row">
+          <span class="dep-from">index.ts</span>
+          <span class="dep-arr">→</span>
+          <span class="dep-to">全部导出</span>
+          <span class="dep-note">API 边界</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Component Registry -->
+    <div class="panel-card">
+      <div class="panel-header collapsible" onclick="toggleCollapse('comp-registry', this)" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;">
+        <span>组件清单 · Registry</span>
+        <span class="chevron" id="comp-registry-chevron" style="font-size:11px;color:var(--text-dim);transition:transform 0.2s;">▲ 收起</span>
+      </div>
+      <div id="comp-registry" style="overflow:hidden;transition:max-height 0.3s ease;max-height:0">
+        <div style="display:flex;flex-direction:column">
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);">基础 · Primitives</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">⚡</span>
+            <span class="dep-to">Button</span>
+            <span class="dep-note">当前示例</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">✏️</span>
+            <span class="dep-to" style="color:var(--text-mid)">Input</span>
+            <span class="dep-note">文本输入</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">☑️</span>
+            <span class="dep-to" style="color:var(--text-mid)">Checkbox / Radio</span>
+            <span class="dep-note">选择控件</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🔽</span>
+            <span class="dep-to" style="color:var(--text-mid)">Select</span>
+            <span class="dep-note">下拉选择</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🏷️</span>
+            <span class="dep-to" style="color:var(--text-mid)">Badge / Tag</span>
+            <span class="dep-note">标记标签</span>
+          </div>
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);border-top:1px solid var(--border);margin-top:4px">浮层 · Overlay</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🪟</span>
+            <span class="dep-to" style="color:var(--text-mid)">Modal / Dialog</span>
+            <span class="dep-note">模态框</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">💬</span>
+            <span class="dep-to" style="color:var(--text-mid)">Tooltip</span>
+            <span class="dep-note">提示气泡</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">📋</span>
+            <span class="dep-to" style="color:var(--text-mid)">Popover</span>
+            <span class="dep-note">浮动面板</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🔔</span>
+            <span class="dep-to" style="color:var(--text-mid)">Toast</span>
+            <span class="dep-note">消息通知</span>
+          </div>
+          <div style="padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);border-bottom:1px solid var(--border);border-top:1px solid var(--border);margin-top:4px">布局 · Layout</div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">📑</span>
+            <span class="dep-to" style="color:var(--text-mid)">Tabs</span>
+            <span class="dep-note">标签页</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px">
+            <span style="font-size:13px">🗂️</span>
+            <span class="dep-to" style="color:var(--text-mid)">Accordion</span>
+            <span class="dep-note">折叠面板</span>
+          </div>
+          <div class="dep-row" style="padding:7px 16px;border-bottom:none">
+            <span style="font-size:13px">⏳</span>
+            <span class="dep-to" style="color:var(--text-mid)">Skeleton / Spinner</span>
+            <span class="dep-note">加载态</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

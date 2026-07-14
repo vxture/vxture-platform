@@ -1,0 +1,18 @@
+{
+  "title": "联系我们",
+  "description": "有任何问题？我们随时为您服务",
+  "form": {
+    "name": "姓名",
+    "email": "邮箱",
+    "subject": "主题",
+    "message": "留言",
+    "submit": "发送",
+    "success": "发送成功，我们将尽快回复"
+  },
+  "info": {
+    "email": "contact@vxture.ai",
+    "phone": "400-123-4567",
+    "address": "北京市朝阳区",
+    "workingHours": "周一至周五 9:00-18:00"
+  }
+}

@@ -1,0 +1,269 @@
+name: db-init
+
+# Manual DB initialization / reseed / reset for VXTURE_DEPLOY_HOST, run over SSH so no
+# local commands are needed. The regular deploy (deploy-production) deliberately
+# skips DDL apply/seed; this workflow performs them with the latest corrected
+# scripts SCP'd from the chosen ref.
+#
+# DDL flow (data_platform_320): the platform DB structure's single source of truth is the
+# hand-written SQL DDL under deploy/database/ddl/ (applied by 28-apply-platform-ddl.sh, which
+# runs ddl/apply.sh in a psql container). Seed is deploy/database/seed/ (run by 29-seed-...).
+# The legacy prisma runners (22-migrate / 23-seed / 26-reset) are SUPERSEDED and no longer called.
+#
+#   action=seed              -> 29-seed (reseed platform catalog + sample via the new DDL seed)
+#                               -> 30-verify (live baseline audit)
+#   action=migrate-seed      -> 28-apply (clean-baseline DDL, no reset) then 29-seed -> 30-verify
+#   action=reset             -> 28b capture appoidc -> 28-apply --reset (DROP+rebuild 18 schemas)
+#                               -> 29-seed -> 28b restore appoidc (coordinated cutover, §6)
+#                               -> 30-verify [destructive]
+#   action=verify            -> 30-verify only (read-only live baseline audit: schema set ==
+#                               18 targets, table count == DDL, seed catalog floors; §9.5-③)
+#   action=provision-secrets -> 27-provision client secrets, 29-seed, recreate RP bffs
+#                               (fixes RP token exchange 401 invalid_client)
+#   action=sync-env          -> ensure each RP's own *_BASE_URL in its runtime env
+#                               (from the example), recreate RP bffs
+#                               (fixes IdP authorize 400 invalid_redirect_uri)
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref whose deploy scripts to use'
+        required: true
+        default: 'main'
+      expected_sha:
+        description: 'Full SHA the ref must resolve to (pin against ref drift; REQUIRED for DB-mutating actions — data_platform_320 §9.5-①)'
+        required: false
+        default: ''
+      action:
+        description: 'DB action'
+        required: true
+        default: 'seed'
+        type: choice
+        options:
+          - seed
+          - migrate-seed
+          - reset
+          - provision-secrets
+          - sync-env
+          - verify
+      confirm:
+        description: 'Type yes to confirm'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-init
+  cancel-in-progress: false
+
+jobs:
+  db-init:
+    name: VXTURE_DEPLOY_HOST DB ${{ inputs.action }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm
+        if: ${{ inputs.confirm != 'yes' }}
+        run: |
+          echo "Confirmation mismatch — type 'yes' to proceed." >&2
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      # expected_sha gate (data_platform_320 §9.5-①): the only DB-mutating pipeline
+      # must consume a PINNED version, not a floating ref. The 2026-07-04 cutover ran
+      # a stale beta seed exactly because nothing asserted "this ref tip IS the
+      # verified DDL+seed". Mutating actions hard-require the pin; read-only ones
+      # verify it when provided.
+      - name: Pin ref against expected_sha
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          DB_ACTION: ${{ inputs.action }}
+        run: |
+          HEAD_SHA="$(git rev-parse HEAD)"
+          if [ -z "$EXPECTED_SHA" ]; then
+            case "$DB_ACTION" in
+              reset|migrate-seed|seed|provision-secrets)
+                echo "::error::DB-mutating action '$DB_ACTION' requires expected_sha (ref tips move; pin the verified version). HEAD=$HEAD_SHA" >&2
+                exit 1
+                ;;
+              *)
+                echo "expected_sha not provided (read-only action '$DB_ACTION') — proceeding with HEAD=$HEAD_SHA"
+                ;;
+            esac
+          elif [ "$HEAD_SHA" != "$EXPECTED_SHA" ]; then
+            echo "::error::expected_sha mismatch — HEAD=$HEAD_SHA, expected=$EXPECTED_SHA (ref moved since verification; re-verify then re-pin)" >&2
+            exit 1
+          else
+            echo "pinned: HEAD == expected_sha == $HEAD_SHA"
+          fi
+
+      - name: Upload DB scripts to VXTURE_DEPLOY_HOST
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          source: 'deploy/scripts,deploy/database,deploy/guardrails,deploy/.env.*.example,deploy/secrets/*.example'
+          target: '/tmp/vxture-deploy'
+          rm: true
+          timeout: 120s
+          command_timeout: 10m
+
+      - name: Run DB action via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          DB_ACTION: ${{ inputs.action }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          command_timeout: 30m
+          envs: DB_ACTION
+          script: |
+            set -e
+            SRC=/tmp/vxture-deploy/deploy
+            DEPLOY_DIR=/srv/vxture/deploy
+            mkdir -p "$DEPLOY_DIR" "$DEPLOY_DIR/secrets"
+
+            # Sync only the deploy code (scripts/database/guardrails/examples);
+            # runtime .env + secrets stay on the host untouched.
+            rm -rf "$DEPLOY_DIR/scripts";    cp -R "$SRC/scripts"    "$DEPLOY_DIR/scripts"
+            rm -rf "$DEPLOY_DIR/database";   cp -R "$SRC/database"   "$DEPLOY_DIR/database"
+            rm -rf "$DEPLOY_DIR/guardrails"; cp -R "$SRC/guardrails" "$DEPLOY_DIR/guardrails"
+            cp -f "$SRC"/.env.*.example "$DEPLOY_DIR/" 2>/dev/null || true
+            cp -f "$SRC"/secrets/*.example "$DEPLOY_DIR/secrets/" 2>/dev/null || true
+
+            cd "$DEPLOY_DIR"
+
+            # ── U-line env migration shim (product_300 §2.3 #4) ──────────────
+            # Legacy cross-domain RP `ruyin` (ruyin.ai) is renamed `umbra`, and
+            # RUYIN_BASE_URL changed meaning (now the NEW client-side surface,
+            # ruyin.vxture.com). Migrate the runtime env in place BEFORE any
+            # seed action so 29-seed can never bind the new ruyin client to
+            # ruyin.ai or to the legacy secret hash. Idempotent; append-only
+            # backfill of non-secret base URLs from the SCP'd example.
+            RT=/srv/vxture/runtime
+            if [ -f "$RT/.env.auth-bff" ]; then
+              # 1) RUYIN_BASE_URL still holding ruyin.ai → that value is umbra's.
+              if grep -qE '^RUYIN_BASE_URL=.*ruyin\.ai' "$RT/.env.auth-bff"; then
+                if ! grep -qE '^UMBRA_BASE_URL=' "$RT/.env.auth-bff"; then
+                  sed -i 's/^RUYIN_BASE_URL=\(.*ruyin\.ai.*\)$/UMBRA_BASE_URL=\1/' "$RT/.env.auth-bff"
+                  echo "  [ok] migrated RUYIN_BASE_URL (ruyin.ai) -> UMBRA_BASE_URL"
+                else
+                  sed -i '/^RUYIN_BASE_URL=.*ruyin\.ai/d' "$RT/.env.auth-bff"
+                  echo "  [ok] dropped stale RUYIN_BASE_URL (ruyin.ai); UMBRA_BASE_URL already set"
+                fi
+              fi
+              # 2) secret hash key rides along to umbra (value MOVES — leaving the
+              #    old key would bind umbra's secret to the NEW ruyin client).
+              if ! grep -qE '^OIDC_CLIENT_SECRET_HASH_UMBRA=' "$RT/.env.auth-bff" \
+                 && grep -qE '^OIDC_CLIENT_SECRET_HASH_RUYIN=..*' "$RT/.env.auth-bff"; then
+                sed -i 's/^OIDC_CLIENT_SECRET_HASH_RUYIN=/OIDC_CLIENT_SECRET_HASH_UMBRA=/' "$RT/.env.auth-bff"
+                echo "  [ok] migrated OIDC_CLIENT_SECRET_HASH_RUYIN -> _UMBRA (secret reuse, product_300 §2.4)"
+              fi
+              # 3) backfill base URLs (non-secret) from the example when missing,
+              #    so 29-seed builds real redirect_uris instead of localhost.
+              for k in UMBRA_BASE_URL RUYIN_BASE_URL; do
+                if ! grep -qE "^${k}=" "$RT/.env.auth-bff"; then
+                  v="$(grep -E "^${k}=" "$DEPLOY_DIR/.env.auth-bff.example" 2>/dev/null | tail -n1 | cut -d= -f2-)"
+                  if [ -n "$v" ]; then
+                    printf '%s=%s\n' "$k" "$v" >> "$RT/.env.auth-bff"
+                    echo "  [ok] appended ${k}=${v} to .env.auth-bff"
+                  else
+                    echo "  [warn] ${k} absent from example; its redirect may fall back to localhost" >&2
+                  fi
+                fi
+              done
+            fi
+
+            case "$DB_ACTION" in
+              seed)
+                # Reseed platform catalog (+ sample) with the new DDL seed, then audit.
+                CONFIRM_SEED=yes bash scripts/29-seed-platform-ddl.sh
+                bash scripts/30-verify-platform-baseline.sh
+                ;;
+              migrate-seed)
+                # Clean-baseline: apply ddl/*.sql (no reset) then seed. Not prisma migrate.
+                CONFIRM_APPLY=yes bash scripts/28-apply-platform-ddl.sh
+                CONFIRM_SEED=yes bash scripts/29-seed-platform-ddl.sh
+                bash scripts/30-verify-platform-baseline.sh
+                ;;
+              reset)
+                # Coordinated cutover reset (data_platform_320 §6): capture the live appoidc
+                # (old iam.oidc_client + signing_key) BEFORE the destructive schema drop, then
+                # apply the new DDL with --reset (DROP+rebuild 18 schemas), reseed, and finally
+                # restore appoidc (real RP secrets overwrite seed placeholders). 28b capture
+                # self-skips when no old iam schema exists; 28b restore self-skips with no dump.
+                # 30-verify is the machine acceptance gate (§9.5-③): green run = baseline met.
+                bash scripts/28b-restore-appoidc.sh capture
+                CONFIRM_RESET=yes bash scripts/28-apply-platform-ddl.sh
+                CONFIRM_SEED=yes bash scripts/29-seed-platform-ddl.sh
+                bash scripts/28b-restore-appoidc.sh restore
+                bash scripts/30-verify-platform-baseline.sh
+                ;;
+              verify)
+                # Read-only live baseline audit (schema set / table count / seed floors).
+                bash scripts/30-verify-platform-baseline.sh
+                ;;
+              provision-secrets)
+                # (base-URL backfill + U-line env migration run above, before the case.)
+                # 1) generate + write confidential RP client secrets (idempotent)
+                CONFIRM_PROVISION_SECRETS=yes bash scripts/27-provision-client-secrets.sh
+                # 2) re-seed so appoidc.oidc_clients picks up the new bcrypt hashes
+                CONFIRM_SEED=yes bash scripts/29-seed-platform-ddl.sh
+                # 3) recreate auth-bff + the RP bffs so they load the new env.
+                # env_file changes only take effect on container *recreate*, not
+                # restart. auth-bff MUST be included: 27-provision mints
+                # OPERATOR_TOTP_ENC_KEY into .env.auth-bff, and without a recreate
+                # the IdP runs without it → operator TOTP enroll/verify 503
+                # (operator_totp_unavailable). Derive image coords from the running
+                # auth-bff so the recreate reuses the exact deployed tag (no pull).
+                IMG="$(docker inspect --format '{{.Config.Image}}' vx-auth-bff)"
+                export VX_IMAGE_TAG="${IMG##*:}"
+                REPO="${IMG%:*}"
+                export VX_IMAGE_NAMESPACE="$(printf '%s' "$REPO" | awk -F/ '{print $(NF-1)}')"
+                export VX_IMAGE_REGISTRY="${REPO%/*/*}"
+                docker compose -f compose.platform.yml up -d --force-recreate --no-deps \
+                  auth-bff website-bff console-bff admin-bff
+                ;;
+              sync-env)
+                # Ensure each RP's own *_BASE_URL is present in its runtime env,
+                # taking the value from the SCP'd example. Missing → the RP builds
+                # redirect_uri from the localhost schema default → IdP authorize
+                # rejects with 400 invalid_redirect_uri. Append-only (never
+                # overwrites an existing value).
+                RT=/srv/vxture/runtime
+                ex_val() { grep -E "^$2=" "$DEPLOY_DIR/$1" 2>/dev/null | tail -n1 | cut -d= -f2-; }
+                ensure_kv() {
+                  f="$1"; k="$2"; v="$3"
+                  [ -n "$v" ] || { echo "  [skip] $k — no example value"; return 0; }
+                  if grep -qE "^$k=" "$f" 2>/dev/null; then
+                    echo "  [skip] $k already in $(basename "$f")"
+                  else
+                    printf '%s=%s\n' "$k" "$v" >> "$f"
+                    echo "  [ok] appended $k to $(basename "$f")"
+                  fi
+                }
+                ensure_kv "$RT/.env.website-bff" WEBSITE_BASE_URL "$(ex_val .env.website-bff.example WEBSITE_BASE_URL)"
+                ensure_kv "$RT/.env.console-bff" CONSOLE_BASE_URL "$(ex_val .env.console-bff.example CONSOLE_BASE_URL)"
+                ensure_kv "$RT/.env.admin-bff"   ADMIN_BASE_URL   "$(ex_val .env.admin-bff.example ADMIN_BASE_URL)"
+                # recreate RP bffs so they load the new env (env_file → recreate).
+                IMG="$(docker inspect --format '{{.Config.Image}}' vx-auth-bff)"
+                export VX_IMAGE_TAG="${IMG##*:}"
+                REPO="${IMG%:*}"
+                export VX_IMAGE_NAMESPACE="$(printf '%s' "$REPO" | awk -F/ '{print $(NF-1)}')"
+                export VX_IMAGE_REGISTRY="${REPO%/*/*}"
+                docker compose -f compose.platform.yml up -d --force-recreate --no-deps \
+                  website-bff console-bff admin-bff
+                ;;
+              *)
+                echo "unknown action: $DB_ACTION" >&2; exit 1
+                ;;
+            esac
+            echo "=== VXTURE_DEPLOY_HOST DB action '$DB_ACTION' done ==="

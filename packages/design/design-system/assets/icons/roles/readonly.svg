@@ -1,0 +1,10 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="readonly role">
+  <defs>
+    <radialGradient id="rg-readonly" cx="0.5" cy="0.34" r="0.78"><stop offset="0" stop-color="#8c95a1"></stop><stop offset="1" stop-color="#5e6977"></stop></radialGradient>
+    <radialGradient id="rh-readonly" cx="0.5" cy="0.5" r="0.5"><stop offset="0.82" stop-color="#a6adb7" stop-opacity="0"></stop><stop offset="0.92" stop-color="#a6adb7" stop-opacity="0.7"></stop><stop offset="1" stop-color="#a6adb7" stop-opacity="0"></stop></radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="url(#rh-readonly)"></circle>
+  <circle cx="64" cy="64" r="52" fill="url(#rg-readonly)"></circle>
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.4"></circle>
+  <g transform="translate(64 64) scale(0.78) translate(-64 -64)"><path d="M30 64 Q64 36 98 64 Q64 92 30 64 Z" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"></path><circle cx="64" cy="64" r="14" fill="#ffffff"></circle><circle cx="64" cy="64" r="6.6" fill="#5e6977"></circle><circle cx="58.6" cy="58.6" r="2.6" fill="#ffffff"></circle></g>
+</svg>

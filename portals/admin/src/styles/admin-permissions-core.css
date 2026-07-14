@@ -1,0 +1,204 @@
+/* Admin permission structure shell styles. Dimensions must resolve through DS permission tokens. */
+
+.vx-admin-permission-structure {
+  display: grid;
+  gap: 0;
+  padding-bottom: var(--vx-admin-permission-space-1r);
+}
+
+.vx-admin-permission-structure > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--vx-admin-permission-space-1r);
+  padding: var(--vx-admin-permission-space-075r) 0 var(--vx-admin-permission-space-025r);
+}
+
+.vx-admin-permission-structure h2,
+.vx-admin-permission-structure p {
+  margin: 0;
+}
+
+.vx-admin-permission-structure h2 {
+  color: var(--tenant-ink);
+  font-size: var(--vx-admin-section-title-size);
+  font-weight: 760;
+}
+
+.vx-admin-permission-structure p {
+  margin-top: var(--vx-admin-permission-space-025r);
+  color: var(--tenant-muted);
+  font-size: var(--vx-admin-meta-size);
+  line-height: 1.55;
+}
+
+.vx-admin-permission-domain-stack {
+  display: grid;
+  gap: var(--vx-admin-permission-space-225r);
+}
+
+/* Admin permission domain header styles. */
+
+.vx-admin-permission-domain {
+  min-width: 0;
+  display: grid;
+  gap: 0;
+}
+
+.vx-admin-permission-domain__header {
+  padding-top: var(--vx-admin-permission-space-1375r);
+  margin-bottom: var(--vx-admin-permission-space-125r);
+  border-top: var(--vx-admin-permission-line-width-1p) solid color-mix(in srgb, var(--vx-color-brand-400) 16%, transparent);
+}
+
+.vx-admin-permission-domain__badges {
+  margin-top: var(--vx-admin-permission-space-0125r);
+}
+
+.vx-admin-permission-domain__badges .vx-btn {
+  min-height: var(--vx-admin-permission-size-1875r);
+  padding-inline: var(--vx-admin-permission-space-0625r);
+  font-size: var(--vx-admin-caption-size);
+}
+
+.vx-admin-permission-domain__badges .vx-badge {
+  min-height: var(--vx-admin-permission-size-175r);
+  border-color: color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
+  color: var(--vx-color-auth-accent);
+  font-size: var(--vx-admin-caption-size);
+  font-weight: 760;
+}
+
+.vx-admin-permission-domain__stats {
+  margin: 0;
+}
+
+.vx-admin-permission-domain__toolbar {
+  margin: 0;
+}
+
+/* Admin permission card grid styles. */
+
+.vx-admin-permission-card-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--vx-admin-permission-space-075r);
+}
+
+.vx-admin-permission-card {
+  min-width: 0;
+  display: grid;
+  gap: var(--vx-admin-permission-space-075r);
+  padding: var(--vx-admin-permission-space-0875r);
+  border: var(--vx-admin-permission-line-width-1p) solid color-mix(in srgb, var(--vx-color-gray-500) 14%, transparent);
+  border-top: var(--vx-admin-permission-line-width-2p) solid var(--tenant-row-tone, var(--vx-color-auth-accent));
+  border-radius: var(--vx-admin-permission-card-radius);
+  background: transparent;
+}
+
+.vx-admin-permission-card--disabled {
+  opacity: 0.66;
+}
+
+.vx-admin-permission-card header {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: var(--vx-admin-permission-track-175r) minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--vx-admin-permission-space-0625r);
+}
+
+.vx-admin-permission-card header > span {
+  width: var(--vx-admin-permission-size-175r);
+  height: var(--vx-admin-permission-size-175r);
+  display: inline-grid;
+  place-items: center;
+  color: var(--tenant-row-tone, var(--vx-color-auth-accent));
+}
+
+.vx-admin-permission-card header div {
+  min-width: 0;
+  display: grid;
+  gap: var(--vx-admin-permission-space-01875r);
+}
+
+.vx-admin-permission-card p,
+.vx-admin-permission-card dd {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vx-admin-permission-card strong {
+  color: var(--tenant-ink);
+  font-size: var(--vx-admin-meta-size);
+  font-weight: 800;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.vx-admin-permission-card code {
+  color: var(--vx-color-gray-500);
+  font-family: var(--font-mono);
+  font-size: var(--vx-admin-caption-size);
+  font-weight: 680;
+}
+
+.vx-admin-permission-card p {
+  margin: 0;
+  color: var(--vx-color-text-muted);
+  font-size: var(--vx-admin-caption-size);
+  line-height: 1.45;
+}
+
+.vx-admin-permission-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--vx-admin-permission-space-0625r);
+  margin: 0;
+}
+
+.vx-admin-permission-card dl div {
+  min-width: 0;
+  display: grid;
+  gap: var(--vx-admin-permission-space-0125r);
+}
+
+.vx-admin-permission-card dt {
+  color: var(--vx-color-gray-400);
+  font-size: var(--vx-admin-caption-size);
+  font-weight: 680;
+}
+
+.vx-admin-permission-card dd {
+  margin: 0;
+  color: var(--vx-color-gray-700);
+  font-size: var(--vx-admin-caption-size);
+  font-weight: 720;
+}
+
+.vx-admin-permission-card dd svg {
+  margin-right: var(--vx-admin-permission-space-03125r);
+  vertical-align: calc(var(--vx-admin-permission-motion-0125r) * -1);
+}
+
+/* Admin permission type tone styles. */
+
+.vx-admin-permission-type--menu {
+  --tenant-row-tone: var(--tenant-blue);
+}
+
+.vx-admin-permission-type--button {
+  --tenant-row-tone: var(--tenant-cyan);
+}
+
+.vx-admin-permission-type--api {
+  --tenant-row-tone: var(--tenant-amber);
+}

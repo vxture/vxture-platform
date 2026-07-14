@@ -1,0 +1,40 @@
+{
+  "title": "Core Capabilities",
+  "subtitle": "Providing data intelligence support systems for governments and enterprises",
+  "tagline": "Data-Driven, Business-Empowered",
+  "items": {
+    "feature-intro-01": {
+      "icon": "graph",
+      "title": "Data Graph Construction",
+      "description": "Data ontology construction, discovering hidden value and deep relationships",
+      "highlights": [
+        "Data Integration",
+        "Graph Construction",
+        "Relationship Mining"
+      ],
+      "cta": { "label": "Learn More" }
+    },
+    "feature-intro-02": {
+      "icon": "sparkles",
+      "title": "Intelligent Decision Dispatch",
+      "description": "Spatio-temporal model engine for real-time intelligent scheduling and planning",
+      "highlights": [
+        "Intelligent Dispatch",
+        "Resource Allocation",
+        "Dynamic Planning"
+      ],
+      "cta": { "label": "Learn More" }
+    },
+    "feature-intro-03": {
+      "icon": "cube",
+      "title": "Digital Twin Simulation",
+      "description": "Complex scenario simulation with simulation and predictive analysis for decisions",
+      "highlights": [
+        "Digital Twin",
+        "Simulation & Deduction",
+        "Intelligent Decisions"
+      ],
+      "cta": { "label": "Learn More" }
+    }
+  }
+}

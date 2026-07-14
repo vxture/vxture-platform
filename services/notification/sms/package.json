@@ -1,0 +1,21 @@
+{
+  "name": "@vxture/service-sms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phone verification code service — Aliyun Number Authentication Service (PNVS / Dypnsapi)",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@alicloud/pop-core": "^1.7.13",
+    "@nestjs/common": "^11.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "title": "Ready to Unlock Your Data Potential?",
+  "subtitle": "From design to production, we partner with you every step",
+  "features": {
+    "features-cta-01": {
+      "name": "Rapid Solution Deployment",
+      "description": "Deep business scenario analysis, providing industry-grade solutions"
+    },
+    "features-cta-02": {
+      "name": "AI Collaboration",
+      "description": "AI agents deeply involved throughout, improving deployment efficiency and outcomes"
+    },
+    "features-cta-03": {
+      "name": "Continuous Evolution",
+      "description": "Continuous iteration around business goals for tech and business upgrades"
+    }
+  },
+  "actions": {
+    "0": { "label": "Book Consultation" },
+    "1": { "label": "AI Agent Live Chat" }
+  },
+  "contact": {
+    "description": "Connect directly with our expert team for professional advice tailored to your business"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "pnpm: 启动前端 (web)",
+      "type": "shell",
+      "command": "pnpm --filter web run dev",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "pnpm: 启动后端 (api)",
+      "type": "shell",
+      "command": "pnpm --filter api run dev",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "pnpm: 安装依赖 (root)",
+      "type": "shell",
+      "command": "pnpm install",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "TypeScript: 检查 (web)",
+      "type": "shell",
+      "command": "pnpm --filter web run type-check",
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Format: 全库",
+      "type": "shell",
+      "command": "pnpm run format",
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    }
+  ]
+}

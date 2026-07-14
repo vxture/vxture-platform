@@ -1,0 +1,194 @@
+{
+  "hero": {
+    "eyebrow": "Emergency Management Solution",
+    "title": "Digital Twin Agentic Solution for Emergency Management",
+    "description": "Build a live digital twin for regions, cities, parks, and critical sites, then layer LLM-based assessment and multi-agent execution across monitoring, decision support, plan simulation, resource dispatch, field coordination, and post-incident review.",
+    "imageAlt": "Emergency command and dispatch visualization screen",
+    "primaryAction": "Open Console",
+    "secondaryAction": "View Architecture",
+    "highlights": [
+      "Digital Twin Situation",
+      "LLM Assessment",
+      "Multi-agent Coordination",
+      "Closed-loop Response"
+    ],
+    "metrics": [
+      { "value": "Minutes", "label": "Cross-agency situation fusion" },
+      { "value": "6", "label": "Command coordination agents" },
+      { "value": "Loop", "label": "Warning to review" }
+    ],
+    "intelligence": {
+      "title": "From seeing an event to organizing a response",
+      "items": [
+        "Sensor, video, IoT, and business data are registered in one twin base to form a live operating picture.",
+        "The LLM turns fragmented event information into risk summaries, response suggestions, and command wording.",
+        "Agents keep tracking teams, supplies, notices, tasks, and review actions so instructions become execution."
+      ]
+    }
+  },
+  "architecture": {
+    "eyebrow": "Capability Architecture",
+    "title": "Three-layer capability architecture",
+    "description": "This is not just a command screen. It separates situation awareness, model reasoning, and execution coordination into deployable layers that can grow from one pilot scenario to a city-scale emergency system.",
+    "items": [
+      {
+        "icon": "cube",
+        "title": "Digital twin situation base",
+        "description": "Map cities, parks, watersheds, roads, critical facilities, and risk sources into a virtual-real model for event localization, impact analysis, and resource reachability.",
+        "points": [
+          "Unified spatial map and risk objects",
+          "Live overlay of events, teams, supplies, and facilities",
+          "Simulation for flooding, fire, congestion, evacuation, and more"
+        ]
+      },
+      {
+        "icon": "sparkles",
+        "title": "LLM assessment center",
+        "description": "Support natural-language queries, event summaries, plan retrieval, risk explanation, and communication drafting for command teams.",
+        "points": [
+          "Automatic summary of multi-source intelligence",
+          "Retrieval of plans and historical cases",
+          "Traceable assessment evidence and action suggestions"
+        ]
+      },
+      {
+        "icon": "workflow",
+        "title": "Multi-agent execution",
+        "description": "Divide monitoring, assessment, dispatch, notification, public communication, and review into cooperating agents that keep advancing the event workflow.",
+        "points": [
+          "Automatic task and owner breakdown",
+          "Status tracking for teams, vehicles, supplies, and arrival",
+          "Incident timeline, outcome review, and optimization suggestions"
+        ]
+      }
+    ]
+  },
+  "flow": {
+    "eyebrow": "Emergency Loop",
+    "title": "Cover the full emergency response lifecycle",
+    "description": "Create a loop across pre-event warning, in-event command, and post-event review, turning every response into better capability for the next one.",
+    "steps": [
+      {
+        "title": "Risk monitoring",
+        "description": "Connect weather, water, fire, traffic, video, and IoT data to detect and locate abnormal events earlier."
+      },
+      {
+        "title": "Situation twin",
+        "description": "Overlay people, facilities, risk sources, shelters, warehouses, and event progress on one twin map."
+      },
+      {
+        "title": "Intelligent assessment",
+        "description": "Read structured and unstructured information to generate incident level, impact area, secondary risks, and response priorities."
+      },
+      {
+        "title": "Plan simulation",
+        "description": "Compare response plans and dispatch strategies against event level, roads, resources, weather, and safety constraints."
+      },
+      {
+        "title": "Command coordination",
+        "description": "Agents track tasks, teams, supplies, notifications, and acknowledgements to keep the command center synchronized."
+      },
+      {
+        "title": "Review optimization",
+        "description": "Compile timelines, bottlenecks, resource consumption, and outcome reviews to improve plans and the knowledge base."
+      }
+    ]
+  },
+  "agents": {
+    "eyebrow": "Agent Matrix",
+    "title": "Agent matrix for emergency management",
+    "description": "Each agent owns a clear emergency task domain and collaborates through shared situation, shared knowledge, and shared task state.",
+    "items": [
+      {
+        "icon": "warning",
+        "title": "Monitoring and warning agent",
+        "description": "Analyzes indicators, thresholds, video clues, and public reports to identify anomalies and trigger graded warnings."
+      },
+      {
+        "icon": "graph",
+        "title": "Situation briefing agent",
+        "description": "Turns event progress, department feedback, field photos, and historical records into readable command briefings."
+      },
+      {
+        "icon": "lightbulb",
+        "title": "Plan simulation agent",
+        "description": "Retrieves plans based on event type and constraints, then creates response paths and risk notes."
+      },
+      {
+        "icon": "server",
+        "title": "Resource dispatch agent",
+        "description": "Matches teams, vehicles, supplies, equipment, and experts, calculates arrival time, and tracks allocation status."
+      },
+      {
+        "icon": "users",
+        "title": "Field coordination agent",
+        "description": "Pushes tasks, routes, safety notes, and acknowledgement requirements to field teams with less manual relay."
+      },
+      {
+        "icon": "chart-bar",
+        "title": "Review assessment agent",
+        "description": "Generates review reports, key timelines, response metrics, and plan revision suggestions."
+      }
+    ]
+  },
+  "scenarios": {
+    "eyebrow": "Priority Scenarios",
+    "title": "Start with four emergency scenarios",
+    "description": "Begin with frequent, high-impact scenarios that clearly require cross-agency coordination, then turn them into demonstrable and repeatable industry templates.",
+    "items": [
+      {
+        "title": "Extreme weather and urban flooding",
+        "description": "Combine rainfall, water levels, roads, pump stations, and shelters to simulate flooding, detours, and relocation strategies."
+      },
+      {
+        "title": "Hazardous chemicals and industrial parks",
+        "description": "Assess impact areas and response boundaries using enterprise data, hazard sources, wind direction, population, and fire resources."
+      },
+      {
+        "title": "Forest and urban fire coordination",
+        "description": "Fuse fire points, wind field, combustible materials, fire stations, and water sources to support spread simulation and force deployment."
+      },
+      {
+        "title": "Large events and public safety",
+        "description": "Monitor crowds, traffic, security positions, and medical support to detect congestion and conflict risks earlier."
+      }
+    ]
+  },
+  "practice": {
+    "eyebrow": "Practice Foundation",
+    "title": "Build the solution from existing practice summaries",
+    "description": "The page abstracts existing case summaries into an industry solution, preserving emergency command, intelligent decision, resource dispatch, and visualization strengths while adding digital twin simulation and agentic coordination.",
+    "imageAlt": "Public safety risk analysis platform",
+    "imageLabel": "Practice transfer",
+    "imageTitle": "Upgrade platform capabilities into a closed-loop emergency solution",
+    "items": [
+      {
+        "label": "Practice 01",
+        "title": "Provincial Emergency Department · Emergency Command Platform",
+        "description": "Reuse the AI command decision support capability from the case, strengthening incident analysis, prediction, assessment, plan management, resource dispatch, and visualization.",
+        "tags": [
+          "Emergency Management",
+          "Data Integration",
+          "Intelligent Decision"
+        ]
+      },
+      {
+        "label": "Practice 02",
+        "title": "Digital twin simulation capability transfer",
+        "description": "Apply modeling, simulation, and optimization patterns from digital twin platforms to disaster spread, evacuation paths, resource arrival, and secondary risk simulation.",
+        "tags": ["Digital Twin", "Simulation", "Forward-looking Decisions"]
+      },
+      {
+        "label": "Practice 03",
+        "title": "Public safety multi-agency intelligence fusion",
+        "description": "Use multi-department data fusion experience from public safety cases to strengthen city-scale risk identification and coordinated response.",
+        "tags": ["Fusion Analysis", "Dynamic Assessment", "Event Response"]
+      }
+    ]
+  },
+  "cta": {
+    "title": "Start with one emergency scenario template",
+    "description": "Choose flooding, hazardous chemicals, fire response, or large-event safety first. Build data access, twin situation, assessment Q&A, plan simulation, and dispatch loop, then expand to a regional emergency management system.",
+    "action": "Open Console"
+  }
+}

@@ -1,0 +1,5 @@
+/* Admin roles style entry. Keep concrete rules in admin-roles-* modules. */
+
+@import "./admin-roles-cards.css";
+@import "./admin-roles-permission-dialog.css";
+@import "./admin-roles-auth-dialog.css";

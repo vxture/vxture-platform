@@ -1,0 +1,57 @@
+{
+  "title": "Features",
+  "description": "Powerful features, simple experience",
+  "categories": [
+    {
+      "name": "Data Analysis",
+      "items": [
+        {
+          "title": "Smart Reports",
+          "description": "Automatically generate various formats of reports"
+        },
+        {
+          "title": "Data Visualization",
+          "description": "Multiple chart types for intuitive data display"
+        },
+        {
+          "title": "Data Mining",
+          "description": "Discover hidden patterns in data"
+        }
+      ]
+    },
+    {
+      "name": "Collaboration",
+      "items": [
+        {
+          "title": "Team Collaboration",
+          "description": "Real-time collaboration to improve efficiency"
+        },
+        {
+          "title": "Permission Management",
+          "description": "Fine-grained permission control"
+        },
+        {
+          "title": "Version Control",
+          "description": "Complete version history"
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "items": [
+        {
+          "title": "Data Encryption",
+          "description": "Transmission and storage encryption"
+        },
+        {
+          "title": "Backup and Recovery",
+          "description": "Regular backups and quick recovery"
+        },
+        {
+          "title": "Compliance",
+          "description": "Meets multiple security standards"
+        }
+      ]
+    }
+  ]
+}

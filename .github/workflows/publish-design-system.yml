@@ -1,0 +1,114 @@
+# publish-design-system.yml - Design System 发布流程。
+# @package vxture
+# @layer Presentation
+# @category ci
+# @author AI-Generated
+# @date 2026-06-07
+
+name: publish-design-system
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只验证发布包，不推送到 GitHub Packages"
+        required: true
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "ds-v*.*.*"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-design-system-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: publish-design-system
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Build shared package
+        run: pnpm --filter @vxture/shared build
+
+      - name: Check design system
+        run: |
+          pnpm --filter @vxture/design-system type-check
+          pnpm --filter @vxture/design-system lint
+          pnpm lint:design
+
+      - name: Build design system package
+        run: pnpm --filter @vxture/design-system build
+
+      - name: Verify publish payloads
+        run: |
+          pnpm --filter @vxture/shared pack --dry-run
+          pnpm --filter @vxture/design-system pack --dry-run
+
+      - name: Configure GitHub Packages registry
+        run: |
+          echo "@vxture:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" >> ~/.npmrc
+
+      - name: Resolve package versions
+        id: versions
+        shell: bash
+        run: |
+          shared_version="$(node -p "require('./packages/shared/shared/package.json').version")"
+          ds_version="$(node -p "require('./packages/design/design-system/package.json').version")"
+          echo "shared_version=${shared_version}" >> "$GITHUB_OUTPUT"
+          echo "ds_version=${ds_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Check existing package versions
+        id: published
+        shell: bash
+        run: |
+          if npm view "@vxture/shared@${{ steps.versions.outputs.shared_version }}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "shared_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "shared_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if npm view "@vxture/design-system@${{ steps.versions.outputs.ds_version }}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "ds_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ds_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish shared package
+        if: ${{ github.event.inputs.dry_run != 'true' && steps.published.outputs.shared_exists != 'true' }}
+        working-directory: packages/shared/shared
+        run: pnpm publish --no-git-checks
+
+      - name: Skip shared package
+        if: ${{ steps.published.outputs.shared_exists == 'true' }}
+        run: echo "@vxture/shared@${{ steps.versions.outputs.shared_version }} already exists; skipping."
+
+      - name: Publish design system package
+        if: ${{ github.event.inputs.dry_run != 'true' && steps.published.outputs.ds_exists != 'true' }}
+        working-directory: packages/design/design-system
+        run: pnpm publish --no-git-checks
+
+      - name: Skip design system package
+        if: ${{ steps.published.outputs.ds_exists == 'true' }}
+        run: echo "@vxture/design-system@${{ steps.versions.outputs.ds_version }} already exists; skipping."
+
+      - name: Dry run summary
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        run: |
+          echo "Dry run completed."
+          echo "@vxture/shared@${{ steps.versions.outputs.shared_version }} exists: ${{ steps.published.outputs.shared_exists }}"
+          echo "@vxture/design-system@${{ steps.versions.outputs.ds_version }} exists: ${{ steps.published.outputs.ds_exists }}"

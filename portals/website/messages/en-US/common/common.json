@@ -1,0 +1,30 @@
+{
+  "title": "Vxture",
+  "description": "Unleash the Infinite Potential of Data",
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "solutions": "Solutions",
+    "cases": "Cases",
+    "about": "About"
+  },
+  "footer": {
+    "copyright": "© 2026 Vxture. All rights reserved."
+  },
+  "actions": {
+    "learnMore": "Learn More",
+    "contactUs": "Contact Us",
+    "signUp": "Sign Up",
+    "login": "Login"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPassword": "Password must be at least 6 characters",
+    "generic": "An error occurred, please try again later"
+  },
+  "success": {
+    "operationCompleted": "Operation completed successfully"
+  },
+  "loading": "Loading..."
+}

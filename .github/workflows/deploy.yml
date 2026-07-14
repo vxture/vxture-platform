@@ -1,0 +1,82 @@
+name: deploy
+
+# 主干 + tag 触发 CD。tag 前缀 → 环境；环境级密钥 + 生产审批门控由 `environment:` 承接。
+# 注意：本文件目前是骨架（deploy 步骤含 TODO）；tag 未推前不会触发，安全 dormant。
+# 前置：镜像已由 docker-build.yml 在同一 tag 上 build+push 到 ACR（tag = github.ref_name）。
+#
+# 这是 domestic profile（ACR + tailnet），用于 vxture-platform / varda / Arda。
+# umbra 是 overseas 变体（README §5）：去掉下面的 tailscale join、镜像换 GHCR、直连公网 SSH。
+
+on:
+  push:
+    tags:
+      - "dev-*"
+      - "beta-*"
+      - "v*.*.*"
+      - "varda-*" # varda（worker-02）自有发布节奏，收敛进本仓（README §7）
+
+permissions:
+  contents: read
+
+concurrency:
+  # 同一环境串行，不取消进行中的生产部署。
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve environment
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.map.outputs.env }}
+    steps:
+      - id: map
+        run: |
+          set -euo pipefail
+          case "${GITHUB_REF_NAME}" in
+            varda-*) echo "env=varda"      >> "$GITHUB_OUTPUT" ;;
+            dev-*)   echo "env=develop"    >> "$GITHUB_OUTPUT" ;;
+            beta-*)  echo "env=beta"       >> "$GITHUB_OUTPUT" ;;
+            v*.*.*)  echo "env=production" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::error::unrecognized deploy tag ${GITHUB_REF_NAME}"; exit 1 ;;
+          esac
+
+  deploy:
+    name: Deploy (${{ needs.resolve.outputs.env }})
+    needs: resolve
+    runs-on: ubuntu-latest
+    # environment 承接两件事：① 注入该环境的 DEPLOY_* 密钥 / CF_TURNSTILE_* 变量；
+    # ② production 触发必需审批人门控（tag 部署策略已限 v*.*.* 才能进 production）。
+    environment: ${{ needs.resolve.outputs.env }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      - name: Load deploy SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+          # 若私钥带口令，ssh-agent action 需 passphrase 支持或改用手动 ssh-add；
+          # 见 secrets.DEPLOY_SSH_PASSPHRASE（TODO：按实际私钥形态接线）。
+
+      - name: Deploy over SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          IMAGE_TAG: ${{ github.ref_name }}
+          IMAGE_BASE: ${{ vars.ALIYUN_ACR_REGISTRY }}/${{ vars.ALIYUN_ACR_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          # TODO（仓库特定）：
+          #   1) ssh 到 $DEPLOY_USER@$DEPLOY_HOST（tailnet 内网地址）
+          #   2) docker login $ALIYUN_ACR_REGISTRY（用 org ALIYUN_ACR_USERNAME/PASSWORD）
+          #   3) 拉取 ${IMAGE_BASE}/<service>:${IMAGE_TAG} 并 compose up -d 单服务重建
+          #   4) healthcheck 探活（见 docs/standards/container-healthcheck-standard.md）
+          echo "→ deploy ${IMAGE_TAG} to ${DEPLOY_HOST} (env=${{ needs.resolve.outputs.env }})"
+          echo "  images under ${IMAGE_BASE}"

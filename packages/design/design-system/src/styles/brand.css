@@ -1,0 +1,51 @@
+/**
+ * brand.css - 品牌标识组合基础样式
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-05-29
+ *
+ * 这些类只定义产品与子品牌标识的视觉基线，不限定内容结构或业务组合方式。
+ */
+
+.vx-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--vx-space-sm);
+  color: var(--vx-color-text-primary);
+  text-decoration: none;
+}
+
+.vx-brand-mark {
+  width: var(--vx-space-xl);
+  height: var(--vx-space-xl);
+  flex: 0 0 auto;
+  display: block;
+  object-fit: contain;
+}
+
+.vx-brand-name {
+  flex: 0 0 auto;
+  font-family: var(--font-brand);
+  font-size: var(--vx-typography-heading-3-size);
+  font-weight: 700;
+  line-height: var(--vx-typography-metric-lg-line-height);
+  letter-spacing: var(--vx-typography-logo-letter-spacing);
+  color: var(--vx-color-text-primary);
+}
+
+.vx-brand-local-name,
+.vx-brand-separator {
+  flex: 0 0 auto;
+  font-family: var(--font-sans);
+  font-size: var(--vx-typography-body-size);
+  font-weight: 500;
+  line-height: var(--vx-typography-metric-lg-line-height);
+  color: var(--vx-color-text-secondary);
+}
+
+.vx-brand-separator {
+  color: var(--vx-color-text-muted);
+}

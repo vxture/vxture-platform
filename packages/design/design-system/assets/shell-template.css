@@ -1,0 +1,21 @@
+/**
+ * shell-template.css — shared portal shell visual system
+ * @package @vxture/design-system
+ *
+ * Verbatim transcription of the Claude Design "通用 Console 模板" shell
+ * (shell.jsx / main-template.jsx): the .app / .vxh / .sidebar / .assistant /
+ * .vela-* chrome plus its tokens. Single source of truth consumed by both the
+ * console and admin portals so the two shells stay pixel-identical.
+ *
+ * Load AFTER the DS base packs (globals/console) so the template chrome and its
+ * ergonomic aliases win. The Phosphor icon font is loaded via <link> in each
+ * portal's app/layout.tsx (a CSS @import would violate "@import must precede all
+ * rules" once inlined after the DS rules).
+ */
+
+@import "./shell-template/tokens.css";
+@import "./shell-template/tokens-admin-shell.css";
+@import "./shell-template/tokens-ext.css";
+@import "./shell-template/user-panel.css";
+@import "./shell-template/app.css";
+@import "./shell-template/overrides.css";

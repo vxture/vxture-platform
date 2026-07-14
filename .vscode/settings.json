@@ -1,0 +1,92 @@
+{
+  // 编辑器核心功能（保留）
+  "editor.fontSize": 14,
+  "editor.lineHeight": 1.6,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 200,
+  "editor.rulers": [120],
+  "editor.guides.bracketPairs": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": true,
+
+  // 格式化与代码质量（核心保留）
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.format.enable": true,
+  "eslint.run": "onSave",
+  "prettier.singleQuote": true,
+  "prettier.semi": true,
+  "prettier.trailingComma": "es5",
+  "prettier.printWidth": 100,
+  "prettier.tabWidth": 2,
+  "prettier.jsxSingleQuote": true,
+  "prettier.endOfLine": "lf",
+
+  // 语言特定配置（只保留技术栈相关）
+  "typescript.locale": "zh-CN",
+  "#js/ts.updateImportsOnFileMove.enabled": "always",
+  "#js/ts.preferences.quoteStyle": "single",
+  "#js/ts.suggest.autoImports": true,
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.validate": true,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+
+  // 文件与工作区（精简）
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  // 团队推荐：在保存时删除行尾空白，减少无意义 diff
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.next/**": true,
+    "**/.git/**": true
+  },
+  "search.exclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.next/**": true,
+    "**/.git/**": true
+  },
+
+  // 终端基础配置
+  "terminal.integrated.fontFamily": "monospace",
+  "terminal.integrated.fontSize": 14,
+
+  // Git核心功能
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "gitlens.codeLens.enabled": true,
+
+  // 新增配置
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  // 平台/个人特定设置已移至 `.vscode/settings.json.template`
+  // 推荐：为 JSON/YAML 提供更严格的 validation（不强制启用）
+  "json.validate.enable": true,
+  "yaml.validate": true,
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "sonarlint.connectedMode.project": {
+    "connectionId": "vx-6b309295f6500aba6b2a71a29ee27de77fa41583",
+    "projectKey": "vxture_vxture"
+  },
+  "chat.mcp.serverSampling": {}
+}

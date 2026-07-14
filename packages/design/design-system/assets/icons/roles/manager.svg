@@ -1,0 +1,10 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="manager role">
+  <defs>
+    <radialGradient id="rg-manager" cx="0.5" cy="0.34" r="0.78"><stop offset="0" stop-color="#a565e7"></stop><stop offset="1" stop-color="#7a32c5"></stop></radialGradient>
+    <radialGradient id="rh-manager" cx="0.5" cy="0.5" r="0.5"><stop offset="0.82" stop-color="#b988ec" stop-opacity="0"></stop><stop offset="0.92" stop-color="#b988ec" stop-opacity="0.7"></stop><stop offset="1" stop-color="#b988ec" stop-opacity="0"></stop></radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="62" fill="url(#rh-manager)"></circle>
+  <circle cx="64" cy="64" r="52" fill="url(#rg-manager)"></circle>
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.4"></circle>
+  <g transform="translate(64 64) scale(0.95) translate(-64 -64)" fill="#ffffff"><path d="M64 36 a17 17 0 1 0 0.01 0 Z M64 46 a7 7 0 1 1 -0.01 0 Z"></path><rect x="59" y="60" width="10" height="34" rx="3.4"></rect><rect x="69" y="73" width="12" height="7" rx="2.4"></rect><rect x="69" y="85" width="9" height="7" rx="2.4"></rect></g>
+</svg>

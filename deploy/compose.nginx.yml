@@ -1,0 +1,40 @@
+# deploy/compose.nginx.yml
+# Nginx 反向代理（独立于平台栈，单独管理）
+# 服务器工作目录：/srv/vxture/data/nginx/
+# 使用：docker compose -f /srv/vxture/data/nginx/compose.yml up -d
+#
+# 前置：
+#   1. 运行 20-sync-nginx-config.sh 同步部署包 nginx/ 配置到 /srv/vxture/data/nginx/conf/
+#   2. 恢复 SSL 证书到 /srv/vxture/data/nginx/ssl/live/vxture.com/
+
+name: vx-nginx
+
+services:
+
+  nginx:
+    image: nginx:1.29-alpine
+    container_name: vxture-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      # Internal platform-api alias (product_310 D13 / arda reply-06 §5.2):
+      # bound to the Tailscale interface only — tailnet peers reach the
+      # product-facing S2S surface via nginx path routing, so the platform
+      # can re-home /platform/* + /usage/* without any product-side change.
+      - "100.100.197.42:8080:8080"
+    volumes:
+      - /srv/vxture/data/nginx/conf/conf.d:/etc/nginx/conf.d:ro
+      - /srv/vxture/data/nginx/conf/sites-enabled:/etc/nginx/sites-enabled:ro
+      - /srv/vxture/data/nginx/html:/var/www/html:ro
+      - /srv/vxture/data/nginx/ssl:/etc/nginx/ssl:ro
+      - /srv/vxture/data/nginx/logs/nginx:/var/log/nginx
+    networks:
+      - vxture-prod
+      - vxture-beta
+
+networks:
+  vxture-prod:
+    external: true
+  vxture-beta:
+    external: true

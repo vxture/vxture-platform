@@ -1,0 +1,21 @@
+/**
+ * platform.css - Cross-application platform semantics
+ * @package @vxture/design-system
+ *
+ * This file is the stable style entry. Keep concrete rules in the
+ * layered platform-* modules so DS / portal / domain boundaries stay visible.
+ */
+
+@import "./platform-core.css";
+@import "./platform-account.css";
+@import "./platform-notifications.css";
+@import "./platform-tenant-settings.css";
+@import "./platform-layout.css";
+@import "./platform-models.css";
+@import "./platform-access.css";
+@import "./platform-shell.css";
+@import "./platform-brand-hero.css";
+@import "./platform-navigation-tabs.css";
+@import "./platform-data-table.css";
+@import "./platform-toolbar.css";
+@import "./platform-responsive.css";

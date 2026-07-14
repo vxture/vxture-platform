@@ -1,0 +1,2 @@
+export const ADMIN_BFF_RO_POOL = "ADMIN_BFF_RO_POOL";
+export const ADMIN_BFF_RW_POOL = "ADMIN_BFF_RW_POOL";

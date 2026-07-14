@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "dsznajder.es7-react-js-snippets",
+    "github.vscode-pull-request-github",
+    "ms-python.python",
+    "sonarsource.sonarlint-vscode"
+  ],
+  "unwantedRecommendations": []
+}

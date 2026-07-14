@@ -1,0 +1,26 @@
+{
+  "name": "@vxture/platform-browser",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "Vxture browser environment utilities - scroll, storage, clipboard, viewport, etc.",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "echo \"No lint yet\"",
+    "lint:fix": "echo \"No lint:fix yet\"",
+    "build": "rimraf dist && tsup"
+  },
+  "dependencies": {
+    "@vxture/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "rimraf": "^6.1.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

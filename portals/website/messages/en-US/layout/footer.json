@@ -1,0 +1,51 @@
+{
+  "brand": {
+    "name": "Vxture Studio",
+    "description": "AI-powered Virtual Nature Exploration Studio",
+    "address": "100 Keji Road, High-tech Zone, Xi'an, Shaanxi, China"
+  },
+  "social": {
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "wechat": "WeChat Official Account"
+  },
+  "sections": {
+    "products": {
+      "title": "Products",
+      "appcenter": "App Center",
+      "products": "Product Matrix",
+      "solutions": "Solutions",
+      "cases": "Case Studies"
+    },
+    "support": {
+      "title": "Support",
+      "docs": "Documentation",
+      "faq": "FAQ",
+      "technology": "Technical Support",
+      "insights": "Industry Insights"
+    },
+    "company": {
+      "title": "About Us",
+      "introduction": "Company",
+      "certifications": "Certifications",
+      "careers": "Careers",
+      "contact": "Contact"
+    }
+  },
+  "legal": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "copyright": "Copyright Policy",
+    "brand": "Brand Policy",
+    "cookies": "Cookie Policy"
+  },
+  "copyright": {
+    "text": "© 2026 vxture.ai. All rights reserved."
+  },
+  "icp": {
+    "text": ""
+  },
+  "publicSecurity": {
+    "text": ""
+  }
+}

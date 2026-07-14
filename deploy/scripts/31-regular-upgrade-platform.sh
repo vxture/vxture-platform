@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# deploy/scripts/31-regular-upgrade-platform.sh
+# 聚合常规升级发布流程。
+# @package  @vxture/repo
+# @layer    Infrastructure
+# @category deployment-script
+# @author   AI-Generated
+# @date     2026-06-07
+#
+# 运行：bash scripts/31-regular-upgrade-platform.sh
+# 约束：常规升级只检查数据库可用性，不执行 migration 或 seed。
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+COMPOSE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+RUNTIME_DIR="${RUNTIME_DIR:-/srv/vxture/runtime}"
+NGINX_COMPOSE_FILE="/srv/vxture/data/nginx/compose.yml"
+
+run_step() {
+  local label="$1"
+  shift
+  echo ""
+  echo "==> $label"
+  "$@"
+}
+
+check_auth_runtime_contract() {
+  local auth_env="$RUNTIME_DIR/.env.auth-bff"
+  local turnstile_hosts
+
+  if [ ! -f "$auth_env" ]; then
+    echo "错误：缺少 runtime auth env：$auth_env" >&2
+    exit 1
+  fi
+
+  if ! grep -qE '^COOKIE_DOMAIN_PLATFORM=.+$' "$auth_env"; then
+    echo "错误：$auth_env 缺少 COOKIE_DOMAIN_PLATFORM。" >&2
+    echo "runtime config 由人工维护，请补齐后再部署。" >&2
+    exit 1
+  fi
+
+  turnstile_hosts="$(grep -E '^CF_TURNSTILE_TENANT_ALLOWED_HOSTNAMES=' "$auth_env" | tail -n 1 | cut -d= -f2- || true)"
+  if [ -z "$turnstile_hosts" ]; then
+    echo "错误：$auth_env 缺少 CF_TURNSTILE_TENANT_ALLOWED_HOSTNAMES。" >&2
+    exit 1
+  fi
+
+  case ",$turnstile_hosts," in
+    *,console.vxture.com,*) ;;
+    *)
+      echo "错误：CF_TURNSTILE_TENANT_ALLOWED_HOSTNAMES 必须包含 console.vxture.com。" >&2
+      echo "runtime config 由人工维护，请补齐后再部署。" >&2
+      exit 1
+      ;;
+  esac
+}
+
+cd "$COMPOSE_DIR"
+echo "=== Vxture Regular Upgrade Platform ==="
+echo "流程：13 -> 20 -> 21 -> 30 -> 40"
+
+run_step "13 准备 runtime env" bash "$SCRIPT_DIR/13-prepare-runtime-env.sh"
+run_step "检查 Auth runtime 契约" check_auth_runtime_contract
+run_step "20 同步 Nginx 配置" bash "$SCRIPT_DIR/20-sync-nginx-config.sh"
+run_step "启动或更新 Nginx" docker compose -f "$NGINX_COMPOSE_FILE" up -d
+run_step "21 检查平台数据库" bash "$SCRIPT_DIR/21-prepare-platform-database.sh"
+run_step "30 更新平台栈" bash "$SCRIPT_DIR/30-deploy-platform-stack.sh"
+run_step "40 验证平台运行态" bash "$SCRIPT_DIR/40-verify-platform-runtime.sh"
+# 新栈验证健康后，回收上一版本遗留的未引用镜像，避免根盘随每次部署累积撑满
+# （在用镜像受 docker 保护不会被删）。清理失败不阻断本次已成功的部署。
+run_step "41 清理未引用镜像（控制根盘占用）" bash -c 'docker image prune -af || true'
+
+echo ""
+echo "=== Regular upgrade flow done ==="
+echo "提示：基线/证书/防火墙等常态漂移巡检由 platform-alerts 定时 workflow 负责（51-check-platform-alerts.sh），不在部署链内重复执行。"

@@ -1,0 +1,25 @@
+{
+  "title": "您准备释放数据潜力了吗？",
+  "subtitle": "从方案设计到落地实战，我们与您并肩推进每一步",
+  "features": {
+    "features-cta-01": {
+      "name": "方案快速落地",
+      "description": "深度研判业务场景，提供行业级整体解决方案"
+    },
+    "features-cta-02": {
+      "name": "人工智能协同",
+      "description": "全过程智能体深度参与，提升落地效率和效果"
+    },
+    "features-cta-03": {
+      "name": "持续演进创新",
+      "description": "围绕业务目标持续迭代，实现技术和业务升级"
+    }
+  },
+  "actions": {
+    "0": { "label": "预约咨询" },
+    "1": { "label": "在线沟通" }
+  },
+  "contact": {
+    "description": "随时与我们的专家团队直接沟通，获取针对您业务场景的专业建议"
+  }
+}

@@ -1,0 +1,22 @@
+@import "@vxture/design-system/styles/globals.css";
+@import "@vxture/design-system/styles/brands/vxture.css";
+/* Shared portal shell visual system — single source of truth in the design
+ * system, identical to console. Loaded after the DS packs so the template's
+ * .app/.vxh/.sidebar/.assistant chrome and ergonomic aliases win. The Phosphor
+ * icon font is loaded via <link> in app/layout.tsx. */
+@import "@vxture/design-system/styles/shell-template.css";
+@import "../styles/admin-base.css";
+@import "../styles/admin-auth-captcha.css";
+@import "../styles/admin-service-health.css";
+@import "../styles/admin-overview.css";
+@import "../styles/admin-products.css";
+@import "../styles/admin-management.css";
+@import "../styles/admin-tenant-detail.css";
+@import "../styles/admin-management-pills.css";
+@import "../styles/admin-placeholder.css";
+@import "../styles/admin-permissions.css";
+@import "../styles/admin-roles.css";
+@import "../styles/admin-directory.css";
+@import "../styles/admin-governance.css";
+@import "../styles/admin-operations.css";
+@import "../styles/admin-platform-autonomy.css";

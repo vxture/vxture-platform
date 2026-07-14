@@ -1,0 +1,23 @@
+{
+  "name": "@vxture/service-mail",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Email sending and verification code service — SMTP + Redis rate limiting",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "ioredis": "^5.0.0",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

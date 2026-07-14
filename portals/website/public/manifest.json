@@ -1,0 +1,22 @@
+// 新建文件: packages/web/public/manifest.json
+// 这是一个全新的文件，直接创建即可
+
+{
+  "name": "Vxture - 现代化企业官网平台",
+  "short_name": "Vxture",
+  "description": "基于 Next.js 15 + FastAPI 的现代化企业官网平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "zh-CN"
+}

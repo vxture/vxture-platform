@@ -1,0 +1,104 @@
+# syntax=docker/dockerfile:1
+# Dockerfile.nextjs — Next.js 门户通用 Dockerfile
+# 构建参数：
+#   PORTAL_PATH     portal 相对路径，如 portals/website
+#   PACKAGE_FILTER  pnpm 包名，如 @vxture/website
+#
+# 用法（从 repo 根目录执行）：
+#   docker build -f deploy/docker/Dockerfile.nextjs \
+#     --build-arg PORTAL_PATH=portals/website \
+#     --build-arg PACKAGE_FILTER=@vxture/website \
+#     -t ghcr.io/vxture/website:latest .
+
+ARG NODE_VERSION=24
+
+# ── 构建层 ────────────────────────────────────────────────────────────────────
+FROM node:${NODE_VERSION}-alpine AS builder
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@10.30.3 --activate
+
+# 先复制 lockfile，最大化 install 缓存命中
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json ./
+# 完整 workspace 源码（.dockerignore 已排除 node_modules/dist/.next）
+COPY packages/ packages/
+COPY portals/ portals/
+COPY agent-studio/ agent-studio/
+COPY bff/ bff/
+COPY services/ services/
+COPY agent-server/ agent-server/
+COPY business/ business/
+# tools/dev-panel is excluded from build context (dev-only) but pnpm needs it as workspace stub
+RUN mkdir -p tools/dev-panel && echo '{"name":"@vxture/dev-panel","version":"0.0.0"}' > tools/dev-panel/package.json
+
+# B7: pnpm content-addressable store 走 BuildKit cache mount —— install 层即便因源码
+# 改动重跑，依赖也从持久 store 取（reused, downloaded 0），免去重复下载/解压。
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --store-dir /pnpm/store
+
+ARG PORTAL_PATH
+ARG PACKAGE_FILTER
+ARG NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY
+ARG NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID
+ARG NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY
+ARG NEXT_PUBLIC_API_URL
+# accounts portal: public base of the OIDC API (login form POST target).
+ARG NEXT_PUBLIC_OIDC_API_BASE
+# console portal: same-origin BFF base so portal↔console-bff share an origin
+# (RP cookie). Unset for other portals.
+ARG NEXT_PUBLIC_CONSOLE_BFF_URL
+# website portal: same-origin BFF base so portal↔website-bff share an origin
+# (RP cookie). Unset for other portals.
+ARG NEXT_PUBLIC_WEBSITE_BFF_URL
+# admin portal: same-origin BFF base so portal↔admin-bff share an origin (RP
+# cookie). Without it the portal falls back to NEXT_PUBLIC_API_URL (api.vxture.com)
+# and the __Host- RP cookie set on admin.vxture.com is never sent → login loops.
+ARG NEXT_PUBLIC_ADMIN_BFF_URL
+
+ENV NEXT_STANDALONE=1
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY}
+ENV NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID}
+ENV NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_OIDC_API_BASE=${NEXT_PUBLIC_OIDC_API_BASE}
+ENV NEXT_PUBLIC_CONSOLE_BFF_URL=${NEXT_PUBLIC_CONSOLE_BFF_URL}
+ENV NEXT_PUBLIC_WEBSITE_BFF_URL=${NEXT_PUBLIC_WEBSITE_BFF_URL}
+ENV NEXT_PUBLIC_ADMIN_BFF_URL=${NEXT_PUBLIC_ADMIN_BFF_URL}
+
+# Build only the workspace packages that this portal actually depends on
+# (pnpm ...^ = recursive deps of PACKAGE_FILTER, excluding PACKAGE_FILTER itself)
+RUN pnpm --filter "...^${PACKAGE_FILTER}" --if-present build
+
+# B7: Next 增量编译缓存（.next/cache）走 cache mount，按 portal 独立 id，避免冷编译。
+# 仅 .next/cache 被挂载；.next/standalone 与 .next/static 仍落在层内供运行层 COPY。
+RUN --mount=type=cache,id=next-${PORTAL_PATH},target=/repo/${PORTAL_PATH}/.next/cache \
+    pnpm --filter ${PACKAGE_FILTER} build
+
+# ── 运行层 ────────────────────────────────────────────────────────────────────
+FROM node:${NODE_VERSION}-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+RUN apk add --no-cache curl \
+  && addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nextjs
+
+ARG PORTAL_PATH
+# Make PORTAL_PATH available at runtime for CMD
+ENV PORTAL_PATH=${PORTAL_PATH}
+
+# standalone 目录包含 server.js + 最小化 node_modules
+COPY --from=builder --chown=nextjs:nodejs /repo/${PORTAL_PATH}/.next/standalone ./
+# 静态资源（CSS/JS chunks）必须单独复制到 standalone 的 .next 目录下
+COPY --from=builder --chown=nextjs:nodejs /repo/${PORTAL_PATH}/.next/static ./${PORTAL_PATH}/.next/static
+# public 目录
+COPY --from=builder --chown=nextjs:nodejs /repo/${PORTAL_PATH}/public ./${PORTAL_PATH}/public
+
+USER nextjs
+
+CMD ["sh", "-c", "node $PORTAL_PATH/server.js"]

@@ -1,0 +1,24 @@
+select {
+  line-height: normal;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.vx-eyebrow,
+.eyebrow {
+  margin: 0 0 var(--vx-admin-base-space-05r);
+  font-size: var(--vx-admin-base-text-size-072r);
+  letter-spacing: var(--vx-admin-base-text-tracking-018e);
+  text-transform: uppercase;
+  color: var(--vx-console-muted);
+}
+
+.console-user-pill span,
+.vx-kpi-card p,
+.vx-action-item p,
+.vx-signal-list__item p {
+  color: var(--vx-console-muted);
+}

@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+# deploy/scripts/40-verify-platform-runtime.sh
+# 验证平台运行态：env 审计、Compose、容器、健康检查、Nginx、公网 HTTPS。
+# @package  @vxture/repo
+# @layer    Infrastructure
+# @category deployment-script
+# @author   AI-Generated
+# @date     2026-06-02
+#
+# 运行：bash 40-verify-platform-runtime.sh
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+COMPOSE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="$COMPOSE_DIR/compose.platform.yml"
+RUNTIME_DIR="${RUNTIME_DIR:-/srv/vxture/runtime}"
+
+FAILED=0
+
+mark_fail() {
+  FAILED=1
+}
+
+run_check() {
+  local label="$1"
+  shift
+
+  echo "==> $label"
+  if "$@"; then
+    echo "  [OK] $label"
+  else
+    echo "  [FAIL] $label"
+    mark_fail
+  fi
+  echo ""
+}
+
+check_file() {
+  local file="$1"
+  if [ -f "$file" ]; then
+    echo "  [OK]   $file"
+  else
+    echo "  [MISS] $file"
+    mark_fail
+  fi
+}
+
+check_required_files() {
+  check_file "$COMPOSE_FILE"
+  check_file "$RUNTIME_DIR/.env"
+  check_file "$RUNTIME_DIR/.env.auth-bff"
+  check_file "$RUNTIME_DIR/.env.gateway-bff"
+  check_file "$RUNTIME_DIR/.env.website-bff"
+  check_file "$RUNTIME_DIR/.env.console-bff"
+  check_file "$RUNTIME_DIR/.env.admin-bff"
+  check_file "$RUNTIME_DIR/.env.model-platform"
+  check_file "$RUNTIME_DIR/secrets/pg-password"
+  check_file "$RUNTIME_DIR/secrets/redis-password"
+  check_file "$RUNTIME_DIR/secrets/platform.env"
+  check_file "$RUNTIME_DIR/secrets/platform-mail.env"
+}
+
+compose_cmd() {
+  docker compose -f "$COMPOSE_FILE" "$@"
+}
+
+check_service_health() {
+  local service="$1"
+  local url="$2"
+
+  echo -n "  $service $url -> "
+  if compose_cmd exec -T "$service" curl -sf --max-time 10 "$url" >/dev/null; then
+    echo "OK"
+  else
+    echo "FAIL"
+    mark_fail
+  fi
+}
+
+check_platform_health() {
+  check_service_health "website" "http://localhost:3000/"
+  check_service_health "console" "http://localhost:3000/"
+  check_service_health "admin" "http://localhost:3000/"
+  check_service_health "gateway-bff" "http://localhost:8000/healthz"
+  check_service_health "auth-bff" "http://localhost:3090/healthz"
+  check_service_health "website-bff" "http://localhost:3011/healthz"
+  check_service_health "console-bff" "http://localhost:3021/healthz"
+  check_service_health "admin-bff" "http://localhost:3031/healthz"
+  check_service_health "model-platform" "http://localhost:3100/model-platform/health/live"
+}
+
+check_model_platform_readiness() {
+  local payload
+
+  if ! payload="$(compose_cmd exec -T model-platform curl -fsS --max-time 10 "http://localhost:3100/model-platform/health/ready")"; then
+    echo "  [FAIL] model-platform readiness endpoint unreachable"
+    return 1
+  fi
+
+  if printf '%s\n' "$payload" | grep -q '"status":"ready"'; then
+    echo "  [OK] model-platform readiness=ready"
+    return 0
+  fi
+
+  echo "  [FAIL] model-platform readiness is not ready"
+  printf '%s\n' "$payload"
+  return 1
+}
+
+check_model_platform_metrics() {
+  local payload
+
+  if ! payload="$(compose_cmd exec -T model-platform curl -fsS --max-time 10 "http://localhost:3100/metrics")"; then
+    echo "  [FAIL] model-platform metrics endpoint unreachable"
+    return 1
+  fi
+
+  if printf '%s\n' "$payload" | grep -Eq '#\\s*TYPE\\s+model_request_in_flight\\s+gauge'; then
+    echo "  [OK] model-platform metrics output includes in-flight gauge"
+    return 0
+  fi
+
+  if printf '%s\n' "$payload" | grep -Eq '^# HELP model_request_latency_ms '; then
+    echo "  [OK] model-platform metrics output includes latency histogram"
+    return 0
+  fi
+
+  echo "  [WARN] model-platform metrics output is missing expected model metrics"
+  echo "$payload"
+  return 0
+}
+
+check_nginx_runtime() {
+  if ! docker inspect vxture-nginx >/dev/null 2>&1; then
+    echo "  [FAIL] vxture-nginx container not found"
+    return 1
+  fi
+
+  docker exec vxture-nginx nginx -t
+}
+
+check_public_https() {
+  local url="$1"
+
+  echo -n "  $url -> "
+  if curl -fsS --max-time 15 -o /dev/null "$url"; then
+    echo "OK"
+  else
+    echo "FAIL"
+    mark_fail
+  fi
+}
+
+echo "=== Vxture Platform Runtime Verification ==="
+echo ""
+
+echo "==> Required files"
+check_required_files
+echo ""
+
+# env 审计已由部署前 fail-fast 闸（30-deploy-platform-stack.sh）独占执行，部署中 env 不变，此处不再重复。
+
+run_check "Docker Compose config" \
+  compose_cmd config --quiet
+
+run_check "Docker Compose service status" \
+  compose_cmd ps
+
+echo "==> Internal health endpoints"
+check_platform_health
+echo ""
+
+run_check "Model Platform readiness" \
+  check_model_platform_readiness
+
+run_check "Model Platform metrics endpoint" \
+  check_model_platform_metrics
+
+run_check "Nginx config test" \
+  check_nginx_runtime
+
+echo "==> Public HTTPS endpoints"
+check_public_https "https://vxture.com/"
+check_public_https "https://console.vxture.com/"
+check_public_https "https://admin.vxture.com/"
+check_public_https "https://api.vxture.com/healthz"
+echo ""
+
+if [ "$FAILED" -eq 0 ]; then
+  echo "=== Verification OK ==="
+else
+  echo "=== Verification FAILED ==="
+  exit 1
+fi

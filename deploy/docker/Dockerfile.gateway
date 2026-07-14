@@ -1,0 +1,23 @@
+# Dockerfile.gateway — gateway-bff 专用 Dockerfile（纯 Node.js .mjs，无构建步骤）
+# 用法（从 repo 根目录执行）：
+#   docker build -f deploy/docker/Dockerfile.gateway \
+#     -t ghcr.io/vxture/bff-gateway:latest .
+
+ARG NODE_VERSION=24
+
+FROM node:${NODE_VERSION}-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV GATEWAY_PORT=8000
+
+RUN apk add --no-cache curl \
+  && addgroup --system --gid 1001 nodejs \
+  && adduser --system --uid 1001 nodeapp
+
+COPY --chown=nodeapp:nodejs bff/gateway-bff/src/main.mjs ./
+
+USER nodeapp
+
+EXPOSE 8000
+CMD ["node", "main.mjs"]

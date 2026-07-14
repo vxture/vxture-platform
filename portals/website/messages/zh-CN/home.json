@@ -1,0 +1,7 @@
+{
+  "hero": "./home/hero.json",
+  "features": "./home/features.json",
+  "solutions": "./home/solutions.json",
+  "cases": "./home/cases.json",
+  "cta": "./home/cta.json"
+}

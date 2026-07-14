@@ -1,0 +1,37 @@
+name: platform-alerts
+
+# 定时巡检 VXTURE_DEPLOY_HOST 平台常态漂移：OS/工具基线、镜像基线、env 残留、容器与 Model Platform 健康、
+# Nginx/TLS、防火墙、备份、部署包完整性。只读检查，不修改文件、不重启服务。
+#
+# 从部署链（30/40）中拆出，避免每次部署重复执行；基线与证书漂移本就不随单次部署变化，定时巡检更及时。
+# 运行已部署在 VXTURE_DEPLOY_HOST 上的 51-check-platform-alerts.sh（监控"正在运行"的系统）。
+
+on:
+  schedule:
+    # 每天 02:00（UTC+8）≈ 18:00 UTC
+    - cron: '0 18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-alerts
+  cancel-in-progress: false
+
+jobs:
+  platform-alerts:
+    name: VXTURE_DEPLOY_HOST platform alerts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run platform alert check via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VX_WORKER_01_HOST }}
+          username: ${{ secrets.VX_WORKER_01_USER }}
+          key: ${{ secrets.VX_WORKER_01_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          command_timeout: 10m
+          script: |
+            set -e
+            bash /srv/vxture/deploy/scripts/51-check-platform-alerts.sh

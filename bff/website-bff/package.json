@@ -1,0 +1,45 @@
+{
+  "name": "@vxture/bff-website",
+  "version": "1.2.2",
+  "private": true,
+  "type": "module",
+  "main": "src/main.ts",
+  "types": "src/main.ts",
+  "description": "Vxture platform — website BFF (Backend For Frontend)",
+  "scripts": {
+    "build": "pnpm -w build:backend-deps && pnpm run build:bundle",
+    "build:bundle": "esbuild src/main.ts --bundle --platform=node --format=cjs --target=node22 --outfile=dist/main.cjs --tsconfig=tsconfig.json --external:@nestjs/websockets/socket-module --external:@nestjs/microservices --external:@nestjs/microservices/microservices-module",
+    "dev": "pnpm run build && node dist/main.cjs",
+    "start": "node dist/main.cjs",
+    "boot-smoke": "node ../../scripts/guardrails/boot-smoke.mjs dist/main.cjs website-bff",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0",
+    "@vxture/core-config": "workspace:*",
+    "@vxture/core-oidc-rp": "workspace:*",
+    "@vxture/service-account": "workspace:*",
+    "@vxture/service-mail": "workspace:*",
+    "@vxture/service-organization": "workspace:*",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.22.1",
+    "ioredis": "^5.0.0",
+    "class-validator": "^0.14.0",
+    "class-transformer": "^0.5.1",
+    "reflect-metadata": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
+    "@types/express": "^4.17.21",
+    "esbuild": "^0.27.4",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

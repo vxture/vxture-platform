@@ -1,0 +1,14 @@
+{
+  "name": "@vxture/dev-panel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local visual service control panel for Vxture development",
+  "scripts": {
+    "dev": "node src/server.mjs",
+    "start": "node src/server.mjs"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

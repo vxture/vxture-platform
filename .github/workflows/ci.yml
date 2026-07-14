@@ -1,0 +1,299 @@
+name: ci
+
+on:
+  # 主干模型：main 的 PR 与 push 跑 CI（quality-gate/build/test-coverage/audit）。
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || format('push-{0}', github.ref_name) }}
+  cancel-in-progress: true
+
+jobs:
+  # ── 1. Format ──────────────────────────────────────────────────────────────
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      - name: Check formatting
+        run: pnpm format:check
+
+  # ── 2. Audit ───────────────────────────────────────────────────────────────
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-pnpm
+
+      # Fails on critical vulnerabilities; high-severity issues are tracked
+      # separately until upstream packages release patches.
+      - name: Dependency security audit
+        run: pnpm audit --audit-level=critical
+
+  # ── 3. Check (type · lint · guardrail · boundaries) ───────────────────────
+  check:
+    # 该名称是稳定契约：被分支保护 ruleset（protect-*）与 branch-promotion.yml 的 REQUIRED_CHECKS 引用。
+    # 内部步骤可演进，但 job 名（quality-gate / build / test-coverage）改动须同步上述两处，否则静默破坏晋升。
+    name: quality-gate
+    runs-on: ubuntu-latest
+    outputs:
+      docs_only: ${{ steps.changes.outputs.docs_only }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Classify changed paths
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/workflows/classify-changes.mjs --base "$BASE_SHA" --head "$HEAD_SHA"
+
+      # 始终运行（含 docs-only）：守住分类器 allow-list「默认 SKIP」安全性，
+      # 防止规则/逻辑改动悄悄退化为误构建/误部署。无依赖、秒级。
+      - name: Classifier allow-list regression test
+        run: node --test scripts/workflows/classify-changes.test.mjs
+
+      - name: Docs-only quality gate
+        if: steps.changes.outputs.docs_only == 'true'
+        run: echo "::notice::Docs-only change; heavy quality gate steps skipped while keeping the required check stable."
+
+      - uses: ./.github/actions/setup-node-pnpm
+        if: steps.changes.outputs.docs_only != 'true'
+
+      - name: Build shared & core packages
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm build:backend-deps
+
+      - name: Generate Prisma clients
+        if: steps.changes.outputs.docs_only != 'true'
+        run: |
+          pnpm --filter @vxture/service-model-platform db:generate
+          pnpm --filter @vxture/agent-server-varda prisma:generate
+
+      # 把已构建的后端依赖 dist 与 Prisma client 作为产物上传，供 build / test job 复用，
+      # 避免在并行 job 中重复执行 build:backend-deps 与 prisma generate。
+      - name: Upload backend build (deps dist + prisma clients)
+        if: steps.changes.outputs.docs_only != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-build
+          path: |
+            packages/shared/shared/dist
+            packages/core/*/dist
+            services/model/platform/src/generated/prisma
+            agent-server/varda/src/generated/prisma
+          retention-days: 1
+          include-hidden-files: true
+
+      - name: Type check
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm type-check:all
+
+      - name: Lint
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm --recursive --if-present lint
+
+      - name: Design system guardrail
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm lint:design
+
+      - name: Env audit (deploy bundle + runtime template contract)
+        if: steps.changes.outputs.docs_only != 'true'
+        run: |
+          VX_WORKER_DIR="deploy" \
+          VX_ENV_AUDIT_FAIL_WARNINGS=1 \
+          node scripts/guardrails/audit-env.mjs
+
+      - name: Package boundary check
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm lint:boundaries
+
+      # SQL-DDL 单一权威门控（data_platform_320）：铁律设计检查 + 退役 schema/搬迁表残留检查。
+      # 残留检查含路径② Prisma @@schema/@@map（防 model-platform 类漏网：裸串扫描无感的库映射残留）。
+      - name: Data architecture guardrail (SQL-DDL single authority)
+        if: steps.changes.outputs.docs_only != 'true'
+        run: |
+          pnpm lint:data-design
+          pnpm lint:schema-residue
+          pnpm lint:seed
+          pnpm lint:catalog-domains
+
+  # ── 4. Build ───────────────────────────────────────────────────────────────
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: [check]
+    # TD-024: auth-bff's RedisService.onModuleInit() awaits a real connection and
+    # fails closed by design (it is the central session store) — its boot-smoke
+    # needs an actual reachable Redis, unlike the other BFFs' lazy clients.
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+    steps:
+      - name: Docs-only build gate
+        if: needs.check.outputs.docs_only == 'true'
+        run: echo "::notice::Docs-only change; build check satisfied without artifact build."
+
+      - uses: actions/checkout@v6
+        if: needs.check.outputs.docs_only != 'true'
+
+      - uses: ./.github/actions/setup-node-pnpm
+        if: needs.check.outputs.docs_only != 'true'
+
+      - name: Restore backend build (deps dist + prisma clients)
+        if: needs.check.outputs.docs_only != 'true'
+        uses: actions/download-artifact@v8
+        with:
+          name: backend-build
+
+      - name: Build Model Platform service
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/service-model-platform build
+
+      - name: Build Varda agent server
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/agent-server-varda build
+
+      # TD-024 boot-smoke: build the admin-bff esbuild bundle and boot its full DI
+      # graph with a fake env. This is the only gate that exercises the bundled
+      # runtime form, where the implicit-constructor-injection trap lives (a bundled
+      # service whose deps silently become undefined) — invisible to tsc/unit.
+      - name: Build admin-bff bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-admin build:bundle
+
+      - name: Boot-smoke admin-bff (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-admin boot-smoke
+
+      - name: Build auth-bff bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-auth build:bundle
+
+      - name: Boot-smoke auth-bff (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-auth boot-smoke
+        env:
+          REDIS_URL: redis://localhost:6379
+
+      - name: Build console-bff bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-console build:bundle
+
+      - name: Boot-smoke console-bff (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-console boot-smoke
+
+      - name: Build website-bff bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-website build:bundle
+
+      - name: Boot-smoke website-bff (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-website boot-smoke
+
+      - name: Build platform-api bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-platform-api build:bundle
+
+      - name: Boot-smoke platform-api (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-platform-api boot-smoke
+
+      - name: Build varda-bff bundle
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-varda build:bundle
+
+      - name: Boot-smoke varda-bff (DI graph resolves under esbuild bundle)
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/bff-varda boot-smoke
+        env:
+          REDIS_URL: redis://localhost:6379
+
+  # ── 5. Test Coverage ───────────────────────────────────────────────────────
+  test:
+    name: test-coverage
+    runs-on: ubuntu-latest
+    needs: [check]
+    steps:
+      - name: Docs-only test gate
+        if: needs.check.outputs.docs_only == 'true'
+        run: echo "::notice::Docs-only change; test-coverage check satisfied without coverage artifact."
+
+      - uses: actions/checkout@v6
+        if: needs.check.outputs.docs_only != 'true'
+
+      - uses: ./.github/actions/setup-node-pnpm
+        if: needs.check.outputs.docs_only != 'true'
+
+      - name: Restore backend build (deps dist + prisma clients)
+        if: needs.check.outputs.docs_only != 'true'
+        uses: actions/download-artifact@v8
+        with:
+          name: backend-build
+
+      - name: Run tests
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --recursive --if-present test
+
+      - name: Generate coverage report
+        if: needs.check.outputs.docs_only != 'true'
+        run: pnpm --filter @vxture/service-model-platform test:coverage
+
+      - name: Upload coverage report
+        if: needs.check.outputs.docs_only != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: services/model/platform/coverage/lcov.info
+          retention-days: 1
+
+  # ── 6. SonarQube ───────────────────────────────────────────────────────────
+  sonar:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    needs: [check, test]
+    if: >
+      needs.check.outputs.docs_only != 'true' &&
+      (
+        github.event_name == 'pull_request' ||
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/beta' ||
+        github.ref == 'refs/heads/develop'
+      )
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-report
+          path: services/model/platform/coverage/
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        with:
+          skipSignatureVerification: false
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

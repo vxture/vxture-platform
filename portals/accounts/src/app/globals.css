@@ -1,0 +1,81 @@
+/* Accounts surface global style entry — reuses the design-system tokens/brand. */
+
+@import "@vxture/design-system/styles/globals.css";
+@import "@vxture/design-system/styles/brands/vxture.css";
+
+/* Minimal notice/placeholder layout (root + missing-challenge fallback). */
+.vx-accounts-notice {
+  margin: 0 auto;
+  padding: var(--vx-space-4xl) var(--vx-space-xl);
+}
+
+/* Operator MFA step affordances (accounts-local; DS tokens only — no hardcoded
+   scale/color). Native button-element usage is tracked in the DS guardrail
+   baseline pending a DS Button primitive. */
+.vx-auth-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: var(--vx-space-sm);
+  color: var(--vx-color-primary);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.vx-operator-recovery-codes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--vx-space-sm);
+  list-style: none;
+  margin: var(--vx-space-md) 0;
+  padding: var(--vx-space-md);
+  border: 1px solid var(--vx-color-border);
+  border-radius: var(--vx-radius-md);
+  font-family: var(--vx-font-mono, monospace);
+}
+
+.vx-operator-recovery-codes li {
+  text-align: center;
+}
+
+.vx-totp-qr {
+  display: block;
+  margin: 0 auto;
+  border-radius: var(--vx-radius-md);
+}
+
+.vx-passkey-manager__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vx-space-md);
+}
+
+.vx-passkey-list {
+  list-style: none;
+  margin: var(--vx-space-md) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--vx-space-sm);
+}
+
+.vx-passkey-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vx-space-md);
+  padding: var(--vx-space-md);
+  border: 1px solid var(--vx-color-border);
+  border-radius: var(--vx-radius-md);
+}
+
+.vx-passkey-list__item span {
+  display: block;
+}
+
+.vx-passkey-list__actions {
+  display: flex;
+  gap: var(--vx-space-md);
+  white-space: nowrap;
+}

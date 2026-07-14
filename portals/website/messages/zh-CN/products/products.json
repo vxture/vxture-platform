@@ -1,0 +1,57 @@
+{
+  "title": "核心功能",
+  "description": "强大的功能，简单的体验",
+  "categories": [
+    {
+      "name": "数据分析",
+      "items": [
+        {
+          "title": "智能报表",
+          "description": "自动化生成各种格式的报表"
+        },
+        {
+          "title": "数据可视化",
+          "description": "多种图表类型，直观展示数据"
+        },
+        {
+          "title": "数据挖掘",
+          "description": "发现数据中的隐藏模式"
+        }
+      ]
+    },
+    {
+      "name": "协作办公",
+      "items": [
+        {
+          "title": "团队协作",
+          "description": "实时协作，提高效率"
+        },
+        {
+          "title": "权限管理",
+          "description": "精细的权限控制"
+        },
+        {
+          "title": "版本控制",
+          "description": "完整的版本历史记录"
+        }
+      ]
+    },
+    {
+      "name": "安全保障",
+      "items": [
+        {
+          "title": "数据加密",
+          "description": "传输和存储加密"
+        },
+        {
+          "title": "备份恢复",
+          "description": "定期备份，快速恢复"
+        },
+        {
+          "title": "合规认证",
+          "description": "符合多种安全标准"
+        }
+      ]
+    }
+  ]
+}

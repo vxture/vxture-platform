@@ -1,0 +1,52 @@
+<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg" font-family="monospace" font-size="13">
+
+  <text x="250" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2328">Component System (Button 为例)</text>
+
+  <!-- Business -->
+  <rect x="150" y="36" width="200" height="32" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="250" y="57" text-anchor="middle" fill="#15803d">website / app</text>
+
+  <line x1="250" y1="68" x2="250" y2="110" stroke="#888" stroke-width="1.2"/>
+  <polygon points="246,106 254,106 250,114" fill="#888"/>
+  <text x="262" y="94" font-size="11" fill="#888">&lt;Button variant="primary" /&gt;</text>
+
+  <!-- Button.tsx -->
+  <rect x="150" y="114" width="200" height="32" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="250" y="135" text-anchor="middle" fill="#1d4ed8">Button.tsx  ★ 唯一对外组件</text>
+
+  <!-- types / index / buttonStyles -->
+  <rect x="20" y="190" width="110" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="75" y="211" text-anchor="middle" fill="#475569">types.ts</text>
+
+  <rect x="148" y="190" width="110" height="32" rx="4" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="203" y="211" text-anchor="middle" fill="#475569">index.ts</text>
+
+  <rect x="276" y="190" width="110" height="32" rx="4" fill="#fef9c3" stroke="#eab308" stroke-width="1.5"/>
+  <text x="331" y="207" text-anchor="middle" fill="#854d0e">buttonStyles.ts</text>
+  <text x="331" y="219" text-anchor="middle" font-size="11" fill="#854d0e">cva() 样式配置</text>
+
+  <!-- shadcn -->
+  <rect x="404" y="190" width="80" height="32" rx="4" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="444" y="207" text-anchor="middle" fill="#6d28d9">shadcn/ui</text>
+  <text x="444" y="219" text-anchor="middle" font-size="11" fill="#6d28d9">源码在 repo</text>
+
+  <!-- arrows from Button.tsx -->
+  <line x1="210" y1="146" x2="95" y2="190" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+  <polygon points="92,186 100,190 94,196" fill="#94a3b8"/>
+  <text x="118" y="172" font-size="11" fill="#94a3b8">类型</text>
+
+  <line x1="240" y1="146" x2="218" y2="190" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+  <polygon points="214,186 222,186 218,194" fill="#94a3b8"/>
+
+  <line x1="270" y1="146" x2="316" y2="190" stroke="#3b82f6" stroke-width="1.5"/>
+  <polygon points="313,186 321,190 315,196" fill="#3b82f6"/>
+  <text x="307" y="172" font-size="11" fill="#3b82f6">样式计算</text>
+
+  <line x1="340" y1="146" x2="430" y2="190" stroke="#7c3aed" stroke-width="1.5"/>
+  <polygon points="427,186 435,190 429,196" fill="#7c3aed"/>
+  <text x="398" y="172" font-size="11" fill="#7c3aed">底层实现</text>
+
+  <!-- note -->
+  <text x="20" y="244" font-size="11" fill="#888">shadcn: Radix Primitives(行为) + Tailwind + cva(样式)  ·  Lyra 风格  ·  代码在自己 repo</text>
+
+</svg>

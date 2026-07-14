@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+**/.next/
+storybook-static/
+
+# Generated files
+**/src/generated/
+coverage/
+**/coverage/
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Turbo
+.turbo/
+
+# Cache
+.cache/
+.parcel-cache/

@@ -1,0 +1,35 @@
+{
+  "title": "Best Practices",
+  "subtitle": "Real-world cases showing digital transformation results",
+  "tagline": "Best Practices, Industry Benchmarks",
+  "ui": {
+    "viewDetails": "View Details"
+  },
+  "items": {
+    "case-intro-01": {
+      "title": "Geological Disaster Management Platform",
+      "description": "Integrating 3D reality and monitoring data for disaster correlation and intelligent monitoring",
+      "tags": ["Data Fusion", "Ontology Modeling", "Business Analytics"],
+      "cover": { "alt": "Geological Disaster Management Platform" },
+      "customer": "Provincial Department of Natural Resources"
+    },
+    "case-intro-02": {
+      "title": "Intelligent Emergency Command Platform",
+      "description": "Cross-Domain Data Integration for Emergency Resource Optimization and Decision Support",
+      "tags": [
+        "Data Integration",
+        "Intelligent Judgment",
+        "Emergency Management"
+      ],
+      "cover": { "alt": "Emergency Command Platform" },
+      "customer": "Provincial Emergency Department"
+    },
+    "case-intro-03": {
+      "title": "Public Safety Intelligence Analysis",
+      "description": "AI-Powered Case Analysis and Decision Support for Precision Safety Prevention",
+      "tags": ["Fusion Analysis", "Dynamic Assessment", "Event Response"],
+      "cover": { "alt": "Public Safety Intelligence Analysis" },
+      "customer": "Municipal Public Security Bureau"
+    }
+  }
+}

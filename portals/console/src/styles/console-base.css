@@ -1,0 +1,55 @@
+/**
+ * console-base.css — console-portal base + loading styles.
+ *
+ * Relocated out of the design system (formerly
+ * @vxture/design-system/styles/console-base.css) so the DS no longer carries a
+ * console-specific shell pack. Holds the console body/base resets, the
+ * session-loading spinner, and the muted text in signal/action lists.
+ */
+
+html,
+body {
+  min-height: 100%;
+  background: linear-gradient(180deg, var(--vx-color-gray-50) 0%, var(--vx-color-shell-bg) 100%);
+  color: var(--vx-console-text);
+}
+
+html.dark,
+body.dark {
+  background: linear-gradient(180deg, var(--vx-color-background) 0%, var(--vx-color-surface-soft) 100%);
+}
+
+body {
+  min-height: var(--vx-console-viewport-min-height);
+  margin: 0;
+  font-feature-settings: "ss01" 1, "ss02" 1;
+}
+
+select {
+  line-height: normal;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.console-loading {
+  min-height: var(--vx-console-viewport-min-height);
+  display: grid;
+  place-items: center;
+}
+
+.console-loading__spinner {
+  width: var(--vx-space-2xl);
+  height: var(--vx-space-2xl);
+  border: var(--vx-space-xs) solid var(--vx-console-border);
+  border-top-color: var(--vx-color-primary);
+  border-radius: var(--vx-radius-full);
+  animation: vx-spin var(--vx-motion-spinner) infinite;
+}
+
+.vx-action-item p,
+.vx-signal-list__item p {
+  color: var(--vx-console-muted);
+}

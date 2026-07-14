@@ -1,0 +1,306 @@
+export type Capability =
+  | "platform.tenant.manage"
+  | "platform.product.manage"
+  | "platform.pricing.manage"
+  | "platform.model.manage"
+  | "tenant.user.manage"
+  | "tenant.role.manage"
+  | "tenant.subscription.read"
+  | "tenant.billing.read"
+  | "tenant.invoice.manage"
+  | "tenant.payment.manage"
+  | "tenant.quota.read";
+
+export interface ConsoleUser {
+  id: string;
+  name: string;
+  displayName?: string;
+  email: string;
+  roleLabel: string;
+  username?: string;
+  phone?: string | null;
+  /** Platform avatar URL (versioned); null/absent → default silhouette. */
+  picture?: string | null;
+}
+
+export interface ConsoleUserProfile {
+  id: string;
+  username: string;
+  /** ISO timestamp when the username may next be changed; null = changeable now. */
+  usernameChangeableAt?: string | null;
+  displayName: string | null;
+  /** Platform avatar URL (versioned `/avatar/usr_<id>?v=<hash>`); null → default. */
+  picture: string | null;
+  /** @deprecated legacy paste-URL field; superseded by `picture`. */
+  avatarUrl: string | null;
+  bio: string | null;
+  email: string | null;
+  /** Whether the email is verified. */
+  emailVerified?: boolean;
+  phone: string | null;
+  /** Whether the phone is verified (the primary anchor → normally true). */
+  phoneVerified?: boolean;
+  timezone: string | null;
+  language: string | null;
+  profileUpdatedAt: string | null;
+  /** Public user number (e.g. "000042"). Returned by BFF when available. */
+  userNo?: string | null;
+  /** Account creation timestamp (ISO). Returned by BFF when available. */
+  accountCreatedAt?: string | null;
+  /** Account status: active | suspended. */
+  accountStatus?: string | null;
+  /** Whether username+password login is disabled (phone/email/social unaffected). */
+  accountLoginDisabled?: boolean;
+}
+
+export interface IdentityRecord {
+  provider: string;
+  providerSubject: string;
+  connectedAt: string;
+}
+
+export interface LastLoginInfo {
+  loginAt: string;
+  ipAddress: string;
+  userAgent: string | null;
+  countryCode: string | null;
+}
+
+export interface LoginHistoryEntry {
+  loginAt: string;
+  ipAddress: string;
+  userAgent: string | null;
+  countryCode: string | null;
+  authMethod: string;
+  result: string;
+}
+
+export interface AuthSessionRecord {
+  sid: string;
+  authMethod: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  lastActiveAt: string;
+  createdAt: string;
+  expiresAt: string;
+}
+
+export interface ConsoleWorkspaceItem {
+  tenantId: string;
+  tenantName: string;
+  tenantType: "personal" | "organization";
+  role: string;
+  workspaceId: string | null;
+  workspaceName: string | null;
+  isCurrent: boolean;
+  /** ISO timestamp the user joined this tenant. */
+  joinedAt?: string | null;
+}
+
+export interface ConsoleOrganizationProfile {
+  tenantId: string;
+  tenantCode: string;
+  tenantName: string;
+  displayName: string;
+  tenantType: "personal" | "organization";
+  status: "trial" | "active" | "suspended" | "cancelled";
+  createdAt: string | null;
+  /** Content hash of the stored logo; null = no custom logo. */
+  logoHash: string | null;
+  description: string | null;
+  industry: string | null;
+  scale: string | null;
+  website: string | null;
+  contactName: string | null;
+  contactRole: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  countryCode: string | null;
+  address: string | null;
+  postalCode: string | null;
+  isBillingRecipient: boolean;
+  timezone: string | null;
+  language: string | null;
+  currency: string | null;
+  /** KYC verification (§3.4) — deferred; read-only summary, skeleton only. */
+  verifiedStatus: "unverified" | "pending" | "verified" | "rejected" | null;
+  updatedAt: string | null;
+}
+
+/** Editable subset of the tenant profile (PUT /api/me/organization). */
+export interface OrganizationProfileUpdate {
+  description?: string | null;
+  industry?: string | null;
+  scale?: string | null;
+  website?: string | null;
+  contactName?: string | null;
+  contactRole?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  countryCode?: string | null;
+  address?: string | null;
+  postalCode?: string | null;
+  isBillingRecipient?: boolean;
+  timezone?: string | null;
+  language?: string | null;
+  currency?: string | null;
+}
+
+export interface TenantContext {
+  id: string;
+  name: string;
+  mode: "platform" | "tenant";
+  workspace: string;
+  tenantType?: "personal" | "organization";
+  tenantCode?: string;
+  status?: string;
+}
+
+export interface BreadcrumbItem {
+  href: string;
+  label: string;
+}
+
+export interface SessionSnapshot {
+  isAuthenticated: boolean;
+  user: ConsoleUser | null;
+  tenant: TenantContext | null;
+  tenantOptions?: TenantContext[];
+  capabilities: Capability[];
+}
+
+export interface ModuleCardStat {
+  label: string;
+  value: string;
+  hint: string;
+}
+
+export interface SummaryMetric {
+  label: string;
+  value: string;
+  trend?: string;
+  tone?: "default" | "positive" | "warning";
+}
+
+export interface QuickAction {
+  label: string;
+  description: string;
+  href: string;
+  icon: string;
+}
+
+export interface MemberRecord {
+  id: string;
+  accountId: string;
+  name: string;
+  username?: string | null;
+  avatarUrl?: string | null;
+  email: string;
+  phone: string | null;
+  role: string;
+  roleCode: string | null;
+  roleId: string | null;
+  status: "Active" | "Invited" | "Suspended";
+  statusCode: "active" | "inactive" | "banned";
+  lastActive: string;
+  team: string;
+  joinedAt: string;
+  isPrimaryOwner: boolean;
+}
+
+export interface TenantRoleRecord {
+  id: string;
+  roleCode: string;
+  roleName: string;
+  description: string | null;
+  status: "active" | "disabled";
+  isSystem: boolean;
+  permissions: TenantPermissionRecord[];
+}
+
+export interface TenantPermissionRecord {
+  id: string;
+  permissionCode: string;
+  permissionName: string;
+  permissionType: string | null;
+  description: string | null;
+}
+
+export interface AiModelRecord {
+  id: string;
+  providerId: string | null;
+  modelCode: string;
+  modelName: string;
+  provider: string;
+  endpointUrl: string;
+  protocol: string;
+  capabilities: string[];
+  keyReference: {
+    source: "env";
+    name: string;
+    configured: boolean;
+  } | null;
+  isActive: boolean;
+  config: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ModelApplicationType =
+  | "agent"
+  | "workflow"
+  | "api_client"
+  | "internal_service";
+
+export interface AiModelGrantRecord {
+  id: string;
+  modelId: string;
+  tenantId: string;
+  applicationId: string | null;
+  applicationType: ModelApplicationType | null;
+  agentId: string | null;
+  priority: number;
+  reason: string | null;
+  expiresAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TenantQuotaRecord {
+  id: string;
+  tenantId: string;
+  subscriptionId: string | null;
+  quotaCycle: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  maxUsers: number | null;
+  maxAgents: number | null;
+  maxKnowledgeBases: number | null;
+  maxStorageGb: number | null;
+  periodTokens: string | null;
+  usedTokens: string;
+  allowedModelIds: string[];
+  allowCustomModel: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TenantUsageSummaryRecord {
+  id: string;
+  tenantId: string;
+  applicationId: string | null;
+  applicationType: ModelApplicationType | null;
+  cycleMonth: string;
+  statType: string;
+  totalRequests: string;
+  successRequests: string;
+  failedRequests: string;
+  totalInputTokens: string;
+  totalOutputTokens: string;
+  totalTokens: string;
+  totalCostAmount: string;
+  currency: string;
+  updatedAt: string;
+}

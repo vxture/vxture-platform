@@ -1,0 +1,7 @@
+/* Website global style entry. Keep concrete rules in src/styles modules. */
+
+@import "@vxture/design-system/styles/globals.css";
+@import "@vxture/design-system/styles/brands/vxture.css";
+@import "@vxture/design-system/styles/shell-template-user-panel.css";
+@import "../styles/website-legal.css";
+@import "../styles/website-marketing.css";
