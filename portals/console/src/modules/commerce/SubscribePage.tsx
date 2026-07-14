@@ -309,81 +309,84 @@ export function SubscribePage() {
       ) : null}
 
       <PageSection title={t("plansSection")}>
-        <div className="vx-detail-actions" style={{ marginBottom: "0.75rem" }}>
-          {CYCLES.map((c) => (
-            <Button
-              key={c}
-              variant={cycle === c ? "default" : "outline"}
-              onClick={() => setCycle(c)}
-            >
-              {t(`cycleToggle.${c === "month" ? "monthly" : "yearly"}`)}
-            </Button>
-          ))}
-        </div>
+        <div className="vx-stack-sm">
+          <div className="vx-detail-actions">
+            {CYCLES.map((c) => (
+              <Button
+                key={c}
+                variant={cycle === c ? "default" : "outline"}
+                onClick={() => setCycle(c)}
+              >
+                {t(`cycleToggle.${c === "month" ? "monthly" : "yearly"}`)}
+              </Button>
+            ))}
+          </div>
 
-        {plans.length === 0 ? (
-          <p className="vx-empty-hint">{t("noPlans")}</p>
-        ) : (
-          <div className="vx-stack-sm">
-            {plans.map((plan) => {
-              const isCurrent =
-                current !== null &&
-                plan.planVersionId === current.planVersionId;
-              const isTarget = targetTier !== null && plan.tier === targetTier;
-              const isEnterprise = plan.prices.length === 0;
-              const price = priceForCycle(plan, cycle);
-              const isFree = price
-                ? Number.parseFloat(price.price) <= 0
-                : false;
-              return (
-                <div key={plan.planId} className="vx-subscription-panel">
-                  <div className="vx-inline-between">
-                    <div className="vx-stack-sm">
-                      <div className="vx-inline-between">
-                        <strong>{plan.planName}</strong>
-                        <Badge>{plan.tier}</Badge>
-                        {isCurrent ? (
-                          <Badge>{t("badges.current")}</Badge>
-                        ) : null}
-                        {isTarget && !isCurrent ? (
-                          <Badge className="vx-badge-positive">
-                            {t("badges.recommended")}
-                          </Badge>
+          {plans.length === 0 ? (
+            <p className="vx-empty-hint">{t("noPlans")}</p>
+          ) : (
+            <div className="vx-stack-sm">
+              {plans.map((plan) => {
+                const isCurrent =
+                  current !== null &&
+                  plan.planVersionId === current.planVersionId;
+                const isTarget =
+                  targetTier !== null && plan.tier === targetTier;
+                const isEnterprise = plan.prices.length === 0;
+                const price = priceForCycle(plan, cycle);
+                const isFree = price
+                  ? Number.parseFloat(price.price) <= 0
+                  : false;
+                return (
+                  <div key={plan.planId} className="vx-subscription-panel">
+                    <div className="vx-inline-between">
+                      <div className="vx-stack-sm">
+                        <div className="vx-inline-between">
+                          <strong>{plan.planName}</strong>
+                          <Badge>{plan.tier}</Badge>
+                          {isCurrent ? (
+                            <Badge>{t("badges.current")}</Badge>
+                          ) : null}
+                          {isTarget && !isCurrent ? (
+                            <Badge className="vx-badge-positive">
+                              {t("badges.recommended")}
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <span>
+                          {isEnterprise
+                            ? t("actions.contactSales")
+                            : price
+                              ? `${formatMoney(price.price, price.currency)} / ${t(
+                                  `cycle.${price.cycleUnit}`,
+                                )}`
+                              : t("pricePending")}
+                        </span>
+                      </div>
+                      <div className="vx-detail-actions">
+                        {isCurrent ? null : isEnterprise ? (
+                          <Button variant="outline" onClick={contactSales}>
+                            {t("actions.contactSales")}
+                          </Button>
+                        ) : price ? (
+                          <Button
+                            disabled={busy !== null}
+                            onClick={() => void onSelect(plan)}
+                          >
+                            {busy === plan.planVersionId
+                              ? t("actions.processing")
+                              : planButtonLabel(isFree)}
+                          </Button>
                         ) : null}
                       </div>
-                      <span>
-                        {isEnterprise
-                          ? t("actions.contactSales")
-                          : price
-                            ? `${formatMoney(price.price, price.currency)} / ${t(
-                                `cycle.${price.cycleUnit}`,
-                              )}`
-                            : t("pricePending")}
-                      </span>
-                    </div>
-                    <div className="vx-detail-actions">
-                      {isCurrent ? null : isEnterprise ? (
-                        <Button variant="outline" onClick={contactSales}>
-                          {t("actions.contactSales")}
-                        </Button>
-                      ) : price ? (
-                        <Button
-                          disabled={busy !== null}
-                          onClick={() => void onSelect(plan)}
-                        >
-                          {busy === plan.planVersionId
-                            ? t("actions.processing")
-                            : planButtonLabel(isFree)}
-                        </Button>
-                      ) : null}
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {error ? <p className="vx-empty-hint">{error}</p> : null}
+                );
+              })}
+            </div>
+          )}
+          {error ? <p className="vx-empty-hint">{error}</p> : null}
+        </div>
       </PageSection>
 
       <PageSection title={t("moreSection")} tone="muted">
