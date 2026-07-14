@@ -95,5 +95,156 @@
     "title": "先用这一页承载第一个产品",
     "description": "内容是可替换的占位版本，结构已经预留了后续补充真实产品模块、案例、价格和演示入口的位置。",
     "action": "进入工作台"
+  },
+  "catalog": {
+    "eyebrow": "产品矩阵",
+    "title": "全栈智能，按需组合",
+    "description": "从模型底座到数据治理、知识与空间智能，六大平台产品围绕 plan 订阅、按需组合；智能体助手 varda 随套餐档位放开。",
+    "pricingCta": "查看套餐定价",
+    "valueLabel": "业务价值",
+    "badges": {
+      "trial": "可试用",
+      "active": "已开通"
+    },
+    "actions": {
+      "subscribe": "订阅",
+      "upgrade": "升级",
+      "enter": "进入工作台",
+      "demo": "申请演示",
+      "detail": "产品介绍",
+      "coming": "敬请期待"
+    },
+    "items": [
+      {
+        "code": "arda",
+        "name": "Arda 智能数据治理平台",
+        "type": "L2 · 数据智能",
+        "icon": "database",
+        "description": "面向企业的数据智能底座：数据集、数据源、服务端点统一治理，内置质量、标准、血缘、安全与主数据能力。",
+        "value": "让数据可治理、可信赖、可复用，为上层智能应用提供高质量数据供给。",
+        "status": "available"
+      },
+      {
+        "code": "atlas",
+        "name": "Atlas 企业模型平台",
+        "type": "L1 · 模型底座",
+        "icon": "cube",
+        "description": "企业级 AI 模型平台：多模型接入、编排与调度，统一模型服务与算力管理。",
+        "value": "把大模型能力沉淀为企业可控、可复用的模型服务底座。",
+        "status": "coming"
+      },
+      {
+        "code": "ontos",
+        "name": "Ontos 企业本体引擎",
+        "type": "L1 · 语义底座",
+        "icon": "workflow",
+        "description": "企业本体与语义引擎：统一概念、关系与规则，构建跨系统的语义骨架。",
+        "value": "用本体对齐术语与语义，让数据与智能在同一语义空间协作。",
+        "status": "coming"
+      },
+      {
+        "code": "runa",
+        "name": "Runa 可组合能力平台",
+        "type": "L1 · 能力编排",
+        "icon": "sparkles",
+        "description": "可组合 AI 能力平台：将模型、工具、工作流封装为可复用能力单元并编排成应用。",
+        "value": "以搭积木的方式快速组装 AI 应用，缩短从能力到业务的路径。",
+        "status": "coming"
+      },
+      {
+        "code": "karda",
+        "name": "Karda 企业知识智能平台",
+        "type": "L2 · 知识智能",
+        "icon": "server",
+        "description": "企业知识智能平台：知识抽取、组织与检索，构建可问答、可推理的企业知识库。",
+        "value": "把散落的企业知识变成可检索、可推理的智能资产。",
+        "status": "coming"
+      },
+      {
+        "code": "terra",
+        "name": "Terra 物理世界智能平台",
+        "type": "L2 · 空间智能",
+        "icon": "map-pin",
+        "description": "物理世界智能平台：空间数据、数字孪生、仿真与地理感知智能体。",
+        "value": "让智能延伸到物理世界，支撑时空分析与数字孪生运营。",
+        "status": "coming"
+      }
+    ],
+    "comingSoonHint": "该产品正在建设中，敬请期待。",
+    "back": "返回产品总览"
+  },
+  "pricing": {
+    "eyebrow": "套餐定价",
+    "title": "智能数据治理平台 · Arda",
+    "cycle": {
+      "monthly": "月付",
+      "yearly": "年付"
+    },
+    "per": {
+      "monthly": "每月",
+      "yearly": "每年"
+    },
+    "contact": "联系销售",
+    "contactSubject": "Arda 企业版咨询",
+    "subscribe": "订阅",
+    "plans": [
+      {
+        "tier": "free",
+        "name": "免费版",
+        "monthly": "¥0",
+        "yearly": "¥0",
+        "features": ["1 席位", "50 数据集", "基础数据治理", "1 GiB 存储"]
+      },
+      {
+        "tier": "starter",
+        "name": "入门版",
+        "monthly": "¥199",
+        "yearly": "¥1,999",
+        "save": "约 8.4 折",
+        "features": [
+          "1 席位",
+          "500 数据集",
+          "varda 助手（只读）",
+          "100 AI 积分/月",
+          "10 GiB 存储"
+        ]
+      },
+      {
+        "tier": "pro",
+        "name": "专业版",
+        "monthly": "¥499",
+        "yearly": "¥4,999",
+        "save": "约 8.3 折",
+        "highlight": true,
+        "features": [
+          "3 席位",
+          "5,000 数据集",
+          "hourly 同步",
+          "1,000 AI 积分/月",
+          "100 GiB 存储"
+        ]
+      },
+      {
+        "tier": "business",
+        "name": "商业版",
+        "monthly": "¥1,999",
+        "yearly": "¥19,999",
+        "save": "约 8.3 折 · 含 5 席位",
+        "features": [
+          "5 席位",
+          "不限数据集",
+          "realtime 同步 + varda 可写",
+          "10,000 AI 积分/月",
+          "1 TiB 存储"
+        ]
+      },
+      {
+        "tier": "enterprise",
+        "name": "企业版",
+        "monthly": null,
+        "yearly": null,
+        "features": ["不限席位", "私有化部署", "专属支持与 SLA", "定制配额"]
+      }
+    ]
   }
 }

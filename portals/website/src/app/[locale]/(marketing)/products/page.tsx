@@ -1,5 +1,5 @@
-import { ProductDetailPartOne } from "@/components/marketing";
+import { ProductsOverviewPage } from "@/components/marketing";
 
 export default function ProductsPage() {
-  return <ProductDetailPartOne />;
+  return <ProductsOverviewPage />;
 }

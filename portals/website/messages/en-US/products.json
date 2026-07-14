@@ -111,5 +111,166 @@
     "title": "Use this page as the first product placeholder",
     "description": "The content is intentionally editable. The structure is ready for real modules, cases, pricing, and demo entry points.",
     "action": "Open console"
+  },
+  "catalog": {
+    "eyebrow": "Product suite",
+    "title": "Full-stack intelligence, composable",
+    "description": "From model foundations to data governance, knowledge and spatial intelligence — six platform products subscribed around plans and composed on demand; the varda assistant unlocks by plan tier.",
+    "pricingCta": "See pricing",
+    "valueLabel": "Business value",
+    "badges": {
+      "trial": "Free trial",
+      "active": "Active"
+    },
+    "actions": {
+      "subscribe": "Subscribe",
+      "upgrade": "Upgrade",
+      "enter": "Enter console",
+      "demo": "Request demo",
+      "detail": "Learn more",
+      "coming": "Coming soon"
+    },
+    "items": [
+      {
+        "code": "arda",
+        "name": "Arda Data Intelligence Platform",
+        "type": "L2 · Data intelligence",
+        "icon": "database",
+        "description": "The enterprise data intelligence fabric: unified governance of datasets, sources and service endpoints, with built-in quality, standards, lineage, security and MDM.",
+        "value": "Make data governable, trustworthy and reusable — high-quality supply for every intelligent app above.",
+        "status": "available"
+      },
+      {
+        "code": "atlas",
+        "name": "Atlas AI Model Platform",
+        "type": "L1 · Model foundation",
+        "icon": "cube",
+        "description": "Enterprise AI model platform: multi-model access, orchestration and scheduling with unified model serving and compute management.",
+        "value": "Turn large-model capability into a controllable, reusable model foundation.",
+        "status": "coming"
+      },
+      {
+        "code": "ontos",
+        "name": "Ontos Ontology Engine",
+        "type": "L1 · Semantic foundation",
+        "icon": "workflow",
+        "description": "Enterprise ontology and semantic engine: unify concepts, relations and rules into a cross-system semantic backbone.",
+        "value": "Align terms and semantics so data and intelligence collaborate in one space.",
+        "status": "coming"
+      },
+      {
+        "code": "runa",
+        "name": "Runa Composable Ability Platform",
+        "type": "L1 · Ability orchestration",
+        "icon": "sparkles",
+        "description": "Composable AI ability platform: wrap models, tools and workflows into reusable ability units and orchestrate them into apps.",
+        "value": "Assemble AI apps like building blocks — shorten the path from capability to business.",
+        "status": "coming"
+      },
+      {
+        "code": "karda",
+        "name": "Karda Knowledge Intelligence Platform",
+        "type": "L2 · Knowledge intelligence",
+        "icon": "server",
+        "description": "Enterprise knowledge intelligence platform: extract, organize and retrieve knowledge into a queryable, reasoning-capable knowledge base.",
+        "value": "Turn scattered enterprise knowledge into retrievable, reasoning-ready assets.",
+        "status": "coming"
+      },
+      {
+        "code": "terra",
+        "name": "Terra Physical-World Intelligence",
+        "type": "L2 · Spatial intelligence",
+        "icon": "map-pin",
+        "description": "Physical-world intelligence platform: spatial data, digital twins, simulation and geo-aware agents.",
+        "value": "Extend intelligence into the physical world for spatiotemporal analysis and digital-twin operations.",
+        "status": "coming"
+      }
+    ],
+    "comingSoonHint": "This product is under construction — stay tuned.",
+    "back": "Back to products"
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "title": "Arda · Data Intelligence Platform",
+    "cycle": {
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "per": {
+      "monthly": "per month",
+      "yearly": "per year"
+    },
+    "contact": "Contact sales",
+    "contactSubject": "Arda Enterprise inquiry",
+    "subscribe": "Subscribe",
+    "plans": [
+      {
+        "tier": "free",
+        "name": "Free",
+        "monthly": "¥0",
+        "yearly": "¥0",
+        "features": [
+          "1 seat",
+          "50 datasets",
+          "Basic governance",
+          "1 GiB storage"
+        ]
+      },
+      {
+        "tier": "starter",
+        "name": "Starter",
+        "monthly": "¥199",
+        "yearly": "¥1,999",
+        "save": "~2 months free",
+        "features": [
+          "1 seat",
+          "500 datasets",
+          "varda assistant (read-only)",
+          "100 AI credits/mo",
+          "10 GiB storage"
+        ]
+      },
+      {
+        "tier": "pro",
+        "name": "Pro",
+        "monthly": "¥499",
+        "yearly": "¥4,999",
+        "save": "~2 months free",
+        "highlight": true,
+        "features": [
+          "3 seats",
+          "5,000 datasets",
+          "Hourly sync",
+          "1,000 AI credits/mo",
+          "100 GiB storage"
+        ]
+      },
+      {
+        "tier": "business",
+        "name": "Business",
+        "monthly": "¥1,999",
+        "yearly": "¥19,999",
+        "save": "~2 months free · 5 seats",
+        "features": [
+          "5 seats",
+          "Unlimited datasets",
+          "Realtime sync + varda write",
+          "10,000 AI credits/mo",
+          "1 TiB storage"
+        ]
+      },
+      {
+        "tier": "enterprise",
+        "name": "Enterprise",
+        "monthly": null,
+        "yearly": null,
+        "features": [
+          "Unlimited seats",
+          "On-prem deployment",
+          "Dedicated support & SLA",
+          "Custom quotas"
+        ]
+      }
+    ]
   }
 }
