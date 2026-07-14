@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge, Button, ActionButton, PageHeader } from "@vxture/design-system";
 import {
+  Badge,
+  Button,
+  ActionButton,
+  DataTable,
+  PageHeader,
+} from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
+import {
+  cancelSubscriptionOrder,
   fetchBillingInvoices,
+  fetchMyOrders,
   fetchMySubscriptions,
+  ConsoleBffError,
   type ConsoleInvoice,
   type ConsoleSubscription,
+  type MyOrder,
 } from "@/api/console-bff";
 import { useConsoleSession } from "@/features/session/ConsoleSessionProvider";
 import {
@@ -81,6 +92,21 @@ function buildInvoiceRows(invoices: ConsoleInvoice[]): string[][] {
   ]);
 }
 
+function formatOrderAmount(amount: string, currency: string): string {
+  const n = Number.parseFloat(amount);
+  const value = Number.isFinite(n) ? n.toLocaleString() : amount;
+  return currency === "CNY" ? `¥${value}` : `${currency} ${value}`;
+}
+
+const ORDER_STATUS_META: Record<
+  MyOrder["orderStatus"],
+  { label: string; badge: string }
+> = {
+  pending: { label: "Awaiting confirmation", badge: "vx-badge-warning" },
+  confirmed: { label: "Confirmed", badge: "vx-badge-positive" },
+  closed: { label: "Closed", badge: "vx-badge-muted" },
+};
+
 // ============================================================================
 // SubscriptionPage
 // ============================================================================
@@ -109,22 +135,47 @@ const paymentMethods = [
 
 export function SubscriptionPage() {
   const { session } = useConsoleSession();
-  const [tab, setTab] = useState<"overview" | "billing" | "payments">(
-    "overview",
-  );
+  const [tab, setTab] = useState<
+    "overview" | "billing" | "orders" | "payments"
+  >("overview");
   const [subscriptions, setSubscriptions] = useState<ConsoleSubscription[]>([]);
   const [invoices, setInvoices] = useState<ConsoleInvoice[]>([]);
+  const [orders, setOrders] = useState<MyOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchMySubscriptions(), fetchBillingInvoices(10)])
-      .then(([subs, invs]) => {
+    Promise.all([
+      fetchMySubscriptions(),
+      fetchBillingInvoices(10),
+      fetchMyOrders(),
+    ])
+      .then(([subs, invs, ords]) => {
         setSubscriptions(subs);
         setInvoices(invs);
+        setOrders(ords);
       })
       .finally(() => setLoading(false));
   }, [session.tenant?.id]);
+
+  async function handleCancelOrder(orderId: string) {
+    setOrderError(null);
+    setCancelingId(orderId);
+    try {
+      await cancelSubscriptionOrder(orderId);
+      setOrders(await fetchMyOrders());
+    } catch (err) {
+      setOrderError(
+        err instanceof ConsoleBffError
+          ? err.message
+          : "Failed to cancel order.",
+      );
+    } finally {
+      setCancelingId(null);
+    }
+  }
 
   const summaryItems = buildSummaryItems(subscriptions);
   const invoiceRows = buildInvoiceRows(invoices);
@@ -153,6 +204,51 @@ export function SubscriptionPage() {
       title: "Overage driver",
       description:
         "Most variable spend comes from burst model access rather than additional seat growth.",
+    },
+  ];
+
+  const orderColumns: DataTableColumn<MyOrder>[] = [
+    { id: "orderNo", header: "Order no.", cell: (o) => o.orderNo },
+    {
+      id: "plan",
+      header: "Plan",
+      cell: (o) => (o.tier ? `${o.planName} · ${o.tier}` : o.planName),
+    },
+    {
+      id: "cycle",
+      header: "Cycle",
+      cell: (o) => (o.cycleUnit === "year" ? "Yearly" : "Monthly"),
+    },
+    {
+      id: "amount",
+      header: "Amount",
+      align: "right",
+      cell: (o) => formatOrderAmount(o.amount, o.currency),
+    },
+    {
+      id: "status",
+      header: "Status",
+      cell: (o) => {
+        const meta = ORDER_STATUS_META[o.orderStatus];
+        return <Badge className={meta.badge}>{meta.label}</Badge>;
+      },
+    },
+    { id: "placed", header: "Placed", cell: (o) => formatDate(o.createdAt) },
+    {
+      id: "action",
+      header: " ",
+      align: "right",
+      cell: (o) =>
+        o.orderStatus === "pending" ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={cancelingId === o.orderId}
+            onClick={() => handleCancelOrder(o.orderId)}
+          >
+            {cancelingId === o.orderId ? "Canceling…" : "Cancel"}
+          </Button>
+        ) : null,
     },
   ];
 
@@ -187,6 +283,14 @@ export function SubscriptionPage() {
           onClick={() => setTab("billing")}
         >
           Recent billing
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={tab === "orders" ? "vx-tab vx-tab--active" : "vx-tab"}
+          onClick={() => setTab("orders")}
+        >
+          My orders
         </Button>
         <Button
           variant="ghost"
@@ -308,6 +412,23 @@ export function SubscriptionPage() {
             <SignalList items={chargeSignals} />
           </PageSection>
         </DashboardSplit>
+      ) : null}
+
+      {tab === "orders" ? (
+        <PageSection
+          title="My orders"
+          description="Offline subscription orders you placed — track the order number, transfer status, and cancel one that is still awaiting confirmation."
+        >
+          {orderError ? <p className="vx-empty-hint">{orderError}</p> : null}
+          <DataTable
+            columns={orderColumns}
+            rows={orders}
+            rowKey={(order) => order.orderId}
+            loading={loading}
+            loadingLabel="Loading orders…"
+            empty="No orders yet."
+          />
+        </PageSection>
       ) : null}
 
       {tab === "payments" ? (
