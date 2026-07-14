@@ -240,6 +240,12 @@ importers:
       '@vxture/core-utils':
         specifier: workspace:*
         version: link:../../packages/core/utils
+      '@vxture/service-provisioning':
+        specifier: workspace:*
+        version: link:../../services/commerce/provisioning
+      '@vxture/service-subscription':
+        specifier: workspace:*
+        version: link:../../services/commerce/subscription
       '@vxture/shared':
         specifier: workspace:*
         version: link:../../packages/shared/shared

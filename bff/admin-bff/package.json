@@ -26,6 +26,8 @@
     "@vxture/core-mail": "workspace:*",
     "@vxture/core-oidc-rp": "workspace:*",
     "@vxture/core-utils": "workspace:*",
+    "@vxture/service-provisioning": "workspace:*",
+    "@vxture/service-subscription": "workspace:*",
     "@vxture/shared": "workspace:*",
     "cookie-parser": "^1.4.7",
     "express": "^4.22.1",
