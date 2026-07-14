@@ -2,11 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Icon, Badge, Button, EmptyState } from "@vxture/design-system";
+import {
+  Icon,
+  Badge,
+  Button,
+  DialogForm,
+  EmptyState,
+  Label,
+  Textarea,
+} from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
   confirmOrderOfflinePayment,
   fetchOrderOperation,
+  voidOrder,
 } from "@/api/admin-bff";
 import type {
   OrderOperationDetailRecord,
@@ -67,6 +76,17 @@ function paySourceLabel(source: OrderPaySource) {
   if (source === "online") return "线上";
   if (source === "offline") return "线下";
   return "无";
+}
+
+// 仅真正的待支付订单可驳回——已有任何收款请走结算而非驳回（product_320 §4.3）。
+function canVoidOrder(order: OrderOperationDetailRecord) {
+  return order.orderStatus === "pending" && order.paidAmount <= 0;
+}
+
+function voidDisabledReason(order: OrderOperationDetailRecord) {
+  if (canVoidOrder(order)) return null;
+  if (order.paidAmount > 0) return "已收到支付的订单不能驳回，请走结算流程。";
+  return "该订单不是待支付状态，无需驳回。";
 }
 
 function subscriptionStatusLabel(
@@ -361,6 +381,9 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
   const [loading, setLoading] = useState(true);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [submittingPayment, setSubmittingPayment] = useState(false);
+  const [voidDialogOpen, setVoidDialogOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState("");
+  const [submittingVoid, setSubmittingVoid] = useState(false);
   const [operationError, setOperationError] = useState<string | null>(null);
   const [operationFeedback, setOperationFeedback] = useState<string | null>(
     null,
@@ -408,6 +431,31 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
       );
     } finally {
       setSubmittingPayment(false);
+    }
+  }
+
+  async function handleVoidOrder() {
+    if (!order) return;
+
+    setSubmittingVoid(true);
+    setOperationError(null);
+
+    try {
+      // Void is 危 commerce:order.void → step-up.
+      const updatedOrder = await runWithStepUp(() =>
+        voidOrder(order.id, voidReason),
+      );
+      setOrder(updatedOrder);
+      setOperationFeedback("订单已驳回。");
+      setVoidDialogOpen(false);
+      setVoidReason("");
+    } catch (error) {
+      if (isStepUpCancelled(error)) return;
+      setOperationError(
+        error instanceof Error ? error.message : "驳回订单失败，请稍后重试。",
+      );
+    } finally {
+      setSubmittingVoid(false);
     }
   }
 
@@ -478,6 +526,20 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
                   <Icon name="check" size="xs" fallback="placeholder" />
                   确认收款
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOperationError(null);
+                    setOperationFeedback(null);
+                    setVoidReason("");
+                    setVoidDialogOpen(true);
+                  }}
+                  disabled={!canVoidOrder(order)}
+                  title={voidDisabledReason(order) ?? undefined}
+                >
+                  <Icon name="x" size="xs" fallback="placeholder" />
+                  驳回订单
+                </Button>
               </>
             ) : null}
           </div>
@@ -511,6 +573,45 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
           }}
           onSubmit={handleConfirmOfflinePayment}
         />
+      ) : null}
+
+      {order && voidDialogOpen ? (
+        <DialogForm
+          open
+          title="驳回订单"
+          description={
+            <>
+              订单号：<strong>{order.orderNo}</strong>
+              {order.tenantName ? `  ·  ${order.tenantName}` : ""}
+            </>
+          }
+          submitLabel="确认驳回"
+          cancelLabel="取消"
+          submitting={submittingVoid}
+          submitDisabled={voidReason.trim().length < 4}
+          onOpenChange={(open) => {
+            if (!open && !submittingVoid) setVoidDialogOpen(false);
+          }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleVoidOrder();
+          }}
+        >
+          <Label htmlFor="vx-order-void-reason">
+            驳回原因 <small>（必填，最少 4 字）</small>
+          </Label>
+          <Textarea
+            id="vx-order-void-reason"
+            value={voidReason}
+            onChange={(e) => setVoidReason(e.target.value)}
+            rows={3}
+            placeholder="例如：客户电话取消，重复下单。"
+            autoFocus
+          />
+          {operationError ? (
+            <p className="text-sm text-vx-danger">{operationError}</p>
+          ) : null}
+        </DialogForm>
       ) : null}
     </div>
   );
