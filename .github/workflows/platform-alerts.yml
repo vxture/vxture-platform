@@ -1,15 +1,16 @@
 name: platform-alerts
 
-# 定时巡检 VXTURE_DEPLOY_HOST 平台常态漂移：OS/工具基线、镜像基线、env 残留、容器与 Model Platform 健康、
+# 巡检 worker-01 平台常态漂移：OS/工具基线、镜像基线、env 残留、容器与 Model Platform 健康、
 # Nginx/TLS、防火墙、备份、部署包完整性。只读检查，不修改文件、不重启服务。
+# 运行已部署在 worker-01 上的 51-check-platform-alerts.sh（监控"正在运行"的系统）。
 #
-# 从部署链（30/40）中拆出，避免每次部署重复执行；基线与证书漂移本就不随单次部署变化，定时巡检更及时。
-# 运行已部署在 VXTURE_DEPLOY_HOST 上的 51-check-platform-alerts.sh（监控"正在运行"的系统）。
+# ⚠️ 触发 = 仅 workflow_dispatch（原每天 02:00 cron 已移除）。原因：SSH 凭证 = 环境级
+# DEPLOY_*（production 环境带**必审人门**），而定时 cron 无法过审批门（每次会卡在待批准、
+# 堆积 pending）。要恢复每天自动巡检，需另配**非门控的只读监控凭证**（repo/org 级只读 key +
+# host），再把 cron 加回；那是独立决策。当前：手动触发（过一次审批门）即可跑。
+# domestic profile：runner 入 tailnet 走内网到 worker-01（与 deploy.yml 同）。
 
 on:
-  schedule:
-    # 每天 02:00（UTC+8）≈ 18:00 UTC
-    - cron: '0 18 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -21,15 +22,23 @@ concurrency:
 
 jobs:
   platform-alerts:
-    name: VXTURE_DEPLOY_HOST platform alerts
+    name: worker-01 platform alerts
     runs-on: ubuntu-latest
+    environment: production # 承接环境级 DEPLOY_* 秘钥 + 审批门
     steps:
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
       - name: Run platform alert check via SSH
         uses: appleboy/ssh-action@v1.2.5
         with:
-          host: ${{ secrets.VX_WORKER_01_HOST }}
-          username: ${{ secrets.VX_WORKER_01_USER }}
-          key: ${{ secrets.VX_WORKER_01_SSH_KEY }}
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 10m
           script: |
