@@ -96,7 +96,9 @@ jobs:
         env:
           VX_IMAGE_TAG: ${{ github.ref_name }}
           VX_ACR_ENABLED: ${{ steps.registry.outputs.acr_enabled }}
-          VX_IMAGE_REGISTRY: ${{ steps.registry.outputs.acr_registry_internal }}
+          # 内网优先(快/省流)、公网兜底(worker-01 内网 ACR 端点不可达时)。
+          VX_IMAGE_REGISTRY_INTERNAL: ${{ steps.registry.outputs.acr_registry_internal }}
+          VX_IMAGE_REGISTRY_PUBLIC: ${{ steps.registry.outputs.acr_registry_public }}
           VX_IMAGE_NAMESPACE: ${{ steps.registry.outputs.acr_namespace }}
           ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
@@ -106,7 +108,7 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 60m
-          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD
+          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY_INTERNAL,VX_IMAGE_REGISTRY_PUBLIC,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD
           script: |
             set -e
 
@@ -130,14 +132,25 @@ jobs:
             rm -rf "$DEPLOY_DIR/database"
             cp -R /tmp/vxture-deploy/deploy/database "$DEPLOY_DIR/database"
 
-            IMAGE_REGISTRY="${VX_IMAGE_REGISTRY:-ghcr.io}"
             IMAGE_NAMESPACE="${VX_IMAGE_NAMESPACE:-vxture}"
             IMAGE_TAG="${VX_IMAGE_TAG:-latest}"
+            IMAGE_REGISTRY="${VX_IMAGE_REGISTRY_PUBLIC:-ghcr.io}"
 
-            # registry 归一化已在 runner 端完成；host 上只做 login（domestic 走 ACR 内网）。
+            # registry 归一化已在 runner 端完成；host 上只做 login。ACR 内网端点(快/省流)
+            # 优先，但 worker-01 若不在同 VPC/区域会连不通(context deadline exceeded)——
+            # 那就回退公网 ACR 端点(docker-build 已把镜像推到公网路径，同一仓库)。
             if [ "${VX_ACR_ENABLED:-false}" = "true" ]; then
-              echo "$ALIYUN_ACR_PASSWORD" | docker login "$IMAGE_REGISTRY" -u "$ALIYUN_ACR_USERNAME" --password-stdin
-              echo "Using Aliyun ACR images: $IMAGE_REGISTRY/$IMAGE_NAMESPACE:$IMAGE_TAG"
+              LOGGED_IN=""
+              for CAND in "$VX_IMAGE_REGISTRY_INTERNAL" "$VX_IMAGE_REGISTRY_PUBLIC"; do
+                [ -n "$CAND" ] || continue
+                if echo "$ALIYUN_ACR_PASSWORD" | docker login "$CAND" -u "$ALIYUN_ACR_USERNAME" --password-stdin; then
+                  IMAGE_REGISTRY="$CAND"; LOGGED_IN=1
+                  echo "Using Aliyun ACR images: $IMAGE_REGISTRY/$IMAGE_NAMESPACE:$IMAGE_TAG"
+                  break
+                fi
+                echo "  ACR login failed/unreachable: $CAND — trying next endpoint"
+              done
+              [ -n "$LOGGED_IN" ] || { echo "ERROR: could not log into ACR (internal + public both failed)"; exit 1; }
             else
               echo "ACR not enabled — falling back to compose default registry ($IMAGE_REGISTRY)."
             fi
