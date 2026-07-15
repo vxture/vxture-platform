@@ -27,14 +27,14 @@ worker-02 varda 栈（自包含）：
 
 工作流 `deploy-varda.yml` 需要：
 
-| Secret                                                 | 说明                                                                              | 状态    |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------- | ------- |
-| `VARDA_DEPLOY_HOST`                                    | worker-02 SSH 地址 = `100.76.219.48`（Tailscale）                                 | ✅ 已设 |
-| `VARDA_DEPLOY_USER`                                    | worker-02 部署用户 = `stone`                                                      | ✅ 已设 |
-| `VARDA_DEPLOY_SSH_KEY` / `VARDA_DEPLOY_SSH_PASSPHRASE` | worker-02 现有部署密钥 + passphrase                                               | ✅ 已设 |
-| `TS_OAUTH_CLIENT_ID`                                   | Tailscale OAuth client id（`tag:ci`）                                             | ✅ 已设 |
-| `TS_OAUTH_SECRET`                                      | Tailscale OAuth secret（runner 加入 tailnet）                                     | ✅ 已设 |
-| 复用平台既有                                           | `DEPLOY_GHCR_USERNAME`/`DEPLOY_GHCR_TOKEN` 或 `ALIYUN_ACR_*`（拉 `*-varda` 镜像） | ✅ 已有 |
+| Secret                                                 | 说明                                                                             | 状态    |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------- | ------- |
+| `VARDA_DEPLOY_HOST`                                    | worker-02 SSH 地址 = `100.76.219.48`（Tailscale）                                | ✅ 已设 |
+| `VARDA_DEPLOY_USER`                                    | worker-02 部署用户 = `stone`                                                     | ✅ 已设 |
+| `VARDA_DEPLOY_SSH_KEY` / `VARDA_DEPLOY_SSH_PASSPHRASE` | worker-02 现有部署密钥 + passphrase                                              | ✅ 已设 |
+| `TAILSCALE_OAUTH_CLIENT_ID`                            | Tailscale OAuth client id（runner 加入 tailnet；与 deploy.yml 同款）             | ✅ 已设 |
+| `TAILSCALE_OAUTH_CLIENT_SECRET`                        | Tailscale OAuth secret；tag 变量 = `vars.TAILSCALE_OAUTH_CLIENT_TAG`             | ✅ 已设 |
+| 复用平台既有                                           | `ALIYUN_ACR_*`（build+pull `varda_bff`/`varda_agent` 镜像）+ `vars.ALIYUN_ACR_*` | ✅ 已有 |
 
 > worker-02 只在 Tailscale 上（无公网 SSH）。workflow 已加 `tailscale/github-action` 步骤让 runner 加入 tailnet（ACL 已放 `tag:ci` → worker-02:22）。**上表 GitHub Secrets 已全部就位。**
 > SSH 用 worker-02 现有部署密钥（`stone` 用户，公钥已在 worker-02，无需再装）。
