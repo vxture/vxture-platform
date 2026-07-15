@@ -1,11 +1,16 @@
 name: deploy
 
 # 主干 + tag 触发 CD。tag 前缀 → 环境；环境级密钥 + 生产审批门控由 `environment:` 承接。
-# 注意：本文件目前是骨架（deploy 步骤含 TODO）；tag 未推前不会触发，安全 dormant。
 # 前置：镜像已由 docker-build.yml 在同一 tag 上 build+push 到 ACR（tag = github.ref_name）。
 #
-# 这是 domestic profile（ACR + tailnet），用于 vxture-platform / varda / Arda。
-# umbra 是 overseas 变体（README §5）：去掉下面的 tailscale join、镜像换 GHCR、直连公网 SSH。
+# 这是 domestic profile（ACR 内网 + tailnet）：CI runner 入 tailnet → 走内网到 worker-01，
+# worker-01 的 SSH 不对公网开放。host 用 DEPLOY_HOST_TAILNET（tailnet 地址）；
+# DEPLOY_HOST_PUBIP 留作手工运维兜底，CI 不用。
+# umbra 是 overseas 变体（README §5）：去掉 tailscale join、镜像换 GHCR、直连公网 SSH。
+#
+# 主机侧只同步部署包（compose/scripts/database…）到 /srv/vxture/deploy；实际 .env、
+# secrets、证书保持在 worker-01 本机（人工维护）。常规升级链路（31）只拉镜像重建 +
+# 健康校验，**不跑 migration/seed** —— seed reseed 是独立授权的人工 DB 操作。
 
 on:
   push:
@@ -51,6 +56,20 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # registry 归一化在 runner 端完成（与 docker-build 复用同一脚本），拉取优先内网地址；
+      # 归一化结果传入 SSH，host 上只做 docker login，不重复实现归一化逻辑。
+      # 注意：namespace 是 org **variable**（非 secret），从 vars.* 取。
+      - name: Resolve image registry (ACR)
+        id: registry
+        shell: bash
+        env:
+          ALIYUN_ACR_REGISTRY: ${{ secrets.ALIYUN_ACR_REGISTRY }}
+          ALIYUN_ACR_INTERNAL_HOST: ${{ secrets.ALIYUN_ACR_INTERNAL_HOST }}
+          ALIYUN_ACR_NAMESPACE: ${{ vars.ALIYUN_ACR_NAMESPACE }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        run: bash scripts/workflows/resolve-acr-registry.sh
+
       - name: Join tailnet
         uses: tailscale/github-action@v3
         with:
@@ -58,25 +77,72 @@ jobs:
           oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
           tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
 
-      - name: Load deploy SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+      # 只同步部署包；实际 .env / secrets / 证书保持在 worker-01 本机。
+      - name: Upload deploy files to worker-01
+        uses: appleboy/scp-action@v1.0.0
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-          # 若私钥带口令，ssh-agent action 需 passphrase 支持或改用手动 ssh-add；
-          # 见 secrets.DEPLOY_SSH_PASSPHRASE（TODO：按实际私钥形态接线）。
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          source: "deploy/compose.platform.yml,deploy/compose.nginx.yml,deploy/.env.example,deploy/.env.*.example,deploy/secrets/*.example,deploy/scripts,deploy/maintenance,deploy/nginx,deploy/guardrails,deploy/database"
+          target: "/tmp/vxture-deploy"
+          rm: true
+          timeout: 120s
+          command_timeout: 10m
 
-      - name: Deploy over SSH
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.5
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          IMAGE_TAG: ${{ github.ref_name }}
-          IMAGE_BASE: ${{ vars.ALIYUN_ACR_REGISTRY }}/${{ vars.ALIYUN_ACR_NAMESPACE }}
-        run: |
-          set -euo pipefail
-          # TODO（仓库特定）：
-          #   1) ssh 到 $DEPLOY_USER@$DEPLOY_HOST（tailnet 内网地址）
-          #   2) docker login $ALIYUN_ACR_REGISTRY（用 org ALIYUN_ACR_USERNAME/PASSWORD）
-          #   3) 拉取 ${IMAGE_BASE}/<service>:${IMAGE_TAG} 并 compose up -d 单服务重建
-          #   4) healthcheck 探活（见 docs/standards/container-healthcheck-standard.md）
-          echo "→ deploy ${IMAGE_TAG} to ${DEPLOY_HOST} (env=${{ needs.resolve.outputs.env }})"
-          echo "  images under ${IMAGE_BASE}"
+          VX_IMAGE_TAG: ${{ github.ref_name }}
+          VX_ACR_ENABLED: ${{ steps.registry.outputs.acr_enabled }}
+          VX_IMAGE_REGISTRY: ${{ steps.registry.outputs.acr_registry_internal }}
+          VX_IMAGE_NAMESPACE: ${{ steps.registry.outputs.acr_namespace }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          command_timeout: 60m
+          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD
+          script: |
+            set -e
+
+            # 服务端只同步部署包，实际 .env、secrets、证书保持在 worker-01 本机。
+            DEPLOY_DIR=/srv/vxture/deploy
+            mkdir -p "$DEPLOY_DIR"
+            cp -f /tmp/vxture-deploy/deploy/compose.platform.yml "$DEPLOY_DIR/compose.platform.yml"
+            cp -f /tmp/vxture-deploy/deploy/compose.nginx.yml "$DEPLOY_DIR/compose.nginx.yml"
+            cp -f /tmp/vxture-deploy/deploy/.env.example "$DEPLOY_DIR/.env.example"
+            cp -f /tmp/vxture-deploy/deploy/.env.*.example "$DEPLOY_DIR/"
+            mkdir -p "$DEPLOY_DIR/secrets"
+            cp -f /tmp/vxture-deploy/deploy/secrets/*.example "$DEPLOY_DIR/secrets/"
+            rm -rf "$DEPLOY_DIR/scripts"
+            cp -R /tmp/vxture-deploy/deploy/scripts "$DEPLOY_DIR/scripts"
+            rm -rf "$DEPLOY_DIR/maintenance"
+            cp -R /tmp/vxture-deploy/deploy/maintenance "$DEPLOY_DIR/maintenance"
+            rm -rf "$DEPLOY_DIR/nginx"
+            cp -R /tmp/vxture-deploy/deploy/nginx "$DEPLOY_DIR/nginx"
+            rm -rf "$DEPLOY_DIR/guardrails"
+            cp -R /tmp/vxture-deploy/deploy/guardrails "$DEPLOY_DIR/guardrails"
+            rm -rf "$DEPLOY_DIR/database"
+            cp -R /tmp/vxture-deploy/deploy/database "$DEPLOY_DIR/database"
+
+            IMAGE_REGISTRY="${VX_IMAGE_REGISTRY:-ghcr.io}"
+            IMAGE_NAMESPACE="${VX_IMAGE_NAMESPACE:-vxture}"
+            IMAGE_TAG="${VX_IMAGE_TAG:-latest}"
+
+            # registry 归一化已在 runner 端完成；host 上只做 login（domestic 走 ACR 内网）。
+            if [ "${VX_ACR_ENABLED:-false}" = "true" ]; then
+              echo "$ALIYUN_ACR_PASSWORD" | docker login "$IMAGE_REGISTRY" -u "$ALIYUN_ACR_USERNAME" --password-stdin
+              echo "Using Aliyun ACR images: $IMAGE_REGISTRY/$IMAGE_NAMESPACE:$IMAGE_TAG"
+            else
+              echo "ACR not enabled — falling back to compose default registry ($IMAGE_REGISTRY)."
+            fi
+
+            # 拉取新镜像并执行常规升级发布链路；migration/seed 只允许首次部署或人工脚本执行。
+            cd "$DEPLOY_DIR"
+            VX_IMAGE_REGISTRY="$IMAGE_REGISTRY" VX_IMAGE_NAMESPACE="$IMAGE_NAMESPACE" VX_IMAGE_TAG="$IMAGE_TAG" COMPOSE_PARALLEL_LIMIT=1 \
+              bash scripts/31-regular-upgrade-platform.sh

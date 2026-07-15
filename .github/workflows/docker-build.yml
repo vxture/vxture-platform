@@ -94,7 +94,9 @@ jobs:
         env:
           ALIYUN_ACR_REGISTRY: ${{ secrets.ALIYUN_ACR_REGISTRY }}
           ALIYUN_ACR_INTERNAL_HOST: ${{ secrets.ALIYUN_ACR_INTERNAL_HOST }}
-          ALIYUN_ACR_NAMESPACE: ${{ secrets.ALIYUN_ACR_NAMESPACE }}
+          # namespace 是 org **variable**（非 secret）；用 secrets.* 会取到空 →
+          # acr_enabled=false → 不推 ACR，断掉 deploy 的内网拉取。必须从 vars.* 取。
+          ALIYUN_ACR_NAMESPACE: ${{ vars.ALIYUN_ACR_NAMESPACE }}
           ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
         run: bash scripts/workflows/resolve-acr-registry.sh
