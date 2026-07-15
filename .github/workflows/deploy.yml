@@ -18,7 +18,7 @@ on:
       - "dev-*"
       - "beta-*"
       - "v*.*.*"
-      - "varda-*" # varda（worker-02）自有发布节奏，收敛进本仓（README §7）
+    # varda 已独立：varda-* 走 deploy-varda.yml（worker-02，独立审批门）。本 workflow 纯平台。
 
 permissions:
   contents: read
@@ -40,7 +40,6 @@ jobs:
         run: |
           set -euo pipefail
           case "${GITHUB_REF_NAME}" in
-            varda-*) echo "env=varda"      >> "$GITHUB_OUTPUT" ;;
             dev-*)   echo "env=develop"    >> "$GITHUB_OUTPUT" ;;
             beta-*)  echo "env=beta"       >> "$GITHUB_OUTPUT" ;;
             v*.*.*)  echo "env=production" >> "$GITHUB_OUTPUT" ;;
