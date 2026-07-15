@@ -1,0 +1,22 @@
+# osv-scanner suppression config (CI `audit` job, .github/workflows/ci.yml).
+#
+# Only accepted residuals go here — each entry names ONE package@version with a
+# documented reason. All other advisories from the baseline were remediated in
+# PR-A/PR-B (direct-dep floor bumps + pnpm.overrides); none were left unfixed.
+#
+# Scope is intentionally per-package-version (PackageOverrides), NOT a global
+# IgnoredVulns by GHSA id — so a future regression that reintroduces the same
+# CVE on a *different* package version is still surfaced.
+
+# uuid 8.3.2 — GHSA-w5hq-g745-h8pq (7.5, insecure randomness in v1/v4 gen).
+# Transitive & dev-only: webpack-dev-server -> sockjs@0.3.24 -> uuid@8.3.2.
+# Never shipped to production (dev-server transport for local HMR only). sockjs
+# pins uuid v8 and uses the removed deep-import API, so forcing uuid>=11 breaks
+# the dev server. The direct uuid usages (auth-bff, website) are already on the
+# fixed 11.1.1 / 13.0.2 lines; only this dev-server leaf remains.
+[[PackageOverrides]]
+name = "uuid"
+version = "8.3.2"
+ecosystem = "npm"
+ignore = true
+reason = "dev-server-only transitive (webpack-dev-server->sockjs); sockjs pins uuid v8; not shipped to production"
