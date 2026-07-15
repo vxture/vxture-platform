@@ -1,12 +1,14 @@
 name: docker-build
 
-# 主干 + tag 触发：部署 tag（dev-*/beta-*/v*.*.*/varda-*）→ build+push 到 ACR，
+# 主干 + tag 触发：平台部署 tag（dev-*/beta-*/v*.*.*）→ build+push 到 ACR，
 # 镜像 tag = github.ref_name（deploy.yml 按同名 tag 拉取部署）。
 # 不再在 push main 上构建 :latest（避免首推/日常合并触发无谓构建；镜像只在部署 tag 上出）。
+# **varda 已独立**：varda-* tag 走 deploy-varda.yml（自建 varda 镜像 + 部署 worker-02），
+# 本 workflow 与 classify-changes 的平台 tag「全建」均排除 varda_*。
 
 on:
   push:
-    tags: ["dev-*", "beta-*", "v*.*.*", "varda-*"]
+    tags: ["dev-*", "beta-*", "v*.*.*"]
 
 permissions:
   contents: read
@@ -122,7 +124,7 @@ jobs:
             # push main → :latest
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             # 部署 tag 的原样名（deploy.yml 用 github.ref_name 拉取）——必需：
-            # semver 模式会把 v0.1.0 剥成 0.1.0，且 dev-*/beta-*/varda-* 非 semver
+            # semver 模式会把 v0.1.0 剥成 0.1.0，且 dev-*/beta-* 非 semver
             # 根本不产出版本 tag，只有 sha-。没有这行 deploy 会 image not found。
             type=raw,value=${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
             # tag v1.2.3 → :1.2.3 :1.2 :1

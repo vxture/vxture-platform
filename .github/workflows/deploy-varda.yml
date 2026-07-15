@@ -1,0 +1,255 @@
+name: deploy-varda
+
+# Varda 独立发布线（worker-02 独立业务箱）。与平台 CD 完全解耦：只由 `varda-*` tag 触发，
+# 自建 varda 镜像 + 部署 worker-02，不碰 worker-01 / compose.platform。设计见
+# docs/deployment/varda-worker-02-runbook.md（§1 secrets、§2 本机 env、§7 常规部署）。
+#
+# 拆仓就绪：本 workflow + deploy/worker-02/ + varda 包（bff/varda-bff、agent-server/varda）
+# 自成一套，将来 varda 拆为独立仓库时整体搬走，改动最小。
+#
+# 平台线（docker-build.yml / deploy.yml）已去掉 varda-*，平台发布不再连带 build/部署 varda。
+
+on:
+  push:
+    tags:
+      - "varda-*"
+
+permissions:
+  contents: read
+  actions: read # deploy 等本 tag 的 build 完成
+
+concurrency:
+  group: deploy-varda-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  # ── build+push varda 两镜像（仿 docker-build.yml，scope 到 varda）───────────────
+  build:
+    name: build ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: varda_bff
+            image: ghcr.io/vxture/varda_bff
+            dockerfile: deploy/docker/Dockerfile.nestjs
+            build-args: |
+              SERVICE_PATH=bff/varda-bff
+              PACKAGE_FILTER=@vxture/bff-varda
+          - name: varda_agent
+            image: ghcr.io/vxture/varda_agent
+            dockerfile: deploy/docker/Dockerfile.nestjs-prisma
+            build-args: |
+              SERVICE_PATH=agent-server/varda
+              PACKAGE_FILTER=@vxture/agent-server-varda
+              PRISMA_SCHEMA=agent-server/varda/prisma/schema.prisma
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        id: buildx
+        continue-on-error: true
+        uses: docker/setup-buildx-action@v4
+
+      - name: Set up Docker Buildx (retry)
+        if: steps.buildx.outcome == 'failure'
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve Aliyun ACR registry
+        id: acr
+        shell: bash
+        env:
+          ALIYUN_ACR_REGISTRY: ${{ vars.ALIYUN_ACR_REGISTRY }}
+          ALIYUN_ACR_INTERNAL_HOST: ${{ vars.ALIYUN_ACR_INTERNAL_HOST }}
+          ALIYUN_ACR_NAMESPACE: ${{ vars.ALIYUN_ACR_NAMESPACE }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        run: bash scripts/workflows/resolve-acr-registry.sh
+
+      - name: Log in to Aliyun ACR
+        if: steps.acr.outputs.acr_enabled == 'true'
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ steps.acr.outputs.acr_registry_public }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "$ALIYUN_ACR_PASSWORD" | docker login "$ACR_REGISTRY" -u "$ALIYUN_ACR_USERNAME" --password-stdin
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ matrix.image }}
+          tags: |
+            # 部署 tag 原样名（deploy 步用 github.ref_name 拉取）；varda-* 非 semver 只产出 sha-，
+            # 没有这行会 image not found。
+            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
+            type=sha,prefix=sha-,format=short
+
+      - name: Resolve image tags (GHCR + ACR)
+        id: image-tags
+        shell: bash
+        env:
+          ACR_ENABLED: ${{ steps.acr.outputs.acr_enabled }}
+          ACR_IMAGE: ${{ steps.acr.outputs.acr_registry_public }}/${{ steps.acr.outputs.acr_namespace }}/${{ matrix.name }}
+          METADATA_TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          set -euo pipefail
+          tags="$METADATA_TAGS"
+          if [ "$ACR_ENABLED" = "true" ]; then
+            while IFS= read -r tag; do
+              [ -z "$tag" ] && continue
+              tag_name="${tag##*:}"
+              tags="${tags}"$'\n'"${ACR_IMAGE}:${tag_name}"
+            done <<< "$METADATA_TAGS"
+          fi
+          {
+            echo "tags<<EOF"
+            echo "$tags"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        id: build
+        continue-on-error: true
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build-args }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image-tags.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+
+      - name: Build and push (retry)
+        if: steps.build.outcome == 'failure'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          build-args: ${{ matrix.build-args }}
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.image-tags.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,scope=${{ matrix.name }},mode=max
+
+  # ── 部署到 worker-02（仿 deploy.yml + runbook §7）─────────────────────────────
+  deploy:
+    name: deploy varda (worker-02)
+    needs: build
+    runs-on: ubuntu-latest
+    # varda 环境承接 worker-02 的 VARDA_DEPLOY_* 密钥 + 独立审批门（与平台生产门分开 = 两次审核）。
+    environment: varda
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve image registry (ACR)
+        id: registry
+        shell: bash
+        env:
+          ALIYUN_ACR_REGISTRY: ${{ vars.ALIYUN_ACR_REGISTRY }}
+          ALIYUN_ACR_INTERNAL_HOST: ${{ vars.ALIYUN_ACR_INTERNAL_HOST }}
+          ALIYUN_ACR_NAMESPACE: ${{ vars.ALIYUN_ACR_NAMESPACE }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        run: bash scripts/workflows/resolve-acr-registry.sh
+
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      # 只上传 compose（+ example 作参考）；worker-02 本机 .env.varda-* / secrets 长驻不覆盖
+      # （缺则 compose fail-fast，不起坏栈——runbook §2/§7）。
+      - name: Upload varda compose to worker-02
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.VARDA_DEPLOY_HOST }}
+          username: ${{ secrets.VARDA_DEPLOY_USER }}
+          key: ${{ secrets.VARDA_DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.VARDA_DEPLOY_SSH_PASSPHRASE }}
+          source: "deploy/worker-02/compose.varda.yml,deploy/worker-02/.env.*.example,deploy/worker-02/secrets/*.example"
+          target: "/tmp/vxture-varda"
+          rm: true
+          timeout: 120s
+          command_timeout: 10m
+
+      - name: Deploy varda via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          VX_IMAGE_TAG: ${{ github.ref_name }}
+          VX_ACR_ENABLED: ${{ steps.registry.outputs.acr_enabled }}
+          VX_IMAGE_REGISTRY_INTERNAL: ${{ steps.registry.outputs.acr_registry_internal }}
+          VX_IMAGE_REGISTRY_PUBLIC: ${{ steps.registry.outputs.acr_registry_public }}
+          VX_IMAGE_NAMESPACE: ${{ steps.registry.outputs.acr_namespace }}
+          ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
+          ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+        with:
+          host: ${{ secrets.VARDA_DEPLOY_HOST }}
+          username: ${{ secrets.VARDA_DEPLOY_USER }}
+          key: ${{ secrets.VARDA_DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.VARDA_DEPLOY_SSH_PASSPHRASE }}
+          command_timeout: 40m
+          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY_INTERNAL,VX_IMAGE_REGISTRY_PUBLIC,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD
+          script: |
+            set -e
+
+            DEPLOY_DIR=/srv/md0/varda/deploy
+            mkdir -p "$DEPLOY_DIR"
+            # 只覆盖 compose；.env.varda-* / secrets 本机长驻（不动）。
+            cp -f /tmp/vxture-varda/deploy/worker-02/compose.varda.yml "$DEPLOY_DIR/compose.varda.yml"
+
+            IMAGE_NAMESPACE="${VX_IMAGE_NAMESPACE:-vxture}"
+            IMAGE_TAG="${VX_IMAGE_TAG:-latest}"
+            IMAGE_REGISTRY="${VX_IMAGE_REGISTRY_PUBLIC:-ghcr.io}"
+
+            # ACR 内网端点优先（快/省流），worker-02 若连不通则公网兜底（同 deploy.yml）。
+            if [ "${VX_ACR_ENABLED:-false}" = "true" ]; then
+              LOGGED_IN=""
+              for CAND in "$VX_IMAGE_REGISTRY_INTERNAL" "$VX_IMAGE_REGISTRY_PUBLIC"; do
+                [ -n "$CAND" ] || continue
+                if echo "$ALIYUN_ACR_PASSWORD" | docker login "$CAND" -u "$ALIYUN_ACR_USERNAME" --password-stdin; then
+                  IMAGE_REGISTRY="$CAND"; LOGGED_IN=1
+                  echo "Using Aliyun ACR images: $IMAGE_REGISTRY/$IMAGE_NAMESPACE:$IMAGE_TAG"
+                  break
+                fi
+                echo "  ACR login failed/unreachable: $CAND — trying next endpoint"
+              done
+              [ -n "$LOGGED_IN" ] || { echo "ERROR: could not log into ACR (internal + public both failed)"; exit 1; }
+            else
+              echo "ACR not enabled — falling back to compose default registry ($IMAGE_REGISTRY)."
+            fi
+
+            cd "$DEPLOY_DIR"
+            export VX_IMAGE_REGISTRY="$IMAGE_REGISTRY" VX_IMAGE_NAMESPACE="$IMAGE_NAMESPACE" VX_IMAGE_TAG="$IMAGE_TAG"
+            # 只拉 varda 应用镜像（pg/redis 本地 pull_policy:missing 不动）；--no-deps 不牵连有状态服务。
+            docker compose -f compose.varda.yml pull varda-server varda-bff
+            docker compose -f compose.varda.yml up -d
+
+            # 健康校验：varda-bff 3121/health（runbook §8）。
+            echo "waiting for varda-bff health ..."
+            for i in $(seq 1 30); do
+              code="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3121/health || true)"
+              [ "$code" = "200" ] && { echo "varda-bff healthy (200)"; exit 0; }
+              echo "  varda-bff not ready ($code) [$i/30]"; sleep 5
+            done
+            echo "::error::varda-bff health check did not reach 200"; exit 1

@@ -212,3 +212,25 @@ test("matrix include 镜像名与 ALL_IMAGES 一致（单一数据源对齐）",
     ALL_IMAGES,
   );
 });
+
+// varda 已独立发布线（deploy-varda.yml）：平台部署 tag 的「全建」必须排除 varda_*。
+test("matrix: 平台 tag ref → 全平台镜像但排除 varda_*", () => {
+  const out = execFileSync(
+    process.execPath,
+    [SCRIPT, "--files", "docs/noop.md", "--matrix"],
+    { encoding: "utf8", env: { ...process.env, GITHUB_REF_TYPE: "tag" } },
+  );
+  const line = out.split(/\r?\n/u).find((l) => l.startsWith("matrix="));
+  const names = JSON.parse(line.slice("matrix=".length)).include.map(
+    (entry) => entry.name,
+  );
+  assert.ok(names.length > 0, "平台 tag 应触发全建");
+  assert.ok(
+    !names.some((n) => n.startsWith("varda_")),
+    `平台 tag 全建不应含 varda：${names.join(",")}`,
+  );
+  assert.deepEqual(
+    names,
+    ALL_IMAGES.filter((n) => !n.startsWith("varda_")),
+  );
+});
