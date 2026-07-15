@@ -1,7 +1,7 @@
 # 技术债登记表
 
-**版本**: 1.7.0
-**更新**: 2026-07-14（backlog 对当前架构审计后修正：**TD-010 作废**（amap/cesium 零消费方、激励场景已死，新架构下非缺口）；**TD-001 改写**（纳入 platform-api 拆分后拓扑，其 S2S 守卫与"收敛 RpAuthService"方向不适用，收敛范围显式排除）；**TD-033 文档 bug 修复**（缺失 `###` 标题曾被并入 TD-032 段尾）。其余 Open 项经审计确认在当前架构下仍是真实缺口、暂缓不动）
+**版本**: 1.8.0
+**更新**: 2026-07-16（GitHub Actions workflow 审查衍生两项，均**待全域确认后执行**：**TD-039** 疑似死 CI 凭证审计清理（跨 org 全仓核引用后 revoke）；**TD-040** 变更门控方法论补进 cicd-optimization-playbook。此前 2026-07-14：backlog 对当前架构审计后修正——**TD-010 作废**、**TD-001 改写**、**TD-033 文档 bug 修复**）
 **维护人**: 架构组
 
 ---
@@ -898,3 +898,33 @@
 **影响**：秘钥轮换是整栈重启事件而非单点操作，放大爆炸半径与窗口时长；共享单值无灰度（新旧双认）通道，轮换必然产生短 401 窗口，制约轮换频率与随时性。
 
 **解决方向**：低优先，登记备案。可选方向：①守卫支持双值并行（`AUTH_INTERNAL_TOKEN` + `AUTH_INTERNAL_TOKEN_NEXT`，轮换期间双认，切换后退役旧值）消除 401 窗口；②秘钥面接入支持热重载的 secret 源（如挂载文件 + 进程 SIGHUP 重读）避免整栈重启；③按 [[project_arda_integration]] D13 已完成的宿主拆分思路，进一步收窄哪些服务真正需要 AUTH_INTERNAL_TOKEN（platform-api 是发/收方，console/website-bff 是否仍需可复核，缩小共享面）。当前整栈重建可接受（14 容器、~90s、内存无忧），不阻塞，故列 LOW。
+
+### TD-039 — 疑似死 CI 凭证待审计清理（需全域确认）
+
+| 字段         | 内容                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------- |
+| **分类**     | Security Hygiene                                                                      |
+| **状态**     | Open                                                                                  |
+| **登记日期** | 2026-07-16                                                                            |
+| **来源**     | GitHub Actions workflow 全面审查（本轮）；主干模式迁移后 gitflow 遗留 secret/variable |
+
+**描述**：主干模式（trunk-based）迁移弃用 gitflow 后，若干旧 secret/variable 可能已零引用：`PROMOTION_TOKEN`/`PROMOTION_ACTOR`（branch-promotion.yml 已废）、`TAILSCALE_AUTHKEY`（若已改用 OAuth client）、`NODE_AUTH_TOKEN`/`VXTURE_NPM_REGISTRY`（包发布/私有 registry 路径变更后）。这些属"泄露即危害或扩大攻击面的死凭证"，与 [[reference_repo_governance_standard]] §3"定期审计死值/重复"一致。
+
+**影响**：零引用的存活凭证只增攻击面、无收益；且散落 org/repo/environment 三级不易辨。属安全卫生缺口，非功能缺陷。
+
+**解决方向**：**需全域确认后执行**——逐个 secret/variable 跨 org 全仓 grep 引用（不止本仓：org 级凭证可能被 umbra/arda 等仍在用），确认真零引用再在源头控制台 revoke + 删除；有疑则保留。清理前须 owner 拍板（误删活跃 org 凭证会连带打断其它仓 CD）。故列**待全域确认**，不在本轮单仓动作内执行。
+
+### TD-040 — 变更门控方法论未沉淀进 cicd-optimization-playbook
+
+| 字段         | 内容                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| **分类**     | Documentation                                                                               |
+| **状态**     | Open                                                                                        |
+| **登记日期** | 2026-07-16                                                                                  |
+| **来源**     | GitHub Actions workflow 审查（本轮）；`ci.yml` build/test 变更门控 + `classify-changes.mjs` |
+
+**描述**：本轮把 CI 的 build/test 从无条件全量改为**变更门控**（`classify-changes.mjs` 按 pnpm workspace 传递依赖算出 `affected_images`，build/test 只处理受影响组件），显著降耗；但该方法论（allow-list 默认 SKIP 安全性、传递依赖推导、docs-only 轻量路径、affected_images 复用 docker-build 同款规则）尚未沉淀进 [`docs/standards/cicd-optimization-playbook.md`](standards/cicd-optimization-playbook.md)，其它仓无法照做。
+
+**影响**：可迁移的提效方法论停留在本仓实现里，[[reference_repo_governance_standard]] 的"CI 提效"一环缺文档支撑，跨仓复用需逐仓逆向。属文档缺口。
+
+**解决方向**：把变更门控模式补进 `cicd-optimization-playbook.md`（触发门控/最小重建/覆盖缺口章节）。低风险纯文档，但**与全域整顿节奏对齐后再统一补**（避免文档与其它仓落地节奏脱节），故随 TD-039 一并列"待全域确认"批次。
