@@ -16,7 +16,7 @@ COMPOSE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$COMPOSE_DIR/compose.platform.yml"
 RUNTIME_DIR="${RUNTIME_DIR:-/srv/vxture/runtime}"
 NGINX_COMPOSE_FILE="/srv/vxture/data/nginx/compose.yml"
-MODEL_PLATFORM_CONTAINER="vx-model-platform"
+MODEL_PLATFORM_CONTAINER="vx-platform-model-platform"
 
 BASELINE_UBUNTU_VERSION="26.04"
 BASELINE_NODE_MAJOR="24"
@@ -246,9 +246,9 @@ check_docker_runtime() {
 check_container_health() {
   local name
   for name in \
-    vx-platform-pg vx-platform-redis vx-auth-bff vx-website-bff \
-    vx-console-bff vx-admin-bff vx-gateway-bff \
-    vx-website vx-console vx-admin; do
+    vx-platform-pg vx-platform-redis vx-platform-auth-bff vx-platform-website-bff \
+    vx-platform-console-bff vx-platform-admin-bff vx-platform-gateway-bff \
+    vx-platform-website vx-platform-console vx-platform-admin; do
     if ! docker inspect "$name" >/dev/null 2>&1; then
       high "容器缺失：$name"
       continue

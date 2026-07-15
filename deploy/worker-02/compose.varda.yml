@@ -65,7 +65,7 @@ services:
       start_period: 10s
 
   varda-server:
-    image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/agent-varda:${VX_IMAGE_TAG:-latest}
+    image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/varda_agent:${VX_IMAGE_TAG:-latest}
     container_name: vx-varda-server
     restart: unless-stopped
     networks: [vx-varda]
@@ -87,7 +87,7 @@ services:
       start_period: 20s
 
   varda-bff:
-    image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/bff-varda:${VX_IMAGE_TAG:-latest}
+    image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/varda_bff:${VX_IMAGE_TAG:-latest}
     container_name: vx-varda-bff
     restart: unless-stopped
     networks: [vx-varda]
