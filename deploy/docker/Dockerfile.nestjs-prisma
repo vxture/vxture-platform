@@ -11,7 +11,7 @@
 #     --build-arg SERVICE_PATH=agent-server/varda \
 #     --build-arg PACKAGE_FILTER=@vxture/agent-server-varda \
 #     --build-arg PRISMA_SCHEMA=agent-server/varda/prisma/schema.prisma \
-#     -t ghcr.io/vxture/agent-varda:latest .
+#     -t ghcr.io/vxture/varda_agent:latest .
 
 ARG NODE_VERSION=24
 

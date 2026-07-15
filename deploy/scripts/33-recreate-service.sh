@@ -33,17 +33,17 @@ RUNTIME_DIR="${RUNTIME_DIR:-/srv/vxture/runtime}"
 
 # compose 服务名 → 容器名（用于按实际在跑镜像取 tag）。有状态服务不在册。
 declare -A CONTAINER_OF=(
-  [auth-bff]=vx-auth-bff
-  [admin-bff]=vx-admin-bff
-  [console-bff]=vx-console-bff
-  [website-bff]=vx-website-bff
-  [gateway-bff]=vx-gateway-bff
+  [auth-bff]=vx-platform-auth-bff
+  [admin-bff]=vx-platform-admin-bff
+  [console-bff]=vx-platform-console-bff
+  [website-bff]=vx-platform-website-bff
+  [gateway-bff]=vx-platform-gateway-bff
   [platform-api]=vx-platform-api
-  [model-platform]=vx-model-platform
-  [website]=vx-website
-  [console]=vx-console
-  [admin]=vx-admin
-  [accounts]=vx-accounts
+  [model-platform]=vx-platform-model-platform
+  [website]=vx-platform-website
+  [console]=vx-platform-console
+  [admin]=vx-platform-admin
+  [accounts]=vx-platform-accounts
 )
 
 if [ "$#" -eq 0 ]; then
@@ -86,7 +86,7 @@ for svc in "$@"; do
     echo "  错误：容器 $cname（服务 $svc）当前未运行——本脚本只重建在跑服务，拒绝执行。" >&2
     exit 1
   fi
-  # 该容器实际在跑的镜像引用，如 crpi-….aliyuncs.com/vxture/bff-auth:sha-732a0dc
+  # 该容器实际在跑的镜像引用，如 crpi-….aliyuncs.com/vxture/platform_bff-auth:sha-732a0dc
   running_image="$(docker inspect --format '{{.Config.Image}}' "$cname")"
   running_tag="${running_image##*:}"
   if [ -z "$running_tag" ] || [ "$running_tag" = "$running_image" ]; then
