@@ -43,7 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           curl -sSfL \
-            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_${OSV_SCANNER_VERSION}_linux_amd64" \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64" \
             -o osv-scanner
           sudo install -m 0755 osv-scanner /usr/local/bin/osv-scanner
           osv-scanner --version
