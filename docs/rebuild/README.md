@@ -1,8 +1,10 @@
 # 重建 runbook：gitflow → main 主干 + tag 触发 CD（org 级模板）
 
 > 适用：vxture-platform 首先落地；Arda / Umbra 后续套同一模板（三者当前都是 gitflow）。
-> 本目录是**模板 + 指令**，不是运行态：`workflows/deploy.yml` 待重建时移入 `.github/workflows/`；
-> `main-ruleset.json` 待**首次导入代码之后**再 apply（见 §4 落地时机）。
+> **vxture-platform 已按本模板落地（2026-07-15），是参照实现**——`deploy.yml` 模板已"毕业"为运行态
+> `.github/workflows/deploy.yml`（并按 [`../standards/repo-governance-standard.md`](../standards/repo-governance-standard.md)
+> 加固：raw image tag / deploy 等 docker-build / registry 同区 / 逐服务重建），其它仓从 vxture-platform 拷贝。
+> `main-ruleset.json` 仍是模板，待**首次导入代码之后**再 apply（见 §4 落地时机）。
 
 ## 1. 分支/发布模型（trunk-based）
 
@@ -45,7 +47,7 @@
 
 | 动作        | 文件                                                                                                        | 说明                                                                                |
 | ----------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 移入        | `docs/rebuild/workflows/deploy.yml` → `.github/workflows/deploy.yml`                                        | tag→env 部署                                                                        |
+| 拷贝        | 从 vxture-platform `.github/workflows/deploy.yml`（参照实现，已加固）复制                                   | tag→env 部署（模板已毕业为运行态，不再放 docs/rebuild/workflows/）                  |
 | 保留+改触发 | `.github/workflows/ci.yml`                                                                                  | 触发改为 `pull_request: [main]` + `push: [main]`，去掉 develop/beta                 |
 | 保留+改触发 | `.github/workflows/docker-build.yml`                                                                        | 触发改为 `push: tags: [dev-*, beta-*, v*.*.*]`，镜像 tag = `${{ github.ref_name }}` |
 | 保留        | `.github/workflows/secret-scan.yml`                                                                         | 已就位，无需改                                                                      |
