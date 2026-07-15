@@ -48,11 +48,11 @@ jobs:
           sudo install -m 0755 osv-scanner /usr/local/bin/osv-scanner
           osv-scanner --version
 
-      # 暂非阻断：triage 完成（PR-A/B 已修全部可修项），仅余 .osv-scanner.toml 里记名接受的
-      # dev-only 传递残留。--config 显式指定（扫 --lockfile 时 osv-scanner 不自动发现根 config）。
-      # 下一步去掉 continue-on-error 收紧为真阻断门（PR-C）。取代原先空跑的假绿。
+      # 阻断门（audit 是 main-ruleset.json 的 required check）：基线已 triage 清零，osv-scanner
+      # 一旦发现新依赖漏洞即 fail，拦住合并。仅 .osv-scanner.toml 里逐条记名接受的残留被过滤
+      # （--config 显式指定：扫 --lockfile 时 osv-scanner 不自动发现根 config）。新漏洞若不可即修，
+      # 加一条带 reason 的 PackageOverrides（而非放宽此门）。取代原先空跑的假绿。
       - name: OSV dependency scan
-        continue-on-error: true
         run: osv-scanner --config=.osv-scanner.toml --lockfile=pnpm-lock.yaml
 
   # ── 3. Check (type · lint · guardrail · boundaries) ───────────────────────

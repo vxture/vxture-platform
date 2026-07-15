@@ -46,21 +46,21 @@
 Required status check 名称是 ruleset 与 workflow 的**接口契约**，不是展示文案。禁止随意改 job name；
 确需修改先更新本规范 + `main-ruleset.json` 并评审。
 
-| Check           | 职责                                                           |
-| --------------- | -------------------------------------------------------------- |
-| `quality-gate`  | 类型检查 · Lint · 设计系统护栏 · 包边界 · 数据架构护栏聚合     |
-| `build`         | 构建关键服务 + boot-smoke（DI 图在 esbuild bundle 下解析）     |
-| `test-coverage` | 单元测试与覆盖率                                               |
-| `audit`         | 依赖安全审计（npm quick-audit 端点已下线，暂非阻断，待接 SCA） |
-| `gitleaks`      | 密钥扫描（见 §governance 敏感信息检查）                        |
-| `Format`        | prettier 格式检查                                              |
+| Check           | 职责                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------- |
+| `quality-gate`  | 类型检查 · Lint · 设计系统护栏 · 包边界 · 数据架构护栏聚合                                |
+| `build`         | 构建关键服务 + boot-smoke（DI 图在 esbuild bundle 下解析）                                |
+| `test-coverage` | 单元测试与覆盖率                                                                          |
+| `audit`         | 依赖安全审计（osv-scanner 扫 pnpm-lock，**阻断门**；残留经 `.osv-scanner.toml` 记名接受） |
+| `gitleaks`      | 密钥扫描（见 §governance 敏感信息检查）                                                   |
+| `Format`        | prettier 格式检查                                                                         |
 
 - **不再有 `enforce-branch-flow`**（主干无分支流/晋升方向可校验）。
 - `quality-gate` 对代码/基础设施变更固定含 type-check / lint / `lint:design` / `lint:boundaries` /
   `lint:data-design` 等；**纯文档变更**（`docs/**`、Markdown）走轻量路径：check 仍稳定产生并成功，
   跳过重型步骤。任何代码/workflow/依赖/部署文件变更必须跑完整门禁。
 - `main` 的 required checks（`main-ruleset.json`）：`quality-gate`、`build`、`test-coverage`、
-  `gitleaks`。`SonarQube` 非阻断（docs-only 时 skipping）。
+  `audit`、`gitleaks`。`SonarQube` 非阻断（docs-only 时 skipping）。
 
 ---
 
