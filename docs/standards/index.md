@@ -15,7 +15,7 @@
 | [`locale-layer.md`](locale-layer.md)                                           | Locale 层规范：i18n key 命名、翻译文件结构                                                                    |
 | [`utils-layer.md`](utils-layer.md)                                             | Utils 层规范：工具函数分层、命名约定                                                                          |
 | [`repo-governance-standard.md`](repo-governance-standard.md)                   | **org 级仓库治理规范（整顿依据）**：主干模式 · 敏感信息检查 · secret/variable 分类 · tag→env CD · 数据层/护栏 |
-| [`git-workflow.md`](git-workflow.md)                                           | Git 工作流规范：分支策略、提交格式、PR 流程                                                                   |
+| [`git-workflow.md`](git-workflow.md)                                           | Git 工作流规范（**主干模式**）：单 main + PR squash、提交格式、tag→env 发布                                   |
 | [`cicd-optimization-playbook.md`](cicd-optimization-playbook.md)               | CI/CD 提效 / 去冗余 playbook：去冗余触发、最小重建部署、覆盖缺口（可迁移方法论）                              |
 | [`testing.md`](testing.md)                                                     | 测试策略：各层测试类型、禁止 mock DB、E2E 范围                                                                |
 | [`security.md`](security.md)                                                   | 安全规范：Secrets 管理、JWT 约束、各层安全边界、CORS                                                          |
