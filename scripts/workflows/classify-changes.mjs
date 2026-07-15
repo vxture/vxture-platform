@@ -276,6 +276,15 @@ writeOutput("changed_count", String(changedFiles.length), outputFile);
 writeOutput("docs_only", String(docsOnly), outputFile);
 writeMultilineOutput("changed_files", changedFiles.join("\n"), outputFile);
 
+// CI build/test 变更门控：本次变更影响哪些镜像（= 构建目标），走 docker-build 同款
+// 传递依赖规则。ci.yml 据此只建/smoke 受影响的 bundle，不重建无关组件（含 varda：
+// 未影响 varda_* 就不建 varda）。tag ref 上按 docker-build 逻辑（可能全量），CI 只在
+// PR/push main（非 tag）消费此输出。
+const affectedImages = IMAGES.filter(
+  (entry) => collectReasons(changedFiles, entry.name, isTagRef).length > 0,
+).map((entry) => entry.name);
+writeOutput("affected_images", JSON.stringify(affectedImages), outputFile);
+
 if (imageName) {
   const reasons = collectReasons(changedFiles, imageName, isTagRef);
   const imageBuild = reasons.length > 0;
