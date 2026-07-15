@@ -60,6 +60,14 @@ if [ "$rc" -ne 0 ] || [ "$TEST_MODE" -eq 1 ]; then
   subj="[$HOST_TAG] Platform Alerts — ${summary#=== Summary: }"
   [ "$TEST_MODE" -eq 1 ] && subj="[$HOST_TAG] Platform Alerts TEST"
 
+  # Envelope MAIL FROM must be the bare authenticated address (no display name),
+  # else DirectMail rejects "Name <addr>" with 500. The display name stays in the
+  # From: header only. Prefer SMTP_USER; else strip <...> out of SMTP_FROM.
+  env_from="${SMTP_USER:-}"
+  if [ -z "$env_from" ]; then
+    env_from="$(printf '%s' "$SMTP_FROM" | sed -E 's/.*<([^>]+)>.*/\1/')"
+  fi
+
   # implicit-TLS on 465, else STARTTLS on 587
   scheme="smtp"
   if [ "${SMTP_PORT:-587}" = "465" ] || [ "$(printf '%s' "${SMTP_SECURE:-}" | tr '[:upper:]' '[:lower:]')" = "true" ]; then
@@ -82,7 +90,7 @@ if [ "$rc" -ne 0 ] || [ "$TEST_MODE" -eq 1 ]; then
   if curl --silent --show-error --ssl-reqd \
     --url "$scheme://${SMTP_HOST}:${SMTP_PORT:-587}" \
     --user "${SMTP_USER}:${SMTP_PASS}" \
-    --mail-from "$SMTP_FROM" \
+    --mail-from "$env_from" \
     --mail-rcpt "$recipient" \
     --upload-file "$msg"; then
     echo "alert email sent to $recipient"
