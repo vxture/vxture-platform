@@ -16,7 +16,7 @@ on:
 
 permissions:
   contents: read
-  actions: read # deploy 等本 tag 的 build 完成
+  packages: write # build 段推 GHCR 需要（与 docker-build.yml 同）
 
 concurrency:
   group: deploy-varda-${{ github.ref_name }}
