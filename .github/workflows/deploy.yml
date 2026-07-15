@@ -86,8 +86,10 @@ jobs:
         id: registry
         shell: bash
         env:
-          ALIYUN_ACR_REGISTRY: ${{ secrets.ALIYUN_ACR_REGISTRY }}
-          ALIYUN_ACR_INTERNAL_HOST: ${{ secrets.ALIYUN_ACR_INTERNAL_HOST }}
+          # registry / internal-host 是 org **variables**（2026-07-15 ACR 迁 cn-beijing
+          # 后由 secret 改为 variable）；username/password 仍是 secrets。
+          ALIYUN_ACR_REGISTRY: ${{ vars.ALIYUN_ACR_REGISTRY }}
+          ALIYUN_ACR_INTERNAL_HOST: ${{ vars.ALIYUN_ACR_INTERNAL_HOST }}
           ALIYUN_ACR_NAMESPACE: ${{ vars.ALIYUN_ACR_NAMESPACE }}
           ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
