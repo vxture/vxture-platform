@@ -172,7 +172,7 @@ async function responseErrorMessage(response: Response, fallback: string) {
 // 统一变更请求：raw fetch + credentials，失败抛 AdminBffError（复用 responseErrorMessage）。
 async function mutateJson<T>(
   path: string,
-  method: "POST" | "PUT" | "DELETE",
+  method: "POST" | "PUT" | "PATCH" | "DELETE",
   body?: unknown,
   fallbackMessage = "Admin BFF request failed",
 ): Promise<T> {
@@ -316,6 +316,74 @@ export async function fetchTenantModelUsageSummaries(
 
 export async function fetchProductPlans(): Promise<ProductPlanRecord[]> {
   return readJson<ProductPlanRecord[]>("/api/products/plans", []);
+}
+
+// ── plan version lifecycle (product_320): list · edit draft · publish ────────
+
+export interface PlanVersionPrice {
+  cycleUnit: string;
+  price: string;
+}
+
+export interface PlanVersionSummary {
+  id: string;
+  versionNo: number;
+  status: string;
+  isLocked: boolean;
+  isCurrent: boolean;
+  prices: PlanVersionPrice[];
+}
+
+export interface PlanVersionDetail extends PlanVersionSummary {
+  planId: string;
+  planCode: string;
+  planName: string;
+  quota: Record<string, unknown>;
+}
+
+export async function fetchPlanVersions(
+  planId: string,
+): Promise<PlanVersionSummary[]> {
+  return readJson<PlanVersionSummary[]>(
+    `/api/products/plans/${encodeURIComponent(planId)}/versions`,
+    [],
+  );
+}
+
+export async function fetchPlanVersion(
+  versionId: string,
+): Promise<PlanVersionDetail | null> {
+  return readJson<PlanVersionDetail | null>(
+    `/api/products/plan-versions/${encodeURIComponent(versionId)}`,
+    null,
+  );
+}
+
+export async function updateDraftPlanVersion(
+  versionId: string,
+  body: {
+    prices?: { cycleUnit: string; price: number }[];
+    quota?: Record<string, unknown>;
+  },
+): Promise<PlanVersionDetail> {
+  return mutateJson<PlanVersionDetail>(
+    `/api/products/plan-versions/${encodeURIComponent(versionId)}`,
+    "PATCH",
+    body,
+    "Failed to update draft version",
+  );
+}
+
+// step-up gated (@RequireStepUp) — wrap the call in runWithStepUp at the UI.
+export async function publishPlanVersion(
+  versionId: string,
+): Promise<{ published: true; versionId: string }> {
+  return mutateJson<{ published: true; versionId: string }>(
+    `/api/products/plan-versions/${encodeURIComponent(versionId)}/publish`,
+    "POST",
+    undefined,
+    "Failed to publish version",
+  );
 }
 
 export async function fetchProductCapabilities(): Promise<
