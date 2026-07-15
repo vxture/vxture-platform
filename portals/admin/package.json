@@ -17,20 +17,20 @@
     "@vxture/design-system": "workspace:*",
     "@vxture/platform-browser": "workspace:*",
     "@vxture/shared": "workspace:*",
-    "next": "^15.5.6",
+    "next": "^15.5.20",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.1",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.3",
+    "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^9.39.3",
     "eslint-config-next": "^15.5.6",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.19",
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3"

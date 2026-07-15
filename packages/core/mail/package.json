@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
+    "@nestjs/core": "^11.1.28",
     "@types/nodemailer": "^6.4.17",
     "reflect-metadata": "^0.2.0",
     "rimraf": "^6.0.1",
