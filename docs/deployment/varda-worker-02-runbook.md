@@ -104,13 +104,19 @@ model-platform 对每次 chat 有三道 DB 门（数据在 worker-01 `platform_m
 
 ## 7. 常规部署（CI/CD）
 
-前置（§1/§2/§3/§4）就绪后，每次发布：
+前置（§1/§2/§3/§4）就绪后，每次发布 = **打 `varda-*` tag**（varda 独立发布线，与平台 `v*.*.*` 互不干扰）：
 
 ```
-gh workflow run deploy-varda.yml -f ref=main -f image_tag=latest -f confirm_deploy=true
+git tag varda-YYYYMMDD.N && git push origin varda-YYYYMMDD.N
 ```
 
-工作流：runner 解析 registry → scp compose+example 到 worker-02 → SSH `docker compose pull && up -d` → 等健康。**不覆盖** worker-02 本机 `.env.varda-*` / `secrets`（缺则 fail-fast 报错，不起坏栈）。
+`deploy-varda.yml`（`varda-*` tag 触发）两段：
+
+1. **build**：build+push `varda_bff` + `varda_agent` 镜像到 ACR（tag = `github.ref_name`）。
+2. **deploy**（`environment: varda`，**独立审批门** = owner 在 GitHub 点批准，与平台生产门分开 = 两次审核）：
+   runner 解析 registry → tailscale → scp `compose.varda.yml` 到 worker-02 → SSH `docker compose pull varda-server varda-bff && up -d` → 等健康（3121/health=200）。**不覆盖** worker-02 本机 `.env.varda-*` / `secrets`（缺则 fail-fast 报错，不起坏栈）。
+
+> 平台线（`docker-build.yml`/`deploy.yml`）已去掉 `varda-*`；打平台 tag 不会 build/部署 varda，反之亦然。
 
 ## 8. 验证
 
