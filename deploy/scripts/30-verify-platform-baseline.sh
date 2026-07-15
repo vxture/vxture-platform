@@ -9,7 +9,7 @@
 #
 # 依据 = data_platform_320 §9.5-③（2026-07-04 cutover 复盘整改）：所有静态检查器都
 # 看不见活库，schema 孤儿 / seed 空洞可静默出网。本脚本对生产库做机器断言：
-#   A. schema 集合 == 18 目标集（无孤儿、无缺失）
+#   A. schema 集合 == 19 目标集（无孤儿、无缺失）
 #   B. 表数 == 权威 DDL 派生（本脚本现场 grep deploy/database/ddl/*.sql，零漂移）
 #   C. seed 基线地板（operator/access RBAC 目录、oidc_clients、oauth_providers、
 #      kyc/loyalty/product/model catalog）+ super_admin 全授等值

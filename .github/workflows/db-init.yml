@@ -13,11 +13,11 @@ name: db-init
 #   action=seed              -> 29-seed (reseed platform catalog + sample via the new DDL seed)
 #                               -> 30-verify (live baseline audit)
 #   action=migrate-seed      -> 28-apply (clean-baseline DDL, no reset) then 29-seed -> 30-verify
-#   action=reset             -> 28b capture appoidc -> 28-apply --reset (DROP+rebuild 18 schemas)
+#   action=reset             -> 28b capture appoidc -> 28-apply --reset (DROP+rebuild 19 schemas)
 #                               -> 29-seed -> 28b restore appoidc (coordinated cutover, §6)
 #                               -> 30-verify [destructive]
 #   action=verify            -> 30-verify only (read-only live baseline audit: schema set ==
-#                               18 targets, table count == DDL, seed catalog floors; §9.5-③)
+#                               19 targets, table count == DDL, seed catalog floors; §9.5-③)
 #   action=provision-secrets -> 27-provision client secrets, 29-seed, recreate RP bffs
 #                               (fixes RP token exchange 401 invalid_client)
 #   action=sync-env          -> ensure each RP's own *_BASE_URL in its runtime env
@@ -208,7 +208,7 @@ jobs:
               reset)
                 # Coordinated cutover reset (data_platform_320 §6): capture the live appoidc
                 # (old iam.oidc_client + signing_key) BEFORE the destructive schema drop, then
-                # apply the new DDL with --reset (DROP+rebuild 18 schemas), reseed, and finally
+                # apply the new DDL with --reset (DROP+rebuild 19 schemas), reseed, and finally
                 # restore appoidc (real RP secrets overwrite seed placeholders). 28b capture
                 # self-skips when no old iam schema exists; 28b restore self-skips with no dump.
                 # 30-verify is the machine acceptance gate (§9.5-③): green run = baseline met.
