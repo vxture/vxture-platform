@@ -120,6 +120,10 @@ jobs:
           tags: |
             # push main → :latest
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            # 部署 tag 的原样名（deploy.yml 用 github.ref_name 拉取）——必需：
+            # semver 模式会把 v0.1.0 剥成 0.1.0，且 dev-*/beta-*/varda-* 非 semver
+            # 根本不产出版本 tag，只有 sha-。没有这行 deploy 会 image not found。
+            type=raw,value=${{ github.ref_name }},enable=${{ github.ref_type == 'tag' }}
             # tag v1.2.3 → :1.2.3 :1.2 :1
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

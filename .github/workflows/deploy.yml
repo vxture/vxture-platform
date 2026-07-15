@@ -22,6 +22,7 @@ on:
 
 permissions:
   contents: read
+  actions: read # gh run list：等待同 tag 的 docker-build 完成
 
 concurrency:
   # 同一环境串行，不取消进行中的生产部署。
@@ -55,6 +56,28 @@ jobs:
     environment: ${{ needs.resolve.outputs.env }}
     steps:
       - uses: actions/checkout@v5
+
+      # deploy 与 docker-build 由同一 tag 并行触发、无先后依赖。过审批门后先确保本 tag
+      # 的 docker-build 已成功（镜像已推 ACR），否则 host 拉取会 image not found
+      # （2026-07-15 首发教训）。轮询等待（最多 ~20min）。
+      - name: Wait for docker-build to publish images
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 80); do
+            line="$(gh run list -R "$REPO" --workflow=docker-build.yml --event=push \
+                      --json headBranch,status,conclusion \
+                      -q "[.[] | select(.headBranch==\"$TAG\")][0] | (.status)+\"/\"+((.conclusion)//\"-\")" 2>/dev/null || echo "")"
+            case "$line" in
+              completed/success) echo "docker-build succeeded for $TAG"; exit 0 ;;
+              completed/*) echo "::error::docker-build for $TAG did not succeed ($line)"; exit 1 ;;
+              *) echo "waiting for docker-build ($TAG): ${line:-pending} [$i/80]"; sleep 15 ;;
+            esac
+          done
+          echo "::error::timed out waiting for docker-build ($TAG)"; exit 1
 
       # registry 归一化在 runner 端完成（与 docker-build 复用同一脚本），拉取优先内网地址；
       # 归一化结果传入 SSH，host 上只做 docker login，不重复实现归一化逻辑。
