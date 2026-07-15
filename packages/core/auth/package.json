@@ -22,8 +22,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "ioredis": "^5.0.0",
-    "@vxture/shared": "workspace:*"
+    "@vxture/shared": "workspace:*",
+    "ioredis": "^5.0.0"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.0",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
+    "@nestjs/core": "^11.1.28",
     "@nestjs/jwt": "^11.0.0",
     "reflect-metadata": "^0.2.0",
     "rimraf": "^6.0.1",
