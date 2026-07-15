@@ -31,6 +31,19 @@ export const COMPONENT_ROLES = ["primary", "bundled"] as const;
 export type ComponentRole = (typeof COMPONENT_ROLES)[number];
 
 /**
+ * plan_versions.status — a plan version's publish lifecycle (product_320).
+ * draft = editable working copy (is_locked=false, never current); the admin
+ * sets prices/quotas here. published = released: on publish the version is
+ * frozen (is_locked=true) and plans.current_version_id points at it. A prior
+ * published version that a new one supersedes stays 'published' (subscriptions
+ * pinned to it keep resolving) — "currently live" is plans.current_version_id,
+ * not a third status. Business logic (what may edit/publish) lives in the
+ * product/admin domain, not here.
+ */
+export const PLAN_VERSION_STATUSES = ["draft", "published"] as const;
+export type PlanVersionStatus = (typeof PLAN_VERSION_STATUSES)[number];
+
+/**
  * The states a subscription can be in (metering.subscriptions.status), from the
  * subscription's own perspective. "No subscription" is NOT a state here — it is
  * conveyed by absence (null) in the entitlement view, never by a value in this set.

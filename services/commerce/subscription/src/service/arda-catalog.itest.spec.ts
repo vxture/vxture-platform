@@ -78,7 +78,8 @@ describe.skipIf(!RUN)("arda catalog → pool materialization (live DB)", () => {
   });
 
   it("subscribing arda-pro materializes the four pools with monthly anchors", async () => {
-    // current version = pricing v2 (product_320); v1 stays locked behind it.
+    // current version = v1 (published/locked); v2 is an unpublished draft, so
+    // the live pools materialize from v1's quota ladder (product_320).
     const pv = await pool.query<{ id: string }>(
       `select pv.id from product.plan_versions pv
          join product.plans p on p.current_version_id = pv.id
@@ -119,10 +120,11 @@ describe.skipIf(!RUN)("arda catalog → pool materialization (live DB)", () => {
       "service.api.call",
       "storage.bytes",
     ]);
-    // biz-260 §3b pro presets, ai.credit re-calibrated by pricing v2 (product_320 §1.3)
+    // biz-260 §3b pro presets from the live v1 ladder (v2 recalibration is an
+    // unpublished draft; ai.credit stays v1=500 until admin publishes v2).
     expect(byMetric["service.api.call"]!.quota_limit).toBe("200000");
     expect(byMetric["quality.check.run"]!.quota_limit).toBe("10000");
-    expect(byMetric["ai.credit"]!.quota_limit).toBe("1000");
+    expect(byMetric["ai.credit"]!.quota_limit).toBe("500");
     expect(byMetric["storage.bytes"]!.quota_limit).toBe(
       String(100 * 1024 * 1024 * 1024),
     );
@@ -143,53 +145,73 @@ describe.skipIf(!RUN)("arda catalog → pool materialization (live DB)", () => {
     expect(byMetric["storage.bytes"]!.period_anchor).toBeNull();
   });
 
-  it("pricing v2 is the current locked version with month+year price pairs (product_320 §1.2)", async () => {
-    const rows = await pool.query<{
+  it("current version stays v1 (published); v2 is an unpublished placeholder draft (product_320)", async () => {
+    // Current (= plans.current_version_id) stays v1 for every arda plan; the
+    // published v1 keeps its real quota ladder + free month@0. v2 is seeded as
+    // an UNPUBLISHED draft (status='draft', not locked, not current) with all
+    // prices and quota params = 1 — the admin sets real values + publishes.
+    const cur = await pool.query<{
       plan_code: string;
       version_no: number;
+      status: string;
+      is_locked: boolean;
+      prices: { cycle_unit: string; price: string }[];
+    }>(
+      `select p.plan_code, pv.version_no, pv.status, pv.is_locked,
+              coalesce((select jsonb_agg(jsonb_build_object('cycle_unit', pp.cycle_unit, 'price', pp.price::text) order by pp.cycle_unit)
+                          from product.plan_prices pp where pp.plan_version_id = pv.id), '[]'::jsonb) as prices
+         from product.plans p
+         join product.plan_versions pv on pv.id = p.current_version_id
+        where p.plan_code like 'arda-%' order by p.plan_code`,
+    );
+    const curByCode = Object.fromEntries(cur.rows.map((r) => [r.plan_code, r]));
+    for (const r of cur.rows) {
+      expect(r.version_no).toBe(1); // v2 is not published, so v1 stays current
+      expect(r.status).toBe("published");
+    }
+    const curPrice = (code: string) =>
+      Object.fromEntries(
+        curByCode[code]!.prices.map((x) => [x.cycle_unit, Number(x.price)]),
+      );
+    expect(curPrice("arda-free")).toEqual({ month: 0 });
+
+    // v2 draft (per paid plan): unpublished, unlocked, placeholder price = 1,
+    // every quota value = 1; enterprise draft carries no price rows.
+    const draft = await pool.query<{
+      plan_code: string;
+      version_no: number;
+      status: string;
       is_locked: boolean;
       prices: { cycle_unit: string; price: string }[];
       quota: Record<string, unknown>;
     }>(
-      `select p.plan_code, pv.version_no, pv.is_locked,
+      `select p.plan_code, pv.version_no, pv.status, pv.is_locked,
               coalesce((select jsonb_agg(jsonb_build_object('cycle_unit', pp.cycle_unit, 'price', pp.price::text) order by pp.cycle_unit)
                           from product.plan_prices pp where pp.plan_version_id = pv.id), '[]'::jsonb) as prices,
               (select pc.quota from product.plan_components pc
                 where pc.plan_version_id = pv.id and pc.component_role = 'primary' limit 1) as quota
          from product.plans p
-         join product.plan_versions pv on pv.id = p.current_version_id
+         join product.plan_versions pv on pv.plan_id = p.id and pv.version_no = 2
         where p.plan_code like 'arda-%' order by p.plan_code`,
     );
-    const byCode = Object.fromEntries(rows.rows.map((r) => [r.plan_code, r]));
-    // every current version is locked (queryPlanLadder precondition)
-    for (const r of rows.rows) expect(r.is_locked).toBe(true);
-    // paid tiers: v2 with the owner price pairs
-    const priceMap = (code: string) =>
+    const draftByCode = Object.fromEntries(
+      draft.rows.map((r) => [r.plan_code, r]),
+    );
+    const draftPrice = (code: string) =>
       Object.fromEntries(
-        byCode[code]!.prices.map((x) => [x.cycle_unit, Number(x.price)]),
+        draftByCode[code]!.prices.map((x) => [x.cycle_unit, Number(x.price)]),
       );
-    for (const [code, month, year] of [
-      ["arda-starter", 199, 1999],
-      ["arda-pro", 499, 4999],
-      ["arda-business", 1999, 19999],
-    ] as const) {
-      expect(byCode[code]!.version_no).toBe(2);
-      expect(priceMap(code)).toEqual({ month, year });
+    for (const code of ["arda-starter", "arda-pro", "arda-business"]) {
+      expect(draftByCode[code]!.status).toBe("draft");
+      expect(draftByCode[code]!.is_locked).toBe(false);
+      expect(draftPrice(code)).toEqual({ month: 1, year: 1 });
+      // every quota value forced to 1
+      for (const v of Object.values(draftByCode[code]!.quota))
+        expect(v).toBe(1);
     }
-    // enterprise: v2, contact-sales = zero price rows
-    expect(byCode["arda-enterprise"]!.version_no).toBe(2);
-    expect(byCode["arda-enterprise"]!.prices).toEqual([]);
-    // free & beta stay on v1 (month@0)
-    expect(byCode["arda-free"]!.version_no).toBe(1);
-    expect(priceMap("arda-free")).toEqual({ month: 0 });
-    expect(byCode["arda-beta-trial"]!.version_no).toBe(1);
-    // v2 quota re-calibration (product_320 §1.3)
-    expect(byCode["arda-starter"]!.quota["ai.credit"]).toBe(100);
-    expect(byCode["arda-pro"]!.quota["member.max"]).toBe(3);
-    expect(byCode["arda-business"]!.quota["member.max"]).toBe(5);
-    expect(byCode["arda-business"]!.quota["ai.credit"]).toBe(10000);
-    // untouched keys survive the jsonb patch copy
-    expect(byCode["arda-business"]!.quota["datasource.max"]).toBe(100);
+    // enterprise: draft too, contact-sales = zero price rows
+    expect(draftByCode["arda-enterprise"]!.status).toBe("draft");
+    expect(draftByCode["arda-enterprise"]!.prices).toEqual([]);
   });
 
   it("consume_mode split across catalogs per R5/D7", async () => {

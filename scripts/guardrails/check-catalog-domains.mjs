@@ -53,6 +53,11 @@ const pairs = [
     ddlCheckIn(p50, "chk_quota_pools_component_role"),
   ],
   [
+    "plan version status",
+    tsArray(dom, "PLAN_VERSION_STATUSES"),
+    ddlCheckIn(p40, "chk_plan_versions_status"),
+  ],
+  [
     "subscription status",
     tsArray(dom, "SUBSCRIPTION_STATUSES"),
     ddlCheckIn(p50, "chk_subscriptions_status"),
