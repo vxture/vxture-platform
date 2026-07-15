@@ -1,16 +1,21 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
   ForbiddenException,
   Get,
   Inject,
   NotFoundException,
   Param,
+  Patch,
+  Post,
   Req,
   UnauthorizedException,
 } from "@nestjs/common";
 import type { Request } from "express";
 import type { Pool } from "pg";
-import { ADMIN_BFF_RO_POOL } from "../tokens";
+import { ADMIN_BFF_RO_POOL, ADMIN_BFF_RW_POOL } from "../tokens";
+import { RequireStepUp } from "../auth/step-up.decorator";
 import type {
   ProductAgentRecord,
   ProductCapabilityIntegration,
@@ -545,7 +550,10 @@ export const defaultModelPolicies: ProductModelPolicyRecord[] = [
 
 @Controller("api/products")
 export class ProductsRouter {
-  constructor(@Inject(ADMIN_BFF_RO_POOL) private readonly pool: Pool) {}
+  constructor(
+    @Inject(ADMIN_BFF_RO_POOL) private readonly pool: Pool,
+    @Inject(ADMIN_BFF_RW_POOL) private readonly rwPool: Pool,
+  ) {}
 
   @Get("capabilities")
   async listCapabilities(
@@ -673,6 +681,239 @@ export class ProductsRouter {
     assertCanManageProducts(req);
     return listEffectiveModelPolicies();
   }
+
+  // ── plan version lifecycle (product_320) — list · edit draft · publish ─────
+  // draft = editable working copy (unlocked, never current); publish freezes it
+  // (is_locked=true) and points plans.current_version_id at it. §7 triggers make
+  // components/prices immutable once locked, so edits are draft-only.
+
+  @Get("plans/:planId/versions")
+  async listPlanVersions(
+    @Req() req: Request & RequestContext,
+    @Param("planId") planId: string,
+  ): Promise<PlanVersionSummary[]> {
+    assertCanManageProducts(req);
+    const { rows } = await this.pool.query<PlanVersionSummaryRow>(
+      PLAN_VERSIONS_SQL,
+      [planId],
+    );
+    return rows.map(mapPlanVersionSummary);
+  }
+
+  @Get("plan-versions/:versionId")
+  async getPlanVersion(
+    @Req() req: Request & RequestContext,
+    @Param("versionId") versionId: string,
+  ): Promise<PlanVersionDetail> {
+    assertCanManageProducts(req);
+    return loadPlanVersionDetail(this.pool, versionId);
+  }
+
+  @Patch("plan-versions/:versionId")
+  async updateDraftVersion(
+    @Req() req: Request & RequestContext,
+    @Param("versionId") versionId: string,
+    @Body() body: UpdateDraftVersionInput,
+  ): Promise<PlanVersionDetail> {
+    assertCanManageProducts(req);
+    const client = await this.rwPool.connect();
+    try {
+      await client.query("BEGIN");
+      const cur = await client.query<{ status: string; is_locked: boolean }>(
+        `SELECT status, is_locked FROM product.plan_versions WHERE id = $1 FOR UPDATE`,
+        [versionId],
+      );
+      const row = cur.rows[0];
+      if (!row) {
+        throw new NotFoundException(`Plan version ${versionId} not found`);
+      }
+      if (row.status !== "draft" || row.is_locked) {
+        throw new BadRequestException(
+          "Only an unpublished draft version can be edited",
+        );
+      }
+      if (Array.isArray(body.prices)) {
+        for (const p of body.prices) {
+          const cycle = p.cycleUnit;
+          if (cycle !== "month" && cycle !== "year") {
+            throw new BadRequestException(
+              `Invalid cycleUnit: ${String(cycle)}`,
+            );
+          }
+          const price = Number(p.price);
+          if (!Number.isFinite(price) || price < 0) {
+            throw new BadRequestException(`Invalid price for ${cycle}`);
+          }
+          await client.query(
+            `INSERT INTO product.plan_prices
+               (id, plan_version_id, cycle_unit, cycle_count, price, currency, created_at)
+             VALUES (gen_random_uuid(), $1, $2, 1, $3, 'CNY', now())
+             ON CONFLICT (plan_version_id, cycle_unit, cycle_count, currency)
+             DO UPDATE SET price = EXCLUDED.price`,
+            [versionId, cycle, price],
+          );
+        }
+      }
+      if (body.quota && typeof body.quota === "object") {
+        await client.query(
+          `UPDATE product.plan_components SET quota = $2::jsonb
+            WHERE plan_version_id = $1 AND component_role = 'primary'`,
+          [versionId, JSON.stringify(body.quota)],
+        );
+      }
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+    return loadPlanVersionDetail(this.pool, versionId);
+  }
+
+  @Post("plan-versions/:versionId/publish")
+  @RequireStepUp()
+  async publishPlanVersion(
+    @Req() req: Request & RequestContext,
+    @Param("versionId") versionId: string,
+  ): Promise<{ published: true; versionId: string }> {
+    assertCanManageProducts(req);
+    const client = await this.rwPool.connect();
+    try {
+      await client.query("BEGIN");
+      const cur = await client.query<{ plan_id: string; status: string }>(
+        `SELECT plan_id, status FROM product.plan_versions WHERE id = $1 FOR UPDATE`,
+        [versionId],
+      );
+      const row = cur.rows[0];
+      if (!row) {
+        throw new NotFoundException(`Plan version ${versionId} not found`);
+      }
+      if (row.status === "published") {
+        throw new BadRequestException("Version is already published");
+      }
+      // publish: freeze the version and make it the plan's live version. A
+      // prior published version stays 'published' (subscriptions pinned to it
+      // keep resolving) — it just stops being current.
+      await client.query(
+        `UPDATE product.plan_versions SET status = 'published', is_locked = true WHERE id = $1`,
+        [versionId],
+      );
+      await client.query(
+        `UPDATE product.plans SET current_version_id = $2, updated_at = now() WHERE id = $1`,
+        [row.plan_id, versionId],
+      );
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+    return { published: true, versionId };
+  }
+}
+
+// ── plan version lifecycle: types · SQL · loaders (product_320) ─────────────
+
+interface PlanVersionPrice {
+  cycleUnit: string;
+  price: string;
+}
+
+interface PlanVersionSummary {
+  id: string;
+  versionNo: number;
+  status: string;
+  isLocked: boolean;
+  isCurrent: boolean;
+  prices: PlanVersionPrice[];
+}
+
+interface PlanVersionDetail extends PlanVersionSummary {
+  planId: string;
+  planCode: string;
+  planName: string;
+  quota: Record<string, unknown>;
+}
+
+interface UpdateDraftVersionInput {
+  prices?: { cycleUnit?: unknown; price?: unknown }[];
+  quota?: Record<string, unknown>;
+}
+
+interface PlanVersionSummaryRow {
+  id: string;
+  version_no: number;
+  status: string;
+  is_locked: boolean;
+  is_current: boolean;
+  prices: PlanVersionPrice[];
+}
+
+const PLAN_VERSIONS_SQL = `
+  SELECT pv.id, pv.version_no, pv.status, pv.is_locked,
+         (pv.id = p.current_version_id) AS is_current,
+         COALESCE((
+           SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', pp.price::text)
+                            ORDER BY pp.cycle_unit)
+             FROM product.plan_prices pp WHERE pp.plan_version_id = pv.id
+         ), '[]'::jsonb) AS prices
+    FROM product.plan_versions pv
+    JOIN product.plans p ON p.id = pv.plan_id
+   WHERE pv.plan_id = $1
+   ORDER BY pv.version_no ASC
+`;
+
+function mapPlanVersionSummary(row: PlanVersionSummaryRow): PlanVersionSummary {
+  return {
+    id: row.id,
+    versionNo: row.version_no,
+    status: row.status,
+    isLocked: row.is_locked,
+    isCurrent: row.is_current,
+    prices: row.prices ?? [],
+  };
+}
+
+async function loadPlanVersionDetail(
+  pool: Pool,
+  versionId: string,
+): Promise<PlanVersionDetail> {
+  const { rows } = await pool.query<
+    PlanVersionSummaryRow & {
+      plan_id: string;
+      plan_code: string;
+      plan_name: string;
+      quota: Record<string, unknown> | null;
+    }
+  >(
+    `SELECT pv.id, pv.plan_id, pv.version_no, pv.status, pv.is_locked,
+            (pv.id = p.current_version_id) AS is_current,
+            p.plan_code, p.plan_name,
+            COALESCE((
+              SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', pp.price::text)
+                               ORDER BY pp.cycle_unit)
+                FROM product.plan_prices pp WHERE pp.plan_version_id = pv.id
+            ), '[]'::jsonb) AS prices,
+            (SELECT pc.quota FROM product.plan_components pc
+              WHERE pc.plan_version_id = pv.id AND pc.component_role = 'primary' LIMIT 1) AS quota
+       FROM product.plan_versions pv
+       JOIN product.plans p ON p.id = pv.plan_id
+      WHERE pv.id = $1`,
+    [versionId],
+  );
+  const row = rows[0];
+  if (!row) {
+    throw new NotFoundException(`Plan version ${versionId} not found`);
+  }
+  return {
+    ...mapPlanVersionSummary(row),
+    planId: row.plan_id,
+    planCode: row.plan_code,
+    planName: row.plan_name,
+    quota: row.quota ?? {},
+  };
 }
 
 // ── C14 de-mock: product catalog capabilities + agents read from the live

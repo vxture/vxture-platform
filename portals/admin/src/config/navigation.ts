@@ -143,6 +143,17 @@ const tenantOpsSections: AdminNavigationSection[] = [
         icon: "star",
       },
       {
+        id: "planVersions",
+        code: "service_plan",
+        i18nKey: "menu.operation.plan_version",
+        status: "active",
+        href: "/plan-versions",
+        label: "套餐版本",
+        description:
+          "管理套餐的版本生命周期：编辑草稿的价格与配额，发布后冻结并设为当前版本。",
+        icon: "star",
+      },
+      {
         id: "promotions",
         code: "promotion_campaign",
         i18nKey: "menu.operation.promotion_campaign",
