@@ -30,6 +30,7 @@ export { SEMANTIC_COLORS } from "./ui.constants";
 export {
   TIERS,
   COMPONENT_ROLES,
+  PLAN_VERSION_STATUSES,
   SUBSCRIPTION_STATUSES,
   MERGE_STRATEGIES,
   CONSUME_MODES,
@@ -38,6 +39,7 @@ export {
 export type {
   Tier,
   ComponentRole,
+  PlanVersionStatus,
   SubscriptionStatus,
   MergeStrategy,
   ConsumeMode,

@@ -138,12 +138,14 @@ CREATE TABLE product.plan_versions (
     id                uuid         PRIMARY KEY DEFAULT gen_random_uuid(),
     plan_id           uuid         NOT NULL REFERENCES product.plans(id) ON DELETE CASCADE,
     version_no        int          NOT NULL,                          -- 同 plan 下从 1 递增
+    status            varchar(32)  NOT NULL DEFAULT 'draft',          -- 发布生命周期（值域=@shared PLAN_VERSION_STATUSES）：draft 可编辑/待发布；published 已发布（发布时随 is_locked=true 冻结、plans.current_version_id 指向）
     is_locked         boolean      NOT NULL DEFAULT false,            -- 锁定 → 版本 + components + prices + trial 全冻结
     trial_cycle_unit  varchar(16),                                    -- 试用时长单位（NULL=不提供试用）
     trial_cycle_count int,                                            -- 试用时长倍数（如 day×14）
     created_by        uuid,                                           -- 裸值→admin.operator_accounts（不建 FK，边界#2）
     created_at        timestamptz  NOT NULL DEFAULT now(),
     CONSTRAINT uq_plan_versions_plan_version UNIQUE (plan_id, version_no),
+    CONSTRAINT chk_plan_versions_status CHECK (status IN ('draft','published')),
     CONSTRAINT chk_plan_versions_trial_cycle_unit CHECK (trial_cycle_unit IS NULL OR trial_cycle_unit IN ('day','week','month'))
 );
 CREATE INDEX idx_plan_versions_plan_id ON product.plan_versions (plan_id);

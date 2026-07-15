@@ -39,6 +39,7 @@ export type {
 export type {
   Tier,
   ComponentRole,
+  PlanVersionStatus,
   SubscriptionStatus,
   MergeStrategy,
   ConsumeMode,
@@ -64,6 +65,7 @@ export {
   // Catalog value domains — platform contract, SoT (product_220 §1/§2/§3)
   TIERS,
   COMPONENT_ROLES,
+  PLAN_VERSION_STATUSES,
   SUBSCRIPTION_STATUSES,
   MERGE_STRATEGIES,
   CONSUME_MODES,

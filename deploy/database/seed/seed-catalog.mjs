@@ -1205,8 +1205,8 @@ export async function seedCatalog(client) {
   if (planId && umbraId) {
     const pvIns = await client.query(
       `
-      insert into product.plan_versions (id, plan_id, version_no, is_locked, created_by, created_at)
-      values (gen_random_uuid(), $1, 1, false, $2, now())
+      insert into product.plan_versions (id, plan_id, version_no, status, is_locked, created_by, created_at)
+      values (gen_random_uuid(), $1, 1, 'published', false, $2, now())
       on conflict (plan_id, version_no) do nothing
       returning id
     `,
@@ -1498,8 +1498,8 @@ export async function seedCatalog(client) {
       if (!pId) continue;
       await client.query(
         `
-        insert into product.plan_versions (id, plan_id, version_no, is_locked, created_by, created_at)
-        values (gen_random_uuid(), $1, 1, false, $2, now())
+        insert into product.plan_versions (id, plan_id, version_no, status, is_locked, created_by, created_at)
+        values (gen_random_uuid(), $1, 1, 'published', false, $2, now())
         on conflict (plan_id, version_no) do nothing
       `,
         [pId, SYS],
@@ -1546,26 +1546,28 @@ export async function seedCatalog(client) {
       );
     }
 
-    // ── arda pricing v2 (product_320 §1.2/§1.3/§4.1) ────────────────────────
-    // Real prices land as a NEW locked version per paid plan (locked v1 is
-    // immutable by trigger; existing subscriptions stay pinned to v1). v2 =
-    // v1 components + quota patch (seat/credit re-calibration, product_320
-    // §1.3) + month & year price rows. enterprise gets NO price rows
-    // (contact-sales: the ladder offers no self-serve purchase and order
-    // creation rejects planless prices). free / beta-trial stay on v1
-    // (month@0 already correct). Idempotent: rerun is a no-op once v2 is
-    // locked; the current_version_id repoint is v1-conditioned so it never
-    // clobbers a future v3.
-    const ARDA_PRICING_V2 = [
-      // [plan_code, monthly_cny, yearly_cny (≈2 months free), quota_patch]
-      ["arda-starter", 199, 1999, { "ai.credit": 100 }],
-      ["arda-pro", 499, 4999, { "member.max": 3, "ai.credit": 1000 }],
-      // business = fixed 5-seat bundle price (owner 2026-07-14); credits
-      // re-calibrated to the 5-seat pack. No per-seat add-on in V1.
-      ["arda-business", 1999, 19999, { "member.max": 5, "ai.credit": 10000 }],
-      ["arda-enterprise", null, null, {}],
+    // ── arda pricing v2 (product_320) — PLACEHOLDER draft ───────────────────
+    // Owner directive (2026-07-15): seed v2 as an UNPUBLISHED, UNLOCKED draft
+    // with every quota param and every price = 1; the real prices/quotas are
+    // set and the version is PUBLISHED from the admin backend. Per paid plan:
+    // copy v1's component shape but force every quota value to 1, add month &
+    // year price rows = 1, keep v2 UNLOCKED (locking would make §7 triggers
+    // reject admin edits) and do NOT repoint current_version_id (admin
+    // publishes). enterprise keeps NO price rows (contact-sales). Non-
+    // clobbering: only a NEWLY inserted v2 is written, so a re-run never
+    // overwrites values the admin has already edited/published.
+    const ARDA_V2_PLANS = [
+      "arda-starter",
+      "arda-pro",
+      "arda-business",
+      "arda-enterprise",
     ];
-    for (const [code, monthly, yearly, patch] of ARDA_PRICING_V2) {
+    const ARDA_V2_PRICED = new Set([
+      "arda-starter",
+      "arda-pro",
+      "arda-business",
+    ]);
+    for (const code of ARDA_V2_PLANS) {
       const planRow = await client.query(
         `select id from product.plans where plan_code = $1 limit 1`,
         [code],
@@ -1578,68 +1580,53 @@ export async function seedCatalog(client) {
       );
       const v1Id = v1Row.rows[0]?.id;
       if (!v1Id) continue;
-      await client.query(
+      const v2Ins = await client.query(
         `
         insert into product.plan_versions (id, plan_id, version_no, is_locked, created_by, created_at)
         values (gen_random_uuid(), $1, 2, false, $2, now())
         on conflict (plan_id, version_no) do nothing
+        returning id
       `,
         [pId, SYS],
       );
-      const v2Row = await client.query(
-        `select id, is_locked from product.plan_versions where plan_id = $1 and version_no = 2`,
-        [pId],
+      // only a freshly inserted draft — never clobber an existing v2 that the
+      // admin may already have edited or published.
+      if (v2Ins.rows.length === 0) continue;
+      const v2Id = v2Ins.rows[0].id;
+      // copy v1's component shape, but force every quota value to 1.
+      await client.query(
+        `
+        insert into product.plan_components
+          (id, plan_version_id, product_id, tier, component_role, priority, features, quota, sort_order, created_at)
+        select gen_random_uuid(), $2, product_id, tier, component_role, priority, features,
+               coalesce((select jsonb_object_agg(key, 1) from jsonb_each(quota)), '{}'::jsonb),
+               sort_order, now()
+        from product.plan_components
+        where plan_version_id = $1
+      `,
+        [v1Id, v2Id],
       );
-      const v2 = v2Row.rows[0];
-      if (!v2) continue;
-      if (!v2.is_locked) {
-        // unlocked v2 (first run / crashed mid-run): rewrite deterministically, then lock.
-        await client.query(
-          `delete from product.plan_components where plan_version_id = $1`,
-          [v2.id],
-        );
-        await client.query(
-          `
-          insert into product.plan_components
-            (id, plan_version_id, product_id, tier, component_role, priority, features, quota, sort_order, created_at)
-          select gen_random_uuid(), $2, product_id, tier, component_role, priority, features, quota || $3::jsonb, sort_order, now()
-          from product.plan_components
-          where plan_version_id = $1
-          on conflict (plan_version_id, product_id, tier) do update set
-            component_role = excluded.component_role, priority = excluded.priority,
-            features = excluded.features, quota = excluded.quota
-        `,
-          [v1Id, v2.id, JSON.stringify(patch)],
-        );
-        for (const [cycleUnit, price] of [
-          ["month", monthly],
-          ["year", yearly],
-        ]) {
-          if (price == null) continue;
+      // placeholder month & year price = 1 (self-serve plans only; enterprise
+      // stays price-less = contact-sales).
+      if (ARDA_V2_PRICED.has(code)) {
+        for (const cycleUnit of ["month", "year"]) {
           await client.query(
             `
             insert into product.plan_prices (id, plan_version_id, cycle_unit, cycle_count, price, currency, created_at)
-            values (gen_random_uuid(), $1, $2, 1, $3, 'CNY', now())
+            values (gen_random_uuid(), $1, $2, 1, 1, 'CNY', now())
             on conflict (plan_version_id, cycle_unit, cycle_count, currency) do nothing
           `,
-            [v2.id, cycleUnit, price],
+            [v2Id, cycleUnit],
           );
         }
-        await client.query(
-          `update product.plan_versions set is_locked = true where id = $1`,
-          [v2.id],
-        );
       }
-      await client.query(
-        `update product.plans set current_version_id = $2
-         where id = $1 and (current_version_id = $3 or current_version_id is null)`,
-        [pId, v2.id, v1Id],
-      );
+      // v2 stays UNLOCKED and current_version_id is NOT repointed — the admin
+      // backend sets the real values and publishes the version.
     }
   }
 
   console.log(
-    "✓  product — checklist + umbra-free + arda catalog (6 plans locked; pricing v2 current on starter/pro/business, enterprise contact-sales, free/beta on v1; 10 product metrics + 2 L0 contributions)",
+    "✓  product — checklist + umbra-free + arda catalog (6 plans; v1 current/locked, v2 seeded as UNPUBLISHED placeholder draft on starter/pro/business/enterprise — all quota params & prices = 1, admin sets real values + publishes; 10 product metrics + 2 L0 contributions)",
   );
 
   // ── 10. model — model_providers + models + model_price_rules (per-tenant grant OUT) ─
