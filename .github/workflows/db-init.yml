@@ -27,17 +27,17 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Git ref whose deploy scripts to use'
+        description: "Git ref whose deploy scripts to use"
         required: true
-        default: 'main'
+        default: "main"
       expected_sha:
-        description: 'Full SHA the ref must resolve to (pin against ref drift; REQUIRED for DB-mutating actions — data_platform_320 §9.5-①)'
+        description: "Full SHA the ref must resolve to (pin against ref drift; REQUIRED for DB-mutating actions — data_platform_320 §9.5-①)"
         required: false
-        default: ''
+        default: ""
       action:
-        description: 'DB action'
+        description: "DB action"
         required: true
-        default: 'seed'
+        default: "seed"
         type: choice
         options:
           - seed
@@ -47,7 +47,7 @@ on:
           - sync-env
           - verify
       confirm:
-        description: 'Type yes to confirm'
+        description: "Type yes to confirm"
         required: true
 
 permissions:
@@ -59,8 +59,12 @@ concurrency:
 
 jobs:
   db-init:
-    name: VXTURE_DEPLOY_HOST DB ${{ inputs.action }}
+    name: worker-01 DB ${{ inputs.action }}
     runs-on: ubuntu-latest
+    # production 环境承接环境级 DEPLOY_* 秘钥（DEPLOY_HOST_TAILNET / DEPLOY_USER /
+    # DEPLOY_SSH_KEY / DEPLOY_SSH_PASSPHRASE）+ 审批门。domestic profile：runner 入
+    # tailnet 走内网到 worker-01（与 deploy.yml 同）。
+    environment: production
     steps:
       - name: Confirm
         if: ${{ inputs.confirm != 'yes' }}
@@ -101,15 +105,22 @@ jobs:
             echo "pinned: HEAD == expected_sha == $HEAD_SHA"
           fi
 
-      - name: Upload DB scripts to VXTURE_DEPLOY_HOST
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      - name: Upload DB scripts to worker-01
         uses: appleboy/scp-action@v1.0.0
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
-          source: 'deploy/scripts,deploy/database,deploy/guardrails,deploy/.env.*.example,deploy/secrets/*.example'
-          target: '/tmp/vxture-deploy'
+          source: "deploy/scripts,deploy/database,deploy/guardrails,deploy/.env.*.example,deploy/secrets/*.example"
+          target: "/tmp/vxture-deploy"
           rm: true
           timeout: 120s
           command_timeout: 10m
@@ -119,7 +130,7 @@ jobs:
         env:
           DB_ACTION: ${{ inputs.action }}
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}

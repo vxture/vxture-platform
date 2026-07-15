@@ -1160,6 +1160,29 @@ export async function seedCatalog(client) {
     on conflict (item_code) do nothing
   `);
 
+  // Ensure plan_versions.status exists before the catalog seed touches it. The
+  // clean-baseline ddl/ apply is create-once (won't ALTER an existing table), and
+  // prisma migrations are retired — so this idempotent additive column keeps the
+  // `seed` action self-sufficient on a LIVE DB too (fresh builds get it from
+  // ddl/40_product.sql; here it's a no-op). Backfill: the version a plan points
+  // at (current_version_id) is its live/published one. (product_320)
+  await client.query(
+    `alter table product.plan_versions add column if not exists status varchar(32) not null default 'draft'`,
+  );
+  await client.query(`
+    update product.plan_versions pv set status = 'published'
+      from product.plans p
+     where p.current_version_id = pv.id and pv.status <> 'published'
+  `);
+  await client.query(`
+    do $$ begin
+      if not exists (select 1 from pg_constraint where conname = 'chk_plan_versions_status') then
+        alter table product.plan_versions
+          add constraint chk_plan_versions_status check (status in ('draft','published'));
+      end if;
+    end $$;
+  `);
+
   // one representative free plan → draft version → bundled_free component + month price.
   // Version stays unlocked (is_locked=false) — no subscription references it yet; the
   // plan_component / plan_price lock guard (§7 triggers) only bites once is_locked=true.
