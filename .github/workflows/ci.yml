@@ -47,12 +47,14 @@ jobs:
 
   # ── 3. Check (type · lint · guardrail · boundaries) ───────────────────────
   check:
-    # 该名称是稳定契约：被分支保护 ruleset（protect-*）与 branch-promotion.yml 的 REQUIRED_CHECKS 引用。
-    # 内部步骤可演进，但 job 名（quality-gate / build / test-coverage）改动须同步上述两处，否则静默破坏晋升。
+    # 该名称是稳定契约：被 main-ruleset.json 的 required status checks 按名引用。
+    # 内部步骤可演进，但 job 名（quality-gate / build / test-coverage）改动须同步 ruleset。
     name: quality-gate
     runs-on: ubuntu-latest
     outputs:
       docs_only: ${{ steps.changes.outputs.docs_only }}
+      # 本次变更影响的镜像集（= 构建目标）；build/test 据此只处理受影响组件。
+      affected_images: ${{ steps.changes.outputs.affected_images }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -170,69 +172,30 @@ jobs:
         with:
           name: backend-build
 
-      - name: Build Model Platform service
+      # 变更门控：只建/smoke 受影响的组件（quality-gate 的 affected_images，走 docker-build
+      # 同款传递依赖规则）。改一个官网页只建 website-bff；varda 没动就不建 varda_*
+      # （varda 独立部署 worker-02，见 repo-governance-standard）。改共享包则正确牵连全部。
+      # TD-024 boot-smoke：建 esbuild bundle 并用假 env 启全 DI 图——唯一验 bundle 运行态
+      # 形态的门（隐式构造注入陷阱在此暴露，tsc/单测看不到）。auth-bff/varda-bff 的 boot-smoke
+      # 需真 Redis（RedisService.onModuleInit fail-closed）；REDIS_URL 全局设，其余 smoke 忽略。
+      - name: Build & boot-smoke affected bundles
         if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/service-model-platform build
-
-      - name: Build Varda agent server
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/agent-server-varda build
-
-      # TD-024 boot-smoke: build the admin-bff esbuild bundle and boot its full DI
-      # graph with a fake env. This is the only gate that exercises the bundled
-      # runtime form, where the implicit-constructor-injection trap lives (a bundled
-      # service whose deps silently become undefined) — invisible to tsc/unit.
-      - name: Build admin-bff bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-admin build:bundle
-
-      - name: Boot-smoke admin-bff (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-admin boot-smoke
-
-      - name: Build auth-bff bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-auth build:bundle
-
-      - name: Boot-smoke auth-bff (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-auth boot-smoke
         env:
+          AFFECTED: ${{ needs.check.outputs.affected_images }}
           REDIS_URL: redis://localhost:6379
-
-      - name: Build console-bff bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-console build:bundle
-
-      - name: Boot-smoke console-bff (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-console boot-smoke
-
-      - name: Build website-bff bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-website build:bundle
-
-      - name: Boot-smoke website-bff (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-website boot-smoke
-
-      - name: Build platform-api bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-platform-api build:bundle
-
-      - name: Boot-smoke platform-api (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-platform-api boot-smoke
-
-      - name: Build varda-bff bundle
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-varda build:bundle
-
-      - name: Boot-smoke varda-bff (DI graph resolves under esbuild bundle)
-        if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --filter @vxture/bff-varda boot-smoke
-        env:
-          REDIS_URL: redis://localhost:6379
+        run: |
+          set -euo pipefail
+          has() { printf '%s' "$AFFECTED" | grep -q "\"$1\""; }
+          smoke() { pnpm --filter "$1" build:bundle && pnpm --filter "$1" boot-smoke; }
+          if has platform_service-model-platform; then pnpm --filter @vxture/service-model-platform build; fi
+          if has varda_agent;                     then pnpm --filter @vxture/agent-server-varda build; fi
+          if has platform_bff-admin;              then smoke @vxture/bff-admin; fi
+          if has platform_bff-auth;               then smoke @vxture/bff-auth; fi
+          if has platform_bff-console;            then smoke @vxture/bff-console; fi
+          if has platform_bff-website;            then smoke @vxture/bff-website; fi
+          if has platform_bff-platform-api;       then smoke @vxture/bff-platform-api; fi
+          if has varda_bff;                       then smoke @vxture/bff-varda; fi
+          echo "built affected bundles: ${AFFECTED:-[]}"
 
   # ── 5. Test Coverage ───────────────────────────────────────────────────────
   test:
@@ -246,6 +209,8 @@ jobs:
 
       - uses: actions/checkout@v6
         if: needs.check.outputs.docs_only != 'true'
+        with:
+          fetch-depth: 0 # pnpm 变更过滤需要 git 历史
 
       - uses: ./.github/actions/setup-node-pnpm
         if: needs.check.outputs.docs_only != 'true'
@@ -256,9 +221,21 @@ jobs:
         with:
           name: backend-build
 
-      - name: Run tests
+      # 只测变更包 + 依赖者（pnpm 原生 `...[<since>]`：<since> 起变更的包 ∪ 其依赖者）。
+      # base 不可用（首推/force-push，SHA 为空或全零）时回退全量测试。
+      - name: Run tests (changed packages + dependents)
         if: needs.check.outputs.docs_only != 'true'
-        run: pnpm --recursive --if-present test
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BASE_SHA" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            echo "testing packages changed since $BASE_SHA + dependents"
+            pnpm --filter "...[${BASE_SHA}]" --if-present test
+          else
+            echo "base '$BASE_SHA' unavailable — running all tests"
+            pnpm --recursive --if-present test
+          fi
 
       - name: Generate coverage report
         if: needs.check.outputs.docs_only != 'true'
