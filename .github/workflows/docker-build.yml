@@ -165,9 +165,9 @@ jobs:
           file: ${{ matrix.dockerfile }}
           build-args: |
             ${{ matrix.build-args }}
-            NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ secrets.CF_TURNSTILE_TENANT_SITE_KEY }}
-            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ secrets.CF_TURNSTILE_ADMIN_SITE_KEY }}
-            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ secrets.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ vars.CF_TURNSTILE_TENANT_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.image-tags.outputs.tags }}
@@ -184,9 +184,9 @@ jobs:
           file: ${{ matrix.dockerfile }}
           build-args: |
             ${{ matrix.build-args }}
-            NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ secrets.CF_TURNSTILE_TENANT_SITE_KEY }}
-            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ secrets.CF_TURNSTILE_ADMIN_SITE_KEY }}
-            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ secrets.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ vars.CF_TURNSTILE_TENANT_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.image-tags.outputs.tags }}
