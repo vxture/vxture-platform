@@ -35,9 +35,14 @@ jobs:
 
       - uses: ./.github/actions/setup-node-pnpm
 
-      # Fails on critical vulnerabilities; high-severity issues are tracked
-      # separately until upstream packages release patches.
+      # NOTE: npm retired the quick-audit endpoint `pnpm audit` calls (HTTP 410
+      # "endpoint is being retired, use the bulk advisory endpoint"), so this
+      # step now always errors regardless of the dependency tree. Kept
+      # non-blocking so it stops hard-failing every PR; a working SCA
+      # (osv-scanner / bulk advisory endpoint / Dependabot) replaces it in a
+      # follow-up. Until then this check carries no real signal.
       - name: Dependency security audit
+        continue-on-error: true
         run: pnpm audit --audit-level=critical
 
   # ── 3. Check (type · lint · guardrail · boundaries) ───────────────────────
