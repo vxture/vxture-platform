@@ -129,12 +129,34 @@ env-audit（部署包/运行态模板契约）。护栏是**仓库级**，本地
 
 ---
 
-## 9. 整顿检查清单
+## 9. 依赖安全（SCA 漏洞门）
+
+**CI `audit` job = osv-scanner 硬阻断门**，扫 `pnpm-lock.yaml` 全依赖树 vs OSV 漏洞库，是 `main` 的
+required status check（发现新漏洞即 fail 拦合并）。
+
+- **用 pinned 二进制**（照 gitleaks 模式下 `osv-scanner_linux_amd64`，`OSV_SCANNER_VERSION` 单点升级），
+  不用第三方 action（免 license/供应链顾虑）。**取代** npm quick-audit（端点已下线，HTTP 410 假绿）。
+- **命令必须带 `--config=.osv-scanner.toml`**——扫 `--lockfile` 时 osv-scanner **不自动发现**根 config，
+  漏了 `--config` 忽略清单不生效。
+- **整顿方法（清基线）**：先按 finding 查 OSV 修复版 vs npm latest 分类 →
+  - **直接依赖**：抬 `package.json` caret floor 到修复版（诚实声明安全下限）。
+  - **纯传递依赖**：根 `pnpm.overrides`；跨多 major 用 `pkg@1`/`pkg@5` 选择器分别定。
+  - **peer-only 依赖**：caret override 会被 pnpm **静默忽略**（反报自己 override unmet），须**精确版 pin**。
+- **残留忽略**（不可修 / 强升有害）：`.osv-scanner.toml` 用 **`[[PackageOverrides]]` 按 name+version 精确
+  `ignore=true` + `reason`**，**不用** `[[IgnoredVulns]]` 按 GHSA 全局忽略（会伏掉其它版本的同 CVE 回归）。
+  典型残留 = dev-server-only 传递漏洞（不进生产、强升破坏上游）。
+- **新漏洞政策**：**修**（升级 / override）或 **带 reason 的 PackageOverrides 记名接受**，
+  **绝不放宽此门**（不加 `continue-on-error`、不从 required 移除）。
+
+---
+
+## 10. 整顿检查清单
 
 - [ ] `main` 唯一长期分支；gitflow 三分支 / 晋升 / `PROMOTION_*` / `deploy-production.yml` 已清。
 - [ ] `main-ruleset` 已 apply（required checks + push 前 PR + 禁 force-push + 线性历史）。
 - [ ] `docker-build`/`deploy` = tag→env；raw tag、wait-for-build、registry 同区、逐服务 recreate 全到位。
 - [ ] 敏感信息四层检测（push protection + gitleaks CI + pre-commit + `.gitleaks.toml`）就位；仓私有；无开源残留。
+- [ ] 依赖 SCA 门：`audit` = osv-scanner（pinned 二进制 + `--config`）硬阻断 + required；基线已 triage 清零，残留经 `.osv-scanner.toml` 逐版本记名接受。
 - [ ] secret/variable **分类正确**、**层级正确**（org/repo/env）、无死值/重复。
 - [ ] 三环境 + production 审批门配置；生产 DB 走 `db-init` + expected_sha + 审批。
 - [ ] （有 DB）DDL 单一权威 + @shared 值域 + 最小权限/列锁 + 活库增量幂等 + 护栏。
