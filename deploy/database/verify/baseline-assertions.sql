@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- baseline-assertions.sql — live-DB baseline audit (data_platform_320 §9.5-③)
 -- Asserts the live database matches the target-state design on four axes:
---   A.  schema set  == the 18 target schemas exactly (no orphans, none missing)
+--   A.  schema set  == the 19 target schemas exactly (no orphans, none missing)
 --   B0. DDL baseline fingerprint == hash of the authoritative DDL (stamped by
 --       apply.sh into public.vx_ddl_baseline; catches column-level drift that
 --       leaves counts unchanged — the §9 upgraded finding)
@@ -31,7 +31,8 @@ DO $$
 DECLARE
   targets text[] := ARRAY[
     'account','identity','credential','kyc','tenancy','access','appoidc','session','loyalty',
-    'metering','billing','provisioning','promotion','product','model','safety','support','admin'];
+    'metering','billing','provisioning','promotion','product','model','safety','support','admin',
+    'sharing'];
   expected int := current_setting('vx.expected_tables')::int;
   fails    text := '';
   missing  text;
@@ -215,5 +216,5 @@ BEGIN
   IF fails <> '' THEN
     RAISE EXCEPTION 'baseline audit FAILED: %', fails;
   END IF;
-  RAISE NOTICE 'baseline audit OK — schema set exact (18 targets), table count == DDL (%), seed catalog floors met, super_admin full-grant (%/%)', expected, cnt2, cnt2;
+  RAISE NOTICE 'baseline audit OK — schema set exact (19 targets), table count == DDL (%), seed catalog floors met, super_admin full-grant (%/%)', expected, cnt2, cnt2;
 END $$;
