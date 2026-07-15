@@ -30,20 +30,29 @@ jobs:
   audit:
     name: audit
     runs-on: ubuntu-latest
+    env:
+      # 升级时改这一处（对照 https://github.com/google/osv-scanner/releases）。
+      OSV_SCANNER_VERSION: "1.9.2"
     steps:
       - uses: actions/checkout@v6
 
-      - uses: ./.github/actions/setup-node-pnpm
+      # 真 SCA：osv-scanner 扫 pnpm-lock 全依赖树 vs OSV 漏洞库，取代已被 npm 下线的
+      # pnpm quick-audit 端点（HTTP 410）。照 secret-scan 的 gitleaks 模式下 pinned
+      # 二进制，不用第三方 action（无 license/供应链顾虑）。install 阻断（URL/版本错会响）。
+      - name: Install osv-scanner
+        run: |
+          set -euo pipefail
+          curl -sSfL \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_${OSV_SCANNER_VERSION}_linux_amd64" \
+            -o osv-scanner
+          sudo install -m 0755 osv-scanner /usr/local/bin/osv-scanner
+          osv-scanner --version
 
-      # NOTE: npm retired the quick-audit endpoint `pnpm audit` calls (HTTP 410
-      # "endpoint is being retired, use the bulk advisory endpoint"), so this
-      # step now always errors regardless of the dependency tree. Kept
-      # non-blocking so it stops hard-failing every PR; a working SCA
-      # (osv-scanner / bulk advisory endpoint / Dependabot) replaces it in a
-      # follow-up. Until then this check carries no real signal.
-      - name: Dependency security audit
+      # 暂非阻断：先在 CI 日志暴露依赖漏洞基线；triage（或加仓库根 .osv-scanner.toml 忽略
+      # 不可修的传递漏洞）后，去掉 continue-on-error 收紧为真阻断门。取代原先空跑的假绿。
+      - name: OSV dependency scan
         continue-on-error: true
-        run: pnpm audit --audit-level=critical
+        run: osv-scanner --lockfile=pnpm-lock.yaml
 
   # ── 3. Check (type · lint · guardrail · boundaries) ───────────────────────
   check:
