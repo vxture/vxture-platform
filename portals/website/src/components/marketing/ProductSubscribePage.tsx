@@ -11,10 +11,11 @@
  * 档位 CTA 深链 console /subscribe（携带 product/intent/target_tier）。
  */
 
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, Icon } from "@vxture/design-system";
+import { Button, DataTable, Icon } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { Link } from "@/lib/i18n/navigation";
 import { buildConsoleSubscribeUrl } from "@/lib/console-entry";
 
@@ -59,6 +60,60 @@ const PLAN_GRID_COLS: Record<number, string> = {
   4: "xl:grid-cols-4",
   5: "xl:grid-cols-5",
 };
+
+/** 对比表行模型：分组标题行 + 功能行，扁平化后交给 DS DataTable 渲染。 */
+type CompareTableRow =
+  | { kind: "group"; title: string }
+  | ({ kind: "feature" } & ComparisonRow);
+
+/** 首列=功能名（分组行渲染分组标题），其余列=各档位取值。 */
+function buildCompareColumns(
+  product: SubscribableProduct,
+  featureHeader: string,
+): DataTableColumn<CompareTableRow>[] {
+  return [
+    {
+      id: "feature",
+      header: (
+        <span className="text-vx-gray-500 dark:text-vx-gray-400">
+          {featureHeader}
+        </span>
+      ),
+      className: "w-56",
+      cell: (row) =>
+        row.kind === "group" ? (
+          <span className="text-xs font-semibold uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400">
+            {row.title}
+          </span>
+        ) : (
+          <span className="text-vx-gray-700 dark:text-vx-gray-200">
+            {row.label}
+          </span>
+        ),
+    },
+    ...product.plans.map(
+      (plan, planIndex): DataTableColumn<CompareTableRow> => ({
+        id: plan.tier,
+        align: "center",
+        header: (
+          <span
+            className={
+              plan.highlight
+                ? "text-vx-brand-600 dark:text-vx-brand-300"
+                : "text-vx-gray-900 dark:text-vx-white"
+            }
+          >
+            {plan.name}
+          </span>
+        ),
+        cell: (row) =>
+          row.kind === "group" ? null : (
+            <ComparisonCell value={row.values[planIndex] ?? false} />
+          ),
+      }),
+    ),
+  ];
+}
 
 function ComparisonCell({ value }: { value: string | boolean }) {
   if (value === true) {
@@ -259,62 +314,26 @@ export default function ProductSubscribePage() {
               {t("compare.title")}
             </h2>
 
-            {/* ── 板块二：对比所有功能 ─────────────────────────────────── */}
-            <div className="mt-8 overflow-x-auto rounded-lg border border-vx-gray-200 bg-vx-white dark:border-vx-gray-800 dark:bg-vx-gray-900">
-              <table className="w-full min-w-[720px] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-vx-gray-200 dark:border-vx-gray-800">
-                    <th className="w-56 px-4 py-3 text-left font-semibold text-vx-gray-500 dark:text-vx-gray-400">
-                      {t("compare.feature")}
-                    </th>
-                    {product.plans.map((plan) => (
-                      <th
-                        key={plan.tier}
-                        className={`px-4 py-3 text-center font-semibold ${
-                          plan.highlight
-                            ? "text-vx-brand-600 dark:text-vx-brand-300"
-                            : "text-vx-gray-900 dark:text-vx-white"
-                        }`}
-                      >
-                        {plan.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.comparison.groups.map((group) => (
-                    <Fragment key={group.title}>
-                      <tr className="bg-vx-gray-50 dark:bg-vx-gray-800/50">
-                        <td
-                          colSpan={product.plans.length + 1}
-                          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400"
-                        >
-                          {group.title}
-                        </td>
-                      </tr>
-                      {group.rows.map((row) => (
-                        <tr
-                          key={row.label}
-                          className="border-t border-vx-gray-100 dark:border-vx-gray-800"
-                        >
-                          <td className="px-4 py-3 text-vx-gray-700 dark:text-vx-gray-200">
-                            {row.label}
-                          </td>
-                          {row.values.map((value, i) => (
-                            <td
-                              key={`${row.label}-${product.plans[i]?.tier ?? i}`}
-                              className="px-4 py-3 text-center"
-                            >
-                              <ComparisonCell value={value} />
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {/* ── 板块二：对比所有功能（DS DataTable，分组行扁平化为行模型） */}
+            <DataTable<CompareTableRow>
+              className="mt-8"
+              columns={buildCompareColumns(product, t("compare.feature"))}
+              rows={product.comparison.groups.flatMap((group) => [
+                { kind: "group" as const, title: group.title },
+                ...group.rows.map((row) => ({
+                  kind: "feature" as const,
+                  ...row,
+                })),
+              ])}
+              rowKey={(row) =>
+                row.kind === "group" ? `group:${row.title}` : row.label
+              }
+              getRowClassName={(row) =>
+                row.kind === "group"
+                  ? "bg-vx-gray-50 dark:bg-vx-gray-800/50"
+                  : undefined
+              }
+            />
           </div>
         </section>
       ) : null}
