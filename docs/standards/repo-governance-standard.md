@@ -1,13 +1,15 @@
 # Vxture 产品仓库治理规范（org 级整顿依据）
 
-> **适用**：org 下全部产品仓库（vxture-platform、umbra、arda、vx-Agent-\* 等）。
-> **用途**：各仓按本文整顿对齐到统一的**主干模式 + tag→环境 CD + 敏感信息治理**。
-> **状态**：vxture-platform 已按本规范落地（2026-07-15），是参照实现。
+> **适用**：org 下全部产品仓库（vxture-platform、vxture-arda、vxture-karda、vxture-varda、umbra 等）。
+> **用途**：**全栈产品仓的模板与要求**——新仓照此搭、旧仓照此整顿，统一到**主干模式 + tag→环境 CD +
+> 稳健 CD 构件 + 敏感信息/SCA 治理 + 数据层/护栏 + 统一骨架**。
+> **参照实现**：`vxture-platform`（治理/SCA/数据层，2026-07-15 起）+ `vxture-arda`（稳健 CD 构件 +
+> 仓库骨架/docs 分类范本）。
 > **配套**：迁移操作步骤见 [`../rebuild/README.md`](../rebuild/README.md)；密钥/边界细节见
 > [`security.md`](security.md)；CI 提效见 [`cicd-optimization-playbook.md`](cicd-optimization-playbook.md)；
 > 容器健康见 [`container-healthcheck-standard.md`](container-healthcheck-standard.md)。
 
-本文只定"每个仓必须对齐什么"，末尾附**整顿检查清单**。
+本文定"每个全栈仓必须具备/对齐什么"，末尾附**整顿检查清单**。
 
 ---
 
@@ -88,6 +90,27 @@
 - **生产写走人工审批门**：生产部署/DB 写由 owner 在 GitHub 环境 **Review deployments 点击批准**，
   不靠 agent/口头授权自审。
 
+**稳健 CD 构件（`vxture-arda` 范本，新仓/迁入照此搭，别现搓）：**
+
+- **复用复合动作 `.github/actions/tailnet-ssh-connect`**：一处封装 tailnet join + 写部署私钥/known_hosts，
+  deploy/rollback/seed 等所有 SSH 工作流共用（连接逻辑改一处即全改，不散落各 workflow）。
+- **`tailscale/github-action@v4` + `ping: <deploy-host>`**：加入 tailnet 后**探到直连再继续**，SSH 前
+  快速失败而非静默超时。（`@v3` 的 SHA256SUM 下载步无 retry，`pkgs.tailscale.com` 一次 5xx 即整步挂——
+  若暂用 v3，按本仓 build 段 `continue-on-error`+retry idiom 加 3 次退避兜住瞬时降级。探其是否恢复用
+  **服务端 fetch**，不受本机网络/GFW 影响。）
+- **原生 `ssh -i ~/.ssh/deploy_key` / `rsync -az --delete`（带 staging 目录）**做交付，不用未 pin 的第三方
+  ssh/scp action；staging 让 `--delete` 原子、不会中途留下半套 compose/config。
+- **拉不可变 `sha-<short>` tag**（确定性、可精确回滚），而非可变 release tag。
+- **`docker login` 带 `timeout` + 多端点 fallback**：内网 ACR→公网 ACR→GHCR 逐个试（海外/跨 VPC 主机
+  内网端点不可达时兜底；worker-02 非 Aliyun VPC 即靠此走公网）。
+- **bootstrap `.env`**：host 无 `<stack_root>/etc/.env` 则从环境 secret base64 推入 + `chmod 600`，
+  **已存在则不覆盖**（本机长驻 `.env`/secret/证书不被 CI 冲掉）。
+- **VERSION 溯源 + 交付校验**：部署 SHA 写 host `VERSION` 文件；`grep` 落地 compose 的关键服务名，
+  catch 陈旧 compose 交付回归。
+- **stack_root 约定** = `/srv/md0/<product>`（数据盘阵列；beta 可 `/srv/md1/<product>-beta`）。
+
+> 内存受限主机（2C2G）另按§上"逐服务 recreate"；数据盘充裕的独立业务箱可整栈 `pull+up -d`（arda/varda 于 worker-02）。
+
 ---
 
 ## 5. 镜像仓库 profile（双仓按地理）
@@ -99,13 +122,29 @@
 
 ---
 
-## 6. 环境与生产 DB 运维
+## 6. 环境、密钥与部署 bootstrap（一次性）
 
-- 三环境 `develop`/`beta`/`production`，tag 部署策略 + production 必审人。若要 `dev-*`/`beta-*` tag 也
-  能部署，**三环境都要配 `DEPLOY_*`**；否则明确"只做生产 tag 部署"（dev/beta 空 → 那些 tag 会失败）。
-- **生产 DB 运维走 `db-init.yml`**（workflow_dispatch）：`confirm=yes` + `expected_sha` 钉版本
-  （防浮动 ref 跑到旧 seed）+ `environment: production` 审批门 + tailnet + `DEPLOY_HOST_TAILNET`。
-  常规部署链**不跑 migration/seed**，DB 结构/数据变更是独立授权动作。
+**GitHub Environments 是 tag→env CD 的承接点**：每个部署目标一个环境（`develop`/`beta`/`production`/
+`<product>`），各自携带本目标的 `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`(+`_PASSPHRASE`/
+`_KNOWN_HOSTS`)/`DEPLOY_DIR`——同一 deploy job 靠 `environment: <route>` 路由到正确主机。
+
+- **环境保护必须配**：生产/产品环境**加 Required reviewers**——这才是 tag→env 安全的关键；
+  **零保护 = tag 一推就直接部署、不停等审批**（varda 首上线教训）。agent 有 repo admin 时**可用
+  `gh api --method PUT repos/{o}/{r}/environments/{env}`（body `{"reviewers":[{"type":"User","id":<uid>}]}`）
+  配 reviewers**，不必让 owner 点 UI 设置；但**部署本身的 Approve 仍是 owner 手点**（[[feedback_production_approval_gate]]，agent 只触发不自审）。
+- **`DEPLOY_DIR` 必须是精确的 stack 目录**（含 compose + `.env.*` 的**那一层**）——差一级（如
+  `/srv/md0/varda` vs `/srv/md0/varda/deploy`）→ 镜像能拉、但 compose 找不到 env_file 失败（varda 教训）。
+  workflow 用 `${DEPLOY_DIR:-<已验证默认>}` 回落。
+- **迁仓/新仓：secrets 不继承**——旧仓的 `DEPLOY_*`/ACR/tailscale secret **不会带到新仓**，必须在
+  新仓/新环境**重新创建全部**（varda "runbook 标已设、实际新仓为空、scp 报 no SSH key" 教训）。
+  迁移前先 SSH 目标主机核实 stack_root/env 文件/ACR 登录在位。
+- **ACR**：`registry`/`namespace` 为 repo `vars.*`（公开标识），`username`/`password` 为 secret；
+  **namespace 按实际 ACR 取**（如 `vx-platform`，非想当然的 `vxture`——build/deploy 都从
+  `vars.ALIYUN_ACR_NAMESPACE` 读，勿硬编码；错 namespace = pull access denied / repository does not exist）。
+
+**生产 DB 运维走 `db-init.yml`**（workflow_dispatch）：`confirm=yes` + `expected_sha` 钉版本
+（防浮动 ref 跑到旧 seed）+ `environment: production` 审批门 + tailnet + `DEPLOY_HOST_TAILNET`。
+常规部署链**不跑 migration/seed**，DB 结构/数据变更是独立授权动作。
 
 ---
 
@@ -150,14 +189,36 @@ required status check（发现新漏洞即 fail 拦合并）。
 
 ---
 
-## 10. 整顿检查清单
+## 10. 仓库骨架与文档分类（全栈产品仓模板）
+
+新建 / 迁入产品仓照 `vxture-arda`（+`vxture-karda`）骨架，避免每仓现搓：
+
+- **根配置**：`.editorconfig` · `.gitattributes` · `.npmrc` · `.gitignore` · `.gitleaks.toml` ·
+  `.env.example` · `CLAUDE.md`（AI 协作纲领）· `README.md` · `docker-compose.yml`。
+- **目录**：`.github/`（`workflows/` + `actions/` 复合动作）· `configs/` · `deploy/`
+  （compose / scripts / database / nginx / worker-NN…）· `docs/` · `scripts/` + 产品源码目录
+  （`portals/` / `services/` / `agent-server/` 等按形态）。
+- **`docs/` 编号分类**（可导航、可预期，跨仓一致）：
+  `10-specs` · `20-design` · `30-implementation` · `40-deployment` · `50-operations` ·
+  `60-workplan` · `70-reply` · `90-memory`。
+- **工程规范** `docs/standards/`：本规范 + `git-workflow` + `cicd-optimization-playbook` +
+  `testing`/`security`/`logging`/`container-healthcheck-standard` 等，随仓携带或链回 org 级权威。
+
+---
+
+## 11. 整顿检查清单
 
 - [ ] `main` 唯一长期分支；gitflow 三分支 / 晋升 / `PROMOTION_*` / `deploy-production.yml` 已清。
 - [ ] `main-ruleset` 已 apply（required checks + push 前 PR + 禁 force-push + 线性历史）。
 - [ ] `docker-build`/`deploy` = tag→env；raw tag、wait-for-build、registry 同区、逐服务 recreate 全到位。
+- [ ] **稳健 CD 构件**：`tailnet-ssh-connect` 复合动作 · `@v4+ping`（或 v3+retry 退避）· 原生 ssh+rsync staging ·
+      拉 sha-tag · login 多端点 fallback · bootstrap `.env` · VERSION 溯源。
 - [ ] 敏感信息四层检测（push protection + gitleaks CI + pre-commit + `.gitleaks.toml`）就位；仓私有；无开源残留。
 - [ ] 依赖 SCA 门：`audit` = osv-scanner（pinned 二进制 + `--config`）硬阻断 + required；基线已 triage 清零，残留经 `.osv-scanner.toml` 逐版本记名接受。
 - [ ] secret/variable **分类正确**、**层级正确**（org/repo/env）、无死值/重复。
-- [ ] 三环境 + production 审批门配置；生产 DB 走 `db-init` + expected_sha + 审批。
+- [ ] **每部署目标一个 Environment**，各带 `DEPLOY_*` 且 **`DEPLOY_DIR` 精确**；生产/产品环境 **Required reviewers 已配**。
+- [ ] **迁仓已在新仓重建全部 secrets**（不继承）；ACR `namespace` 从 `vars` 取（非硬编码）；迁移前 SSH 核实目标主机 stack_root/env/ACR 登录在位。
+- [ ] 生产 DB 走 `db-init` + `expected_sha` + 审批；常规部署链不跑 migration/seed。
 - [ ] （有 DB）DDL 单一权威 + @shared 值域 + 最小权限/列锁 + 活库增量幂等 + 护栏。
 - [ ] 部署 profile 选对（domestic ACR+tailnet / overseas GHCR+公网）。
+- [ ] **仓库骨架 + `docs/` 编号分类**对齐模板。
