@@ -51,6 +51,7 @@
     "lint:seed": "node scripts/guardrails/check-seed-idempotency.mjs",
     "lint:column-locks": "node scripts/guardrails/check-column-locks.mjs",
     "lint:catalog-domains": "node scripts/guardrails/check-catalog-domains.mjs",
+    "lint:docs-numbering": "node scripts/guardrails/check-docs-numbering.mjs",
     "lint:boundaries": "depcruise portals agent-studio agent-server business bff services packages/core packages/shared packages/ai packages/design packages/platform --config .depcruiserc.cjs",
     "lint:fix": "pnpm --recursive --if-present lint:fix",
     "type-check": "pnpm --filter @vxture/website type-check",
