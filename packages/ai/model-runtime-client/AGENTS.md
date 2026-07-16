@@ -8,7 +8,7 @@
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | 1. 全局规则     | 根目录 `AGENTS.md`（G1–G6）                                                                                                            |
 | 2. 任务路由     | [`docs/90-memory/agent.md`](../../../docs/90-memory/10-agent.md)                                                                       |
-| 3. 层架构规范   | [`docs/30-design/architecture/06-model-runtime-client.md`](../../../docs/30-design/architecture/06-model-runtime-client.md)            |
+| 3. 层架构规范   | [`docs/30-design/architecture/06-model-runtime-client.md`](../../../docs/40-implementation/packages/ai/10-model-runtime-client.md)     |
 | 4. 包实现上下文 | [`docs/40-implementation/packages/ai/model-runtime-client.md`](../../../docs/40-implementation/packages/ai/10-model-runtime-client.md) |
 
 > 职责：Model Platform HTTP 客户端封装（LLM / Embedding / RAG / Workflow 类型）

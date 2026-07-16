@@ -7,8 +7,8 @@
 | 步骤            | 文档                                                                                                    |
 | --------------- | ------------------------------------------------------------------------------------------------------- |
 | 1. 全局规则     | 根目录 `AGENTS.md`（G1–G6）                                                                             |
-| 2. 任务路由     | [`docs/90-memory/agent.md`](../../../docs/90-memory/agent.md)                                           |
-| 3. 层架构规范   | [`docs/30-design/architecture/05-bff-layer.md`](../../../docs/30-design/architecture/05-bff-layer.md)   |
-| 4. 包实现上下文 | [`docs/40-implementation/packages/bff/admin.md`](../../../docs/40-implementation/packages/bff/admin.md) |
+| 2. 任务路由     | [`docs/90-memory/agent.md`](../../docs/90-memory/10-agent.md)                                           |
+| 3. 层架构规范   | [`docs/30-design/architecture/05-bff-layer.md`](../../docs/30-design/architecture/05-bff-layer.md)      |
+| 4. 包实现上下文 | [`docs/40-implementation/packages/bff/admin.md`](../../docs/40-implementation/packages/bff/10-admin.md) |
 
 > 职责：平台运营后台 BFF，委托 auth-bff 签发 JWT
