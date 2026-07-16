@@ -134,11 +134,7 @@ const SolutionCard = memo(function SolutionCard({
             <div className="flex flex-col gap-4 mt-auto mb-4">
               {/* 了解更多 */}
               <div className="flex justify-start items-center ml-12">
-                <Button
-                  asChild
-                  variant="default"
-                  className="rounded-lg px-5 py-2 h-auto w-max bg-vx-brand-500 hover:bg-vx-brand-600 dark:bg-vx-brand-500/80 dark:hover:bg-vx-brand-500"
-                >
+                <Button asChild variant="default" className="w-max px-5">
                   <a href={solution.cta.href}>{uiTexts.viewDetails}</a>
                 </Button>
               </div>

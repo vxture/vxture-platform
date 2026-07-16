@@ -104,7 +104,8 @@
     "valueLabel": "业务价值",
     "badges": {
       "trial": "可试用",
-      "active": "已开通"
+      "active": "已开通",
+      "developing": "开发中"
     },
     "actions": {
       "subscribe": "订阅",
@@ -173,9 +174,18 @@
     "comingSoonHint": "该产品正在建设中，敬请期待。",
     "back": "返回产品总览"
   },
-  "pricing": {
-    "eyebrow": "套餐定价",
-    "title": "智能数据治理平台 · Arda",
+  "subscription": {
+    "eyebrow": "产品订阅",
+    "title": "选择适合你的套餐",
+    "description": "统一的订阅入口，覆盖全部产品、套餐与解决方案；选定档位后前往控制台完成开通。",
+    "pick": {
+      "title": "选择套餐与席位",
+      "description": "按月或按年订阅，档位随团队规模灵活升级。"
+    },
+    "compare": {
+      "title": "对比所有功能",
+      "feature": "功能"
+    },
     "cycle": {
       "monthly": "月付",
       "yearly": "年付"
@@ -184,67 +194,137 @@
       "monthly": "每月",
       "yearly": "每年"
     },
-    "contact": "联系销售",
-    "contactSubject": "Arda 企业版咨询",
+    "recommended": "推荐",
     "subscribe": "订阅",
-    "plans": [
-      {
-        "tier": "free",
-        "name": "免费版",
-        "monthly": "¥0",
-        "yearly": "¥0",
-        "features": ["1 席位", "50 数据集", "基础数据治理", "1 GiB 存储"]
-      },
-      {
-        "tier": "starter",
-        "name": "入门版",
-        "monthly": "¥199",
-        "yearly": "¥1,999",
-        "save": "约 8.4 折",
-        "features": [
-          "1 席位",
-          "500 数据集",
-          "varda 助手（只读）",
-          "100 AI 积分/月",
-          "10 GiB 存储"
-        ]
-      },
-      {
-        "tier": "pro",
-        "name": "专业版",
-        "monthly": "¥499",
-        "yearly": "¥4,999",
-        "save": "约 8.3 折",
-        "highlight": true,
-        "features": [
-          "3 席位",
-          "5,000 数据集",
-          "hourly 同步",
-          "1,000 AI 积分/月",
-          "100 GiB 存储"
-        ]
-      },
-      {
-        "tier": "business",
-        "name": "商业版",
-        "monthly": "¥1,999",
-        "yearly": "¥19,999",
-        "save": "约 8.3 折 · 含 5 席位",
-        "features": [
-          "5 席位",
-          "不限数据集",
-          "realtime 同步 + varda 可写",
-          "10,000 AI 积分/月",
-          "1 TiB 存储"
-        ]
-      },
-      {
-        "tier": "enterprise",
-        "name": "企业版",
-        "monthly": null,
-        "yearly": null,
-        "features": ["不限席位", "私有化部署", "专属支持与 SLA", "定制配额"]
+    "contact": "联系销售",
+    "back": "返回产品中心",
+    "unavailable": "该产品暂未开放线上订阅，可联系销售获取方案。",
+    "products": {
+      "arda": {
+        "name": "Arda 智能数据治理平台",
+        "contactSubject": "Arda 企业版咨询",
+        "plans": [
+          {
+            "tier": "free",
+            "name": "免费版",
+            "monthly": "¥0",
+            "yearly": "¥0",
+            "seats": "1 席位",
+            "features": ["50 数据集", "基础数据治理", "1 GiB 存储"]
+          },
+          {
+            "tier": "starter",
+            "name": "入门版",
+            "monthly": "¥199",
+            "yearly": "¥1,999",
+            "save": "约 8.4 折",
+            "seats": "1 席位",
+            "features": [
+              "500 数据集",
+              "varda 助手（只读）",
+              "100 AI 积分/月",
+              "10 GiB 存储"
+            ]
+          },
+          {
+            "tier": "pro",
+            "name": "专业版",
+            "monthly": "¥499",
+            "yearly": "¥4,999",
+            "save": "约 8.3 折",
+            "highlight": true,
+            "seats": "3 席位",
+            "features": [
+              "5,000 数据集",
+              "hourly 同步",
+              "1,000 AI 积分/月",
+              "100 GiB 存储"
+            ]
+          },
+          {
+            "tier": "business",
+            "name": "商业版",
+            "monthly": "¥1,999",
+            "yearly": "¥19,999",
+            "save": "约 8.3 折",
+            "seats": "5 席位",
+            "features": [
+              "不限数据集",
+              "realtime 同步 + varda 可写",
+              "10,000 AI 积分/月",
+              "1 TiB 存储"
+            ]
+          },
+          {
+            "tier": "enterprise",
+            "name": "企业版",
+            "monthly": null,
+            "yearly": null,
+            "seats": "不限席位",
+            "features": ["私有化部署", "专属支持与 SLA", "定制配额"]
+          }
+        ],
+        "comparison": {
+          "groups": [
+            {
+              "title": "核心配额",
+              "rows": [
+                {
+                  "label": "席位",
+                  "values": ["1", "1", "3", "5", "不限"]
+                },
+                {
+                  "label": "数据集",
+                  "values": ["50", "500", "5,000", "不限", "定制"]
+                },
+                {
+                  "label": "存储空间",
+                  "values": ["1 GiB", "10 GiB", "100 GiB", "1 TiB", "定制"]
+                },
+                {
+                  "label": "AI 积分 / 月",
+                  "values": [false, "100", "1,000", "10,000", "定制"]
+                }
+              ]
+            },
+            {
+              "title": "数据治理与同步",
+              "rows": [
+                {
+                  "label": "基础数据治理",
+                  "values": [true, true, true, true, true]
+                },
+                {
+                  "label": "定时同步",
+                  "values": [false, false, "Hourly", "Realtime", "定制"]
+                }
+              ]
+            },
+            {
+              "title": "智能助手",
+              "rows": [
+                {
+                  "label": "varda 助手",
+                  "values": [false, "只读", "只读", "可写", "可写"]
+                }
+              ]
+            },
+            {
+              "title": "部署与支持",
+              "rows": [
+                {
+                  "label": "私有化部署",
+                  "values": [false, false, false, false, true]
+                },
+                {
+                  "label": "专属支持与 SLA",
+                  "values": [false, false, false, false, true]
+                }
+              ]
+            }
+          ]
+        }
       }
-    ]
+    }
   }
 }

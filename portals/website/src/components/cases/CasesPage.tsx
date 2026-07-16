@@ -191,7 +191,7 @@ export default function CasesPage() {
                 setSelectedCategory("all");
                 setSearchTerm("");
               }}
-              className="mt-4 px-6 py-2 bg-vx-brand-600 text-vx-white rounded-lg hover:bg-vx-brand-700 transition-colors"
+              className="mt-4"
             >
               {t(CASES_DATA.ui.clearFiltersKey)}
             </Button>

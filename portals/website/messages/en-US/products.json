@@ -120,7 +120,8 @@
     "valueLabel": "Business value",
     "badges": {
       "trial": "Free trial",
-      "active": "Active"
+      "active": "Active",
+      "developing": "In development"
     },
     "actions": {
       "subscribe": "Subscribe",
@@ -189,9 +190,18 @@
     "comingSoonHint": "This product is under construction — stay tuned.",
     "back": "Back to products"
   },
-  "pricing": {
-    "eyebrow": "Pricing",
-    "title": "Arda · Data Intelligence Platform",
+  "subscription": {
+    "eyebrow": "Subscription",
+    "title": "Pick the plan that fits",
+    "description": "One subscription entry for every product, plan and solution — pick a tier and complete checkout in the console.",
+    "pick": {
+      "title": "Pick your plan, choose your seats",
+      "description": "Subscribe monthly or yearly, and upgrade tiers as your team grows."
+    },
+    "compare": {
+      "title": "Compare all features",
+      "feature": "Feature"
+    },
     "cycle": {
       "monthly": "Monthly",
       "yearly": "Yearly"
@@ -200,77 +210,141 @@
       "monthly": "per month",
       "yearly": "per year"
     },
-    "contact": "Contact sales",
-    "contactSubject": "Arda Enterprise inquiry",
+    "recommended": "Recommended",
     "subscribe": "Subscribe",
-    "plans": [
-      {
-        "tier": "free",
-        "name": "Free",
-        "monthly": "¥0",
-        "yearly": "¥0",
-        "features": [
-          "1 seat",
-          "50 datasets",
-          "Basic governance",
-          "1 GiB storage"
-        ]
-      },
-      {
-        "tier": "starter",
-        "name": "Starter",
-        "monthly": "¥199",
-        "yearly": "¥1,999",
-        "save": "~2 months free",
-        "features": [
-          "1 seat",
-          "500 datasets",
-          "varda assistant (read-only)",
-          "100 AI credits/mo",
-          "10 GiB storage"
-        ]
-      },
-      {
-        "tier": "pro",
-        "name": "Pro",
-        "monthly": "¥499",
-        "yearly": "¥4,999",
-        "save": "~2 months free",
-        "highlight": true,
-        "features": [
-          "3 seats",
-          "5,000 datasets",
-          "Hourly sync",
-          "1,000 AI credits/mo",
-          "100 GiB storage"
-        ]
-      },
-      {
-        "tier": "business",
-        "name": "Business",
-        "monthly": "¥1,999",
-        "yearly": "¥19,999",
-        "save": "~2 months free · 5 seats",
-        "features": [
-          "5 seats",
-          "Unlimited datasets",
-          "Realtime sync + varda write",
-          "10,000 AI credits/mo",
-          "1 TiB storage"
-        ]
-      },
-      {
-        "tier": "enterprise",
-        "name": "Enterprise",
-        "monthly": null,
-        "yearly": null,
-        "features": [
-          "Unlimited seats",
-          "On-prem deployment",
-          "Dedicated support & SLA",
-          "Custom quotas"
-        ]
+    "contact": "Contact sales",
+    "back": "Back to products",
+    "unavailable": "Online subscription for this product is not open yet — contact sales for a quote.",
+    "products": {
+      "arda": {
+        "name": "Arda Data Intelligence Platform",
+        "contactSubject": "Arda Enterprise inquiry",
+        "plans": [
+          {
+            "tier": "free",
+            "name": "Free",
+            "monthly": "¥0",
+            "yearly": "¥0",
+            "seats": "1 seat",
+            "features": ["50 datasets", "Basic governance", "1 GiB storage"]
+          },
+          {
+            "tier": "starter",
+            "name": "Starter",
+            "monthly": "¥199",
+            "yearly": "¥1,999",
+            "save": "~2 months free",
+            "seats": "1 seat",
+            "features": [
+              "500 datasets",
+              "varda assistant (read-only)",
+              "100 AI credits/mo",
+              "10 GiB storage"
+            ]
+          },
+          {
+            "tier": "pro",
+            "name": "Pro",
+            "monthly": "¥499",
+            "yearly": "¥4,999",
+            "save": "~2 months free",
+            "highlight": true,
+            "seats": "3 seats",
+            "features": [
+              "5,000 datasets",
+              "Hourly sync",
+              "1,000 AI credits/mo",
+              "100 GiB storage"
+            ]
+          },
+          {
+            "tier": "business",
+            "name": "Business",
+            "monthly": "¥1,999",
+            "yearly": "¥19,999",
+            "save": "~2 months free",
+            "seats": "5 seats",
+            "features": [
+              "Unlimited datasets",
+              "Realtime sync + varda write",
+              "10,000 AI credits/mo",
+              "1 TiB storage"
+            ]
+          },
+          {
+            "tier": "enterprise",
+            "name": "Enterprise",
+            "monthly": null,
+            "yearly": null,
+            "seats": "Unlimited seats",
+            "features": [
+              "On-prem deployment",
+              "Dedicated support & SLA",
+              "Custom quotas"
+            ]
+          }
+        ],
+        "comparison": {
+          "groups": [
+            {
+              "title": "Core quotas",
+              "rows": [
+                {
+                  "label": "Seats",
+                  "values": ["1", "1", "3", "5", "Unlimited"]
+                },
+                {
+                  "label": "Datasets",
+                  "values": ["50", "500", "5,000", "Unlimited", "Custom"]
+                },
+                {
+                  "label": "Storage",
+                  "values": ["1 GiB", "10 GiB", "100 GiB", "1 TiB", "Custom"]
+                },
+                {
+                  "label": "AI credits / mo",
+                  "values": [false, "100", "1,000", "10,000", "Custom"]
+                }
+              ]
+            },
+            {
+              "title": "Governance & sync",
+              "rows": [
+                {
+                  "label": "Basic governance",
+                  "values": [true, true, true, true, true]
+                },
+                {
+                  "label": "Scheduled sync",
+                  "values": [false, false, "Hourly", "Realtime", "Custom"]
+                }
+              ]
+            },
+            {
+              "title": "AI assistant",
+              "rows": [
+                {
+                  "label": "varda assistant",
+                  "values": [false, "Read-only", "Read-only", "Write", "Write"]
+                }
+              ]
+            },
+            {
+              "title": "Deployment & support",
+              "rows": [
+                {
+                  "label": "On-prem deployment",
+                  "values": [false, false, false, false, true]
+                },
+                {
+                  "label": "Dedicated support & SLA",
+                  "values": [false, false, false, false, true]
+                }
+              ]
+            }
+          ]
+        }
       }
-    ]
+    }
   }
 }
