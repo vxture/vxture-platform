@@ -34,6 +34,9 @@
 | `90-memory`         | 仓内 AI handoff                        | agent.md、handoff 约定                         |
 
 > 未用满时空号保留（如无 workplan 也占住 `70`，勿挪用）。standards 居 `10`（基础层，governs 一切），非末尾。
+> **`95-readme`**（2026-07-17）：内部包 README 归集区（package 只留 `AGENTS.md` 入口，内容收 docs）；
+> 属**过渡 staging**，后续与 `40-implementation/packages/` 合并去重后可回收。已发布包（shared/design-system）
+> README 保留在 package（作 npm registry 页面）。
 
 ---
 
