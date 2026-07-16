@@ -127,11 +127,16 @@ Removes the OOM failure class entirely.
 
 ## 7. Host / networking gotchas (worker-01)
 
-- **Tailscale ↔ Aliyun 100.100/16 overlap**: Tailscale's `ts-input -s 100.64.0.0/10
-! -i tailscale0 -j DROP` drops replies from Aliyun's internal `100.100.0.0/16`
-  (metadata, CloudMonitor). Carved out + persisted via
-  `/usr/local/sbin/aliyun-cms-netfilter-fix.sh` + a `tailscaled` `ExecStartPost`
-  drop-in (ACCEPT `100.100.0.0/16` + `100.103.0.0/16`). Keep this if re-imaging.
+- **Tailscale ↔ Aliyun CGNAT (100.64/10) overlap**: Tailscale's `ts-input -s
+100.64.0.0/10 ! -i tailscale0 -j DROP` drops replies from Aliyun internal
+  services that also live in the CGNAT range: `100.100.0.0/16` /
+  `100.103.0.0/16` (metadata, CloudMonitor) and `100.118.0.0/16` (**OSS
+  internal VIPs** — ACR VPC-endpoint image pulls fetch blobs from OSS, so
+  without this carve-out `docker pull` dies with `dial tcp 100.118.x.x:80: i/o
+timeout` while ACR login still succeeds; hit on the v0.19.0 deploy,
+  2026-07-16). All three carved out + persisted via
+  `/usr/local/sbin/aliyun-cms-netfilter-fix.sh` + a `tailscaled`
+  `ExecStartPost` drop-in. Keep this if re-imaging.
 - **prisma version**: the deploy pins `prisma@6.0.0`, where `multiSchema` is a
   preview feature — the generator MUST keep `previewFeatures = ["multiSchema"]`
   (a newer local prisma has it GA and masks the requirement).
