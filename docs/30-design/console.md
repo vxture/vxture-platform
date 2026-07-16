@@ -1,7 +1,7 @@
 # Console UI 设计规范
 
 > 跨包能力域设计索引：[`docs/30-design/00-index.md`](./00-index.md)
-> 包实现上下文：[`docs/40-implementation/packages/portals/console.md`](../40-implementation/packages/portals/console.md)
+> 包实现上下文：[`docs/40-implementation/packages/portals/console.md`](../40-implementation/packages/portals/20-console.md)
 
 ---
 

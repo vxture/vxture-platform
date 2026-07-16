@@ -24,7 +24,7 @@ Vxture 是基于 **pnpm workspace monorepo** 的企业 SaaS 平台（TypeScript 
 
 ## 当前实施状态
 
-> 详细进度见 → [`docs/00-meta/status.md`](../00-meta/status.md)
+> 详细进度见 → [`docs/00-meta/status.md`](../00-meta/30-status.md)
 
 | 模块                      | 状态                                |
 | ------------------------- | ----------------------------------- |
@@ -63,12 +63,12 @@ docs/
 ## 🔴 高优先修复项（接任务前必看）
 
 以下债务存在**安全或启动静默失效风险**，优先于常规功能开发处理。
-详情见 → [`docs/60-operations/tech-debt.md`](../60-operations/tech-debt.md)
+详情见 → [`docs/60-operations/tech-debt.md`](../60-operations/10-tech-debt.md)
 
-| ID     | 位置                                         | 风险                                                         | 详情链接                                                                                                |
-| ------ | -------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| TD-012 | `bff/auth-bff/src/providers/` OAuth provider | OAuth 凭据未入 schema，缺失时空字符串静默通过                | [→ TD-012](../60-operations/tech-debt.md#td-012--bff-oauth-provider-凭据未入-core-config-schema)        |
-| TD-013 | `bff/auth-bff/src/routers/` 多处             | 跨服务 URL / cookie domain 未入 schema，配置错误无 fail-fast | [→ TD-013](../60-operations/tech-debt.md#td-013--bff-跨服务-url--cookie-domain-未入-core-config-schema) |
+| ID     | 位置                                         | 风险                                                         | 详情链接                                                                                                   |
+| ------ | -------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| TD-012 | `bff/auth-bff/src/providers/` OAuth provider | OAuth 凭据未入 schema，缺失时空字符串静默通过                | [→ TD-012](../60-operations/10-tech-debt.md#td-012--bff-oauth-provider-凭据未入-core-config-schema)        |
+| TD-013 | `bff/auth-bff/src/routers/` 多处             | 跨服务 URL / cookie domain 未入 schema，配置错误无 fail-fast | [→ TD-013](../60-operations/10-tech-debt.md#td-013--bff-跨服务-url--cookie-domain-未入-core-config-schema) |
 
 ---
 

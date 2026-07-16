@@ -16,7 +16,7 @@
 
 ## FB-002 认证标签三态 UI（已实名认证 > 手机已验证 > 未认证）
 
-- **登记**：2026-07-06（owner，首用户"已认证"语义澄清）· **设计稿已出** → [`console/verification-badge-design.md`](./console/verification-badge-design.md)
+- **登记**：2026-07-06（owner，首用户"已认证"语义澄清）· **设计稿已出** → [`console/verification-badge-design.md`](./console/10-verification-badge-design.md)
 - **意图**：用户名后标签(tag)**只有三态**：`已实名认证`（KYC 通过）> `手机已验证`（phone_verified_at 有值）> `未认证`。**不关联邮箱**。UI 载体 = **用户名后 tag**（owner 澄清:当前"已认证"是名后标签,非徽章;徽章暂未放认证态）。
 - **设计要点**（详见设计稿）：后端派生枚举 `verificationTier: real_name|phone_verified|none`(纯读 kyc+phone,无 schema 改动);前端标签按枚举渲染。**顺带暴露两个既有问题**(归 FB-005):①等级名前后端分叉(DB `Starter/Bronze/…` vs 前端硬编码 `普通用户/认证用户/…`);②等级 2 硬编码名"认证用户"与认证语义撞车,建议避开"认证"字样。
 - **状态**：设计稿 v0.1 待 owner 审 → 审定后进实现(无 DDL 变更,不需 reset 窗口)。

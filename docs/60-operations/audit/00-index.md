@@ -6,21 +6,21 @@
 
 ## 审计清单
 
-| 文件                                       | 内容                                                                 |
-| ------------------------------------------ | -------------------------------------------------------------------- |
-| [`checklist-core.md`](./checklist-core.md) | Core 层包检查清单（依赖边界 / 导出结构 / NestJS 规范 / TS 严格模式） |
-| [`checklist-ds.md`](./checklist-ds.md)     | Design System 合规审计记录（存量债务 / 已收敛基线）                  |
+| 文件                                          | 内容                                                                 |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| [`checklist-core.md`](./10-checklist-core.md) | Core 层包检查清单（依赖边界 / 导出结构 / NestJS 规范 / TS 严格模式） |
+| [`checklist-ds.md`](./20-checklist-ds.md)     | Design System 合规审计记录（存量债务 / 已收敛基线）                  |
 
 ## 操作文档
 
-| 文件                                         | 内容                  |
-| -------------------------------------------- | --------------------- |
-| [`run.md`](./run.md)                         | 如何运行审计          |
-| [`scope.md`](./scope.md)                     | 审计范围定义          |
-| [`prompt.md`](./prompt.md)                   | 审计用 Prompt 模板    |
-| [`ci-gate.md`](./ci-gate.md)                 | CI 门控集成           |
-| [`report-template.md`](./report-template.md) | 审计报告模板          |
-| [`severity.md`](./severity.md)               | 问题严重级别（P0-P3） |
+| 文件                                            | 内容                  |
+| ----------------------------------------------- | --------------------- |
+| [`run.md`](./60-run.md)                         | 如何运行审计          |
+| [`scope.md`](./70-scope.md)                     | 审计范围定义          |
+| [`prompt.md`](./40-prompt.md)                   | 审计用 Prompt 模板    |
+| [`ci-gate.md`](./30-ci-gate.md)                 | CI 门控集成           |
+| [`report-template.md`](./50-report-template.md) | 审计报告模板          |
+| [`severity.md`](./80-severity.md)               | 问题严重级别（P0-P3） |
 
 ## 规则检查文件（rules/）
 

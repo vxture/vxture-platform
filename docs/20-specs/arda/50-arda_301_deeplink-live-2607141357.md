@@ -1,7 +1,7 @@
 # 平台通知：console 转化深链落地页已上产，请端到端验证（arda_301_deeplink-live）
 
 > 时间标记：**2607141357**（YYMMDDHHMM）· 方向：**vxture 平台（线 A）→ arda（线 B）**
-> 性质：**上产通知 + 联测请求**（对接定型后的一次性通知，非契约变更；契约以 [`arda_200`](./arda_200_interface.md) / [`arda_300`](./arda_300_integration-final.md) 为准）。
+> 性质：**上产通知 + 联测请求**（对接定型后的一次性通知，非契约变更；契约以 [`arda_200`](./30-arda_200_interface.md) / [`arda_300`](./40-arda_300_integration-final.md) 为准）。
 
 ---
 
@@ -17,7 +17,7 @@ GET https://console.vxture.com/subscribe?product=arda&intent={upgrade|renew|addo
 
 - `product` / `intent` 必带；`target_tier`（升级目标档，console 预选）/ `metric`（addon 场景，哪个额度用尽）选带；
 - **`workspace_id` 由 console 会话的活跃租户解析，产品不带也不应带**；
-- 权威 = [`product_200`](../../30-design/product_200_integration.md) §3.2；产品侧义务 = [`arda_300`](./arda_300_integration-final.md) §转化出口。
+- 权威 = [`product_200`](../../30-design/product_200_integration.md) §3.2；产品侧义务 = [`arda_300`](./40-arda_300_integration-final.md) §转化出口。
 
 ## 3. 落地页行为（联测预期）
 

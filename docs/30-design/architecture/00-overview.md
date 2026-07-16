@@ -448,13 +448,13 @@ are kept apart by design. Different governance, deployment cadence, and dependen
 | `06-agent-server.md`       | Agent Server 层架构                     |
 | `07-tech-stack.md`         | 技术栈选型与版本基线                    |
 
-包级实现约束见 `docs/40-implementation/packages/`，其中 Design System 说明见 [`docs/40-implementation/packages/design/design-system.md`](../../40-implementation/packages/design/design-system.md)。编码和 TypeScript 规范见 `docs/40-implementation/ai/`，能力域设计见 `docs/30-design/`，工程合规审计见 `docs/60-operations/audit/`。
+包级实现约束见 `docs/40-implementation/packages/`，其中 Design System 说明见 [`docs/40-implementation/packages/design/design-system.md`](../../40-implementation/packages/design/10-design-system.md)。编码和 TypeScript 规范见 `docs/40-implementation/ai/`，能力域设计见 `docs/30-design/`，工程合规审计见 `docs/60-operations/audit/`。
 
 ---
 
 ## Appendix: Portal Internal Architecture Notes
 
-portals/website v2.0 架构要点（Content Registry、路由分组、Middleware 策略）见 [`docs/40-implementation/packages/portals/website.md`](../../40-implementation/packages/portals/website.md)。
+portals/website v2.0 架构要点（Content Registry、路由分组、Middleware 策略）见 [`docs/40-implementation/packages/portals/website.md`](../../40-implementation/packages/portals/30-website.md)。
 
 ---
 

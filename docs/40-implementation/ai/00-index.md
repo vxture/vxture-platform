@@ -13,7 +13,7 @@
 | [`03-coding-comments.md`](./03-coding-comments.md)             | 文件头模板 / JSDoc 格式 / 分区注释 / 中文注释要求                        | 必读         |
 | [`04-coding-typescript.md`](./04-coding-typescript.md)         | TypeScript 配置标准 / tsconfig 继承结构 / 严格模式策略                   | 必读         |
 | [`05-bff-data-access-guide.md`](./05-bff-data-access-guide.md) | BFF 层数据访问与前端对接：Pool 注入 / req.user / auth 委托 / Schema 速查 | BFF 任务必读 |
-| [`port-allocation.md`](./port-allocation.md)                   | 全局端口表 / 3NNX 规则 / 新服务登记流程                                  | 按需         |
+| [`port-allocation.md`](./10-port-allocation.md)                | 全局端口表 / 3NNX 规则 / 新服务登记流程                                  | 按需         |
 
 ## 工程合规审计
 

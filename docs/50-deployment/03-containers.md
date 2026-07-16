@@ -3,7 +3,7 @@
 > Dockerfile 模板、构建顺序、服务调用拓扑、资源规格
 > 更新：2026-06-10
 
-相关文档：[`00-overview.md`](./00-overview.md) · [`04-services.md`](./04-services.md) · [`08-code-environment-map.md`](./08-code-environment-map.md) · [`../ai/port-allocation.md`](../40-implementation/ai/port-allocation.md)
+相关文档：[`00-overview.md`](./00-overview.md) · [`04-services.md`](./04-services.md) · [`08-code-environment-map.md`](./08-code-environment-map.md) · [`../ai/port-allocation.md`](../40-implementation/ai/10-port-allocation.md)
 
 ---
 

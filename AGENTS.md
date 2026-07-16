@@ -2,7 +2,7 @@
 
 > **使用说明**：这是根目录指令文件，适用于所有 AI 编码工具（Claude / Cursor / Copilot 等）。
 > 所有 AI 操作必须先读完本文件，
-> 再读 [`docs/90-memory/agent.md`](docs/90-memory/agent.md)（任务路由入口），
+> 再读 [`docs/90-memory/agent.md`](docs/90-memory/10-agent.md)（任务路由入口），
 > 再读取目标包目录下的子级 `AGENTS.md`（导航指针）。
 > 子级文件只保留导航指针，详细上下文在 `docs/40-implementation/packages/` 体系。根文件规则**全局生效**。
 

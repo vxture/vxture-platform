@@ -2,7 +2,7 @@
 
 > 更新：2026-05-14
 > 架构层：`Infrastructure`（见 `docs/30-design/architecture/03-core-layer.md`）
-> 依赖网关：[`docs/40-implementation/packages/services/model-platform.md`](../services/model-platform.md)
+> 依赖网关：[`docs/40-implementation/packages/services/model-platform.md`](../services/40-model-platform.md)
 
 ---
 

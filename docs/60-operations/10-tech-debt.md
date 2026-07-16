@@ -550,7 +550,7 @@
 
 **解决方向**：需产品先定义具体字段/工作流（如：风险记录是否需要 reviewer_id+reviewed_at 标记模式？合规事件的处理状态机有哪些状态？维护窗口 CRUD 的权限门槛与是否需要提前通知）。有明确定义后，可参照 `platform-admins.router.ts` 已有模式（能力门控 + 审计日志 + 视情况 `@RequireStepUp`）实施，工作量不大，主要是设计前置。**不投机实现**——按项目"先有依据才动手"纪律，无产品定义前不写字段/工作流。
 
-**进展**：2026-07-05 设计稿已成 → [`docs/20-specs/platform/admin/governance-write-paths.md`](../20-specs/platform/admin/governance-write-paths.md)（三表工作流/状态机、端点清单、权限映射含新增 `tenant:risk.*`/`compliance:event.*` 四码、GQ1–GQ8 默认决策），owner 审定（v1.1，修订 4 处）后按 G1/G2/G3 实施。
+**进展**：2026-07-05 设计稿已成 → [`docs/20-specs/platform/admin/governance-write-paths.md`](../20-specs/platform/admin/30-governance-write-paths.md)（三表工作流/状态机、端点清单、权限映射含新增 `tenant:risk.*`/`compliance:event.*` 四码、GQ1–GQ8 默认决策），owner 审定（v1.1，修订 4 处）后按 G1/G2/G3 实施。
 
 **销号（2026-07-05，全链上线 —— PR #615 合 develop=`30f01951` → 活库 seed 补投 → beta→main 部署）**：
 
@@ -923,7 +923,7 @@
 | **登记日期** | 2026-07-16                                                                                  |
 | **来源**     | GitHub Actions workflow 审查（本轮）；`ci.yml` build/test 变更门控 + `classify-changes.mjs` |
 
-**描述**：本轮把 CI 的 build/test 从无条件全量改为**变更门控**（`classify-changes.mjs` 按 pnpm workspace 传递依赖算出 `affected_images`，build/test 只处理受影响组件），显著降耗；但该方法论（allow-list 默认 SKIP 安全性、传递依赖推导、docs-only 轻量路径、affected_images 复用 docker-build 同款规则）尚未沉淀进 [`docs/10-standards/cicd-optimization-playbook.md`](../10-standards/cicd-optimization-playbook.md)，其它仓无法照做。
+**描述**：本轮把 CI 的 build/test 从无条件全量改为**变更门控**（`classify-changes.mjs` 按 pnpm workspace 传递依赖算出 `affected_images`，build/test 只处理受影响组件），显著降耗；但该方法论（allow-list 默认 SKIP 安全性、传递依赖推导、docs-only 轻量路径、affected_images 复用 docker-build 同款规则）尚未沉淀进 [`docs/10-standards/cicd-optimization-playbook.md`](../10-standards/010-cicd-optimization-playbook.md)，其它仓无法照做。
 
 **影响**：可迁移的提效方法论停留在本仓实现里，[[reference_repo_governance_standard]] 的"CI 提效"一环缺文档支撑，跨仓复用需逐仓逆向。属文档缺口。
 

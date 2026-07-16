@@ -3,7 +3,7 @@
 > 版本：**v1.0** · 状态：三通道定型上产，对接闭环
 > 定位：**产品包侧（线 B 面向）**——取代回函链（原 301–306 过程回函）。只留**最终产品侧义务** + **架构级决策详细留痕（防回退：结论 + 否决方案 + 依据）**。逐轮对账/实施流水/晋升车次已删。
 > **与 [`product_310`](../../30-design/product_310_arda-integration.md) 的分工**（去重，勿两处重述）：本文 §2 = 决策**详细留痕**（唯一详细版，线 B 读它）；`product_310`（design 侧，平台视角）= 实施规划 + 交付状态 + 决策**概要索引**（指回本文）。
-> 权威：接口形状以 [`arda_200_interface.md`](./arda_200_interface.md) 为准；契约语义以 [`product_200`](../../30-design/product_200_integration.md) / [`product_220`](../../30-design/product_220_catalog-resource-model.md) 为准。本文是"面向 arda 实现"的义务与决策合并视图。
+> 权威：接口形状以 [`arda_200_interface.md`](./30-arda_200_interface.md) 为准；契约语义以 [`product_200`](../../30-design/product_200_integration.md) / [`product_220`](../../30-design/product_220_catalog-resource-model.md) 为准。本文是"面向 arda 实现"的义务与决策合并视图。
 
 ---
 

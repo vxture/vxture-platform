@@ -31,7 +31,7 @@
 | [`10-version-baseline.md`](./10-version-baseline.md)                   | **版本基线**       | Ubuntu / Node / Docker / Compose / 容器镜像 / CI 的生产与开发版本基线                                                                               |
 | [`11-model-platform-operations.md`](./11-model-platform-operations.md) | **模型平台运维**   | Model Platform P4 健康检查、结构化日志、部署检查、告警分级规划                                                                                      |
 
-**端口分配** → [`docs/40-implementation/ai/port-allocation.md`](../40-implementation/ai/port-allocation.md)（端口权威来源，部署文档只引用，不重复定义）
+**端口分配** → [`docs/40-implementation/ai/port-allocation.md`](../40-implementation/ai/10-port-allocation.md)（端口权威来源，部署文档只引用，不重复定义）
 
 ---
 

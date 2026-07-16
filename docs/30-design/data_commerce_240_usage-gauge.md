@@ -2,7 +2,7 @@
 
 > 版本:**v0.1 草案** · 日期:2026-07-09 · 状态:**设计稿待评审**(实施逐项授权)
 > 文档族:数据架构族 `data_{domain}_{NNN}`,本文 = commerce 域 **240**(细化层,metering 子域 gauge 专题);上游 = [`data_commerce_200_metering.md`](./data_commerce_200_metering.md)(计量基座)。
-> 定位:落地 **product_310 D5** —— 把 `storage.bytes` 从"过渡池"转正为真正的 **gauge(存量)**计量,补齐 `metric_kind = counter | gauge` 的**写路径与读侧**。gauge vs delta/consume 的决策依据见 [`arda_300`](../20-specs/arda/arda_300_integration-final.md) §2;值域权威见 [`product_220`](./product_220_catalog-resource-model.md) §4。
+> 定位:落地 **product_310 D5** —— 把 `storage.bytes` 从"过渡池"转正为真正的 **gauge(存量)**计量,补齐 `metric_kind = counter | gauge` 的**写路径与读侧**。gauge vs delta/consume 的决策依据见 [`arda_300`](../20-specs/arda/40-arda_300_integration-final.md) §2;值域权威见 [`product_220`](./product_220_catalog-resource-model.md) §4。
 
 ---
 

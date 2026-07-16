@@ -2,7 +2,7 @@
 
 > 更新：2026-05-12
 > 架构层参考：[`docs/30-design/architecture/03-core-layer.md`](../../../30-design/architecture/03-core-layer.md)
-> 消费方文档：[`docs/40-implementation/packages/bff/console.md`](../bff/console.md) · [`docs/40-implementation/packages/bff/admin.md`](../bff/admin.md)
+> 消费方文档：[`docs/40-implementation/packages/bff/console.md`](../bff/40-console.md) · [`docs/40-implementation/packages/bff/admin.md`](../bff/10-admin.md)
 
 ---
 

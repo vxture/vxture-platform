@@ -1,7 +1,7 @@
 # 平台治理写路径设计 — risk_records / compliance_events / maintenance_windows（TD-021）
 
 > 状态：✅ 已审定（owner 2026-07-05 委托代审；对抗式核对权威源后修订 4 处，见 §7）· v1.1 · 2026-07-05
-> 对应技术债：[TD-021](../../../60-operations/tech-debt.md#td-021--风险合规维护窗口治理写路径未定义)（Design Pending）
+> 对应技术债：[TD-021](../../../60-operations/10-tech-debt.md#td-021--风险合规维护窗口治理写路径未定义)（Design Pending）
 > 表权威定义：`deploy/database/ddl/80_admin.sql` + `docs/30-design/data_admin_200_schema.md` §2.4–2.6
 > 实施参照模式：`admin-app-completion-plan.md` 纪律 + `platform-admins.router.ts`（能力门控/审计/step-up）+ `announcements.router.ts`（CRUD 端点形状）
 

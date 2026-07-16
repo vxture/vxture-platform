@@ -106,4 +106,4 @@
 
 **B9 已完成**——`feat/b9-idp-delegation` 分支（PR #609，2026-07-04 合并 develop=`f77d2a86`）：operator（平台管理员）身份管理全链路，凭据操作全部委派 IdP（auth-bff），never 直写库。含 admin-bff↔auth-bff 内部委派端点、rank 分级门控（TD-017）、带外密码重置/初始设密、verified-contact 主防线、自助改联系方式。B9 完成后本计划 **B1–B18 全部落地，无遗留批次**，正式收尾（对应 tech-debt.md 无独立 TD 条目——B9 相关安全债已由 TD-017/018/019 单独跟踪并 Resolved）。
 
-**明确排除在本计划外、不视为遗留**：`admin.risk_records`/`compliance_events`/`maintenance_windows` 三张表的写路径——这三张表从未被排进 B1–B18 任何批次，产品未定义字段/工作流，属**新能力**而非本计划的疏漏。已登记为 [TD-021](../../../60-operations/tech-debt.md#td-021--风险合规维护窗口治理写路径未定义)，需产品先定义再排期。
+**明确排除在本计划外、不视为遗留**：`admin.risk_records`/`compliance_events`/`maintenance_windows` 三张表的写路径——这三张表从未被排进 B1–B18 任何批次，产品未定义字段/工作流，属**新能力**而非本计划的疏漏。已登记为 [TD-021](../../../60-operations/10-tech-debt.md#td-021--风险合规维护窗口治理写路径未定义)，需产品先定义再排期。

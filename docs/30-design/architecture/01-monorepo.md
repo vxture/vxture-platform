@@ -616,6 +616,6 @@ See `12-typescript.md` for full TypeScript configuration details.
 
 ## Appendix A: portals/website Internal Architecture
 
-portals/website v2.0 架构要点（路由分组、Content Registry、Middleware、i18n 策略）见 [`docs/40-implementation/packages/portals/website.md`](../../40-implementation/packages/portals/website.md)。
+portals/website v2.0 架构要点（路由分组、Content Registry、Middleware、i18n 策略）见 [`docs/40-implementation/packages/portals/website.md`](../../40-implementation/packages/portals/30-website.md)。
 
 End of document.

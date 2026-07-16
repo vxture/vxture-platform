@@ -1,7 +1,7 @@
 # Docs 编号与标识体系（taxonomy）
 
 > **权威**：`docs/` 目录结构、文件命名、标识符的唯一规范。所有产品仓（vxture-platform/arda/karda/varda…）共用。
-> **配套**：仓库骨架见 [`repo-governance-standard.md`](./repo-governance-standard.md) §10；强制见 `pnpm lint:docs-numbering`。
+> **配套**：仓库骨架见 [`repo-governance-standard.md`](./140-repo-governance-standard.md) §10；强制见 `pnpm lint:docs-numbering`。
 > **参照**：`vxture-arda` 的 `docs/` 编号分类是范式来源（本文在其基础上把 standards 提前、加元规则）。
 
 ---
