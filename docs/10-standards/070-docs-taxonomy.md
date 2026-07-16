@@ -37,11 +37,12 @@
 
 ---
 
-## 2. 目录内文件编号
+## 2. 目录内文件与子目录编号（每一级都编号）
 
-- 形态 **`NN-kebab-slug.md`**，`NN` **十位跳**（`10/20/30…`，插档 `15`）。
+- **文件** `NN-kebab-slug.md`，`NN` **十位跳**（`10/20/30…`，插档 `15`）；≤9 文件用 2 位、>9 用 3 位（`010/020…`，sort-safe）。
+- **子目录也编号**（2 级/3 级/…概莫能外）：普通子目录用 `NN-name/`；**产品子目录用层级编码号**（见 §6）。
 - 每目录索引 = **`00-index.md`**（0 位固定给索引/概览）。
-- 无编号 `.md` = 临时，`lint:docs-numbering` 报错（除白名单：`README.md`、根级 `CLAUDE.md` 等非 docs 正文）。
+- 无编号 `.md`/目录 = 临时，`lint:docs-numbering` 报错（白名单：`README.md`、根级 `CLAUDE.md` 等非 docs 正文）。
 
 ---
 
@@ -77,7 +78,35 @@
 
 ---
 
-## 6. 强制（`lint:docs-numbering`）
+## 6. 产品编号（层级编码）
+
+产品目录（`20-specs/` 下、及任何按产品组织处）用**层级编码号**——**首位数字 = 层**，一眼看出层级、排序即层序，十位跳留空。权威产品矩阵 = `30-design/product/*_matrix`（product_100）。
+
+| 号    | 产品     | 层      | 说明                                              |
+| ----- | -------- | ------- | ------------------------------------------------- |
+| `000` | platform | L0      | Vxture 平台本身（租户/商业/协议底座）             |
+| `001` | varda    | L0 内嵌 | 平台内嵌副驾；**只服务 platform，与其它产品无关** |
+| `110` | atlas    | L1      | 模型平台                                          |
+| `120` | ontos    | L1      | 语义平台                                          |
+| `130` | runa     | L1      | 技能平台                                          |
+| `210` | arda     | L2      | 结构化数据平台                                    |
+| `220` | karda    | L2      | 知识平台                                          |
+| `230` | terra    | L2      | 时空平台                                          |
+| `310` | raven    | L3      | 行业 agent                                        |
+| `320` | anlan    | L3      | 行业 agent                                        |
+| `330` | forge    | L3      | 行业 agent                                        |
+| `340` | xuanzhen | L3      | 行业 agent                                        |
+| `910` | ruyin    | 层外    | client 端（desktop）                              |
+| `920` | umbra    | 层外    | 外部边界 VPN（ruyin.ai）                          |
+| `930` | hermes   | 层外    | internal                                          |
+
+- **内嵌专用 agent 不单独编号**（除平台级 `varda=001`）：L1/L2 的"内嵌 agent" = 产品的 agentic 表面，产品号已涵盖；L3 本就是独立 agent 产品。
+- **每产品保留 `NN1–NN9` 空位**：将来某产品真长出独立子件（如 varda 之于 platform），届时取 `产品号+1`；不预分空号。
+- 产品定义待建者**不预建空目录**——有实际 specs 才建 `20-specs/<号>-<产品>/`。
+
+---
+
+## 7. 强制（`lint:docs-numbering`）
 
 `scripts/guardrails/check-docs-numbering.mjs` 扫 `docs/` 下每个 `.md`：非 `00-index.md`、非白名单、且既不匹配 `NN-` / `{kind}_{domain}_{NNN}_` / `ADR-|TD-` 者 → 报错（= 未编号 = 临时，须编号或删除）。
 
@@ -86,9 +115,10 @@
 
 ---
 
-## 7. 迁移（分批，每批一 PR，含内链/linter/memory 路径修复）
+## 8. 迁移（分批，每批一 PR，含内链/linter/memory 路径修复）
 
-1. **批 1（本文）**：固化本权威 + 护栏脚本（report 模式）+ 更新 `repo-governance-standard.md` §10。
-2. **批 2**：建 `00–90` 顶层目录骨架，迁 standards→`10-standards`、product→`20-specs` 等，`00-index.md` 就位。
-3. **批 3**：目录内文件加 `NN-` 十位编号；散落根文件归位或删除。
-4. **批 4**：ADR 两处合并到 `30-design/decisions/`（保号）；`lint:docs-numbering` 转硬门。
+1. **批 1**：固化本权威 + 护栏脚本（report 模式）+ 更新 `repo-governance-standard.md` §10。✅
+2. **批 2**：建 `00–90` 顶层目录骨架，迁移到位，`00-index.md` 就位。✅
+3. **批 3a**：简单目录文件加 `NN-` 编号；护栏认 `{prefix}_{NNN}` 已编号。✅
+4. **批 3b**：`30-design` 域子目录（identity/commerce/…）+ 文件编号；`20-specs` 产品层级编号（§6）；子目录编号；`platform-alerts-cron-runbook`→`60-operations`；temp 输入稿清理。
+5. **批 4**：ADR 两处合并到 `30-design/decisions/`（保号）；`lint:docs-numbering` 转 `--strict` 硬门。

@@ -2,7 +2,7 @@
 
 > ⚠️ 待大版本重构 | 迁移自 `packages/core/locale/AGENTS.md`
 > 架构层参考：[`docs/30-design/architecture/03-core-layer.md`](../../../30-design/architecture/03-core-layer.md)
-> 能力域设计：[`docs/30-design/locale.md`](../../../30-design/locale.md)
+> 能力域设计：[`docs/30-design/locale.md`](../../../30-design/design_locale_100_overview.md)
 
 ---
 

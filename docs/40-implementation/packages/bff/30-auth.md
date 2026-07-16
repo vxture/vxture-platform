@@ -1,7 +1,7 @@
 # @vxture/bff-auth
 
 > 架构层参考：[`docs/30-design/architecture/05-bff-layer.md`](../../../30-design/architecture/05-bff-layer.md)
-> 认证设计全貌：[`docs/30-design/auth.md`](../../../30-design/auth.md)
+> 认证设计全貌：[`docs/30-design/auth.md`](../../../30-design/identity/010-auth.md)
 
 ---
 

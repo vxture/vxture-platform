@@ -1,8 +1,8 @@
-> 🗄 **已归档 · 历史决策台账（2026-07-01）** — 本文是 SSO 重建 B1–B5 / D-1~D-10 决策与 P0–P5 路线的原始出处，其**顶层身份模型已被四层重建取代**。现行权威：数据架构与字段级数据模型见 [`data_platform_100_architecture.md`](./data_platform_100_architecture.md)（架构）+ [`data_platform_200_schema.md`](./data_platform_200_schema.md)（字段级）+ [`data_platform_300_migration.md`](./data_platform_300_migration.md)（落地）。机制层细节仍由各 P0–P4 子文承接；本文仅作历史/决策档，**勿据顶层模型部分实施**。
+> 🗄 **已归档 · 历史决策台账（2026-07-01）** — 本文是 SSO 重建 B1–B5 / D-1~D-10 决策与 P0–P5 路线的原始出处，其**顶层身份模型已被四层重建取代**。现行权威：数据架构与字段级数据模型见 [`data_platform_100_architecture.md`](../data_platform_100_architecture.md)（架构）+ [`data_platform_200_schema.md`](../data_platform_200_schema.md)（字段级）+ [`data_platform_300_migration.md`](../data_platform_300_migration.md)（落地）。机制层细节仍由各 P0–P4 子文承接；本文仅作历史/决策档，**勿据顶层模型部分实施**。
 
 # Identity 决策台账 / ADR（identity 板块 · 归档）
 
-> 🧭 本文 = identity 板块的**决策/ADR 横切归档**（B1–B5 / D-1~D10 / P0–P5 的原始决策与 rationale）。架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md)（§8 为本台账的决策索引摘要）。
+> 🧭 本文 = identity 板块的**决策/ADR 横切归档**（B1–B5 / D-1~D10 / P0–P5 的原始决策与 rationale）。架构层见 [`identity-platform-architecture.md`](./040-architecture.md)（§8 为本台账的决策索引摘要）。
 
 > 范围：vxture-platform（IdP）+ console / website / admin / ruyin / xuanzhen / hermes / …（RP，开放集合）
 > 版本：v2.1（2026-06-10）
@@ -95,7 +95,7 @@
 > 2. **认证服务（IdP）** = 专职 AuthN / SSO / 跨域跨子域签发，即 auth-bff 的演进体。**目标态更名 `identity-server`、归位 `services/identity/server`**（**可运行平台服务**，与库 `services/identity/iam` 同域；**不是 BFF**——它服务全体 RP 而非某一前端；先例：`services/model/platform` 即 `services/` 下的可运行中心服务），随 **P5** 退 legacy 时一并搬迁。
 > 3. **权益 / 授权（entitlement）** = 独立、按请求**实时回查**，**不进 token**（见 §8 + §16 D-10）。
 >
-> `accounts.vxture.com` 是唯一公开门面，反代 `/oidc/*` 到内部 identity-server；详见 [`identity-platform-idp.md`](./identity-platform-idp.md)。
+> `accounts.vxture.com` 是唯一公开门面，反代 `/oidc/*` 到内部 identity-server；详见 [`identity-platform-idp.md`](./070-idp.md)。
 
 ---
 
@@ -139,7 +139,7 @@ OIDC 化后用 **realm** 承载这个隔离：
 
 ### 4.2 登录方式（IdP 自身的认证手段，在 /authorize 登录页内完成）
 
-> **门面拓扑（v2 收敛，权威见 [`identity-platform-idp.md`](./identity-platform-idp.md)）**：唯一公开身份域 **`accounts.vxture.com`** 同时承载登录/账号 UI（`/login`，realm 驱动）与（反代到内部 auth-bff 的）OIDC 协议端点（`/oidc/*`·`/.well-known/*`）；**`OIDC_ISSUER = https://accounts.vxture.com`**，auth-bff 无公开主机名。登录页与登录端点同源 → 免 CORS。本文及各阶段文档内 `accounts.vxture.com` 即此公开 IdP 域。
+> **门面拓扑（v2 收敛，权威见 [`identity-platform-idp.md`](./070-idp.md)）**：唯一公开身份域 **`accounts.vxture.com`** 同时承载登录/账号 UI（`/login`，realm 驱动）与（反代到内部 auth-bff 的）OIDC 协议端点（`/oidc/*`·`/.well-known/*`）；**`OIDC_ISSUER = https://accounts.vxture.com`**，auth-bff 无公开主机名。登录页与登录端点同源 → 免 CORS。本文及各阶段文档内 `accounts.vxture.com` 即此公开 IdP 域。
 
 OIDC 化后，应用不再各自实现登录；登录只发生在 IdP 的 `/authorize` 页面。**核心模型：以平台账号为中心**——第三方身份只是绑定到平台账号的上游登录方式，业务应用只认平台 token、从不直接对接第三方。IdP 支持的认证手段沿用现有实现：
 

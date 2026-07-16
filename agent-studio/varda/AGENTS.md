@@ -10,6 +10,6 @@
 | 2. 任务路由     | [`docs/90-memory/agent.md`](../../docs/90-memory/10-agent.md)                                                               |
 | 3. 层架构规范   | [`docs/30-design/architecture/02-package-boundaries.md`](../../docs/30-design/architecture/02-package-boundaries.md)        |
 | 4. 包实现上下文 | [`docs/40-implementation/packages/agents/varda/studio.md`](../../docs/40-implementation/packages/agents/varda/20-studio.md) |
-| 5. 产品规格     | [`docs/20-specs/agents/varda/spec.md`](../../docs/20-specs/agents/varda/10-spec.md)                                         |
+| 5. 产品规格     | [`docs/20-specs/agents/varda/spec.md`](../../docs/20-specs/001-varda/10-spec.md)                                            |
 
 > Varda 智能助手前端（嵌入式微前端）。CallerContext 由 varda-bff 构建，此处只渲染 UI。

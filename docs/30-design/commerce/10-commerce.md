@@ -4,7 +4,7 @@
 **更新**：2026-05-14
 **范围**：订阅管理 / 配额分配 / 用量计量 / 账单 / 付款 / 退款 / Feature Gating
 
-> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](./data_platform_100_architecture.md) + [-schema.md](./data_platform_200_schema.md)（本文不重述平台 DDL，只述本板块内容）。
+> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](../data_platform_100_architecture.md) + [-schema.md](../data_platform_200_schema.md)（本文不重述平台 DDL，只述本板块内容）。
 
 ---
 

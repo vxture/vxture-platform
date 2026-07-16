@@ -2,7 +2,7 @@
 
 > ⚠️ 待大版本重构 | 迁移自 `bff/varda-bff/AGENTS.md`
 > 架构层参考：[`docs/30-design/architecture/05-bff-layer.md`](../../../30-design/architecture/05-bff-layer.md)
-> 产品规格：[`docs/20-specs/agents/varda/spec.md`](../../../20-specs/agents/varda/10-spec.md)
+> 产品规格：[`docs/20-specs/agents/varda/spec.md`](../../../20-specs/001-varda/10-spec.md)
 
 ---
 

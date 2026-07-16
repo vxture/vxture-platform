@@ -1,6 +1,6 @@
 # @vxture/service-model-platform
 
-> 能力域设计：[`docs/30-design/model-platform.md`](../../../30-design/model-platform.md)
+> 能力域设计：[`docs/30-design/model-platform.md`](../../../30-design/platform/40-model-platform.md)
 
 ---
 

@@ -1,7 +1,7 @@
 # Identity 平台架构（identity 板块 · 架构层）
 
 > 🧭 **本文 = identity 板块的架构层**（C4 Context / Container 级）：只讲 **what / why / how-it-fits + 边界 + 指路**，**不含字段级 DDL / 列清单 / 端点报文**。字段级看数据权威，机制看详细层，落地看实施衔接层。
-> 与 [`data_platform_100_architecture.md`](./data_platform_100_architecture.md)（数据板块）的 **a/b/c 三层同构**对齐：架构层（本文）/ 详细层（机制文档）/ 实施衔接层（迁移·rollout）。
+> 与 [`data_platform_100_architecture.md`](../data_platform_100_architecture.md)（数据板块）的 **a/b/c 三层同构**对齐：架构层（本文）/ 详细层（机制文档）/ 实施衔接层（迁移·rollout）。
 > 版本：v1.0（2026-07-01）。状态：架构基线（statement-of-record），统摄既有已上线体系。
 
 ## 三层路由（先定位再深入）
@@ -12,11 +12,11 @@
 | **详细层**     | 机制字段级：端点 / 报文 / 状态机 / claim | §9 机制文档清单 |
 | **实施衔接层** | 迁移差量 / Batch 进度 / 部署 runbook     | §9 实施清单     |
 
-- **上级（概念父文档）**：[`control-plane.md`](./control-plane.md) —— identity 是「平台控制面 = 全平台唯一真相源」中的**身份与访问**子域。
+- **上级（概念父文档）**：[`control-plane.md`](../platform/10-control-plane.md) —— identity 是「平台控制面 = 全平台唯一真相源」中的**身份与访问**子域。
 - **数据权威（本文只引用、绝不重述字段）**：
-  - **a** = [`data_platform_100_architecture.md`](./data_platform_100_architecture.md)：架构级 —— §3.4 各域概览、**§4 identity**、**§5 iam**、§6 成长子域、§14 operator/admin 概览。
-  - **b** = [`data_platform_200_schema.md`](./data_platform_200_schema.md)：字段级 —— **§4 identity 全表 DDL**、**§4.18 双 realm 隔离边界**、**§5 iam（role/permission/oidc_client/signing_key）**、**§14 admin.operator\_\***。
-  - **c**（落地/迁移）= [`data_platform_300_migration.md`](./data_platform_300_migration.md)。
+  - **a** = [`data_platform_100_architecture.md`](../data_platform_100_architecture.md)：架构级 —— §3.4 各域概览、**§4 identity**、**§5 iam**、§6 成长子域、§14 operator/admin 概览。
+  - **b** = [`data_platform_200_schema.md`](../data_platform_200_schema.md)：字段级 —— **§4 identity 全表 DDL**、**§4.18 双 realm 隔离边界**、**§5 iam（role/permission/oidc_client/signing_key）**、**§14 admin.operator\_\***。
+  - **c**（落地/迁移）= [`data_platform_300_migration.md`](../data_platform_300_migration.md)。
 - **铁律**：任何"表长啥样 / 列叫什么 / claim 报文结构"一律回指 a/b 或对应机制文档，本文**不复制**。
 
 ---
@@ -74,7 +74,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 2. **`sub` 命名空间**：`usr_` vs `opr_`，物理不可混。
 3. **`aud` 单值 + `userType`**：operator token（`aud=admin`/`userType=operator`）拿到任何 customer RP 校验**结构性被拒**，反之亦然。
 
-> 隔离不变量（零 FK、会话/刷新/验证码不得跨 schema 泄漏）字段级见 **b§4.18**（identity 侧）+ **b§14**（operator 侧）；红线概述见 [`identity-platform-operator.md`](./identity-platform-operator.md) §1。
+> 隔离不变量（零 FK、会话/刷新/验证码不得跨 schema 泄漏）字段级见 **b§4.18**（identity 侧）+ **b§14**（operator 侧）；红线概述见 [`identity-platform-operator.md`](./090-operator.md) §1。
 
 ---
 
@@ -109,7 +109,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 - **禁用**：iframe 静默 SSO（check_session）与 front-channel logout —— Safari ITP / 第三方 cookie 弃用会使其失效。
 - **每接一个新业务** = 注册一个 `oidc_client` + 该业务 BFF 做 RP（含 back-channel 接收）+ 域内 portal↔BFF 同源反代，**IdP 侧零改动**。
 
-> cookie/SSO/SLO/同源反代/operator 登录接线的**权威细节** = [`identity-platform-access-topology.md`](./identity-platform-access-topology.md)（含决策 D-AT 逐子域反代 / D-AU 统一 post-logout 品牌页 / D-AW 跨域 SLO 可配置）。
+> cookie/SSO/SLO/同源反代/operator 登录接线的**权威细节** = [`identity-platform-access-topology.md`](./110-access-topology.md)（含决策 D-AT 逐子域反代 / D-AU 统一 post-logout 品牌页 / D-AW 跨域 SLO 可配置）。
 
 ---
 
@@ -122,7 +122,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 - **社交联邦 = 入站 broker**：平台作为 RP 去对接**上游** IdP（飞书/钉钉/Google），绑定到平台账号；业务应用只认平台 token、从不直接对接第三方。上游 broker 配置（`identity.oauth_provider`，入站）与 `iam.oidc_client`（出站发 token）**方向相反、不可复用同一张表**。上游未返回手机 → 进绑手机流程。
 - **BFF token 持有**：token（id/access/refresh）只在 RP-BFF 服务端，浏览器仅持 opaque RP 会话 cookie，富 access_token 只用于 BFF→后端 API、绝不下发浏览器。
 
-> 机制权威：IdP 机制（门面拓扑 + issuer 收敛 + 端点/密钥/会话/refresh）= [`identity-platform-idp.md`](./identity-platform-idp.md)；账号与认证（三层标识/验证码登录/社交 broker/账号合并/邮箱两态/头像）= [`identity-platform-account.md`](./identity-platform-account.md)。token claims/DB 来源速查见 a/b + `identity-platform-idp.md` §6。
+> 机制权威：IdP 机制（门面拓扑 + issuer 收敛 + 端点/密钥/会话/refresh）= [`identity-platform-idp.md`](./070-idp.md)；账号与认证（三层标识/验证码登录/社交 broker/账号合并/邮箱两态/头像）= [`identity-platform-account.md`](./050-account.md)。token claims/DB 来源速查见 a/b + `identity-platform-idp.md` §6。
 
 ---
 
@@ -133,7 +133,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 - **执行层**：每个 BFF 两级守卫 —— ① 身份类型守卫（`userType` 校验）；② 路由级 `@RequirePermission` 装饰器；console/业务 BFF 强制 `tenantId` 只从 token 取、查询必带租户过滤。
 - **entitlement/capability 已退役出 iam**：SoT 归 commerce(b§8)/product(b§7)，access token **不含业务权益**（AuthN ⟂ AuthZ 分离）。
 
-> RBAC 跨包协作/执行规范 = [`identity-platform-authorization.md`](./identity-platform-authorization.md)；iam 表（role/permission/role_permission/oidc_client/signing_key）字段级 = **b§5**；operator 侧 `admin.operator_role*` 与 iam **零交叉** = b§14。
+> RBAC 跨包协作/执行规范 = [`identity-platform-authorization.md`](./060-authorization.md)；iam 表（role/permission/role_permission/oidc_client/signing_key）字段级 = **b§5**；operator 侧 `admin.operator_role*` 与 iam **零交叉** = b§14。
 
 ---
 
@@ -152,7 +152,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 - **provisioning（开通 webhook）= OUT**：属 commerce，当前 parked；需业务空间开通编排时再落地。
 - **entitlement 起步期不依赖**：commerce 未上线，App 不置 `product_id`、业务授权走自有库；商业化后再启用 token 硬门控（或改实时回查端点）。
 
-> RP 接入（标准 + 集成模板 + business-app 契约 + provisioning）= [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md)；首个跨域应用契约（独立）= [`identity-platform-ruyin-contract.md`](./identity-platform-ruyin-contract.md)；per-app 订阅/EntitlementProvider〔邻域 commerce〕= [`commerce-app-subscription.md`](./commerce-app-subscription.md)。
+> RP 接入（标准 + 集成模板 + business-app 契约 + provisioning）= [`identity-platform-rp-integration.md`](./080-rp-integration.md)；首个跨域应用契约（独立）= [`identity-platform-ruyin-contract.md`](./140-ruyin-contract.md)；per-app 订阅/EntitlementProvider〔邻域 commerce〕= [`commerce-app-subscription.md`](../commerce/20-app-subscription.md)。
 
 ---
 
@@ -163,7 +163,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 - **刻意取舍**：不采用 mTLS/Cf-Access 作登录层、不用短信作唯一 MFA、不联邦第三方 IdP（operator 身份只留 vxture）；补偿控制见 §2.4 of 专项。
 - **凭据**：密码 Argon2id、TOTP secret 加密落库、恢复码单次哈希。
 
-> 权威设计 = [`identity-platform-operator.md`](./identity-platform-operator.md)；operator 身份域全表（account/credential/mfa/webauthn/recovery/verification/login_attempt/refresh/role\*/session）字段级 = **b§14**。
+> 权威设计 = [`identity-platform-operator.md`](./090-operator.md)；operator 身份域全表（account/credential/mfa/webauthn/recovery/verification/login_attempt/refresh/role\*/session）字段级 = **b§14**。
 
 ---
 
@@ -186,7 +186,7 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 | D-AW     | 跨域 SLO                                                           | 每业务可配是否参与全域 back-channel logout（ruyin 默认参与）                                                  | identity-platform-access-topology.md §10   |
 | OP-V2    | operator MFA / 无 mTLS / 无第三方联邦                              | TOTP 默认 + 高权限强制 WebAuthn + 恢复码；不引 mTLS/Cf-Access                                                 | identity-platform-operator.md §2           |
 
-> 完整历史决策台账（B1–B5 / D-1~D-10 全表 + 演进）见已归档的 [`identity-platform-decisions.md`](./identity-platform-decisions.md)（顶层身份模型已被四层重建取代，仅作决策档）。
+> 完整历史决策台账（B1–B5 / D-1~D-10 全表 + 演进）见已归档的 [`identity-platform-decisions.md`](./130-decisions.md)（顶层身份模型已被四层重建取代，仅作决策档）。
 
 ---
 
@@ -200,23 +200,23 @@ customer（`identity.*`）与 workforce（`admin.operator_*`）是两套**完全
 
 ### 9.2 详细层（机制字段级）
 
-| 文档                                                                             | 覆盖 realm    | 机制                                                                                            |
-| -------------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------- |
-| [`identity-platform-access-topology.md`](./identity-platform-access-topology.md) | 双 realm      | SSO/SLO/三 cookie/同源/跨域/operator 登录                                                       |
-| [`identity-platform-idp.md`](./identity-platform-idp.md)                         | 双 realm      | IdP 机制：门面拓扑/issuer + 端点/RS256/JWKS/会话/refresh（合并 p0-idp + login-surface）         |
-| [`identity-platform-account.md`](./identity-platform-account.md)                 | customer      | 账号与认证：三层标识/验证码登录/社交 broker/账号合并/邮箱两态/头像（合并 4 篇）                 |
-| [`identity-platform-authorization.md`](./identity-platform-authorization.md)     | 双 realm      | 两级 RBAC 执行（跨包）                                                                          |
-| [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md)   | customer      | RP 接入：标准（子域+跨域）/集成模板/business-app 契约/provisioning（合并 4 篇；ruyin 契约独立） |
-| [`identity-platform-ruyin-contract.md`](./identity-platform-ruyin-contract.md)   | customer      | ruyin 跨域对接契约（仍生效）                                                                    |
-| [`identity-platform-operator.md`](./identity-platform-operator.md)               | **workforce** | operator 身份安全权威（MFA/隔离/审计）                                                          |
+| 文档                                                               | 覆盖 realm    | 机制                                                                                            |
+| ------------------------------------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------- |
+| [`identity-platform-access-topology.md`](./110-access-topology.md) | 双 realm      | SSO/SLO/三 cookie/同源/跨域/operator 登录                                                       |
+| [`identity-platform-idp.md`](./070-idp.md)                         | 双 realm      | IdP 机制：门面拓扑/issuer + 端点/RS256/JWKS/会话/refresh（合并 p0-idp + login-surface）         |
+| [`identity-platform-account.md`](./050-account.md)                 | customer      | 账号与认证：三层标识/验证码登录/社交 broker/账号合并/邮箱两态/头像（合并 4 篇）                 |
+| [`identity-platform-authorization.md`](./060-authorization.md)     | 双 realm      | 两级 RBAC 执行（跨包）                                                                          |
+| [`identity-platform-rp-integration.md`](./080-rp-integration.md)   | customer      | RP 接入：标准（子域+跨域）/集成模板/business-app 契约/provisioning（合并 4 篇；ruyin 契约独立） |
+| [`identity-platform-ruyin-contract.md`](./140-ruyin-contract.md)   | customer      | ruyin 跨域对接契约（仍生效）                                                                    |
+| [`identity-platform-operator.md`](./090-operator.md)               | **workforce** | operator 身份安全权威（MFA/隔离/审计）                                                          |
 
 ### 9.3 实施衔接层（迁移 / rollout）
 
-| 文档                                                                           | 覆盖                                                                                            |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [`data_platform_300_migration.md`](./data_platform_300_migration.md)（c）      | 数据现状→最终态差量 + 落地步骤 + 代码锁步                                                       |
-| [`identity-platform-decisions.md`](./identity-platform-decisions.md)（归档）   | 历史决策台账（B1–B5 / D-1~D-10）                                                                |
-| [`identity-platform-implementation.md`](./identity-platform-implementation.md) | 现状→新版迁移 / rollout Batch 进度 / 部署 runbook+踩坑 / operator 实施 / 收尾+退桥（合并 6 篇） |
+| 文档                                                                       | 覆盖                                                                                            |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [`data_platform_300_migration.md`](../data_platform_300_migration.md)（c） | 数据现状→最终态差量 + 落地步骤 + 代码锁步                                                       |
+| [`identity-platform-decisions.md`](./130-decisions.md)（归档）             | 历史决策台账（B1–B5 / D-1~D-10）                                                                |
+| [`identity-platform-implementation.md`](./120-implementation.md)           | 现状→新版迁移 / rollout Batch 进度 / 部署 runbook+踩坑 / operator 实施 / 收尾+退桥（合并 6 篇） |
 
 ---
 

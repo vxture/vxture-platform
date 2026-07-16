@@ -8,7 +8,7 @@
 >
 > 关联文档：
 >
-> - 架构目标态：[`docs/30-design/data-access.md`](../../30-design/data-access.md)
+> - 架构目标态：[`docs/30-design/data-access.md`](../../30-design/platform/30-data-access.md)
 > - API 契约：[`docs/40-implementation/packages/bff/admin.md`](../packages/bff/10-admin.md)
 > - BFF 层架构：[`docs/30-design/architecture/05-bff-layer.md`](../../30-design/architecture/05-bff-layer.md)
 

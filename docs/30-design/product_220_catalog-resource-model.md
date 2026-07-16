@@ -5,7 +5,7 @@
 > 定位:**平台商业目录与权益资源的结构标准**——回答"什么是产品/什么是可售项/什么是资源、五档阶梯与捆绑怎么建模、哪些资源归 L0 共享池、C2 信封长什么样"。所有产品(arda 为首)的计费模型设计与 C2 消费实现以本文为准。
 > 上游:ADR-11(权益引擎)、[`product_100_matrix.md`](./product_100_matrix.md)(产品矩阵)、[`product_200_integration.md`](./product_200_integration.md)(三通道契约,本文细化其 C2 响应语义)。
 > 下游:[`data_product_200_schema.md`](./data_product_200_schema.md) / [`data_commerce_200_metering.md`](./data_commerce_200_metering.md)(字段级,随实施车按 §8 更新)、各产品计费模型文档(arda = `arda-biz-260`)。
-> 说明:"bundled 作为 tier 第六值"的旧消费规则已被 §3 的 `bundled` 布尔正交轴取代（防回退留痕见 [`arda_300`](../20-specs/arda/40-arda_300_integration-final.md) §2）。
+> 说明:"bundled 作为 tier 第六值"的旧消费规则已被 §3 的 `bundled` 布尔正交轴取代（防回退留痕见 [`arda_300`](../20-specs/210-arda/40-arda_300_integration-final.md) §2）。
 
 ---
 
@@ -251,7 +251,7 @@ GET /platform/entitlements?workspace_id={W}&product={P}
 2. metric 常量:`varda.credit` → **`ai.credit`**(storage.bytes 键名不变);
 3. 计费模型文档(biz-260 类)按 §2 改捆绑组件规格:`{ role:'bundled', quota:{...} }`,删除 `billing=bundled_free` 判别与 "tier rank=free" 表述;**并删除"平台配 bundled 组件"表述——bundled 配置归拥有 agent plan 的一方(§2 配置归属),被捆绑产品自己不 seed**;
 4. 共享池展示:storage/ai.credit 余量为**该产品实际可消费口径**(§4.3:自留 +（若参与）可及共享;默认全保留 = 仅自留,各产品看到的是自己的额度,不会被别的产品烧掉);共享由租户管理员开启后才跨产品流动;
-5. 其余(缓存/409/webhook/gauge)见 [`arda_200`](../20-specs/arda/30-arda_200_interface.md) 契约,不变。
+5. 其余(缓存/409/webhook/gauge)见 [`arda_200`](../20-specs/210-arda/30-arda_200_interface.md) 契约,不变。
 
 ## 10. 决策登记
 

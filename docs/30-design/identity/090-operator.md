@@ -1,6 +1,6 @@
 # Identity Operator 安全（identity 板块 · 详细层 · workforce realm）
 
-> 🧭 架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md) §7（workforce realm 概览）。本文 = operator 身份安全（MFA / 隔离 / 审计）的详细层权威 reference。
+> 🧭 架构层见 [`identity-platform-architecture.md`](./040-architecture.md) §7（workforce realm 概览）。本文 = operator 身份安全（MFA / 隔离 / 审计）的详细层权威 reference。
 > 平台数据模型权威 = [data_platform_100_architecture.md] + [-schema.md]（operator 身份域字段级 = **b §14 admin.operator\_\***，本文不重述 DDL）。
 
 > 版本 v1.0（2026-06-23）。运营控制面 `admin.vxture.com` 的 operator 身份与登录安全 **权威设计**。
@@ -211,7 +211,7 @@ admin /login → admin-bff /auth/login → IdP /oidc/authorize (realm=operator)
 
 ### 6.5 seed（幂等，统一进 `deploy/database/seed/seed-catalog.mjs`）
 
-> **RBAC 初始化数据权威 = [`data_admin_200_schema.md`](./data_admin_200_schema.md) §4**（七预置角色 + rank 值 + perm_code 三段式目录 + role→perm 映射 + super_admin 显式全授 + 两系统账号）。本节只列安全侧要点，不复制目录。
+> **RBAC 初始化数据权威 = [`data_admin_200_schema.md`](../data_admin_200_schema.md) §4**（七预置角色 + rank 值 + perm_code 三段式目录 + role→perm 映射 + super_admin 显式全授 + 两系统账号）。本节只列安全侧要点，不复制目录。
 
 - `operator_role`（7 角色 + `rank`）+ `operator_permission`（三段式目录，`gen_random_uuid`+`on conflict perm_code`）+ `operator_role_permission`。**super_admin 显式全授**（无硬编码旁路，缺则自锁 403；seed 运行时自检 super_admin 映射数==perm 全集）。
 - 预建两账号（哨兵 UUID 锚点）：`systemadmin`（`sys_config`/`disabled`，元锚点不登录，无凭据）+ `superadmin`（`super_admin`/`active`，`is_system=true`）+ `operator_credential`（Argon2id，`force_password_change`）+ `operator_mfa`（首登强制注册：policy 由平台默认/角色下限决定）。

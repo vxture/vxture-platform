@@ -9,7 +9,7 @@
 | #   | 问题                | 决策                                                                                                                                                                                                                           |
 | --- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Q1  | 是否需要订阅计划？  | ✅ **需要**（v2.0 反转）。Arda = L2 数据平台产品，参与 workspace × product 权益引擎（ADR-11）；**门控不经 token，经 C2 实时回查**（`product_200_integration.md` §3）。plan 结构（`arda-free` 起步）随 product_310 P1.2 落 seed |
-| Q2  | arda-app 代码位置？ | **独立仓库**（不在 vxture monorepo 内）。需参考 [`docs/30-design/identity-platform-rp-integration.md`](../docs/30-design/identity-platform-rp-integration.md) 自行实现 RP 端点                                                 |
+| Q2  | arda-app 代码位置？ | **独立仓库**（不在 vxture monorepo 内）。需参考 [`docs/30-design/identity-platform-rp-integration.md`](../docs/30-design/identity/080-rp-integration.md) 自行实现 RP 端点                                                      |
 | Q3  | client_id 策略？    | **双 client**（v2.0 按 seed 现实更新）：`arda`（stable）+ `arda-beta`（release_channel=beta，仅当 `ARDA_BETA_BASE_URL` 注入时登记），各自单条 redirect_uri；v1.1 的"单 client 双 URI"表述作废                                  |
 
 ---
@@ -64,7 +64,7 @@ cat /srv/vxture/runtime/secrets/oidc-client-secret-arda.txt
 
 ### 3.1 需实现的 RP 端点
 
-参考 [`identity-platform-rp-integration.md §4`](../docs/30-design/identity-platform-rp-integration.md#4-app-须实现的端点app-bff)：
+参考 [`identity-platform-rp-integration.md §4`](../docs/30-design/identity/080-rp-integration.md#4-app-须实现的端点app-bff)：
 
 | 端点                            | 职责                                         | 参考实现                                                                             |
 | ------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ |

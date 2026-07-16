@@ -2,9 +2,9 @@
 
 > 版本：**v2.0** · 状态：三通道定型上产，对接闭环
 > 定位：**平台侧（线 A）视角**——Arda（L2 数据平台，三通道首个消费者）对接的**实施规划 + 交付状态 + 决策概要索引**。逐步实施/晋升/探针流水已删。
-> **与 [`arda_300`](../20-specs/arda/40-arda_300_integration-final.md) 的分工**（去重，勿两处重述）：本文（design 侧）= 平台怎么交付 + 决策**概要索引**（结论 + 指针）；`arda_300`（产品包侧，线 B 面向）= 产品侧义务 + 决策**详细留痕**（结论 + 否决方案 + 依据）。**决策的"为什么/否决什么"以 arda_300 §2 与 product_220 §7 为准，本文不重述。**
+> **与 [`arda_300`](../20-specs/210-arda/40-arda_300_integration-final.md) 的分工**（去重，勿两处重述）：本文（design 侧）= 平台怎么交付 + 决策**概要索引**（结论 + 指针）；`arda_300`（产品包侧，线 B 面向）= 产品侧义务 + 决策**详细留痕**（结论 + 否决方案 + 依据）。**决策的"为什么/否决什么"以 arda_300 §2 与 product_220 §7 为准，本文不重述。**
 > 上游：[`product_200`](./product_200_integration.md)（三通道契约）、[`product_220`](./product_220_catalog-resource-model.md)（目录·权益·资源）、[`product_230`](./product_230_mesh-architecture.md)（传输面）、[`product_210`](./product_210_tool-protocol.md)（工具协议）、ADR-11（权益引擎）。
-> 产品侧落地包：[`arda_000`](../20-specs/arda/10-arda_000_definition.md)（定义）、[`arda_100`](../20-specs/arda/20-arda_100_handoff.md)（交接）、[`arda_200`](../20-specs/arda/30-arda_200_interface.md)（接口契约）、[`arda_300`](../20-specs/arda/40-arda_300_integration-final.md)（最终要求 + 决策详细留痕）。
+> 产品侧落地包：[`arda_000`](../20-specs/210-arda/10-arda_000_definition.md)（定义）、[`arda_100`](../20-specs/210-arda/20-arda_100_handoff.md)（交接）、[`arda_200`](../20-specs/210-arda/30-arda_200_interface.md)（接口契约）、[`arda_300`](../20-specs/210-arda/40-arda_300_integration-final.md)（最终要求 + 决策详细留痕）。
 
 ---
 
@@ -35,13 +35,13 @@
 
 ## 3. 决策索引（D1–D13，概要）
 
-> **本表只留结论 + 权威指针（概要）**。每条决策"为什么这样、否决了什么旧方案"的**详细防回退留痕**——产品面决策见 [`arda_300`](../20-specs/arda/40-arda_300_integration-final.md) §2，全平台契约级见 [`product_220`](./product_220_catalog-resource-model.md) §7「明确不采纳」/§10。改动前先读那两处。
+> **本表只留结论 + 权威指针（概要）**。每条决策"为什么这样、否决了什么旧方案"的**详细防回退留痕**——产品面决策见 [`arda_300`](../20-specs/210-arda/40-arda_300_integration-final.md) §2，全平台契约级见 [`product_220`](./product_220_catalog-resource-model.md) §7「明确不采纳」/§10。改动前先读那两处。
 
 | #      | 决策             | 结论                                                                                   | 详细留痕 / 权威                                                         |
 | ------ | ---------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | D1→D13 | C2/C3 宿主       | 独立宿主 platform-api（身份/商业面分离；D1 挂 auth-bff 由 D13 修正）                   | arda_300 §2                                                             |
 | D2     | invalidate v1    | 短 TTL（30–60s）缓存自然过期，推送随共享面建                                           | 本文 §1                                                                 |
-| D3     | Arda v1 范围     | 不含 P 级资产供给                                                                      | [`arda_000`](../20-specs/arda/10-arda_000_definition.md) §3             |
+| D3     | Arda v1 范围     | 不含 P 级资产供给                                                                      | [`arda_000`](../20-specs/210-arda/10-arda_000_definition.md) §3         |
 | D4     | webhook 渠道维度 | 搁置备案（per-product 单行；触发条件成立按备案设计再开）                               | 本文（备案）                                                            |
 | D5     | storage 计量     | gauge 快照（LWW，`PUT /usage/gauge`）                                                  | arda_300 §2 · [`data_commerce_240`](./data_commerce_240_usage-gauge.md) |
 | D6     | bundled 建模     | role 轴正交化（C2 加 `bundled` 布尔，tier 纯五档）                                     | product_220 §2/§3/§7                                                    |

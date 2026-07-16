@@ -10,6 +10,6 @@
 | 2. 任务路由     | [`docs/90-memory/agent.md`](../../docs/90-memory/10-agent.md)                                                               |
 | 3. 层架构规范   | [`docs/30-design/architecture/06-agent-server.md`](../../docs/30-design/architecture/06-agent-server.md)                    |
 | 4. 包实现上下文 | [`docs/40-implementation/packages/agents/varda/server.md`](../../docs/40-implementation/packages/agents/varda/10-server.md) |
-| 5. 产品规格     | [`docs/20-specs/agents/varda/spec.md`](../../docs/20-specs/agents/varda/10-spec.md)                                         |
+| 5. 产品规格     | [`docs/20-specs/agents/varda/spec.md`](../../docs/20-specs/001-varda/10-spec.md)                                            |
 
 > Tool Use Loop + CallerContext 二次校验 + tenantId 强制数据隔离。安全约束见包上下文。
