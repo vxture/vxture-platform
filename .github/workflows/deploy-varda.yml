@@ -171,7 +171,38 @@ jobs:
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
         run: bash scripts/workflows/resolve-acr-registry.sh
 
+      # tailscale/github-action 的 SHA256SUM 下载步无 retry，pkgs.tailscale.com 一次 504
+      # 即整步失败（2026-07-16 首上线实测）。按本 workflow build 段同款 continue-on-error+retry
+      # idiom 做 3 次尝试 + 递增退避，兜住 CDN 瞬时降级。
       - name: Join tailnet
+        id: tailnet1
+        continue-on-error: true
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      - name: Backoff before tailnet retry 1
+        if: steps.tailnet1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Join tailnet (retry 1)
+        id: tailnet2
+        if: steps.tailnet1.outcome == 'failure'
+        continue-on-error: true
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      - name: Backoff before tailnet retry 2
+        if: steps.tailnet1.outcome == 'failure' && steps.tailnet2.outcome == 'failure'
+        run: sleep 45
+
+      - name: Join tailnet (retry 2)
+        if: steps.tailnet1.outcome == 'failure' && steps.tailnet2.outcome == 'failure'
         uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
