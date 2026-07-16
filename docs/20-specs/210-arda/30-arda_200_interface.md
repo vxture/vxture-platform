@@ -184,7 +184,7 @@ Header: x-vxture-internal-auth: <AUTH_INTERNAL_TOKEN>
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | 三通道对接契约            | [`product_200_integration.md`](../../30-design/product_200_integration.md)（§7 = 接入 checklist/验收清单）                             |
 | 目录·权益·资源模型        | [`product_220_catalog-resource-model.md`](../../30-design/product_220_catalog-resource-model.md)（C2 契约 v2、L0 资源、消费方义务 §9） |
-| 订阅·权益引擎             | [`ADR-11-subscription-entitlement-design.md`](../../30-design/decisions/ADR-11-subscription-entitlement-design.md) §11.7               |
+| 订阅·权益引擎             | [`ADR-11-subscription-entitlement-design.md`](../../30-design/decisions/ADR-011-subscription-entitlement-design.md) §11.7              |
 | C1 RP 通则 + webhook wire | [`identity-platform-rp-integration.md`](../../30-design/identity/080-rp-integration.md)（§5 = webhook）                                |
 | gauge 计量                | [`data_commerce_240_usage-gauge.md`](../../30-design/data_commerce_240_usage-gauge.md)                                                 |
 | 值域                      | `@vxture/shared`（catalog value domains）                                                                                              |

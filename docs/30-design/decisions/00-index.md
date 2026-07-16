@@ -8,13 +8,13 @@
 
 ## 决策列表
 
-| 编号                                         | 标题                          | 状态        | 日期       |
-| -------------------------------------------- | ----------------------------- | ----------- | ---------- |
-| [ADR-001](./001-auth-bff-sole-jwt-issuer.md) | auth-bff 作为唯一 JWT 签发者  | ✅ Accepted | 2026-03-01 |
-| [ADR-002](./002-bcp47-locale-format.md)      | 全链路使用完整 BCP47 语言标签 | ✅ Accepted | 2026-03-16 |
-| [ADR-003](./003-pnpm-workspaces-monorepo.md) | 采用 pnpm workspaces monorepo | ✅ Accepted | 2026-02-01 |
-| [ADR-004](./004-nestjs-for-bff.md)           | BFF 层使用 NestJS 框架        | ✅ Accepted | 2026-02-01 |
-| [ADR-005](./005-plg-tenant-model.md)         | PLG 自动租户模型              | ✅ Accepted | 2026-03-01 |
+| 编号                                             | 标题                          | 状态        | 日期       |
+| ------------------------------------------------ | ----------------------------- | ----------- | ---------- |
+| [ADR-001](./ADR-001-auth-bff-sole-jwt-issuer.md) | auth-bff 作为唯一 JWT 签发者  | ✅ Accepted | 2026-03-01 |
+| [ADR-002](./ADR-002-bcp47-locale-format.md)      | 全链路使用完整 BCP47 语言标签 | ✅ Accepted | 2026-03-16 |
+| [ADR-003](./ADR-003-pnpm-workspaces-monorepo.md) | 采用 pnpm workspaces monorepo | ✅ Accepted | 2026-02-01 |
+| [ADR-004](./ADR-004-nestjs-for-bff.md)           | BFF 层使用 NestJS 框架        | ✅ Accepted | 2026-02-01 |
+| [ADR-005](./ADR-005-plg-tenant-model.md)         | PLG 自动租户模型              | ✅ Accepted | 2026-03-01 |
 
 ---
 

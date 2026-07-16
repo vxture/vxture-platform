@@ -110,8 +110,8 @@
 
 `scripts/guardrails/check-docs-numbering.mjs` 扫 `docs/` 下每个 `.md`：非 `00-index.md`、非白名单、且既不匹配 `NN-` / `{kind}_{domain}_{NNN}_` / `ADR-|TD-` 者 → 报错（= 未编号 = 临时，须编号或删除）。
 
-- **迁移期**：report 模式（列违规=迁移工作单），不阻断。
-- **迁移完成后**：去 report、接入 CI `quality-gate` 硬门（照 §governance 护栏惯例）。
+- **硬门（现行）**：`lint:docs-numbering --strict` 已接入 CI `quality-gate`（始终跑，含 docs-only），
+  任何未编号 `.md` 即 fail 拦合并——把元规则"无编号=待删"变成铁律。新增 `.md` 必须编号或删除。
 
 ---
 
@@ -121,4 +121,4 @@
 2. **批 2**：建 `00–90` 顶层目录骨架，迁移到位，`00-index.md` 就位。✅
 3. **批 3a**：简单目录文件加 `NN-` 编号；护栏认 `{prefix}_{NNN}` 已编号。✅
 4. **批 3b**：`30-design` 域子目录（identity/commerce/…）+ 文件编号；`20-specs` 产品层级编号（§6）；子目录编号；`platform-alerts-cron-runbook`→`60-operations`；temp 输入稿清理。
-5. **批 4**：ADR 两处合并到 `30-design/decisions/`（保号）；`lint:docs-numbering` 转 `--strict` 硬门。
+5. **批 4**：ADR 统一 `ADR-NNN`（001-005 加前缀保号、11/12→011/012，`30-design/decisions/`）；`lint:docs-numbering --strict` 接 CI 硬门。✅ **迁移完成，214 docs 全编号。**

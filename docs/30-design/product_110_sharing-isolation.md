@@ -3,7 +3,7 @@
 > 版本:**v1.0**
 > 状态:**已定稿**(2026-07-06 owner 拍板,待拍板项全部销号,见 §12 决策记录)
 > 文档族:产品架构族 `product_{NNN}`,本文 = **110**(架构位);族路由见 [`product_100_matrix.md`](./product_100_matrix.md) §0 头部
-> 上游文档:[`product_100_matrix.md`](./product_100_matrix.md) v1.0(产品矩阵与分层,本仓重构)、[`ADR-11`](./decisions/ADR-11-subscription-entitlement-design.md)(订阅/权益)、[`ADR-12`](./decisions/ADR-12-sharing-grant-design.md)(共享授权决策记录)
+> 上游文档:[`product_100_matrix.md`](./product_100_matrix.md) v1.0(产品矩阵与分层,本仓重构)、[`ADR-11`](./decisions/ADR-011-subscription-entitlement-design.md)(订阅/权益)、[`ADR-12`](./decisions/ADR-012-sharing-grant-design.md)(共享授权决策记录)
 > 伴生文档:[`product_200_integration.md`](./product_200_integration.md)(vxture×产品三通道对接标准)
 > 适用范围:L2 域平台(Arda / Karda / Terra)统一原型、Runa 产品边界、L0 工具协议规范、Karda 产品定义前置输入、L3 agent 数据下沉规范
 > 留档:v0.2 原稿见 [`inputs/sharing-isolation-model-v0.2.md`](./inputs/20-sharing-isolation-model-v0.2.md);评审与对账见 [`sharing-isolation-review.md`](./design_sharing_100_isolation-review.md)
