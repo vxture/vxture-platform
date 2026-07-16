@@ -77,6 +77,9 @@ function walk(dir, out = []) {
     const st = statSync(p);
     if (st.isDirectory()) {
       if (name === 'node_modules' || name.startsWith('.')) continue;
+      // 95-readme = 内部包使用文档归集（非数据架构文档），不套 DDL 铁律
+      // （避免 README 里描述 TS const/enum 被 pg-enum 规则误判）。
+      if (name === '95-readme') continue;
       walk(p, out);
     } else if (name.endsWith('.md')) {
       out.push(p);
