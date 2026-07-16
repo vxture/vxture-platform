@@ -198,11 +198,14 @@ required status check（发现新漏洞即 fail 拦合并）。
 - **目录**：`.github/`（`workflows/` + `actions/` 复合动作）· `configs/` · `deploy/`
   （compose / scripts / database / nginx / worker-NN…）· `docs/` · `scripts/` + 产品源码目录
   （`portals/` / `services/` / `agent-server/` 等按形态）。
-- **`docs/` 编号分类**（可导航、可预期，跨仓一致）：
-  `10-specs` · `20-design` · `30-implementation` · `40-deployment` · `50-operations` ·
-  `60-workplan` · `70-reply` · `90-memory`。
-- **工程规范** `docs/standards/`：本规范 + `git-workflow` + `cicd-optimization-playbook` +
-  `testing`/`security`/`logging`/`container-healthcheck-standard` 等，随仓携带或链回 org 级权威。
+- **`docs/` 编号分类**（详见 [`docs-taxonomy.md`](docs-taxonomy.md)，跨仓一致）——顶层十进制分段：
+  `00-meta` · **`10-standards`**（全栈规范，基础层居首）· `20-specs` · `30-design` ·
+  `40-implementation` · `50-deployment` · `60-operations` · `70-workplan` · `80-liaison` · `90-memory`。
+- **元规则（铁律）**：**编号 = 正式文件（永久）；无编号 = 临时（定位即待删），概莫能外**（连 `00-index` 也不破例）。
+  **编号预留空位、不连续**（目录=十位段、文件=十位跳、域文档=百位段内十位跳）；类型寄存器 `ADR-`/`TD-` append-only 保号。
+  由 `lint:docs-numbering` 护栏强制。
+- **域文档命名** `{kind}_{domain}_{NNN}_{slug}`（`kind`∈data/design/ops，`NNN` 段义 1xx 架构/2xx schema/3xx 实施）；
+  **域码用全词**（platform/identity/commerce/…，见 taxonomy §5）。
 
 ---
 
