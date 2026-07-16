@@ -1,7 +1,7 @@
 # Vxture 全产品 OIDC × 订阅体系设计
 
 > ⚠️ **SUPERSEDED · 标记删除（2026-07-06，ADR-12）——本文档已被取代，仅存档待删，不得作为实施依据。**
-> 取代关系：产品清单/定位 → [`product_100_matrix.md`](./product_100_matrix.md) v1.0（本文 `arda`=平台 shell、`vault`/`cortex` 候选名等表述**作废**；`ruyin` 对接方现名 **umbra**，域名 ruyin.ai 不变，改名规划见 `product_300_naming-migration.md`）；接入通道/claim 解析 → [`product_200_integration.md`](./product_200_integration.md) v1.0（本文 tenant×app 粒度的 `TenantSubscription` resolver 与 workspace×product 权益引擎冲突，以 ADR-11 为准）。
+> 取代关系：产品清单/定位 → [`product_100_matrix.md`](../product_100_matrix.md) v1.0（本文 `arda`=平台 shell、`vault`/`cortex` 候选名等表述**作废**；`ruyin` 对接方现名 **umbra**，域名 ruyin.ai 不变，改名规划见 `product_300_naming-migration.md`）；接入通道/claim 解析 → [`product_200_integration.md`](../product_200_integration.md) v1.0（本文 tenant×app 粒度的 `TenantSubscription` resolver 与 workspace×product 权益引擎冲突，以 ADR-11 为准）。
 > 删除前置：§五 UUID 分配表与 §六 Phase 实施清单如仍有效，须先迁入接替文档或 seed 注释；确认无引用后执行删除（删除为独立动作，须 owner 确认）。
 
 **版本**: 1.0  

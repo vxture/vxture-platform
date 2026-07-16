@@ -4,7 +4,7 @@
 **Updated**: 2026-06-07
 **Scope**: Unified model access, model control plane, model runtime, technical authorization, quota check, usage metering, and provider cost tracking.
 
-> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](./data_platform_100_architecture.md)（架构/§3.4）+ [data_platform_200_schema.md](./data_platform_200_schema.md)（字段级权威，全表 DDL/列/索引/触发器/Prisma §4–§15）；落地见 [data_platform_300_migration.md](./data_platform_300_migration.md)。本文不重述平台 DDL，只述本板块（Model Platform）内容。
+> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](../data_platform_100_architecture.md)（架构/§3.4）+ [data_platform_200_schema.md](../data_platform_200_schema.md)（字段级权威，全表 DDL/列/索引/触发器/Prisma §4–§15）；落地见 [data_platform_300_migration.md](../data_platform_300_migration.md)。本文不重述平台 DDL，只述本板块（Model Platform）内容。
 
 ---
 
@@ -14,7 +14,7 @@ Model Platform is Vxture's platform-level model capability domain. It solves two
 
 The current implementation is still named `@vxture/service-model-platform` and deployed as `vx-model-platform`. That name is retained for compatibility. Architecturally, it is an early combined implementation of Model Platform, not the final domain name.
 
-> 📌 **终态产品名 = Atlas**（2026-07-06 定名，[`product_100_matrix.md`](./product_100_matrix.md) v1.0，L1 模型平台）：统一模型接入/路由/配额/用量治理，大模型与**专用小模型**唯一宿主、唯一 LLM 出口与计量口径（[`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md) v1.0 §6.6/§13）。注意与 schema 迁移工具 `ariga/atlas`（`data_platform_320` 引用）同名不同物。服务/包改名为独立实施项，本文暂沿用 model-platform 称呼。
+> 📌 **终态产品名 = Atlas**（2026-07-06 定名，[`product_100_matrix.md`](../product_100_matrix.md) v1.0，L1 模型平台）：统一模型接入/路由/配额/用量治理，大模型与**专用小模型**唯一宿主、唯一 LLM 出口与计量口径（[`product_110_sharing-isolation.md`](../product_110_sharing-isolation.md) v1.0 §6.6/§13）。注意与 schema 迁移工具 `ariga/atlas`（`data_platform_320` 引用）同名不同物。服务/包改名为独立实施项，本文暂沿用 model-platform 称呼。
 
 Target naming:
 

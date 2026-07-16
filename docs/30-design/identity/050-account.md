@@ -1,7 +1,7 @@
 # Identity 账号与认证（identity 板块 · 详细层）
 
-> 🧭 架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md)（板块定位 / 边界 / 拓扑总览 / 双 realm）。本文 = **账号标识 / 登录手段 / 社交联邦 / 账号合并 / 头像 的详细层 reference**。IdP 端点 / 密钥 / 会话机制见 [`identity-platform-idp.md`](./identity-platform-idp.md)；RP 接入见 [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md)。
-> 平台数据模型权威 = [`data_platform_100_architecture.md`](./data_platform_100_architecture.md)（a）+ [`data_platform_200_schema.md`](./data_platform_200_schema.md)（b）：`users` / `identities` / `user_credential` / `user_avatar` 等字段级见 **b §4 identity**，本文**不重述 DDL**。
+> 🧭 架构层见 [`identity-platform-architecture.md`](./040-architecture.md)（板块定位 / 边界 / 拓扑总览 / 双 realm）。本文 = **账号标识 / 登录手段 / 社交联邦 / 账号合并 / 头像 的详细层 reference**。IdP 端点 / 密钥 / 会话机制见 [`identity-platform-idp.md`](./070-idp.md)；RP 接入见 [`identity-platform-rp-integration.md`](./080-rp-integration.md)。
+> 平台数据模型权威 = [`data_platform_100_architecture.md`](../data_platform_100_architecture.md)（a）+ [`data_platform_200_schema.md`](../data_platform_200_schema.md)（b）：`users` / `identities` / `user_credential` / `user_avatar` 等字段级见 **b §4 identity**，本文**不重述 DDL**。
 > 合并自 `identity-account-consolidation` + `identity-auth-consolidation` + `identity-sso-google-provider` + `identity-avatar`，2026-07-01。状态：机制基线（statement-of-record）。
 
 ---
@@ -41,7 +41,7 @@
 
 ## 2. 登录手段与验证码
 
-`/authorize` 登录页复用既有能力，**只把「签 JWT + 设 cookie」的尾部换成「建中心会话 + 继续 authorize」**（IdP 机制见 [`identity-platform-idp.md`](./identity-platform-idp.md) §7）。tenant realm 登录面**验证码优先**；operator realm 永远密码-only、无 tab、无验证码 / 社交 / 注册。
+`/authorize` 登录页复用既有能力，**只把「签 JWT + 设 cookie」的尾部换成「建中心会话 + 继续 authorize」**（IdP 机制见 [`identity-platform-idp.md`](./070-idp.md) §7）。tenant realm 登录面**验证码优先**；operator realm 永远密码-only、无 tab、无验证码 / 社交 / 注册。
 
 ### 2.1 登录 tab 与智能输入框
 

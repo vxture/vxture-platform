@@ -1,7 +1,7 @@
 # 数据接入层架构设计
 
 > 版本：1.0.0 | 2026-05-15
-> 上级文档：[`docs/30-design/data_platform_100_architecture.md`](./data_platform_100_architecture.md)（平台数据架构顶层权威；原 database.md 已并入）
+> 上级文档：[`docs/30-design/data_platform_100_architecture.md`](../data_platform_100_architecture.md)（平台数据架构顶层权威；原 database.md 已并入）
 > 执行级别：**强制** — 所有数据库访问必须遵循本文件定义的分层与权限规则
 
 ---

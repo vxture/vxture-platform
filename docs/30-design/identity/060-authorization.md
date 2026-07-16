@@ -6,8 +6,8 @@ updated: 2026-05-12
 
 # Identity 授权 / 两级 RBAC 执行（identity 板块 · 详细层）
 
-> 🧭 架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md)（板块定位 / 边界 / 授权总览）。本文 = 两级 RBAC **执行**的详细层 reference（BFF 守卫 / menu↔permission 映射 / 跨包协作）。
-> 平台数据模型权威 = [data_platform_100_architecture.md](./data_platform_100_architecture.md) + [-schema.md](./data_platform_200_schema.md)：iam `role`/`permission`/`role_permission` 字段级见 **b §5**，本文不重述 DDL。
+> 🧭 架构层见 [`identity-platform-architecture.md`](./040-architecture.md)（板块定位 / 边界 / 授权总览）。本文 = 两级 RBAC **执行**的详细层 reference（BFF 守卫 / menu↔permission 映射 / 跨包协作）。
+> 平台数据模型权威 = [data_platform_100_architecture.md](../data_platform_100_architecture.md) + [-schema.md](../data_platform_200_schema.md)：iam `role`/`permission`/`role_permission` 字段级见 **b §5**，本文不重述 DDL。
 
 **版本**：1.0.0
 **日期**：2026-05-12
@@ -19,7 +19,7 @@ updated: 2026-05-12
 
 ## 1. RBAC 模型（引用）
 
-iam RBAC 权限模型（`permission` / `role` / `role_permission` / 角色绑定，字段级权威）= [data_platform_200_schema.md](./data_platform_200_schema.md) §iam；域概览见 [data_platform_100_architecture.md](./data_platform_100_architecture.md) §3.4。本文不重述平台 DDL。
+iam RBAC 权限模型（`permission` / `role` / `role_permission` / 角色绑定，字段级权威）= [data_platform_200_schema.md](../data_platform_200_schema.md) §iam；域概览见 [data_platform_100_architecture.md](../data_platform_100_architecture.md) §3.4。本文不重述平台 DDL。
 
 术语对齐（重建后 iam 模型）：
 

@@ -45,9 +45,9 @@
 
 ## 5. 参考实例：arda
 
-| 文件                                                                            | 角色                         |
-| ------------------------------------------------------------------------------- | ---------------------------- |
-| [`arda/arda_000_definition.md`](./arda/10-arda_000_definition.md)               | 产品定义                     |
-| [`arda/arda_100_handoff.md`](./arda/20-arda_100_handoff.md)                     | 对接交接总纲 v1.0            |
-| [`arda/arda_200_interface.md`](./arda/30-arda_200_interface.md)                 | 对接接口契约 v2.0            |
-| [`arda/arda_300_integration-final.md`](./arda/40-arda_300_integration-final.md) | 最终对接要求 + 决策留痕 v1.0 |
+| 文件                                                                                | 角色                         |
+| ----------------------------------------------------------------------------------- | ---------------------------- |
+| [`arda/arda_000_definition.md`](./210-arda/10-arda_000_definition.md)               | 产品定义                     |
+| [`arda/arda_100_handoff.md`](./210-arda/20-arda_100_handoff.md)                     | 对接交接总纲 v1.0            |
+| [`arda/arda_200_interface.md`](./210-arda/30-arda_200_interface.md)                 | 对接接口契约 v2.0            |
+| [`arda/arda_300_integration-final.md`](./210-arda/40-arda_300_integration-final.md) | 最终对接要求 + 决策留痕 v1.0 |

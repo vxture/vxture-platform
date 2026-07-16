@@ -1,12 +1,12 @@
 # Ruyin ⇄ Vxture OIDC 集成契约（接口标准）
 
-> 📌 **对接方更名（2026-07-06，ADR-12 D7）→ 切换完成（2026-07-07）**：本契约的对接方为 **umbra（边界 VPN 产品）**——域名 **ruyin.ai 不变**；**client_id 已切换为 `umbra`**（一次切换，[`product_300_naming-migration.md`](./product_300_naming-migration.md) §2 v1.1 执行完成：活库 seed + worker-04 对端 env，authorize 正负探针验证过），scope 相应改 `umbra`/`umbra:subscription`，secret 沿用原 hash；其余契约条款**全部照旧有效**（umbra 保持现状租户级订阅模式，豁免 workspace×product 权益引擎与 SharingGrant）。"Ruyin"一名现指 client 端产品（desktop，产品定义待建），其 web RP 已注册在 `ruyin.vxture.com`，与本契约无关。
+> 📌 **对接方更名（2026-07-06，ADR-12 D7）→ 切换完成（2026-07-07）**：本契约的对接方为 **umbra（边界 VPN 产品）**——域名 **ruyin.ai 不变**；**client_id 已切换为 `umbra`**（一次切换，[`product_300_naming-migration.md`](../product_300_naming-migration.md) §2 v1.1 执行完成：活库 seed + worker-04 对端 env，authorize 正负探针验证过），scope 相应改 `umbra`/`umbra:subscription`，secret 沿用原 hash；其余契约条款**全部照旧有效**（umbra 保持现状租户级订阅模式，豁免 workspace×product 权益引擎与 SharingGrant）。"Ruyin"一名现指 client 端产品（desktop，产品定义待建），其 web RP 已注册在 `ruyin.vxture.com`，与本契约无关。
 
-> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](./data_platform_100_architecture.md) + [data_platform_200_schema.md](./data_platform_200_schema.md)（本文不重述平台 DDL，只述本板块内容）。
-> 📌 通用跨域接入（子域/跨域两模式、cookie/会话通则）已被 [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md) 取代；本文只留 **ruyin 专属** OIDC 接口契约（端点/PKCE/claim 名/back-channel logout）。token 内 claims（`active_org`/`roles`/`entitlement` 等）是 **OIDC 投影**，权威模型 = data_platform_200_schema.md（identity / iam 域，字段级权威）。
+> 🧭 平台数据模型权威 = [data_platform_100_architecture.md](../data_platform_100_architecture.md) + [data_platform_200_schema.md](../data_platform_200_schema.md)（本文不重述平台 DDL，只述本板块内容）。
+> 📌 通用跨域接入（子域/跨域两模式、cookie/会话通则）已被 [`identity-platform-rp-integration.md`](./080-rp-integration.md) 取代；本文只留 **ruyin 专属** OIDC 接口契约（端点/PKCE/claim 名/back-channel logout）。token 内 claims（`active_org`/`roles`/`entitlement` 等）是 **OIDC 投影**，权威模型 = data_platform_200_schema.md（identity / iam 域，字段级权威）。
 
 > 面向 **ruyin.ai（外部仓库 worker-04 / umbra 栈）团队** 的对接标准。本文是 vxture 平台作为 **OIDC IdP** 对外承诺的接口契约，ruyin 据此**并行开发** RP（Relying Party）。
-> 与 [`identity-platform-implementation.md`](./identity-platform-implementation.md)（内部设计）配套；**本文以平台已落地实现（P0–P2）为准**，claim 名称/端点/校验规则均与生产代码一致，可直接编码。
+> 与 [`identity-platform-implementation.md`](./120-implementation.md)（内部设计）配套；**本文以平台已落地实现（P0–P2）为准**，claim 名称/端点/校验规则均与生产代码一致，可直接编码。
 > 版本：v2.1（2026-06-19）。状态：**接口冻结，可对接**。
 > v2.1 裁定（ruyin 联调反馈三项偏离）：**D-BI** §5 授权"多子域 RP 用 Domain-scoped 不透明 cookie（去 `__Host-`，Secure/HttpOnly/SameSite=Lax、控全部子域）"——ruyin 现状即合规；**§2.3** 增登出吊销 refresh 硬化说明（全局 `end_session` 已吊销，仅本地登出需 `/oidc/revoke`）；**D-BJ** §13 删 `OIDC_RP_ENABLED`（桥退役、vxture 自身亦移除）。
 > v2 修订：`access_token` 上下文模型对齐现行四层模型（`active_org`/`active_workspace`/`roles`，弃 legacy `active_tenant_*`/`tenants`）；人类身份声明（`name`/`preferred_username`/`account_status`/`email`/`phone`）已在 `access_token` 下发（§8）；`entitlement`当前不下发、暂缓（§8.1/§10）；推荐 scope =`openid profile email phone umbra umbra:subscription`（原 `... ruyin`，2026-07-07 随 client_id 切换）；头像 `picture`见`identity-platform-account.md`。

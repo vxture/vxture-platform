@@ -15,7 +15,7 @@
 | [`arda_300_integration-final.md`](./40-arda_300_integration-final.md)                            | **最终对接要求 + 决策留痕**：三通道定型后的产品侧义务清单 + 关键架构决策（含被否决的旧方案，防回退）             |
 | [`product_200_integration.md`](../../30-design/product_200_integration.md)                       | 三通道对接契约权威；§7 = 新产品接入 checklist（验收清单）                                                        |
 | [`product_220_catalog-resource-model.md`](../../30-design/product_220_catalog-resource-model.md) | 目录·权益与资源模型权威：C2 信封形状、L0 共享资源目录、消费方义务                                                |
-| [`identity-platform-rp-integration.md`](../../30-design/identity-platform-rp-integration.md)     | C1 RP 接入通则（五端点、PKCE、RS256 验签、服务端会话、back-channel logout）；§5 = provisioning webhook wire 契约 |
+| [`identity-platform-rp-integration.md`](../../30-design/identity/080-rp-integration.md)          | C1 RP 接入通则（五端点、PKCE、RS256 验签、服务端会话、back-channel logout）；§5 = provisioning webhook wire 契约 |
 | [`data_platform_100_architecture.md`](../../30-design/data_platform_100_architecture.md) §2.3    | 业务面模板硬约束：库名/四 schema/`workspace_id` 隔离键/不读平台库                                                |
 | [`product_210_tool-protocol.md`](../../30-design/product_210_tool-protocol.md)                   | L0 工具协议（"agent 调 Arda"目标态，v1 不要求实现，仅预留见 §4）                                                 |
 

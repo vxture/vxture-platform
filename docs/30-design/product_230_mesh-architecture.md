@@ -4,7 +4,7 @@
 > 文档族:产品架构族 `product_{NNN}`,本文 = **230**(细化标准位);族路由见 [`product_100_matrix.md`](./product_100_matrix.md) §0 头部
 > 定位:**登录授权之后**的跨产品通信**传输面 / mesh 架构权威**——按"域关系 × 产品层"两轴分级,定义 S2S 通信走公网边缘还是内网 tailnet、边界如何收口、会话如何互验、控制面/数据面如何分离。补齐 product_200(三通道**结构**)与 product_210(产品↔产品**身份/授权/计量**)之外的**第三维:字节怎么走、走哪张网**。
 > 上游:[`product_200_integration.md`](./product_200_integration.md) v1.0(三通道契约)、[`product_210_tool-protocol.md`](./product_210_tool-protocol.md) v1.0(token exchange = 本文 §5 收敛目标)、[`product_100_matrix.md`](./product_100_matrix.md) v1.0(产品矩阵)。
-> 定位:平台传输面(S2S 内网 tailnet 寻址、边缘/内网双面边界、控制·数据面分离)的**架构定稿**。产品侧决策留痕见 [`arda_300`](../20-specs/arda/40-arda_300_integration-final.md) §2。
+> 定位:平台传输面(S2S 内网 tailnet 寻址、边缘/内网双面边界、控制·数据面分离)的**架构定稿**。产品侧决策留痕见 [`arda_300`](../20-specs/210-arda/40-arda_300_integration-final.md) §2。
 > 铁律承接:**平台只出规范与凭证,不出网关**(product_210 §0)——本文定传输面分级与边界,不新建中心代理/ESB;**S2S 永不公网、密钥与内部端点不出内网**。
 
 ---

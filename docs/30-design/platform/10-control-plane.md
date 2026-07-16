@@ -1,6 +1,6 @@
 # Vxture 平台控制面与业务数据面架构概要设计
 
-> 🧭 产品架构层上游（2026-07-06 新增，产品架构族 `product_{NNN}`）：**产品分层与矩阵** = [`product_100_matrix.md`](./product_100_matrix.md) v1.0（L0–L3，终版命名）；**共享与隔离语义** = [`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md) v1.0（P-T-A 资产分级、SharingGrant、供给直连）；**对接契约** = [`product_200_integration.md`](./product_200_integration.md) v1.0（三通道）。本文的双平面架构继续有效，L2 域平台的资产托管落在各自**业务面**基础设施（不进平台控制面库）。数据架构权威 = `data_platform_100_architecture.md`（本文部分 schema 命名为旧稿表述，以彼为准）。
+> 🧭 产品架构层上游（2026-07-06 新增，产品架构族 `product_{NNN}`）：**产品分层与矩阵** = [`product_100_matrix.md`](../product_100_matrix.md) v1.0（L0–L3，终版命名）；**共享与隔离语义** = [`product_110_sharing-isolation.md`](../product_110_sharing-isolation.md) v1.0（P-T-A 资产分级、SharingGrant、供给直连）；**对接契约** = [`product_200_integration.md`](../product_200_integration.md) v1.0（三通道）。本文的双平面架构继续有效，L2 域平台的资产托管落在各自**业务面**基础设施（不进平台控制面库）。数据架构权威 = `data_platform_100_architecture.md`（本文部分 schema 命名为旧稿表述，以彼为准）。
 
 ## 1. 文档目标
 
@@ -507,13 +507,13 @@ vx-{business}-bff, vx-{business}-server, vx-{business}-pg, vx-{business}-redis
 
 不同业务相互隔离，一个业务崩溃不影响平台控制面。业务容器如需使用 AI 能力，只能通过受控 HTTP/API 调用平台 Model Platform，禁止在业务 worker 部署 `vx-model-platform` 或持有平台 Provider Key。
 
-详见 [`docs/50-deployment/04-services.md`](../50-deployment/04-services.md)。
+详见 [`docs/50-deployment/04-services.md`](../../50-deployment/04-services.md)。
 
 ---
 
 # 9. Docker Compose 与 CI/CD
 
-Docker Compose 配置、镜像命名、环境变量管理见 [`docs/50-deployment/`](../50-deployment/00-index.md)。
+Docker Compose 配置、镜像命名、环境变量管理见 [`docs/50-deployment/`](../../50-deployment/00-index.md)。
 
 ---
 

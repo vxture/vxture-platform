@@ -4,7 +4,7 @@
 
 > 状态：v1 草案 · 编号 `data_admin_200`（细化设计层）· 待评审 · 部分在产（见 §0）
 > 上级权威：[`data_platform_100_architecture.md`](./data_platform_100_architecture.md) §2.2.4 八条铁律
-> 运营身份**权威专项**：[`identity-platform-operator.md`](./identity-platform-operator.md) §6（本文不复制，只做落库归口 + 治理表字段级）。
+> 运营身份**权威专项**：[`identity-platform-operator.md`](./identity/090-operator.md) §6（本文不复制，只做落库归口 + 治理表字段级）。
 > 取代范围：**取代** [`data_platform_200_schema.md`](./data_platform_200_schema.md) §14（operator/admin 域）字段级内容。
 
 ---

@@ -2,12 +2,12 @@
 
 > 版本:**v1.0** · 日期:2026-07-06 · 状态:**已定稿**(产品名称为终版,owner 拍板,稳定使用,除非再次修订)
 > 定位:平台**产品架构层**权威——回答"平台由哪些产品组成、各在什么层、彼此什么关系"。与 [`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md) v1.0 互为伴生(本文管结构,彼文管资产与授权流动);对接契约见 [`product_200_integration.md`](./product_200_integration.md)。
-> 取代:外部上游 `product-matrix.md v1.1`(不再提供,本文重构);[`product-oidc-subscription.md`](./product-oidc-subscription.md) 的产品清单/定位部分(该文档已标记删除)。
+> 取代:外部上游 `product-matrix.md v1.1`(不再提供,本文重构);[`product-oidc-subscription.md`](./commerce/40-oidc-subscription.md) 的产品清单/定位部分(该文档已标记删除)。
 > 下游:`data_platform_100_architecture.md` §1#1(产品矩阵业务目标)、product 域 seed/目录、各产品定义文档。
 >
 > 🧭 **产品架构文档族路由(`product_{NNN}`,2026-07-06 立族)**:编号对齐 `data_{domain}_{NNN}` 惯例——**1\*\* 架构 / 2\*\* 细化标准 / 3\*\* 实施**,编号预留扩展空间。
 > **100** 本文(矩阵与分层总纲,族入口)｜**110** [`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md)(共享与隔离模型)｜**200** [`product_200_integration.md`](./product_200_integration.md)(平台×产品三通道对接标准)｜**210** [`product_210_tool-protocol.md`](./product_210_tool-protocol.md)(L0 工具协议规范,**v1.0 已定稿**)｜**220** [`product_220_catalog-resource-model.md`](./product_220_catalog-resource-model.md)(目录·权益与资源模型,**v1.0 已定稿**)｜**230** [`product_230_mesh-architecture.md`](./product_230_mesh-architecture.md)(登录后跨产品通信 fabric/mesh 架构,**v1.0 已定稿**)｜**300** [`product_300_naming-migration.md`](./product_300_naming-migration.md)(目录定名迁移 runbook,规划稿)｜**310** [`product_310_arda-integration.md`](./product_310_arda-integration.md)(Arda 对接实施总纲,规划稿)。
-> 族外:决策记录 = ADR-11/ADR-12(ADR 自有编号线);评审/过程留档([`sharing-isolation-review.md`](./sharing-isolation-review.md))与 owner 原稿([`inputs/`](./inputs/README.md))**不进编号体系**;各产品定义文档归 `docs/20-specs/` 产品文档线。
+> 族外:决策记录 = ADR-11/ADR-12(ADR 自有编号线);评审/过程留档([`sharing-isolation-review.md`](./design_sharing_100_isolation-review.md))与 owner 原稿([`inputs/`](./inputs/README.md))**不进编号体系**;各产品定义文档归 `docs/20-specs/` 产品文档线。
 
 ---
 
@@ -108,5 +108,5 @@ L3  行业 agent 应用(消费同一套 L1/L2 能力面,差异仅来自数据与
 
 ## 7. 旧文档处置
 
-- [`product-oidc-subscription.md`](./product-oidc-subscription.md):产品清单/定位被本文取代,接入通道被 [`product_200_integration.md`](./product_200_integration.md) 取代——**已标记删除**(banner);其 UUID 分配表/Phase 实施细节在删除前如仍有效须迁入接替文档或 seed 注释;
+- [`product-oidc-subscription.md`](./commerce/40-oidc-subscription.md):产品清单/定位被本文取代,接入通道被 [`product_200_integration.md`](./product_200_integration.md) 取代——**已标记删除**(banner);其 UUID 分配表/Phase 实施细节在删除前如仍有效须迁入接替文档或 seed 注释;
 - `tenant.md` / `decisions/005` / `glossary.md` 相关条目:单层租户与旧 ruyin 语义的清理见各文件标记。

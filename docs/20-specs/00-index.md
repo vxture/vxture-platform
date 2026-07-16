@@ -17,20 +17,20 @@
 
 > 产品对接文档采用**编号交接包**规范 → [`000_handoff-package-convention.md`](./10-000_handoff-package-convention.md)
 
-| 路径                                                                                          | 内容                                                          | 状态    |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------- |
-| [`arda/arda_000_definition.md`](./arda/10-arda_000_definition.md)                             | Arda 产品定义 v1.0                                            | ✅ 定稿 |
-| [`arda/arda_100_handoff.md`](./arda/20-arda_100_handoff.md)                                   | Arda 对接交接总纲 v2.0（数据平台，L2；实施仓为独立 arda 仓）  | ✅ 定稿 |
-| [`arda/arda_200_interface.md`](./arda/30-arda_200_interface.md)                               | Arda 对接接口契约 v2.0（C1/C2/C3/webhook/值域/鉴权）          | ✅ 定稿 |
-| [`arda/arda_300_integration-final.md`](./arda/40-arda_300_integration-final.md)               | Arda 最终对接要求 + 决策留痕 v1.0（三通道定型，取代逐轮回函） | ✅ 定稿 |
-| [`arda/arda_301_deeplink-live-2607141357.md`](./arda/50-arda_301_deeplink-live-2607141357.md) | 通知：console `/subscribe` 深链落地页上产 + 联测请求          | 📨 通知 |
+| 路径                                                                                              | 内容                                                          | 状态    |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------- |
+| [`arda/arda_000_definition.md`](./210-arda/10-arda_000_definition.md)                             | Arda 产品定义 v1.0                                            | ✅ 定稿 |
+| [`arda/arda_100_handoff.md`](./210-arda/20-arda_100_handoff.md)                                   | Arda 对接交接总纲 v2.0（数据平台，L2；实施仓为独立 arda 仓）  | ✅ 定稿 |
+| [`arda/arda_200_interface.md`](./210-arda/30-arda_200_interface.md)                               | Arda 对接接口契约 v2.0（C1/C2/C3/webhook/值域/鉴权）          | ✅ 定稿 |
+| [`arda/arda_300_integration-final.md`](./210-arda/40-arda_300_integration-final.md)               | Arda 最终对接要求 + 决策留痕 v1.0（三通道定型，取代逐轮回函） | ✅ 定稿 |
+| [`arda/arda_301_deeplink-live-2607141357.md`](./210-arda/50-arda_301_deeplink-live-2607141357.md) | 通知：console `/subscribe` 深链落地页上产 + 联测请求          | 📨 通知 |
 
 ## Agent 产品面
 
-| 路径                                                    | 内容                              | 状态        |
-| ------------------------------------------------------- | --------------------------------- | ----------- |
-| [`agents/varda/spec.md`](./agents/varda/10-spec.md)     | Varda 智能助手完整规格（1127 行） | ✅ 已完成   |
-| [`agents/varda/status.md`](./agents/varda/20-status.md) | Varda 实施进度                    | 🟡 滚动更新 |
+| 路径                                                 | 内容                              | 状态        |
+| ---------------------------------------------------- | --------------------------------- | ----------- |
+| [`agents/varda/spec.md`](./001-varda/10-spec.md)     | Varda 智能助手完整规格（1127 行） | ✅ 已完成   |
+| [`agents/varda/status.md`](./001-varda/20-status.md) | Varda 实施进度                    | 🟡 滚动更新 |
 
 Ruyin 产品规格已随代码迁移到 `vxture/agentstudio-ruyin`，本仓不再维护 Ruyin 实现文档。
 

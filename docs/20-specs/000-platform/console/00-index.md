@@ -57,7 +57,7 @@ Console 对应租户体系中的**租户工作台层**：
 - 个人租户（`personal`）：只有自己一个成员，免费试用
 - 企业租户（`enterprise`）：可邀请多名成员，需订阅套餐
 
-详见 [`docs/30-design/tenant.md`](../../../30-design/tenant.md)。
+详见 [`docs/30-design/tenant.md`](../../../30-design/identity/030-tenant.md)。
 
 ---
 
@@ -81,7 +81,7 @@ Console 展示租户当前订阅状态（套餐、有效期、功能开关）和
 | 创建自定义角色 | owner         |
 | 查看成员列表   | 全部          |
 
-权限模型详见 [`docs/30-design/identity-platform-authorization.md`](../../../30-design/identity-platform-authorization.md)。
+权限模型详见 [`docs/30-design/identity-platform-authorization.md`](../../../30-design/identity/060-authorization.md)。
 
 ---
 

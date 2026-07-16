@@ -1,7 +1,7 @@
 # Identity 实施衔接（identity 板块 · 实施衔接层）
 
-> 🧭 架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md)；机制详细层见 identity-platform-{idp,account,rp-integration,access-topology,authorization,operator}。本文 = **实施衔接层**：现状→新版迁移 / rollout 进度 / 部署 runbook / 收尾。
-> 数据落地/迁移见 [`data_platform_300_migration.md`](./data_platform_300_migration.md)（c）。合并自 website-rp-migration + identity-platform-workplan + identity-rebuild-deploy-runbook + operator-identity-security-workplan + p5-closeout + p3-ruyin，2026-07-01。
+> 🧭 架构层见 [`identity-platform-architecture.md`](./040-architecture.md)；机制详细层见 identity-platform-{idp,account,rp-integration,access-topology,authorization,operator}。本文 = **实施衔接层**：现状→新版迁移 / rollout 进度 / 部署 runbook / 收尾。
+> 数据落地/迁移见 [`data_platform_300_migration.md`](../data_platform_300_migration.md)（c）。合并自 website-rp-migration + identity-platform-workplan + identity-rebuild-deploy-runbook + operator-identity-security-workplan + p5-closeout + p3-ruyin，2026-07-01。
 
 ---
 
@@ -195,7 +195,7 @@ operator token 到租户 RP 被拒、反之亦然；operator 登录不静默进 
 
 ## 5. website RP 迁移（认证面归属 + 拆分）
 
-> 目标态：website 与 console 一样**自身不渲染认证表单**——登录/注册走 accounts 中央面，website-bff 退化为纯 OIDC RP，进入统一 SSO/SLO。决策 D-AZ：先出方案不动手；本轮范围 = 16a+16b+16c，16d 社交独立批。机制规则见 [`identity-platform-access-topology.md`](./identity-platform-access-topology.md)（SSO/SLO/同源/跨域）。
+> 目标态：website 与 console 一样**自身不渲染认证表单**——登录/注册走 accounts 中央面，website-bff 退化为纯 OIDC RP，进入统一 SSO/SLO。决策 D-AZ：先出方案不动手；本轮范围 = 16a+16b+16c，16d 社交独立批。机制规则见 [`identity-platform-access-topology.md`](./110-access-topology.md)（SSO/SLO/同源/跨域）。
 
 ### 5.1 现状（website vs console 模板）
 
@@ -233,13 +233,13 @@ website 的 RP **后端已就绪但未启用**，前端仍 legacy，且比 conso
 - **16c ✅ 完成（2026-06-15）— 重置密码**（D-BB；**D-BE=A 邮箱链接**）：IdP 后端 `password-reset.repository`（`identity.password_reset_token`：token=randomBytes(32)→存 sha256/TTL 15min、**原子一次性 consume**）+ `AuthnService.requestPasswordReset`（查邮箱→签 token→`${LOGIN_UI_BASE_URL}/reset-password?token=`→`MailService.sendPasswordReset`，投递失败吞掉）+ `resetPassword`（→`AccountService.setPassword` Argon2id）+ `AuthnController` `POST /auth/forgot-password`（**恒 200 防枚举**）+ `POST /auth/reset-password`（缺字段/弱密码/坏 token→400）。accounts 前端 `/forgot-password`+`/reset-password?token=` + 登录面「忘记密码？」（仅 tenant realm，复用 design-system panel 未改 DS）。实测：happy 200 + Argon2id 实证改密、replay/expired/unknown/missing/short 全 400；邮件本地无 SMTP 不真发（prod 配置）。
 - **16d ✅ 代码完成（2026-06-15）— 社交登录 + bind-phone**（D-BF 三 provider；D-BG 凭据；D-BH 按钮 accounts 本地）：IdP 经纪式 OAuth——`OAuthProviderRegistry`（表驱动 `oauth_provider` 按 code 实例化适配器）+ Redis `vx:oauth:state`(带 login_challenge)/`vx:oauth:bind` 一次性 store + `GET /auth/oauth/:provider/start`+`/callback`（命中登录 / 带手机自动建号+绑定 / 无手机签 bindToken→bind-phone）+ `POST /auth/oauth/bind-phone`（先验码后销 token）+ `/auth/oauth/providers` + `OidcService.completeLoginWithUser`；email 绝不自动并号，建号只写 phone+name。accounts `SocialLoginButtons`（接 `OidcLoginForm` social 槽，仅 tenant）+ `/bind-phone?binding_token=` 页 + `BindPhonePanel`（复用 `AuthPhoneLoginPanel`）。后端 commit `3cffb6de`；沿用现状：适配器 state-only CSRF（无 PKCE），state/bind 用 Redis 非 `oauth_state` 表。自动化实测全过；**16d.5 真实 provider 真人 e2e 待用户凭据**（D-BG）。
 
-> 16d.5 生产闭合（2026-06-17，worker01）与 SMS 演进见 §5.4。社交登录账号合并/邮箱回填细节见 [`identity-platform-account.md`](./identity-platform-account.md)。
+> 16d.5 生产闭合（2026-06-17，worker01）与 SMS 演进见 §5.4。社交登录账号合并/邮箱回填细节见 [`identity-platform-account.md`](./050-account.md)。
 
 ### 5.4 收尾留项与关联演进
 
 - **legacy `/api/auth/*` seam 退役 ✅（2026-06-15，`4ef1031f`）**：删 website-bff `auth.router`/`phone-auth.router`/`verifycode.router`（`/api/auth/*`、`/api/send-code`、`/api/verify-code` 全 404）+ 注销（含 `MailModule`）+ 清 `auth.middleware` 死白名单；删 website 旧页 `reset-password`/`bind-phone`(+表单) + `useAuth`；裁 `auth.api`（仅留 `buildAuthUrl`+RP-backed `/api/me*`）+ store `login/signup/logout` action。**保留**：`MeRouter`、`getProfile`、`restoreSession`/`AuthSessionBootstrap`、`set-nickname` 登录后页、`WebsiteAuthService`（middleware 用）。boot 实测：`/api/auth/*` 404、`/api/me` 401、`/auth/login` 302。
 - **console legacy reset 清退 ✅（2026-06-22，Batch C1）**：删 console `(auth)/reset-password` 页 + `ResetPasswordForm` + `console-bff.ts` `resetPassword` wrapper。至此 **website/console/admin 三 portal 零本地认证表单**。
-- **16d.5 worker01 社交登录闭合（2026-06-17）**：feishu+dingtalk 在 website+console 真人实测正常（Google 暂缓——纯网络出海，auth-bff 容器境内连不上 google，需改服务器网络，非代码可解，见 [`identity-platform-idp.md`](./identity-platform-idp.md) 关联 Google egress）。修三类首发部署坑对应踩坑录 #12/#13/#14。
+- **16d.5 worker01 社交登录闭合（2026-06-17）**：feishu+dingtalk 在 website+console 真人实测正常（Google 暂缓——纯网络出海，auth-bff 容器境内连不上 google，需改服务器网络，非代码可解，见 [`identity-platform-idp.md`](./070-idp.md) 关联 Google egress）。修三类首发部署坑对应踩坑录 #12/#13/#14。
 - **SMS 演进**：Batch 12 由「建 SMS」collapse 为「验证+启用+补 Turnstile」（`@vxture/service-sms` 早已真实实现并接入 IdP）；2026-06-29（PR #519）改用号码认证服务 Dypnsapi 并上生产（弃 Dysmsapi 自管码→托管 `SendSmsVerifyCode`/`CheckSmsVerifyCode`），真机 send=OK/verify=PASS。
 
 ### 5.5 决策记录（已定 2026-06-15）
@@ -284,7 +284,7 @@ website 的 RP **后端已就绪但未启用**，前端仍 legacy，且比 conso
 
 ### 6.2 P3 ruyin——跨域接入 + 退桥（已完成，ruyin 已迁出外部仓）
 
-> 一次性 token 桥已退役、ruyin 已迁出至外部仓 `vxture/agentstudio-ruyin`。对外契约见 [`identity-platform-ruyin-contract.md`](./identity-platform-ruyin-contract.md)（仍生效）+ [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md)。此处仅存跨域机制要点。
+> 一次性 token 桥已退役、ruyin 已迁出至外部仓 `vxture/agentstudio-ruyin`。对外契约见 [`identity-platform-ruyin-contract.md`](./140-ruyin-contract.md)（仍生效）+ [`identity-platform-rp-integration.md`](./080-rp-integration.md)。此处仅存跨域机制要点。
 
 - **跨域 vs 子域差异**：`vx_sid` 在 `.vxture.com`，浏览器**不发给 ruyin.ai**；SSO 靠**顶级跳转落 IdP 域**（`ruyin.ai → /auth/login → accounts.vxture.com/authorize`，此时浏览器对 accounts 是第一方，`vx_sid`(SameSite=Lax) 携带 → 静默发码 → 回 ruyin）。**必须顶级跳转**（非 iframe/非 XHR，三方 cookie 限制）。RP 会话 cookie = `__Host-vx_rp_session`（`ruyin.ai` host-only，独立）。
 - **back-channel logout = ruyin 唯一登出联动手段**：全局登出销毁 `.vxture.com` 的 `vx_sid` 清不掉 ruyin 跨域 RP cookie → 杀 ruyin 会话**唯一**途径是 OIDC back-channel（IdP→ruyin 服务端）。`oidc_client(ruyin).back_channel_logout_uri = https://ruyin.ai/auth/backchannel-logout`（**必填**）。对比子域 RP 的 back-channel 是兜底（另有父域 cookie 失效），ruyin 是唯一。
@@ -295,7 +295,7 @@ website 的 RP **后端已就绪但未启用**，前端仍 legacy，且比 conso
 
 ## 附. 关联文档
 
-- 架构层：[`identity-platform-architecture.md`](./identity-platform-architecture.md)（板块定位/模型/拓扑/边界/ADR 索引）。
-- 详细层：[`identity-platform-idp.md`](./identity-platform-idp.md)（IdP 机制）/ [`identity-platform-account.md`](./identity-platform-account.md)（账号与认证）/ [`identity-platform-access-topology.md`](./identity-platform-access-topology.md)（SSO/SLO/同源/跨域）/ [`identity-platform-authorization.md`](./identity-platform-authorization.md)（RBAC 执行）/ [`identity-platform-rp-integration.md`](./identity-platform-rp-integration.md)（RP 接入）/ [`identity-platform-operator.md`](./identity-platform-operator.md)（operator 安全权威）。
-- 数据落地：[`data_platform_300_migration.md`](./data_platform_300_migration.md)（c）；字段级 a/b。
-- 归档：[`identity-platform-decisions.md`](./identity-platform-decisions.md)（决策台账）；`identity-sso-p5-closeout` / `identity-sso-p3-ruyin` 已并入本文 §6。
+- 架构层：[`identity-platform-architecture.md`](./040-architecture.md)（板块定位/模型/拓扑/边界/ADR 索引）。
+- 详细层：[`identity-platform-idp.md`](./070-idp.md)（IdP 机制）/ [`identity-platform-account.md`](./050-account.md)（账号与认证）/ [`identity-platform-access-topology.md`](./110-access-topology.md)（SSO/SLO/同源/跨域）/ [`identity-platform-authorization.md`](./060-authorization.md)（RBAC 执行）/ [`identity-platform-rp-integration.md`](./080-rp-integration.md)（RP 接入）/ [`identity-platform-operator.md`](./090-operator.md)（operator 安全权威）。
+- 数据落地：[`data_platform_300_migration.md`](../data_platform_300_migration.md)（c）；字段级 a/b。
+- 归档：[`identity-platform-decisions.md`](./130-decisions.md)（决策台账）；`identity-sso-p5-closeout` / `identity-sso-p3-ruyin` 已并入本文 §6。

@@ -88,7 +88,7 @@ app/
 | Usage     | 用量概览 / 消耗记录                             | `tenant.quota.read`                                |
 | Settings  | 租户设置 / 通知 / 个人偏好                      | —                                                  |
 
-设计规范见 [`docs/30-design/console.md`](../../../30-design/console.md)。
+设计规范见 [`docs/30-design/console.md`](../../../30-design/platform/20-console.md)。
 
 ---
 
