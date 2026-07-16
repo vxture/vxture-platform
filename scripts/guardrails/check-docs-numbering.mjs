@@ -5,7 +5,7 @@
  * @layer    Infrastructure
  * @category guardrail
  * @description
- *   固化 docs/standards/docs-taxonomy.md 的元规则：编号=正式文件、无编号=临时(待删)。
+ *   固化 docs/10-standards/docs-taxonomy.md 的元规则：编号=正式文件、无编号=临时(待删)。
  *   扫 docs/ 下每个 .md，非索引/非白名单且不匹配任一合法编号形态者 → 违规。
  *   迁移期默认 report 模式(列违规=工作单，exit 0)；迁移完成后 `--strict` 转硬门接 CI。
  *
@@ -70,7 +70,7 @@ if (violations.length === 0) {
 }
 
 console.log(
-  `[docs-numbering] ${violations.length} 未编号 .md（= 临时/待删或待编号，见 docs/standards/docs-taxonomy.md）:`,
+  `[docs-numbering] ${violations.length} 未编号 .md（= 临时/待删或待编号，见 docs/10-standards/docs-taxonomy.md）:`,
 );
 for (const v of violations) console.log(`  ${v}`);
 

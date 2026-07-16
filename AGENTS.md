@@ -2,9 +2,9 @@
 
 > **使用说明**：这是根目录指令文件，适用于所有 AI 编码工具（Claude / Cursor / Copilot 等）。
 > 所有 AI 操作必须先读完本文件，
-> 再读 [`docs/agent.md`](docs/agent.md)（任务路由入口），
+> 再读 [`docs/90-memory/agent.md`](docs/90-memory/agent.md)（任务路由入口），
 > 再读取目标包目录下的子级 `AGENTS.md`（导航指针）。
-> 子级文件只保留导航指针，详细上下文在 `docs/packages/` 体系。根文件规则**全局生效**。
+> 子级文件只保留导航指针，详细上下文在 `docs/40-implementation/packages/` 体系。根文件规则**全局生效**。
 
 ---
 
@@ -12,13 +12,13 @@
 
 执行任何代码任务前，以下三份文档必须遵守：
 
-| 文档             | 内容                                            | 路径                                  |
-| ---------------- | ----------------------------------------------- | ------------------------------------- |
-| **注释规范**     | 文件头模板、JSDoc 格式、分区注释、英文注释要求  | `docs/ai/03-coding-comments.md`       |
-| **编码规则**     | 包边界约束、层职责、AI 行为规范                 | `docs/ai/01-coding-rules.md`          |
-| **代码风格**     | TypeScript 约定、命名规则、导出风格             | `docs/ai/02-coding-style.md`          |
-| **端口分配**     | 全局端口表、3NNX 规则、新 Agent 登记流程        | `docs/ai/port-allocation.md`          |
-| **BFF 数据访问** | Pool 注入、req.user、auth 委托签发、Schema 速查 | `docs/ai/05-bff-data-access-guide.md` |
+| 文档             | 内容                                            | 路径                                                    |
+| ---------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| **注释规范**     | 文件头模板、JSDoc 格式、分区注释、英文注释要求  | `docs/40-implementation/ai/03-coding-comments.md`       |
+| **编码规则**     | 包边界约束、层职责、AI 行为规范                 | `docs/40-implementation/ai/01-coding-rules.md`          |
+| **代码风格**     | TypeScript 约定、命名规则、导出风格             | `docs/40-implementation/ai/02-coding-style.md`          |
+| **端口分配**     | 全局端口表、3NNX 规则、新 Agent 登记流程        | `docs/40-implementation/ai/port-allocation.md`          |
+| **BFF 数据访问** | Pool 注入、req.user、auth 委托签发、Schema 速查 | `docs/40-implementation/ai/05-bff-data-access-guide.md` |
 
 > 三份文档与本文件如有冲突，**以本文件为准**。
 
@@ -71,7 +71,7 @@ portals/* / agent-studio/*
          packages/shared
 ```
 
-完整规则见 `docs/architecture/02-package-boundaries.md`。
+完整规则见 `docs/30-design/architecture/02-package-boundaries.md`。
 
 ---
 
@@ -129,18 +129,18 @@ portals/* / agent-studio/*
 
 进入对应目录工作时，**必须**读取子级文件以获取层专属规则：
 
-所有包的 `AGENTS.md` 已统一改为**导航指针**，完整上下文在 `docs/packages/` 体系：
+所有包的 `AGENTS.md` 已统一改为**导航指针**，完整上下文在 `docs/40-implementation/packages/` 体系：
 
-| 目录                 | 指针目标                            |
-| -------------------- | ----------------------------------- |
-| `packages/shared/`   | `docs/packages/shared/index.md`     |
-| `packages/core/`     | `docs/packages/core/{包名}.md`      |
-| `packages/platform/` | `docs/packages/sdk/{包名}.md`       |
-| `packages/design/`   | `docs/packages/design/{包名}.md`    |
-| `services/*/*`       | `docs/packages/services/{包名}.md`  |
-| `bff/*`              | `docs/packages/bff/{bff名}.md`      |
-| `portals/*`          | `docs/packages/portals/{包名}.md`   |
-| `agent-server/*`     | `docs/packages/agents/{agent名}.md` |
+| 目录                 | 指针目标                                              |
+| -------------------- | ----------------------------------------------------- |
+| `packages/shared/`   | `docs/40-implementation/packages/shared/00-index.md`  |
+| `packages/core/`     | `docs/40-implementation/packages/core/{包名}.md`      |
+| `packages/platform/` | `docs/40-implementation/packages/sdk/{包名}.md`       |
+| `packages/design/`   | `docs/40-implementation/packages/design/{包名}.md`    |
+| `services/*/*`       | `docs/40-implementation/packages/services/{包名}.md`  |
+| `bff/*`              | `docs/40-implementation/packages/bff/{bff名}.md`      |
+| `portals/*`          | `docs/40-implementation/packages/portals/{包名}.md`   |
+| `agent-server/*`     | `docs/40-implementation/packages/agents/{agent名}.md` |
 
 ---
 

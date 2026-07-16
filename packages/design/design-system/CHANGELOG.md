@@ -1,7 +1,7 @@
 # @vxture/design-system — 更新日志
 
 发布走 `publish-design-system.yml`（GitHub Packages `npm.pkg.github.com`）。版本规则见
-`docs/standards/design-system-release.md`：新增公开入口为 minor，删除/改名入口为 major。
+`docs/10-standards/design-system-release.md`：新增公开入口为 minor，删除/改名入口为 major。
 
 ---
 

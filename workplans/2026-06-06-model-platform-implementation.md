@@ -14,7 +14,7 @@ Legacy model gateway naming has been removed from the repository directionally a
 - runtime container / deploy identity `vx-model-platform`
 - runtime env file `.env.model-platform`
 
-This workplan tracks the next coding phase. Long-term architecture remains in `docs/design/model-platform.md`; this file is only the execution plan for branch, version, implementation order, validation, and merge checkpoints.
+This workplan tracks the next coding phase. Long-term architecture remains in `docs/30-design/model-platform.md`; this file is only the execution plan for branch, version, implementation order, validation, and merge checkpoints.
 
 ## Branch Strategy
 
@@ -198,7 +198,7 @@ Console Portal:
 
 Exit checks:
 
-- BFF data access follows `docs/ai/05-bff-data-access-guide.md`.
+- BFF data access follows `docs/40-implementation/ai/05-bff-data-access-guide.md`.
 - Permission checks are explicit at BFF entrypoints.
 - Portal UI uses existing design system conventions and does not import service packages.
 - Service tests cover admin/control-plane success and denial cases.
@@ -249,11 +249,11 @@ Execution principle:
 P4.0 documentation closeout:
 
 - Mark P3 as completed and merged to `develop`.
-- Align `docs/design/model-platform.md`, `docs/packages/services/model-platform.md`, and deployment docs with P4 scope.
+- Align `docs/30-design/model-platform.md`, `docs/40-implementation/packages/services/model-platform.md`, and deployment docs with P4 scope.
 - Record the P4 milestone as `model-platform-v0.5-prod-baseline`.
 - Define the execution branch and confirmation gates.
 - Keep this workplan as the only formal P4 task/status tracker.
-- Keep `docs/deployment/11-model-platform-operations.md` as the formal runbook and operations rule document.
+- Keep `docs/50-deployment/11-model-platform-operations.md` as the formal runbook and operations rule document.
 - Keep `.work-in-progress/` as local-only draft storage; do not commit it.
 
 P4.1 observability contract:
@@ -315,7 +315,7 @@ P4.5 remaining consolidation tasks:
 | Diagnostics guard hardening  | High     | completed locally | Diagnostics endpoint requires an internal guard and does not expose secret values.                                                |
 | Log privacy verification     | High     | completed locally | Tests prove logs exclude prompt, response, provider key reference, and provider key value.                                        |
 | Script syntax verification   | Medium   | completed locally | `D:\Program Files\Git\bin\bash.exe -n` passed for `40` and `51` scripts on 2026-06-07.                                            |
-| Formal runbook consolidation | Medium   | completed locally | Temporary runbook content merged into `docs/deployment/11-model-platform-operations.md`.                                          |
+| Formal runbook consolidation | Medium   | completed locally | Temporary runbook content merged into `docs/50-deployment/11-model-platform-operations.md`.                                       |
 | Task tracker consolidation   | Medium   | completed locally | Temporary task list content merged into this workplan; `.work-in-progress/` remains local-only.                                   |
 | Server-side verification     | High     | pass              | VXTURE_DEPLOY_HOST runs `40-verify-platform-runtime.sh` and `51-check-platform-alerts.sh` after deployment (pass, HIGH=0, LOW=1). |
 | CI gates and coverage        | Medium   | completed         | CI validates type-check, lint, tests, env audit, and no secrets in deploy bundle with warning-fail mode in CI.                    |
@@ -360,7 +360,7 @@ Scope:
 P5.1 实施清单:
 
 1. 生产指标改造：`@vxture/service-model-platform` 现有 `metrics.registry.ts` + `metrics.controller.ts`。
-2. 运维能力改造：补齐告警阈值表与告警联系人/处理动作到 `docs/deployment/11-model-platform-operations.md`。
+2. 运维能力改造：补齐告警阈值表与告警联系人/处理动作到 `docs/50-deployment/11-model-platform-operations.md`。
 3. 部署核验改造：`40-verify-platform-runtime.sh` 与 `51-check-platform-alerts.sh` 增加 P5 可观测项检查。
 4. 运行验证：本地链路测试 + VXTURE_DEPLOY_HOST 可抓取性验证 + CI 可验证检查项。
 
@@ -388,7 +388,7 @@ The following actions require explicit confirmation before execution:
 
 - [x] Start `feature/model-platform-observability-harden`.
 - [x] Implement P5.1 production metrics hardening in `@vxture/service-model-platform`.
-- [x] Update `docs/deployment/11-model-platform-operations.md` with scrape/ACL/SLO/alert playbook.
+- [x] Update `docs/50-deployment/11-model-platform-operations.md` with scrape/ACL/SLO/alert playbook.
 - [x] Extend `40-verify-platform-runtime.sh` and `51-check-platform-alerts.sh` with P5 checks.
 - [x] Execute local verification (type-check / lint / test / coverage / design guardrails / env audit / boundaries).
 - [ ] Execute CI verification and record outputs.
