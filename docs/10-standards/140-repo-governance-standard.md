@@ -5,9 +5,9 @@
 > 稳健 CD 构件 + 敏感信息/SCA 治理 + 数据层/护栏 + 统一骨架**。
 > **参照实现**：`vxture-platform`（治理/SCA/数据层，2026-07-15 起）+ `vxture-arda`（稳健 CD 构件 +
 > 仓库骨架/docs 分类范本）。
-> **配套**：迁移操作步骤见 [`../rebuild/README.md`](../50-deployment/rebuild/README.md)；密钥/边界细节见
-> [`security.md`](./security.md)；CI 提效见 [`cicd-optimization-playbook.md`](./cicd-optimization-playbook.md)；
-> 容器健康见 [`container-healthcheck-standard.md`](./container-healthcheck-standard.md)。
+> **配套**：迁移操作步骤见 [`../rebuild/README.md`](../50-deployment/rebuild/10-README.md)；密钥/边界细节见
+> [`security.md`](./150-security.md)；CI 提效见 [`cicd-optimization-playbook.md`](./010-cicd-optimization-playbook.md)；
+> 容器健康见 [`container-healthcheck-standard.md`](./020-container-healthcheck-standard.md)。
 
 本文定"每个全栈仓必须具备/对齐什么"，末尾附**整顿检查清单**。
 
@@ -198,7 +198,7 @@ required status check（发现新漏洞即 fail 拦合并）。
 - **目录**：`.github/`（`workflows/` + `actions/` 复合动作）· `configs/` · `deploy/`
   （compose / scripts / database / nginx / worker-NN…）· `docs/` · `scripts/` + 产品源码目录
   （`portals/` / `services/` / `agent-server/` 等按形态）。
-- **`docs/` 编号分类**（详见 [`docs-taxonomy.md`](./docs-taxonomy.md)，跨仓一致）——顶层十进制分段：
+- **`docs/` 编号分类**（详见 [`docs-taxonomy.md`](./070-docs-taxonomy.md)，跨仓一致）——顶层十进制分段：
   `00-meta` · **`10-standards`**（全栈规范，基础层居首）· `20-specs` · `30-design` ·
   `40-implementation` · `50-deployment` · `60-operations` · `70-workplan` · `80-liaison` · `90-memory`。
 - **元规则（铁律）**：**编号 = 正式文件（永久）；无编号 = 临时（定位即待删），概莫能外**（连 `00-index` 也不破例）。

@@ -3,7 +3,7 @@
 > 状态：v1 草案 · 2026-07-04 · 待评审（doc-driven，先固化后实施）
 > 范围：admin 运营后台对 operator/customer 账号的**凭据类写操作**如何经 IdP（auth-bff）委托，而非 admin-bff 直写库。
 > 依据调研：本仓现状（见 §1 事实）；关联 [`identity-platform-operator.md`](./identity-platform-operator.md) §2.3 step-up、[`identity-platform-access-topology.md`](./identity-platform-access-topology.md)、[`data_admin_200_schema.md`](./data_admin_200_schema.md)、[`data_identity_200_schema.md`](./data_identity_200_schema.md)。
-> 上游背景：admin 应用补齐 [`../product/platform/admin/admin-app-completion-plan.md`](../20-specs/platform/admin/admin-app-completion-plan.md) B9。
+> 上游背景：admin 应用补齐 [`../product/platform/admin/admin-app-completion-plan.md`](../20-specs/platform/admin/10-admin-app-completion-plan.md) B9。
 
 ## 0. 定位
 

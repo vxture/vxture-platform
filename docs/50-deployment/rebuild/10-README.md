@@ -2,7 +2,7 @@
 
 > 适用：vxture-platform 首先落地；Arda / Umbra 后续套同一模板（三者当前都是 gitflow）。
 > **vxture-platform 已按本模板落地（2026-07-15），是参照实现**——`deploy.yml` 模板已"毕业"为运行态
-> `.github/workflows/deploy.yml`（并按 [`../standards/repo-governance-standard.md`](../../10-standards/repo-governance-standard.md)
+> `.github/workflows/deploy.yml`（并按 [`../standards/repo-governance-standard.md`](../../10-standards/140-repo-governance-standard.md)
 > 加固：raw image tag / deploy 等 docker-build / registry 同区 / 逐服务重建），其它仓从 vxture-platform 拷贝。
 > `main-ruleset.json` 仍是模板，待**首次导入代码之后**再 apply（见 §4 落地时机）。
 

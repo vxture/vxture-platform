@@ -1,8 +1,8 @@
 # Console 租户工作台产品规格
 
 > 版本：1.0.0 | 更新：2026-05-11
-> 技术实现：[`docs/40-implementation/packages/portals/console.md`](../../../40-implementation/packages/portals/console.md)
-> BFF：[`docs/40-implementation/packages/bff/console.md`](../../../40-implementation/packages/bff/console.md)
+> 技术实现：[`docs/40-implementation/packages/portals/console.md`](../../../40-implementation/packages/portals/20-console.md)
+> BFF：[`docs/40-implementation/packages/bff/console.md`](../../../40-implementation/packages/bff/40-console.md)
 
 ---
 

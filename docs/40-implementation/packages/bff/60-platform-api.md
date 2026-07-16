@@ -38,9 +38,9 @@
 
 契约权威不在本文（本文只是宿主说明）：
 
-- C2/C3 端点形状 = ADR-11 §11.7 + [`docs/20-specs/arda/arda_200_interface.md`](../../../20-specs/arda/arda_200_interface.md)；
+- C2/C3 端点形状 = ADR-11 §11.7 + [`docs/20-specs/arda/arda_200_interface.md`](../../../20-specs/arda/30-arda_200_interface.md)；
 - 三通道标准 = [`docs/30-design/product_200_integration.md`](../../../30-design/product_200_integration.md)；
-- 契约收缩（信封 v2）产品侧最终要求 = [`docs/20-specs/arda/arda_300_integration-final.md`](../../../20-specs/arda/arda_300_integration-final.md) §1。
+- 契约收缩（信封 v2）产品侧最终要求 = [`docs/20-specs/arda/arda_300_integration-final.md`](../../../20-specs/arda/40-arda_300_integration-final.md) §1。
 
 ## 运行环境
 

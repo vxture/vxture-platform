@@ -2,8 +2,8 @@
 
 > 版本：**v2.0** · 状态：定稿（契约收缩定型）· 受众：**线 B（arda 独立仓）开发**
 > v2.0 = 契约收缩：C2 信封 v2（§2.2，capabilities 退役、limits 独立块、时间戳四件套）、值域六值（§5）、`arda:subscription` scope + `arda` claim 退役（§1）。
-> 文档族：产品交接包 `arda_{NNN}`，本文 = **200**（接口契约位）；命名规范见 [`000_handoff-package-convention.md`](../000_handoff-package-convention.md)
-> 性质：**接口契约本体**——只表述"arda ↔ 平台"的接口（端点、请求/响应形状、值域、鉴权、事件）。范围/边界 = [`arda_100_handoff.md`](./arda_100_handoff.md)；最终义务与决策留痕 = [`arda_300_integration-final.md`](./arda_300_integration-final.md)。
+> 文档族：产品交接包 `arda_{NNN}`，本文 = **200**（接口契约位）；命名规范见 [`000_handoff-package-convention.md`](../10-000_handoff-package-convention.md)
+> 性质：**接口契约本体**——只表述"arda ↔ 平台"的接口（端点、请求/响应形状、值域、鉴权、事件）。范围/边界 = [`arda_100_handoff.md`](./20-arda_100_handoff.md)；最终义务与决策留痕 = [`arda_300_integration-final.md`](./40-arda_300_integration-final.md)。
 > 权威回指：语义以各权威文档为准（见 §6）；本文是"面向 arda 实现"的合并视图，与权威冲突以权威为准。
 
 ---
@@ -118,7 +118,7 @@ Header: x-vxture-internal-auth: <AUTH_INTERNAL_TOKEN>
 ```
 
 - **200** = 扣减成功，返回瀑布扣减明细；幂等回放附 `"replayed": true`。
-- **409** = gated（额度不足），body 带 `remaining_total`（真实余额）。解除机制**不要发明持久标志**——`gated ⇔ C2 该 metric remaining ≤ 0`，池周期翻转后 C2 读侧自动恢复，下次拉取门自开（[`arda_300`](./arda_300_integration-final.md) §1）。
+- **409** = gated（额度不足），body 带 `remaining_total`（真实余额）。解除机制**不要发明持久标志**——`gated ⇔ C2 该 metric remaining ≤ 0`，池周期翻转后 C2 读侧自动恢复，下次拉取门自开（[`arda_300`](./40-arda_300_integration-final.md) §1）。
 - **消费模式**：`ai.credit` = atomic 预扣（贵操作前置门控）；`service.api.call`/`quality.check.run` = divisible 后报（廉操作后置记账）。
 - **产品侧模式**：`local_usage.usage_raw` 缓冲 + 异步 Job 上报，**不做本地配额裁决**（用量唯一写入方 = 平台 consume）。
 
@@ -151,7 +151,7 @@ Header: x-vxture-internal-auth: <AUTH_INTERNAL_TOKEN>
 | 其它 header | `x-vxture-event`（类型） / `x-vxture-delivery`（投递 id）                                              |
 | payload     | `{ id, type, occurred_at, seq, workspace_id, tenant_id, application:"arda", plan, data }`              |
 
-**产品端义务**：①验签；②按 `id` 幂等；③按 `seq`（per (workspace,product) 单调）忽略陈旧事件，**不依赖到达顺序**；④`tenant.provisioned`→建该 WS 业务空间，`tenant.deprovisioned`→拆除；⑤2xx 回执（平台默认 8 次退避后死信）；⑥**按 `payload.plan` 忽略 beta plan 的开通事件**（beta 空间懒建，见 [`arda_000_definition.md`](./arda_000_definition.md) §5.1）。
+**产品端义务**：①验签；②按 `id` 幂等；③按 `seq`（per (workspace,product) 单调）忽略陈旧事件，**不依赖到达顺序**；④`tenant.provisioned`→建该 WS 业务空间，`tenant.deprovisioned`→拆除；⑤2xx 回执（平台默认 8 次退避后死信）；⑥**按 `payload.plan` 忽略 beta plan 的开通事件**（beta 空间懒建，见 [`arda_000_definition.md`](./10-arda_000_definition.md) §5.1）。
 
 ### 4.2 `subscription_changed` / `grant.invalidated`
 
@@ -188,6 +188,6 @@ Header: x-vxture-internal-auth: <AUTH_INTERNAL_TOKEN>
 | C1 RP 通则 + webhook wire | [`identity-platform-rp-integration.md`](../../30-design/identity-platform-rp-integration.md)（§5 = webhook）                           |
 | gauge 计量                | [`data_commerce_240_usage-gauge.md`](../../30-design/data_commerce_240_usage-gauge.md)                                                 |
 | 值域                      | `@vxture/shared`（catalog value domains）                                                                                              |
-| 最终义务 + 决策留痕       | [`arda_300_integration-final.md`](./arda_300_integration-final.md)（产品侧义务清单 + 架构级决策防回退）                                |
+| 最终义务 + 决策留痕       | [`arda_300_integration-final.md`](./40-arda_300_integration-final.md)（产品侧义务清单 + 架构级决策防回退）                             |
 
 > 变更纪律：接口的实质变更（新端点/字段/值域/鉴权方式）→ 升本文与 handoff 版本；架构级决策（含被否决方案）落 arda_300 §2。

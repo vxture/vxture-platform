@@ -1,8 +1,8 @@
 # Website 营销站点产品规格
 
 > 版本：1.0.0 | 更新：2026-05-11
-> 技术实现：[`docs/40-implementation/packages/portals/website.md`](../../../40-implementation/packages/portals/website.md)
-> BFF：[`docs/40-implementation/packages/bff/website.md`](../../../40-implementation/packages/bff/website.md)
+> 技术实现：[`docs/40-implementation/packages/portals/website.md`](../../../40-implementation/packages/portals/30-website.md)
+> BFF：[`docs/40-implementation/packages/bff/website.md`](../../../40-implementation/packages/bff/80-website.md)
 
 ---
 

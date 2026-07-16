@@ -2,7 +2,7 @@
 
 > 版本：**v1.0** · 状态：定稿（三通道已定型上产；v1 功能切片可依此开发）
 > 依据：[`product_100_matrix.md`](../../30-design/product_100_matrix.md) §2/§3、[`product_110_sharing-isolation.md`](../../30-design/product_110_sharing-isolation.md) §4/§5、[`product_200_integration.md`](../../30-design/product_200_integration.md)（三通道契约）
-> 配套：接口契约 = [`arda_200_interface.md`](./arda_200_interface.md)；最终对接要求与决策留痕 = [`arda_300_integration-final.md`](./arda_300_integration-final.md)
+> 配套：接口契约 = [`arda_200_interface.md`](./30-arda_200_interface.md)；最终对接要求与决策留痕 = [`arda_300_integration-final.md`](./40-arda_300_integration-final.md)
 > 实施仓：arda 独立产品仓（不进 vxture monorepo）；本文为产品定义权威，实现细节归 arda 仓文档。
 
 ---
@@ -54,7 +54,7 @@
 
 ## 5. 三通道接入（参数与契约以 arda_200 为准）
 
-三通道端点、请求响应形状、值域、鉴权全部收敛在 [`arda_200_interface.md`](./arda_200_interface.md)（接口契约本体）。本节仅记 Arda 的产品级参数：
+三通道端点、请求响应形状、值域、鉴权全部收敛在 [`arda_200_interface.md`](./30-arda_200_interface.md)（接口契约本体）。本节仅记 Arda 的产品级参数：
 
 | 项              | 取值                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------- |

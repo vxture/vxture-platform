@@ -10,10 +10,10 @@
 
 ### Varda — 内嵌智能助手
 
-| 部分 | 文档                                   | 路径                  | 端口 | 说明                                           |
-| ---- | -------------------------------------- | --------------------- | ---- | ---------------------------------------------- |
-| 后端 | [`varda/server.md`](./varda/server.md) | `agent-server/varda/` | 3122 | Tool Use Loop，持久化会话，接入 model-platform |
-| 前端 | [`varda/studio.md`](./varda/studio.md) | `agent-studio/varda/` | —    | 嵌入式微前端，渲染对话 UI，SSE 消费            |
+| 部分 | 文档                                      | 路径                  | 端口 | 说明                                           |
+| ---- | ----------------------------------------- | --------------------- | ---- | ---------------------------------------------- |
+| 后端 | [`varda/server.md`](./varda/10-server.md) | `agent-server/varda/` | 3122 | Tool Use Loop，持久化会话，接入 model-platform |
+| 前端 | [`varda/studio.md`](./varda/20-studio.md) | `agent-studio/varda/` | —    | 嵌入式微前端，渲染对话 UI，SSE 消费            |
 
 **部署模式**：嵌入式（iframe / module federation），载入 admin 和 console portal。后续若迁移到独立业务仓库，目标仓库为 `vxture/agentstudio-varda`；迁移前不得在本仓新增 vx-worker-02 workflow。
 
@@ -25,10 +25,10 @@ Ruyin 代码已迁移到 `vxture/agentstudio-ruyin`。本仓 P7b 已删除 Ruyin
 
 ## 新 Agent Fork 起点
 
-| 部分 | 文档                                                     | 说明                                                            |
-| ---- | -------------------------------------------------------- | --------------------------------------------------------------- |
-| 后端 | [`agent-template/server.md`](./agent-template/server.md) | agent-server fork 模板，含 CallerContext、ToolRegistry 接入规范 |
-| 前端 | [`agent-template/studio.md`](./agent-template/studio.md) | agent-studio fork 模板，SSE 消费，BFF 接入规范                  |
+| 部分 | 文档                                                        | 说明                                                            |
+| ---- | ----------------------------------------------------------- | --------------------------------------------------------------- |
+| 后端 | [`agent-template/server.md`](./agent-template/10-server.md) | agent-server fork 模板，含 CallerContext、ToolRegistry 接入规范 |
+| 前端 | [`agent-template/studio.md`](./agent-template/20-studio.md) | agent-studio fork 模板，SSE 消费，BFF 接入规范                  |
 
 新增 Agent 时先 fork 这两个模板，再注册端口（见 `docs/40-implementation/ai/port-allocation.md`）。
 

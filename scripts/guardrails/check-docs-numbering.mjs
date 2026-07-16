@@ -23,12 +23,13 @@ const STRICT = process.argv.includes("--strict");
 const WHITELIST = new Set(["README.md"]);
 
 // 合法「已编号」形态（其一即可）：
-//   00-index.md / NN-slug.md      —— 目录内序列(十位跳，00 留给索引)
-//   {kind}_{domain}_{NNN}_slug.md —— 域文档(百位分段)
+//   00-index.md / NN-slug.md      —— 目录内序列(十位跳，00 留给索引；2–3 位)
+//   {prefix}_{NNN}_slug.md        —— 带 NNN 段的域/序列文档(推荐 {kind}_{domain}_{NNN}，
+//                                    但已有 arda_/product_/data_ 等 {prefix}_{NNN} 序列均视为已编号)
 //   ADR-NNN* / TD-NNN*            —— 类型寄存器
 const NUMBERED = [
-  /^\d{2}-.+\.md$/u, // NN-slug.md（含 00-index.md）
-  /^(data|design|ops)_[a-z][a-z-]*_\d{3}_.+\.md$/u, // 域文档
+  /^\d{2,3}-.+\.md$/u, // NN(N)-slug.md（含 00-index.md）
+  /^[a-z][a-z0-9-]*(_[a-z][a-z0-9-]*)?_\d{3}[_.-].*\.md$/u, // {prefix}(_{domain})?_{NNN}_slug（data_platform_100 / arda_000 / product_100）
   /^(ADR|TD)-\d{3}.*\.md$/u, // 寄存器
 ];
 

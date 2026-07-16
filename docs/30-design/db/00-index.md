@@ -63,7 +63,7 @@ npx prisma migrate resolve --applied "0001_schema_migration" \
   --schema=packages/core/database/prisma/schema.prisma
 ```
 
-详见 [`docs/40-implementation/packages/core/database.md`](../../40-implementation/packages/core/database.md)。
+详见 [`docs/40-implementation/packages/core/database.md`](../../40-implementation/packages/core/40-database.md)。
 
 业务库（例如外部 Ruyin，或未来迁移后的 Varda）迁移命令由外部业务仓库维护；本仓不得据此执行业务 worker 数据库部署。
 

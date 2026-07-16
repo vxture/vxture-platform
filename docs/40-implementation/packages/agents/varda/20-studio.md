@@ -1,7 +1,7 @@
 # @vxture/agent-studio-varda
 
 > 架构层参考：[`docs/30-design/architecture/06-agent-server.md`](../../../../30-design/architecture/06-agent-server.md)
-> 产品规格：[`docs/20-specs/agents/varda/spec.md`](../../../../20-specs/agents/varda/spec.md)
+> 产品规格：[`docs/20-specs/agents/varda/spec.md`](../../../../20-specs/agents/varda/10-spec.md)
 
 ---
 

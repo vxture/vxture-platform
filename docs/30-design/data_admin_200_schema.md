@@ -309,7 +309,7 @@
 
 ### 4.6 与 rank 门控 / TD-017 的衔接
 
-本 seed 是 **rank 分级模型 + TD-017（平台管理员权限"平顶"P0）整改的数据前置**。数据层交付到位后，应用层还需（**bucket 3，非本轮数据层**）：跨 operator 操作三层门控（权限→rank 严格大于→末位 super_admin 存活保护）、重置链接**带外投递**（不回传发起方）、能力串 `platform.admin.manage`→`operator:account.manage` 迁移、前端 `canManage`/角色下拉过滤。见 [`tech-debt.md`](../60-operations/tech-debt.md) TD-017。
+本 seed 是 **rank 分级模型 + TD-017（平台管理员权限"平顶"P0）整改的数据前置**。数据层交付到位后，应用层还需（**bucket 3，非本轮数据层**）：跨 operator 操作三层门控（权限→rank 严格大于→末位 super_admin 存活保护）、重置链接**带外投递**（不回传发起方）、能力串 `platform.admin.manage`→`operator:account.manage` 迁移、前端 `canManage`/角色下拉过滤。见 [`tech-debt.md`](../60-operations/10-tech-debt.md) TD-017。
 
 ## 5. 待办 / 开放项
 

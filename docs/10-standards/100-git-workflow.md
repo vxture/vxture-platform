@@ -2,7 +2,7 @@
 
 > 版本：3.0.0 | 更新：2026-07-15
 > **主干模式（trunk-based）取代原 gitflow 三分支晋升**（2026-07-15）。CD/密钥/部署细节见
-> [`repo-governance-standard.md`](./repo-governance-standard.md)，本文只定 git 工作流（分支 · 提交 · PR · tag）。
+> [`repo-governance-standard.md`](./140-repo-governance-standard.md)，本文只定 git 工作流（分支 · 提交 · PR · tag）。
 
 ---
 
@@ -124,7 +124,7 @@ chore(deps): upgrade pnpm to 10.x
 
 ### 4.1 部署 tag（触发 CD）
 
-**部署只由 tag 触发**，前缀决定环境（详见 [`repo-governance-standard.md`](./repo-governance-standard.md) §4）：
+**部署只由 tag 触发**，前缀决定环境（详见 [`repo-governance-standard.md`](./140-repo-governance-standard.md) §4）：
 
 | tag               | 环境       | 门控                       |
 | ----------------- | ---------- | -------------------------- |

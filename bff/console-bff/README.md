@@ -2,7 +2,7 @@
 
 租户工作台专属 BFF，聚合 console 页面所需数据，委托 auth-bff 完成 JWT 签发。
 
-完整接口契约与架构约束见 [`docs/40-implementation/packages/bff/console.md`](../../docs/40-implementation/packages/bff/console.md)。
+完整接口契约与架构约束见 [`docs/40-implementation/packages/bff/console.md`](../../docs/40-implementation/packages/bff/40-console.md)。
 
 ---
 

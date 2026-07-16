@@ -2,7 +2,7 @@
 
 > 状态：📋 计划待审定 · v1 · 2026-07-11 · 分支 `feature/admin-platform-refinement`
 > 依据 = 12-agent 全量盘点（portal 三组 × bff × docs × services × 行业对标 × 盲区稽查 × 4 补查，2026-07-11）
-> 前序 = [admin-app-completion-plan.md](./admin-app-completion-plan.md)（B1–B18，2026-07-05 收尾）
+> 前序 = [admin-app-completion-plan.md](./10-admin-app-completion-plan.md)（B1–B18，2026-07-05 收尾）
 > 定位：B1–B18 解决的是「每页出真数据 + 基础写路径」；本轮解决 **功能闭环断点、RBAC 安全收口、占位板块建设、数据真实化、工程质量兜底**。
 
 ## 0. 现状盘点结论
@@ -142,7 +142,7 @@ admin 平台 = portals/admin（44 路由板块）+ bff/admin-bff（29 controller
 - `bff/admin-bff/src/routers/tenants.router.ts`：`@Get("verifications")` + approve/reject 三路由前移至 `@Get(":id")` 之前；`getTenant` 加 `requireUuid` 预校验（异常输入 400 而非 500）。
 - `bff/admin-bff/src/routers/route-order.spec.ts`（新增）：源码级扫描全部 router，静态段被同方法参数路由遮蔽即 fail——扫描确认其余 28 个 router 无同类问题。
 - `portals/admin/src/modules/tenants/VerificationsPage.tsx`：`loadVerifications` 补 catch + toast（此前无 catch，路由 500 时静默 unhandled rejection）。
-- tech-debt 登记 [TD-026](../../../60-operations/tech-debt.md#td-026) 并同步销号。
+- tech-debt 登记 [TD-026](../../../60-operations/10-tech-debt.md#td-026) 并同步销号。
 
 **C2 step-up ceremony UI** ✅（解锁 17 个 `@RequireStepUp` 写端点）
 
