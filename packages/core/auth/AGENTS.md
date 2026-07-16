@@ -8,7 +8,7 @@
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
 | 1. 全局规则     | 根目录 `AGENTS.md`（G1–G6）                                                                                |
 | 2. 任务路由     | [`docs/90-memory/agent.md`](../../../docs/90-memory/10-agent.md)                                           |
-| 3. 层架构规范   | [`docs/30-design/architecture/05-core-layer.md`](../../../docs/30-design/architecture/05-core-layer.md)    |
+| 3. 层架构规范   | [`docs/30-design/architecture/05-core-layer.md`](../../../docs/30-design/architecture/03-core-layer.md)    |
 | 4. 包实现上下文 | [`docs/40-implementation/packages/core/auth.md`](../../../docs/40-implementation/packages/core/20-auth.md) |
 
 > 职责：JWT 验证、会话工具、角色类型
