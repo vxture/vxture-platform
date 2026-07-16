@@ -4,7 +4,7 @@
 
 > 状态：v1 草案 · 编号 `data_sharing_100`（架构层）· 待评审 · 未实施
 > 上级权威：[`data_platform_100_architecture.md`](./data_platform_100_architecture.md) §2.2.4 八条铁律；共享模型主文档 = [`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md) v1.0 §8（本文不重述模型语义，只做数据域落位）
-> 决策依据：[`ADR-12`](./decisions/ADR-12-sharing-grant-design.md) D2（策略 SoT = 平台控制面新增 `sharing` 域）
+> 决策依据：[`ADR-12`](./decisions/ADR-012-sharing-grant-design.md) D2（策略 SoT = 平台控制面新增 `sharing` 域）
 > 通道契约：[`product_200_integration.md`](./product_200_integration.md) §3.2（C2 可见集解析）、§4.2（C3 grant invalidate）
 > 姊妹文件：[`data_sharing_200_schema.md`](./data_sharing_200_schema.md)（字段级细化）
 > 实施登记：建库 = `product_300_naming-migration.md` M5、[`product_310_arda-integration.md`](./product_310_arda-integration.md) P4.2；解析 API + invalidate = P4.3
