@@ -5,11 +5,14 @@
 > 稳健 CD 构件 + 敏感信息/SCA 治理 + 数据层/护栏 + 统一骨架**。
 > **参照实现**：`vxture-platform`（治理/SCA/数据层，2026-07-15 起）+ `vxture-arda`（稳健 CD 构件 +
 > 仓库骨架/docs 分类范本）。
-> **配套**：迁移操作步骤见 [`../rebuild/README.md`](../50-deployment/rebuild/10-README.md)；密钥/边界细节见
+> **配套**：**各仓照 [`自整顿 runbook`](../50-deployment/rebuild/20-self-rectify-runbook.md) 自行整顿**（可移植工具清单 +
+> 分批步骤 + 每步机检命令）；迁移操作见 [`rebuild/README`](../50-deployment/rebuild/10-README.md)；密钥/边界见
 > [`security.md`](./150-security.md)；CI 提效见 [`cicd-optimization-playbook.md`](./010-cicd-optimization-playbook.md)；
 > 容器健康见 [`container-healthcheck-standard.md`](./020-container-healthcheck-standard.md)。
 
-本文定"每个全栈仓必须具备/对齐什么"，末尾附**整顿检查清单**。
+本文定"每个全栈仓必须具备/对齐什么"（要求 WHAT），末尾附**整顿检查清单**。**执行模型**：标准明确+严格且
+**机器可验**（每项对应一条验收命令 / CI 硬门，不达标即拦合并，无需人主观判断）；各仓 owner/agent **自整顿**，
+vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺口先补进标准（本文/taxonomy）再各仓照新标准整顿。
 
 ---
 
