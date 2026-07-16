@@ -14,6 +14,7 @@ export { default as StatsSection } from "./StatsSection";
 export { default as TestSection } from "./TestSection";
 export { default as ProductDetailPartOne } from "./ProductDetailPartOne";
 export { default as ProductsOverviewPage } from "./ProductsOverviewPage";
+export { default as ProductSubscribePage } from "./ProductSubscribePage";
 export { default as ProductComingSoon } from "./ProductComingSoon";
 export { default as EmergencySolutionPage } from "./EmergencySolutionPage";
 export { default as BestPracticePage } from "./BestPracticePage";

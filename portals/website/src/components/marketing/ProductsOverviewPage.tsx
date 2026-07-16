@@ -1,10 +1,11 @@
 "use client";
 
 /**
- * ProductsOverviewPage — /products 总览（product_320 §4.5）。
- * 六产品卡片（L1 Atlas/Ontos/Runa + L2 Arda/Karda/Terra）+ arda 五档定价区。
+ * ProductsOverviewPage — /products 产品中心总览（product_320 §4.5）。
+ * 六产品卡片（L1 Atlas/Ontos/Runa + L2 Arda/Karda/Terra）。
  * 卡片解剖借鉴智能体广场，去掉功能/特色，保留 logo + 类型 + 标题 + 概要 + 业务价值。
- * 订阅围绕 plan（可 bundle 产品，如 varda）；深链落 console /subscribe。
+ * 定价/订阅移至独立通用订阅页 /pricing（ProductSubscribePage）；
+ * 卡片「订阅」跳 /pricing?product=code，档位选定后由订阅页深链 console /subscribe。
  *
  * 订阅态（可试用|已开通、未订阅|已订阅）需 website-bff 的 product-subscriptions
  * 端点，作为后续项；本版卡片统一呈现「可试用」+ 订阅/申请演示/产品介绍。
@@ -41,18 +42,6 @@ type ProductCard = {
   loggedOutVisible?: boolean;
 };
 
-type PricingPlan = {
-  tier: string;
-  name: string;
-  monthly: string | null; // null = 联系销售（企业版）
-  yearly: string | null;
-  save?: string;
-  features: string[];
-  highlight?: boolean;
-};
-
-type Cycle = "monthly" | "yearly";
-
 /**
  * 卡片可见/操作态（product_320 §4.5，per-card）：
  *  - 未登录：loggedOutVisible=false → 隐藏；否则按「未登录模式」（= 未订阅动作）呈现；
@@ -62,11 +51,6 @@ type Cycle = "monthly" | "yearly";
  * 订阅态 subscribed 需 website-bff /api/me/product-subscriptions（后续项）；暂缺 → false。
  */
 
-const PRIMARY_BTN =
-  "inline-flex h-10 items-center justify-center rounded-md bg-vx-gray-900 px-4 text-sm font-semibold text-vx-white transition hover:bg-vx-brand-600 dark:bg-vx-brand-600 dark:hover:bg-vx-brand-500";
-const OUTLINE_BTN =
-  "inline-flex h-10 items-center justify-center rounded-md border border-vx-gray-200 px-4 text-sm font-medium text-vx-gray-700 transition hover:border-vx-brand-200 hover:text-vx-brand-700 dark:border-vx-gray-700 dark:text-vx-gray-200 dark:hover:border-vx-brand-500/40";
-
 export default function ProductsOverviewPage() {
   const t = useTranslations("products");
   const locale = useLocale();
@@ -75,8 +59,6 @@ export default function ProductsOverviewPage() {
   const hasSession = isAuthenticated && Boolean(user);
   const consoleEntryUrl = buildConsoleEntryUrl(locale);
   const products = t.raw("catalog.items") as ProductCard[];
-  const plans = t.raw("pricing.plans") as PricingPlan[];
-  const [cycle, setCycle] = useState<Cycle>("yearly");
   // 登录租户各产品订阅态（code → state）；未登录为空 → 卡片按未登录/未订阅呈现。
   const [subs, setSubs] = useState<Map<string, ProductSubscriptionState>>(
     () => new Map(),
@@ -117,8 +99,8 @@ export default function ProductsOverviewPage() {
               {t("catalog.description")}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Button asChild size="lg" className="px-5 hover:bg-vx-brand-500">
-                <a href="#pricing">{t("catalog.pricingCta")}</a>
+              <Button asChild size="lg" className="px-5">
+                <Link href="/pricing">{t("catalog.pricingCta")}</Link>
               </Button>
             </div>
           </div>
@@ -160,7 +142,11 @@ export default function ProductsOverviewPage() {
                           ? t("catalog.badges.active")
                           : t("catalog.badges.trial")}
                       </span>
-                    ) : null}
+                    ) : (
+                      <span className="shrink-0 rounded-full border border-vx-gray-200 bg-vx-gray-50 px-2.5 py-1 text-xs font-medium text-vx-gray-500 dark:border-vx-gray-700 dark:bg-vx-gray-800/60 dark:text-vx-gray-400">
+                        {t("catalog.badges.developing")}
+                      </span>
+                    )}
                   </div>
 
                   <p className="mt-5 text-sm leading-6 text-vx-gray-600 dark:text-vx-gray-300">
@@ -180,7 +166,7 @@ export default function ProductsOverviewPage() {
                     <Link
                       href={`/products/${product.code}`}
                       target="_blank"
-                      className="inline-flex h-10 items-center text-sm font-medium text-vx-brand-700 transition hover:text-vx-brand-600 dark:text-vx-brand-300"
+                      className="inline-flex h-10 items-center text-sm font-medium text-vx-brand-500 underline-offset-4 transition hover:text-vx-brand-600 hover:underline dark:text-vx-brand-400 dark:hover:text-vx-brand-300"
                     >
                       {t("catalog.actions.detail")}
                     </Link>
@@ -196,149 +182,45 @@ export default function ProductsOverviewPage() {
                         </Button>
                       ) : subscribed ? (
                         <>
-                          <a
-                            href={buildConsoleSubscribeUrl(
-                              locale,
-                              product.code,
-                              "upgrade",
-                            )}
-                            className={OUTLINE_BTN}
-                          >
-                            {t("catalog.actions.upgrade")}
-                          </a>
-                          <a href={consoleEntryUrl} className={PRIMARY_BTN}>
-                            {t("catalog.actions.enter")}
-                          </a>
+                          <Button asChild variant="outline">
+                            <a
+                              href={buildConsoleSubscribeUrl(
+                                locale,
+                                product.code,
+                                "upgrade",
+                              )}
+                            >
+                              {t("catalog.actions.upgrade")}
+                            </a>
+                          </Button>
+                          <Button asChild>
+                            <a href={consoleEntryUrl}>
+                              {t("catalog.actions.enter")}
+                            </a>
+                          </Button>
                         </>
                       ) : (
                         <>
-                          <a
-                            href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
-                              `${product.name} ${t("catalog.actions.demo")}`,
-                            )}`}
-                            className={OUTLINE_BTN}
-                          >
-                            {t("catalog.actions.demo")}
-                          </a>
-                          <a
-                            href={buildConsoleSubscribeUrl(
-                              locale,
-                              product.code,
-                              "subscribe",
-                            )}
-                            className={PRIMARY_BTN}
-                          >
-                            {t("catalog.actions.subscribe")}
-                          </a>
+                          <Button asChild variant="outline">
+                            <a
+                              href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
+                                `${product.name} ${t("catalog.actions.demo")}`,
+                              )}`}
+                            >
+                              {t("catalog.actions.demo")}
+                            </a>
+                          </Button>
+                          <Button asChild>
+                            <Link
+                              href={`/pricing?product=${product.code}`}
+                              target="_blank"
+                            >
+                              {t("catalog.actions.subscribe")}
+                            </Link>
+                          </Button>
                         </>
                       )}
                     </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section id="pricing" className="vx-section-even">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 xl:max-w-screen-2xl">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-vx-brand-600 dark:text-vx-brand-300">
-                {t("pricing.eyebrow")}
-              </p>
-              <h2 className="font-display mt-2 text-3xl font-bold text-vx-gray-900 dark:text-vx-white">
-                {t("pricing.title")}
-              </h2>
-            </div>
-            <div className="flex gap-2">
-              {(["monthly", "yearly"] as Cycle[]).map((c) => (
-                <Button
-                  key={c}
-                  variant={cycle === c ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCycle(c)}
-                  className="h-10 px-4"
-                >
-                  {t(`pricing.cycle.${c}`)}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            {plans.map((plan) => {
-              const price = cycle === "monthly" ? plan.monthly : plan.yearly;
-              const isContact = price === null;
-              return (
-                <article
-                  key={plan.tier}
-                  className={`flex flex-col rounded-lg border p-5 shadow-sm transition ${
-                    plan.highlight
-                      ? "border-vx-brand-400 bg-vx-brand-50/40 dark:border-vx-brand-500/40 dark:bg-vx-brand-950/20"
-                      : "border-vx-gray-200 bg-vx-white dark:border-vx-gray-800 dark:bg-vx-gray-900"
-                  }`}
-                >
-                  <h3 className="text-lg font-semibold text-vx-gray-900 dark:text-vx-white">
-                    {plan.name}
-                  </h3>
-                  <div className="mt-3">
-                    {isContact ? (
-                      <p className="text-xl font-bold text-vx-gray-900 dark:text-vx-white">
-                        {t("pricing.contact")}
-                      </p>
-                    ) : (
-                      <>
-                        <p className="text-2xl font-bold text-vx-gray-900 dark:text-vx-white">
-                          {price}
-                        </p>
-                        <p className="text-xs text-vx-gray-500 dark:text-vx-gray-400">
-                          {t(`pricing.per.${cycle}`)}
-                          {cycle === "yearly" && plan.save
-                            ? ` · ${plan.save}`
-                            : ""}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  <ul className="mt-4 space-y-2">
-                    {plan.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex gap-2 text-sm text-vx-gray-600 dark:text-vx-gray-300"
-                      >
-                        <Icon
-                          name="check"
-                          className="mt-0.5 h-4 w-4 shrink-0 text-vx-brand-500"
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-auto pt-5">
-                    {isContact ? (
-                      <a
-                        href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
-                          t("pricing.contactSubject"),
-                        )}`}
-                        className="inline-flex h-10 w-full items-center justify-center rounded-md border border-vx-gray-200 px-4 text-sm font-medium text-vx-gray-700 transition hover:border-vx-brand-200 hover:text-vx-brand-700 dark:border-vx-gray-700 dark:text-vx-gray-200"
-                      >
-                        {t("pricing.contact")}
-                      </a>
-                    ) : (
-                      <a
-                        href={buildConsoleSubscribeUrl(
-                          locale,
-                          "arda",
-                          "subscribe",
-                          plan.tier,
-                        )}
-                        className="inline-flex h-10 w-full items-center justify-center rounded-md bg-vx-gray-900 px-4 text-sm font-semibold text-vx-white transition hover:bg-vx-brand-600 dark:bg-vx-brand-600 dark:hover:bg-vx-brand-500"
-                      >
-                        {t("pricing.subscribe")}
-                      </a>
-                    )}
                   </div>
                 </article>
               );

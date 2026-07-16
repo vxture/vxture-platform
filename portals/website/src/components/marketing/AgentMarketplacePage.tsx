@@ -201,12 +201,9 @@ export default function AgentMarketplacePage() {
                       </span>
                     ))}
                   </div>
-                  <Link
-                    href="/signin"
-                    className="mt-5 inline-flex h-10 w-full items-center justify-center rounded-md bg-vx-gray-900 px-4 text-sm font-semibold text-vx-white transition hover:bg-vx-brand-600 dark:bg-vx-brand-600 dark:hover:bg-vx-brand-500"
-                  >
-                    {t("agents.action")}
-                  </Link>
+                  <Button asChild className="mt-5 w-full">
+                    <Link href="/signin">{t("agents.action")}</Link>
+                  </Button>
                 </div>
               </article>
             ))}
