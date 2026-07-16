@@ -37,7 +37,7 @@ import "@vxture/design-system/styles/globals.css";
 
 禁止从 `@vxture/design-system/src/**` 或其他未导出的子路径导入。
 
-跨仓库消费项目应先引入 `styles/globals.css`，再选择一个品牌入口。平台级应用使用 `brands/vxture.css`，如影产品级应用使用 `brands/ruyin.css`；禁止同时引入两个品牌入口。完整接入标准见 `docs/standards/design-system.md`。
+跨仓库消费项目应先引入 `styles/globals.css`，再选择一个品牌入口。平台级应用使用 `brands/vxture.css`，如影产品级应用使用 `brands/ruyin.css`；禁止同时引入两个品牌入口。完整接入标准见 `docs/10-standards/design-system.md`。
 
 ## Root Layout
 
@@ -147,7 +147,7 @@ Foundation 层统一维护 spacing、radius、shadow、motion 和 animation keyf
 
 已开放的新增能力包括 `--vx-space-3xl/4xl`、`--vx-radius-xs/2xl/3xl`、`--vx-shadow-xs/xl/2xl/glow/focus-ring/focus-ring-ai`、`--vx-duration-*`、`--vx-ease-*`、`--vx-motion-*` 和 `--animate-vx-*`。应用端不得重新定义阴影、圆角、动效曲线或关键帧；AI 发光、shimmer 和 pop 动效只能通过 DS 语义 token 或 DS 组件组合使用。
 
-临时迁移 patch 文件不得作为 DS 长期源码保留。Foundation 与字体迁入完成后，正式来源只认 `src/styles/*`、`src/tokens/*`、`docs/standards/design-system.md` 和 `docs/standards/font-system.md`。
+临时迁移 patch 文件不得作为 DS 长期源码保留。Foundation 与字体迁入完成后，正式来源只认 `src/styles/*`、`src/tokens/*`、`docs/10-standards/design-system.md` 和 `docs/10-standards/font-system.md`。
 
 ### 品牌标识组合
 
@@ -199,6 +199,6 @@ pnpm --filter @vxture/design-system build
 
 ## 关联文档
 
-- `docs/standards/design-system.md`：应用侧使用规范
-- `docs/packages/design/design-system.md`：包实现约束
-- `docs/audit/checklist-ds.md`：DS 审计记录与收敛任务
+- `docs/10-standards/design-system.md`：应用侧使用规范
+- `docs/40-implementation/packages/design/design-system.md`：包实现约束
+- `docs/60-operations/audit/checklist-ds.md`：DS 审计记录与收敛任务

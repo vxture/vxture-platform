@@ -56,7 +56,7 @@ release-main-2026-06-02.md
 - 临时检查、执行记录、过程判断留在 `workplans/`，完成后可删除。
 - 如果一份任务文档同时包含长期规则和过程记录，完成时必须拆分：长期内容进 `docs/`，过程内容留在 `workplans/` 或清理。
 
-`docs/audit/` 属于长期审计规划、规范性检查和规则沉淀；某次任务中的临时 audit / review / checklist 归入 `workplans/`。
+`docs/60-operations/audit/` 属于长期审计规划、规范性检查和规则沉淀；某次任务中的临时 audit / review / checklist 归入 `workplans/`。
 
 ## 迁移原则
 

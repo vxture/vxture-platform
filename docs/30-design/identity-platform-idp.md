@@ -1,0 +1,207 @@
+# Identity IdP 机制（identity 板块 · 详细层）
+
+> 🧭 架构层见 [`identity-platform-architecture.md`](./identity-platform-architecture.md)（板块定位 / 边界 / 拓扑总览 / 双 realm）。本文 = **IdP 核心机制的详细层 reference**：公开门面拓扑 + OIDC 端点 / 密钥 / 会话 / refresh / 登录手段。
+> 平台数据模型权威 = [`data_platform_100_architecture.md`](./data_platform_100_architecture.md)（a）+ [`data_platform_200_schema.md`](./data_platform_200_schema.md)（b）：`oidc_client` / `auth_session` / `signing_key` 字段级见 **b §identity/§iam**，本文**不重述 DDL**。
+> 合并自 `identity-sso-p0-idp`（IdP 地基）+ `identity-sso-login-surface`（门面拓扑），2026-07-01。状态：机制基线（statement-of-record）。
+
+---
+
+## 1. 公开门面拓扑与 issuer 收敛
+
+**唯一公开身份域 `accounts.vxture.com` 同时承载登录/账号 UI 与（反代到内部 auth-bff 的）OIDC 协议端点；auth-bff 无公开主机名。** 能力层 ⟂ 表现层从「两个公开域」收敛为「一个公开域 + 反代按路径分流到两个后端」。
+
+```
+公开:  accounts.vxture.com        ← 唯一身份门面；OIDC_ISSUER
+        ├─ /login, /(账号中心 UI)          → accounts 前端 app（表现层）
+        └─ /oidc/*, /.well-known/*          → auth-bff（能力层，内部上游）
+内部:  auth-bff                    ← IdP 服务；只在反代后面可达；无公开 DNS
+issuer = https://accounts.vxture.com
+```
+
+- **`OIDC_ISSUER` = `https://accounts.vxture.com`**（discovery 全量用 issuer 拼，代码零改、只改配置值）。
+- **同源、免 CORS** 🎯：登录页（`accounts.vxture.com/login`）与登录端点（`/oidc/authorize/login`）**同源**——跨域 POST 带 credentials + CORS 整块消失（prod）。dev 跨端口（accounts 前端→auth-bff）需 dev CORS 或 dev 反代。
+- **认证后端目标态命名 = `identity-server`**（现名 auth-bff）：它是中心 IdP、非某前端的 BFF，目标态归位 `services/identity/server`，随 P5 搬迁（见 arch §9 + `identity-platform-decisions.md` §16 D-9）。
+- **否决**：登录页放 website（多门户化后不再中心）/ 放 console（tenant-realm 应用塞 operator 登录破坏隔离）/ 保留独立公开 `auth.vxture.com` 品牌域（与「auth 不可见」相悖 + 多一个公开主机名 + 跨域 CORS）。
+- 澄清（OIDC 性质）：登录页托管在哪 ≠ 用户最终落在哪（授权码回最初发起的 RP）；`/authorize`·`/token`·`/jwks`·`/.well-known` 按协议必须对浏览器/RP 后端可达——「auth 不可见」= 没有独立 auth 公开域，非「没有公开端点」。
+
+### 1.1 端到端登录流程
+
+```
+RP(门户/ruyin/xuanzhen/console…) 未登录
+  └─302─▶ accounts.vxture.com/oidc/authorize?client_id=…&redirect_uri=…   (反代→auth-bff)
+            无中心会话 → 存 login_challenge
+  └─302─▶ accounts.vxture.com/login?login_challenge=…&realm=tenant|operator  (→accounts 前端)
+            用户输账号密码(+Turnstile)
+  ── POST accounts.vxture.com/oidc/authorize/login {login_challenge, identifier, password}  (同源；反代→auth-bff)
+  ◀── { redirectTo }  +  Set-Cookie 中心会话(由 accounts.vxture.com 种，见 §4)
+  └─302─▶ RP /auth/callback?code&state → RP 后端 POST /oidc/token 换 token → 登录完成
+```
+
+登录页只渲染表单；中心会话 cookie 由 **accounts.vxture.com（=issuer 主机）** 种，accounts 前端不持会话 cookie（至多自有 CSRF）。RP 后端（含外部 ruyin.ai）的 `/oidc/token`·`/oidc/jwks` 也走公开 `accounts.vxture.com`（反代→auth-bff）。
+
+---
+
+## 2. 数据底座与 Redis 存储
+
+本模块依赖 `identity.oidc_client`（应用注册表，与入站 broker `oauth_provider` 方向相反的**出站**发 token 配置）、`identity.auth_session`（中心会话持久镜像，真相在 Redis §2.1、可重建）、`identity.signing_key`（签名公钥/元数据，私钥不入库）——字段级 DDL/列/索引/`@@map`/`@@schema` 及初始 client seed 见 **b §identity/§iam**（字段级权威）/ **a §3.4**；落地（增量 migration + 幂等 seed）见 **[implementation](./identity-platform-implementation.md) / c**。
+
+> 关键约束：会话按 client 的 `active_tenant` 为 Redis 专属、不落 `auth_session`；私钥**不**入库（按 `kid` 存 secret manager 或 `platform.env` 的 `OIDC_SIGNING_KEY_{kid}`）；seed 的 client secret 明文只在 secret manager 派发给各 RP-BFF、库里存 bcrypt hash；`ruyin`的`back_channel_logout_uri` 必填（跨域 SLO 依赖，§5.7）。
+
+### 2.1 Redis 存储（前缀 `vx:`）
+
+| 键                         | 值                                                                                                | TTL                          | 操作                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------- |
+| `vx:oidc:code:{code}`      | JSON：clientId, sub, sid, realm, redirectUri, codeChallenge, scope, nonce, activeTenant, authTime | 60s                          | `setex` 写、`getdel` 单用             |
+| `vx:sess:{sid}`            | hash：sub, realm, authMethod, createdAt, lastActiveAt                                             | 滑动 4h（idle）+ 绝对上限 7d | `hset`/`expire` 续期                  |
+| `vx:sess:{sid}:tenant`     | hash：{client_id → active_tenant_id}                                                              | 同会话                       | `hset`/`hget`（按应用 active_tenant） |
+| `vx:oidc:rt:{tokenId}`     | JSON：sid, clientId, sub, realm, familyId, consumed                                               | = client.refreshTokenTtl     | `setex`；轮换时旧标 consumed          |
+| `vx:oidc:rtfam:{familyId}` | set：该 family 全部 tokenId                                                                       | 同上                         | 重放检测命中→整 family 吊销           |
+
+**复用现网**：`vx:blacklist:{jti}`（access 吊销）、`vx:revoked-before:*`（按 subject 水位）、`vx:oauth:state:{state}` 与 `vx:oauth:bind:{token}`（入站 broker + 绑手机）。idle 续期 fail-open、refresh 校验 fail-closed（ADR-001）。
+
+---
+
+## 3. 签名与密钥（RS256）
+
+- **密钥对**：RS256（2048+）。`kid` 命名 `rsa-{yyyymm}-{seq}`。
+- **JWKS**（`/jwks`）：输出 `status ∈ {active, next, retiring}` 的 `publicJwk`，含 `kid`/`use:"sig"`/`alg:"RS256"`。
+- **签发**：用唯一 `status=active` 私钥，JWT header 带 `kid`。
+- **轮换**：新键先 `next`（JWKS 已发布、暂不签）→ 切 `active`（旧键转 `retiring`，仍验签）→ 旧 token 全过期后旧键 `retired`（移出 JWKS）。
+- **RP 端**：固定 `alg=RS256`，按 `kid` 选公钥，缓存 JWKS（带刷新）。**拒 `none`、拒 HS**（防降级）。
+
+---
+
+## 4. realm 解析、sub 命名与会话 cookie
+
+- **realm 由 client 决定**：`oidc_client.realm`。`admin`→workforce（认证 `admin.operator_*`），其余→customer（认证 `identity` 账号）。（realm 取值 customer/workforce，旧名 tenant/operator。）
+- **sub 命名空间**：customer 用 `usr_{account.id}`、workforce 用 `opr_{operator.id}`——前缀隔离，物理不可混。
+- **会话 cookie 按 realm**（由 issuer 主机 `accounts.vxture.com` 种）：
+
+| realm               | cookie      | 作用域                                           | 说明                                                          |
+| ------------------- | ----------- | ------------------------------------------------ | ------------------------------------------------------------- |
+| customer(tenant)    | `vx_sid`    | `domain=.vxture.com`                             | 跨子域共享 → 各门户/子域 app 静默 SSO                         |
+| workforce(operator) | `vx_sid_op` | **host-only `accounts.vxture.com`**（无 domain） | 不下发子域 → 与客户面硬隔离；`/authorize`(在 accounts) 仍能读 |
+
+均 HttpOnly + Secure + SameSite=Lax（Lax 允许 RP→IdP 顶级跳转携带，ruyin 跨站 SSO 因此成立）。admin 侧 `__Host-vx_rp_session` 另在 admin.vxture.com host-only，二者正交。（拓扑权威见 [`identity-platform-access-topology.md`](./identity-platform-access-topology.md)。）
+
+---
+
+## 5. OIDC 端点契约（字段级）
+
+### 5.1 `GET /.well-known/openid-configuration`
+
+关键字段：`issuer`、`authorization_endpoint`、`token_endpoint`、`userinfo_endpoint`、`jwks_uri`、`end_session_endpoint`、`revocation_endpoint`、`response_types_supported:["code"]`、`grant_types_supported:["authorization_code","refresh_token"]`、`code_challenge_methods_supported:["S256"]`、`id_token_signing_alg_values_supported:["RS256"]`、`subject_types_supported:["public"]`、`token_endpoint_auth_methods_supported:["client_secret_basic","client_secret_post"]`、`backchannel_logout_supported:true`、`backchannel_logout_session_supported:true`、`scopes_supported`、`claims_supported`。
+
+### 5.2 `GET /authorize`
+
+入参：`response_type=code`、`client_id`、`redirect_uri`、`scope`、`state`、`code_challenge`、`code_challenge_method=S256`、`nonce`、`prompt`(none|login|consent)、`login_hint?`、`max_age?`、`tenant_hint?`（自定义，切租户用）。流程：
+
+1. 校验 client 启用 + `redirect_uri` 精确匹配 + `scope ⊆ allowed_scopes` + PKCE 必带。
+2. 由 client 定 realm；读对应 realm 会话 cookie（`vx_sid`/`vx_sid_op`）。
+3. 有有效会话 → 跳第 5 步；无会话且 `prompt=none` → 回跳 `redirect_uri?error=login_required`；否则渲染该 realm 登录页（§7）。
+4. 登录成功 → 建/续中心会话 `sid`（写 `vx:sess`、`auth_session`、设 realm cookie）。
+5. 解析 `(sid, client_id)` 的 active_tenant：`tenant_hint` 在成员内则用之并写回；否则取已存/默认个人租户；单租户直接定。
+6. 签发授权码（`vx:oidc:code`），`302 redirect_uri?code=&state=`。第一方应用**跳过 consent**（受信）。错误按 OIDC：`invalid_request`/`unauthorized_client`/`access_denied`/`login_required`，带 `state` 回跳。
+
+### 5.3 `POST /token`
+
+客户端认证：`client_secret_basic`（Authorization: Basic）或 `client_secret_post`，比对 `client_secret_hash`。
+
+- **grant_type=authorization_code**：`code`+`redirect_uri`+`code_verifier`。校验 code（getdel 单用）、redirect_uri 一致、`S256(code_verifier)==code_challenge`、client 一致。按 code 内 sub/sid/active_tenant 组装 claims（查 membership 填角色/状态/env/tenants[]；entitlement 走 §6.4 provider）→ 签 id_token + access_token（RS256）+ refresh（opaque）。
+- **grant_type=refresh_token**：`refresh_token`(+`scope` 子集)。查 `vx:oidc:rt`，**已 consumed → 重放：吊销整个 family**；否则轮换（旧标 consumed、发新）。**从会话重解析 active_tenant**（使切租户/改订阅在刷新时对齐）、重填 entitlement → 发新三件套。响应：`access_token`、`token_type:"Bearer"`、`expires_in`、`refresh_token`、`id_token`、`scope`。错误：`invalid_grant`/`invalid_client`/`invalid_request`。
+
+### 5.4 `GET /userinfo`（Bearer）
+
+校验 access_token（验签+未吊销）→ 返回 `sub`、`name`、`picture`、`phone_number`、`phone_number_verified`、`email`、`email_verified`。RP 可短 TTL 只读缓存。
+
+### 5.5 `GET /jwks`
+
+见 §3。
+
+### 5.6 `POST /revoke`
+
+`token`+`token_type_hint`。access → 写 `vx:blacklist:{jti}`；refresh → 删 `vx:oidc:rt` + family。恒 200（防探测）。
+
+### 5.7 `GET|POST /end_session`
+
+入参：`id_token_hint`（或 cookie 的 sid）、`post_logout_redirect_uri`、`state`。流程：销毁 `sid`（删 `vx:sess*`、`auth_session.status=revoked`、清 realm cookie）→ 枚举该 sid 下有会话的 client → 各发 **back-channel logout**：向 `back_channel_logout_uri` POST `logout_token`（JWT：`iss`、`aud=client_id`、`iat`、`jti`、`sid`、`events:{"http://schemas.openid.net/event/backchannel-logout":{}}`，RS256 签）→ 回跳 `post_logout_redirect_uri?state=`。
+
+> 子域 RP 另靠父域 cookie 失效；ruyin（跨域）**只能**靠 back-channel（§2 必填）。
+
+---
+
+## 6. Token 签发细节
+
+- **id_token claims**：`iss`、`sub`、`aud=client_id`、`iat`、`exp`（短）、`auth_time`、`nonce`、`sid`、`userType`，可选 `phone_number_verified`/`email_verified`。仅供 RP 建会话，不用于 API 鉴权。
+- **access_token claims**：RS256、header 带 `kid`、`aud` 单值；带粗粒度治理角色 + 账号/租户上下文（语义见 arch §5 + `identity-platform-architecture.md`）。
+- **refresh**：opaque 句柄（非 JWT），存 `vx:oidc:rt`，绑 `sid+client_id`，轮换 + family 重放检测（D-3）。
+
+### 6.1 `EntitlementProvider` 接缝〔邻域 commerce〕
+
+entitlement 由 `EntitlementProvider` 接口产出，IdP 只持接口、不拥有商业逻辑（entitlement SoT 归 **commerce**，见 arch §1.3 OUT）：
+
+```ts
+interface EntitlementProvider {
+  resolve(
+    tenantId: string,
+    productRef: string,
+  ): Promise<{
+    plan: string;
+    status: string;
+    expires_at: number | null;
+  } | null>;
+}
+```
+
+起步期 stub（`{plan:"free",status:"active",expires_at:null}`）让全链路可跑；per-app 实现（按 `(tenantId, productRef)` 直读订阅）为 commerce 邻域契约（`commerce-app-subscription.md`）——**端点/claims 不变，仅换实现**。
+
+---
+
+## 7. 登录手段与 accounts surface
+
+`/authorize` 登录页内复用现有能力，**只把「签 JWT+设 cookie」的尾部换成「建中心会话+继续 authorize」**：
+
+- **手机验证码（强锚点）**：`@vxture/service-sms` `PhoneCodeService` + 「登录即注册」。
+- **密码**：`@vxture/service-iam` `AccountAuthService.authenticate()`（Argon2id）。
+- **社交登录（brokered）**：`oauth.router` + Dingtalk/Feishu/Google provider + `vx:oauth:state`/`vx:oauth:bind` 绑手机；回调落点改「建中心会话」。（详见 [`identity-platform-account.md`](./identity-platform-account.md)。）
+- **PLG 建租户**：建租户后进会话而非重签 JWT。
+- **workforce(operator)**：仅密码 + 运营 Turnstile，**无自助注册 / 无社交 / 无手机码**。
+
+### 7.1 两个 realm surface（accounts `/login`）
+
+|                 | customer(tenant)                     | workforce(operator)                        |
+| --------------- | ------------------------------------ | ------------------------------------------ |
+| 字段            | 账号(邮箱/用户名/手机) + 密码        | 账号 + 密码                                |
+| Turnstile       | 租户 site key / action `tenant_auth` | **运营** site key / action `operator_auth` |
+| 社交 / 手机码   | 有（验证码优先，见下）               | **永不**                                   |
+| 注册 / 找回密码 | 有(→注册流)                          | **无**(operator 预建)                      |
+
+> customer 登录面**验证码优先**——tab `验证码登录`（默认/左）\| `密码登录`（右）；验证码 tab 单一智能输入框自动识别手机/邮箱（手机码即注册；**邮箱码仅登录不注册**）。operator 维持密码-only 无 tab。详见 [`identity-platform-account.md`](./identity-platform-account.md)。
+
+### 7.2 accounts surface 范围
+
+- **现在**：`/login`（customer + operator，密码/验证码 + Turnstile）。
+- **将来**：账号中心——资料、密码/安全(2FA)、已连接应用与授权(consent)、活跃会话与登出、绑手机/社交管理（收敛散落各门户的账号自助到中立账号域，accounts.google.com 模式）。
+
+---
+
+## 8. 配置 / 环境变量
+
+| 变量                                             | 说明                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| `OIDC_ISSUER`                                    | `https://accounts.vxture.com`（dev `http://localhost:3090`） |
+| `LOGIN_UI_BASE_URL`                              | prod = issuer 同源；dev = accounts 前端端口                  |
+| `OIDC_SIGNING_KEY_{kid}` / `OIDC_ACTIVE_KID`     | 私钥 JWK（secret manager / platform.env）+ 当前签发 kid      |
+| `OIDC_ACCESS_TTL` / `OIDC_REFRESH_TTL`           | 默认 TTL（可被 client 覆盖）                                 |
+| `OIDC_SESSION_IDLE_TTL` / `OIDC_SESSION_ABS_TTL` | 4h / 7d                                                      |
+| `COOKIE_DOMAIN_PLATFORM`                         | `.vxture.com`（sid cookie）                                  |
+
+prod 反代：`accounts.vxture.com` 的 `/oidc/*` + `/.well-known/*` → auth-bff（内部上游）；其余（`/login`、账号中心）→ accounts 前端。OIDC API 在 `/oidc/*`、UI 用 `/login`（避让反代规则）。
+
+---
+
+## 9. 验收与风险
+
+**验收**：discovery 可达且字段合法、`/jwks` 可验签；test client 跑通 `authorize→code→token→userinfo→refresh→revoke→end_session`；PKCE 错 `code_verifier`→`invalid_grant`；篡改/`alg=none`/HS/错 `kid` 全拒；**aud 单值**（A client token 到 B client 被拒）；**realm 隔离**（operator 会话不能驱动 customer client、`sub` 前缀互异、cross-realm 全拒）；**active_tenant 按应用**（同 sid 下 console 切租户不影响 ruyin、refresh 后对齐）；多设备两 sid 各自独立；back-channel 投出合法 `logout_token`；密钥轮换 `next→active→retiring→retired` 期间新旧 token 均可验签；operator 仅密码 + 运营 Turnstile 无社交/手机/注册；中心会话由 accounts 种、`vx_sid_op` 不下发子域；浏览器在 accounts 上无 OIDC token。
+
+**风险 / 接驳**：私钥不入库（泄露即换 kid）；Redis 不可用 → idle fail-open、refresh fail-closed；entitlement 起步期 stub、商业化前不做 token 硬门控；`identity-server` 搬迁（P5）；落地阶段/迁移见 [implementation](./identity-platform-implementation.md)。

@@ -7,14 +7,14 @@
 
 ## Background
 
-`docs/deployment/09-deployment-scripts.md` has defined the target VXTURE_DEPLOY_HOST
+`docs/50-deployment/09-deployment-scripts.md` has defined the target VXTURE_DEPLOY_HOST
 deployment script model. The current repository still keeps the older script
 names and is missing dedicated runtime verification and runtime env backup
 scripts.
 
 This workplan tracks the implementation task only. Long-term naming rules,
 script responsibilities, and execution order remain in
-`docs/deployment/09-deployment-scripts.md`.
+`docs/50-deployment/09-deployment-scripts.md`.
 
 ## Target Scripts
 
@@ -58,5 +58,5 @@ script responsibilities, and execution order remain in
 
 - All target script names exist under `deploy/scripts/`.
 - Old script names are removed or replaced only by explicit compatibility notes if needed.
-- `docs/deployment/09-deployment-scripts.md` matches the actual script files.
+- `docs/50-deployment/09-deployment-scripts.md` matches the actual script files.
 - Env audit and runtime verification commands are documented and pass.

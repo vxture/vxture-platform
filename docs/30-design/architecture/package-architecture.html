@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vxture — 包架构总览</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b22;
+    --bg3: #1e2530;
+    --border: #30363d;
+    --border2: #21262d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --blue: #58a6ff;
+    --blue2: #1f6feb;
+    --green: #3fb950;
+    --green2: #196c2e;
+    --amber: #d29922;
+    --amber2: #533b1b;
+    --red: #f85149;
+    --red2: #6e1a17;
+    --purple: #bc8cff;
+    --purple2: #3d2b7a;
+    --teal: #39d353;
+    --cyan: #76e3ea;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+    --r: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ── Layout ── */
+  .shell { display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -.2px; }
+  .topbar .meta { color: var(--text2); font-size: 12px; }
+  .topbar-spacer { flex: 1; }
+  .stats { display: flex; gap: 20px; }
+  .stat { text-align: center; }
+  .stat strong { display: block; font-size: 18px; font-weight: 700; color: var(--blue); }
+  .stat span { font-size: 11px; color: var(--text3); }
+  .main { display: flex; flex: 1; }
+  .sidebar {
+    width: 200px; min-width: 200px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    position: sticky; top: 49px;
+    height: calc(100vh - 49px);
+    overflow-y: auto;
+  }
+  .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+  /* ── Sidebar nav ── */
+  .nav-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; }
+  .nav-link {
+    display: block; padding: 5px 16px;
+    color: var(--text2); text-decoration: none;
+    font-size: 12px; border-left: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  .nav-link:hover { color: var(--text); border-left-color: var(--border); }
+  .nav-link.active { color: var(--blue); border-left-color: var(--blue); }
+
+  /* ── Layer sections ── */
+  .layer { margin-bottom: 32px; }
+  .layer-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .layer-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .layer-header h2 { font-size: 14px; font-weight: 600; }
+  .layer-desc { font-size: 12px; color: var(--text2); margin-left: auto; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+
+  /* ── Package card ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    transition: border-color .15s;
+  }
+  .card:hover { border-color: #444c56; }
+  .card-head {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px; cursor: pointer;
+    user-select: none;
+  }
+  .card-head:hover { background: rgba(255,255,255,.03); }
+  .pkg-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; font-weight: 700;
+  }
+  .card-title { flex: 1; min-width: 0; }
+  .pkg-name { font-size: 13px; font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; }
+  .pkg-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .chevron { color: var(--text3); font-size: 10px; padding-top: 4px; transition: transform .2s; }
+  .card.open .chevron { transform: rotate(90deg); }
+
+  /* ── Badges ── */
+  .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 1px 6px; border-radius: 10px;
+    font-size: 10px; font-weight: 500; white-space: nowrap;
+  }
+  .badge-green { background: var(--green2); color: var(--green); }
+  .badge-amber { background: var(--amber2); color: var(--amber); }
+  .badge-red { background: var(--red2); color: var(--red); }
+  .badge-blue { background: rgba(31,111,235,.2); color: var(--blue); }
+  .badge-purple { background: var(--purple2); color: var(--purple); }
+  .badge-gray { background: rgba(110,118,129,.2); color: var(--text2); }
+
+  /* ── Card body ── */
+  .card-body { display: none; padding: 0 14px 14px; }
+  .card.open .card-body { display: block; }
+
+  .section { margin-top: 10px; }
+  .section-title {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .6px; color: var(--text3); margin-bottom: 6px;
+  }
+
+  .dep-list { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dep-tag {
+    padding: 2px 7px; border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px; white-space: nowrap;
+  }
+  .dep-internal { background: rgba(88,166,255,.12); color: #79b8ff; border: 1px solid rgba(88,166,255,.2); }
+  .dep-external { background: rgba(110,118,129,.12); color: var(--text2); border: 1px solid var(--border2); }
+  .dep-none { color: var(--text3); font-size: 11px; }
+
+  .export-list { display: flex; flex-wrap: wrap; gap: 4px; }
+  .export-tag {
+    padding: 2px 6px; border-radius: 4px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px; white-space: nowrap;
+    background: rgba(63,185,80,.1); color: #7ee787;
+    border: 1px solid rgba(63,185,80,.15);
+  }
+
+  .methods { display: flex; flex-direction: column; gap: 2px; }
+  .method {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px; color: var(--text2); line-height: 1.6;
+    padding: 2px 0; border-bottom: 1px solid var(--border2);
+  }
+  .method:last-child { border-bottom: none; }
+  .method .m-class { color: var(--purple); }
+  .method .m-name { color: var(--blue); }
+  .method .m-param { color: var(--text); }
+  .method .m-ret { color: var(--green); }
+  .method .m-kw { color: var(--amber); }
+
+  .note-box {
+    margin-top: 8px; padding: 8px 10px;
+    background: rgba(110,118,129,.08);
+    border-left: 2px solid var(--border);
+    border-radius: 0 4px 4px 0;
+    font-size: 11px; color: var(--text2);
+    line-height: 1.6;
+  }
+  .note-box.warn { border-left-color: var(--amber); background: rgba(210,153,34,.06); }
+  .note-box.info { border-left-color: var(--blue); background: rgba(88,166,255,.06); }
+
+  /* ── Dep flow diagram ── */
+  #dep-flow { scroll-margin-top: 60px; }
+  .flow-diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .flow-row { display: flex; gap: 8px; justify-content: center; align-items: stretch; margin-bottom: 4px; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 16px; padding: 0 4px; }
+  .flow-node {
+    padding: 6px 12px; border-radius: 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px; text-align: center; white-space: nowrap;
+    border: 1px solid;
+  }
+  .flow-layer {
+    display: flex; flex-direction: column; gap: 4px; align-items: center;
+    padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+  }
+  .flow-layer-label { font-size: 9px; text-transform: uppercase; letter-spacing: .8px; color: var(--text3); margin-bottom: 4px; font-weight: 600; }
+  .fn-shared { background: rgba(120,120,180,.15); border-color: rgba(120,120,180,.3); color: #adadff; }
+  .fn-core { background: rgba(88,166,255,.1); border-color: rgba(88,166,255,.2); color: #79b8ff; }
+  .fn-service { background: rgba(63,185,80,.1); border-color: rgba(63,185,80,.2); color: #7ee787; }
+  .fn-ai { background: rgba(188,140,255,.1); border-color: rgba(188,140,255,.2); color: var(--purple); }
+  .fn-design { background: rgba(240,136,62,.1); border-color: rgba(240,136,62,.2); color: #f0883e; }
+  .fn-bff { background: rgba(210,153,34,.1); border-color: rgba(210,153,34,.2); color: var(--amber); }
+  .fn-portal { background: rgba(248,81,73,.1); border-color: rgba(248,81,73,.2); color: #ffa198; }
+  .flow-connector { text-align: center; color: var(--text3); font-size: 18px; line-height: 1; margin: 2px 0; }
+
+  /* ── Issues section ── */
+  .issues-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .issue-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 12px 14px;
+  }
+  .issue-card .issue-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+  .issue-card .issue-body { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .issue-card.type-warn { border-left: 3px solid var(--amber); }
+  .issue-card.type-info { border-left: 3px solid var(--blue); }
+  .issue-card.type-ok { border-left: 3px solid var(--green); }
+  .issue-card.type-stub { border-left: 3px solid var(--text3); }
+
+  /* ── Util ── */
+  .divider { height: 1px; background: var(--border2); margin: 8px 0; }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; background: rgba(110,118,129,.15); padding: 1px 4px; border-radius: 3px; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══════════════════════════════════════════════════ TOP BAR -->
+<header class="topbar">
+  <h1>Vxture · 包架构总览</h1>
+  <span class="meta">TypeScript 5.9 · pnpm workspace monorepo · 2026-05-03</span>
+  <div class="topbar-spacer"></div>
+  <div class="stats">
+    <div class="stat"><strong>11</strong><span>packages/</span></div>
+    <div class="stat"><strong>8</strong><span>services/</span></div>
+    <div class="stat"><strong>7</strong><span>bff/</span></div>
+    <div class="stat"><strong>3</strong><span>portals/</span></div>
+  </div>
+</header>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════════════════ SIDEBAR -->
+<nav class="sidebar">
+  <div class="nav-section">依赖流</div>
+  <a class="nav-link" href="#dep-flow">依赖方向图</a>
+  <a class="nav-link" href="#audit">一致性审核</a>
+
+  <div class="nav-section">packages/</div>
+  <a class="nav-link" href="#layer-shared">Shared</a>
+  <a class="nav-link" href="#layer-core">Core (7)</a>
+  <a class="nav-link" href="#layer-ai">Model Runtime Client</a>
+  <a class="nav-link" href="#layer-design">Design / Platform</a>
+
+  <div class="nav-section">services/</div>
+  <a class="nav-link" href="#layer-service">Service (8)</a>
+
+  <div class="nav-section">bff/</div>
+  <a class="nav-link" href="#layer-bff">BFF (7)</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════ CONTENT -->
+<div class="content">
+
+<!-- ── Dep Flow ── -->
+<section id="dep-flow" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#8888cc"></div>
+    <h2>依赖方向总图</h2>
+    <span class="layer-desc">只允许向下依赖，违反即破坏架构</span>
+  </div>
+  <div class="flow-diagram">
+    <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap">
+
+      <div class="flow-layer">
+        <div class="flow-layer-label">Frontend / Portals</div>
+        <div class="flow-node fn-portal">portals/website</div>
+        <div class="flow-node fn-portal">portals/admin</div>
+        <div class="flow-node fn-portal">portals/console</div>
+        <div class="flow-node fn-portal" style="opacity:.6">agent-studio/*</div>
+      </div>
+
+      <div style="display:flex;align-items:center;font-size:22px;color:var(--text3);margin-top:40px">↓</div>
+
+      <div class="flow-layer">
+        <div class="flow-layer-label">BFF Layer</div>
+        <div class="flow-node fn-bff">bff/website-bff</div>
+        <div class="flow-node fn-bff">bff/admin-bff</div>
+        <div class="flow-node fn-bff">bff/console-bff</div>
+        <div class="flow-node fn-bff">bff/vela-bff</div>
+        <div class="flow-node fn-bff" style="opacity:.5">bff/ruyinagent-bff</div>
+        <div class="flow-node fn-bff" style="opacity:.5">bff/gateway-bff</div>
+      </div>
+
+      <div style="display:flex;align-items:center;font-size:22px;color:var(--text3);margin-top:40px">↓</div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="flow-layer">
+          <div class="flow-layer-label">Service Layer</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <div class="flow-node fn-service">service-iam</div>
+            <div class="flow-node fn-service">service-organization</div>
+            <div class="flow-node fn-service">service-subscription</div>
+            <div class="flow-node fn-service">service-billing</div>
+            <div class="flow-node fn-service">service-mail</div>
+            <div class="flow-node fn-service">service-ticket</div>
+            <div class="flow-node fn-service">service-model-platform</div>
+            <div class="flow-node fn-service" style="opacity:.4">workers (stub)</div>
+          </div>
+        </div>
+        <div class="flow-layer">
+          <div class="flow-layer-label">Model Runtime Client</div>
+          <div class="flow-node fn-ai">@vxture/ai-sdk</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;font-size:22px;color:var(--text3);margin-top:40px">↓</div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="flow-layer">
+          <div class="flow-layer-label">Core Layer</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <div class="flow-node fn-core">core-api</div>
+            <div class="flow-node fn-core">core-auth</div>
+            <div class="flow-node fn-core">core-config</div>
+            <div class="flow-node fn-core">core-locale</div>
+            <div class="flow-node fn-core">core-mail</div>
+            <div class="flow-node fn-core">core-tenant</div>
+            <div class="flow-node fn-core" style="grid-column:1/-1">core-utils</div>
+          </div>
+        </div>
+        <div class="flow-layer">
+          <div class="flow-layer-label">Frontend Only</div>
+          <div class="flow-node fn-design">design-system</div>
+          <div class="flow-node fn-design">platform-browser</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;font-size:22px;color:var(--text3);margin-top:40px">↓</div>
+
+      <div class="flow-layer">
+        <div class="flow-layer-label">Shared (底层)</div>
+        <div class="flow-node fn-shared">@vxture/shared</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border2);display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text2)">
+      <span><span style="color:var(--red)">❌</span> Frontend → service-* 直接调用</span>
+      <span><span style="color:var(--red)">❌</span> Core → 其他 Core（core 包间零依赖）</span>
+      <span><span style="color:var(--red)">❌</span> Service → 其他 Service</span>
+      <span><span style="color:var(--red)">❌</span> BFF → 其他 BFF</span>
+      <span><span style="color:var(--green)">✅</span> BFF → agent-server（HTTP）</span>
+      <span><span style="color:var(--blue)">ℹ</span> core-mail 读 process.env 直接，不依赖 core-config</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: SHARED
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-shared" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#8888cc"></div>
+    <h2>Shared Layer</h2>
+    <span class="layer-desc">packages/shared — 零依赖，纯工具 / 类型 / 常量</span>
+  </div>
+  <div class="cards">
+
+    <!-- @vxture/shared -->
+    <div class="card" id="pkg-shared">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(136,136,204,.15);color:#adadff">S</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/shared</div>
+          <div class="pkg-sub">packages/shared/shared</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-blue">零依赖</span>
+            <span class="badge badge-purple">纯函数</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section">
+          <div class="section-title">内部依赖</div>
+          <span class="dep-none">无（monorepo 最底层）</span>
+        </div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">VxtureError</span><span class="export-tag">ValidationError</span>
+            <span class="export-tag">formatCurrency</span><span class="export-tag">formatDate</span>
+            <span class="export-tag">formatNumber</span><span class="export-tag">deepMerge</span>
+            <span class="export-tag">deepClone</span><span class="export-tag">isPlainObject</span>
+            <span class="export-tag">AUTH_CONSTANTS</span><span class="export-tag">SUPPORTED_LOCALES</span>
+            <span class="export-tag">ApiSuccessResponse</span><span class="export-tag">ApiErrorResponse</span>
+            <span class="export-tag">UserInfo</span><span class="export-tag">TokenData</span>
+            <span class="export-tag">Locale</span><span class="export-tag">Theme</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">formatCurrency</span>(<span class="m-param">value: number, locale?: Locale</span>): <span class="m-ret">string</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">formatDate</span>(<span class="m-param">date: Date, format?: string</span>): <span class="m-ret">string</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">formatNumber</span>(<span class="m-param">value: number, options?: Intl.NumberFormatOptions</span>): <span class="m-ret">string</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">deepMerge</span>&lt;T&gt;(<span class="m-param">target: T, source: Partial&lt;T&gt;</span>): <span class="m-ret">T</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">deepClone</span>&lt;T&gt;(<span class="m-param">obj: T</span>): <span class="m-ret">T</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">isPlainObject</span>(<span class="m-param">value: unknown</span>): <span class="m-ret">boolean</span></div>
+          </div>
+        </div>
+        <div class="note-box info">所有函数均为纯函数，无副作用，无框架依赖。可在 Node.js 和浏览器两端使用。</div>
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: CORE
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-core" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#58a6ff"></div>
+    <h2>Core Layer <span style="font-weight:400;color:var(--text2)">(7 个包)</span></h2>
+    <span class="layer-desc">packages/core — 平台基础设施原语，极低变更</span>
+  </div>
+  <div class="cards">
+
+    <!-- core-config -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">Cfg</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-config</div>
+          <div class="pkg-sub">packages/core/config</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">zod schema</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><span class="dep-none">无（直接读 process.env）</span></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">zod</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">VxConfigModule</span><span class="export-tag">VxConfigService</span>
+            <span class="export-tag">CONFIG_TOKEN</span><span class="export-tag">AppConfig</span>
+            <span class="export-tag">DatabaseConfig</span><span class="export-tag">RedisConfig</span>
+            <span class="export-tag">AuthConfig</span><span class="export-tag">VxConfig</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">VxConfigModule</span>.<span class="m-name">register</span>(<span class="m-param">options?: { domains: string[] }</span>): <span class="m-ret">DynamicModule</span></div>
+            <div class="method"><span class="m-class">VxConfigService</span>.<span class="m-name">get</span>&lt;K&gt;(<span class="m-param">key: K</span>): <span class="m-ret">VxConfig[K]</span></div>
+            <div class="method"><span class="m-class">VxConfigService</span>.<span class="m-name">getOrThrow</span>&lt;K&gt;(<span class="m-param">key: K</span>): <span class="m-ret">VxConfig[K]</span></div>
+            <div class="method"><span class="m-class">VxConfigService</span>.<span class="m-name">database</span> → <span class="m-ret">DatabaseConfig</span></div>
+            <div class="method"><span class="m-class">VxConfigService</span>.<span class="m-name">auth</span> → <span class="m-ret">AuthConfig</span></div>
+          </div>
+        </div>
+        <div class="note-box info">域配置：domains 可取 'app' | 'auth' | 'database' | 'redis' | 'ai'。从对应 .env 文件加载，zod 运行时校验。<br><b>消费方</b>：admin-bff, console-bff, website-bff, service-iam, service-organization, service-model-platform。</div>
+      </div>
+    </div>
+
+    <!-- core-auth -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">Auth</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-auth</div>
+          <div class="pkg-sub">packages/core/auth</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-blue">NestJS Guard</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">jsonwebtoken</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">VxJwtClient</span><span class="export-tag">JwtAuthGuard</span>
+            <span class="export-tag">RolesGuard</span><span class="export-tag">@Public</span>
+            <span class="export-tag">@Roles</span><span class="export-tag">@CurrentUser</span>
+            <span class="export-tag">JwtAccessPayload</span><span class="export-tag">OAuthProviderType</span>
+            <span class="export-tag">extractBearerToken</span><span class="export-tag">hasRole</span>
+            <span class="export-tag">isAdmin</span><span class="export-tag">generateJti</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">VxJwtClient</span>.<span class="m-name">signAccessToken</span>(<span class="m-param">payload: Omit&lt;JwtAccessPayload, 'iat'|'exp'&gt;</span>): <span class="m-ret">string</span></div>
+            <div class="method"><span class="m-class">VxJwtClient</span>.<span class="m-name">verifyAccessToken</span>(<span class="m-param">token: string</span>): <span class="m-ret">JwtAccessPayload</span></div>
+            <div class="method"><span class="m-class">VxJwtClient</span>.<span class="m-name">signRefreshToken</span>(<span class="m-param">payload, secret: string</span>): <span class="m-ret">string</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">extractBearerToken</span>(<span class="m-param">headers?: Record&lt;string,string&gt;</span>): <span class="m-ret">string | null</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">hasRole</span>(<span class="m-param">user: AuthUser, role: PlatformRole</span>): <span class="m-ret">boolean</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">isAdmin</span>(<span class="m-param">user: AuthUser</span>): <span class="m-ret">boolean</span></div>
+          </div>
+        </div>
+        <div class="note-box info">仅提供 JWT 原语，不包含业务权限逻辑（业务权限在 service-iam 中）。<br><b>消费方</b>：admin-bff, console-bff, website-bff, service-ticket。</div>
+      </div>
+    </div>
+
+    <!-- core-api -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">API</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-api</div>
+          <div class="pkg-sub">packages/core/api</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">axios</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">axios</span><span class="dep-external">form-data</span><span class="dep-external">@nestjs/axios</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">VxHttpModule</span><span class="export-tag">VxHttpClient</span>
+            <span class="export-tag">ApiResponse</span><span class="export-tag">PageQuery</span>
+            <span class="export-tag">PageResult</span><span class="export-tag">ok</span>
+            <span class="export-tag">fail</span><span class="export-tag">buildPageResult</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">VxHttpClient</span>.<span class="m-name">get</span>&lt;T&gt;(<span class="m-param">path: string, options?: RequestOptions</span>): <span class="m-ret">Promise&lt;T&gt;</span></div>
+            <div class="method"><span class="m-class">VxHttpClient</span>.<span class="m-name">post</span>&lt;T&gt;(<span class="m-param">path: string, data?: unknown</span>): <span class="m-ret">Promise&lt;T&gt;</span></div>
+            <div class="method"><span class="m-class">VxHttpClient</span>.<span class="m-name">upload</span>&lt;T&gt;(<span class="m-param">path, file: Buffer, filename: string</span>): <span class="m-ret">Promise&lt;T&gt;</span></div>
+            <div class="method"><span class="m-class">VxHttpClient</span>.<span class="m-name">getWithContext</span>&lt;T&gt;(<span class="m-param">path, context: RequestContext</span>): <span class="m-ret">Promise&lt;T&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box info">服务端 HTTP 客户端。自动注入 token / tenantId。支持重试、超时、文件上传下载。<br><b>消费方</b>：service-billing, service-ticket（目前这两个 service 是 stub，实际未调用远程）。</div>
+      </div>
+    </div>
+
+    <!-- core-tenant -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">Ten</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-tenant</div>
+          <div class="pkg-sub">packages/core/tenant</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-blue">NestJS Middleware</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><span class="dep-none">无</span></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">TenantModule</span><span class="export-tag">TenantContext</span>
+            <span class="export-tag">TenantMiddleware</span><span class="export-tag">resolveTenantId</span>
+            <span class="export-tag">extractSubdomain</span><span class="export-tag">tenantKey</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">TenantMiddleware</span>.<span class="m-name">use</span>(<span class="m-param">req, res, next</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+            <div class="method"><span class="m-class">TenantContext</span>.<span class="m-name">id</span>: <span class="m-ret">string</span> <span style="color:var(--text3)">(getter)</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">resolveTenantId</span>(<span class="m-param">options: TenantResolveOptions</span>): <span class="m-ret">string | null</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">extractSubdomain</span>(<span class="m-param">hostname: string</span>): <span class="m-ret">string | null</span></div>
+          </div>
+        </div>
+        <div class="note-box info">TenantContext 使用 NestJS REQUEST scope，每次请求独立实例。从 Header / 子域名 / 路径参数解析 tenantId。</div>
+      </div>
+    </div>
+
+    <!-- core-locale -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">i18n</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-locale</div>
+          <div class="pkg-sub">packages/core/locale</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-gray">无框架依赖</span>
+            <span class="badge badge-purple">前端可用</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><span class="dep-none">无</span></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">resolveLocale</span><span class="export-tag">localizeContent</span>
+            <span class="export-tag">Locale</span><span class="export-tag">SUPPORTED_LOCALES</span>
+            <span class="export-tag">DEFAULT_LOCALE</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">resolveLocale</span>(<span class="m-param">req: LocaleRequest, default?: Locale</span>): <span class="m-ret">Locale</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">localizeContent</span>&lt;T&gt;(<span class="m-param">content: T, locale: Locale</span>): <span class="m-ret">string</span></div>
+          </div>
+        </div>
+        <div class="note-box info">唯一允许 Frontend 直接引用的 core 包（纯工具，无副作用）。Cookie / Accept-Language 解析。</div>
+      </div>
+    </div>
+
+    <!-- core-utils -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">Util</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-utils</div>
+          <div class="pkg-sub">packages/core/utils</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-gray">双端兼容</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><span class="dep-none">无</span></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">VxLogger</span><span class="export-tag">logger</span>
+            <span class="export-tag">isProduction</span><span class="export-tag">isDevelopment</span>
+            <span class="export-tag">isNode</span><span class="export-tag">isBrowser</span>
+            <span class="export-tag">isString</span><span class="export-tag">isNumber</span>
+            <span class="export-tag">isValidUrl</span><span class="export-tag">isUuid</span>
+            <span class="export-tag">Maybe</span><span class="export-tag">Nullable</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">VxLogger</span>.<span class="m-name">debug</span> / <span class="m-name">info</span> / <span class="m-name">warn</span> / <span class="m-name">error</span>(<span class="m-param">message: string, data?</span>): <span class="m-ret">void</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">isProduction</span>(): <span class="m-ret">boolean</span> &nbsp; <span class="m-kw">function</span> <span class="m-name">isNode</span>(): <span class="m-ret">boolean</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">isValidUrl</span>(<span class="m-param">value: string</span>): <span class="m-ret">boolean</span></div>
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">isUuid</span>(<span class="m-param">value: string</span>): <span class="m-ret">boolean</span></div>
+          </div>
+        </div>
+        <div class="note-box info">结构化日志在 Node.js 下输出 JSON，在浏览器下降级为 console。所有类型守卫为纯函数。</div>
+      </div>
+    </div>
+
+    <!-- core-mail -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(88,166,255,.15);color:#79b8ff">Mail</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/core-mail</div>
+          <div class="pkg-sub">packages/core/mail</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.0.0</span>
+            <span class="badge badge-blue">@Global() Module</span>
+            <span class="badge badge-amber">no-op 安全</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><span class="dep-none">无（直接读 process.env.SMTP_*）</span></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">nodemailer</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">MailModule</span><span class="export-tag">MailService</span>
+            <span class="export-tag">MailPayload</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">MailService</span>.<span class="m-name">send</span>(<span class="m-param">payload: MailPayload</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box warn">
+          <b>⚠ 与 service-mail 的区别</b>：core-mail 是轻量的 NestJS 全局 Module，供 BFF 层 fire-and-forget 发通知邮件。service-mail 包含 Redis 验证码 + 批量发送，用于业务领域。两者各司其职，不冲突。<br>
+          <b>SMTP 配置</b>：读 process.env 而非 core-config（core 包间零依赖约束）。SMTP_HOST 缺失时静默 no-op。<br>
+          <b>当前消费方</b>：admin-bff（付款通知）、console-bff（订阅状态邮件）。
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: Model Runtime Client
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-ai" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#bc8cff"></div>
+    <h2>Model Runtime Client</h2>
+    <span class="layer-desc">packages/ai — 共享 AI 能力，仅服务端</span>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(188,140,255,.15);color:#bc8cff">AI</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/ai-sdk</div>
+          <div class="pkg-sub">packages/ai/model-runtime-client</div>
+          <div class="badges">
+            <span class="badge badge-amber">v0.0.0 开发中</span>
+            <span class="badge badge-gray">服务端专用</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><span class="dep-none">无（网关调用通过 HTTP）</span></div>
+        <div class="section">
+          <div class="section-title">模块划分</div>
+          <div class="export-list">
+            <span class="export-tag">llm</span><span class="export-tag">rag</span>
+            <span class="export-tag">embedding</span><span class="export-tag">workflow</span>
+            <span class="export-tag">ModelRuntimeLLMClient</span>
+            <span class="export-tag">LLMMessage</span><span class="export-tag">LLMResponse</span>
+            <span class="export-tag">LLMStreamChunk</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">已实现方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">ModelRuntimeLLMClient</span>.<span class="m-name">chat</span>(<span class="m-param">request: GatewayChatRequest</span>): <span class="m-ret">Promise&lt;GatewayChatResponse&gt;</span></div>
+            <div class="method"><span class="m-class">ModelRuntimeLLMClient</span>.<span class="m-name">stream</span>(<span class="m-param">request: GatewayChatRequest</span>): <span class="m-ret">AsyncGenerator&lt;StreamEvent&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box warn">RAG / Embedding / Workflow 模块当前仅有类型定义，无实现。LLM 模块通过 HTTP 调用 Model Platform（不直接集成 provider SDK）。消费方：agent-server/vela, agent-server/ruyinagent。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: DESIGN / PLATFORM
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-design" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#f0883e"></div>
+    <h2>Design System &amp; Platform SDK</h2>
+    <span class="layer-desc">packages/design, packages/platform — 前端专属，不可在服务端引用</span>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(240,136,62,.15);color:#f0883e">DS</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/design-system</div>
+          <div class="pkg-sub">packages/design/design-system</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.2.2</span>
+            <span class="badge badge-purple">React 组件库</span>
+            <span class="badge badge-gray">Radix UI + Tailwind</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">react</span><span class="dep-external">@radix-ui/react-*</span><span class="dep-external">@phosphor-icons/react</span><span class="dep-external">tailwindcss</span><span class="dep-external">next-themes</span><span class="dep-external">clsx</span></div></div>
+        <div class="section">
+          <div class="section-title">导出分类</div>
+          <div class="export-list">
+            <span class="export-tag">Icon</span><span class="export-tag">Button</span><span class="export-tag">Input</span>
+            <span class="export-tag">Select</span><span class="export-tag">Dialog</span><span class="export-tag">Dropdown</span>
+            <span class="export-tag">Tabs</span><span class="export-tag">Tooltip</span><span class="export-tag">Switch</span>
+            <span class="export-tag">useTheme</span><span class="export-tag">useDensity</span>
+            <span class="export-tag">tokens</span><span class="export-tag">layers</span>
+          </div>
+        </div>
+        <div class="note-box info">消费方：portals/*, agent-studio/*。服务端代码严禁 import。含全局样式 styles/globals.css。</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(240,136,62,.15);color:#f0883e">PB</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/platform-browser</div>
+          <div class="pkg-sub">packages/platform/browser</div>
+          <div class="badges">
+            <span class="badge badge-green">v1.0.0</span>
+            <span class="badge badge-gray">浏览器专用</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">resetWindowScrollTop</span>
+            <span class="export-tag">ScrollBehavior</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-kw">function</span> <span class="m-name">resetWindowScrollTop</span>(<span class="m-param">behavior?: ScrollBehavior</span>): <span class="m-ret">void</span></div>
+          </div>
+        </div>
+        <div class="note-box info">所有函数内部有 <code>typeof window !== 'undefined'</code> 守卫，SSR 安全。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: SERVICES
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-service" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#3fb950"></div>
+    <h2>Service Layer <span style="font-weight:400;color:var(--text2)">(8 个包)</span></h2>
+    <span class="layer-desc">services/ — 共享业务域服务，BFF 和 agent-server 消费</span>
+  </div>
+  <div class="cards">
+
+    <!-- service-iam -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">IAM</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-iam</div>
+          <div class="pkg-sub">services/identity/iam</div>
+          <div class="badges">
+            <span class="badge badge-green">v0.1.0</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">pg 直连</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/core-config</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">pg</span><span class="dep-external">bcryptjs</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">IamModule</span><span class="export-tag">AccountAuthService</span>
+            <span class="export-tag">AccountProfileView</span><span class="export-tag">CreateAccountInput</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">AccountAuthService</span>.<span class="m-name">createAccount</span>(<span class="m-param">input: CreateAccountInput</span>): <span class="m-ret">Promise&lt;AuthenticatedAccountView&gt;</span></div>
+            <div class="method"><span class="m-class">AccountAuthService</span>.<span class="m-name">authenticate</span>(<span class="m-param">credentials: AccountCredentialRecord</span>): <span class="m-ret">Promise&lt;AuthenticatedAccountView&gt;</span></div>
+            <div class="method"><span class="m-class">AccountAuthService</span>.<span class="m-name">getAccountProfile</span>(<span class="m-param">accountId: string</span>): <span class="m-ret">Promise&lt;AccountProfileView&gt;</span></div>
+            <div class="method"><span class="m-class">AccountAuthService</span>.<span class="m-name">updateAccountProfile</span>(<span class="m-param">accountId, input</span>): <span class="m-ret">Promise&lt;AccountProfileView&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box info">账户认证服务。密码用 bcryptjs 加密，pg 直连数据库。消费方：console-bff, admin-bff（通过 IamModule 注入）。</div>
+      </div>
+    </div>
+
+    <!-- service-organization -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">Org</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-organization</div>
+          <div class="pkg-sub">services/tenant/organization</div>
+          <div class="badges">
+            <span class="badge badge-green">v0.1.0</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">pg 直连</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/core-config</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">pg</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">OrganizationModule</span><span class="export-tag">OrganizationReadService</span>
+            <span class="export-tag">TenantService</span><span class="export-tag">TenantContextView</span>
+            <span class="export-tag">TenantMemberSummary</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">OrganizationReadService</span>.<span class="m-name">getTenant</span>(<span class="m-param">tenantId: string</span>): <span class="m-ret">Promise&lt;TenantContextView&gt;</span></div>
+            <div class="method"><span class="m-class">OrganizationReadService</span>.<span class="m-name">getTenants</span>(<span class="m-param">userId: string</span>): <span class="m-ret">Promise&lt;TenantContextView[]&gt;</span></div>
+            <div class="method"><span class="m-class">OrganizationReadService</span>.<span class="m-name">getTenantMembers</span>(<span class="m-param">tenantId: string</span>): <span class="m-ret">Promise&lt;TenantMemberSummary[]&gt;</span></div>
+            <div class="method"><span class="m-class">TenantService</span>.<span class="m-name">createTenant</span>(<span class="m-param">input: CreateTenantInput</span>): <span class="m-ret">Promise&lt;TenantContextView&gt;</span></div>
+            <div class="method"><span class="m-class">TenantService</span>.<span class="m-name">addMember</span>(<span class="m-param">tenantId, userId, role: string</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box info">租户组织读写服务。OrganizationReadService 只读（适合查询）。TenantService 处理写操作。消费方：console-bff（通过 OrganizationModule）。</div>
+      </div>
+    </div>
+
+    <!-- service-subscription -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">Sub</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-subscription</div>
+          <div class="pkg-sub">services/commerce/subscription</div>
+          <div class="badges">
+            <span class="badge badge-amber">v0.0.0</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">in-memory repo</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span><span class="dep-internal">@vxture/core-api</span></div></div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">getSubscriptionById</span>(<span class="m-param">id: string</span>): <span class="m-ret">Promise&lt;Subscription&gt;</span></div>
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">getTenantSubscriptions</span>(<span class="m-param">tenantId: string</span>): <span class="m-ret">Promise&lt;Subscription[]&gt;</span></div>
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">upgradePlan</span>(<span class="m-param">id, planId, changedBy</span>): <span class="m-ret">Promise&lt;Subscription&gt;</span></div>
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">pauseSubscription</span>(<span class="m-param">id, reason?, changedBy</span>): <span class="m-ret">Promise&lt;Subscription&gt;</span></div>
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">resumeSubscription</span>(<span class="m-param">id, changedBy</span>): <span class="m-ret">Promise&lt;Subscription&gt;</span></div>
+            <div class="method"><span class="m-class">SubscriptionService</span>.<span class="m-name">cancelSubscription</span>(<span class="m-param">id, reason?, immediate, changedBy</span>): <span class="m-ret">Promise&lt;Subscription&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box warn">Repository 为内存实现（无真实数据库持久化），v0.0.0 仍在开发阶段。<code>core-api</code> 依赖目前未实际使用（历史遗留）。消费方：console-bff（subscriptionRouter）。</div>
+      </div>
+    </div>
+
+    <!-- service-billing -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">Bill</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-billing</div>
+          <div class="pkg-sub">services/commerce/billing</div>
+          <div class="badges">
+            <span class="badge badge-amber">v0.0.0</span>
+            <span class="badge badge-red">Stub 实现</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span><span class="dep-internal">@vxture/core-api</span><span class="dep-internal">@vxture/core-utils</span></div></div>
+        <div class="section">
+          <div class="section-title">关键方法（接口定义，无实现）</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">BillingService</span>.<span class="m-name">createInvoice</span>(<span class="m-param">input: CreateInvoiceInput</span>): <span class="m-ret">Promise&lt;Invoice&gt;</span></div>
+            <div class="method"><span class="m-class">BillingService</span>.<span class="m-name">processPayment</span>(<span class="m-param">input: ProcessPaymentInput</span>): <span class="m-ret">Promise&lt;Payment&gt;</span></div>
+            <div class="method"><span class="m-class">BillingService</span>.<span class="m-name">getInvoices</span>(<span class="m-param">params?: InvoiceQueryParams</span>): <span class="m-ret">Promise&lt;Invoice[]&gt;</span></div>
+            <div class="method"><span class="m-class">BillingService</span>.<span class="m-name">getBillingStats</span>(<span class="m-param">params?</span>): <span class="m-ret">Promise&lt;BillingStats&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box warn">纯 stub，无 repository 实现。admin-bff 的账单功能通过直连 pg（在 BillingRouter 内）实现，绕过了本 service。待真实 Prisma repository 接入后对齐。</div>
+      </div>
+    </div>
+
+    <!-- service-mail -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">Ntf</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-mail</div>
+          <div class="pkg-sub">services/notification/mail</div>
+          <div class="badges">
+            <span class="badge badge-green">v0.1.0</span>
+            <span class="badge badge-blue">NestJS Module</span>
+            <span class="badge badge-gray">Redis 验证码</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><span class="dep-none">无</span></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">nodemailer</span><span class="dep-external">ioredis</span></div></div>
+        <div class="section">
+          <div class="section-title">核心导出</div>
+          <div class="export-list">
+            <span class="export-tag">MailModule</span><span class="export-tag">MailService</span>
+            <span class="export-tag">VerifyCodeService</span><span class="export-tag">MailMessage</span>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">MailService</span>.<span class="m-name">send</span>(<span class="m-param">message: MailMessage</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+            <div class="method"><span class="m-class">MailService</span>.<span class="m-name">sendBatch</span>(<span class="m-param">messages: MailMessage[]</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+            <div class="method"><span class="m-class">VerifyCodeService</span>.<span class="m-name">sendVerifyCode</span>(<span class="m-param">email: string, code: string</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+            <div class="method"><span class="m-class">VerifyCodeService</span>.<span class="m-name">verifyCode</span>(<span class="m-param">email: string, code: string</span>): <span class="m-ret">Promise&lt;boolean&gt;</span></div>
+            <div class="method"><span class="m-class">VerifyCodeService</span>.<span class="m-name">expireVerifyCode</span>(<span class="m-param">email: string</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box info">与 core-mail 职责分工：service-mail 处理验证码（含 Redis TTL）和批量发送，适合业务领域场景（登录、注册）。core-mail 仅做 BFF 层 fire-and-forget 通知。消费方：website-bff（登录验证码）。</div>
+      </div>
+    </div>
+
+    <!-- service-model-platform -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">GW</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-model-platform</div>
+          <div class="pkg-sub">services/model/platform</div>
+          <div class="badges">
+            <span class="badge badge-green">v0.1.0</span>
+            <span class="badge badge-blue">NestJS Service</span>
+            <span class="badge badge-gray">Prisma ORM</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/core-config</span><span class="dep-internal">@vxture/shared</span></div></div>
+        <div class="section"><div class="section-title">外部依赖</div><div class="dep-list"><span class="dep-external">@prisma/client</span></div></div>
+        <div class="section">
+          <div class="section-title">关键方法</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">GatewayService</span>.<span class="m-name">chat</span>(<span class="m-param">request: ChatRequest</span>): <span class="m-ret">Promise&lt;ChatResponse&gt;</span></div>
+            <div class="method"><span class="m-class">GatewayService</span>.<span class="m-name">stream</span>(<span class="m-param">request: ChatRequest</span>): <span class="m-ret">AsyncGenerator&lt;StreamEvent&gt;</span></div>
+            <div class="method"><span class="m-class">ModelRegistryService</span>.<span class="m-name">getActiveModel</span>(<span class="m-param">modelCode: string</span>): <span class="m-ret">Promise&lt;AiModelRecord&gt;</span></div>
+            <div class="method"><span class="m-class">QuotaService</span>.<span class="m-name">assertAllowed</span>(<span class="m-param">model, request</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+            <div class="method"><span class="m-class">MeteringService</span>.<span class="m-name">recordTokenUsage</span>(<span class="m-param">...</span>): <span class="m-ret">Promise&lt;void&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box info">多模型路由：Claude / Doubao / PrivateProvider。Prisma 持久化模型配置和用量数据。admin-bff 的 ModelPlatformRouter 通过 HTTP 调用本服务（端口 3100）。</div>
+      </div>
+    </div>
+
+    <!-- service-ticket -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(63,185,80,.12);color:#7ee787">Tkt</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/service-ticket</div>
+          <div class="pkg-sub">services/support/ticket</div>
+          <div class="badges">
+            <span class="badge badge-amber">v0.0.0</span>
+            <span class="badge badge-red">Stub</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="section"><div class="section-title">内部依赖</div><div class="dep-list"><span class="dep-internal">@vxture/shared</span><span class="dep-internal">@vxture/core-api</span><span class="dep-internal">@vxture/core-auth</span></div></div>
+        <div class="section">
+          <div class="section-title">关键方法（接口定义）</div>
+          <div class="methods">
+            <div class="method"><span class="m-class">TicketService</span>.<span class="m-name">createTicket</span>(<span class="m-param">input: CreateTicketInput</span>): <span class="m-ret">Promise&lt;Ticket&gt;</span></div>
+            <div class="method"><span class="m-class">TicketService</span>.<span class="m-name">getTickets</span>(<span class="m-param">params?: TicketQueryParams</span>): <span class="m-ret">Promise&lt;Ticket[]&gt;</span></div>
+            <div class="method"><span class="m-class">TicketService</span>.<span class="m-name">closeTicket</span>(<span class="m-param">id: string</span>): <span class="m-ret">Promise&lt;Ticket&gt;</span></div>
+            <div class="method"><span class="m-class">TicketService</span>.<span class="m-name">reassignTicket</span>(<span class="m-param">id, assigneeId: string</span>): <span class="m-ret">Promise&lt;Ticket&gt;</span></div>
+          </div>
+        </div>
+        <div class="note-box warn">Stub 实现。admin-bff TicketsRouter 目前通过直连 pg 查询 support.ticket 表（未使用本 service）。core-auth 依赖尚未在任何方法中实际使用——待清理。</div>
+      </div>
+    </div>
+
+    <!-- workers -->
+    <div class="card">
+      <div class="card-head" onclick="toggle(this)">
+        <div class="pkg-icon" style="background:rgba(110,118,129,.1);color:var(--text3)">W</div>
+        <div class="card-title">
+          <div class="pkg-name">@vxture/workers</div>
+          <div class="pkg-sub">services/support/workers</div>
+          <div class="badges">
+            <span class="badge badge-amber">v0.0.0</span>
+            <span class="badge badge-red">空 Stub</span>
+          </div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="note-box warn">仅含 package.json + src/.gitkeep，无任何实现。预留给异步任务处理（Bull Queue / BullMQ）。公告群发批量邮件（M4）将在此实现。</div>
+      </div>
+    </div>
+
+  </div><!-- /cards -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LAYER: BFF
+══════════════════════════════════════════════════════════════ -->
+<section id="layer-bff" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#d29922"></div>
+    <h2>BFF Layer <span style="font-weight:400;color:var(--text2)">(7 个包)</span></h2>
+    <span class="layer-desc">bff/ — 前后端唯一通道，仅做聚合 + 鉴权</span>
+  </div>
+
+  <!-- BFF 依赖矩阵 -->
+  <div style="margin-bottom:14px;overflow-x:auto">
+    <table style="border-collapse:collapse;width:100%;font-size:11px;min-width:600px">
+      <thead>
+        <tr style="background:var(--bg3)">
+          <th style="padding:6px 10px;text-align:left;border:1px solid var(--border2);color:var(--text2)">BFF 包</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">core-config</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">core-auth</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">core-mail</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">core-api</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">svc-iam</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">svc-org</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">svc-sub</th>
+          <th style="padding:6px 10px;text-align:center;border:1px solid var(--border2);color:var(--text2)">pg直连</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace">admin-bff</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--amber)">✓ 多处</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,.02)">
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace">console-bff</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace">website-bff</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,.02)">
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace">vela-bff</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--green)">✓</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+          <td style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">—</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace;color:var(--text3)">ruyinagent-bff</td>
+          <td colspan="8" style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">建设中（待补全）</td>
+        </tr>
+        <tr style="background:rgba(255,255,255,.02)">
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace;color:var(--text3)">gateway-bff</td>
+          <td colspan="8" style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">Model Platform 代理层，待补全</td>
+        </tr>
+        <tr>
+          <td style="padding:5px 10px;border:1px solid var(--border2);font-family:monospace;color:var(--text3)">agent-template-bff</td>
+          <td colspan="8" style="padding:5px 10px;border:1px solid var(--border2);text-align:center;color:var(--text3)">模板 BFF，待实例化</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-size:12px;color:var(--text2);line-height:1.8">
+    <b style="color:var(--text)">admin-bff 核心路由模块（已实现）：</b><br>
+    auth · accounts · admin-roles · admin-permissions · tenants · platform-admins · platform-governance ·
+    billing · invoices · orders · payments <span style="color:var(--green)">（含 verify/reject + MailService）</span> ·
+    subscription · commercial · products · skills · model-platform · audit-logs · announcements <span style="color:var(--amber)">（stub）</span> ·
+    tickets <span style="color:var(--green)">（pg 直连）</span><br><br>
+    <b style="color:var(--text)">console-bff 核心路由模块（已实现）：</b><br>
+    auth · me · capabilities · iam · tenant-context · subscription <span style="color:var(--green)">（含 actions + MailService）</span> · health
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AUDIT
+══════════════════════════════════════════════════════════════ -->
+<section id="audit" class="layer">
+  <div class="layer-header">
+    <div class="layer-dot" style="background:#d29922"></div>
+    <h2>一致性审核</h2>
+    <span class="layer-desc">跨包发现的结构性问题与建议</span>
+  </div>
+  <div class="issues-grid">
+
+    <div class="issue-card type-warn">
+      <div class="issue-title">⚠ admin-bff 多处直连 pg（绕过 service 层）</div>
+      <div class="issue-body">BillingRouter、InvoicesRouter、OrdersRouter、PaymentsRouter、TicketsRouter 均自持 Pool 直连数据库，未通过 service-billing / service-ticket。这绕过了分层约束，但目前这些 service 是 stub，属于务实选择。<br><b>建议</b>：service-billing / service-ticket 接入真实 Prisma 仓库后，逐步将 BFF 切换为调用 service。</div>
+    </div>
+
+    <div class="issue-card type-warn">
+      <div class="issue-title">⚠ service-billing / service-ticket 依赖 core-api，但未使用</div>
+      <div class="issue-body"><code>@vxture/core-api</code>（HTTP 客户端）被列为依赖，但这两个 service 没有对外发 HTTP 请求的场景。这些依赖是历史遗留，增加了构建体积。<br><b>建议</b>：从两个 stub service 的 package.json 中移除 core-api。</div>
+    </div>
+
+    <div class="issue-card type-warn">
+      <div class="issue-title">⚠ service-ticket 依赖 core-auth，但未在方法中使用</div>
+      <div class="issue-body"><code>@vxture/core-auth</code> 依赖声明存在，但 TicketService 的公共方法均不使用 JWT 验证功能（认证在 BFF middleware 层）。<br><b>建议</b>：移除 core-auth 依赖，认证边界保持在 BFF 层。</div>
+    </div>
+
+    <div class="issue-card type-info">
+      <div class="issue-title">ℹ 两个 mail 包的职责划分</div>
+      <div class="issue-body">
+        <b>core-mail</b>（packages/core/mail）— 轻量 NestJS 全局模块，single <code>send()</code>，BFF 层 fire-and-forget 通知。无 Redis，no-op 安全。<br>
+        <b>service-mail</b>（services/notification/mail）— 业务域服务，含 VerifyCodeService（Redis TTL）+ 批量发送，用于登录/注册验证码流程。<br>
+        <b>结论</b>：划分合理，无重复。应保持各自职责，不合并。
+      </div>
+    </div>
+
+    <div class="issue-card type-info">
+      <div class="issue-title">ℹ core-mail 不依赖 core-config（设计决定）</div>
+      <div class="issue-body">core-mail 直接读 process.env.SMTP_* 而不通过 VxConfigService，原因是 core 包间禁止互相依赖。Consumer BFF 已通过 VxConfigModule 加载 .env，SMTP 变量在 MailService 构造时已可用。<br><b>结论</b>：架构约束合理，无需修改。</div>
+    </div>
+
+    <div class="issue-card type-stub">
+      <div class="issue-title">▣ workers 包为空 stub</div>
+      <div class="issue-body">services/support/workers 只有 package.json + .gitkeep，无代码。M4（公告群发邮件）的批量异步逻辑计划在此实现（BullMQ）。<br><b>建议</b>：M4 启动前设计队列接口，确定 Redis 连接配置后建包。</div>
+    </div>
+
+    <div class="issue-card type-stub">
+      <div class="issue-title">▣ ai-sdk 模块不完整</div>
+      <div class="issue-body">RAG / Embedding / Workflow 三个模块仅有类型定义，ModelRuntimeLLMClient 已实现。version 0.0.0 反映开发状态。<br><b>建议</b>：以 LLM 模块为模板，RAG/Embedding 模块按需实现，勿提前扩张接口。</div>
+    </div>
+
+    <div class="issue-card type-ok">
+      <div class="issue-title">✓ Core 层包间零依赖约束满足</div>
+      <div class="issue-body">7 个 core 包中，core-api / auth / locale / tenant / utils 均只依赖 @vxture/shared；core-config 零内部依赖；core-mail 零内部依赖。没有 core 包引用其他 core 包。约束完全满足。</div>
+    </div>
+
+    <div class="issue-card type-ok">
+      <div class="issue-title">✓ Service 层包间零依赖约束满足</div>
+      <div class="issue-body">所有 service 包均未引用其他 service 包。跨域数据在 BFF 层通过 aggregator 组合。约束完全满足。</div>
+    </div>
+
+    <div class="issue-card type-ok">
+      <div class="issue-title">✓ 端口分配自洽</div>
+      <div class="issue-body">Platform BFFs：3011/3021/3031；Vela 三端：3120/3121/3122；Model Platform：3100。全部符合 3NNX 规则，已在 port-allocation.md 登记。</div>
+    </div>
+
+  </div>
+</section>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+function toggle(head) {
+  const card = head.closest('.card');
+  card.classList.toggle('open');
+}
+
+// Sidebar active link tracking
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// Auto-open first card in each layer
+document.querySelectorAll('.layer').forEach(layer => {
+  const first = layer.querySelector('.card');
+  if (first) first.classList.add('open');
+});
+</script>
+</body>
+</html>
