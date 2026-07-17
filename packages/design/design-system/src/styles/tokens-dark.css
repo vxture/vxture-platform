@@ -175,4 +175,10 @@
   --vx-color-hero-line-rgb: 147 197 253;
   --vx-color-hero-scan: rgba(147, 197, 253, 0.45);
   --vx-color-hero-fade: rgba(15, 23, 42, 0.52);
+
+  /* Card 组件语义（components-display.css :where(.vx-card) 消费）——
+     此前无 dark 覆盖，裸 Card 在暗色下仍是白底（admin 被 .dark
+     .vx-section-card 显式规则遮蔽未暴露）。对齐暗色表格/面板处理。 */
+  --vx-card-border: color-mix(in srgb, var(--vx-color-gray-400) 14%, transparent);
+  --vx-card-background: color-mix(in srgb, var(--vx-color-surface) 92%, transparent);
 }

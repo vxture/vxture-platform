@@ -33,6 +33,11 @@
   background: color-mix(in srgb, var(--vx-color-shell-surface) 92%, transparent);
 }
 
+/* 强调卡：品牌色描边（如定价推荐档）。语义类保证压过工具类的边框色。 */
+.vx-card--accent {
+  border-color: var(--vx-color-primary);
+}
+
 .vx-page-section {
   gap: var(--vx-layout-page-section-gap);
   padding: var(--vx-layout-page-section-padding);

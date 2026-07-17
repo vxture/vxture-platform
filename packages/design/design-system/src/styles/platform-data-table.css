@@ -101,3 +101,15 @@
   display: grid;
   gap: var(--vx-platform-table-stack-gap);
 }
+
+/* DataTable 的 admin 观感修饰：brand 色带表头（同 .vx-table__header），
+   供营销侧（如 /pricing 对比表）复用平台表格语言。 */
+.vx-data-table--banded thead {
+  background: var(--vx-color-brand-50);
+  color: var(--vx-color-shell-muted);
+}
+
+.dark .vx-data-table--banded thead {
+  background: color-mix(in srgb, var(--vx-color-gray-800) 48%, transparent);
+  color: var(--vx-color-text-muted);
+}
