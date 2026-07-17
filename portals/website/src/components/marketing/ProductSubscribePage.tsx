@@ -4,8 +4,8 @@
  * ProductSubscribePage — /pricing 通用订阅页。
  * 从产品中心卡片「订阅」进入，?product= 选定产品（默认 arda）；
  * 页面结构参照 figma.com/pricing 简化为两个板块：
- *   1. 选择套餐与席位（计费周期切换 + 档位卡片）
- *   2. 对比所有功能（分组功能对比表）
+ *   1. 选择套餐与席位（居中头部 + 胶囊计费切换 + 档位卡片，推荐档强调）
+ *   2. 对比所有功能（DS DataTable 分组对比表，推荐列淡色高亮）
  * 数据按产品 code 组织在 products.subscription.products 下，
  * 后续产品/套餐/解决方案开放订阅时只需补充对应 code 的数据。
  * 档位 CTA 深链 console /subscribe（携带 product/intent/target_tier）。
@@ -61,6 +61,9 @@ const PLAN_GRID_COLS: Record<number, string> = {
   5: "xl:grid-cols-5",
 };
 
+/** 推荐档位在对比表中的整列淡色高亮。 */
+const HIGHLIGHT_COL = "bg-vx-brand-50/50 dark:bg-vx-brand-950/25";
+
 /** 对比表行模型：分组标题行 + 功能行，扁平化后交给 DS DataTable 渲染。 */
 type CompareTableRow =
   | { kind: "group"; title: string }
@@ -75,14 +78,14 @@ function buildCompareColumns(
     {
       id: "feature",
       header: (
-        <span className="text-vx-gray-500 dark:text-vx-gray-400">
+        <span className="text-xs uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400">
           {featureHeader}
         </span>
       ),
       className: "w-56",
       cell: (row) =>
         row.kind === "group" ? (
-          <span className="text-xs font-semibold uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400">
+          <span className="text-xs font-semibold uppercase tracking-wide text-vx-brand-600 dark:text-vx-brand-300">
             {row.title}
           </span>
         ) : (
@@ -95,11 +98,14 @@ function buildCompareColumns(
       (plan, planIndex): DataTableColumn<CompareTableRow> => ({
         id: plan.tier,
         align: "center",
+        ...(plan.highlight
+          ? { headerClassName: HIGHLIGHT_COL, cellClassName: HIGHLIGHT_COL }
+          : {}),
         header: (
           <span
             className={
               plan.highlight
-                ? "text-vx-brand-600 dark:text-vx-brand-300"
+                ? "font-bold text-vx-brand-600 dark:text-vx-brand-300"
                 : "text-vx-gray-900 dark:text-vx-white"
             }
           >
@@ -126,10 +132,12 @@ function ComparisonCell({ value }: { value: string | boolean }) {
     );
   }
   if (value === false) {
-    return <span className="text-vx-gray-400 dark:text-vx-gray-600">—</span>;
+    return <span className="text-vx-gray-300 dark:text-vx-gray-600">—</span>;
   }
   return (
-    <span className="text-vx-gray-700 dark:text-vx-gray-200">{value}</span>
+    <span className="font-medium text-vx-gray-700 dark:text-vx-gray-200">
+      {value}
+    </span>
   );
 }
 
@@ -146,22 +154,25 @@ export default function ProductSubscribePage() {
     <div className="vx-page-surface">
       <section className="vx-section-odd">
         <div className="mx-auto max-w-7xl px-6 pt-24 lg:px-8 xl:max-w-screen-2xl">
-          <p className="vx-website-hero-eyebrow text-sm font-semibold uppercase text-vx-brand-600 dark:text-vx-info-200">
-            {t("eyebrow")}
-          </p>
-          <h1 className="font-brand mt-3 text-4xl font-bold leading-tight text-vx-gray-900 dark:text-vx-white md:text-5xl">
-            {t("title")}
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-vx-gray-600 dark:text-vx-gray-300">
-            {t("description")}
-          </p>
+          {/* ── 居中页头：产品订阅统一入口 ─────────────────────────────── */}
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="vx-website-hero-eyebrow text-sm font-semibold uppercase text-vx-brand-600 dark:text-vx-info-200">
+              {t("eyebrow")}
+            </p>
+            <h1 className="font-brand mt-4 text-4xl font-bold leading-tight text-vx-gray-900 dark:text-vx-white md:text-5xl">
+              {t("title")}
+            </h1>
+            <p className="mt-4 text-base leading-7 text-vx-gray-600 dark:text-vx-gray-300">
+              {t("description")}
+            </p>
+          </div>
 
           {!product ? (
-            <div className="mt-12 rounded-lg border border-vx-gray-200 bg-vx-white p-8 dark:border-vx-gray-800 dark:bg-vx-gray-900">
+            <div className="mx-auto mt-12 max-w-xl rounded-lg border border-vx-gray-200 bg-vx-white p-8 text-center dark:border-vx-gray-800 dark:bg-vx-gray-900">
               <p className="text-sm leading-6 text-vx-gray-600 dark:text-vx-gray-300">
                 {t("unavailable")}
               </p>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap justify-center gap-3">
                 <Button asChild variant="outline">
                   <a
                     href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
@@ -178,27 +189,23 @@ export default function ProductSubscribePage() {
             </div>
           ) : (
             <>
-              {/* ── 板块一：选择套餐与席位 ───────────────────────────────── */}
-              <div className="mt-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-vx-brand-600 dark:text-vx-brand-300">
-                    {product.name}
-                  </p>
-                  <h2 className="font-display mt-2 text-2xl font-bold text-vx-gray-900 dark:text-vx-white md:text-3xl">
-                    {t("pick.title")}
-                  </h2>
-                  <p className="mt-2 text-sm text-vx-gray-600 dark:text-vx-gray-300">
-                    {t("pick.description")}
-                  </p>
-                </div>
-                <div className="flex gap-2">
+              {/* ── 产品上下文 + 胶囊计费切换（居中） ───────────────────── */}
+              <div className="mt-10 flex flex-col items-center gap-6">
+                <span className="inline-flex items-center gap-2 rounded-full border border-vx-brand-200 bg-vx-brand-50/60 px-4 py-1.5 text-sm font-medium text-vx-brand-700 dark:border-vx-brand-500/30 dark:bg-vx-brand-950/30 dark:text-vx-brand-200">
+                  <span className="h-1.5 w-1.5 rounded-full bg-vx-brand-500" />
+                  {product.name}
+                </span>
+                <div
+                  role="group"
+                  className="inline-flex items-center gap-1 rounded-full border border-vx-gray-200 bg-vx-white p-1 shadow-sm dark:border-vx-gray-700 dark:bg-vx-gray-900"
+                >
                   {(["monthly", "yearly"] as Cycle[]).map((c) => (
                     <Button
                       key={c}
-                      variant={cycle === c ? "default" : "outline"}
+                      variant={cycle === c ? "default" : "ghost"}
                       size="sm"
                       onClick={() => setCycle(c)}
-                      className="h-10 px-4"
+                      className="rounded-full px-5"
                     >
                       {t(`cycle.${c}`)}
                     </Button>
@@ -206,8 +213,9 @@ export default function ProductSubscribePage() {
                 </div>
               </div>
 
+              {/* ── 板块一：档位卡片（推荐档强调） ─────────────────────── */}
               <div
-                className={`mt-8 grid gap-4 md:grid-cols-2 ${
+                className={`mt-12 grid items-stretch gap-4 md:grid-cols-2 ${
                   PLAN_GRID_COLS[product.plans.length] ?? "xl:grid-cols-5"
                 }`}
               >
@@ -218,51 +226,59 @@ export default function ProductSubscribePage() {
                   return (
                     <article
                       key={plan.tier}
-                      className={`relative flex flex-col rounded-lg border p-5 shadow-sm transition ${
+                      className={`relative flex flex-col rounded-xl p-6 transition ${
                         plan.highlight
-                          ? "border-vx-brand-400 bg-vx-brand-50/40 dark:border-vx-brand-500/40 dark:bg-vx-brand-950/20"
-                          : "border-vx-gray-200 bg-vx-white dark:border-vx-gray-800 dark:bg-vx-gray-900"
+                          ? "border-2 border-vx-brand-500 bg-vx-white shadow-lg dark:border-vx-brand-400/70 dark:bg-vx-gray-900"
+                          : "border border-vx-gray-200 bg-vx-white shadow-sm hover:border-vx-brand-200 hover:shadow-md dark:border-vx-gray-800 dark:bg-vx-gray-900 dark:hover:border-vx-brand-500/30"
                       }`}
                     >
                       {plan.highlight ? (
-                        <span className="absolute -top-3 right-4 rounded-full bg-vx-brand-600 px-2.5 py-0.5 text-xs font-semibold text-vx-white dark:bg-vx-brand-500">
+                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-vx-brand-600 px-3 py-1 text-xs font-semibold text-vx-white shadow-sm dark:bg-vx-brand-500">
                           {t("recommended")}
                         </span>
                       ) : null}
-                      <h3 className="text-lg font-semibold text-vx-gray-900 dark:text-vx-white">
+
+                      <h3 className="text-sm font-semibold uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400">
                         {plan.name}
                       </h3>
-                      <div className="mt-3">
+
+                      <div className="mt-4 min-h-16">
                         {isContact ? (
-                          <p className="text-xl font-bold text-vx-gray-900 dark:text-vx-white">
+                          <p className="text-2xl font-bold leading-tight text-vx-gray-900 dark:text-vx-white">
                             {t("contact")}
                           </p>
                         ) : (
                           <>
-                            <p className="text-2xl font-bold text-vx-gray-900 dark:text-vx-white">
-                              {price}
+                            <p className="flex items-baseline gap-1">
+                              <span className="text-3xl font-bold tracking-tight text-vx-gray-900 dark:text-vx-white">
+                                {price}
+                              </span>
+                              <span className="text-sm text-vx-gray-500 dark:text-vx-gray-400">
+                                / {t(`per.${cycle}`)}
+                              </span>
                             </p>
-                            <p className="text-xs text-vx-gray-500 dark:text-vx-gray-400">
-                              {t(`per.${cycle}`)}
-                              {cycle === "yearly" && plan.save
-                                ? ` · ${plan.save}`
-                                : ""}
-                            </p>
+                            {cycle === "yearly" && plan.save ? (
+                              <span className="mt-2 inline-flex rounded-full bg-vx-brand-50 px-2.5 py-0.5 text-xs font-medium text-vx-brand-700 dark:bg-vx-brand-950/40 dark:text-vx-brand-300">
+                                {plan.save}
+                              </span>
+                            ) : null}
                           </>
                         )}
                       </div>
-                      <p className="mt-3 flex items-center gap-2 border-t border-vx-gray-100 pt-3 text-sm font-medium text-vx-gray-700 dark:border-vx-gray-800 dark:text-vx-gray-200">
+
+                      <p className="mt-4 flex items-center gap-2 border-t border-vx-gray-100 pt-4 text-sm font-semibold text-vx-gray-900 dark:border-vx-gray-800 dark:text-vx-white">
                         <Icon
                           name="users"
                           className="h-4 w-4 shrink-0 text-vx-brand-500"
                         />
                         {plan.seats}
                       </p>
-                      <ul className="mt-3 space-y-2">
+
+                      <ul className="mt-3 space-y-2.5">
                         {plan.features.map((feature) => (
                           <li
                             key={feature}
-                            className="flex gap-2 text-sm text-vx-gray-600 dark:text-vx-gray-300"
+                            className="flex gap-2 text-sm leading-5 text-vx-gray-600 dark:text-vx-gray-300"
                           >
                             <Icon
                               name="check"
@@ -272,7 +288,8 @@ export default function ProductSubscribePage() {
                           </li>
                         ))}
                       </ul>
-                      <div className="mt-auto pt-5">
+
+                      <div className="mt-auto pt-6">
                         {isContact ? (
                           <Button asChild variant="outline" className="w-full">
                             <a
@@ -284,7 +301,11 @@ export default function ProductSubscribePage() {
                             </a>
                           </Button>
                         ) : (
-                          <Button asChild className="w-full">
+                          <Button
+                            asChild
+                            variant={plan.highlight ? "default" : "outline"}
+                            className="w-full"
+                          >
                             <a
                               href={buildConsoleSubscribeUrl(
                                 locale,
@@ -310,13 +331,17 @@ export default function ProductSubscribePage() {
       {product ? (
         <section className="vx-section-even">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 xl:max-w-screen-2xl">
-            <h2 className="font-display text-2xl font-bold text-vx-gray-900 dark:text-vx-white md:text-3xl">
-              {t("compare.title")}
-            </h2>
-
-            {/* ── 板块二：对比所有功能（DS DataTable，分组行扁平化为行模型） */}
+            {/* ── 板块二：对比所有功能 ─────────────────────────────────── */}
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="font-display text-2xl font-bold text-vx-gray-900 dark:text-vx-white md:text-3xl">
+                {t("compare.title")}
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-vx-gray-600 dark:text-vx-gray-300">
+                {t("compare.description")}
+              </p>
+            </div>
             <DataTable<CompareTableRow>
-              className="mt-8"
+              className="mt-10"
               columns={buildCompareColumns(product, t("compare.feature"))}
               rows={product.comparison.groups.flatMap((group) => [
                 { kind: "group" as const, title: group.title },
