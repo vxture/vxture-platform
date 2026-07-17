@@ -14,7 +14,15 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, DataTable, Icon } from "@vxture/design-system";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  DataTable,
+  Icon,
+  StatusBadge,
+} from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
 import { Link } from "@/lib/i18n/navigation";
 import { buildConsoleSubscribeUrl } from "@/lib/console-entry";
@@ -224,102 +232,106 @@ export default function ProductSubscribePage() {
                     cycle === "monthly" ? plan.monthly : plan.yearly;
                   const isContact = price === null;
                   return (
-                    <article
+                    <Card
                       key={plan.tier}
-                      className={`relative flex flex-col rounded-xl p-6 transition ${
+                      className={`flex flex-col shadow-none ${
                         plan.highlight
-                          ? "border-2 border-vx-brand-500 bg-vx-white shadow-lg dark:border-vx-brand-400/70 dark:bg-vx-gray-900"
-                          : "border border-vx-gray-200 bg-vx-white shadow-sm hover:border-vx-brand-200 hover:shadow-md dark:border-vx-gray-800 dark:bg-vx-gray-900 dark:hover:border-vx-brand-500/30"
+                          ? "vx-card--accent"
+                          : "transition hover:border-vx-brand-200 dark:hover:border-vx-brand-500/30"
                       }`}
                     >
-                      {plan.highlight ? (
-                        <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-vx-brand-600 px-3 py-1 text-xs font-semibold text-vx-white shadow-sm dark:bg-vx-brand-500">
-                          {t("recommended")}
-                        </span>
-                      ) : null}
-
-                      <h3 className="text-sm font-semibold uppercase tracking-wide text-vx-gray-500 dark:text-vx-gray-400">
-                        {plan.name}
-                      </h3>
-
-                      <div className="mt-4 min-h-16">
-                        {isContact ? (
-                          <p className="text-2xl font-bold leading-tight text-vx-gray-900 dark:text-vx-white">
-                            {t("contact")}
-                          </p>
-                        ) : (
-                          <>
-                            <p className="flex items-baseline gap-1">
-                              <span className="text-3xl font-bold tracking-tight text-vx-gray-900 dark:text-vx-white">
-                                {price}
-                              </span>
-                              <span className="text-sm text-vx-gray-500 dark:text-vx-gray-400">
-                                / {t(`per.${cycle}`)}
-                              </span>
+                      <CardContent className="flex flex-1 flex-col gap-4 p-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-vx-text-muted">
+                              {plan.name}
                             </p>
-                            {cycle === "yearly" && plan.save ? (
-                              <span className="mt-2 inline-flex rounded-full bg-vx-brand-50 px-2.5 py-0.5 text-xs font-medium text-vx-brand-700 dark:bg-vx-brand-950/40 dark:text-vx-brand-300">
-                                {plan.save}
+                            <div className="mt-2 flex items-baseline gap-1">
+                              <span className="text-2xl font-semibold leading-none text-vx-text-primary">
+                                {isContact ? t("contact") : price}
                               </span>
-                            ) : null}
-                          </>
-                        )}
-                      </div>
-
-                      <p className="mt-4 flex items-center gap-2 border-t border-vx-gray-100 pt-4 text-sm font-semibold text-vx-gray-900 dark:border-vx-gray-800 dark:text-vx-white">
-                        <Icon
-                          name="users"
-                          className="h-4 w-4 shrink-0 text-vx-brand-500"
-                        />
-                        {plan.seats}
-                      </p>
-
-                      <ul className="mt-3 space-y-2.5">
-                        {plan.features.map((feature) => (
-                          <li
-                            key={feature}
-                            className="flex gap-2 text-sm leading-5 text-vx-gray-600 dark:text-vx-gray-300"
-                          >
-                            <Icon
-                              name="check"
-                              className="mt-0.5 h-4 w-4 shrink-0 text-vx-brand-500"
-                            />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="mt-auto pt-6">
-                        {isContact ? (
-                          <Button asChild variant="outline" className="w-full">
-                            <a
-                              href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
-                                product.contactSubject,
-                              )}`}
-                            >
-                              {t("contact")}
-                            </a>
-                          </Button>
-                        ) : (
-                          <Button
-                            asChild
-                            variant={plan.highlight ? "default" : "outline"}
-                            className="w-full"
-                          >
-                            <a
-                              href={buildConsoleSubscribeUrl(
-                                locale,
-                                productCode,
-                                "subscribe",
-                                plan.tier,
+                              {isContact ? null : (
+                                <span className="text-xs text-vx-text-muted">
+                                  / {t(`per.${cycle}`)}
+                                </span>
                               )}
+                            </div>
+                            {/* 折扣槽位固定高度，保证各卡头部区等高、分隔线对齐 */}
+                            <div className="mt-2 min-h-6">
+                              {!isContact && cycle === "yearly" && plan.save ? (
+                                <StatusBadge tone="success">
+                                  {plan.save}
+                                </StatusBadge>
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="flex h-10 shrink-0 items-start">
+                            {plan.highlight ? (
+                              <Badge>{t("recommended")}</Badge>
+                            ) : (
+                              <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-vx-primary-soft text-vx-primary-strong">
+                                <Icon name="users" className="h-5 w-5" />
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="border-t border-vx-border pt-4">
+                          <p className="text-sm font-medium text-vx-text-primary">
+                            {plan.seats}
+                          </p>
+                          <ul className="mt-3 space-y-2.5">
+                            {plan.features.map((feature) => (
+                              <li
+                                key={feature}
+                                className="flex gap-2 text-sm leading-5 text-vx-text-muted"
+                              >
+                                <Icon
+                                  name="check"
+                                  className="mt-0.5 h-4 w-4 shrink-0 text-vx-primary"
+                                />
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="mt-auto pt-2">
+                          {isContact ? (
+                            <Button
+                              asChild
+                              variant="outline"
+                              className="w-full"
                             >
-                              {t("subscribe")}
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </article>
+                              <a
+                                href={`mailto:sales@vxture.com?subject=${encodeURIComponent(
+                                  product.contactSubject,
+                                )}`}
+                              >
+                                {t("contact")}
+                              </a>
+                            </Button>
+                          ) : (
+                            <Button
+                              asChild
+                              variant={plan.highlight ? "default" : "outline"}
+                              className="w-full"
+                            >
+                              <a
+                                href={buildConsoleSubscribeUrl(
+                                  locale,
+                                  productCode,
+                                  "subscribe",
+                                  plan.tier,
+                                )}
+                              >
+                                {t("subscribe")}
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   );
                 })}
               </div>
@@ -341,7 +353,7 @@ export default function ProductSubscribePage() {
               </p>
             </div>
             <DataTable<CompareTableRow>
-              className="mt-10"
+              className="vx-data-table--banded mt-10 shadow-none"
               columns={buildCompareColumns(product, t("compare.feature"))}
               rows={product.comparison.groups.flatMap((group) => [
                 { kind: "group" as const, title: group.title },
@@ -354,9 +366,7 @@ export default function ProductSubscribePage() {
                 row.kind === "group" ? `group:${row.title}` : row.label
               }
               getRowClassName={(row) =>
-                row.kind === "group"
-                  ? "bg-vx-gray-50 dark:bg-vx-gray-800/50"
-                  : undefined
+                row.kind === "group" ? "bg-vx-surface-muted" : undefined
               }
             />
           </div>
