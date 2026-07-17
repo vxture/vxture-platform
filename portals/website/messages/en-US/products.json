@@ -193,14 +193,11 @@
   "subscription": {
     "eyebrow": "Subscription",
     "title": "Pick the plan that fits",
-    "description": "One subscription entry for every product, plan and solution — pick a tier and complete checkout in the console.",
-    "pick": {
-      "title": "Pick your plan, choose your seats",
-      "description": "Subscribe monthly or yearly, and upgrade tiers as your team grows."
-    },
+    "description": "One subscription entry for every product, plan and solution — subscribe monthly or yearly and upgrade tiers as your team grows.",
     "compare": {
       "title": "Compare all features",
-      "feature": "Feature"
+      "feature": "Feature",
+      "description": "Every feature and quota across tiers — pick what you need, upgrade anytime."
     },
     "cycle": {
       "monthly": "Monthly",

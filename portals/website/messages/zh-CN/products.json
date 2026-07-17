@@ -177,14 +177,11 @@
   "subscription": {
     "eyebrow": "产品订阅",
     "title": "选择适合你的套餐",
-    "description": "统一的订阅入口，覆盖全部产品、套餐与解决方案；选定档位后前往控制台完成开通。",
-    "pick": {
-      "title": "选择套餐与席位",
-      "description": "按月或按年订阅，档位随团队规模灵活升级。"
-    },
+    "description": "统一的订阅入口，覆盖全部产品、套餐与解决方案；按月或按年订阅，档位随团队规模灵活升级。",
     "compare": {
       "title": "对比所有功能",
-      "feature": "功能"
+      "feature": "功能",
+      "description": "各档位的完整功能与配额一览，按需选择、随时升级。"
     },
     "cycle": {
       "monthly": "月付",
