@@ -49,7 +49,7 @@
 
 **每笔订单 = 一行 `metering.subscriptions`（`status='suspended'`，`activation_method='offline_purchase'`）+ 一张 `billing.invoices`（`bill_status='unpaid'`，`subscription_id` 指向订单行）+ 一行 `invoice_items`（`subscription_fee`）。** 不新增订阅状态值（@shared 六值为已发布产品契约），不建独立 order 表（维持 admin 合成订单视图模型）。
 
-- **待支付订单判定谓词**（全平台统一，勿散写）：`status='suspended' AND activation_method='offline_purchase' AND 最新 invoice bill_status='unpaid'`。与"用户主动暂停"（activation_method 为原购买方式、无未付账单）可区分。
+- **待支付订单判定谓词**（全平台统一，勿散写）：`status='suspended' AND activation_method='offline_purchase' AND 最新 invoice bill_status IN ('unpaid','partial')`——**321 修订**：原 `='unpaid'` 查不到有实收的存量部分收款单（admin 部分确认路径产生），[product_321](product_321_order-payment-and-settlement.md) P1 将其纳入"待付款"族（cashDue 自动扣减已收）；同步改动点=subscribe-context `pendingOrder` 查询、下单重复挂单 409 守卫（PR2 落地）。与"用户主动暂停"（activation_method 为原购买方式、无未付账单）可区分。
 - 配额池随单物化，但 D10 门控（仅 active/trialing 可消费）使挂单期天然不可烧——无需额外防护。
 - 挂单不触发 provisioning（ACTIVATED 集合不含 suspended）；确认激活时经服务层状态迁移钩子恰好补发一次 `tenant.provisioned`。
 
