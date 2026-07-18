@@ -264,6 +264,15 @@ jobs:
                 ensure_kv "$RT/.env.website-bff" WEBSITE_BASE_URL "$(ex_val .env.website-bff.example WEBSITE_BASE_URL)"
                 ensure_kv "$RT/.env.console-bff" CONSOLE_BASE_URL "$(ex_val .env.console-bff.example CONSOLE_BASE_URL)"
                 ensure_kv "$RT/.env.admin-bff"   ADMIN_BASE_URL   "$(ex_val .env.admin-bff.example ADMIN_BASE_URL)"
+                # Offline payment channel config (product_321 §4.4) — append-only
+                # from the example; a channel with any key missing/blank ships
+                # DISABLED on the payment page, so landing these enables alipay +
+                # bank transfer. Real account later = edit runtime env by hand
+                # (this never overwrites).
+                for k in OFFLINE_PAY_ACCOUNT_NAME OFFLINE_PAY_BANK_NAME \
+                         OFFLINE_PAY_ACCOUNT_NO OFFLINE_PAY_ALIPAY_QR; do
+                  ensure_kv "$RT/.env.console-bff" "$k" "$(ex_val .env.console-bff.example "$k")"
+                done
                 # recreate RP bffs so they load the new env (env_file → recreate).
                 IMG="$(docker inspect --format '{{.Config.Image}}' vx-auth-bff)"
                 export VX_IMAGE_TAG="${IMG##*:}"
