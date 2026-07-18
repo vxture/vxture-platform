@@ -16,7 +16,17 @@ import {
   EmptyState,
   ViewModeSwitch,
 } from "@vxture/design-system";
-import { fetchPromotionOperations } from "@/api/admin-bff";
+import {
+  assignVouchers,
+  createVoucherBatch,
+  fetchPromotionOperations,
+} from "@/api/admin-bff";
+import { useStepUp, isStepUpCancelled } from "@/providers/StepUpProvider";
+import {
+  AssignVouchersDialog,
+  CreateVoucherBatchDialog,
+  type CreateBatchPayload,
+} from "@/modules/commercial/VoucherBatchDialogs";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
 import type {
@@ -332,6 +342,15 @@ export function PromotionsPage() {
   const [selectedRecordIds, setSelectedRecordIds] = useState<Set<string>>(
     () => new Set(),
   );
+  // 发券写动作（product_321 PR5）：批次创建 / 定向发放，两者均 step-up。
+  const { runWithStepUp } = useStepUp();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [assignTarget, setAssignTarget] =
+    useState<PromotionOperationRecord | null>(null);
+  const [writeBusy, setWriteBusy] = useState(false);
+  const [writeError, setWriteError] = useState<string | null>(null);
+  const [assignedCodes, setAssignedCodes] = useState<string[] | null>(null);
+  const [reloadNonce, setReloadNonce] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -358,7 +377,46 @@ export function PromotionsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadNonce]);
+
+  async function handleCreateBatch(payload: CreateBatchPayload) {
+    setWriteBusy(true);
+    setWriteError(null);
+    try {
+      await runWithStepUp(() => createVoucherBatch(payload));
+      setCreateOpen(false);
+      setReloadNonce((n) => n + 1);
+    } catch (error) {
+      if (isStepUpCancelled(error)) return;
+      setWriteError(
+        error instanceof Error ? error.message : "批次创建失败，请稍后重试。",
+      );
+    } finally {
+      setWriteBusy(false);
+    }
+  }
+
+  async function handleAssign(payload: {
+    batchId: string;
+    count: number;
+    targetUserId?: string;
+    targetWorkspaceId?: string;
+  }) {
+    setWriteBusy(true);
+    setWriteError(null);
+    try {
+      const result = await runWithStepUp(() => assignVouchers(payload));
+      setAssignedCodes(result.codes);
+      setReloadNonce((n) => n + 1);
+    } catch (error) {
+      if (isStepUpCancelled(error)) return;
+      setWriteError(
+        error instanceof Error ? error.message : "券码发放失败，请稍后重试。",
+      );
+    } finally {
+      setWriteBusy(false);
+    }
+  }
 
   const filteredRecords = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -563,8 +621,34 @@ export function PromotionsPage() {
           >
             导出全部
           </ActionButton>
-          <ActionButton variant="outline" icon="plus" disabled>
+          <ActionButton
+            variant="outline"
+            icon="plus"
+            onClick={() => {
+              setWriteError(null);
+              setCreateOpen(true);
+            }}
+          >
             新建优惠
+          </ActionButton>
+          <ActionButton
+            variant="outline"
+            icon="arrow-right"
+            disabled={selectedRecords.length !== 1}
+            title={
+              selectedRecords.length === 1
+                ? undefined
+                : "勾选一个批次后可发放券码"
+            }
+            onClick={() => {
+              const target = selectedRecords[0];
+              if (!target) return;
+              setWriteError(null);
+              setAssignedCodes(null);
+              setAssignTarget(target);
+            }}
+          >
+            发放券码
           </ActionButton>
         </section>
         {selectedRecords.length > 0 ? (
@@ -648,6 +732,28 @@ export function PromotionsPage() {
           </footer>
         </section>
       </div>
+
+      {createOpen ? (
+        <CreateVoucherBatchDialog
+          busy={writeBusy}
+          error={writeError}
+          onClose={() => setCreateOpen(false)}
+          onSubmit={(payload) => void handleCreateBatch(payload)}
+        />
+      ) : null}
+      {assignTarget ? (
+        <AssignVouchersDialog
+          batch={assignTarget}
+          busy={writeBusy}
+          error={writeError}
+          assignedCodes={assignedCodes}
+          onClose={() => {
+            setAssignTarget(null);
+            setAssignedCodes(null);
+          }}
+          onSubmit={(payload) => void handleAssign(payload)}
+        />
+      ) : null}
     </div>
   );
 }
