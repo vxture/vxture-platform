@@ -586,7 +586,9 @@ function buildTimeline(
       title: `续订周期 #${r.cycle_seq}`,
       description:
         r.failure_reason ??
-        (r.amount !== null ? `应扣 ${toNumber(r.amount)}` : r.status),
+        (r.amount !== null
+          ? `应扣 ¥${toNumber(r.amount).toFixed(2)}`
+          : r.status),
       actor: "system",
       at: toIso(r.created_at),
       tone: renewalTone(r.status),

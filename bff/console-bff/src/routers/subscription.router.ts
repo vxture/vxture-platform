@@ -512,7 +512,7 @@ export class SubscriptionRouter {
               coalesce(
                 jsonb_agg(jsonb_build_object(
                   'cycleUnit', pp.cycle_unit, 'cycleCount', pp.cycle_count,
-                  'price', pp.price::text, 'currency', pp.currency
+                  'price', to_char(pp.price, 'FM999999999990.00'), 'currency', pp.currency
                 ) order by pp.cycle_unit, pp.cycle_count)
                 filter (where pp.id is not null), '[]'::jsonb
               ) as prices
@@ -639,7 +639,7 @@ export class SubscriptionRouter {
           orderId: null,
           orderNo: null,
           billNo: null,
-          amount: "0",
+          amount: "0.00",
           currency: plan.currency,
           planCode: plan.planCode,
           cycleUnit,
@@ -671,7 +671,7 @@ export class SubscriptionRouter {
         orderId: order.subscription.id,
         orderNo: order.orderNo,
         billNo: order.billNo,
-        amount: String(plan.price),
+        amount: Number(plan.price).toFixed(2),
         currency: plan.currency,
         planCode: plan.planCode,
         cycleUnit,

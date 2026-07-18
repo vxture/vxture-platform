@@ -855,7 +855,7 @@ const PLAN_VERSIONS_SQL = `
   SELECT pv.id, pv.version_no, pv.status, pv.is_locked,
          (pv.id = p.current_version_id) AS is_current,
          COALESCE((
-           SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', pp.price::text)
+           SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', to_char(pp.price, 'FM999999999990.00'))
                             ORDER BY pp.cycle_unit)
              FROM product.plan_prices pp WHERE pp.plan_version_id = pv.id
          ), '[]'::jsonb) AS prices
@@ -892,7 +892,7 @@ async function loadPlanVersionDetail(
             (pv.id = p.current_version_id) AS is_current,
             p.plan_code, p.plan_name,
             COALESCE((
-              SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', pp.price::text)
+              SELECT jsonb_agg(jsonb_build_object('cycleUnit', pp.cycle_unit, 'price', to_char(pp.price, 'FM999999999990.00'))
                                ORDER BY pp.cycle_unit)
                 FROM product.plan_prices pp WHERE pp.plan_version_id = pv.id
             ), '[]'::jsonb) AS prices,
@@ -1426,8 +1426,8 @@ const planFallbacks: Record<string, ProductPlanRecord> = {
 
 function formatCurrency(value: number, currency: string): string {
   if (currency === "CNY")
-    return `¥${new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 0 }).format(value)}`;
-  return `${currency} ${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value)}`;
+    return `¥${new Intl.NumberFormat("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)}`;
+  return `${currency} ${new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)}`;
 }
 
 function entitlementFor(

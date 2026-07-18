@@ -43,7 +43,7 @@ import {
 } from "@/modules/billing/InvoiceReceiptActionDialog";
 import {
   formatDate,
-  formatNumber,
+  formatQuantity,
   typeLabel,
 } from "@/modules/tenants/tenant-utils";
 import { useStepUp, isStepUpCancelled } from "@/providers/StepUpProvider";
@@ -346,7 +346,7 @@ function BillingDetails({
                 <strong>{item.itemName}</strong>
               </span>
               <small>
-                {item.itemType} | {formatNumber(item.quantity)}{" "}
+                {item.itemType} | {formatQuantity(item.quantity)}{" "}
                 {item.itemUnit ?? ""}
               </small>
               <em>{formatCurrency(item.totalAmount, bill.currency)}</em>

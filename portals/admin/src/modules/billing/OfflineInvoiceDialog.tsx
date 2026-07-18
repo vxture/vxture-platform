@@ -16,7 +16,11 @@ import type {
 } from "@/entities/console";
 
 export function remainingInvoiceAmount(bill: BillingRecord) {
-  return Math.max(0, bill.payableAmount - bill.invoicedAmount);
+  // Round to cents — float subtraction error must not reach the amount input.
+  return Math.max(
+    0,
+    Math.round((bill.payableAmount - bill.invoicedAmount) * 100) / 100,
+  );
 }
 
 export function canSyncOfflineInvoice(bill: BillingRecord) {

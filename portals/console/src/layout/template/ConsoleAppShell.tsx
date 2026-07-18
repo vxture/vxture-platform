@@ -258,7 +258,8 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
 
   const currencySymbol =
     billing.currency === "USD" ? "$" : billing.currency === "EUR" ? "€" : "¥";
-  const billingLabel = `${currencySymbol}${billing.amount.toLocaleString()}`;
+  const billingAmount = Number(billing.amount ?? 0);
+  const billingLabel = `${currencySymbol}${(Number.isFinite(billingAmount) ? billingAmount : 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // ── Drawer 占位数据（demo，待接真实消息中心 / 系统设置）──
   const drawerNotifs: DrawerNotif[] = [

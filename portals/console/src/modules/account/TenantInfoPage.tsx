@@ -519,7 +519,9 @@ export function TenantInfoPage() {
                 <div className="vx-account-connected-meta">
                   <span>{t("fields.price")}</span>
                   <span>
-                    {sub.price} {sub.currency}
+                    {Number.isFinite(Number(sub.price))
+                      ? `${Number(sub.price).toFixed(2)} ${sub.currency}`
+                      : `— ${sub.currency}`}
                   </span>
                 </div>
                 <div className="vx-account-connected-meta">
