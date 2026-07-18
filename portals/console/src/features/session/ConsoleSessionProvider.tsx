@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -18,7 +19,11 @@ import {
 import type { SessionSnapshot } from "@/entities/console";
 
 type SessionStatus = "idle" | "loading" | "ready";
-const SESSION_SYNC_INTERVAL_MS = 2000;
+// Background heartbeat only. focus/visibilitychange below already sync immediately
+// when the user returns to the tab, so this interval just catches session expiry
+// while the tab stays focused. Kept at 5 min (was 2 s): every 2 s each open console
+// tab fired 5 HTTP requests (probe + 4 aggregated reads) at the shared 2C/2G host.
+const SESSION_SYNC_INTERVAL_MS = 300_000;
 const SESSION_SYNC_THROTTLE_MS = 1500;
 const ANONYMOUS_SESSION: SessionSnapshot = {
   isAuthenticated: false,
@@ -188,25 +193,33 @@ export function ConsoleSessionProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshSession, status]);
 
-  function signOut() {
+  const signOut = useCallback(() => {
     // Top-level navigation (not fetch) so the browser sends vx_sid to the IdP
     // end_session, which performs single-logout across all RPs and lands on the
     // unified post-logout page. The page unloads, so no local commit is needed.
     window.location.assign(buildLogoutUrl());
-  }
+  }, []);
 
-  async function switchTenant(tenantId: string) {
-    setStatus("loading");
-    const snapshot = await switchTenantSession(tenantId);
-    writeStoredTenantId(tenantId);
-    commitSession(snapshot);
-    setStatus("ready");
-  }
+  const switchTenant = useCallback(
+    async (tenantId: string) => {
+      setStatus("loading");
+      const snapshot = await switchTenantSession(tenantId);
+      writeStoredTenantId(tenantId);
+      commitSession(snapshot);
+      setStatus("ready");
+    },
+    [commitSession],
+  );
+
+  // Stable context value: consumers only re-render when session/status actually
+  // change, not on every ancestor render.
+  const contextValue = useMemo<SessionContextValue>(
+    () => ({ session, status, signOut, switchTenant, refreshSession }),
+    [session, status, signOut, switchTenant, refreshSession],
+  );
 
   return (
-    <SessionContext.Provider
-      value={{ session, status, signOut, switchTenant, refreshSession }}
-    >
+    <SessionContext.Provider value={contextValue}>
       {children}
     </SessionContext.Provider>
   );

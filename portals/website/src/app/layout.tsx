@@ -77,6 +77,15 @@ export default async function RootLayout({
     <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        {/* Warm up the unpkg connection (DNS+TLS) before the render-blocking
+            icon stylesheets below are requested. TODO(perf): self-host
+            @phosphor-icons/web so these are not third-party render-blocking. */}
+        <link rel="preconnect" href="https://unpkg.com" />
+        <link
+          rel="preconnect"
+          href="https://unpkg.com"
+          crossOrigin="anonymous"
+        />
         {/* Phosphor icon font — user panel uses ph ph-* classes. */}
         <link
           rel="stylesheet"

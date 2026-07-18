@@ -48,7 +48,11 @@ export default function AnimatedHeroBg() {
     if (!ctx) return;
 
     const palette = readHeroCanvasPalette();
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     let raf = 0;
+    let running = false;
     let width = 0;
     let height = 0;
     let scanY = 0;
@@ -83,9 +87,10 @@ export default function AnimatedHeroBg() {
     };
 
     const LINK_DIST = 150;
+    const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
     const SCAN_SPEED = 0.5;
 
-    const draw = () => {
+    const renderFrame = () => {
       ctx.clearRect(0, 0, width, height);
       const mouse = mouseRef.current;
 
@@ -105,13 +110,16 @@ export default function AnimatedHeroBg() {
         }
       }
 
-      // 绘制节点连线
+      // 绘制节点连线（先用平方距离筛除，命中才开方，省掉绝大多数 sqrt）
       for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i]!;
         for (let j = i + 1; j < nodes.length; j++) {
-          const a = nodes[i]!;
           const b = nodes[j]!;
-          const d = Math.hypot(a.x - b.x, a.y - b.y);
-          if (d < LINK_DIST) {
+          const ddx = a.x - b.x;
+          const ddy = a.y - b.y;
+          const dsq = ddx * ddx + ddy * ddy;
+          if (dsq < LINK_DIST_SQ) {
+            const d = Math.sqrt(dsq);
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
@@ -139,23 +147,57 @@ export default function AnimatedHeroBg() {
       scanGrad.addColorStop(1, "transparent");
       ctx.fillStyle = scanGrad;
       ctx.fillRect(0, scanY, width, 1.5);
+    };
 
-      raf = requestAnimationFrame(draw);
+    const loop = () => {
+      if (!running) return;
+      renderFrame();
+      raf = requestAnimationFrame(loop);
+    };
+
+    const startLoop = () => {
+      if (running || prefersReducedMotion) return;
+      running = true;
+      raf = requestAnimationFrame(loop);
+    };
+
+    const stopLoop = () => {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
     };
 
     resize();
-    draw();
+    // Draw one static frame immediately so the background is present before the
+    // first animation tick (and is the final state when motion is reduced).
+    renderFrame();
 
     const onMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
 
+    // Only animate while the hero is actually on screen — the marketing pages
+    // that use this run a 60fps O(n²) canvas that otherwise keeps burning CPU
+    // after the user scrolls past.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          startLoop();
+        } else {
+          stopLoop();
+        }
+      },
+      { threshold: 0 },
+    );
+    observer.observe(canvas);
+
     window.addEventListener("resize", resize);
     canvas.addEventListener("pointermove", onMove);
 
     return () => {
-      cancelAnimationFrame(raf);
+      stopLoop();
+      observer.disconnect();
       window.removeEventListener("resize", resize);
       canvas.removeEventListener("pointermove", onMove);
     };
