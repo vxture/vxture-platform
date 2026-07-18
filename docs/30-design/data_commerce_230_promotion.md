@@ -27,7 +27,7 @@
 - **discount 可复用**：`vouchers.max_uses`（折扣券可 >1），`voucher_redemptions` 不加 UNIQUE；其余 kind `max_uses=1` 收敛。
 - **金额单位**：`effect` JSONB 内金额用整数**分（cents）**（配置值，免浮点）；**落账一律转 `NUMERIC(12,2)` 元入 `billing.transactions`**（真账本）。
 
-五型：`credit_voucher`(代金券,赠额入余额) / `recharge_card`(充值卡,实付入余额) / `redemption`(兑换码,激活订阅) / `discount`(折扣券,购买减价) / `extension`(展期券,延长订阅)。
+五型：`credit_voucher`(代金券,**直接抵扣账单的结算腿**——[product_321](product_321_order-payment-and-settlement.md) P7 修订,原"赠额入余额"语义废止:入余额=现金过账钱包的变体,退款原路/开票口径/对账链三重反对,且钱包休眠期代金券须可独立工作) / `recharge_card`(充值卡,实付入余额) / `redemption`(兑换码,激活订阅) / `discount`(折扣券,购买减价) / `extension`(展期券,延长订阅)。
 
 ---
 
@@ -71,21 +71,21 @@
 
 ## 3. `voucher_redemptions`（核销记录，效果追溯）
 
-| 字段                                                          | 类型        | 约束                                 | 说明                                                   |
-| ------------------------------------------------------------- | ----------- | ------------------------------------ | ------------------------------------------------------ |
-| `id`                                                          | uuid        | PK                                   |                                                        |
-| `voucher_id`                                                  | uuid        | NOT NULL, FK→`vouchers.id`           |                                                        |
-| `tenant_id`                                                   | uuid        | NOT NULL, FK→`tenancy.tenants.id`    | 核销侧强制归属                                         |
-| `workspace_id`                                                | uuid        | NOT NULL, FK→`tenancy.workspaces.id` |                                                        |
-| `user_id`                                                     | uuid        | NOT NULL, FK→`account.users.id`      | 核销人（客户 realm 确定）                              |
-| `kind`                                                        | varchar(20) | NOT NULL                             | 冗余，避免查询三级 JOIN                                |
-| `effect_snapshot`                                             | jsonb       | NOT NULL                             | 核销时刻的 `effect` 快照（防批次后续改配置致追溯失真） |
-| **效果追溯（按 kind 填对应列，其余 NULL；均真跨 schema FK）** |             |                                      |                                                        |
-| `transaction_id`                                              | uuid        | NULL, FK→`billing.transactions.id`   | credit_voucher(grant) / recharge_card(recharge)        |
-| `subscription_id`                                             | uuid        | NULL, FK→`metering.subscriptions.id` | redemption(新建) / extension(被延长的订阅)             |
-| `invoice_item_id`                                             | uuid        | NULL, FK→`billing.invoice_items.id`  | discount 挂靠的账单项                                  |
-| `payment_id`                                                  | uuid        | NULL, FK→`billing.payments.id`       | redemption 线下 payment 追溯                           |
-| `redeemed_at`                                                 | timestamptz | NOT NULL DEFAULT now()               |                                                        |
+| 字段                                                          | 类型        | 约束                                 | 说明                                                                                       |
+| ------------------------------------------------------------- | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------ |
+| `id`                                                          | uuid        | PK                                   |                                                                                            |
+| `voucher_id`                                                  | uuid        | NOT NULL, FK→`vouchers.id`           |                                                                                            |
+| `tenant_id`                                                   | uuid        | NOT NULL, FK→`tenancy.tenants.id`    | 核销侧强制归属                                                                             |
+| `workspace_id`                                                | uuid        | NOT NULL, FK→`tenancy.workspaces.id` |                                                                                            |
+| `user_id`                                                     | uuid        | NOT NULL, FK→`account.users.id`      | 核销人（客户 realm 确定）                                                                  |
+| `kind`                                                        | varchar(20) | NOT NULL                             | 冗余，避免查询三级 JOIN                                                                    |
+| `effect_snapshot`                                             | jsonb       | NOT NULL                             | 核销时刻的 `effect` 快照（防批次后续改配置致追溯失真）                                     |
+| **效果追溯（按 kind 填对应列，其余 NULL；均真跨 schema FK）** |             |                                      |                                                                                            |
+| `transaction_id`                                              | uuid        | NULL, FK→`billing.transactions.id`   | recharge_card(recharge)（credit_voucher 已迁 `payment_id`，321 修订）                      |
+| `subscription_id`                                             | uuid        | NULL, FK→`metering.subscriptions.id` | redemption(新建) / extension(被延长的订阅)                                                 |
+| `invoice_item_id`                                             | uuid        | NULL, FK→`billing.invoice_items.id`  | discount 挂靠的账单项                                                                      |
+| `payment_id`                                                  | uuid        | NULL, FK→`billing.payments.id`       | **credit_voucher(结算腿 `pay_source='voucher'`，321 修订)** / redemption 线下 payment 追溯 |
+| `redeemed_at`                                                 | timestamptz | NOT NULL DEFAULT now()               |                                                                                            |
 
 索引：`idx_voucher_redemptions_tenant_ws (tenant_id, workspace_id)`、`idx_voucher_redemptions_voucher (voucher_id)`。**不加 UNIQUE(voucher_id)**——discount 复用可多次核销。
 
@@ -94,8 +94,8 @@
 ## 4. `effect` JSONB 各 kind 约定（服务层按 kind 校验，如 zod）
 
 ```jsonc
-// credit_voucher（代金券：赠额入余额）
-{ "amount_cents": 5000, "currency": "CNY", "credit_expires_in_days": 90 }
+// credit_voucher（代金券：直接抵扣账单的结算腿，321 修订；原 credit_expires_in_days 随入余额语义废止）
+{ "amount_cents": 5000, "currency": "CNY" }
 
 // recharge_card（充值卡：实付面值入余额）
 { "face_value_cents": 10000, "bonus_cents": 0 }   // 可留 bonus 扩展
@@ -118,7 +118,7 @@
 
 ## 5. 三个实现要点
 
-1. **discount 的 `reserved` 中间态**：挂到未支付 invoice 时先 `assigned→reserved` 锁定并占 `used_count`；invoice 支付成功 → 落 `voucher_redemptions`、回填 `invoice_item_id`（`used_count` 已在 reserve 时占用，此处**不再自增**）；**仅当 `used_count` 达 `max_uses` 才 status→`redeemed`（终态），否则回 `assigned` 供复用**（修正：max_uses>1 的折扣券首次核销后不得过早置终态）；invoice 作废 → 释放回 `assigned`、退 `used_count`。其余四型 `max_uses=1`，**核销即终态**，无此中间态。
+1. **discount 的 `reserved` 中间态**：挂到未支付 invoice 时先 `assigned→reserved` 锁定并占 `used_count`；invoice 支付成功 → 落 `voucher_redemptions`、回填 `invoice_item_id`（`used_count` 已在 reserve 时占用，此处**不再自增**）；**仅当 `used_count` 达 `max_uses` 才 status→`redeemed`（终态），否则回 `assigned` 供复用**（修正：max_uses>1 的折扣券首次核销后不得过早置终态）；invoice 作废 → 释放回 `assigned`、退 `used_count`。其余四型 `max_uses=1`，**核销即终态**——**例外（321 修订）：挂单场景下 `credit_voucher` 同样允许 `reserved` 中间态**（申报占用、足额确认终态、驳回/取消/超时释放回 `assigned`，与 discount 对齐；状态值域 CHECK 已含 `reserved`，零结构变更），详见 [product_321](product_321_order-payment-and-settlement.md) P7/P8。
 2. **核销原子性**：`UPDATE vouchers SET used_count=used_count+1 WHERE id=? AND used_count<max_uses AND status IN (...)` + `INSERT voucher_redemptions` + 效果写入（transaction/subscription/…）**同一事务**；以**受影响行数=1** 判抢占成功，防并发重复核销。
 3. **code 归一化**：生成时去混淆字符（0/O、1/I）、统一大写；核销入口按归一化后查 `@unique(code)`，无需模糊匹配。
 
