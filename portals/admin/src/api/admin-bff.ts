@@ -680,6 +680,45 @@ export async function fetchPromotionOperations(): Promise<
   );
 }
 
+// step-up gated (@RequireStepUp) — wrap the call in runWithStepUp at the UI.
+// Creates a voucher batch (product_321 §4.2; V1 kinds discount /
+// credit_voucher; gate fields rejected server-side).
+export async function createVoucherBatch(payload: {
+  kind: "discount" | "credit_voucher";
+  name: string;
+  codePrefix?: string;
+  effect: Record<string, unknown>;
+  totalCount: number;
+  perUserLimit?: number;
+  validFrom: string;
+  validUntil: string;
+  tenantId?: string;
+}): Promise<{ batchId: string }> {
+  return mutateJson<{ batchId: string }>(
+    "/api/commercial/voucher-batches",
+    "POST",
+    payload,
+    "Voucher batch creation failed",
+  );
+}
+
+// step-up gated (@RequireStepUp) — wrap the call in runWithStepUp at the UI.
+// Assigns vouchers from a batch (codes generated on demand; issued_count
+// seized atomically; per-user limit enforced for user targets).
+export async function assignVouchers(payload: {
+  batchId: string;
+  count?: number;
+  targetUserId?: string;
+  targetWorkspaceId?: string;
+}): Promise<{ codes: string[] }> {
+  return mutateJson<{ codes: string[] }>(
+    "/api/commercial/vouchers/assign",
+    "POST",
+    payload,
+    "Voucher assignment failed",
+  );
+}
+
 export async function fetchPromotionRedemptionRecords(): Promise<
   PromotionRedemptionRecord[]
 > {
