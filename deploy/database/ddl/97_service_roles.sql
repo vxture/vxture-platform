@@ -133,14 +133,17 @@ BEGIN
     SELECT * FROM (VALUES
       -- auth-bff（13）：身份/会话/OIDC 签发 + 权益 claim 刷新 + 操作员内部面
       ('svc_auth_bff',    ARRAY['account','identity','credential','tenancy','access','appoidc','session','loyalty','metering','provisioning','product','support','admin']),
-      -- admin-bff（11）：运营治理/账单/工单/租户/订阅/目录，自身路由无 service-* 模块
-      ('svc_admin_bff',   ARRAY['admin','billing','kyc','metering','product','support','tenancy','access','account','promotion','session']),
-      -- console-bff（13）：租户工作台，账单/订阅/成员 + IamModule 带入 admin/support/appoidc
-      ('svc_console_bff', ARRAY['account','identity','credential','session','loyalty','tenancy','access','billing','metering','product','admin','support','appoidc']),
+      -- admin-bff（12）：运营治理/账单/工单/租户/订阅/目录 + provisioning（段 2 激活
+      -- enqueue，320 期缺口随 product_321 PR2 收口）
+      ('svc_admin_bff',   ARRAY['admin','billing','kyc','metering','product','support','tenancy','access','account','promotion','session','provisioning']),
+      -- console-bff（15）：租户工作台，账单/订阅/成员 + IamModule 带入 admin/support/appoidc
+      -- + promotion（券结算，product_321）+ provisioning（cashDue=0 段 2 enqueue / free 即开）
+      ('svc_console_bff', ARRAY['account','identity','credential','session','loyalty','tenancy','access','billing','metering','product','admin','support','appoidc','promotion','provisioning']),
       -- website-bff（7）：注册/登录/me，多为读，account 有 profile 写
       ('svc_website_bff', ARRAY['account','identity','credential','session','tenancy','access','loyalty']),
-      -- platform-api（5）：C2/C3 产品面 + provisioning/sharing 作业
-      ('svc_platform_api',ARRAY['metering','product','sharing','provisioning','tenancy']),
+      -- platform-api（7）：C2/C3 产品面 + provisioning/sharing 作业
+      -- + billing/promotion（product_321 超时/对账 sweep 谓词 + 券释放）
+      ('svc_platform_api',ARRAY['metering','product','sharing','provisioning','tenancy','billing','promotion']),
       -- model-platform（2）：模型注册表 + 配额计量（Prisma @@schema=model+metering）
       ('svc_model_platform', ARRAY['model','metering'])
     ) AS t(role_name, schemas)

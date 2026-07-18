@@ -277,7 +277,7 @@ CREATE TABLE billing.payments (
     created_at             timestamptz   NOT NULL DEFAULT now(),
     updated_at             timestamptz   NOT NULL DEFAULT now(),
     CONSTRAINT uq_payments_pay_order_no  UNIQUE (pay_order_no),
-    CONSTRAINT chk_payments_pay_source   CHECK (pay_source IN ('online','offline')),
+    CONSTRAINT chk_payments_pay_source   CHECK (pay_source IN ('online','offline','voucher')),  -- 'voucher' = settlement leg (product_321 P7)
     CONSTRAINT chk_payments_pay_status   CHECK (pay_status IN ('pending','pending_verify','paid','failed','closed','refunding')),
     CONSTRAINT chk_payments_actor_type   CHECK (actor_type IN ('system','customer','operator'))
 );

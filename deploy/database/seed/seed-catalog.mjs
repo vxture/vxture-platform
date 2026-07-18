@@ -166,6 +166,8 @@ const OPERATOR_PERMISSIONS = [
   ["commerce:payment.manage", "Manage payments"],
   ["commerce:payment.settle", "Settle / confirm a payment (high-risk)"],
   ["commerce:refund.execute", "Execute refund (high-risk)"],
+  ["promotion:campaign.read", "View voucher batches / redemptions"],
+  ["promotion:campaign.manage", "Create voucher batches / assign vouchers (high-risk)"],
   ["product:plan.read", "View plans"],
   ["product:plan.manage", "Manage plans"],
   ["product:price.read", "View pricing"],
@@ -310,6 +312,8 @@ const OPERATOR_ROLE_PERMS = {
     "commerce:payment.manage",
     "commerce:payment.settle",
     "commerce:refund.execute",
+    "promotion:campaign.read",
+    "promotion:campaign.manage",
     "product:plan.read",
     "product:plan.manage",
     "product:price.read",
@@ -342,6 +346,7 @@ const OPERATOR_ROLE_PERMS = {
     "user:profile.read",
     "commerce:subscription.read",
     "commerce:order.read",
+    "promotion:campaign.read",
     "product:plan.read",
     "product:plan.manage",
     "product:price.read",
@@ -372,6 +377,8 @@ const OPERATOR_ROLE_PERMS = {
     "commerce:payment.manage",
     "commerce:payment.settle",
     "commerce:refund.execute",
+    "promotion:campaign.read",
+    "promotion:campaign.manage",
     "product:plan.read",
     "product:price.read",
   ],
@@ -1182,6 +1189,52 @@ export async function seedCatalog(client) {
       end if;
     end $$;
   `);
+
+  // product_321 PR2 — live-DB self-sufficiency (ddl/ apply is create-once):
+  // ① pay_source CHECK gains 'voucher' (the settlement leg, P7). Drop+add is
+  //    safe: the constraint only widens, existing rows all satisfy it.
+  await client.query(`
+    do $$ begin
+      alter table billing.payments drop constraint if exists chk_payments_pay_source;
+      alter table billing.payments
+        add constraint chk_payments_pay_source
+        check (pay_source in ('online','offline','voucher'));
+    end $$;
+  `);
+  // ② TD-020 service-role schema whitelists (97_service_roles is apply-once;
+  //    live roles need the same widening — no-op when the roles don't exist
+  //    yet). console-bff +promotion+provisioning, platform-api +billing
+  //    +promotion, admin-bff +provisioning (320-era gap, product_321 §3).
+  await client.query(`
+    do $$
+    declare
+      spec record;
+    begin
+      for spec in
+        select * from (values
+          ('svc_console_bff',  array['promotion','provisioning']),
+          ('svc_platform_api', array['billing','promotion']),
+          ('svc_admin_bff',    array['provisioning'])
+        ) as t(role_name, schemas)
+      loop
+        if exists (select from pg_roles where rolname = spec.role_name) then
+          execute format('grant usage on schema %s to %I',
+            array_to_string(spec.schemas, ', '), spec.role_name);
+          execute format('grant select, insert, update, delete on all tables in schema %s to %I',
+            array_to_string(spec.schemas, ', '), spec.role_name);
+          execute format('grant usage, select on all sequences in schema %s to %I',
+            array_to_string(spec.schemas, ', '), spec.role_name);
+          execute format('alter default privileges in schema %s grant select, insert, update, delete on tables to %I',
+            array_to_string(spec.schemas, ', '), spec.role_name);
+          execute format('alter default privileges in schema %s grant usage, select on sequences to %I',
+            array_to_string(spec.schemas, ', '), spec.role_name);
+        end if;
+      end loop;
+    end $$;
+  `);
+  console.log(
+    "✓  product_321 — payments.pay_source +'voucher', svc role whitelists widened",
+  );
 
   // one representative free plan → draft version → bundled_free component + month price.
   // Version stays unlocked (is_locked=false) — no subscription references it yet; the

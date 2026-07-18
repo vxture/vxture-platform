@@ -10,6 +10,7 @@ import { AccountModule } from "@vxture/service-account";
 import { IamModule } from "@vxture/service-iam";
 import { OrganizationModule } from "@vxture/service-organization";
 import { BillingModule } from "@vxture/service-billing";
+import { PromotionModule } from "@vxture/service-promotion";
 import { SubscriptionModule } from "@vxture/service-subscription";
 import { SmsModule } from "@vxture/service-sms";
 import { OidcRpModule } from "./oidc/oidc-rp.module";
@@ -40,6 +41,7 @@ import { TenantContextRouter } from "./routers/tenant-context.router";
     IamModule,
     OrganizationModule,
     BillingModule,
+    PromotionModule,
     SubscriptionModule,
     SmsModule,
     OidcRpModule,

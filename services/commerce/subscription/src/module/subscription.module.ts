@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { VxConfigModule, VxConfigService } from "@vxture/core-config";
 import { ProvisioningModule } from "@vxture/service-provisioning";
+import { PromotionModule } from "@vxture/service-promotion";
 import { Pool } from "pg";
 import { COMMERCE_PG_POOL } from "../tokens";
 import { PgSubscriptionRepository } from "../repository/pg-subscription.repository";
@@ -12,9 +13,13 @@ import { ConsumeService } from "../service/consume.service";
   // ProvisioningModule: the subscription lifecycle is the provisioning-enqueue
   // caller (product_310 P2.3b) — activation/lapse fan out per-component
   // tenant.provisioned / tenant.deprovisioned events.
+  // PromotionModule: the declare/sweep orchestration reserves & releases
+  // vouchers inside the order transaction (product_321 §5.1). It provides its
+  // own (non-exported) pool under the same token string — no DI collision.
   imports: [
     VxConfigModule.register({ domains: ["database"] }),
     ProvisioningModule,
+    PromotionModule,
   ],
   providers: [
     {

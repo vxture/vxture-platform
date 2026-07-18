@@ -22,6 +22,7 @@ import { SharingModule } from "@vxture/service-sharing";
 import { SubscriptionModule } from "@vxture/service-subscription";
 import { PlatformAuthGuard } from "./authn/platform-auth.guard";
 import { S2sTokenVerifier } from "./authn/s2s-token-verifier.service";
+import { OrderPaymentExpiryJob } from "./jobs/order-payment-expiry.job";
 import { ProvisioningDispatchJob } from "./jobs/provisioning-dispatch.job";
 import { SharingExpiryJob } from "./jobs/sharing-expiry.job";
 import { TrialExpiryJob } from "./jobs/trial-expiry.job";
@@ -56,6 +57,7 @@ import { PlatformUsageRouter } from "./routers/platform-usage.router";
     ProvisioningDispatchJob,
     SharingExpiryJob,
     TrialExpiryJob,
+    OrderPaymentExpiryJob,
   ],
 })
 export class AppModule {}

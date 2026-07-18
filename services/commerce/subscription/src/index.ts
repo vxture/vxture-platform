@@ -20,4 +20,7 @@ export type {
   OfflineOrderRecord,
   ActivateOrderInput,
   CancelOfflineOrderInput,
+  DeclarePayChannel,
+  DeclarePaymentInput,
+  DeclarePaymentResult,
 } from "./types/subscription.types";
