@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/lib/i18n/navigation";
 import {
   Badge,
   Button,
@@ -12,6 +14,7 @@ import type { DataTableColumn } from "@vxture/design-system";
 import {
   cancelSubscriptionOrder,
   fetchBillingInvoices,
+  fetchCredits,
   fetchMyOrders,
   fetchMySubscriptions,
   ConsoleBffError,
@@ -98,13 +101,16 @@ function formatOrderAmount(amount: string, currency: string): string {
   return currency === "CNY" ? `¥${value}` : `${currency} ${value}`;
 }
 
-const ORDER_STATUS_META: Record<
-  MyOrder["orderStatus"],
-  { label: string; badge: string }
-> = {
-  pending: { label: "Awaiting confirmation", badge: "vx-badge-warning" },
-  confirmed: { label: "Confirmed", badge: "vx-badge-positive" },
-  closed: { label: "Closed", badge: "vx-badge-muted" },
+// Six-state contract (product_321 P1); labels come from the orderPay i18n
+// namespace at render time (this page's own copy stays the 320-era English
+// placeholder debt — the ORDERS tab is the one surface localized here).
+const ORDER_STATUS_BADGES: Record<MyOrder["orderStatus"], string> = {
+  pending_payment: "vx-badge-warning",
+  paid_pending_verify: "vx-badge-info",
+  activating: "vx-badge-info",
+  completed: "vx-badge-positive",
+  cancelled: "vx-badge-muted",
+  expired: "vx-badge-muted",
 };
 
 // ============================================================================
@@ -135,12 +141,18 @@ const paymentMethods = [
 
 export function SubscriptionPage() {
   const { session } = useConsoleSession();
+  const tOrder = useTranslations("orderPay");
+  const router = useRouter();
   const [tab, setTab] = useState<
     "overview" | "billing" | "orders" | "payments"
   >("overview");
   const [subscriptions, setSubscriptions] = useState<ConsoleSubscription[]>([]);
   const [invoices, setInvoices] = useState<ConsoleInvoice[]>([]);
   const [orders, setOrders] = useState<MyOrder[]>([]);
+  const [credits, setCredits] = useState<{
+    balance: string;
+    currency: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
@@ -151,11 +163,13 @@ export function SubscriptionPage() {
       fetchMySubscriptions(),
       fetchBillingInvoices(10),
       fetchMyOrders(),
+      fetchCredits(),
     ])
-      .then(([subs, invs, ords]) => {
+      .then(([subs, invs, ords, creditRecord]) => {
         setSubscriptions(subs);
         setInvoices(invs);
         setOrders(ords);
+        setCredits(creditRecord);
       })
       .finally(() => setLoading(false));
   }, [session.tenant?.id]);
@@ -210,6 +224,11 @@ export function SubscriptionPage() {
   const orderColumns: DataTableColumn<MyOrder>[] = [
     { id: "orderNo", header: "Order no.", cell: (o) => o.orderNo },
     {
+      id: "type",
+      header: "Type",
+      cell: () => tOrder("list.typeSubscription"),
+    },
+    {
       id: "plan",
       header: "Plan",
       cell: (o) => (o.tier ? `${o.planName} · ${o.tier}` : o.planName),
@@ -223,15 +242,28 @@ export function SubscriptionPage() {
       id: "amount",
       header: "Amount",
       align: "right",
-      cell: (o) => formatOrderAmount(o.amount, o.currency),
+      cell: (o) => (
+        <span>
+          {formatOrderAmount(o.amount, o.currency)}
+          {Number(o.voucherOff) > 0 ? (
+            <span className="vx-empty-hint">
+              {" "}
+              {tOrder("list.voucherOff", {
+                amount: formatOrderAmount(o.voucherOff, o.currency),
+              })}
+            </span>
+          ) : null}
+        </span>
+      ),
     },
     {
       id: "status",
       header: "Status",
-      cell: (o) => {
-        const meta = ORDER_STATUS_META[o.orderStatus];
-        return <Badge className={meta.badge}>{meta.label}</Badge>;
-      },
+      cell: (o) => (
+        <Badge className={ORDER_STATUS_BADGES[o.orderStatus]}>
+          {tOrder(`status.${o.orderStatus}`)}
+        </Badge>
+      ),
     },
     { id: "placed", header: "Placed", cell: (o) => formatDate(o.createdAt) },
     {
@@ -239,16 +271,32 @@ export function SubscriptionPage() {
       header: " ",
       align: "right",
       cell: (o) =>
-        o.orderStatus === "pending" ? (
+        o.orderStatus === "pending_payment" ? (
+          <span className="vx-inline-between">
+            <Button
+              size="sm"
+              onClick={() => router.push(`/subscribe/pay/${o.orderId}`)}
+            >
+              {tOrder("list.payNow")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={cancelingId === o.orderId || Number(o.paidAmount) > 0}
+              onClick={() => handleCancelOrder(o.orderId)}
+            >
+              {cancelingId === o.orderId ? "Canceling…" : "Cancel"}
+            </Button>
+          </span>
+        ) : (
           <Button
             variant="ghost"
             size="sm"
-            disabled={cancelingId === o.orderId}
-            onClick={() => handleCancelOrder(o.orderId)}
+            onClick={() => router.push(`/subscribe/pay/${o.orderId}`)}
           >
-            {cancelingId === o.orderId ? "Canceling…" : "Cancel"}
+            {tOrder("list.view")}
           </Button>
-        ) : null,
+        ),
     },
   ];
 
@@ -364,6 +412,23 @@ export function SubscriptionPage() {
 
       {tab === "overview" ? (
         <DashboardSplit>
+          <PageSection
+            title={tOrder("list.creditsTitle")}
+            description={tOrder("list.creditsNote")}
+            tone="muted"
+          >
+            {/* Dormant wallet (product_321 P6): read-only balance, no top-up. */}
+            <div className="vx-subscription-panel">
+              <div className="vx-inline-between">
+                <strong>
+                  {formatOrderAmount(
+                    credits?.balance ?? "0.00",
+                    credits?.currency ?? "CNY",
+                  )}
+                </strong>
+              </div>
+            </div>
+          </PageSection>
           <PageSection
             title="Billing posture"
             description="Keep payment context available without turning subscription into a finance page."

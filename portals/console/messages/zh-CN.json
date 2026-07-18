@@ -1666,6 +1666,103 @@
       }
     }
   },
+  "orderPay": {
+    "title": "订单付款",
+    "notFound": "订单不存在或无权查看。",
+    "countdown": "付款剩余 {time}",
+    "rejectBanner": "上次付款申报未通过：{reason} 券与折扣已释放，可重新申报或取消订单，倒计时已重置。",
+    "cycleStartNote": "订阅周期自确认收款时刻起算",
+    "status": {
+      "pending_payment": "待付款",
+      "paid_pending_verify": "已付款 · 待确认",
+      "activating": "开通处理中",
+      "completed": "已完成",
+      "cancelled": "已取消",
+      "expired": "已超时"
+    },
+    "stateTitle": {
+      "paid_pending_verify": "我们正在核对你的付款",
+      "activating": "付款成功 · 开通处理中",
+      "completed": "订阅已生效",
+      "cancelled": "订单已取消",
+      "expired": "订单已超时关闭"
+    },
+    "stateHint": {
+      "paid_pending_verify": "已收到付款申报，确认到账后订阅立即生效，一般 1 个工作日内完成，页面会自动刷新。",
+      "activating": "款项已结清，正在为你开通订阅，通常几分钟内完成，页面会自动刷新。",
+      "completed": "订阅已生效，可前往订阅页查看权益。",
+      "cancelled": "该订单已取消，如需订阅请重新下单。",
+      "expired": "超过付款时限订单已自动关闭，如需订阅请重新下单。",
+      "already_settled": "该订单已结清。"
+    },
+    "cycle": {
+      "day": "日付",
+      "week": "周付",
+      "month": "月付",
+      "year": "年付",
+      "perpetual": "永久"
+    },
+    "breakdown": {
+      "title": "金额明细",
+      "listPrice": "套餐原价",
+      "discountVoucher": "折扣券",
+      "noDiscountVoucher": "无折扣券",
+      "creditVoucher": "代金券",
+      "noCreditVoucher": "无代金券",
+      "alreadyPaid": "已收款",
+      "cashDue": "还需支付"
+    },
+    "voucher": {
+      "percentOff": "立减 {value}%",
+      "fixedOff": "立减 ¥{value}"
+    },
+    "channels": {
+      "title": "选择支付方式",
+      "alipay": "支付宝",
+      "wechat": "微信支付",
+      "bank_transfer": "银行转账",
+      "comingSoon": "即将开放",
+      "alipayQrAlt": "支付宝收款码",
+      "noneEnabled": "支付渠道配置中，请联系客服。"
+    },
+    "bank": {
+      "accountName": "户名",
+      "bankName": "开户行",
+      "accountNo": "账号"
+    },
+    "referenceNote": "转账请备注订单号 {orderNo}，以便我们快速核账。",
+    "actions": {
+      "declarePaid": "我已完成付款",
+      "settleInstant": "确认并生效",
+      "cancelOrder": "取消订单",
+      "refresh": "刷新状态",
+      "backToSubscription": "返回订阅页"
+    },
+    "declareDialog": {
+      "title": "确认付款申报",
+      "titleInstant": "确认使用券结清",
+      "description": "支付方式：{channel} · 金额：{amount}。提交后订单进入待确认，运营核对到账后订阅生效。",
+      "confirm": "提交申报",
+      "cancel": "再想想",
+      "payerName": "付款人（选填）",
+      "payerPlaceholder": "转账户名，便于核账",
+      "transactionNo": "转账流水号（选填）",
+      "optional": "选填"
+    },
+    "errors": {
+      "quote": "金额试算失败，请刷新重试。",
+      "declare": "付款申报失败，请稍后重试。",
+      "cancel": "取消订单失败，请稍后重试。"
+    },
+    "list": {
+      "typeSubscription": "订阅",
+      "payNow": "去付款",
+      "view": "查看",
+      "voucherOff": "券抵扣 {amount}",
+      "creditsTitle": "账户余额（租户共享）",
+      "creditsNote": "余额用于未来按量扣款，充值入口将随扣款业务开放。"
+    }
+  },
   "subscribePage": {
     "title": {
       "upgrade": "升级套餐",
@@ -1750,6 +1847,7 @@
       "referenceHint": "务必填写订单号，便于核销",
       "configPending": "收款账户信息待配置，请联系客服获取汇款方式。",
       "cancel": "取消订单",
+      "goPay": "去付款",
       "cancelling": "取消中…"
     },
     "orderCreated": "订单已创建，等待财务确认收款。",

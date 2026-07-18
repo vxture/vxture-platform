@@ -531,7 +531,17 @@ export interface CreateOrderResult {
   cycleUnit: string | null;
   paymentInstructions: OfflinePaymentInstructions | null;
   subscriptionId: string | null;
+  expireAt: string | null;
 }
+
+/** Six-state order contract (product_321 P1). */
+export type OrderState =
+  | "activating"
+  | "completed"
+  | "paid_pending_verify"
+  | "cancelled"
+  | "expired"
+  | "pending_payment";
 
 export interface MyOrder {
   orderId: string;
@@ -543,9 +553,163 @@ export interface MyOrder {
   cycleUnit: string;
   amount: string;
   currency: string;
-  orderStatus: "pending" | "confirmed" | "closed";
+  orderStatus: OrderState;
+  orderType: "subscription";
+  expireAt: string | null;
+  paidAmount: string;
+  voucherOff: string;
   createdAt: string;
   confirmedAt: string | null;
+}
+
+// ── payment page (product_321 §4.1) ─────────────────────────────────────────
+
+export interface PaymentChannelInfo {
+  channel: "alipay" | "wechat" | "bank_transfer";
+  enabled: boolean;
+  qrAsset?: string;
+  account?: {
+    accountName: string;
+    bankName: string;
+    accountNo: string;
+    reference: string;
+  };
+}
+
+export interface OrderVoucherOption {
+  voucherId: string;
+  code: string;
+  kind: "discount" | "credit_voucher";
+  batchName: string;
+  discountType?: "percent" | "fixed";
+  discountValue?: number;
+  maxOff?: string | null;
+  amount?: string;
+  expiresAt: string;
+}
+
+export interface OrderPaymentLeg {
+  paymentId: string;
+  kind: "cash" | "voucher" | "other";
+  status: string;
+  amount: string;
+  channel: string | null;
+  createdAt: string;
+}
+
+export interface OrderDetail {
+  orderId: string;
+  orderNo: string;
+  billNo: string | null;
+  planCode: string;
+  planName: string;
+  tier: string | null;
+  cycleUnit: string;
+  currency: string;
+  orderState: OrderState;
+  orderType: "subscription";
+  createdAt: string;
+  expireAt: string | null;
+  listPrice: string;
+  paidAmount: string;
+  rejectReason: string | null;
+  vouchers: OrderVoucherOption[];
+  legs: OrderPaymentLeg[];
+  paymentChannels: PaymentChannelInfo[];
+}
+
+export interface OrderQuote {
+  listPrice: string;
+  discountOff: string;
+  payable: string;
+  paidAmount: string;
+  voucherOff: string;
+  balanceOff: string;
+  cashDue: string;
+  discountApplicable: boolean;
+}
+
+export interface DeclareResult {
+  outcome:
+    | "declared"
+    | "already_declared"
+    | "activated"
+    | "activating"
+    | "already_settled";
+  cashDue: string;
+  paymentId: string | null;
+}
+
+export async function fetchOrderDetail(
+  orderId: string,
+): Promise<OrderDetail | null> {
+  return readJson<OrderDetail | null>(
+    `/api/subscription/orders/${encodeURIComponent(orderId)}`,
+    null,
+  );
+}
+
+export async function quoteOrder(
+  orderId: string,
+  body: { discountVoucherId?: string; creditVoucherId?: string },
+): Promise<OrderQuote> {
+  const response = await fetch(
+    `${DEFAULT_BFF_URL}${CONSOLE_API_PREFIX}/api/subscription/orders/${encodeURIComponent(orderId)}/quote`,
+    {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!response.ok) {
+    throw new ConsoleBffError(
+      await extractErrorMessage(response, "试算失败"),
+      response.status,
+    );
+  }
+  return (await response.json()) as OrderQuote;
+}
+
+export async function declareOrderPayment(
+  orderId: string,
+  body: {
+    payChannel: "alipay" | "bank_transfer";
+    discountVoucherId?: string;
+    creditVoucherId?: string;
+    payerName?: string;
+    transactionNo?: string;
+    remark?: string;
+  },
+): Promise<DeclareResult> {
+  const response = await fetch(
+    `${DEFAULT_BFF_URL}${CONSOLE_API_PREFIX}/api/subscription/orders/${encodeURIComponent(orderId)}/payment-declare`,
+    {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!response.ok) {
+    throw new ConsoleBffError(
+      await extractErrorMessage(response, "付款申报失败"),
+      response.status,
+    );
+  }
+  return (await response.json()) as DeclareResult;
+}
+
+export async function fetchCredits(): Promise<{
+  balance: string;
+  currency: string;
+}> {
+  return readJson<{ balance: string; currency: string }>(
+    "/api/subscription/credits",
+    { balance: "0.00", currency: "CNY" },
+  );
 }
 
 export async function fetchSubscribeContext(params: {
