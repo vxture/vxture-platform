@@ -19,6 +19,10 @@ import {
   SubscriptionService,
 } from "@vxture/service-subscription";
 import {
+  PgPromotionRepository,
+  PromotionService,
+} from "@vxture/service-promotion";
+import {
   PgProvisioningRepository,
   ProvisioningService,
 } from "@vxture/service-provisioning";
@@ -43,9 +47,14 @@ export const commerceServicesProvider: Provider = {
       { resolve: () => null },
       { deliveryFailed: () => {} },
     );
+    // PromotionService is a REQUIRED third dependency (product_321 §5.1) —
+    // never optional: an optional param here would silently strip the P8b
+    // voucher-release hooks from admin void / cancel paths (the repo-wide
+    // esbuild-DI lesson, applied to manual construction).
     return new SubscriptionService(
       new PgSubscriptionRepository(pool),
       provisioning,
+      new PromotionService(new PgPromotionRepository(pool)),
     );
   },
 };
