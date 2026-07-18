@@ -976,7 +976,11 @@ export type OrderOperationStatus =
   | "confirmed"
   | "overdue"
   | "closed"
-  | "abnormal";
+  | "abnormal"
+  // product_321 P1/§4.2 — operator-visible non-terminal states that must NOT
+  // read as "confirmed" (both were invisible-to-ops blind spots):
+  | "paid_unprovisioned" // invoice paid but subscription still pending (stage-2 hang)
+  | "partial_pending"; // money collected but invoice unclear (legacy partial)
 export type OrderPaymentStatus =
   | "not_required"
   | "unpaid"
@@ -987,7 +991,7 @@ export type OrderPaymentStatus =
   | "failed"
   | "closed"
   | "refunding";
-export type OrderPaySource = "online" | "offline" | "none";
+export type OrderPaySource = "online" | "offline" | "voucher" | "none";
 export type OrderOfflinePaymentType = "bank_transfer" | "cash" | "other";
 
 export interface OrderInvoiceItemRecord {
@@ -1056,6 +1060,15 @@ export interface OrderOperationRecord {
   currency: string;
   operatorName: string;
   operationHint: string;
+  /** Customer payment declaration on the in-flight leg (product_321 P1). */
+  declaredPayment: {
+    channel: string | null;
+    payerName: string | null;
+    transactionNo: string | null;
+    remark: string | null;
+    amount: number;
+    declaredAt: string;
+  } | null;
   createdAt: string;
   confirmedAt: string | null;
   updatedAt: string;

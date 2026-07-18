@@ -15,6 +15,7 @@ import type { IconName } from "@vxture/design-system";
 import {
   confirmOrderOfflinePayment,
   fetchOrderOperation,
+  rejectOrderPaymentDeclaration,
   voidOrder,
 } from "@/api/admin-bff";
 import type {
@@ -57,6 +58,8 @@ function orderStatusLabel(status: OrderOperationStatus) {
   if (status === "confirmed") return "已确认";
   if (status === "overdue") return "逾期";
   if (status === "closed") return "已关闭";
+  if (status === "paid_unprovisioned") return "已付未开通";
+  if (status === "partial_pending") return "部分收款·挂账";
   return "异常";
 }
 
@@ -75,12 +78,23 @@ function paymentStatusLabel(status: OrderPaymentStatus) {
 function paySourceLabel(source: OrderPaySource) {
   if (source === "online") return "线上";
   if (source === "offline") return "线下";
+  if (source === "voucher") return "券";
   return "无";
 }
 
+const DECLARED_CHANNEL_LABELS: Record<string, string> = {
+  alipay: "支付宝",
+  bank: "银行转账",
+};
+
 // 仅真正的待支付订单可驳回——已有任何收款请走结算而非驳回（product_320 §4.3）。
+// product_321 P2：已申报（pending_verify）订单须先「驳回申报」再作废。
 function canVoidOrder(order: OrderOperationDetailRecord) {
-  return order.orderStatus === "pending" && order.paidAmount <= 0;
+  return (
+    order.orderStatus === "pending" &&
+    order.paidAmount <= 0 &&
+    !order.declaredPayment
+  );
 }
 
 function voidDisabledReason(order: OrderOperationDetailRecord) {
@@ -382,6 +396,9 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [submittingPayment, setSubmittingPayment] = useState(false);
   const [voidDialogOpen, setVoidDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [submittingReject, setSubmittingReject] = useState(false);
   const [voidReason, setVoidReason] = useState("");
   const [submittingVoid, setSubmittingVoid] = useState(false);
   const [operationError, setOperationError] = useState<string | null>(null);
@@ -428,6 +445,65 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
         error instanceof Error
           ? error.message
           : "确认线下收款失败，请稍后重试。",
+      );
+    } finally {
+      setSubmittingPayment(false);
+    }
+  }
+
+  async function handleRejectDeclaration() {
+    if (!order) return;
+
+    setSubmittingReject(true);
+    setOperationError(null);
+
+    try {
+      // Reject shares the settle danger class (commerce:payment.settle) → step-up.
+      const updatedOrder = await runWithStepUp(() =>
+        rejectOrderPaymentDeclaration(order.id, rejectReason),
+      );
+      setOrder(updatedOrder);
+      setOperationFeedback(
+        "付款申报已驳回，券与折扣已释放，客户端将看到驳回原因。",
+      );
+      setRejectDialogOpen(false);
+      setRejectReason("");
+    } catch (error) {
+      if (isStepUpCancelled(error)) return;
+      setOperationError(
+        error instanceof Error
+          ? error.message
+          : "驳回付款申报失败，请稍后重试。",
+      );
+    } finally {
+      setSubmittingReject(false);
+    }
+  }
+
+  async function handleRedriveProvisioning() {
+    if (!order) return;
+
+    setSubmittingPayment(true);
+    setOperationError(null);
+
+    try {
+      // Same endpoint as confirm — the backend detects the paid-but-hung order
+      // and re-drives stage 2 without requiring declaration fields (P8 ③).
+      const updatedOrder = await runWithStepUp(() =>
+        confirmOrderOfflinePayment(order.id, {
+          paidAmount: 0,
+          offlinePayType: "other",
+          payerName: "-",
+          paidAt: new Date().toISOString(),
+          reason: "manual stage-2 re-drive",
+        }),
+      );
+      setOrder(updatedOrder);
+      setOperationFeedback("已重试开通（段 2 重驱动）。");
+    } catch (error) {
+      if (isStepUpCancelled(error)) return;
+      setOperationError(
+        error instanceof Error ? error.message : "重试开通失败，请稍后重试。",
       );
     } finally {
       setSubmittingPayment(false);
@@ -526,6 +602,30 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
                   <Icon name="check" size="xs" fallback="placeholder" />
                   确认收款
                 </Button>
+                {order.declaredPayment ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setOperationError(null);
+                      setOperationFeedback(null);
+                      setRejectReason("");
+                      setRejectDialogOpen(true);
+                    }}
+                  >
+                    <Icon name="warning" size="xs" fallback="placeholder" />
+                    驳回申报
+                  </Button>
+                ) : null}
+                {order.orderStatus === "paid_unprovisioned" ? (
+                  <Button
+                    variant="outline"
+                    onClick={handleRedriveProvisioning}
+                    disabled={submittingPayment}
+                  >
+                    <Icon name="play" size="xs" fallback="placeholder" />
+                    重试开通
+                  </Button>
+                ) : null}
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -554,6 +654,51 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
 
       {order ? (
         <>
+          {order.declaredPayment ? (
+            <section className="vx-tenant-directory__header">
+              <DetailSectionHeading icon="clock" title="客户付款申报" />
+              <p className="vx-subscription-action-dialog__description">
+                客户在付款页提交的申报信息，确认前请核对到账；实收不符请「驳回申报」。
+              </p>
+              <div className="vx-detail-grid">
+                <div>
+                  <Label>申报金额</Label>
+                  <p>
+                    {formatCurrency(
+                      order.declaredPayment.amount,
+                      order.currency,
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <Label>支付渠道</Label>
+                  <p>
+                    {DECLARED_CHANNEL_LABELS[
+                      order.declaredPayment.channel ?? ""
+                    ] ??
+                      order.declaredPayment.channel ??
+                      "未填写"}
+                  </p>
+                </div>
+                <div>
+                  <Label>付款方</Label>
+                  <p>{order.declaredPayment.payerName ?? "未填写"}</p>
+                </div>
+                <div>
+                  <Label>流水号</Label>
+                  <p>{order.declaredPayment.transactionNo ?? "未填写"}</p>
+                </div>
+                <div>
+                  <Label>申报时间</Label>
+                  <p>{formatDate(order.declaredPayment.declaredAt)}</p>
+                </div>
+                <div>
+                  <Label>备注</Label>
+                  <p>{order.declaredPayment.remark ?? "无"}</p>
+                </div>
+              </div>
+            </section>
+          ) : null}
           <OrderSummary order={order} />
           <OrderDetails order={order} />
         </>
@@ -573,6 +718,49 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
           }}
           onSubmit={handleConfirmOfflinePayment}
         />
+      ) : null}
+
+      {order && rejectDialogOpen ? (
+        <DialogForm
+          open
+          title="驳回付款申报"
+          description={
+            <>
+              订单号：<strong>{order.orderNo}</strong>
+              {order.declaredPayment
+                ? ` · 申报 ${formatCurrency(order.declaredPayment.amount, order.currency)}`
+                : ""}
+              。驳回后券与折扣自动释放，订单回到待付款，驳回原因将展示在客户付款页。
+            </>
+          }
+          submitLabel="确认驳回申报"
+          cancelLabel="取消"
+          submitting={submittingReject}
+          submitDisabled={rejectReason.trim().length < 4}
+          onOpenChange={(open) => {
+            if (!open && !submittingReject) setRejectDialogOpen(false);
+          }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleRejectDeclaration();
+          }}
+        >
+          <Label htmlFor="order-reject-reason">
+            驳回原因 <small>（必填，最少 4 字；将展示给客户）</small>
+          </Label>
+          <Textarea
+            id="order-reject-reason"
+            value={rejectReason}
+            onChange={(event) => setRejectReason(event.target.value)}
+            placeholder="例如：未查到对应转账记录，请核对金额后重新付款；实收 500 与申报 860 不符。"
+            maxLength={512}
+            rows={3}
+            autoFocus
+          />
+          {operationError ? (
+            <p className="text-sm text-vx-danger">{operationError}</p>
+          ) : null}
+        </DialogForm>
       ) : null}
 
       {order && voidDialogOpen ? (

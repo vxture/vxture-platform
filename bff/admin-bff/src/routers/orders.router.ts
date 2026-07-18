@@ -36,11 +36,15 @@ import { randomUUID } from "node:crypto";
 import type { Request } from "express";
 import type { Pool, PoolClient } from "pg";
 import { extractClientIp } from "@vxture/core-utils";
+import type { PromotionService } from "@vxture/service-promotion";
 import type { SubscriptionService } from "@vxture/service-subscription";
 import { assertAnyCapability } from "../auth/capability";
 import { RequireStepUp } from "../auth/step-up.decorator";
 import { ADMIN_BFF_RO_POOL, ADMIN_BFF_RW_POOL } from "../tokens";
-import { ADMIN_SUBSCRIPTION_SERVICE } from "../providers/commerce-services.provider";
+import {
+  ADMIN_PROMOTION_SERVICE,
+  ADMIN_SUBSCRIPTION_SERVICE,
+} from "../providers/commerce-services.provider";
 import type {
   OrderInvoiceItemRecord,
   OrderOfflinePaymentType,
@@ -64,6 +68,8 @@ export class OrdersRouter {
     @Inject(ADMIN_BFF_RW_POOL) private readonly rwPool: Pool,
     @Inject(ADMIN_SUBSCRIPTION_SERVICE)
     private readonly subscriptions: SubscriptionService,
+    @Inject(ADMIN_PROMOTION_SERVICE)
+    private readonly promotion: PromotionService,
   ) {}
 
   @Get()
@@ -131,11 +137,16 @@ export class OrdersRouter {
 
     const actorId = requireOperatorId(req.user?.id);
     const subscriptionId = requireUuid(orderId, "Invalid order id");
-    const input = normalizeOfflinePaymentBody(body);
 
     let isPendingOrderRow = false;
     let runStage2 = false;
     let orderIntent: OrderInvoiceIntent = { intent: "new" };
+    // Body validation is deferred INTO the transaction (product_321 P8 ③):
+    // a stage-2 re-drive on a hung paid order has no cash to declare, so
+    // forcing paidAmount>0/payerName up front made the re-drive unreachable
+    // (round-3 review). The re-drive/strict decision is made under the row
+    // lock — no probe race, no extra read path.
+    let input: NormalizedOfflinePayment | undefined;
 
     const client = await this.rwPool.connect();
     try {
@@ -143,7 +154,7 @@ export class OrdersRouter {
 
       // ① 锁定订阅（订单主体）
       const subResult = await client.query<SubscriptionLockRow>(
-        `select id, tenant_id, status, activation_method, currency
+        `select id, tenant_id, workspace_id, status, activation_method, currency
          from metering.subscriptions
          where id = $1 and deleted_at is null
          for update`,
@@ -186,6 +197,9 @@ export class OrdersRouter {
       }
       // re-drive: stage1 already committed by a prior call, nothing to write here.
       runStage2 = stage1Done && isPendingOrderRow;
+      input = runStage2
+        ? relaxedRedriveInput(body)
+        : normalizeOfflinePaymentBody(body);
 
       if (!stage1Done) {
         const payable = toNumber(invoice.payable_amount);
@@ -194,9 +208,38 @@ export class OrdersRouter {
         if (remaining <= 0) {
           throw new BadRequestException("Invoice has no outstanding balance");
         }
-        if (input.paidAmount > remaining) {
+
+        // Declared-leg branch (product_321 P9): a customer-declared
+        // pending_verify cash leg exists → the confirm FLIPS that leg (never
+        // inserts a second row) and the amount must equal the declared amount
+        // EXACTLY — mismatched real income goes through payment-reject.
+        const legResult = await client.query<DeclaredLegRow>(
+          `select id, total_amount, actor_id, channel_raw_data
+             from billing.payments
+            where bill_id = $1 and pay_status = 'pending_verify'
+            order by created_at desc
+            limit 1
+            for update`,
+          [invoice.id],
+        );
+        const declaredLeg = legResult.rows[0] ?? null;
+        const credential = parseLegCredential(declaredLeg?.channel_raw_data);
+        let voucherOff = 0;
+
+        if (declaredLeg) {
+          const declaredAmount = toNumber(declaredLeg.total_amount);
+          if (round2(input.paidAmount) !== declaredAmount) {
+            throw new BadRequestException(
+              `确认金额必须等于申报金额 ${declaredAmount.toFixed(2)}；实收不符请驳回申报（payment-reject）`,
+            );
+          }
+          voucherOff = toNumber(credential?.voucherOff ?? 0);
+        } else if (round2(input.paidAmount) !== remaining) {
+          // No declared leg (legacy / post-reject manual settle): the same
+          // full-amount rule — ≤ would keep breeding unterminable partial
+          // orders through this side door (P9, round-3 review).
           throw new BadRequestException(
-            "Confirmed amount exceeds the outstanding balance",
+            `确认金额必须等于剩余应收 ${remaining.toFixed(2)}（系统不再受理部分到账；实收不符请线下协商退回/补齐）`,
           );
         }
 
@@ -233,37 +276,136 @@ export class OrdersRouter {
         );
         const transactionId = transactionResult.rows[0]?.id ?? null;
 
-        // ④ 支付记录（线下已收）。关联本笔流水。
-        await client.query(
-          `insert into billing.payments (
-             tenant_id, bill_id, transaction_id, pay_order_no, pay_source,
-             offline_pay_type, offline_payer_name, offline_pay_time, offline_evidence_url,
-             total_amount, paid_amount, currency, pay_status, paid_at,
-             actor_type, actor_id, operate_remark
-           ) values (
-             $1, $2, $3, $4, 'offline',
-             $5, $6, $7, $8,
-             $9, $9, $10, 'paid', $7,
-             'operator', $11, $12
-           )`,
-          [
-            tenantId,
-            invoice.id,
-            transactionId,
-            payOrderNo,
-            input.offlinePayType,
-            input.payerName,
-            input.paidAt,
-            input.evidenceUrl,
-            input.paidAmount,
-            currency,
-            actorId,
-            input.reason,
-          ],
-        );
+        if (declaredLeg) {
+          // ④a 翻转申报腿（pending_verify → paid，回填实收与流水）。
+          await client.query(
+            `update billing.payments
+               set pay_status = 'paid',
+                   paid_amount = $2,
+                   transaction_id = $3,
+                   paid_at = $4,
+                   offline_pay_type = $5,
+                   offline_payer_name = coalesce($6, offline_payer_name),
+                   offline_pay_time = $4,
+                   offline_evidence_url = coalesce($7, offline_evidence_url),
+                   operate_remark = $8,
+                   updated_at = now()
+             where id = $1`,
+            [
+              declaredLeg.id,
+              input.paidAmount,
+              transactionId,
+              input.paidAt,
+              input.offlinePayType,
+              input.payerName,
+              input.evidenceUrl,
+              input.reason,
+            ],
+          );
 
-        // ⑤ 回写账单：累加实收，足额转 paid（并落 paid_at），否则 partial。
-        const newPaid = round2(alreadyPaid + input.paidAmount);
+          // ④b 券 finalize（P7 终态）：代金券先落结算腿（pay_source='voucher'），
+          // redemption 回填 payment_id / 折扣券回填申报时的负额行 id。凭据随腿
+          // 携带（P10），此处不回查 promotion 配置。
+          if (credential) {
+            let voucherLegId: string | null = null;
+            if (credential.creditVoucherId && voucherOff > 0) {
+              const voucherLeg = await client.query<InsertedIdRow>(
+                `insert into billing.payments (
+                   tenant_id, bill_id, pay_order_no, pay_source,
+                   total_amount, paid_amount, currency, pay_status, paid_at,
+                   actor_type, actor_id, operate_remark
+                 ) values ($1, $2, $3, 'voucher', $4, $4, $5, 'paid', $6,
+                           'operator', $7, $8)
+                 returning id`,
+                [
+                  tenantId,
+                  invoice.id,
+                  billingCode("PAY"),
+                  voucherOff,
+                  currency,
+                  input.paidAt,
+                  actorId,
+                  input.reason,
+                ],
+              );
+              voucherLegId = voucherLeg.rows[0]?.id ?? null;
+            }
+            const redemptionUser =
+              credential.declaredBy ?? declaredLeg.actor_id;
+            if (
+              (credential.discountVoucherId || credential.creditVoucherId) &&
+              !redemptionUser
+            ) {
+              // voucher_redemptions.user_id is NOT NULL FK→account.users; an
+              // operator id is not a customer user — refuse rather than
+              // corrupt the redemption ledger.
+              throw new BadRequestException(
+                "申报凭据缺少核销人，无法核销券（请驳回申报后由客户重新申报）",
+              );
+            }
+            // Guard above ensures non-null whenever a voucher participates.
+            const scope = {
+              tenantId,
+              workspaceId: sub.workspace_id,
+              userId: redemptionUser as string,
+            };
+            const finalizeInputs = [];
+            if (credential.discountVoucherId) {
+              finalizeInputs.push({
+                voucherId: credential.discountVoucherId,
+                kind: "discount" as const,
+                scope,
+                effectSnapshot: credential.discountEffectSnapshot ?? {},
+                invoiceItemId: credential.discountItemId ?? null,
+              });
+            }
+            if (credential.creditVoucherId) {
+              finalizeInputs.push({
+                voucherId: credential.creditVoucherId,
+                kind: "credit_voucher" as const,
+                scope,
+                effectSnapshot: credential.creditEffectSnapshot ?? {},
+                paymentId: voucherLegId,
+              });
+            }
+            if (finalizeInputs.length > 0) {
+              await this.promotion.finalizeReserved(client, finalizeInputs);
+            }
+          }
+        } else {
+          // ④c 无申报腿：保留原插行路径（历史遗留订单向后兼容）。
+          await client.query(
+            `insert into billing.payments (
+               tenant_id, bill_id, transaction_id, pay_order_no, pay_source,
+               offline_pay_type, offline_payer_name, offline_pay_time, offline_evidence_url,
+               total_amount, paid_amount, currency, pay_status, paid_at,
+               actor_type, actor_id, operate_remark
+             ) values (
+               $1, $2, $3, $4, 'offline',
+               $5, $6, $7, $8,
+               $9, $9, $10, 'paid', $7,
+               'operator', $11, $12
+             )`,
+            [
+              tenantId,
+              invoice.id,
+              transactionId,
+              payOrderNo,
+              input.offlinePayType,
+              input.payerName,
+              input.paidAt,
+              input.evidenceUrl,
+              input.paidAmount,
+              currency,
+              actorId,
+              input.reason,
+            ],
+          );
+        }
+
+        // ⑤ 回写账单：累加实收（现金 + 券腿），足额转 paid（并落 paid_at）。
+        // 恒等校验下必然足额；条件保留为防御。
+        const newPaid = round2(alreadyPaid + input.paidAmount + voucherOff);
         const fullySettled = newPaid >= payable;
         await client.query(
           `update billing.invoices
@@ -347,16 +489,17 @@ export class OrdersRouter {
 
     // 段2：走服务层，独立事务，正确触发 provisioning webhook（product_320 §4.3）。
     if (runStage2) {
+      const remark = input?.reason ?? "manual stage-2 re-drive";
       if (orderIntent.intent === "upgrade" && orderIntent.upgradeOf) {
         await this.subscriptions.applyUpgradeOrder(
           subscriptionId,
           orderIntent.upgradeOf,
-          { operatorId: actorId, remark: input.reason },
+          { operatorId: actorId, remark },
         );
       } else {
         await this.subscriptions.activatePendingOrder(subscriptionId, {
           operatorId: actorId,
-          remark: input.reason,
+          remark,
           clientIp: extractClientIp(req),
         });
       }
@@ -370,8 +513,171 @@ export class OrdersRouter {
     return detail;
   }
 
+  // 驳回付款申报（product_321 P9/P8b）：现金腿 pending_verify → failed（原因落 status_msg，
+  //   透传用户付款页横幅）+ 完整释放编排（券回 assigned + 计价层回滚 + 凭据 released）+
+  //   histories payment_rejected（TTL 重锚）。与确认同码同级（commerce:payment.settle +
+  //   step-up）——驳回申报与确认收款是同一职责的正反面。
+  @Post(":orderId/payment-reject")
+  @RequireStepUp()
+  async rejectPaymentDeclaration(
+    @Req() req: Request & RequestContext,
+    @Param("orderId") orderId: string,
+    @Body() body: VoidOrderBody,
+  ): Promise<OrderOperationDetailRecord> {
+    assertCanSettleOrderPayment(req);
+
+    const actorId = requireOperatorId(req.user?.id);
+    const subscriptionId = requireUuid(orderId, "Invalid order id");
+    const reason = normalizeVoidReason(body);
+
+    const client = await this.rwPool.connect();
+    try {
+      await client.query("begin");
+
+      // 锁序 §7：先订阅行，再账单，再券。
+      const subResult = await client.query<SubscriptionLockRow>(
+        `select id, tenant_id, workspace_id, status, activation_method, currency
+           from metering.subscriptions
+          where id = $1 and deleted_at is null
+          for update`,
+        [subscriptionId],
+      );
+      const sub = subResult.rows[0];
+      if (!sub) throw new NotFoundException("Order not found");
+      if (
+        sub.status !== "suspended" ||
+        sub.activation_method !== "offline_purchase"
+      ) {
+        throw new BadRequestException("订单不是待支付状态，无法驳回申报");
+      }
+
+      const invoiceResult = await client.query<InvoiceLockRow>(
+        `select id, tenant_id, payable_amount, paid_amount, bill_status, currency, operate_remark
+           from billing.invoices
+          where subscription_id = $1 and deleted_at is null
+          order by created_at desc
+          limit 1
+          for update`,
+        [subscriptionId],
+      );
+      const invoice = invoiceResult.rows[0];
+      if (!invoice) {
+        throw new BadRequestException("Order has no invoice");
+      }
+
+      const legResult = await client.query<DeclaredLegRow>(
+        `select id, total_amount, actor_id, channel_raw_data
+           from billing.payments
+          where bill_id = $1 and pay_status = 'pending_verify'
+          order by created_at desc
+          limit 1
+          for update`,
+        [invoice.id],
+      );
+      const declaredLeg = legResult.rows[0];
+      if (!declaredLeg) {
+        throw new BadRequestException("该订单没有待确认的付款申报");
+      }
+      const credential = parseLegCredential(declaredLeg.channel_raw_data);
+
+      // P8b 前置守卫：本单已有 redemption（券已 finalize）说明状态错乱，拒绝
+      // 自动回滚（会断 redemption FK / 事后追折），转人工。
+      if (credential?.discountVoucherId || credential?.creditVoucherId) {
+        const redeemed = await client.query(
+          `select 1 from promotion.voucher_redemptions
+            where voucher_id = any($1::uuid[]) limit 1`,
+          [
+            [credential.discountVoucherId, credential.creditVoucherId].filter(
+              Boolean,
+            ),
+          ],
+        );
+        if (redeemed.rows[0]) {
+          throw new BadRequestException(
+            "该申报的券已核销，不能自动驳回（状态异常，请人工处理）",
+          );
+        }
+      }
+
+      // ① 现金腿 → failed（status_msg=原因，付款页横幅取 histories remark）。
+      await client.query(
+        `update billing.payments
+            set pay_status = 'failed', status_msg = $2, closed_at = now(),
+                updated_at = now()
+          where id = $1`,
+        [declaredLeg.id, reason],
+      );
+
+      // ② 券释放（reserved → assigned 退 used_count；stale 凭据由 status 守卫兜住）。
+      if (credential?.discountVoucherId || credential?.creditVoucherId) {
+        await this.promotion.releaseReserved(client, {
+          discountVoucherId: credential.discountVoucherId,
+          creditVoucherId: credential.creditVoucherId,
+        });
+      }
+
+      // ③ 计价层回滚（P8b 步 2）：软删折扣负额行 + 归还原价（缺此步 = 驳回后
+      // 重申报少付差额 / 换券双重折扣，round-1 blocker）。
+      await client.query(
+        `update billing.invoice_items
+            set deleted_at = now(), updated_at = now()
+          where bill_id = $1 and item_type = 'discount' and deleted_at is null`,
+        [invoice.id],
+      );
+      await client.query(
+        `update billing.invoices i set
+           total_amount = agg.total,
+           payable_amount = agg.total,
+           discount_amount = agg.discount_off,
+           updated_at = now()
+          from (
+            select coalesce(sum(total_amount), 0) as total,
+                   coalesce(abs(sum(total_amount) filter (where item_type = 'discount')), 0) as discount_off
+              from billing.invoice_items
+             where bill_id = $1 and deleted_at is null
+          ) agg
+         where i.id = $1`,
+        [invoice.id],
+      );
+
+      // ④ 凭据 released=true（P10 防重放）。
+      await client.query(
+        `update billing.payments
+            set channel_raw_data = jsonb_set(coalesce(channel_raw_data, '{}'::jsonb),
+                                             '{settlement,released}', 'true'::jsonb),
+                updated_at = now()
+          where id = $1`,
+        [declaredLeg.id],
+      );
+
+      // ⑤ histories payment_rejected（P4 TTL 重锚 + 付款页横幅来源）。
+      await client.query(
+        `insert into metering.subscription_histories (
+           tenant_id, subscription_id, change_type, from_status, to_status,
+           actor_type, actor_id, remark, client_ip
+         ) values ($1, $2, 'payment_rejected', 'suspended', 'suspended',
+                   'operator', $3, $4, $5)`,
+        [sub.tenant_id, subscriptionId, actorId, reason, extractClientIp(req)],
+      );
+
+      await client.query("commit");
+    } catch (error) {
+      await client.query("rollback");
+      throw error;
+    } finally {
+      client.release();
+    }
+
+    const detail = await this.getOrder(req, subscriptionId);
+    if (!detail) {
+      throw new NotFoundException("Order not found after reject");
+    }
+    return detail;
+  }
+
   // 驳回未付线下订单（product_320 §4.3）：仅限真正的待支付订单（suspended + offline_purchase）
   //   且尚无已支付/部分支付流水；已收款的订单请走结算而非驳回。危码复用 commerce:order.void。
+  //   product_321 P2：存在 pending_verify 申报腿时 service/repo 守卫 409（先驳回申报再作废）。
   @Post(":orderId/void")
   @RequireStepUp()
   async voidOrder(
@@ -491,6 +797,26 @@ function normalizeOfflinePaymentBody(
   };
 }
 
+// Stage-2 re-drive body (product_321 P8 ③): money already settled — only an
+// optional reason is meaningful; declaration fields are not required.
+function relaxedRedriveInput(
+  body: OfflinePaymentConfirmBody | undefined,
+): NormalizedOfflinePayment {
+  const reason =
+    body && typeof body.reason === "string" && body.reason.trim()
+      ? body.reason.trim()
+      : "manual stage-2 re-drive";
+  return {
+    paidAmount: 0,
+    offlinePayType: "other",
+    payerName: "",
+    paidAt: new Date().toISOString(),
+    transactionNo: null,
+    evidenceUrl: null,
+    reason,
+  };
+}
+
 function trimOrNull(value: string | null | undefined): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
@@ -563,9 +889,58 @@ interface NormalizedOfflinePayment {
 interface SubscriptionLockRow {
   id: string;
   tenant_id: string;
+  workspace_id: string;
   status: string;
   activation_method: string | null;
   currency: string | null;
+}
+
+interface DeclaredLegRow {
+  id: string;
+  total_amount: string | number | null;
+  actor_id: string | null;
+  channel_raw_data: unknown;
+}
+
+/** Settlement credential carried on the declared cash leg (product_321 P10). */
+interface LegCredential {
+  discountVoucherId: string | null;
+  creditVoucherId: string | null;
+  voucherOff: string | number | null;
+  released: boolean;
+  discountItemId: string | null;
+  discountEffectSnapshot: Record<string, unknown> | null;
+  creditEffectSnapshot: Record<string, unknown> | null;
+  declaredBy: string | null;
+}
+
+function parseLegCredential(raw: unknown): LegCredential | null {
+  if (!raw || typeof raw !== "object") return null;
+  const settlement = (raw as { settlement?: unknown }).settlement;
+  if (!settlement || typeof settlement !== "object") return null;
+  const s = settlement as Record<string, unknown>;
+  return {
+    discountVoucherId:
+      typeof s.discountVoucherId === "string" ? s.discountVoucherId : null,
+    creditVoucherId:
+      typeof s.creditVoucherId === "string" ? s.creditVoucherId : null,
+    voucherOff:
+      typeof s.voucherOff === "string" || typeof s.voucherOff === "number"
+        ? s.voucherOff
+        : null,
+    released: s.released === true,
+    discountItemId:
+      typeof s.discountItemId === "string" ? s.discountItemId : null,
+    discountEffectSnapshot:
+      s.discountEffectSnapshot && typeof s.discountEffectSnapshot === "object"
+        ? (s.discountEffectSnapshot as Record<string, unknown>)
+        : null,
+    creditEffectSnapshot:
+      s.creditEffectSnapshot && typeof s.creditEffectSnapshot === "object"
+        ? (s.creditEffectSnapshot as Record<string, unknown>)
+        : null,
+    declaredBy: typeof s.declaredBy === "string" ? s.declaredBy : null,
+  };
 }
 
 interface InvoiceLockRow {
@@ -606,6 +981,7 @@ select
   sub.id,
   sub.order_no,
   sub.status                       as subscription_status,
+  sub.activation_method,
   sub.cycle_unit,
   sub.pay_amount,
   sub.currency,
@@ -651,9 +1027,24 @@ left join lateral (
   select p.id, p.pay_order_no, p.pay_source, p.pay_method, p.pay_status, p.paid_amount, p.paid_at
   from billing.payments p
   where p.bill_id = inv.id
-  order by p.created_at desc
+  -- Representative leg: cash before voucher (product_321 §4.2 — a paid
+  -- voucher leg is newest after confirm and would shadow the cash leg,
+  -- showing the reduction amount as "paid").
+  order by (p.pay_source = 'voucher') asc, p.created_at desc
   limit 1
 ) pay on true
+left join lateral (
+  select p.pay_channel   as declared_channel,
+         p.offline_payer_name as declared_payer,
+         p.channel_transaction_no as declared_transaction_no,
+         p.operate_remark as declared_remark,
+         p.total_amount   as declared_amount,
+         p.created_at     as declared_at
+  from billing.payments p
+  where p.bill_id = inv.id and p.pay_status = 'pending_verify'
+  order by p.created_at desc
+  limit 1
+) declared on true
 where sub.deleted_at is null
 `;
 
@@ -761,6 +1152,7 @@ function mapCycle(cycleUnit: string): SubscriptionOperationCycle {
 function mapPaySource(source: string | null): OrderPaySource {
   if (source === "online") return "online";
   if (source === "offline") return "offline";
+  if (source === "voucher") return "voucher";
   return "none";
 }
 
@@ -787,17 +1179,23 @@ function mapPaymentStatus(
   }
 }
 
-// 订单态由“支付态优先，账单态兜底”派生。
+// 订单态派生（product_321 §4.2 收窄）：已完结判定 = invoice paid 且订阅非在途。
+// 在途（suspended + offline_purchase）时，"钱到了但没开通/没收齐"必须以独立态
+// 浮出（置顶集），绝不并入 confirmed——否则悬挂/部分收款单在运营视角"已完结"，
+// 永不被发现（P1 序 1 同款盲区）。
 function deriveOrderStatus(
   payStatus: string | null,
   billStatus: string | null,
+  inFlightOrder: boolean,
 ): OrderOperationStatus {
+  if (billStatus === "paid" && inFlightOrder) return "paid_unprovisioned";
   if (payStatus === "paid" || billStatus === "paid") return "confirmed";
   if (payStatus === "pending_verify") return "pending_verify";
+  if (billStatus === "partial")
+    return inFlightOrder ? "partial_pending" : "confirmed";
   if (payStatus === "failed") return "abnormal";
   if (payStatus === "closed" || billStatus === "cancelled") return "closed";
   if (billStatus === "overdue") return "overdue";
-  if (billStatus === "partial") return "confirmed";
   return "pending";
 }
 
@@ -814,7 +1212,17 @@ function operatorDisplay(
 function mapOrderRow(row: OrderRow): OrderOperationRecord {
   const hasInvoice = Boolean(row.bill_id);
   const amount = toNumber(row.pay_amount ?? row.bill_payable_amount);
-  const paidAmount = toNumber(row.payment_paid_amount ?? row.bill_paid_amount);
+  // Invoice truth for money collected (product_321 §4.2) — the representative
+  // leg's paid_amount is one leg, not the order's total income.
+  const paidAmount = toNumber(row.bill_paid_amount ?? row.payment_paid_amount);
+  const inFlightOrder =
+    row.subscription_status === "suspended" &&
+    row.activation_method === "offline_purchase";
+  const orderStatus = deriveOrderStatus(
+    row.pay_status,
+    row.bill_status,
+    inFlightOrder,
+  );
   return {
     id: row.id,
     orderNo: row.order_no ?? row.id,
@@ -832,7 +1240,7 @@ function mapOrderRow(row: OrderRow): OrderOperationRecord {
     subscriptionId: row.id,
     subscriptionStatus: mapSubscriptionStatus(row.subscription_status),
     cycleType: mapCycle(row.cycle_unit),
-    orderStatus: deriveOrderStatus(row.pay_status, row.bill_status),
+    orderStatus,
     paymentStatus: mapPaymentStatus(row.pay_status, hasInvoice),
     paySource: mapPaySource(row.pay_source),
     payMethod: row.pay_method,
@@ -845,15 +1253,29 @@ function mapOrderRow(row: OrderRow): OrderOperationRecord {
     paidAmount,
     currency: row.currency ?? "CNY",
     operatorName: operatorDisplay(row.operator_name, row.created_by_type),
-    operationHint:
-      deriveOrderStatus(row.pay_status, row.bill_status) === "pending"
-        ? "待客户完成支付"
-        : "",
+    operationHint: OPERATION_HINTS[orderStatus] ?? "",
+    declaredPayment: row.declared_at
+      ? {
+          channel: row.declared_channel,
+          payerName: row.declared_payer,
+          transactionNo: row.declared_transaction_no,
+          remark: row.declared_remark,
+          amount: toNumber(row.declared_amount),
+          declaredAt: toIso(row.declared_at),
+        }
+      : null,
     createdAt: toIso(row.created_at),
     confirmedAt: toIsoOrNull(row.payment_paid_at ?? row.bill_paid_at),
     updatedAt: toIso(row.updated_at),
   };
 }
+
+const OPERATION_HINTS: Partial<Record<OrderOperationStatus, string>> = {
+  pending: "待客户完成支付",
+  pending_verify: "客户已申报付款，请核对到账后确认或驳回",
+  paid_unprovisioned: "已收款未开通（自愈中/需人工重驱动）",
+  partial_pending: "部分收款挂账，待客户申报剩余或线下协商",
+};
 
 function mapInvoiceItemRow(row: InvoiceItemRow): OrderInvoiceItemRecord {
   return {
@@ -921,6 +1343,7 @@ interface OrderRow {
   id: string;
   order_no: string | null;
   subscription_status: string;
+  activation_method: string | null;
   cycle_unit: string;
   pay_amount: string | number | null;
   currency: string | null;
@@ -948,6 +1371,12 @@ interface OrderRow {
   pay_status: string | null;
   payment_paid_amount: string | number | null;
   payment_paid_at: Date | string | null;
+  declared_channel: string | null;
+  declared_payer: string | null;
+  declared_transaction_no: string | null;
+  declared_remark: string | null;
+  declared_amount: string | number | null;
+  declared_at: Date | string | null;
 }
 
 interface InvoiceItemRow {

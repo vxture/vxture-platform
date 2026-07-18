@@ -90,32 +90,45 @@ export function OrderOfflinePaymentDialog({
   }) => void;
 }) {
   const remainingAmount = useMemo(() => remainingOrderAmount(order), [order]);
+  // Declared order (product_321 P9): the amount is LOCKED to the customer's
+  // declared cash-leg amount — full-amount-or-reject, no partial acceptance.
+  const declared = order.declaredPayment;
+  const lockedAmount = declared ? declared.amount : remainingAmount;
   const [paidAmount, setPaidAmount] = useState(
-    String(remainingAmount || order.amount),
+    String(lockedAmount || order.amount),
   );
-  const [offlinePayType, setOfflinePayType] =
-    useState<OrderOfflinePaymentType>("bank_transfer");
-  const [payerName, setPayerName] = useState(order.tenantName);
+  const [offlinePayType, setOfflinePayType] = useState<OrderOfflinePaymentType>(
+    // declared channel: 'bank' → bank_transfer; 'alipay' has no dedicated
+    // offline_pay_type value → 'other'.
+    declared && declared.channel === "alipay" ? "other" : "bank_transfer",
+  );
+  const [payerName, setPayerName] = useState(
+    declared?.payerName || order.tenantName,
+  );
   const [paidAt, setPaidAt] = useState(localDateTimeValue(new Date()));
-  const [transactionNo, setTransactionNo] = useState("");
+  const [transactionNo, setTransactionNo] = useState(
+    declared?.transactionNo ?? "",
+  );
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [reason, setReason] = useState("");
   const normalizedAmount = Number(paidAmount);
   const canSubmit =
     Number.isFinite(normalizedAmount) &&
     normalizedAmount > 0 &&
-    normalizedAmount <= remainingAmount &&
+    (declared
+      ? normalizedAmount === declared.amount
+      : normalizedAmount <= remainingAmount) &&
     payerName.trim().length > 0 &&
     reason.trim().length >= 4;
 
   useEffect(() => {
-    setPaidAmount(String(remainingAmount || order.amount));
-    setPayerName(order.tenantName);
+    setPaidAmount(String(lockedAmount || order.amount));
+    setPayerName(declared?.payerName || order.tenantName);
     setPaidAt(localDateTimeValue(new Date()));
-    setTransactionNo("");
+    setTransactionNo(declared?.transactionNo ?? "");
     setEvidenceUrl("");
     setReason("");
-  }, [order, remainingAmount]);
+  }, [order, remainingAmount, lockedAmount, declared]);
 
   return (
     <div
@@ -151,21 +164,26 @@ export function OrderOfflinePaymentDialog({
           <div>
             <h2 id="order-payment-dialog-title">确认线下收款</h2>
             <p>
-              {order.orderNo} · 剩余应收{" "}
-              {formatCurrency(remainingAmount, order.currency)}
+              {order.orderNo} ·{" "}
+              {declared
+                ? `客户申报 ${formatCurrency(declared.amount, order.currency)}`
+                : `剩余应收 ${formatCurrency(remainingAmount, order.currency)}`}
             </p>
           </div>
         </header>
         <p className="vx-subscription-action-dialog__description">
-          仅用于运营人员确认银行转账、现金或其他线下回款。确认后会写入支付记录并更新账单收款状态，不自动变更订阅权益。
+          {declared
+            ? "客户已申报付款。确认金额锁定为申报金额（全额确认）；实际到账与申报不符时请改用「驳回申报」，由客户重新申报或线下协商。"
+            : "仅用于运营人员确认银行转账、现金或其他线下回款。确认金额须等于剩余应收（全额确认）。"}
         </p>
         <div className="vx-order-payment-dialog__grid">
           <label className="vx-subscription-action-dialog__field">
-            <span>确认金额</span>
+            <span>确认金额{declared ? "（申报锁定）" : ""}</span>
             <Input
               value={paidAmount}
               onChange={(event) => setPaidAmount(event.target.value)}
               inputMode="decimal"
+              readOnly={Boolean(declared)}
             />
           </label>
           <label className="vx-subscription-action-dialog__field">

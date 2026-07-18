@@ -199,6 +199,15 @@ export class BillingRouter {
       const invoiced = toNum(bill.invoiced_amount);
       let resultBillId = bill.id;
 
+      // In-flight-order fencing (product_321 P5/P10): cancel/mark_overdue
+      // overwrite operate_remark wholesale — on an order bill that wipes the
+      // machine-readable intent (upgrade orders would mis-activate) and the
+      // pricing channel must stay unique. Route order bills through the order
+      // side (void / payment-reject).
+      if (action === "cancel" || action === "mark_overdue") {
+        await assertNotInFlightOrderBill(client, bill.id);
+      }
+
       switch (action) {
         case "cancel": {
           if (bill.bill_status === "cancelled")
@@ -319,6 +328,10 @@ export class BillingRouter {
       await client.query("begin");
 
       const bill = await this.lockBillForAction(client, billId);
+      // In-flight-order fencing (product_321 P5): the manual write-off is a
+      // second discount channel that de-syncs payable from the item ledger —
+      // order bills discount exclusively via voucher negative rows.
+      await assertNotInFlightOrderBill(client, bill.id);
       if (bill.bill_status === "cancelled") {
         throw new ConflictException("已作废账单不能继续处理。");
       }
@@ -695,6 +708,35 @@ function toIsoOrNull(value: Date | string | null): string | null {
   return value instanceof Date
     ? value.toISOString()
     : new Date(value).toISOString();
+}
+
+/**
+ * In-flight-order bill fencing (product_321 P5/P10): bills of a pending
+ * offline order must not be cancelled / marked overdue / written off from the
+ * billing side — those overwrite operate_remark (killing the machine intent)
+ * and open a second discount channel. Order-side endpoints own these bills.
+ */
+async function assertNotInFlightOrderBill(
+  client: PoolClient,
+  billId: string,
+): Promise<void> {
+  const res = await client.query<{ subscription_id: string }>(
+    `select s.id as subscription_id
+       from billing.invoices i
+       join metering.subscriptions s on s.id = i.subscription_id
+      where i.id = $1
+        and s.status = 'suspended'
+        and s.activation_method = 'offline_purchase'
+        and s.deleted_at is null
+      limit 1`,
+    [billId],
+  );
+  const hit = res.rows[0];
+  if (hit) {
+    throw new ConflictException(
+      `该账单关联在途订单（${hit.subscription_id}），请从订单侧处理（作废走 void，实收不符走 payment-reject）`,
+    );
+  }
 }
 
 function toNum(value: string | number | null): number {

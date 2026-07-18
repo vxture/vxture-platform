@@ -91,6 +91,13 @@ const CONFIRM_BODY = {
   reason: "bank receipt confirmed",
 };
 
+// Voucher-less suites: promotion primitives are exercised by the declared-leg
+// and reject paths (PR3 follow-up specs), not these.
+const PROMOTION_STUB = {
+  finalizeReserved: async () => [],
+  releaseReserved: async () => [],
+} as never;
+
 function stubGetOrder(router: OrdersRouter) {
   return vi
     .spyOn(router, "getOrder")
@@ -105,6 +112,7 @@ describe("offline-payment-confirm: authz + tx integrity", () => {
       noDbPool().pool,
       rw.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.confirmOfflinePayment(
@@ -124,6 +132,7 @@ describe("offline-payment-confirm: authz + tx integrity", () => {
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.confirmOfflinePayment(
@@ -170,6 +179,7 @@ describe("offline-payment-confirm: authz + tx integrity", () => {
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.confirmOfflinePayment(
@@ -222,6 +232,7 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
@@ -263,6 +274,7 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
@@ -294,6 +306,7 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
@@ -310,7 +323,10 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
     expect(subs.applyUpgradeOrder).not.toHaveBeenCalled();
   });
 
-  it("a partial payment never activates and never fires stage 2", async () => {
+  it("a partial amount is refused outright — full-amount rule (product_321 P9)", async () => {
+    // v1.3 P9 removed partial acceptance: ≤ kept breeding unterminable
+    // partial orders (void/cancel/sweep all 409 on paid_amount>0). Mismatched
+    // real income goes through payment-reject + offline resolution instead.
     const subRow = {
       id: ORDER_ID,
       tenant_id: ORDER_ID,
@@ -324,17 +340,24 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
-    await router.confirmOfflinePayment(
-      makeReq(["commerce:payment.settle"]),
-      ORDER_ID,
-      { ...CONFIRM_BODY, paidAmount: 40 },
-    );
+    await expect(
+      router.confirmOfflinePayment(
+        makeReq(["commerce:payment.settle"]),
+        ORDER_ID,
+        { ...CONFIRM_BODY, paidAmount: 40 },
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
 
+    // No money writes of any kind reached the ledger.
     expect(
-      tx.calls.some((c) => /update\s+metering\.subscriptions/i.test(c)),
+      tx.calls.some((c) => /insert\s+into\s+billing\.transactions/i.test(c)),
+    ).toBe(false);
+    expect(
+      tx.calls.some((c) => /insert\s+into\s+billing\.payments/i.test(c)),
     ).toBe(false);
     expect(subs.activatePendingOrder).not.toHaveBeenCalled();
     expect(subs.applyUpgradeOrder).not.toHaveBeenCalled();
@@ -370,6 +393,7 @@ describe("offline-payment-confirm: stage-2 dispatch decision (the point of produ
       dummyRoPool(),
       tx.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
@@ -395,6 +419,7 @@ describe("void: authz + delegation", () => {
       noDbPool().pool,
       rw.pool,
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.voidOrder(makeReq(["commerce:order.read"]), ORDER_ID, {
@@ -410,6 +435,7 @@ describe("void: authz + delegation", () => {
       dummyRoPool(),
       dummyRoPool(),
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.voidOrder(makeReq(["commerce:order.void"]), ORDER_ID, {
@@ -425,6 +451,7 @@ describe("void: authz + delegation", () => {
       dummyRoPool(),
       dummyRoPool(),
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     stubGetOrder(router);
 
@@ -450,6 +477,7 @@ describe("void: authz + delegation", () => {
       dummyRoPool(),
       dummyRoPool(),
       subs as unknown as SubscriptionService,
+      PROMOTION_STUB,
     );
     await expect(
       router.voidOrder(makeReq(["commerce:order.void"]), ORDER_ID, {

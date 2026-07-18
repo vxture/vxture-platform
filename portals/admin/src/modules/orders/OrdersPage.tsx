@@ -73,6 +73,8 @@ function orderStatusLabel(status: OrderOperationStatus) {
   if (status === "confirmed") return "已确认";
   if (status === "overdue") return "逾期";
   if (status === "closed") return "已关闭";
+  if (status === "paid_unprovisioned") return "已付未开通";
+  if (status === "partial_pending") return "部分收款·挂账";
   return "异常";
 }
 
@@ -81,6 +83,18 @@ function orderStatusIcon(status: OrderOperationStatus): IconName {
   if (status === "pending" || status === "pending_verify") return "clock";
   if (status === "closed") return "x";
   return "warning";
+}
+
+// 关注态置顶（product_321 §4.2）：钱在途/钱到了没开通/收了一半的单排最前，
+// 运营一眼看到需要动手的行；同层内按创建时间倒序（保持既有习惯）。
+const ATTENTION_RANK: Partial<Record<OrderOperationStatus, number>> = {
+  pending_verify: 0,
+  paid_unprovisioned: 1,
+  partial_pending: 2,
+};
+
+function attentionRank(status: OrderOperationStatus): number {
+  return ATTENTION_RANK[status] ?? 9;
 }
 
 function paymentStatusLabel(status: OrderPaymentStatus) {
@@ -586,19 +600,26 @@ export function OrdersPage() {
   const filteredOrders = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return orders.filter((order) => {
-      if (statusFilter !== "all" && order.orderStatus !== statusFilter)
-        return false;
-      if (paymentFilter !== "all" && order.paymentStatus !== paymentFilter)
-        return false;
-      if (paySourceFilter !== "all" && order.paySource !== paySourceFilter)
-        return false;
-      if (tierFilter !== "all" && tierFilterValue(order) !== tierFilter)
-        return false;
-      if (normalizedQuery && !orderSearchText(order).includes(normalizedQuery))
-        return false;
-      return true;
-    });
+    return orders
+      .filter((order) => {
+        if (statusFilter !== "all" && order.orderStatus !== statusFilter)
+          return false;
+        if (paymentFilter !== "all" && order.paymentStatus !== paymentFilter)
+          return false;
+        if (paySourceFilter !== "all" && order.paySource !== paySourceFilter)
+          return false;
+        if (tierFilter !== "all" && tierFilterValue(order) !== tierFilter)
+          return false;
+        if (
+          normalizedQuery &&
+          !orderSearchText(order).includes(normalizedQuery)
+        )
+          return false;
+        return true;
+      })
+      .sort(
+        (a, b) => attentionRank(a.orderStatus) - attentionRank(b.orderStatus),
+      );
   }, [orders, paymentFilter, paySourceFilter, query, statusFilter, tierFilter]);
 
   const pageCount = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
@@ -629,6 +650,11 @@ export function OrdersPage() {
   ).length;
   const abnormalCount = orders.filter(
     (item) => item.orderStatus === "abnormal",
+  ).length;
+  const attentionCount = orders.filter(
+    (item) =>
+      item.orderStatus === "paid_unprovisioned" ||
+      item.orderStatus === "partial_pending",
   ).length;
 
   useEffect(() => {
@@ -747,9 +773,14 @@ export function OrdersPage() {
         <SummaryItem
           icon="warning"
           label="异常逾期"
-          value={formatNumber(overdueCount + abnormalCount)}
-          tags={[`异常 ${formatNumber(abnormalCount)}`]}
-          tone={overdueCount || abnormalCount ? "rose" : "green"}
+          value={formatNumber(overdueCount + abnormalCount + attentionCount)}
+          tags={[
+            `异常 ${formatNumber(abnormalCount)}`,
+            `付未开通/挂账 ${formatNumber(attentionCount)}`,
+          ]}
+          tone={
+            overdueCount || abnormalCount || attentionCount ? "rose" : "green"
+          }
         />
       </section>
 
