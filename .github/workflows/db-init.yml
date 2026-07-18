@@ -235,7 +235,7 @@ jobs:
                 # the IdP runs without it → operator TOTP enroll/verify 503
                 # (operator_totp_unavailable). Derive image coords from the running
                 # auth-bff so the recreate reuses the exact deployed tag (no pull).
-                IMG="$(docker inspect --format '{{.Config.Image}}' vx-auth-bff)"
+                IMG="$(docker inspect --format '{{.Config.Image}}' vx-platform-auth-bff)"
                 export VX_IMAGE_TAG="${IMG##*:}"
                 REPO="${IMG%:*}"
                 export VX_IMAGE_NAMESPACE="$(printf '%s' "$REPO" | awk -F/ '{print $(NF-1)}')"
@@ -274,7 +274,7 @@ jobs:
                   ensure_kv "$RT/.env.console-bff" "$k" "$(ex_val .env.console-bff.example "$k")"
                 done
                 # recreate RP bffs so they load the new env (env_file → recreate).
-                IMG="$(docker inspect --format '{{.Config.Image}}' vx-auth-bff)"
+                IMG="$(docker inspect --format '{{.Config.Image}}' vx-platform-auth-bff)"
                 export VX_IMAGE_TAG="${IMG##*:}"
                 REPO="${IMG%:*}"
                 export VX_IMAGE_NAMESPACE="$(printf '%s' "$REPO" | awk -F/ '{print $(NF-1)}')"
