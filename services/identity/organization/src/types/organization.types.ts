@@ -167,6 +167,20 @@ export interface OrganizationReadRepository {
   /** Admin search across organizations by id or name (case-insensitive, capped). */
   searchOrgs(query: string, limit: number): Promise<OrgView[]>;
   getDefaultWorkspace(orgId: string): Promise<WorkspaceView | null>;
+  /**
+   * Default workspace for an org plus the caller's active membership role in it,
+   * in a single round-trip. `membershipRole` is null when the user has no active
+   * workspace membership (the workspace itself is still returned). Used by
+   * active-context resolution on the session hot path to fold what were two
+   * sequential reads (getDefaultWorkspace + getWorkspaceMembership) into one.
+   */
+  getDefaultWorkspaceWithMembership(
+    orgId: string,
+    userId: string,
+  ): Promise<{
+    workspace: WorkspaceView | null;
+    membershipRole: string | null;
+  }>;
 
   // ── Org profile (§3.2/3.3/3.6): display/contact/localization + logo bytes ──
   /** The org's profile row; null when none has been created yet. */

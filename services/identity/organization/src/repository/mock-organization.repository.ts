@@ -165,6 +165,18 @@ export class MockOrganizationRepository implements OrganizationReadRepository {
       if (w.organizationId === orgId && w.isDefault) return w;
     return null;
   }
+  async getDefaultWorkspaceWithMembership(
+    orgId: string,
+    userId: string,
+  ): Promise<{
+    workspace: WorkspaceView | null;
+    membershipRole: string | null;
+  }> {
+    const workspace = await this.getDefaultWorkspace(orgId);
+    if (!workspace) return { workspace: null, membershipRole: null };
+    const membership = await this.getWorkspaceMembership(userId, workspace.id);
+    return { workspace, membershipRole: membership?.role ?? null };
+  }
   async getOrgProfile(orgId: string): Promise<OrganizationProfileView | null> {
     return this.profiles.get(orgId) ?? null;
   }

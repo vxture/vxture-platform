@@ -42,19 +42,20 @@ export class ActiveContextService {
       memberships[0]!;
 
     const roles = [`org:${active.role}`];
-    const workspace = await this.repo.getDefaultWorkspace(
-      active.organizationId,
-    );
+    // Default workspace + this user's workspace role in a single round-trip
+    // (was two sequential reads). membershipRole is null when the user has no
+    // active workspace membership; the workspace is still returned.
+    const { workspace, membershipRole } =
+      await this.repo.getDefaultWorkspaceWithMembership(
+        active.organizationId,
+        userId,
+      );
     let activeWorkspace: string | null = null;
     let activeWorkspaceName: string | null = null;
     if (workspace) {
       activeWorkspace = workspace.id;
       activeWorkspaceName = workspace.name;
-      const wsMembership = await this.repo.getWorkspaceMembership(
-        userId,
-        workspace.id,
-      );
-      if (wsMembership) roles.push(`workspace:${wsMembership.role}`);
+      if (membershipRole) roles.push(`workspace:${membershipRole}`);
     }
 
     // list-for-user reads carry the joined org snapshot; default to "personal"

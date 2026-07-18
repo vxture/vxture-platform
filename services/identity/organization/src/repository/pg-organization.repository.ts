@@ -241,6 +241,39 @@ export class PgOrganizationRepository implements OrganizationReadRepository {
     return mapWorkspace(r.rows[0]);
   }
 
+  async getDefaultWorkspaceWithMembership(
+    orgId: string,
+    userId: string,
+  ): Promise<{
+    workspace: WorkspaceView | null;
+    membershipRole: string | null;
+  }> {
+    // Default workspace + this user's active workspace role in one round-trip.
+    // LEFT JOIN LATERAL keeps the workspace row even when the user has no active
+    // membership (ws_role is then null) — matching the old getDefaultWorkspace +
+    // getWorkspaceMembership pair where a missing membership skipped the role.
+    const r = await this.pool.query<WorkspaceRow & { ws_role: string | null }>(
+      `select w.id, w.tenant_id, w.name, w.is_default,
+              wm.role_code as ws_role
+         from tenancy.workspaces w
+         left join lateral (
+           select rr.role_code
+             from tenancy.workspace_memberships m
+             join access.roles rr on rr.id = m.role_id
+            where m.workspace_id = w.id and m.user_id = $2 and m.status = 'active'
+            limit 1
+         ) wm on true
+        where w.tenant_id = $1 and w.is_default = true and w.deleted_at is null
+        limit 1`,
+      [orgId, userId],
+    );
+    const row = r.rows[0];
+    return {
+      workspace: mapWorkspace(row),
+      membershipRole: row?.ws_role ?? null,
+    };
+  }
+
   // Profile base columns (tenancy.tenant_profiles). logo_hash no longer lives here:
   // logo bytes/hash moved to tenancy.tenant_logos (per 20_tenancy.sql), joined in below.
   // Contacts moved to tenancy.tenant_contacts 1:N (data_identity_200 §5.8); the API-facing
