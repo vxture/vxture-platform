@@ -43,7 +43,7 @@ type PayChannel = "alipay" | "bank_transfer";
 
 function fmt(amount: string, currency: string): string {
   const n = Number(amount);
-  if (!Number.isFinite(n)) return amount;
+  if (!Number.isFinite(n)) return "—";
   return `${currency === "CNY" ? "¥" : currency} ${n.toFixed(2)}`;
 }
 
@@ -76,7 +76,7 @@ function voucherLabel(
           });
     return `${v.batchName} · ${off}`;
   }
-  return `${v.batchName} · ¥${v.amount ?? "0"}`;
+  return `${v.batchName} · ¥${Number(v.amount ?? 0).toFixed(2)}`;
 }
 
 export function OrderPayPage() {

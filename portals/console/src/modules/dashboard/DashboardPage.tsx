@@ -38,9 +38,14 @@ function formatDate(dateStr: string): string {
 }
 
 function formatAmount(amount: number, currency = "CNY"): string {
-  return currency === "CNY"
-    ? `¥${amount.toLocaleString()}`
-    : `${currency} ${amount.toLocaleString()}`;
+  const n = Number(amount);
+  const value = Number.isFinite(n)
+    ? n.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : "—";
+  return currency === "CNY" ? `¥${value}` : `${currency} ${value}`;
 }
 
 function buildInvoiceRows(invoices: ConsoleInvoice[]): string[][] {

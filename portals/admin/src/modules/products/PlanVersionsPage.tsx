@@ -39,6 +39,14 @@ function statusBadge(status: string, isCurrent: boolean) {
   return <Badge className="vx-badge-warning">草稿 · 待发布</Badge>;
 }
 
+// Money-input prefill: the BFF now serializes prices at fixed 2dp, but keep
+// the guard so a legacy 6dp string never reaches the editor input.
+function normalizePrice(raw: string | undefined): string {
+  if (!raw) return "";
+  const n = Number(raw);
+  return Number.isFinite(n) ? n.toFixed(2) : "";
+}
+
 export function PlanVersionsPage() {
   const { runWithStepUp } = useStepUp();
   const [plans, setPlans] = useState<ProductPlanRecord[]>([]);
@@ -74,8 +82,12 @@ export function PlanVersionsPage() {
     const d = await fetchPlanVersion(versionId);
     setDetail(d);
     if (d) {
-      setPriceMonth(d.prices.find((p) => p.cycleUnit === "month")?.price ?? "");
-      setPriceYear(d.prices.find((p) => p.cycleUnit === "year")?.price ?? "");
+      setPriceMonth(
+        normalizePrice(d.prices.find((p) => p.cycleUnit === "month")?.price),
+      );
+      setPriceYear(
+        normalizePrice(d.prices.find((p) => p.cycleUnit === "year")?.price),
+      );
       setQuotaText(JSON.stringify(d.quota, null, 2));
     }
   }
@@ -183,7 +195,10 @@ export function PlanVersionsPage() {
                     <span className="text-sm text-vx-gray-500">
                       {v.prices.length > 0
                         ? v.prices
-                            .map((p) => `${p.cycleUnit} ¥${p.price}`)
+                            .map(
+                              (p) =>
+                                `${p.cycleUnit} ¥${Number(p.price).toFixed(2)}`,
+                            )
                             .join(" · ")
                         : "无价格"}
                     </span>

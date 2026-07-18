@@ -75,6 +75,14 @@ const PROTOCOL_OPTIONS = [
 ] as const;
 const LINK_CHECK_MIN_FEEDBACK_MS = 650;
 
+// Per-token unit prices are legitimately sub-cent (NUMERIC(18,6)) — keep the
+// significant fraction but drop the "0.001000"-style trailing-zero noise.
+// (Forcing 2dp here would flatten 0.0012 to 0.00.)
+function trimUnitPrice(raw: string): string {
+  const n = Number(raw);
+  return Number.isFinite(n) ? String(n) : raw;
+}
+
 function defaultModelForm() {
   return {
     modelCode: "",
@@ -1764,11 +1772,11 @@ export function ModelPlatformPage() {
                     </div>
                     <div className="vx-tenant-directory-card__metrics">
                       <span>
-                        <b>{rule.inputUnitPrice}</b>
+                        <b>{trimUnitPrice(rule.inputUnitPrice)}</b>
                         <small>输入单价</small>
                       </span>
                       <span>
-                        <b>{rule.outputUnitPrice}</b>
+                        <b>{trimUnitPrice(rule.outputUnitPrice)}</b>
                         <small>输出单价</small>
                       </span>
                       <span>

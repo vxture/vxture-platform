@@ -185,7 +185,7 @@ export default function Page() {
       ? `${summary.applicationType}:${summary.applicationId ?? "-"}`
       : summary.statType,
     formatBigIntText(summary.totalTokens),
-    `${summary.totalCostAmount} ${summary.currency}`,
+    `${Number.isFinite(Number(summary.totalCostAmount)) ? Number(summary.totalCostAmount).toFixed(2) : "—"} ${summary.currency}`,
   ]);
 
   const statusSignals = [

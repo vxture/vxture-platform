@@ -20,11 +20,23 @@ export function formatNumber(value: number) {
   );
 }
 
+/**
+ * Billing-line quantity (invoice_items.quantity is NUMERIC(12,4)): keep the
+ * real fraction (trailing zeros dropped) - the integer formatNumber turned
+ * 1.5 seats into 2 and broke quantity x unit price = subtotal.
+ */
+export function formatQuantity(value: number) {
+  return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 4 }).format(
+    value,
+  );
+}
+
 export function formatMoney(value: number) {
   return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency: "CNY",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

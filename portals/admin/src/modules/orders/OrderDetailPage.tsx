@@ -33,7 +33,7 @@ import {
 } from "@/modules/orders/OrderOfflinePaymentDialog";
 import {
   formatDate,
-  formatNumber,
+  formatQuantity,
   typeLabel,
 } from "@/modules/tenants/tenant-utils";
 import { useStepUp, isStepUpCancelled } from "@/providers/StepUpProvider";
@@ -307,7 +307,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
                 <strong>{item.itemName}</strong>
               </span>
               <small>
-                {item.itemType} | {formatNumber(item.quantity)}{" "}
+                {item.itemType} | {formatQuantity(item.quantity)}{" "}
                 {item.itemUnit ?? ""}
               </small>
               <em>{formatCurrency(item.totalAmount, order.currency)}</em>

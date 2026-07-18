@@ -62,11 +62,12 @@ type BillingExceptionFilter =
 function formatCurrency(
   value: number,
   currency: string,
-  maximumFractionDigits = 0,
+  maximumFractionDigits = 2,
 ) {
   return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency: currency || "CNY",
+    minimumFractionDigits: Math.min(2, maximumFractionDigits),
     maximumFractionDigits,
   }).format(value);
 }

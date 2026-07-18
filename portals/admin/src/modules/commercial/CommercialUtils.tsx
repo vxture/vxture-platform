@@ -11,11 +11,12 @@ export type ViewMode = "list" | "cards";
 export function formatCurrency(
   value: number,
   currency = "CNY",
-  maximumFractionDigits = 0,
+  maximumFractionDigits = 2,
 ) {
   return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency,
+    minimumFractionDigits: Math.min(2, maximumFractionDigits),
     maximumFractionDigits,
   }).format(value);
 }
@@ -23,7 +24,8 @@ export function formatCurrency(
 export function formatPercent(value: number) {
   return new Intl.NumberFormat("zh-CN", {
     style: "percent",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
