@@ -61,6 +61,8 @@
       "@vxture/service-ticket/*": ["./services/support/ticket/src/*"],
       "@vxture/service-billing": ["./services/commerce/billing/src"],
       "@vxture/service-billing/*": ["./services/commerce/billing/src/*"],
+      "@vxture/service-promotion": ["./services/commerce/promotion/src"],
+      "@vxture/service-promotion/*": ["./services/commerce/promotion/src/*"],
       "@vxture/service-subscription": ["./services/commerce/subscription/src"],
       "@vxture/service-subscription/*": [
         "./services/commerce/subscription/src/*"
