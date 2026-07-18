@@ -744,6 +744,43 @@ export async function confirmOrderOfflinePayment(
   return (await response.json()) as OrderOperationDetailRecord;
 }
 
+// step-up gated (@RequireStepUp) — wrap the call in runWithStepUp at the UI.
+// Rejects the customer's payment declaration (product_321 P9/P8b): cash leg
+// → failed with the reason, vouchers released, invoice pricing restored,
+// payment_rejected history (customer banner + TTL re-anchor).
+export async function rejectOrderPaymentDeclaration(
+  orderId: string,
+  reason: string,
+): Promise<OrderOperationDetailRecord> {
+  const response = await fetch(
+    `${DEFAULT_BFF_URL}${ADMIN_API_PREFIX}/api/orders/${encodeURIComponent(orderId)}/payment-reject`,
+    {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason }),
+    },
+  );
+
+  if (!response.ok) {
+    let message = "Payment declaration reject failed";
+
+    try {
+      const body = (await response.json()) as { message?: string | string[] };
+      message = Array.isArray(body.message)
+        ? (body.message[0] ?? message)
+        : (body.message ?? message);
+    } catch {
+      // Keep a typed error for non-JSON proxy responses.
+    }
+
+    throw new AdminBffError(message, response.status);
+  }
+
+  return (await response.json()) as OrderOperationDetailRecord;
+}
+
 export async function voidOrder(
   orderId: string,
   reason: string,

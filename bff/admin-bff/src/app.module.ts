@@ -8,7 +8,10 @@ import { APP_GUARD } from "@nestjs/core";
 import { VxConfigModule } from "@vxture/core-config";
 import { MailModule } from "@vxture/core-mail";
 import { AdminBffPoolsModule } from "./providers/pools.module";
-import { commerceServicesProvider } from "./providers/commerce-services.provider";
+import {
+  commerceServicesProvider,
+  promotionServiceProvider,
+} from "./providers/commerce-services.provider";
 import { OidcRpModule } from "./oidc/oidc-rp.module";
 import { PlatformAuthService } from "./auth/auth.service";
 import { OperatorStepUpService } from "./auth/operator-stepup.service";
@@ -99,6 +102,7 @@ import { NotificationLogsRouter } from "./routers/notification-logs.router";
     OperatorStepUpService,
     OperatorAdminService,
     commerceServicesProvider,
+    promotionServiceProvider,
     { provide: APP_GUARD, useClass: OperatorStepUpGuard },
   ],
 })

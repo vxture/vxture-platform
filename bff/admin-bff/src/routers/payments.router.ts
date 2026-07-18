@@ -25,6 +25,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
   Inject,
@@ -35,7 +36,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import type { Request } from "express";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { assertAnyCapability } from "../auth/capability";
 import { RequireStepUp } from "../auth/step-up.decorator";
 import { ADMIN_BFF_RO_POOL, ADMIN_BFF_RW_POOL } from "../tokens";
@@ -112,6 +113,13 @@ export class PaymentsRouter {
           `Payment in status ${payment.pay_status} cannot be verified`,
         );
       }
+
+      // In-flight-order fencing (product_321 P9): the ledger's verify only
+      // settles money — it never activates the subscription nor finalizes
+      // reserved vouchers, so a ledger-side verify of an order bill is the
+      // O6.1-class bypass (invoice partial + voucher stuck reserved + sweep
+      // livelock). Route these through the order-side confirm.
+      await assertNotInFlightOrderBill(client, payment.bill_id);
 
       const invoiceResult = await client.query<InvoiceLockRow>(
         `select id, payable_amount, paid_amount, bill_status
@@ -221,8 +229,11 @@ export class PaymentsRouter {
     try {
       await client.query("begin");
 
-      const payResult = await client.query<{ pay_status: string }>(
-        `select pay_status from billing.payments where id = $1 for update`,
+      const payResult = await client.query<{
+        pay_status: string;
+        bill_id: string;
+      }>(
+        `select pay_status, bill_id from billing.payments where id = $1 for update`,
         [targetId],
       );
       const payment = payResult.rows[0];
@@ -237,6 +248,12 @@ export class PaymentsRouter {
           `Payment in status ${payment.pay_status} cannot be rejected`,
         );
       }
+
+      // In-flight-order fencing (product_321 P9): a ledger-side reject of a
+      // declared order leg would strip the P8b release orchestration (voucher
+      // stuck reserved, no pricing rollback, no payment_rejected history, no
+      // step-up). Route these through the order-side payment-reject.
+      await assertNotInFlightOrderBill(client, payment.bill_id);
 
       await client.query(
         `update billing.payments set
@@ -505,6 +522,36 @@ function requireUuid(value: string | undefined, message: string): string {
 }
 
 // 备注归一：去空白，空串→null，截断到 transactions.remark(varchar 512) 上限。
+/**
+ * In-flight-order bill fencing (product_321 P9): bills of a pending offline
+ * order (suspended + offline_purchase) must be settled/rejected from the
+ * order side — the ledger endpoints lack activation, voucher finalize/release
+ * and the payment_rejected trail. 409 with a pointer, not a silent bypass.
+ */
+async function assertNotInFlightOrderBill(
+  client: PoolClient,
+  billId: string | null,
+): Promise<void> {
+  if (!billId) return;
+  const res = await client.query<{ subscription_id: string }>(
+    `select s.id as subscription_id
+       from billing.invoices i
+       join metering.subscriptions s on s.id = i.subscription_id
+      where i.id = $1
+        and s.status = 'suspended'
+        and s.activation_method = 'offline_purchase'
+        and s.deleted_at is null
+      limit 1`,
+    [billId],
+  );
+  const hit = res.rows[0];
+  if (hit) {
+    throw new ConflictException(
+      `该账单关联在途订单（${hit.subscription_id}），请从订单侧处理：确认收款走 offline-payment-confirm，驳回申报走 payment-reject`,
+    );
+  }
+}
+
 function normalizeRemark(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();

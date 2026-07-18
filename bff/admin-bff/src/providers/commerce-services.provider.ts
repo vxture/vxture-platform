@@ -29,6 +29,20 @@ import {
 import { ADMIN_BFF_RW_POOL } from "../tokens";
 
 export const ADMIN_SUBSCRIPTION_SERVICE = "ADMIN_SUBSCRIPTION_SERVICE";
+export const ADMIN_PROMOTION_SERVICE = "ADMIN_PROMOTION_SERVICE";
+
+/**
+ * Standalone PromotionService for the orders router (product_321 PR3):
+ * confirm stage 1 finalizes reserved vouchers and payment-reject releases
+ * them inside the router's own raw-SQL transaction (client-scoped
+ * primitives). Same module-less shape as the subscription wire above.
+ */
+export const promotionServiceProvider: Provider = {
+  provide: ADMIN_PROMOTION_SERVICE,
+  inject: [ADMIN_BFF_RW_POOL],
+  useFactory: (pool: Pool): PromotionService =>
+    new PromotionService(new PgPromotionRepository(pool)),
+};
 
 export const commerceServicesProvider: Provider = {
   provide: ADMIN_SUBSCRIPTION_SERVICE,

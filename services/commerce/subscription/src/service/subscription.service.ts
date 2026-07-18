@@ -388,6 +388,9 @@ export class SubscriptionService {
           await this.repo.recomputeInvoiceTx(client, invoice.id);
         }
 
+        // Everything admin confirm's stage 1 needs to finalize the vouchers
+        // rides on the leg (P10): voucher ids, the discount item FK, reserve-
+        // time effect snapshots and the declaring customer (redemption user).
         const credential = {
           settlement: {
             discountVoucherId: discount?.voucherId ?? null,
@@ -396,6 +399,10 @@ export class SubscriptionService {
             cashDue: centsToYuan(quote.cashDueCents),
             reservedAt: new Date().toISOString(),
             released: false,
+            discountItemId,
+            discountEffectSnapshot: discount?.effectSnapshot ?? null,
+            creditEffectSnapshot: credit?.effectSnapshot ?? null,
+            declaredBy: input.userId,
           },
         };
 
