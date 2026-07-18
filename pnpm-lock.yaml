@@ -259,6 +259,9 @@ importers:
       '@vxture/core-utils':
         specifier: workspace:*
         version: link:../../packages/core/utils
+      '@vxture/service-promotion':
+        specifier: workspace:*
+        version: link:../../services/commerce/promotion
       '@vxture/service-provisioning':
         specifier: workspace:*
         version: link:../../services/commerce/provisioning
@@ -451,6 +454,9 @@ importers:
       '@vxture/service-organization':
         specifier: workspace:*
         version: link:../../services/identity/organization
+      '@vxture/service-promotion':
+        specifier: workspace:*
+        version: link:../../services/commerce/promotion
       '@vxture/service-sms':
         specifier: workspace:*
         version: link:../../services/notification/sms
@@ -1393,6 +1399,9 @@ importers:
       '@vxture/core-config':
         specifier: workspace:*
         version: link:../../../packages/core/config
+      '@vxture/service-promotion':
+        specifier: workspace:*
+        version: link:../promotion
       '@vxture/service-provisioning':
         specifier: workspace:*
         version: link:../provisioning

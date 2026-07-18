@@ -7,6 +7,14 @@ import {
   ConflictException,
 } from "@nestjs/common";
 import { ProvisioningService } from "@vxture/service-provisioning";
+import {
+  PromotionService,
+  computeSettlement,
+  centsToYuan,
+  yuanToCents,
+  type DiscountEffect,
+  type ReservedVoucher,
+} from "@vxture/service-promotion";
 import { PgSubscriptionRepository } from "../repository/pg-subscription.repository";
 import type {
   SubscriptionRecord,
@@ -17,7 +25,31 @@ import type {
   UpdateSubscriptionInput,
   CreateOfflineOrderInput,
   OfflineOrderRecord,
+  DeclarePaymentInput,
+  DeclarePaymentResult,
 } from "../types/subscription.types";
+
+/** Machine-readable order intent stored in invoices.operate_remark (320). */
+const parseOrderIntent = (
+  remark: string | null,
+): { intent: "new" | "renew" | "upgrade"; upgradeOf: string | null } => {
+  try {
+    const parsed = JSON.parse(remark ?? "{}") as {
+      intent?: string;
+      upgrade_of?: string;
+    };
+    if (
+      parsed.intent === "new" ||
+      parsed.intent === "renew" ||
+      parsed.intent === "upgrade"
+    ) {
+      return { intent: parsed.intent, upgradeOf: parsed.upgrade_of ?? null };
+    }
+  } catch {
+    /* fall through — degrade to 'new' (mirrors admin stage-2 behavior) */
+  }
+  return { intent: "new", upgradeOf: null };
+};
 
 /**
  * Statuses that count as "the workspace holds this product" (ADR-11 §11.3/§11.4).
@@ -35,11 +67,20 @@ export class SubscriptionService {
 
   // Explicit tokens: bff bundles (esbuild) emit no decorator metadata, so an
   // implicit constructor type silently injects undefined (repo-wide pattern).
+  // Reconcile-pass failure ledger (product_321 §4.3): per-order consecutive
+  // failure count; at the threshold the job stops auto-retrying and the order
+  // surfaces to operators ("自愈失败"). In-memory is deliberate — the job runs
+  // in one platform-api instance and a restart re-arming retries is desired.
+  private readonly reconcileFailures = new Map<string, number>();
+  private static readonly RECONCILE_FAILURE_LIMIT = 3;
+
   constructor(
     @Inject(PgSubscriptionRepository)
     private readonly repo: PgSubscriptionRepository,
     @Inject(ProvisioningService)
     private readonly provisioning: ProvisioningService,
+    @Inject(PromotionService)
+    private readonly promotion: PromotionService,
   ) {}
 
   async listSubscriptions(
@@ -124,7 +165,12 @@ export class SubscriptionService {
    */
   async activatePendingOrder(
     orderId: string,
-    params: { operatorId: string; remark?: string; clientIp?: string },
+    params: {
+      operatorId: string;
+      remark?: string;
+      clientIp?: string;
+      actorType?: "operator" | "customer" | "system";
+    },
   ): Promise<SubscriptionRecord | null> {
     const before = await this.getSubscription(orderId);
     if (
@@ -157,7 +203,11 @@ export class SubscriptionService {
   async applyUpgradeOrder(
     orderId: string,
     upgradeOfSubscriptionId: string,
-    params: { operatorId: string; remark?: string },
+    params: {
+      operatorId: string;
+      remark?: string;
+      actorType?: "operator" | "customer" | "system";
+    },
   ): Promise<SubscriptionRecord | null> {
     const order = await this.getSubscription(orderId);
     if (
@@ -167,6 +217,23 @@ export class SubscriptionService {
       throw new ConflictException("订单不是待支付状态，无法激活");
     }
     const target = await this.getSubscription(upgradeOfSubscriptionId);
+    // Idempotency guard (product_321 §4.3 upgrade arm): a re-drive after the
+    // crash window "upgradeSubscription committed, order row not yet closed"
+    // must NOT re-run the version switch — repo.update would re-materialize
+    // the quota pools (wiping quota_used) and re-fire webhooks. Target already
+    // on the order's version = the switch is done; only close the order row.
+    if (
+      target.status === "active" &&
+      target.planVersionId === order.planVersionId
+    ) {
+      await this.updateSubscription(orderId, {
+        status: "cancelled",
+        operatorType: "operator",
+        operatorId: params.operatorId,
+        operatorRemark: `upgrade already applied to ${upgradeOfSubscriptionId} (re-drive close)`,
+      });
+      return target;
+    }
     if (target.status === "active") {
       const upgraded = await this.upgradeSubscription(
         upgradeOfSubscriptionId,
@@ -196,10 +263,11 @@ export class SubscriptionService {
   async cancelPendingOrder(
     orderId: string,
     params: {
-      actorType: "customer" | "operator";
+      actorType: "customer" | "operator" | "system";
       actorId: string;
       remark?: string;
       clientIp?: string;
+      changeType?: "cancelled" | "order_expired";
     },
   ): Promise<SubscriptionRecord> {
     const before = await this.getSubscription(orderId);
@@ -208,6 +276,312 @@ export class SubscriptionService {
       this.fireEntitlementInvalidate(after, [before.planVersionId]),
     );
     return after;
+  }
+
+  // ── payment declaration + jobs (product_321 P8/§4.3) ──────────────────────
+
+  /**
+   * Customer payment declaration (P8): one funds transaction under the order's
+   * row lock — voucher reserve (discount then credit, §7), pricing write +
+   * invoice recompute, then either a pending_verify cash leg (cashDue>0) or an
+   * instant voucher settlement (cashDue=0). The cashDue=0 path triggers
+   * stage-2 activation AFTER commit (admin-confirm-identical two-phase shape —
+   * an in-tx activation would self-deadlock on the row lock); a hung stage 2
+   * degrades to 'activating' and the reconcile pass finishes it.
+   */
+  async declarePayment(
+    input: DeclarePaymentInput,
+  ): Promise<DeclarePaymentResult> {
+    const settled = await this.repo.withPendingOrderTx(
+      input.orderId,
+      async ({ client, order, invoice }) => {
+        if (!invoice) throw new ConflictException("订单缺少账单，无法申报");
+
+        // Hang-window re-submit (§7 rule 2): invoice already cleared → report
+        // the current state instead of double-settling.
+        if (invoice.billStatus === "paid") {
+          return {
+            done: {
+              outcome: "already_settled" as const,
+              cashDue: "0.00",
+              paymentId: null,
+            },
+          };
+        }
+        if (
+          order.status !== "suspended" ||
+          order.activationMethod !== "offline_purchase" ||
+          !["unpaid", "partial"].includes(invoice.billStatus)
+        ) {
+          throw new ConflictException("订单不是待付款状态，无法申报付款");
+        }
+
+        // Idempotent re-submit: one in-flight declared leg per order.
+        const existingLeg = await this.repo.findPendingVerifyLegTx(
+          client,
+          invoice.id,
+        );
+        if (existingLeg) {
+          return {
+            done: {
+              outcome: "already_declared" as const,
+              cashDue: existingLeg.totalAmount,
+              paymentId: existingLeg.id,
+            },
+          };
+        }
+
+        // Defensive pricing reset (P8 precondition) — a residual discount row
+        // means an earlier release missed the pricing rollback; self-heal.
+        const cleaned = await this.repo.softDeleteDiscountItemsTx(
+          client,
+          invoice.id,
+        );
+        if (cleaned > 0) {
+          this.logger.warn(
+            `declare ${input.orderId}: cleaned ${cleaned} residual discount row(s) before settling`,
+          );
+        }
+        const base = await this.repo.recomputeInvoiceTx(client, invoice.id);
+
+        // Reserve vouchers (discount before credit — §7 voucher order).
+        const scope = {
+          tenantId: order.tenantId,
+          workspaceId: order.workspaceId,
+          userId: input.userId,
+        };
+        const reserved = await this.promotion.reserveForOrder(client, {
+          scope,
+          discountVoucherId: input.discountVoucherId ?? null,
+          creditVoucherId: input.creditVoucherId ?? null,
+        });
+        const discount = reserved.find((v) => v.kind === "discount") ?? null;
+        const credit =
+          reserved.find((v) => v.kind === "credit_voucher") ?? null;
+        let discountItemId: string | null = null;
+
+        const quote = computeSettlement({
+          listPriceCents: yuanToCents(base.totalAmount),
+          paidCents: yuanToCents(invoice.paidAmount),
+          discountEffect: discount ? (discount.effect as DiscountEffect) : null,
+          creditVoucherCents: credit
+            ? (credit.effect as { amountCents: number }).amountCents
+            : null,
+        });
+        if (discount && !quote.discountApplicable) {
+          throw new ConflictException(
+            "折扣券不可用于该订单（折后应付低于已收款）",
+          );
+        }
+
+        // Pricing layer: discount negative row + invoice recompute (P7).
+        if (discount && quote.discountOffCents > 0) {
+          const itemId = await this.repo.insertDiscountItemTx(client, {
+            invoiceId: invoice.id,
+            tenantId: order.tenantId,
+            workspaceId: order.workspaceId,
+            subscriptionId: order.id,
+            itemName: `折扣券抵扣 (${discount.voucherId})`,
+            amountYuan: `-${centsToYuan(quote.discountOffCents)}`,
+          });
+          discountItemId = itemId;
+          await this.repo.recomputeInvoiceTx(client, invoice.id);
+        }
+
+        const credential = {
+          settlement: {
+            discountVoucherId: discount?.voucherId ?? null,
+            creditVoucherId: credit?.voucherId ?? null,
+            voucherOff: centsToYuan(quote.voucherOffCents),
+            cashDue: centsToYuan(quote.cashDueCents),
+            reservedAt: new Date().toISOString(),
+            released: false,
+          },
+        };
+
+        if (quote.cashDueCents === 0) {
+          // Instant settle: finalize vouchers + clear the invoice; stage 2
+          // runs after commit.
+          const { voucherLegId } = await this.repo.settleInvoiceByVouchersTx(
+            client,
+            {
+              tenantId: order.tenantId,
+              invoiceId: invoice.id,
+              voucherLegYuan: centsToYuan(quote.voucherOffCents),
+              currency: invoice.currency,
+              actorId: input.userId,
+            },
+          );
+          await this.promotion.finalizeReserved(
+            client,
+            reserved.map((v: ReservedVoucher) => ({
+              voucherId: v.voucherId,
+              kind: v.kind,
+              scope,
+              effectSnapshot: v.effectSnapshot,
+              invoiceItemId: v.kind === "discount" ? discountItemId : null,
+              paymentId: v.kind === "credit_voucher" ? voucherLegId : null,
+            })),
+          );
+          await this.repo.insertHistoryTx(client, {
+            tenantId: order.tenantId,
+            subscriptionId: order.id,
+            changeType: "payment_declared",
+            fromStatus: "suspended",
+            toStatus: "suspended",
+            actorType: "customer",
+            actorId: input.userId,
+            remark: JSON.stringify({ ...credential.settlement, instant: true }),
+            clientIp: input.clientIp ?? null,
+          });
+          return {
+            settle: { operateRemark: invoice.operateRemark },
+          };
+        }
+
+        // Declared path: pending_verify cash leg with the credential (P10).
+        const paymentId = await this.repo.insertCashLegTx(client, {
+          tenantId: order.tenantId,
+          invoiceId: invoice.id,
+          payChannel: input.payChannel === "alipay" ? "alipay" : "bank",
+          offlinePayType:
+            input.payChannel === "bank_transfer" ? "bank_transfer" : null,
+          payerName: input.payerName ?? null,
+          transactionNo: input.transactionNo ?? null,
+          remark: input.remark ?? null,
+          amountYuan: centsToYuan(quote.cashDueCents),
+          currency: invoice.currency,
+          credential,
+          actorId: input.userId,
+        });
+        await this.repo.insertHistoryTx(client, {
+          tenantId: order.tenantId,
+          subscriptionId: order.id,
+          changeType: "payment_declared",
+          fromStatus: "suspended",
+          toStatus: "suspended",
+          actorType: "customer",
+          actorId: input.userId,
+          remark: JSON.stringify(credential.settlement),
+          clientIp: input.clientIp ?? null,
+        });
+        return {
+          done: {
+            outcome: "declared" as const,
+            cashDue: centsToYuan(quote.cashDueCents),
+            paymentId,
+          },
+        };
+      },
+    );
+
+    if ("done" in settled && settled.done) return settled.done;
+
+    // cashDue=0: funds committed — run stage 2 as its own transaction (P8).
+    const { intent, upgradeOf } = parseOrderIntent(
+      "settle" in settled ? (settled.settle?.operateRemark ?? null) : null,
+    );
+    try {
+      const activated =
+        intent === "upgrade" && upgradeOf
+          ? await this.applyUpgradeOrder(input.orderId, upgradeOf, {
+              operatorId: input.userId,
+              remark: "instant voucher settlement (declare)",
+              actorType: "customer",
+            })
+          : await this.activatePendingOrder(input.orderId, {
+              operatorId: input.userId,
+              remark: "instant voucher settlement (declare)",
+              actorType: "customer",
+            });
+      return {
+        outcome: activated ? "activated" : "activating",
+        cashDue: "0.00",
+        paymentId: null,
+      };
+    } catch (err) {
+      // Funds are safe (committed); the reconcile pass / admin re-drive will
+      // finish activation. Surface the transitional state, not an error.
+      this.logger.error(
+        `declare ${input.orderId}: stage-2 activation failed after settle — reconcile will retry: ${String(err)}`,
+      );
+      return { outcome: "activating", cashDue: "0.00", paymentId: null };
+    }
+  }
+
+  /**
+   * Timeout sweep (§4.3 duty 1): close pending orders past the TTL. The
+   * repo predicate carries the full P4 guard (no declared leg, zero income);
+   * per-order failures log and continue — never kill the pass.
+   */
+  async sweepExpiredPaymentOrders(
+    ttlMinutes: number,
+    limit = 100,
+  ): Promise<number> {
+    const ids = await this.repo.findExpiredPaymentOrderIds(ttlMinutes, limit);
+    let closed = 0;
+    for (const id of ids) {
+      try {
+        await this.cancelPendingOrder(id, {
+          actorType: "system",
+          actorId: "order-payment-expiry-sweep",
+          changeType: "order_expired",
+          remark: `payment window elapsed (${ttlMinutes}min TTL)`,
+        });
+        closed += 1;
+      } catch (err) {
+        this.logger.error(
+          `payment expiry sweep: order ${id} failed to close — ${String(err)}`,
+        );
+      }
+    }
+    return closed;
+  }
+
+  /**
+   * Hung-order reconcile (§4.3 duty 2, P8 self-heal): finish stage 2 for
+   * invoice-cleared orders whose activation never landed. Per-order
+   * consecutive-failure ledger stops auto-retry at the limit (operator takes
+   * over); a success clears the ledger entry.
+   */
+  async reconcileHungPaidOrders(
+    minAgeMinutes = 2,
+    limit = 20,
+  ): Promise<number> {
+    const candidates = await this.repo.findHungPaidOrders(minAgeMinutes, limit);
+    let healed = 0;
+    for (const { id, operateRemark } of candidates) {
+      const failures = this.reconcileFailures.get(id) ?? 0;
+      if (failures >= SubscriptionService.RECONCILE_FAILURE_LIMIT) {
+        this.logger.warn(
+          `reconcile: order ${id} exceeded ${failures} failures — auto-retry stopped, operator action required`,
+        );
+        continue;
+      }
+      try {
+        const { intent, upgradeOf } = parseOrderIntent(operateRemark);
+        const result =
+          intent === "upgrade" && upgradeOf
+            ? await this.applyUpgradeOrder(id, upgradeOf, {
+                operatorId: "order-payment-reconcile",
+                remark: "hung paid order self-heal",
+                actorType: "system",
+              })
+            : await this.activatePendingOrder(id, {
+                operatorId: "order-payment-reconcile",
+                remark: "hung paid order self-heal",
+                actorType: "system",
+              });
+        if (result) healed += 1;
+        this.reconcileFailures.delete(id);
+      } catch (err) {
+        this.reconcileFailures.set(id, failures + 1);
+        this.logger.error(
+          `reconcile: order ${id} failed (${failures + 1}/${SubscriptionService.RECONCILE_FAILURE_LIMIT}) — ${String(err)}`,
+        );
+      }
+    }
+    return healed;
   }
 
   async cancelSubscription(

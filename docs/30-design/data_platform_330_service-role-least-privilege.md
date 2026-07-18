@@ -39,14 +39,14 @@
 
 6 个进程角色，**只授各自触达的 schema、在其内给 RW**：
 
-| 角色                 | 进程           | schema 集（RW）                                                                                                                  |
-| -------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `svc_auth_bff`       | auth-bff       | account, identity, credential, tenancy, access, appoidc, session, loyalty, metering, provisioning, product, support, admin（13） |
-| `svc_admin_bff`      | admin-bff      | admin, billing, kyc, metering, product, support, tenancy, access, account, promotion, session（11）                              |
-| `svc_console_bff`    | console-bff    | account, identity, credential, session, loyalty, tenancy, access, billing, metering, product, admin, support, appoidc（13）      |
-| `svc_website_bff`    | website-bff    | account, identity, credential, session, tenancy, access, loyalty（7）                                                            |
-| `svc_platform_api`   | platform-api   | metering, product, sharing, provisioning, tenancy（5）                                                                           |
-| `svc_model_platform` | model-platform | model, metering（2）                                                                                                             |
+| 角色                 | 进程           | schema 集（RW）                                                                                                                                                                                           |
+| -------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `svc_auth_bff`       | auth-bff       | account, identity, credential, tenancy, access, appoidc, session, loyalty, metering, provisioning, product, support, admin（13）                                                                          |
+| `svc_admin_bff`      | admin-bff      | admin, billing, kyc, metering, product, support, tenancy, access, account, promotion, session, provisioning（12；provisioning 为 320 期缺口，随 product_321 PR2 收口）                                    |
+| `svc_console_bff`    | console-bff    | account, identity, credential, session, loyalty, tenancy, access, billing, metering, product, admin, support, appoidc, promotion, provisioning（15；后两项 product_321：券结算 + cashDue=0 段 2 enqueue） |
+| `svc_website_bff`    | website-bff    | account, identity, credential, session, tenancy, access, loyalty（7）                                                                                                                                     |
+| `svc_platform_api`   | platform-api   | metering, product, sharing, provisioning, tenancy, billing, promotion（7；后两项 product_321：超时/对账 sweep + 券释放）                                                                                  |
+| `svc_model_platform` | model-platform | model, metering（2）                                                                                                                                                                                      |
 
 **为什么本轮不精调 R-vs-RW**：schema 级收窄已拿到主要爆炸半径收益（如 website-bff 从全库降到 7 schema，碰不到 billing/metering/admin/model/kyc 等 12 个）。R-vs-RW 逐 schema 精调易错——AccountModule/OrganizationModule 写能力在同池、一个新增写路径就让"设为 R 的 schema"运行时炸；且已发现映射中 website-bff account 实为 RW（me/profile 写）。精调留独立后续项（先确认每进程每 schema 的确切写路径）。`safety` 一律不授。
 

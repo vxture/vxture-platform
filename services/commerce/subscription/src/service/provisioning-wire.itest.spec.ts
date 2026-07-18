@@ -47,6 +47,8 @@ describe.skipIf(!RUN)("subscription → provisioning wire (live DB)", () => {
     service = new SubscriptionService(
       new PgSubscriptionRepository(pool),
       provisioning,
+      // Voucher-less suite: promotion is out of scope here (declare specs own it).
+      { reserveForOrder: async () => [] } as never,
     );
 
     await pool.query(

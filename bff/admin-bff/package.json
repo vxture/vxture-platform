@@ -26,6 +26,7 @@
     "@vxture/core-mail": "workspace:*",
     "@vxture/core-oidc-rp": "workspace:*",
     "@vxture/core-utils": "workspace:*",
+    "@vxture/service-promotion": "workspace:*",
     "@vxture/service-provisioning": "workspace:*",
     "@vxture/service-subscription": "workspace:*",
     "@vxture/shared": "workspace:*",

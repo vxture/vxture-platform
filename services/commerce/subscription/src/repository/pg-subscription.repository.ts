@@ -38,6 +38,29 @@ interface SubscriptionRow {
   deleted_at: Date | null;
 }
 
+interface LockedInvoiceRow {
+  id: string;
+  bill_no: string;
+  bill_status: string;
+  total_amount: string;
+  payable_amount: string;
+  paid_amount: string;
+  currency: string;
+  operate_remark: string | null;
+}
+
+/** Locked latest invoice handed to the declare orchestration (product_321 P8). */
+export interface LockedInvoice {
+  id: string;
+  billNo: string;
+  billStatus: string;
+  totalAmount: string;
+  payableAmount: string;
+  paidAmount: string;
+  currency: string;
+  operateRemark: string | null;
+}
+
 interface HistoryRow {
   id: string;
   tenant_id: string;
@@ -385,10 +408,11 @@ export class PgSubscriptionRepository {
         `insert into metering.subscription_histories (
           tenant_id, subscription_id, change_type, from_status, to_status,
           actor_type, actor_id, remark, client_ip, created_at
-        ) values ($1, $2, 'offline_payment_confirmed', 'suspended', 'active', 'operator', $3, $4, $5, now())`,
+        ) values ($1, $2, 'offline_payment_confirmed', 'suspended', 'active', $3, $4, $5, $6, now())`,
         [
           updated.tenant_id,
           id,
+          input.actorType ?? "operator",
           input.operatorId,
           input.remark ?? null,
           input.clientIp ?? null,
@@ -450,7 +474,32 @@ export class PgSubscriptionRepository {
         throw new ConflictException("订单已收到支付，不能取消（请走结算流程）");
       }
 
+      // Declared-payment guard (product_321 P2): an in-flight pending_verify
+      // cash leg blocks close — customer cancel AND admin void both funnel
+      // here, so one enforcement point covers both faces.
       if (invoice) {
+        const leg = await client.query(
+          `select 1 from billing.payments
+            where bill_id = $1 and pay_status = 'pending_verify' limit 1`,
+          [invoice.id],
+        );
+        if (leg.rows[0]) {
+          throw new ConflictException(
+            "订单已申报付款、等待确认中，不能取消（请先由运营驳回申报）",
+          );
+        }
+      }
+
+      if (invoice) {
+        // Defensive pricing rollback (product_321 P8b): a reject should have
+        // already restored the invoice, but closing is the last exit — soft-
+        // delete any live discount rows so a closed order can never keep a
+        // shrunken payable on the books.
+        await client.query(
+          `update billing.invoice_items set deleted_at = now(), updated_at = now()
+            where bill_id = $1 and item_type = 'discount' and deleted_at is null`,
+          [invoice.id],
+        );
         await client.query(
           `update billing.invoices set bill_status = 'cancelled', updated_at = now() where id = $1`,
           [invoice.id],
@@ -468,10 +517,11 @@ export class PgSubscriptionRepository {
         `insert into metering.subscription_histories (
           tenant_id, subscription_id, change_type, from_status, to_status,
           actor_type, actor_id, remark, client_ip, created_at
-        ) values ($1, $2, 'cancelled', 'suspended', 'cancelled', $3, $4, $5, $6, now())`,
+        ) values ($1, $2, $3, 'suspended', 'cancelled', $4, $5, $6, $7, now())`,
         [
           sub.tenant_id,
           id,
+          input.changeType ?? "cancelled",
           input.actorType,
           input.actorId,
           input.remark ?? null,
@@ -722,6 +772,393 @@ export class PgSubscriptionRepository {
       [limit],
     );
     return result.rows.map((r) => r.id);
+  }
+
+  // ── payment declaration tx-core (product_321 P8/§5.2) ─────────────────────
+  // The declare orchestration lives in the SERVICE (it interleaves promotion
+  // reserve + pure settlement math between these writes); the repo owns the
+  // transaction boundary + row locks and exposes client-scoped primitives.
+  // Lock order (§7 rule 1): subscription row first, then its invoice.
+
+  /**
+   * Opens the declare transaction: locks the order's subscription row FOR
+   * UPDATE, then its latest non-deleted invoice FOR UPDATE, and hands both to
+   * the orchestration callback. Commit on resolve, rollback on throw.
+   */
+  async withPendingOrderTx<T>(
+    orderId: string,
+    fn: (ctx: {
+      client: PoolClient;
+      order: SubscriptionRecord;
+      invoice: LockedInvoice | null;
+    }) => Promise<T>,
+  ): Promise<T> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("begin");
+      const subResult = await client.query<SubscriptionRow>(
+        `select * from metering.subscriptions
+          where id = $1 and deleted_at is null for update`,
+        [orderId],
+      );
+      const sub = subResult.rows[0];
+      if (!sub) throw new ConflictException("订单不存在");
+
+      const invResult = await client.query<LockedInvoiceRow>(
+        `select id, bill_no, bill_status, total_amount, payable_amount,
+                paid_amount, currency, operate_remark
+           from billing.invoices
+          where subscription_id = $1 and deleted_at is null
+          order by created_at desc limit 1
+          for update`,
+        [orderId],
+      );
+      const inv = invResult.rows[0] ?? null;
+
+      const out = await fn({
+        client,
+        order: this.mapSubscription(sub),
+        invoice: inv
+          ? {
+              id: inv.id,
+              billNo: inv.bill_no,
+              billStatus: inv.bill_status,
+              totalAmount: inv.total_amount,
+              payableAmount: inv.payable_amount,
+              paidAmount: inv.paid_amount,
+              currency: inv.currency,
+              operateRemark: inv.operate_remark,
+            }
+          : null,
+      });
+      await client.query("commit");
+      return out;
+    } catch (err) {
+      await client.query("rollback");
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** In-flight declared cash leg of an invoice (pending_verify), if any. */
+  async findPendingVerifyLegTx(
+    client: PoolClient,
+    invoiceId: string,
+  ): Promise<{ id: string; totalAmount: string } | null> {
+    const res = await client.query<{ id: string; total_amount: string }>(
+      `select id, total_amount from billing.payments
+        where bill_id = $1 and pay_status = 'pending_verify'
+        order by created_at desc limit 1`,
+      [invoiceId],
+    );
+    const row = res.rows[0];
+    return row ? { id: row.id, totalAmount: row.total_amount } : null;
+  }
+
+  /**
+   * Defensive pricing reset (P8 declare precondition): soft-delete residual
+   * live discount rows. Returns how many were cleaned (0 on the happy path).
+   */
+  async softDeleteDiscountItemsTx(
+    client: PoolClient,
+    invoiceId: string,
+  ): Promise<number> {
+    const res = await client.query(
+      `update billing.invoice_items set deleted_at = now(), updated_at = now()
+        where bill_id = $1 and item_type = 'discount' and deleted_at is null`,
+      [invoiceId],
+    );
+    return res.rowCount ?? 0;
+  }
+
+  /** Insert the discount-voucher negative line (P7 pricing layer). */
+  async insertDiscountItemTx(
+    client: PoolClient,
+    input: {
+      invoiceId: string;
+      tenantId: string;
+      workspaceId: string;
+      subscriptionId: string;
+      itemName: string;
+      /** Negative NUMERIC(12,2) yuan string, e.g. "-240.00". */
+      amountYuan: string;
+    },
+  ): Promise<string> {
+    const res = await client.query<{ id: string }>(
+      `insert into billing.invoice_items (
+         bill_id, tenant_id, workspace_id, subscription_id,
+         item_name, item_type, quantity, unit_price, total_amount,
+         created_at, updated_at
+       ) values ($1, $2, $3, $4, $5, 'discount', 1, $6, $6, now(), now())
+       returning id`,
+      [
+        input.invoiceId,
+        input.tenantId,
+        input.workspaceId,
+        input.subscriptionId,
+        input.itemName,
+        input.amountYuan,
+      ],
+    );
+    const row = res.rows[0];
+    if (!row) throw new Error("discount item insert returned no row");
+    return row.id;
+  }
+
+  /**
+   * Recompute the invoice money columns from live items (§5.3 formula:
+   * total = Σ undeleted items, payable = total, discount_amount = |Σ discount
+   * rows| mirror). Returns the recomputed figures.
+   */
+  async recomputeInvoiceTx(
+    client: PoolClient,
+    invoiceId: string,
+  ): Promise<{ totalAmount: string; payableAmount: string }> {
+    const res = await client.query<{
+      total_amount: string;
+      payable_amount: string;
+    }>(
+      `update billing.invoices i set
+         total_amount = agg.total,
+         payable_amount = agg.total,
+         discount_amount = agg.discount_off,
+         updated_at = now()
+        from (
+          select coalesce(sum(total_amount), 0) as total,
+                 coalesce(abs(sum(total_amount) filter (where item_type = 'discount')), 0) as discount_off
+            from billing.invoice_items
+           where bill_id = $1 and deleted_at is null
+        ) agg
+       where i.id = $1
+       returning i.total_amount, i.payable_amount`,
+      [invoiceId],
+    );
+    const row = res.rows[0];
+    if (!row) throw new Error(`invoice ${invoiceId} recompute matched no row`);
+    return { totalAmount: row.total_amount, payableAmount: row.payable_amount };
+  }
+
+  /**
+   * Insert the customer's declared cash leg (pending_verify, P1). The
+   * settlement credential lands in channel_raw_data (P10).
+   */
+  async insertCashLegTx(
+    client: PoolClient,
+    input: {
+      tenantId: string;
+      invoiceId: string;
+      /** 'alipay' | 'bank' (DDL pay_channel vocabulary — mapped by service). */
+      payChannel: string;
+      offlinePayType: string | null;
+      payerName: string | null;
+      transactionNo: string | null;
+      remark: string | null;
+      /** NUMERIC(12,2) yuan string. */
+      amountYuan: string;
+      currency: string;
+      credential: Record<string, unknown>;
+      actorId: string;
+    },
+  ): Promise<string> {
+    const res = await client.query<{ id: string }>(
+      `insert into billing.payments (
+         tenant_id, bill_id, pay_order_no, pay_source, pay_channel,
+         offline_pay_type, offline_payer_name, channel_transaction_no,
+         total_amount, paid_amount, currency, pay_status,
+         channel_raw_data, actor_type, actor_id, operate_remark,
+         created_at, updated_at
+       ) values (
+         $1, $2, $3, 'offline', $4, $5, $6, $7, $8, 0, $9,
+         'pending_verify', $10, 'customer', $11, $12, now(), now()
+       ) returning id`,
+      [
+        input.tenantId,
+        input.invoiceId,
+        visibleCode("PAY"),
+        input.payChannel,
+        input.offlinePayType,
+        input.payerName,
+        input.transactionNo,
+        input.amountYuan,
+        input.currency,
+        JSON.stringify(input.credential),
+        input.actorId,
+        input.remark,
+      ],
+    );
+    const row = res.rows[0];
+    if (!row) throw new Error("cash leg insert returned no row");
+    return row.id;
+  }
+
+  /**
+   * cashDue=0 settlement (P8): insert the paid voucher leg (when a credit
+   * voucher participates) and clear the invoice in one shot. Cash never moves.
+   */
+  async settleInvoiceByVouchersTx(
+    client: PoolClient,
+    input: {
+      tenantId: string;
+      invoiceId: string;
+      /** NUMERIC(12,2) yuan of the credit-voucher leg; "0.00" = none. */
+      voucherLegYuan: string;
+      currency: string;
+      actorId: string;
+    },
+  ): Promise<{ voucherLegId: string | null }> {
+    let voucherLegId: string | null = null;
+    if (Number(input.voucherLegYuan) > 0) {
+      const leg = await client.query<{ id: string }>(
+        `insert into billing.payments (
+           tenant_id, bill_id, pay_order_no, pay_source,
+           total_amount, paid_amount, currency, pay_status, paid_at,
+           actor_type, actor_id, created_at, updated_at
+         ) values ($1, $2, $3, 'voucher', $4, $4, $5, 'paid', now(),
+                   'customer', $6, now(), now())
+         returning id`,
+        [
+          input.tenantId,
+          input.invoiceId,
+          visibleCode("PAY"),
+          input.voucherLegYuan,
+          input.currency,
+          input.actorId,
+        ],
+      );
+      voucherLegId = leg.rows[0]?.id ?? null;
+    }
+    await client.query(
+      `update billing.invoices set
+         paid_amount = paid_amount + $2,
+         bill_status = 'paid',
+         paid_at = now(),
+         payment_method = 'voucher',
+         updated_at = now()
+       where id = $1`,
+      [input.invoiceId, input.voucherLegYuan],
+    );
+    return { voucherLegId };
+  }
+
+  /** Append a subscription_histories row inside the declare tx. */
+  async insertHistoryTx(
+    client: PoolClient,
+    input: {
+      tenantId: string;
+      subscriptionId: string;
+      changeType: string;
+      fromStatus: string;
+      toStatus: string;
+      actorType: string;
+      actorId: string;
+      remark?: string | null;
+      clientIp?: string | null;
+    },
+  ): Promise<void> {
+    await client.query(
+      `insert into metering.subscription_histories (
+         tenant_id, subscription_id, change_type, from_status, to_status,
+         actor_type, actor_id, remark, client_ip, created_at
+       ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())`,
+      [
+        input.tenantId,
+        input.subscriptionId,
+        input.changeType,
+        input.fromStatus,
+        input.toStatus,
+        input.actorType,
+        input.actorId,
+        input.remark ?? null,
+        input.clientIp ?? null,
+      ],
+    );
+  }
+
+  // ── payment jobs queries (product_321 §4.3) ───────────────────────────────
+
+  /**
+   * Timeout-sweep candidates (P4 full-guard predicate): pending offline
+   * orders past the TTL — anchored at GREATEST(created_at, latest
+   * payment_rejected history) — with NO declared leg and ZERO collected
+   * money. Any real income exempts the order from auto-close forever.
+   */
+  async findExpiredPaymentOrderIds(
+    ttlMinutes: number,
+    limit: number,
+  ): Promise<string[]> {
+    const res = await this.pool.query<{ id: string }>(
+      `select sub.id
+         from metering.subscriptions sub
+         join lateral (
+           select id, bill_status, paid_amount from billing.invoices i
+            where i.subscription_id = sub.id and i.deleted_at is null
+            order by i.created_at desc limit 1
+         ) inv on true
+        where sub.status = 'suspended'
+          and sub.activation_method = 'offline_purchase'
+          and sub.deleted_at is null
+          and inv.bill_status not in ('paid', 'partial')
+          and inv.paid_amount = 0
+          and not exists (
+            select 1 from billing.payments p
+             where p.bill_id = inv.id and p.pay_status = 'pending_verify'
+          )
+          and greatest(
+            sub.created_at,
+            coalesce((
+              select max(h.created_at) from metering.subscription_histories h
+               where h.subscription_id = sub.id
+                 and h.change_type = 'payment_rejected'
+            ), sub.created_at)
+          ) + make_interval(mins => $1) <= now()
+        order by sub.created_at asc
+        limit $2`,
+      [ttlMinutes, limit],
+    );
+    return res.rows.map((r) => r.id);
+  }
+
+  /**
+   * Hung paid orders for the reconcile pass (P8 self-heal): invoice cleared
+   * but the subscription never activated, with no in-flight declared leg.
+   * Anchored at the stage-1 landing trace (payment_declared /
+   * offline_payment_confirmed history) — NEVER paid_at, which is admin-typed
+   * wall-clock time and can be days in the past (§4.3).
+   */
+  async findHungPaidOrders(
+    minAgeMinutes: number,
+    limit: number,
+  ): Promise<Array<{ id: string; operateRemark: string | null }>> {
+    const res = await this.pool.query<{
+      id: string;
+      operate_remark: string | null;
+    }>(
+      `select sub.id, inv.operate_remark
+         from metering.subscriptions sub
+         join lateral (
+           select id, bill_status, operate_remark from billing.invoices i
+            where i.subscription_id = sub.id and i.deleted_at is null
+            order by i.created_at desc limit 1
+         ) inv on true
+        where sub.status = 'suspended'
+          and sub.activation_method = 'offline_purchase'
+          and sub.deleted_at is null
+          and inv.bill_status = 'paid'
+          and not exists (
+            select 1 from billing.payments p
+             where p.bill_id = inv.id and p.pay_status = 'pending_verify'
+          )
+          and coalesce((
+            select max(h.created_at) from metering.subscription_histories h
+             where h.subscription_id = sub.id
+               and h.change_type in ('payment_declared', 'offline_payment_confirmed')
+          ), sub.created_at) + make_interval(mins => $1) <= now()
+        order by sub.created_at asc
+        limit $2`,
+      [minAgeMinutes, limit],
+    );
+    return res.rows.map((r) => ({ id: r.id, operateRemark: r.operate_remark }));
   }
 
   /**

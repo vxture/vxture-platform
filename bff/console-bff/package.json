@@ -27,6 +27,7 @@
     "@vxture/service-account": "workspace:*",
     "@vxture/service-iam": "workspace:*",
     "@vxture/service-organization": "workspace:*",
+    "@vxture/service-promotion": "workspace:*",
     "@vxture/service-sms": "workspace:*",
     "@vxture/service-subscription": "workspace:*",
     "@vxture/shared": "workspace:*",

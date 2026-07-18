@@ -156,11 +156,61 @@ export interface ActivateOrderInput {
   operatorId: string;
   remark?: string;
   clientIp?: string;
+  /**
+   * History actor (product_321 P8): 'operator' (admin confirm, default),
+   * 'customer' (cashDue=0 instant settle) or 'system' (reconcile job).
+   */
+  actorType?: "operator" | "customer" | "system";
 }
 
 export interface CancelOfflineOrderInput {
-  actorType: "customer" | "operator";
+  actorType: "customer" | "operator" | "system";
   actorId: string;
   remark?: string;
   clientIp?: string;
+  /**
+   * subscription_histories.change_type for the close (product_321 P4):
+   * 'cancelled' (default — customer cancel / admin void) or 'order_expired'
+   * (timeout sweep), so the six-state derivation can tell them apart.
+   */
+  changeType?: "cancelled" | "order_expired";
+}
+
+// ── Payment declaration (product_321 P8) ────────────────────────────────────
+
+export type DeclarePayChannel = "alipay" | "bank_transfer";
+
+export interface DeclarePaymentInput {
+  orderId: string;
+  /** Ownership is validated by the caller; used for scoping voucher reserve. */
+  tenantId: string;
+  userId: string;
+  payChannel: DeclarePayChannel;
+  discountVoucherId?: string | null;
+  creditVoucherId?: string | null;
+  payerName?: string;
+  transactionNo?: string;
+  remark?: string;
+  clientIp?: string;
+}
+
+export interface DeclarePaymentResult {
+  /**
+   * declared            — cash leg created, awaiting admin confirm
+   * already_declared    — idempotent re-submit, existing leg returned
+   * activated           — cashDue=0, stage 2 succeeded (subscription live)
+   * activating          — cashDue=0, funds committed but stage 2 hung; the
+   *                       reconcile job / admin re-drive will finish it (P8)
+   * already_settled     — invoice already cleared (hang window re-submit)
+   */
+  outcome:
+    | "declared"
+    | "already_declared"
+    | "activated"
+    | "activating"
+    | "already_settled";
+  /** Cash still due, NUMERIC(12,2) yuan string ("0.00" for cashDue=0). */
+  cashDue: string;
+  /** The pending_verify cash-leg payments row id (null when cashDue=0). */
+  paymentId: string | null;
 }

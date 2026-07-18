@@ -25,8 +25,20 @@ import {
 import type { Request } from "express";
 import type { Pool } from "pg";
 import { MailService } from "@vxture/core-mail";
+import { BillingService } from "@vxture/service-billing";
+import {
+  PromotionService,
+  computeSettlement,
+  centsToYuan,
+  yuanToCents,
+  type AvailableVoucher,
+  type DiscountEffect,
+} from "@vxture/service-promotion";
 import { SubscriptionService } from "@vxture/service-subscription";
-import type { SubscriptionRecord } from "@vxture/service-subscription";
+import type {
+  DeclarePaymentResult,
+  SubscriptionRecord,
+} from "@vxture/service-subscription";
 import { SUBSCRIPTION_STATUSES, TIERS, type Tier } from "@vxture/shared";
 import type { RequestContext } from "../types/console.types";
 
@@ -58,6 +70,26 @@ type SubscribeIntent = (typeof KNOWN_INTENTS)[number];
 const ORDER_INTENTS = ["new", "renew", "upgrade"] as const;
 type OrderCreateIntent = (typeof ORDER_INTENTS)[number];
 const CYCLE_UNITS = ["month", "year"] as const;
+
+// ── payment flow vocabulary (product_321 P1) ────────────────────────────────
+
+/** Six-state ordered derivation — wire slugs are the orderStatus contract. */
+type OrderState =
+  | "activating"
+  | "completed"
+  | "paid_pending_verify"
+  | "cancelled"
+  | "expired"
+  | "pending_payment";
+
+const DECLARE_CHANNELS = ["alipay", "bank_transfer"] as const;
+type DeclareChannel = (typeof DECLARE_CHANNELS)[number];
+
+/** Payment TTL (P4); read per call so ops can tune without redeploy. */
+const paymentTtlMinutes = (): number => {
+  const raw = Number(process.env.ORDER_PAYMENT_TTL_MINUTES);
+  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : 30;
+};
 
 const PRODUCT_CODE_RE = /^[a-z][a-z0-9_-]{0,63}$/;
 
@@ -104,6 +136,10 @@ export interface PendingOrderSummary {
   amount: string;
   currency: string;
   createdAt: string;
+  /** 付款截止（P4）；已申报/有实收时 null */
+  expireAt: string | null;
+  /** 恢复现场用的六态（进付款页直达对应视图） */
+  paymentState: OrderState;
 }
 
 export interface SubscribeContext {
@@ -154,6 +190,8 @@ interface CreateOrderResult {
   paymentInstructions: OfflinePaymentInstructions | null;
   /** free 即时开通时返回新订阅 id */
   subscriptionId: string | null;
+  /** 付款截止（P4，创建时刻 + TTL）；free 即时开通为 null */
+  expireAt: string | null;
 }
 
 interface MyOrderRecord {
@@ -166,9 +204,103 @@ interface MyOrderRecord {
   cycleUnit: string;
   amount: string;
   currency: string;
-  orderStatus: "pending" | "confirmed" | "closed";
+  /** Six-state contract (product_321 P1) — replaces pending/confirmed/closed. */
+  orderStatus: OrderState;
+  /** 'subscription' in V1; 'recharge' reserved for the wallet phase (P6). */
+  orderType: "subscription";
+  /** ISO deadline while counting down; null = TTL-exempt (paid_amount>0) or terminal. */
+  expireAt: string | null;
+  /** Money already collected on the invoice (legacy partial orders, P5). */
+  paidAmount: string;
+  /** Voucher reduction display: discount mirror + paid voucher legs. */
+  voucherOff: string;
   createdAt: string;
   confirmedAt: string | null;
+}
+
+// ── payment page contracts (product_321 §4.1) ───────────────────────────────
+
+interface PaymentChannelInfo {
+  channel: "alipay" | "wechat" | "bank_transfer";
+  enabled: boolean;
+  qrAsset?: string;
+  account?: {
+    accountName: string;
+    bankName: string;
+    accountNo: string;
+    reference: string;
+  };
+}
+
+interface OrderVoucherOption {
+  voucherId: string;
+  code: string;
+  kind: "discount" | "credit_voucher";
+  batchName: string;
+  /** discount */
+  discountType?: "percent" | "fixed";
+  discountValue?: number;
+  maxOff?: string | null;
+  /** credit_voucher face, yuan string */
+  amount?: string;
+  expiresAt: string;
+}
+
+interface OrderPaymentLeg {
+  paymentId: string;
+  kind: "cash" | "voucher" | "other";
+  status: string;
+  amount: string;
+  channel: string | null;
+  createdAt: string;
+}
+
+interface OrderDetailResult {
+  orderId: string;
+  orderNo: string;
+  billNo: string | null;
+  planCode: string;
+  planName: string;
+  tier: string | null;
+  cycleUnit: string;
+  currency: string;
+  orderState: OrderState;
+  orderType: "subscription";
+  createdAt: string;
+  expireAt: string | null;
+  /** Base list price (pre-discount), yuan string. */
+  listPrice: string;
+  paidAmount: string;
+  /** Latest reject reason to surface in the banner (P2), if any. */
+  rejectReason: string | null;
+  vouchers: OrderVoucherOption[];
+  legs: OrderPaymentLeg[];
+  paymentChannels: PaymentChannelInfo[];
+}
+
+interface QuoteBody {
+  discountVoucherId?: string;
+  creditVoucherId?: string;
+}
+
+interface QuoteResult {
+  listPrice: string;
+  discountOff: string;
+  payable: string;
+  paidAmount: string;
+  voucherOff: string;
+  balanceOff: string;
+  cashDue: string;
+  discountApplicable: boolean;
+}
+
+interface DeclareBody {
+  payChannel: string;
+  discountVoucherId?: string;
+  creditVoucherId?: string;
+  payerName?: string;
+  transactionNo?: string;
+  remark?: string;
 }
 
 interface SubscriptionActionBody {
@@ -193,11 +325,31 @@ export class SubscriptionRouter {
   constructor(
     @Inject(SubscriptionService)
     private readonly subscriptionService: SubscriptionService,
+    @Inject(PromotionService)
+    private readonly promotionService: PromotionService,
+    @Inject(BillingService)
+    private readonly billingService: BillingService,
     @Inject(MailService)
     private readonly mailService: MailService,
     @Inject(COMMERCE_PG_POOL)
     private readonly pool: Pool,
   ) {}
+
+  // --------------------------------------------------------------------------
+  // GET /api/subscription/credits — 租户钱包余额（product_321 P6：V1 只读展示）
+  // --------------------------------------------------------------------------
+
+  @Get("credits")
+  async getCredits(
+    @Req() req: Request & RequestContext,
+  ): Promise<{ balance: string; currency: string }> {
+    if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
+    const record = await this.billingService.getCreditBalance(req.tenant.id);
+    return {
+      balance: record?.balance ?? "0.00",
+      currency: record?.currency ?? "CNY",
+    };
+  }
 
   // --------------------------------------------------------------------------
   // GET /api/subscription/subscribe-context — /subscribe deep-link landing data
@@ -450,6 +602,9 @@ export class SubscriptionRouter {
         message: "该套餐/周期不可自助购买（如企业版请联系销售）",
       });
 
+    // One open order per (tenant × product) — paid AND free branch (P3/§7.3).
+    await this.assertNoPendingOrderForProduct(req.tenant.id, productCode);
+
     const workspaceId = await this.resolveDefaultWorkspace(req.tenant.id);
     const createdBy = req.user.id;
 
@@ -490,6 +645,7 @@ export class SubscriptionRouter {
           cycleUnit,
           paymentInstructions: null,
           subscriptionId: sub.id,
+          expireAt: null,
         };
       } catch (err) {
         throw mapOrderError(err);
@@ -521,6 +677,9 @@ export class SubscriptionRouter {
         cycleUnit,
         paymentInstructions: buildPaymentInstructions(order.orderNo),
         subscriptionId: null,
+        expireAt: new Date(
+          Date.now() + paymentTtlMinutes() * 60_000,
+        ).toISOString(),
       };
     } catch (err) {
       throw mapOrderError(err);
@@ -533,9 +692,7 @@ export class SubscriptionRouter {
     @Req() req: Request & RequestContext,
   ): Promise<MyOrderRecord[]> {
     if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
-    const res = await this.pool.query<MyOrderRow>(MY_ORDERS_SQL, [
-      req.tenant.id,
-    ]);
+    const res = await this.pool.query<OrderRow>(MY_ORDERS_SQL, [req.tenant.id]);
     return res.rows.map(mapMyOrderRow);
   }
 
@@ -569,6 +726,265 @@ export class SubscriptionRouter {
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Payment page endpoints (product_321 §4.1)
+  // --------------------------------------------------------------------------
+
+  /** GET /api/subscription/orders/:orderId — 付款页详情 */
+  @Get("orders/:orderId")
+  async getOrderDetail(
+    @Req() req: Request & RequestContext,
+    @Param("orderId") orderId: string,
+  ): Promise<OrderDetailResult> {
+    if (!req.user || !req.tenant) throw new UnauthorizedException("会话已失效");
+    const row = await this.loadOrderRow(req.tenant.id, orderId?.trim());
+    if (!row) throw new BadRequestException("订单不存在或无权查看");
+
+    const state = deriveOrderState(row);
+    const scope = {
+      tenantId: req.tenant.id,
+      workspaceId: row.workspace_id,
+      userId: req.user.id,
+    };
+    const [vouchers, legs, rejectReason] = await Promise.all([
+      state === "pending_payment"
+        ? this.promotionService.listAvailableVouchers(scope)
+        : Promise.resolve([] as AvailableVoucher[]),
+      this.loadPaymentLegs(row.invoice_id),
+      this.loadLatestRejectReason(orderId),
+    ]);
+
+    return {
+      orderId: row.order_id,
+      orderNo: row.order_no,
+      billNo: row.bill_no,
+      planCode: row.plan_code ?? "",
+      planName: row.plan_name ?? "",
+      tier: row.tier,
+      cycleUnit: row.cycle_unit,
+      currency: row.currency ?? "CNY",
+      orderState: state,
+      orderType: "subscription",
+      createdAt: row.created_at.toISOString(),
+      expireAt: deriveExpireAt(row, state),
+      listPrice: baseListPrice(row),
+      paidAmount: row.paid_amount ?? "0",
+      rejectReason,
+      vouchers: vouchers.map(mapVoucherOption),
+      legs,
+      paymentChannels: buildPaymentChannels(row.order_no),
+    };
+  }
+
+  /** POST /api/subscription/orders/:orderId/quote — 纯试算（零副作用） */
+  @Post("orders/:orderId/quote")
+  async quoteOrder(
+    @Req() req: Request & RequestContext,
+    @Param("orderId") orderId: string,
+    @Body() body: QuoteBody,
+  ): Promise<QuoteResult> {
+    if (!req.user || !req.tenant) throw new UnauthorizedException("会话已失效");
+    const row = await this.loadOrderRow(req.tenant.id, orderId?.trim());
+    if (!row) throw new BadRequestException("订单不存在或无权查看");
+    if (deriveOrderState(row) !== "pending_payment")
+      throw new ConflictException("订单不是待付款状态");
+
+    const scope = {
+      tenantId: req.tenant.id,
+      workspaceId: row.workspace_id,
+      userId: req.user.id,
+    };
+    // Same predicate as reserve (P7): a voucher usable here cannot fail at
+    // declare for availability reasons.
+    const discountId = body?.discountVoucherId?.trim() || null;
+    const creditId = body?.creditVoucherId?.trim() || null;
+    const [discount, credit] = await Promise.all([
+      discountId
+        ? this.promotionService.resolveForQuote(scope, discountId, "discount")
+        : Promise.resolve(null),
+      creditId
+        ? this.promotionService.resolveForQuote(
+            scope,
+            creditId,
+            "credit_voucher",
+          )
+        : Promise.resolve(null),
+    ]);
+    if (discountId && !discount)
+      throw new BadRequestException("折扣券不可用，请刷新券列表");
+    if (creditId && !credit)
+      throw new BadRequestException("代金券不可用，请刷新券列表");
+
+    const quote = computeSettlement({
+      listPriceCents: yuanToCents(baseListPrice(row)),
+      paidCents: yuanToCents(row.paid_amount ?? "0"),
+      discountEffect: discount ? (discount.effect as DiscountEffect) : null,
+      creditVoucherCents: credit
+        ? (credit.effect as { amountCents: number }).amountCents
+        : null,
+    });
+    return {
+      listPrice: centsToYuan(quote.listPriceCents),
+      discountOff: centsToYuan(quote.discountOffCents),
+      payable: centsToYuan(quote.payableCents),
+      paidAmount: centsToYuan(quote.paidCents),
+      voucherOff: centsToYuan(quote.voucherOffCents),
+      balanceOff: "0.00",
+      cashDue: centsToYuan(quote.cashDueCents),
+      discountApplicable: quote.discountApplicable,
+    };
+  }
+
+  /** POST /api/subscription/orders/:orderId/payment-declare — 我已完成付款（P8） */
+  @Post("orders/:orderId/payment-declare")
+  async declarePayment(
+    @Req() req: Request & RequestContext,
+    @Param("orderId") orderId: string,
+    @Body() body: DeclareBody,
+  ): Promise<DeclarePaymentResult> {
+    if (!req.user || !req.tenant) throw new UnauthorizedException("会话已失效");
+    const id = orderId?.trim();
+    if (!id) throw new BadRequestException("orderId 不能为空");
+
+    const payChannel = (body?.payChannel ?? "").trim();
+    if (!(DECLARE_CHANNELS as readonly string[]).includes(payChannel))
+      throw new BadRequestException(
+        "payChannel 必须是 alipay 或 bank_transfer",
+      );
+    // Channel must be enabled by env-derived config (§4.4) — no declaring
+    // against a channel the payment page can't render.
+    const channel = buildPaymentChannels("").find(
+      (c) => c.channel === payChannel,
+    );
+    if (!channel?.enabled)
+      throw new BadRequestException("该支付渠道未开放，请选择其它渠道");
+
+    // Ownership (tenant scope), same assertion as cancel.
+    const sub = await this.subscriptionService
+      .getSubscription(id)
+      .catch(() => null);
+    if (!sub || sub.tenantId !== req.tenant.id)
+      throw new BadRequestException("订单不存在或无权操作");
+
+    try {
+      return await this.subscriptionService.declarePayment({
+        orderId: id,
+        tenantId: req.tenant.id,
+        userId: req.user.id,
+        payChannel: payChannel as DeclareChannel,
+        discountVoucherId: body?.discountVoucherId?.trim() || null,
+        creditVoucherId: body?.creditVoucherId?.trim() || null,
+        ...(body?.payerName?.trim()
+          ? { payerName: body.payerName.trim() }
+          : {}),
+        ...(body?.transactionNo?.trim()
+          ? { transactionNo: body.transactionNo.trim() }
+          : {}),
+        ...(body?.remark?.trim() ? { remark: body.remark.trim() } : {}),
+      });
+    } catch (err) {
+      throw mapOrderError(err);
+    }
+  }
+
+  /** Payment-page order row (single order, tenant-scoped). */
+  private async loadOrderRow(
+    tenantId: string,
+    orderId: string | undefined,
+  ): Promise<OrderRow | null> {
+    if (!orderId) return null;
+    const res = await this.pool.query<OrderRow>(
+      `${ORDER_ROW_SELECT}
+        where sub.tenant_id = $1 and sub.id = $2
+          and sub.order_no is not null and sub.deleted_at is null
+        limit 1`,
+      [tenantId, orderId],
+    );
+    return res.rows[0] ?? null;
+  }
+
+  private async loadPaymentLegs(
+    invoiceId: string | null,
+  ): Promise<OrderPaymentLeg[]> {
+    if (!invoiceId) return [];
+    const res = await this.pool.query<{
+      id: string;
+      pay_source: string;
+      pay_status: string;
+      total_amount: string;
+      pay_channel: string | null;
+      created_at: Date;
+    }>(
+      `select id, pay_source, pay_status, total_amount, pay_channel, created_at
+         from billing.payments where bill_id = $1
+        order by created_at asc`,
+      [invoiceId],
+    );
+    return res.rows.map((r) => ({
+      paymentId: r.id,
+      kind:
+        r.pay_source === "voucher"
+          ? "voucher"
+          : r.pay_source === "offline"
+            ? "cash"
+            : "other",
+      status: r.pay_status,
+      amount: r.total_amount,
+      channel: r.pay_channel,
+      createdAt: r.created_at.toISOString(),
+    }));
+  }
+
+  /** Latest reject reason (P2 banner) from the payment_rejected history. */
+  private async loadLatestRejectReason(
+    orderId: string,
+  ): Promise<string | null> {
+    const res = await this.pool.query<{ remark: string | null }>(
+      `select remark from metering.subscription_histories
+        where subscription_id = $1 and change_type = 'payment_rejected'
+        order by created_at desc limit 1`,
+      [orderId],
+    );
+    return res.rows[0]?.remark ?? null;
+  }
+
+  /**
+   * Duplicate pending-order guard (320 O1 predicate, 321-widened to include
+   * partial): one open order per (tenant × product) — both the paid and the
+   * free branch of createOrder enforce it (P3: a free activation while a paid
+   * order hangs is the known tier-conflict hang factor).
+   */
+  private async assertNoPendingOrderForProduct(
+    tenantId: string,
+    productCode: string,
+  ): Promise<void> {
+    const res = await this.pool.query<{ order_no: string }>(
+      `select sub.order_no
+         from metering.subscriptions sub
+         join product.plan_components pc
+           on pc.plan_version_id = sub.plan_version_id and pc.component_role = 'primary'
+         join product.products prod on prod.id = pc.product_id
+         join lateral (
+           select bill_status from billing.invoices i
+            where i.subscription_id = sub.id and i.deleted_at is null
+            order by i.created_at desc limit 1
+         ) inv on true
+        where sub.tenant_id = $1 and prod.product_code = $2
+          and sub.status = 'suspended'
+          and sub.activation_method = 'offline_purchase'
+          and inv.bill_status in ('unpaid', 'partial')
+          and sub.deleted_at is null
+        limit 1`,
+      [tenantId, productCode],
+    );
+    if (res.rows[0]) {
+      throw new ConflictException({
+        code: "PENDING_ORDER_EXISTS",
+        message: `已有待付款订单（${res.rows[0].order_no}），请先完成付款或取消该订单`,
+      });
+    }
+  }
+
   /**
    * Pending offline order for (tenant × product): suspended + offline_purchase
    * subscription with an unpaid invoice (product_320 §2 O1 判定谓词).
@@ -577,35 +993,21 @@ export class SubscriptionRouter {
     tenantId: string,
     productCode: string,
   ): Promise<PendingOrderSummary | null> {
-    const res = await this.pool.query<{
-      order_id: string;
-      order_no: string;
-      bill_no: string | null;
-      plan_code: string;
-      tier: string | null;
-      cycle_unit: string;
-      pay_amount: string | null;
-      currency: string;
-      created_at: Date;
-    }>(
-      `select sub.id as order_id, sub.order_no, inv.bill_no,
-              plan.plan_code, pc.tier, sub.cycle_unit, sub.pay_amount, sub.currency,
-              sub.created_at
-         from metering.subscriptions sub
-         join product.plan_versions pv on pv.id = sub.plan_version_id
-         join product.plans plan on plan.id = pv.plan_id
-         join product.plan_components pc
-           on pc.plan_version_id = sub.plan_version_id and pc.component_role = 'primary'
-         join product.products prod on prod.id = pc.product_id
-         join lateral (
-           select id, bill_no from billing.invoices i
-            where i.subscription_id = sub.id and i.bill_status = 'unpaid' and i.deleted_at is null
-            order by i.created_at desc limit 1
-         ) inv on true
+    // 320 O1 predicate, 321-widened: 'unpaid' alone misses legacy partial
+    // orders (bill_status IN ('unpaid','partial') — product_321 P1).
+    const res = await this.pool.query<OrderRow>(
+      `${ORDER_ROW_SELECT}
         where sub.tenant_id = $1
-          and prod.product_code = $2
+          and exists (
+            select 1 from product.plan_components pcx
+            join product.products prodx on prodx.id = pcx.product_id
+            where pcx.plan_version_id = sub.plan_version_id
+              and pcx.component_role = 'primary'
+              and prodx.product_code = $2
+          )
           and sub.status = 'suspended'
           and sub.activation_method = 'offline_purchase'
+          and inv.bill_status in ('unpaid', 'partial')
           and sub.deleted_at is null
         order by sub.created_at desc
         limit 1`,
@@ -613,16 +1015,19 @@ export class SubscriptionRouter {
     );
     const r = res.rows[0];
     if (!r) return null;
+    const state = deriveOrderState(r);
     return {
       orderId: r.order_id,
       orderNo: r.order_no,
       billNo: r.bill_no,
-      planCode: r.plan_code,
+      planCode: r.plan_code ?? "",
       tier: r.tier,
       cycleUnit: r.cycle_unit,
       amount: r.pay_amount ?? "0",
-      currency: r.currency,
+      currency: r.currency ?? "CNY",
       createdAt: r.created_at.toISOString(),
+      expireAt: deriveExpireAt(r, state),
+      paymentState: state,
     };
   }
 
@@ -847,9 +1252,12 @@ function buildPaymentInstructions(orderNo: string): OfflinePaymentInstructions {
   };
 }
 
-interface MyOrderRow {
+interface OrderRow {
   order_id: string;
   order_no: string;
+  workspace_id: string;
+  activation_method: string;
+  invoice_id: string | null;
   bill_no: string | null;
   plan_code: string | null;
   plan_name: string | null;
@@ -859,15 +1267,27 @@ interface MyOrderRow {
   currency: string | null;
   sub_status: string;
   bill_status: string | null;
-  pay_status: string | null;
+  total_amount: string | null;
+  paid_amount: string | null;
+  discount_amount: string | null;
+  voucher_paid: string | null;
+  has_pending_leg: boolean;
+  has_expired_history: boolean;
+  ttl_anchor: Date;
   paid_at: Date | null;
   created_at: Date;
 }
 
-const MY_ORDERS_SQL = `
+// One projection for the list and the payment-page detail — the six-state
+// inputs (bill status, declared leg, expiry history, TTL anchor) come from the
+// same SQL so the two faces can never derive different states for one order.
+const ORDER_ROW_SELECT = `
 select
   sub.id               as order_id,
   sub.order_no,
+  sub.workspace_id,
+  sub.activation_method,
+  inv.id               as invoice_id,
   inv.bill_no,
   plan.plan_code,
   plan.plan_name,
@@ -877,7 +1297,28 @@ select
   sub.currency,
   sub.status           as sub_status,
   inv.bill_status,
-  pay.pay_status,
+  inv.total_amount,
+  inv.paid_amount,
+  inv.discount_amount,
+  coalesce((
+    select sum(p.paid_amount) from billing.payments p
+     where p.bill_id = inv.id and p.pay_status = 'paid' and p.pay_source = 'voucher'
+  ), 0)                as voucher_paid,
+  exists(
+    select 1 from billing.payments p
+     where p.bill_id = inv.id and p.pay_status = 'pending_verify'
+  )                    as has_pending_leg,
+  exists(
+    select 1 from metering.subscription_histories h
+     where h.subscription_id = sub.id and h.change_type = 'order_expired'
+  )                    as has_expired_history,
+  greatest(
+    sub.created_at,
+    coalesce((
+      select max(h2.created_at) from metering.subscription_histories h2
+       where h2.subscription_id = sub.id and h2.change_type = 'payment_rejected'
+    ), sub.created_at)
+  )                    as ttl_anchor,
   inv.paid_at,
   sub.created_at
 from metering.subscriptions sub
@@ -888,26 +1329,113 @@ left join lateral (
    where plan_version_id = sub.plan_version_id and component_role = 'primary' limit 1
 ) pc on true
 left join lateral (
-  select id, bill_no, bill_status, paid_at from billing.invoices i
+  select id, bill_no, bill_status, total_amount, paid_amount, discount_amount, paid_at
+    from billing.invoices i
    where i.subscription_id = sub.id and i.deleted_at is null
    order by i.created_at desc limit 1
-) inv on true
-left join lateral (
-  select pay_status from billing.payments p where p.bill_id = inv.id
-   order by p.created_at desc limit 1
-) pay on true
+) inv on true`;
+
+const MY_ORDERS_SQL = `${ORDER_ROW_SELECT}
 where sub.tenant_id = $1 and sub.order_no is not null and sub.deleted_at is null
 order by sub.created_at desc
 limit 100
 `;
 
-function mapMyOrderRow(r: MyOrderRow): MyOrderRecord {
-  const orderStatus: MyOrderRecord["orderStatus"] =
-    r.bill_status === "paid" || r.pay_status === "paid"
-      ? "confirmed"
-      : r.sub_status === "cancelled" || r.bill_status === "cancelled"
-        ? "closed"
-        : "pending";
+/** Six-state ordered derivation (product_321 P1 — first hit wins). */
+function deriveOrderState(r: OrderRow): OrderState {
+  if (r.bill_status === "paid") {
+    // Upgrade orders close as cancelled with a paid invoice — still completed.
+    return r.sub_status === "suspended" &&
+      r.activation_method === "offline_purchase"
+      ? "activating"
+      : "completed";
+  }
+  if (r.has_pending_leg) return "paid_pending_verify";
+  if (r.sub_status === "cancelled")
+    return r.has_expired_history ? "expired" : "cancelled";
+  return "pending_payment";
+}
+
+/** TTL deadline (P4): only while pending payment with zero collected money. */
+function deriveExpireAt(r: OrderRow, state: OrderState): string | null {
+  if (state !== "pending_payment") return null;
+  if (Number(r.paid_amount ?? 0) > 0) return null; // TTL-exempt family
+  const deadline = new Date(
+    r.ttl_anchor.getTime() + paymentTtlMinutes() * 60_000,
+  );
+  return deadline.toISOString();
+}
+
+/**
+ * Base (pre-discount) list price: invoice total already nets the discount
+ * rows, so base = total + |discount mirror|; a clean invoice degrades to
+ * total = order amount. No invoice → order amount.
+ */
+function baseListPrice(r: OrderRow): string {
+  if (r.total_amount == null) return r.pay_amount ?? "0";
+  return centsToYuan(
+    yuanToCents(r.total_amount) + yuanToCents(r.discount_amount ?? "0"),
+  );
+}
+
+function mapVoucherOption(v: AvailableVoucher): OrderVoucherOption {
+  if (v.kind === "discount") {
+    const e = v.effect as DiscountEffect;
+    return {
+      voucherId: v.voucherId,
+      code: v.code,
+      kind: v.kind,
+      batchName: v.batchName,
+      discountType: e.discountType,
+      discountValue: e.value,
+      maxOff: e.maxOffCents != null ? centsToYuan(e.maxOffCents) : null,
+      expiresAt: v.expiresAt.toISOString(),
+    };
+  }
+  const e = v.effect as { amountCents: number };
+  return {
+    voucherId: v.voucherId,
+    code: v.code,
+    kind: v.kind,
+    batchName: v.batchName,
+    amount: centsToYuan(e.amountCents),
+    expiresAt: v.expiresAt.toISOString(),
+  };
+}
+
+/**
+ * Payment channel config, env-derived (§4.4). enabled = every env of the
+ * channel is present AND non-blank after trim — a missing/blank config must
+ * never ship enabled:true with empty credentials (the §1 pain-point 1 replay).
+ */
+function buildPaymentChannels(orderNo: string): PaymentChannelInfo[] {
+  const trimmed = (v: string | undefined): string => (v ?? "").trim();
+  const alipayQr = trimmed(process.env.OFFLINE_PAY_ALIPAY_QR);
+  const accountName = trimmed(process.env.OFFLINE_PAY_ACCOUNT_NAME);
+  const bankName = trimmed(process.env.OFFLINE_PAY_BANK_NAME);
+  const accountNo = trimmed(process.env.OFFLINE_PAY_ACCOUNT_NO);
+  const bankEnabled = Boolean(accountName && bankName && accountNo);
+  return [
+    {
+      channel: "alipay",
+      enabled: Boolean(alipayQr),
+      ...(alipayQr ? { qrAsset: alipayQr } : {}),
+    },
+    { channel: "wechat", enabled: false },
+    {
+      channel: "bank_transfer",
+      enabled: bankEnabled,
+      ...(bankEnabled
+        ? {
+            account: { accountName, bankName, accountNo, reference: orderNo },
+          }
+        : {}),
+    },
+  ];
+}
+
+function mapMyOrderRow(r: OrderRow): MyOrderRecord {
+  const state = deriveOrderState(r);
   return {
     orderId: r.order_id,
     orderNo: r.order_no,
@@ -918,7 +1446,14 @@ function mapMyOrderRow(r: MyOrderRow): MyOrderRecord {
     cycleUnit: r.cycle_unit,
     amount: r.pay_amount ?? "0",
     currency: r.currency ?? "CNY",
-    orderStatus,
+    orderStatus: state,
+    orderType: "subscription",
+    expireAt: deriveExpireAt(r, state),
+    paidAmount: r.paid_amount ?? "0",
+    voucherOff: centsToYuan(
+      yuanToCents(r.discount_amount ?? "0") +
+        yuanToCents(r.voucher_paid ?? "0"),
+    ),
     createdAt: r.created_at.toISOString(),
     confirmedAt: r.paid_at ? r.paid_at.toISOString() : null,
   };
