@@ -2,8 +2,7 @@ import { Inject, Injectable, type NestMiddleware } from "@nestjs/common";
 import type { NextFunction, Request, Response } from "express";
 import { SessionAggregator } from "../aggregators/session.aggregator";
 import type { RequestContext } from "../types/console.types";
-
-const AUTH_CONTEXT_ONLY_PATHS = new Set(["/api/auth/tenant/switch"]);
+import { AUTH_CONTEXT_ONLY_PATHS } from "./auth-context-paths";
 
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {

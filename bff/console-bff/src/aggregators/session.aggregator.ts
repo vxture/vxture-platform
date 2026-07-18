@@ -388,6 +388,18 @@ export class SessionAggregator {
     return resolved ? [...TENANT_CAPABILITIES] : [];
   }
 
+  /**
+   * Capabilities for an already-resolved request context, with no DB round-trip.
+   * In the console middleware chain (Auth → Tenant → Permission) TenantMiddleware
+   * has already resolved the active org and 401/403-gated the request before
+   * PermissionMiddleware runs, so a present tenant means the org exists — which
+   * is the only thing async getCapabilities' ~4-query resolveOrg determines.
+   * async getCapabilities is kept for callers that must resolve the org first.
+   */
+  capabilitiesForContext(hasTenant: boolean) {
+    return hasTenant ? [...TENANT_CAPABILITIES] : [];
+  }
+
   async getIamSummary(userId: string, orgId?: string) {
     const resolved = await this.resolveOrg(userId, orgId);
     if (!resolved) {
