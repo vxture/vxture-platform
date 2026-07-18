@@ -153,7 +153,8 @@ export interface OfflineOrderRecord {
 }
 
 export interface ActivateOrderInput {
-  operatorId: string;
+  /** null for system actors — actor_id is a uuid column (jobs have no uuid). */
+  operatorId: string | null;
   remark?: string;
   clientIp?: string;
   /**
@@ -165,7 +166,8 @@ export interface ActivateOrderInput {
 
 export interface CancelOfflineOrderInput {
   actorType: "customer" | "operator" | "system";
-  actorId: string;
+  /** null for system actors — actor_id is a uuid column (jobs have no uuid). */
+  actorId: string | null;
   remark?: string;
   clientIp?: string;
   /**

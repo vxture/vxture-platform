@@ -166,7 +166,7 @@ export class SubscriptionService {
   async activatePendingOrder(
     orderId: string,
     params: {
-      operatorId: string;
+      operatorId: string | null;
       remark?: string;
       clientIp?: string;
       actorType?: "operator" | "customer" | "system";
@@ -204,7 +204,7 @@ export class SubscriptionService {
     orderId: string,
     upgradeOfSubscriptionId: string,
     params: {
-      operatorId: string;
+      operatorId: string | null;
       remark?: string;
       actorType?: "operator" | "customer" | "system";
     },
@@ -228,8 +228,8 @@ export class SubscriptionService {
     ) {
       await this.updateSubscription(orderId, {
         status: "cancelled",
-        operatorType: "operator",
-        operatorId: params.operatorId,
+        operatorType: params.actorType ?? "operator",
+        ...(params.operatorId ? { operatorId: params.operatorId } : {}),
         operatorRemark: `upgrade already applied to ${upgradeOfSubscriptionId} (re-drive close)`,
       });
       return target;
@@ -238,13 +238,13 @@ export class SubscriptionService {
       const upgraded = await this.upgradeSubscription(
         upgradeOfSubscriptionId,
         order.planVersionId,
-        params.operatorId,
+        params.operatorId ?? undefined,
         params.remark,
       );
       await this.updateSubscription(orderId, {
         status: "cancelled",
-        operatorType: "operator",
-        operatorId: params.operatorId,
+        operatorType: params.actorType ?? "operator",
+        ...(params.operatorId ? { operatorId: params.operatorId } : {}),
         operatorRemark: `upgrade applied to ${upgradeOfSubscriptionId}`,
       });
       return upgraded;
@@ -264,7 +264,7 @@ export class SubscriptionService {
     orderId: string,
     params: {
       actorType: "customer" | "operator" | "system";
-      actorId: string;
+      actorId: string | null;
       remark?: string;
       clientIp?: string;
       changeType?: "cancelled" | "order_expired";
@@ -531,7 +531,7 @@ export class SubscriptionService {
       try {
         await this.cancelPendingOrder(id, {
           actorType: "system",
-          actorId: "order-payment-expiry-sweep",
+          actorId: null,
           changeType: "order_expired",
           remark: `payment window elapsed (${ttlMinutes}min TTL)`,
         });
@@ -570,12 +570,12 @@ export class SubscriptionService {
         const result =
           intent === "upgrade" && upgradeOf
             ? await this.applyUpgradeOrder(id, upgradeOf, {
-                operatorId: "order-payment-reconcile",
+                operatorId: null,
                 remark: "hung paid order self-heal",
                 actorType: "system",
               })
             : await this.activatePendingOrder(id, {
-                operatorId: "order-payment-reconcile",
+                operatorId: null,
                 remark: "hung paid order self-heal",
                 actorType: "system",
               });
