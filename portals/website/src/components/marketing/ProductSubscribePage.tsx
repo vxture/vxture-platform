@@ -323,6 +323,9 @@ export default function ProductSubscribePage() {
                                   productCode,
                                   "subscribe",
                                   plan.tier,
+                                  // 展示值域 monthly|yearly → wire 值域 month|year
+                                  // （console 严格匹配 cycle_unit，直传必失配）
+                                  cycle === "monthly" ? "month" : "year",
                                 )}
                               >
                                 {t("subscribe")}

@@ -21,7 +21,6 @@ import { Badge, Button, PageHeader } from "@vxture/design-system";
 import { useRouter } from "@/lib/i18n/navigation";
 import { PageSection } from "@/layout/shell";
 import {
-  cancelSubscriptionOrder,
   createSubscriptionOrder,
   fetchSubscribeContext,
   type SubscribeContext,
@@ -79,9 +78,15 @@ export function SubscribePage() {
     [params],
   );
 
+  // website 深链预选周期（product_321 §6.2）：wire 值域固定 month|year，
+  // 非法值静默忽略（默认年付）。
+  const cycleParam = params.get("cycle");
+  const initialCycle: Cycle =
+    cycleParam === "month" || cycleParam === "year" ? cycleParam : "year";
+
   const [ctx, setCtx] = useState<SubscribeContext | null>(null);
   const [loading, setLoading] = useState(true);
-  const [cycle, setCycle] = useState<Cycle>("year"); // 默认年付（更省）
+  const [cycle, setCycle] = useState<Cycle>(initialCycle); // 深链预选，默认年付（更省）
   const [busy, setBusy] = useState<string | null>(null); // planVersionId | "cancel"
   const [error, setError] = useState<string | null>(null);
 
@@ -119,20 +124,8 @@ export function SubscribePage() {
     if (fresh) setCtx(fresh);
   }
 
-  // ── 待支付订单面板 ────────────────────────────────────────────────────────
+  // ── 待支付订单：直接引导进付款页（product_321 §6.1，占位面板退役）──────────
   if (pendingOrder) {
-    const onCancel = async () => {
-      setBusy("cancel");
-      setError(null);
-      try {
-        await cancelSubscriptionOrder(pendingOrder.orderId);
-        await reload();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : t("cancelOrderFailed"));
-      } finally {
-        setBusy(null);
-      }
-    };
     return (
       <div className="vx-page-stack">
         <PageHeader
@@ -162,33 +155,21 @@ export function SubscribePage() {
                 </strong>
               </div>
             </div>
+            <div className="vx-detail-actions">
+              <Button
+                onClick={() =>
+                  router.push(`/subscribe/pay/${pendingOrder.orderId}`)
+                }
+              >
+                {t("pending.goPay")}
+              </Button>
+              <Button variant="outline" onClick={() => void reload()}>
+                {t("actions.refresh")}
+              </Button>
+            </div>
           </div>
-        </PageSection>
-        <PageSection title={t("pending.bankTitle")} tone="muted">
-          {/* 汇款账户来自服务端配置；context 不透传敏感账户，仅展示占位提示 + 订单号备注 */}
-          <p className="vx-empty-hint">{t("pending.configPending")}</p>
-          <p className="vx-empty-hint">
-            {t("pending.reference")}：<strong>{pendingOrder.orderNo}</strong>（
-            {t("pending.referenceHint")}）
-          </p>
         </PageSection>
         {error ? <p className="vx-empty-hint">{error}</p> : null}
-        <PageSection title={t("moreSection")} tone="muted">
-          <div className="vx-detail-actions">
-            <Button
-              variant="outline"
-              disabled={busy !== null}
-              onClick={() => void reload()}
-            >
-              {t("actions.refresh")}
-            </Button>
-            <Button disabled={busy !== null} onClick={() => void onCancel()}>
-              {busy === "cancel"
-                ? t("pending.cancelling")
-                : t("pending.cancel")}
-            </Button>
-          </div>
-        </PageSection>
       </div>
     );
   }
@@ -223,7 +204,12 @@ export function SubscribePage() {
         router.replace("/subscription"); // free 即时开通
         return;
       }
-      await reload(); // pending order 生成 → 渲染待支付面板
+      if (result.orderId) {
+        // 付费订单 → 直达付款页（product_321 §6.1，不再就地渲染面板）
+        router.push(`/subscribe/pay/${result.orderId}`);
+        return;
+      }
+      await reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : t("orderFailed"));
       setBusy(null);

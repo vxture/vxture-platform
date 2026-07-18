@@ -59,19 +59,24 @@ export function buildConsoleEntryUrl(locale: string): string {
 }
 
 /**
- * 构建直达 Console `/subscribe` 深链（product_320 §4.5）：产品卡片的转化出口，
- * 携带 product/intent[/target_tier] 落到套餐目录下单，并带来源上下文。
+ * 构建直达 Console `/subscribe` 深链（product_320 §4.5 / product_321 §6.2）：
+ * 产品卡片的转化出口，携带 product/intent[/target_tier][/cycle] 落到套餐目录
+ * 下单，并带来源上下文。
  *
  * @param locale - 当前语言代码
  * @param product - 产品 code（如 "arda"）
  * @param intent - 深链意图（subscribe/upgrade/renew…；console 侧容错未知值）
  * @param tier - 可选，预选目标档位
+ * @param cycle - 可选，预选计费周期。wire 值域固定 "month" | "year"（console
+ *   侧严格匹配 plan_prices.cycle_unit）——调用方若持有 "monthly"/"yearly"
+ *   展示值必须先映射；无周期上下文的入口（如 products 总览 upgrade）不传。
  */
 export function buildConsoleSubscribeUrl(
   locale: string,
   product: string,
   intent: string,
   tier?: string,
+  cycle?: "month" | "year",
 ): string {
   const ctx = encodePortalContext({
     from: "website",
@@ -81,6 +86,7 @@ export function buildConsoleSubscribeUrl(
   });
   const params = new URLSearchParams({ product, intent });
   if (tier) params.set("target_tier", tier);
+  if (cycle) params.set("cycle", cycle);
   return `${CONSOLE_BASE_URL}/${locale}/subscribe?${params.toString()}&${ctx}`;
 }
 
