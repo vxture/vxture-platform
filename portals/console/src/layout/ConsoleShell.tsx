@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+import type { SessionSnapshot } from "@/entities/console";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -65,9 +66,15 @@ function ShellFrame({ children }: { children: ReactNode }) {
   );
 }
 
-export function ConsoleShell({ children }: { children: ReactNode }) {
+export function ConsoleShell({
+  children,
+  initialSession,
+}: {
+  children: ReactNode;
+  initialSession?: SessionSnapshot | null;
+}) {
   return (
-    <ConsoleSessionProvider>
+    <ConsoleSessionProvider initialSession={initialSession ?? null}>
       <TenantProvider>
         <PortalEntryProvider>
           <ShellFrame>{children}</ShellFrame>
