@@ -12,6 +12,12 @@
  */
 
 import { cookies, headers } from "next/headers";
+import type {
+  Capability,
+  ConsoleUser,
+  SessionSnapshot,
+  TenantContext,
+} from "@/entities/console";
 
 const INTERNAL_BFF_FALLBACK = "http://localhost:3021";
 
@@ -65,4 +71,44 @@ export async function fetchBffAsUser<T>(path: string, fallback: T): Promise<T> {
   } catch {
     return fallback;
   }
+}
+
+/**
+ * Build the console SessionSnapshot server-side by replaying restoreSession's
+ * reads against the internal BFF with the caller's cookies, so the (console)
+ * layout can seed the provider and skip the client-side spinner waterfall.
+ *
+ * Returns null whenever the session isn't cleanly resolvable — the caller MUST
+ * then neither seed nor redirect: an unseeded provider falls back to the exact
+ * existing client flow (restore + prompt=none silent SSO). This is why an
+ * expired cookie or a platform-only user degrades gracefully instead of
+ * hard-redirecting a logged-in user to /signin.
+ */
+export async function loadServerSessionSnapshot(): Promise<SessionSnapshot | null> {
+  // Probe first: the cookie can exist but be expired (BFF replies 401 → null).
+  const probe = await fetchBffAsUser<{ status?: string } | null>(
+    "/auth/session",
+    null,
+  );
+  if (!probe || probe.status !== "active") return null;
+
+  const [user, tenant, tenantOptions, capabilities] = await Promise.all([
+    fetchBffAsUser<ConsoleUser | null>("/api/me", null),
+    fetchBffAsUser<TenantContext | null>("/api/tenant-context", null),
+    fetchBffAsUser<TenantContext[]>("/api/tenant-context/options", []),
+    fetchBffAsUser<Capability[]>("/api/capabilities", []),
+  ]);
+
+  // Incomplete (e.g. a platform-only user with no active org) → let the client
+  // do the full restore rather than seed a partial snapshot.
+  if (!user || !tenant) return null;
+
+  // Only seed when the server-resolved tenant matches the user's selected tenant
+  // (the mirror cookie). If they differ, a tenant-switcher's RP active_org lags
+  // the cookie and seeding would flash the wrong tenant's capabilities — skip it
+  // and let the client reconcile as before.
+  const activeTenant = await readActiveTenantCookie();
+  if (activeTenant && tenant.id !== activeTenant) return null;
+
+  return { isAuthenticated: true, user, tenant, tenantOptions, capabilities };
 }

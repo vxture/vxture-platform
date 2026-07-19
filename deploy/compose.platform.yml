@@ -112,6 +112,10 @@ services:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
+      # Server-only internal address the console SSR uses to fetch the session
+      # snapshot from console-bff (same Docker network). Non-secret; the browser
+      # keeps using the public same-origin path. See lib/server/bff-server.ts (#7).
+      CONSOLE_BFF_INTERNAL_URL: http://vx-platform-console-bff:3021
     healthcheck:
       test:
         [

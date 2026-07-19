@@ -121,10 +121,28 @@ function getSessionIdentity(snapshot: SessionSnapshot) {
   });
 }
 
-export function ConsoleSessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<SessionSnapshot>(ANONYMOUS_SESSION);
-  const [status, setStatus] = useState<SessionStatus>("loading");
-  const sessionRef = useRef<SessionSnapshot>(ANONYMOUS_SESSION);
+export function ConsoleSessionProvider({
+  children,
+  initialSession,
+}: {
+  children: ReactNode;
+  initialSession?: SessionSnapshot | null;
+}) {
+  // Server-seeded snapshot (#7): when the (console) server layout resolved an
+  // authenticated session, start `ready` so the shell paints on first render
+  // with no client spinner waterfall. When absent (unauthenticated / tenant
+  // mismatch / fetch failed) behaviour is exactly as before.
+  const seeded = Boolean(initialSession?.isAuthenticated);
+  const [session, setSession] = useState<SessionSnapshot>(
+    initialSession ?? ANONYMOUS_SESSION,
+  );
+  const [status, setStatus] = useState<SessionStatus>(
+    seeded ? "ready" : "loading",
+  );
+  const sessionRef = useRef<SessionSnapshot>(
+    initialSession ?? ANONYMOUS_SESSION,
+  );
+  const seededRef = useRef(seeded);
   const lastSyncAtRef = useRef(0);
   const syncInFlightRef = useRef(false);
 
@@ -170,6 +188,13 @@ export function ConsoleSessionProvider({ children }: { children: ReactNode }) {
       params.delete("vx_sso_silent");
       const cleanUrl = `${window.location.pathname}${params.size ? `?${params.toString()}` : ""}${window.location.hash}`;
       window.history.replaceState(null, "", cleanUrl);
+    }
+
+    // Already seeded an authenticated snapshot server-side: reconcile silently
+    // (no spinner, shell already painted) and never redirect — the user is in.
+    if (seededRef.current) {
+      void refreshSession({ silent: true });
+      return;
     }
 
     refreshSession().then((snapshot) => {
