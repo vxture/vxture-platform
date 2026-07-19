@@ -1,0 +1,145 @@
+# deploy-cert.yml — Let's Encrypt wildcard TLS cert for *.vxture.com.
+#
+# Issues a wildcard cert (vxture.com + *.vxture.com) via the DNS-01 challenge
+# (Cloudflare API), then deploys it to worker-01's nginx and reloads. Issuance
+# runs entirely in the runner; the host only receives the two PEM files and
+# reloads nginx (minimal server change). See docs/50-deployment/12-letsencrypt-cert.md.
+#
+# Required to be set once (GitHub → repo Settings → Secrets and variables → Actions):
+#   secret CLOUDFLARE_DNS_API_TOKEN — a scoped CF API token: Zone:DNS:Edit +
+#     Zone:Zone:Read, limited to the vxture.com zone (the "Edit zone DNS" template).
+# Reuses the existing deploy secrets: TAILSCALE_OAUTH_CLIENT_ID/SECRET,
+#   DEPLOY_HOST_TAILNET, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_SSH_PASSPHRASE
+#   and var TAILSCALE_OAUTH_CLIENT_TAG.
+#
+# NOTE: deliberately NOT gated by an `environment:` approval — a cert rotation
+# must be unattended or the cert eventually lapses (outage). The blast radius is
+# bounded: only the two cert files change, `nginx -t` gates the reload, and a bad
+# cert auto-rolls-back to the pre-change backup.
+
+name: deploy-cert
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate against LE staging without issuing/deploying a real cert (run this first)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "23 4 6 * *" # monthly renew (6th, 04:23 UTC); 90-day cert stays >=60d valid
+
+concurrency:
+  group: deploy-cert
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CERT_DOMAINS: "-d vxture.com -d *.vxture.com"
+  CERT_NAME: vxture.com
+  ACME_EMAIL: yanhaoguo@gmail.com
+
+jobs:
+  cert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Issue / renew LE wildcard cert (DNS-01 via Cloudflare)
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$HOME/cf"
+          cat > "$HOME/cf/cloudflare.ini" <<EOF
+          dns_cloudflare_api_token = ${{ secrets.CLOUDFLARE_DNS_API_TOKEN }}
+          EOF
+
+          sudo apt-get update -y
+          sudo apt-get install -y certbot python3-certbot-dns-cloudflare
+
+          DRY=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then DRY="--dry-run"; fi
+
+          sudo certbot certonly $DRY \
+            --dns-cloudflare \
+            --dns-cloudflare-credentials "$HOME/cf/cloudflare.ini" \
+            --dns-cloudflare-propagation-seconds 60 \
+            $CERT_DOMAINS \
+            --cert-name "$CERT_NAME" \
+            --key-type ecdsa \
+            --non-interactive --agree-tos -m "$ACME_EMAIL" \
+            --keep-until-expiring
+
+          rm -f "$HOME/cf/cloudflare.ini"
+
+          if [ -n "$DRY" ]; then
+            echo "DRY-RUN passed — DNS-01 works. No real cert issued, nothing deployed."
+            echo "deploy=false" >> "$GITHUB_ENV"
+          else
+            mkdir -p cert-out
+            sudo cp -L "/etc/letsencrypt/live/$CERT_NAME/fullchain.pem" cert-out/fullchain.pem
+            sudo cp -L "/etc/letsencrypt/live/$CERT_NAME/privkey.pem" cert-out/privkey.pem
+            sudo chown "$USER" cert-out/*.pem
+            chmod 600 cert-out/privkey.pem
+            echo "issuer: $(openssl x509 -in cert-out/fullchain.pem -noout -issuer)"
+            echo "deploy=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Join tailnet
+        if: env.deploy == 'true'
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          tags: ${{ vars.TAILSCALE_OAUTH_CLIENT_TAG }}
+
+      - name: Upload cert to worker-01
+        if: env.deploy == 'true'
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          source: "cert-out/fullchain.pem,cert-out/privkey.pem"
+          target: "/tmp/vxture-cert"
+          rm: true
+          timeout: 60s
+
+      - name: Install cert + reload nginx (with backup + rollback)
+        if: env.deploy == 'true'
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.DEPLOY_HOST_TAILNET }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          command_timeout: 5m
+          script: |
+            set -e
+            SSLDIR=/srv/vxture/data/nginx/ssl/live/vxture.com
+            SRC=/tmp/vxture-cert/cert-out
+
+            BK="/srv/vxture/data/nginx/ssl/backup-$(date +%Y%m%d-%H%M%S)"
+            mkdir -p "$BK"
+            cp -a "$SSLDIR/." "$BK/" || true
+
+            install -m 644 "$SRC/fullchain.pem" "$SSLDIR/fullchain.pem.new"
+            install -m 600 "$SRC/privkey.pem" "$SSLDIR/privkey.pem.new"
+            mv "$SSLDIR/fullchain.pem.new" "$SSLDIR/fullchain.pem"
+            mv "$SSLDIR/privkey.pem.new" "$SSLDIR/privkey.pem"
+
+            if docker exec vxture-nginx nginx -t; then
+              docker exec vxture-nginx nginx -s reload
+              echo "cert installed + nginx reloaded"
+              echo | openssl s_client -connect 127.0.0.1:443 -servername vxture.com 2>/dev/null \
+                | openssl x509 -noout -issuer -enddate || true
+            else
+              echo "nginx -t FAILED after cert swap — rolling back to $BK"
+              cp -a "$BK/." "$SSLDIR/"
+              docker exec vxture-nginx nginx -s reload || true
+              rm -rf /tmp/vxture-cert
+              exit 1
+            fi
+
+            rm -rf /tmp/vxture-cert
