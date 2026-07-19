@@ -34,6 +34,7 @@ mkdir -p /srv/vxture/data/nginx/logs/nginx
 mkdir -p /srv/vxture/data/nginx/ssl/live/vxture.com
 
 cp -v "$SRC/nginx.conf"                     "$DST/nginx.conf"
+cp -v "$SRC/conf.d/"*.conf                  "$DST/conf.d/"
 cp -v "$SRC/snippets/"*.conf                "$DST/snippets/"
 cp -v "$SRC/sites-enabled/"*.conf           "$DST/sites-enabled/"
 cp -v "$COMPOSE_SRC"                        "$COMPOSE_DST"
