@@ -28,8 +28,12 @@ nginx（最小服务器改动）。
 
 ## 首次签发流程
 
+> 每次运行都会停在 **production 审批门**(工作流用了 `environment: production` 才能拿 SSH
+> secret)。到 Actions 里那次 run 的 "Review deployments" → 勾 `production` → Approve 放行。
+> dry-run 也会停一次审批,但它只做 LE staging 校验、不碰生产,放心批。
+
 1. **先 dry-run 验证链路**（不消耗真证书、不碰生产）：
-   Actions → `deploy-cert` → Run workflow → 勾选 **dry_run = true** → Run。
+   Actions → `deploy-cert` → Run workflow → 勾选 **dry_run = true** → Run → 到 run 里 Approve。
    通过说明 CF token 权限 OK、DNS-01 能建/删 TXT、校验通过。
 
 2. **正式签发 + 部署**：Actions → `deploy-cert` → Run workflow → **dry_run = false** → Run。
@@ -43,11 +47,18 @@ nginx（最小服务器改动）。
      | openssl x509 -noout -issuer     # 应为 Let's Encrypt
    ```
 
-## 自动续期
+## 续期（月度 + 审批门）
 
-`schedule: cron "23 4 6 * *"` 每月 6 号自动重签 + 部署（90 天证书始终保留 ≥60 天有效期）。
-**刻意不设 `environment:` 审批门** —— 证书续期必须无人值守,否则会过期(等同故障);风险受控:
-只改两个证书文件、`nginx -t` 把关、坏证书自动回滚到备份。
+`schedule: cron "23 4 6 * *"` 每月 6 号自动**触发**重签 + 部署。因为部署要用的 SSH secret
+（`DEPLOY_*`)是 **production 环境级**,工作流声明了 `environment: production`,所以**每次运行
+都会停在生产审批门,由 owner 点批**(与"agent 只触发不自审"一致)。
+
+- 每次签发的是一张全新 90 天证书,大缓冲:即便某次月度续期你漏批,上一张证书仍有 ~60 天有效,
+  下月再触发;GitHub 的 pending 审批本身也保留 30 天。故审批延迟不会导致证书过期。
+- reload 仍由 `nginx -t` 把关,坏证书自动回滚到备份。
+- 若你更想要**完全无人值守续期**,可另建一个无 Required reviewers 的专用环境(如 `cert`)、
+  把 `DEPLOY_*` secret 放进去、工作流改 `environment: cert`——但这偏离"生产写操作都过审批门"的
+  治理约定,取舍自定。
 
 ## 回滚
 
