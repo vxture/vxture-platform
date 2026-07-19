@@ -44,7 +44,12 @@ import {
 } from "../oidc/oidc.service";
 import { TOKEN_EXCHANGE_GRANT_TYPE } from "../oidc/token-exchange.service";
 import type { OidcJwk } from "../oidc/oidc-key.service";
-import { buildSidCookie, SID_COOKIE_NAME as SID_COOKIE } from "../authn/cookie";
+import {
+  buildSidCookie,
+  buildHintCookie,
+  SID_COOKIE_NAME as SID_COOKIE,
+  HINT_COOKIE_NAME,
+} from "../authn/cookie";
 
 /** Raw form fields accepted at the token endpoint. */
 interface TokenRequestBody {
@@ -227,6 +232,11 @@ export class OidcRouter {
     const cookieDomain = this.config.platform.COOKIE_DOMAIN_PLATFORM;
     res.clearCookie(SID_COOKIE.operator, { path: "/" });
     res.clearCookie(SID_COOKIE.tenant, {
+      path: "/",
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+    });
+    // Clear the JS-readable login-state hint alongside the tenant session.
+    res.clearCookie(HINT_COOKIE_NAME, {
       path: "/",
       ...(cookieDomain ? { domain: cookieDomain } : {}),
     });
@@ -497,6 +507,16 @@ export class OidcRouter {
       platformCookieDomain: this.config.platform.COOKIE_DOMAIN_PLATFORM ?? null,
     });
     res.cookie(cookie.name, cookie.value, cookie.options);
+    // Tenant realm: also drop the JS-readable login-state hint so the marketing
+    // website can skip the prompt=none bounce for anonymous visitors.
+    if (completion.realm !== "workforce") {
+      const hint = buildHintCookie({
+        maxAgeSeconds: completion.sessionIdleTtl,
+        platformCookieDomain:
+          this.config.platform.COOKIE_DOMAIN_PLATFORM ?? null,
+      });
+      res.cookie(hint.name, hint.value, hint.options);
+    }
   }
 
   /** Token endpoint — authorization_code + refresh_token + token-exchange grants (confidential client). */

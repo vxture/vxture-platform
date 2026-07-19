@@ -11,10 +11,29 @@ const SESSION_RESTORE_THROTTLE_MS = 1500;
 // to catch session expiry while the tab stays focused. Kept at 5 min (was 2 s) to
 // avoid every open tab hammering the shared 2C/2G host with a request every 2 s.
 const SESSION_SYNC_INTERVAL_MS = 300_000;
-// One silent prompt=none SSO attempt per browser tab session. Without this, every
-// cold visit / hard refresh by an anonymous marketing visitor triggers a full-page
-// IdP round-trip, loading the page twice.
+// One silent prompt=none SSO attempt per browser tab session — AND only when the
+// login-state hint cookie says the user is actually logged in at the IdP, so a
+// truly-anonymous marketing visitor never pays a full-page IdP round-trip (the
+// reported "content shows, tab keeps spinning" case). The hint gate is the primary
+// fix; this per-tab guard just prevents repeats once an attempt has fired.
 const SSO_ATTEMPT_STORAGE_KEY = "vx_sso_attempted";
+
+// Login-state hint cookie set by auth-bff on `.vxture.com` at login and cleared at
+// logout (non-HttpOnly, so we can read it synchronously). Presence == logged in at
+// the IdP → worth bootstrapping the website RP session via prompt=none. Absence ==
+// anonymous → skip the bounce entirely. It is only a hint; the RP session +
+// /api/me stay authoritative.
+const LOGIN_HINT_COOKIE = "vx_hint";
+
+function hasLoginHint() {
+  try {
+    return document.cookie
+      .split("; ")
+      .some((c) => c.startsWith(`${LOGIN_HINT_COOKIE}=`));
+  } catch {
+    return false;
+  }
+}
 
 function hasAttemptedSilentSso() {
   try {
@@ -60,7 +79,14 @@ export function AuthSessionBootstrap() {
         .getState()
         .restoreSession({ silent: false })
         .then((user) => {
-          if (!user && !silentJustFailed && !hasAttemptedSilentSso()) {
+          // Only bounce when the hint says the user IS logged in at the IdP;
+          // anonymous visitors (no hint) render immediately with no round-trip.
+          if (
+            !user &&
+            hasLoginHint() &&
+            !silentJustFailed &&
+            !hasAttemptedSilentSso()
+          ) {
             markSilentSsoAttempted();
             window.location.replace(
               buildRpLoginUrl(window.location.href, { prompt: "none" }),
