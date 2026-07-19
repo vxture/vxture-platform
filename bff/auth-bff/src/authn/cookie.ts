@@ -55,3 +55,49 @@ export function buildSidCookie(input: {
     options,
   };
 }
+
+/** Login-state hint cookie name (non-HttpOnly, JS-readable on *.vxture.com). */
+export const HINT_COOKIE_NAME = "vx_hint";
+
+export interface HintCookie {
+  name: string;
+  value: string;
+  options: {
+    httpOnly: false;
+    secure: true;
+    sameSite: "lax";
+    path: "/";
+    maxAge: number;
+    domain?: string;
+  };
+}
+
+/**
+ * Build the login-state HINT cookie (tenant realm only).
+ *
+ * A non-HttpOnly, `.vxture.com`-shared cookie so first-party pages (esp. the
+ * marketing website) can tell "is anyone logged in?" synchronously via
+ * `document.cookie` — a truly-anonymous visitor then never pays a full-page
+ * prompt=none SSO bounce. Presence == logged in; lifecycle mirrors `vx_sid`.
+ *
+ * ⚠️ JS-readable (XSS-exposed) and unsigned: it carries NO secret and NO
+ * authority — value is the literal "1", an optimization HINT only. Every gated
+ * decision still relies on the HttpOnly `vx_sid` session + server checks. The
+ * operator realm stays isolated and gets no hint.
+ */
+export function buildHintCookie(input: {
+  maxAgeSeconds: number;
+  platformCookieDomain?: string | null;
+}): HintCookie {
+  const options: HintCookie["options"] = {
+    httpOnly: false,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: input.maxAgeSeconds * 1000,
+  };
+  if (input.platformCookieDomain) {
+    options.domain = input.platformCookieDomain;
+  }
+  return { name: HINT_COOKIE_NAME, value: "1", options };
+}

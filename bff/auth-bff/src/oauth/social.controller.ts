@@ -26,7 +26,7 @@ import {
 import type { Request, Response } from "express";
 import { extractClientIp } from "@vxture/core-utils";
 import { VxConfigService } from "@vxture/core-config";
-import { buildSidCookie } from "../authn/cookie";
+import { buildSidCookie, buildHintCookie } from "../authn/cookie";
 import { SocialAuthService } from "./social-auth.service";
 
 @Controller("auth/oauth")
@@ -135,6 +135,15 @@ export class SocialController {
       platformCookieDomain: this.config.platform.COOKIE_DOMAIN_PLATFORM ?? null,
     });
     res.cookie(cookie.name, cookie.value, cookie.options);
+    // Tenant realm: mirror oidc.router — set the JS-readable login-state hint.
+    if (completion.realm !== "workforce") {
+      const hint = buildHintCookie({
+        maxAgeSeconds: completion.sessionIdleTtl,
+        platformCookieDomain:
+          this.config.platform.COOKIE_DOMAIN_PLATFORM ?? null,
+      });
+      res.cookie(hint.name, hint.value, hint.options);
+    }
   }
 }
 
