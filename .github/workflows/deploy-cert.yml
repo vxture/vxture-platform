@@ -8,14 +8,17 @@
 # Required to be set once (GitHub → repo Settings → Secrets and variables → Actions):
 #   secret CLOUDFLARE_DNS_API_TOKEN — a scoped CF API token: Zone:DNS:Edit +
 #     Zone:Zone:Read, limited to the vxture.com zone (the "Edit zone DNS" template).
-# Reuses the existing deploy secrets: TAILSCALE_OAUTH_CLIENT_ID/SECRET,
-#   DEPLOY_HOST_TAILNET, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_SSH_PASSPHRASE
-#   and var TAILSCALE_OAUTH_CLIENT_TAG.
+#     Add it at repo level (the job also sees it with environment: production).
+# Reuses existing secrets: TAILSCALE_OAUTH_CLIENT_ID/SECRET (org) and the
+#   production-environment secrets DEPLOY_HOST_TAILNET / DEPLOY_USER /
+#   DEPLOY_SSH_KEY / DEPLOY_SSH_PASSPHRASE, plus var TAILSCALE_OAUTH_CLIENT_TAG.
 #
-# NOTE: deliberately NOT gated by an `environment:` approval — a cert rotation
-# must be unattended or the cert eventually lapses (outage). The blast radius is
-# bounded: only the two cert files change, `nginx -t` gates the reload, and a bad
-# cert auto-rolls-back to the pre-change backup.
+# The SSH deploy secrets are scoped to the `production` environment, so this job
+# declares `environment: production` to reach them — which means every run
+# (including scheduled renewal) pauses for the owner's approval, consistent with
+# the deploy-gate discipline. Renewal is scheduled well before expiry so an
+# approval delay never lapses the cert. The reload is still guarded by nginx -t
+# with auto-rollback to the pre-change backup.
 
 name: deploy-cert
 
@@ -44,6 +47,9 @@ env:
 jobs:
   cert:
     runs-on: ubuntu-latest
+    # Needed to reach the DEPLOY_* SSH secrets (production-environment scoped);
+    # also routes the run through the production approval gate.
+    environment: production
     steps:
       - name: Issue / renew LE wildcard cert (DNS-01 via Cloudflare)
         run: |
