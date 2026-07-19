@@ -2,9 +2,12 @@
  * product-subscriptions.router.ts - 当前租户各产品订阅态（website 侧）
  * @package @vxture/bff-website
  *
- * GET /api/me/product-subscriptions —— 登录租户各产品的「代表订阅」态，口径与
- * C2 引擎/console 一致：D10 谓词（从未付费的失效试用视为无）+ @shared 状态优先级，
- * 平票取周期末最新。驱动官网产品卡片的 已开通/升级/进入 分支（product_320 §4.5）。
+ * GET /api/me/product-subscriptions —— 登录租户 **default workspace** 各产品的
+ * 「代表订阅」态。订阅真实主体是 workspace（metering.subscriptions.workspace_id），
+ * tenant_id 仅账单 rollup；每租户唯一一个 default workspace（uq_workspaces_one_default_per_tenant），
+ * website 无 workspace 上下文，故统一按 active_org 的 default workspace 取（product_320 §4.5）。
+ * 口径与 C2 引擎/console 一致：D10 谓词（从未付费的失效试用视为无）+ @shared 状态优先级，
+ * 平票取周期末最新。驱动官网产品卡片的 已开通/升级/进入 分支。
  * 未登录 → []。AuthMiddleware 非阻断，req.tenantId 缺失即视为未登录。
  */
 import { Controller, Get, Inject, Req } from "@nestjs/common";
@@ -51,7 +54,11 @@ export class ProductSubscriptionsRouter {
              on pc.plan_version_id = ts.plan_version_id
             and pc.component_role = 'primary'
            join product.products prod on prod.id = pc.product_id
-          where ts.tenant_id = $1
+          where ts.workspace_id = (
+                  select id from tenancy.workspaces
+                   where tenant_id = $1 and is_default
+                   limit 1
+                )
             and ts.deleted_at is null
             and not (ts.subscription_kind = 'trial'
                      and ts.status in ('expired', 'cancelled'))
