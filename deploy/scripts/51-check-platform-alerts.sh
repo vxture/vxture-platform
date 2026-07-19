@@ -248,7 +248,8 @@ check_container_health() {
   for name in \
     vx-platform-pg vx-platform-redis vx-platform-auth-bff vx-platform-website-bff \
     vx-platform-console-bff vx-platform-admin-bff vx-platform-gateway-bff \
-    vx-platform-website vx-platform-console vx-platform-admin; do
+    vx-platform-api vx-platform-website vx-platform-console vx-platform-admin \
+    vx-platform-accounts; do
     if ! docker inspect "$name" >/dev/null 2>&1; then
       high "容器缺失：$name"
       continue
@@ -402,6 +403,39 @@ check_backups() {
   fi
 }
 
+# Host memory headroom — worker-01 is ~1.6GB and has OOM-thrashed twice. Steady
+# state leaves MemAvailable ~700MB; this is a steady-state drift check (weekly
+# cron cadence), not a real-time OOM catch for deploy-time spikes.
+check_host_memory() {
+  local mem_avail_kb mem_avail_mb swap_total_kb swap_free_kb swap_free_mb
+  mem_avail_kb="$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo 2>/dev/null || true)"
+  if [ -z "$mem_avail_kb" ]; then
+    low "无法读取 /proc/meminfo MemAvailable"
+    return
+  fi
+  mem_avail_mb=$((mem_avail_kb / 1024))
+  if [ "$mem_avail_mb" -lt 150 ]; then
+    high "可用内存偏低：MemAvailable=${mem_avail_mb}MB (<150MB，逼近 OOM)"
+  elif [ "$mem_avail_mb" -lt 300 ]; then
+    medium "可用内存吃紧：MemAvailable=${mem_avail_mb}MB (<300MB)"
+  else
+    ok "可用内存正常：MemAvailable=${mem_avail_mb}MB"
+  fi
+
+  swap_total_kb="$(awk '/^SwapTotal:/ {print $2}' /proc/meminfo 2>/dev/null || true)"
+  swap_free_kb="$(awk '/^SwapFree:/ {print $2}' /proc/meminfo 2>/dev/null || true)"
+  if [ -n "$swap_total_kb" ] && [ "$swap_total_kb" -gt 0 ]; then
+    swap_free_mb=$((swap_free_kb / 1024))
+    if [ "$swap_free_mb" -lt 256 ]; then
+      medium "swap 余量偏低：SwapFree=${swap_free_mb}MB (<256MB，重度换页)"
+    else
+      ok "swap 余量正常：SwapFree=${swap_free_mb}MB"
+    fi
+  else
+    low "未启用 swap（建议 11-bootstrap-host.sh 配置 2G swapfile）"
+  fi
+}
+
 echo "=== Vxture Platform Alerts ==="
 check_os
 check_tool_versions
@@ -409,6 +443,7 @@ check_runtime_files
 check_env_residue
 check_compose_images
 check_docker_runtime
+check_host_memory
 check_container_health
 check_model_platform_health
 check_model_platform_readiness
