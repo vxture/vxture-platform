@@ -54,18 +54,48 @@ const SessionContext = createContext<SessionContextValue>({
 });
 
 const ACTIVE_TENANT_STORAGE_KEY = "vx-console-active-tenant-id";
+// Mirror of the active tenant in a cookie so the server (a future (console)
+// server-layout building the initial session snapshot for SSR) can read the
+// user's selected tenant — localStorage is not visible server-side. Non-sensitive
+// (the BFF still validates membership per request); SameSite=Lax so it rides
+// top-level navigations. Written client-side, hence not HttpOnly.
+const ACTIVE_TENANT_COOKIE = "vx-console-active-tenant";
+const ACTIVE_TENANT_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+function readTenantCookie(): string | undefined {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${ACTIVE_TENANT_COOKIE}=([^;]*)`),
+  );
+  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
+}
+
+function writeTenantCookie(tenantId: string) {
+  if (typeof document === "undefined") {
+    return;
+  }
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${ACTIVE_TENANT_COOKIE}=${encodeURIComponent(tenantId)}; Path=/; Max-Age=${ACTIVE_TENANT_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+}
 
 function readStoredTenantId() {
   if (typeof window === "undefined") {
     return undefined;
   }
 
-  return window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY) ?? undefined;
+  return (
+    window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY) ??
+    readTenantCookie() ??
+    undefined
+  );
 }
 
 function writeStoredTenantId(tenantId: string) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, tenantId);
+    writeTenantCookie(tenantId);
   }
 }
 
