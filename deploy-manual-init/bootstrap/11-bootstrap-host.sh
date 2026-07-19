@@ -237,9 +237,49 @@ ensure_data_disk_mount() {
   echo "数据盘已挂载：$device -> $DATA_MOUNT_POINT"
 }
 
+# 2G swapfile + vm.swappiness=10 —— worker-01 仅 ~1.6GB 物理内存，swap 作应急缓冲，
+# 让内存尖峰换页而非直接触发 host OOM-killer（曾两次打爆全机）。与容器 mem_limit 配套。
+# 幂等：已存在则跳过；创建失败（磁盘不足）非致命，警告后继续。
+ensure_swapfile() {
+  echo "==> [preflight] 配置 swap（应急内存缓冲，2G）"
+  local swapfile=/swapfile
+
+  if [ -f "$swapfile" ] || grep -q "$swapfile" /proc/swaps 2>/dev/null; then
+    echo "swapfile 已存在，跳过创建"
+  elif dd if=/dev/zero of="$swapfile" bs=1M count=2048 status=none \
+    && chmod 600 "$swapfile" && mkswap "$swapfile" >/dev/null; then
+    echo "已创建 $swapfile（2048MB）"
+  else
+    echo "warning: swapfile 创建失败（磁盘空间不足？），跳过 swap 配置"
+    rm -f "$swapfile"
+    return 0
+  fi
+
+  # swapon：未激活才启用（dd 建的是真实文件，非 fallocate holey 文件，mkswap 才接受）
+  if ! swapon --show=NAME --noheadings 2>/dev/null | grep -qx "$swapfile"; then
+    swapon "$swapfile" || echo "warning: swapon $swapfile 失败"
+  fi
+
+  # fstab：仿数据盘范式，缺项才追加（幂等）
+  if ! grep -qE "^[[:space:]]*$swapfile[[:space:]]" /etc/fstab; then
+    echo "$swapfile none swap sw 0 0" >> /etc/fstab
+    echo "已写入 /etc/fstab：$swapfile"
+  fi
+
+  # vm.swappiness：drop-in 覆盖式（与 resolved/docker daemon 同风格，非 tee -a 追加，幂等）
+  mkdir -p /etc/sysctl.d
+  cat > /etc/sysctl.d/60-vxture-swappiness.conf <<'EOF'
+# Vxture: only lean on swap when physical memory is tight (emergency buffer, not routine paging)
+vm.swappiness=10
+EOF
+  sysctl --system >/dev/null 2>&1 || true
+  echo "vm.swappiness=10（当前 $(cat /proc/sys/vm/swappiness 2>/dev/null || echo '?')）"
+}
+
 ensure_dns_resolution
 ensure_apt_sources_reachable
 ensure_data_disk_mount
+ensure_swapfile
 
 echo "==> [1/7] 系统更新"
 if [ "$(hostname)" != "$TARGET_HOSTNAME" ]; then

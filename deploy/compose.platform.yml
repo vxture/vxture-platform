@@ -24,6 +24,11 @@ services:
     image: postgres:18-alpine@sha256:96d56f7f57c6aacd1fcb908bc83b345ec5f83231ee486dd66a1baadce274db88
     container_name: vx-platform-pg
     restart: unless-stopped
+    # Ceiling only (steady state ~40-100MB/container; whole host ~900MB). Stateful:
+    # NOT pinned to no-swap (no memswap_limit) so it can lean on swap under pressure
+    # rather than be OOM-killed — a killed pg cascades (all BFF depend_on it).
+    # Owner: verify against `docker stats` on worker-01 before trusting this value.
+    mem_limit: 512m
     networks: [vxture-prod]
     environment:
       POSTGRES_USER: vxture
@@ -44,6 +49,11 @@ services:
     image: redis:8-alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1
     container_name: vx-platform-redis
     restart: unless-stopped
+    # --maxmemory 96mb (below this 128m ceiling) makes redis self-evict before the
+    # cgroup OOM-kills it. volatile-lru only evicts TTL-bearing keys (all session/
+    # token/rate-limit keys have TTLs) — an evicted idle session (user re-logs in)
+    # beats redis being OOM-killed and losing every session.
+    mem_limit: 128m
     networks: [vxture-prod]
     secrets: [platform_redis_password]
     volumes:
@@ -52,7 +62,7 @@ services:
       [
         "sh",
         "-c",
-        'redis-server --appendonly yes --requirepass "$$(cat /run/secrets/platform_redis_password)"',
+        'redis-server --appendonly yes --maxmemory 96mb --maxmemory-policy volatile-lru --requirepass "$$(cat /run/secrets/platform_redis_password)"',
       ]
     healthcheck:
       test:
@@ -71,10 +81,13 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_website:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-website
     restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m # == mem_limit: no swap, so a runaway dies at its own ceiling instead of eating host swap
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.vxture.com
+      NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
       test:
         [
@@ -92,10 +105,13 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_console:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-console
     restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.vxture.com
+      NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
       test:
         [
@@ -113,10 +129,13 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_admin:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-admin
     restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: https://api.vxture.com
+      NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
       test:
         [
@@ -136,10 +155,13 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_accounts:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-accounts
     restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
       NEXT_PUBLIC_OIDC_API_BASE: https://accounts.vxture.com
+      NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
       test:
         [
@@ -159,9 +181,15 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-auth:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-auth-bff
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 192m
     networks: [vxture-prod]
     ports:
       - "100.100.197.42:3090:3090" # 绑定 Tailscale 接口，仅 Tailscale 对端可达
+    # Overrides any NODE_OPTIONS from env_file (inline wins). Owner: confirm no
+    # host .env.* already sets NODE_OPTIONS flags that would be clobbered.
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -191,7 +219,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-gateway:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-gateway-bff
     restart: unless-stopped
+    mem_limit: 128m
+    memswap_limit: 128m
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=96
     env_file: /srv/vxture/runtime/.env.gateway-bff
     healthcheck:
       test:
@@ -210,7 +242,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-website:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-website-bff
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 192m
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -239,7 +275,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_service-model-platform:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-model-platform
     restart: unless-stopped
+    mem_limit: 256m
+    memswap_limit: 256m
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
     # 绑 worker-01 tailscale IP，把 LLM 网关暴露给 tailnet（worker-02 varda-server 消费）。
     # 仅 100.100.197.42（tailscale0）可达，不绑 0.0.0.0 公网。见 docs/deployment/varda-worker-02-runbook.md §3。
     ports: ["100.100.197.42:3100:3100"]
@@ -268,7 +308,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-console:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-console-bff
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 192m
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -298,7 +342,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-admin:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-admin-bff
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 192m
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -331,7 +379,11 @@ services:
     image: ${VX_IMAGE_REGISTRY:-ghcr.io}/${VX_IMAGE_NAMESPACE:-vxture}/platform_bff-platform-api:${VX_IMAGE_TAG:-latest}
     container_name: vx-platform-api
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 192m # owner: verify RSS — this one runs commerce cron jobs (dispatch/expiry sweeps)
     networks: [vxture-prod]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
