@@ -89,13 +89,7 @@ services:
       NEXT_PUBLIC_API_URL: https://api.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -117,13 +111,7 @@ services:
       # keeps using the public same-origin path. See lib/server/bff-server.ts (#7).
       CONSOLE_BFF_INTERNAL_URL: http://vx-platform-console-bff:3021
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -141,13 +129,7 @@ services:
       NEXT_PUBLIC_API_URL: https://api.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -167,13 +149,7 @@ services:
       NEXT_PUBLIC_OIDC_API_BASE: https://accounts.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -207,13 +183,7 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3090/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3090/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -230,13 +200,7 @@ services:
       NODE_OPTIONS: --max-old-space-size=96
     env_file: /srv/vxture/runtime/.env.gateway-bff
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:8000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -263,13 +227,7 @@ services:
       redis: { condition: service_healthy }
       auth-bff: { condition: service_healthy }
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3011/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3011/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -297,12 +255,7 @@ services:
       postgres: { condition: service_healthy }
     healthcheck:
       test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3100/model-platform/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+        ["CMD", "curl", "-fsS", "http://127.0.0.1:3100/model-platform/health/live"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -330,13 +283,7 @@ services:
       auth-bff: { condition: service_healthy }
       model-platform: { condition: service_healthy }
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3021/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3021/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -363,13 +310,7 @@ services:
       redis: { condition: service_healthy }
       auth-bff: { condition: service_healthy }
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3031/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3031/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -399,13 +340,7 @@ services:
       redis: { condition: service_healthy }
       auth-bff: { condition: service_healthy }
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "fetch('http://127.0.0.1:3041/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3041/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
