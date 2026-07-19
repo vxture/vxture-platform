@@ -16,6 +16,8 @@ export interface OrgView {
   type: OrgType;
   ownerUserId: string;
   status: string;
+  /** Human-friendly tenant number (tenancy.tenants.tenant_no "可视码"), bigint as string. */
+  tenantNo?: string;
   /** ISO timestamp of org creation (present on getOrgById reads). */
   createdAt?: string;
 }
