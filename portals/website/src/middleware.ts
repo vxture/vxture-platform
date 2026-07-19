@@ -79,10 +79,7 @@ export function middleware(request: NextRequest) {
   // 如需已登录跳转，由客户端 AuthSessionBootstrap + 各页面自行处理
 
   // 交给 next-intl 处理语言前缀路由
-  // 写入 pathname 供 getRequestConfig 按需加载翻译
-  const response = intlMiddleware(request);
-  response.headers.set("x-pathname", request.nextUrl.pathname);
-  return response;
+  return intlMiddleware(request);
 }
 
 export const config = {
