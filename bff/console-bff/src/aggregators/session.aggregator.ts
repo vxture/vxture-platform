@@ -651,7 +651,7 @@ function toUserProfile(
 
 function toTenantContext(
   orgId: string,
-  org: { name: string; type: string; status: string },
+  org: { name: string; type: string; status: string; tenantNo?: string },
   workspace: string | null,
 ): TenantContext {
   return {
@@ -661,6 +661,7 @@ function toTenantContext(
     workspace: workspace ?? "default",
     tenantType: org.type === "organization" ? "organization" : "personal",
     tenantCode: orgId,
+    tenantNo: org.tenantNo ?? null,
     status: org.status,
   };
 }

@@ -12,5 +12,8 @@ export function formatTenantDisplay(
 ): string {
   const n = (name ?? "").trim();
   if (!n) return "";
-  return type ? `${n} ${type}` : n;
+  const t = (type ?? "").trim();
+  if (!t) return n;
+  // Capitalize the type suffix — e.g. "StoneSmoker Personal" / "Acme Organization".
+  return `${n} ${t.charAt(0).toUpperCase()}${t.slice(1)}`;
 }

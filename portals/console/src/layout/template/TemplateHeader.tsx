@@ -116,7 +116,8 @@ export function TemplateHeader({
 
   const user = session.user;
   const tenant = session.tenant;
-  const tenantName = tenant?.workspace ?? tenant?.name ?? labels.tenantOrg;
+  const tenantName =
+    formatTenantDisplay(tenant?.name, tenant?.tenantType) || labels.tenantOrg;
   const displayName = (
     user?.displayName ||
     user?.name ||
@@ -243,6 +244,9 @@ export function TemplateHeader({
                     {formatTenantDisplay(tenant?.name, tenant?.tenantType) ||
                       tenantName}
                   </div>
+                  {tenant?.tenantNo ? (
+                    <span className="vxh-org-plan">T-{tenant.tenantNo}</span>
+                  ) : null}
                   <span className="vxh-org-plan">
                     {tenantTypeLabel}
                     {tenant?.status === "active" ? (

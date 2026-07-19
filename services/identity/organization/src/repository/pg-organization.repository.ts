@@ -91,6 +91,7 @@ interface OrgRow {
   type: string;
   owner_user_id: string;
   status: string;
+  tenant_no?: string | null;
   created_at?: string | null;
 }
 interface WorkspaceRow {
@@ -204,6 +205,7 @@ export class PgOrganizationRepository implements OrganizationReadRepository {
   async getOrgById(orgId: string): Promise<OrgView | null> {
     const r = await this.pool.query<OrgRow>(
       `select id, name, type, owner_user_id, status,
+              tenant_no::text as tenant_no,
               created_at::text as created_at
          from tenancy.tenants
         where id = $1 and deleted_at is null
@@ -788,6 +790,7 @@ function mapOrg(row?: OrgRow): OrgView | null {
     ownerUserId: row.owner_user_id,
     status: row.status,
   };
+  if (row.tenant_no != null) view.tenantNo = row.tenant_no;
   if (row.created_at != null) view.createdAt = row.created_at;
   return view;
 }

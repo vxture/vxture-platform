@@ -129,6 +129,8 @@ export interface TenantContext {
   workspace: string;
   tenantType?: "personal" | "organization";
   tenantCode?: string;
+  /** Human-friendly tenant number (tenancy.tenants.tenant_no "可视码"), bigint as string; null when unavailable. */
+  tenantNo?: string | null;
   status?: string;
 }
 
