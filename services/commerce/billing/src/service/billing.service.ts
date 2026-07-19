@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Inject,
   NotFoundException,
   ConflictException,
 } from "@nestjs/common";
@@ -16,7 +17,14 @@ import type {
 
 @Injectable()
 export class BillingService {
-  constructor(private readonly billing: PgBillingRepository) {}
+  constructor(
+    // Explicit token: esbuild does not emit design:paramtypes metadata into the
+    // BFF bundle, so implicit constructor injection silently resolves to
+    // undefined at runtime (this.billing.listInvoices → TypeError). See the
+    // repository's own @Inject(COMMERCE_PG_POOL) for the same pattern.
+    @Inject(PgBillingRepository)
+    private readonly billing: PgBillingRepository,
+  ) {}
 
   async listInvoices(params: ListInvoicesParams): Promise<ListInvoicesResult> {
     return this.billing.listInvoices(params);
