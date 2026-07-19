@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -18,7 +19,11 @@ import {
 import type { SessionSnapshot } from "@/entities/console";
 
 type SessionStatus = "idle" | "loading" | "ready";
-const SESSION_SYNC_INTERVAL_MS = 2000;
+// Background heartbeat only. focus/visibilitychange below already sync immediately
+// when the user returns to the tab, so this interval just catches session expiry
+// while the tab stays focused. Kept at 5 min (was 2 s): every 2 s each open console
+// tab fired 5 HTTP requests (probe + 4 aggregated reads) at the shared 2C/2G host.
+const SESSION_SYNC_INTERVAL_MS = 300_000;
 const SESSION_SYNC_THROTTLE_MS = 1500;
 const ANONYMOUS_SESSION: SessionSnapshot = {
   isAuthenticated: false,
@@ -49,18 +54,48 @@ const SessionContext = createContext<SessionContextValue>({
 });
 
 const ACTIVE_TENANT_STORAGE_KEY = "vx-console-active-tenant-id";
+// Mirror of the active tenant in a cookie so the server (a future (console)
+// server-layout building the initial session snapshot for SSR) can read the
+// user's selected tenant — localStorage is not visible server-side. Non-sensitive
+// (the BFF still validates membership per request); SameSite=Lax so it rides
+// top-level navigations. Written client-side, hence not HttpOnly.
+const ACTIVE_TENANT_COOKIE = "vx-console-active-tenant";
+const ACTIVE_TENANT_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+function readTenantCookie(): string | undefined {
+  if (typeof document === "undefined") {
+    return undefined;
+  }
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${ACTIVE_TENANT_COOKIE}=([^;]*)`),
+  );
+  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
+}
+
+function writeTenantCookie(tenantId: string) {
+  if (typeof document === "undefined") {
+    return;
+  }
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${ACTIVE_TENANT_COOKIE}=${encodeURIComponent(tenantId)}; Path=/; Max-Age=${ACTIVE_TENANT_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+}
 
 function readStoredTenantId() {
   if (typeof window === "undefined") {
     return undefined;
   }
 
-  return window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY) ?? undefined;
+  return (
+    window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY) ??
+    readTenantCookie() ??
+    undefined
+  );
 }
 
 function writeStoredTenantId(tenantId: string) {
   if (typeof window !== "undefined") {
     window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, tenantId);
+    writeTenantCookie(tenantId);
   }
 }
 
@@ -188,25 +223,33 @@ export function ConsoleSessionProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshSession, status]);
 
-  function signOut() {
+  const signOut = useCallback(() => {
     // Top-level navigation (not fetch) so the browser sends vx_sid to the IdP
     // end_session, which performs single-logout across all RPs and lands on the
     // unified post-logout page. The page unloads, so no local commit is needed.
     window.location.assign(buildLogoutUrl());
-  }
+  }, []);
 
-  async function switchTenant(tenantId: string) {
-    setStatus("loading");
-    const snapshot = await switchTenantSession(tenantId);
-    writeStoredTenantId(tenantId);
-    commitSession(snapshot);
-    setStatus("ready");
-  }
+  const switchTenant = useCallback(
+    async (tenantId: string) => {
+      setStatus("loading");
+      const snapshot = await switchTenantSession(tenantId);
+      writeStoredTenantId(tenantId);
+      commitSession(snapshot);
+      setStatus("ready");
+    },
+    [commitSession],
+  );
+
+  // Stable context value: consumers only re-render when session/status actually
+  // change, not on every ancestor render.
+  const contextValue = useMemo<SessionContextValue>(
+    () => ({ session, status, signOut, switchTenant, refreshSession }),
+    [session, status, signOut, switchTenant, refreshSession],
+  );
 
   return (
-    <SessionContext.Provider
-      value={{ session, status, signOut, switchTenant, refreshSession }}
-    >
+    <SessionContext.Provider value={contextValue}>
       {children}
     </SessionContext.Provider>
   );

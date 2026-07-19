@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
 import type { TenantContext } from "@/entities/console";
 import { useConsoleSession } from "@/features/session/ConsoleSessionProvider";
@@ -68,7 +68,13 @@ function sortTenants(items: TenantListItem[]) {
 export function TenantProvider({ children }: TenantProviderProps) {
   const { session, switchTenant } = useConsoleSession();
   const router = useRouter();
+  // Read pathname through a ref so switchTenantContext can stay referentially
+  // stable — subscribing to usePathname re-renders this provider on every
+  // navigation, but the memoized context value below keeps consumers from
+  // re-rendering unless the tenant data itself changed.
   const pathname = usePathname();
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
 
   const baseTenants = useMemo(() => {
     const tenantMap = new Map<string, TenantContext>();
@@ -98,36 +104,52 @@ export function TenantProvider({ children }: TenantProviderProps) {
     (tenant) => tenant.type === "personal",
   );
 
-  async function switchTenantContext(tenantId: string) {
-    const tenant = tenantList.find((item) => item.id === tenantId);
-    if (!tenant || tenant.id === currentTenant?.id) {
-      return;
-    }
+  const switchTenantContext = useCallback(
+    async (tenantId: string) => {
+      const tenant = tenantList.find((item) => item.id === tenantId);
+      if (!tenant || tenant.id === currentTenant?.id) {
+        return;
+      }
 
-    await switchTenant(tenant.id);
-    router.replace(pathname);
-    router.refresh();
-  }
+      await switchTenant(tenant.id);
+      router.replace(pathnameRef.current);
+      router.refresh();
+    },
+    [tenantList, currentTenant?.id, switchTenant, router],
+  );
 
-  async function createTenant(payload: CreateTenantPayload) {
-    if (payload.type === "personal" && hasPersonalTenant) {
-      throw new Error("Only one personal workspace is allowed.");
-    }
+  const createTenant = useCallback(
+    async (payload: CreateTenantPayload) => {
+      if (payload.type === "personal" && hasPersonalTenant) {
+        throw new Error("Only one personal workspace is allowed.");
+      }
 
-    throw new Error("Tenant creation BFF endpoint is not available.");
-  }
+      throw new Error("Tenant creation BFF endpoint is not available.");
+    },
+    [hasPersonalTenant],
+  );
+
+  const contextValue = useMemo<TenantContextState>(
+    () => ({
+      currentTenantId,
+      currentTenant,
+      tenantList,
+      hasPersonalTenant,
+      switchTenantContext,
+      createTenant,
+    }),
+    [
+      currentTenantId,
+      currentTenant,
+      tenantList,
+      hasPersonalTenant,
+      switchTenantContext,
+      createTenant,
+    ],
+  );
 
   return (
-    <TenantUiContext.Provider
-      value={{
-        currentTenantId,
-        currentTenant,
-        tenantList,
-        hasPersonalTenant,
-        switchTenantContext,
-        createTenant,
-      }}
-    >
+    <TenantUiContext.Provider value={contextValue}>
       {children}
     </TenantUiContext.Provider>
   );

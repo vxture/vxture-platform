@@ -61,7 +61,8 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
   const tenantId = session.tenant?.id;
   useEffect(() => {
     let alive = true;
-    void (async () => {
+
+    const loadUsage = async () => {
       try {
         const quotas = await fetchTenantModelQuotas(false);
         const q = quotas[0];
@@ -73,6 +74,9 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
       } catch {
         /* fallback 0/100 */
       }
+    };
+
+    const loadBilling = async () => {
       try {
         const subs = await fetchMySubscriptions();
         const active = subs.find((s) => s.status === "active") ?? subs[0];
@@ -82,13 +86,22 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
       } catch {
         /* fallback 0 */
       }
+    };
+
+    const loadApps = async () => {
       try {
         const entries = await fetchMyApps();
         if (alive) setAppEntries(entries);
       } catch {
         /* fallback empty — static catalog rendered below */
       }
-    })();
+    };
+
+    // These three reads are independent — fire them concurrently instead of
+    // chaining awaits, so the sidebar usage/billing/apps data lands after one
+    // round-trip rather than three.
+    void Promise.all([loadUsage(), loadBilling(), loadApps()]);
+
     return () => {
       alive = false;
     };

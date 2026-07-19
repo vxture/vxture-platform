@@ -20,17 +20,12 @@
 
 import type { Metadata } from "next";
 import { Funnel_Display, Geist_Mono, Inter } from "next/font/google";
-import { cookies } from "next/headers";
 import {
   ThemeProvider,
   FullscreenProvider,
   themeBootstrapScript,
 } from "@vxture/design-system";
-import {
-  DEFAULT_LOCALE,
-  PREFERENCE_CONSTANTS,
-  THEME_CONSTANTS,
-} from "@vxture/shared";
+import { DEFAULT_LOCALE, THEME_CONSTANTS } from "@vxture/shared";
 import "./globals.css";
 
 const fontBrand = Funnel_Display({
@@ -59,24 +54,30 @@ export const metadata: Metadata = {
   description: "AI-based virtual nature exploration platform",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const defaultTheme =
-    cookieStore.get(THEME_CONSTANTS.COOKIE_KEY)?.value ??
-    THEME_CONSTANTS.DEFAULT_THEME;
-  const defaultDensity = cookieStore.get(
-    PREFERENCE_CONSTANTS.DENSITY_COOKIE_KEY,
-  )?.value;
-
+  // No cookies()/headers() in the root layout: reading the theme/density cookie
+  // opted every route — including the static marketing pages — into dynamic SSR.
+  // themeBootstrapScript already applies the persisted theme from localStorage
+  // before first paint, and density is only applied client-side on mount, so the
+  // layout stays static and defers the actual preference to the client.
   return (
     // suppressHydrationWarning 是 next-themes 官方要求，避免 SSR/CSR class 不一致警告
     <html lang={DEFAULT_LOCALE} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        {/* Warm up the unpkg connection (DNS+TLS) before the render-blocking
+            icon stylesheets below are requested. TODO(perf): self-host
+            @phosphor-icons/web so these are not third-party render-blocking. */}
+        <link rel="preconnect" href="https://unpkg.com" />
+        <link
+          rel="preconnect"
+          href="https://unpkg.com"
+          crossOrigin="anonymous"
+        />
         {/* Phosphor icon font — user panel uses ph ph-* classes. */}
         <link
           rel="stylesheet"
@@ -92,18 +93,8 @@ export default async function RootLayout({
       >
         {/* ThemeProvider 管理全站多主题模式，默认跟随系统偏好 */}
         <ThemeProvider
-          defaultMode={
-            defaultTheme === "light" ||
-            defaultTheme === "dark" ||
-            defaultTheme === "system"
-              ? defaultTheme
-              : "system"
-          }
-          defaultDensity={
-            defaultDensity === "compact" || defaultDensity === "comfortable"
-              ? defaultDensity
-              : "default"
-          }
+          defaultMode={THEME_CONSTANTS.DEFAULT_THEME}
+          defaultDensity="default"
         >
           {/* FullscreenProvider 管理全站全屏状态，默认 pseudo 模式 */}
           <FullscreenProvider defaultMode="native" defaultLockScroll={false}>

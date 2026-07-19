@@ -190,8 +190,13 @@ const SolutionCard = memo(function SolutionCard({
                       alt={t(`items.${solution.id}.cover.alt`)}
                       width={1}
                       height={1}
-                      sizes="100vw"
-                      priority
+                      // Solutions is an below-the-fold section (3rd full-screen
+                      // snap section) and a carousel that only mounts the active
+                      // slide. Lazy-load it instead of preloading; and cap the
+                      // requested variant to the real display width (max-w-2xl
+                      // ≈ 672px) rather than the full viewport.
+                      sizes="(max-width: 768px) 100vw, 672px"
+                      loading="lazy"
                       className="w-full h-auto object-contain select-none pointer-events-none block"
                       draggable={false}
                       onContextMenu={(e) => e.preventDefault()}

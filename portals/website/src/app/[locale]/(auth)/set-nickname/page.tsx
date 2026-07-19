@@ -8,10 +8,13 @@
  * string and lets the user set (or skip) a nickname after first login.
  */
 
-"use client";
-
+import { Suspense } from "react";
 import { SetNicknameForm } from "@/components/auth/SetNicknameForm";
 
 export default function SetNicknamePage() {
-  return <SetNicknameForm />;
+  return (
+    <Suspense>
+      <SetNicknameForm />
+    </Suspense>
+  );
 }

@@ -13,7 +13,6 @@ import { VxConfigService } from "@vxture/core-config";
 import { AccountService } from "@vxture/service-account";
 import {
   ActiveContextService,
-  OrganizationService,
   type OrgRole,
 } from "@vxture/service-organization";
 import type {
@@ -33,8 +32,6 @@ export class SessionAggregator {
   constructor(
     @Inject(AccountService)
     private readonly account: AccountService,
-    @Inject(OrganizationService)
-    private readonly org: OrganizationService,
     @Inject(ActiveContextService)
     private readonly active: ActiveContextService,
     @Inject(VxConfigService)
@@ -69,15 +66,20 @@ export class SessionAggregator {
     try {
       const ctx = await this.active.resolveActiveContext(userId);
       if (!ctx?.activeOrg) return fallback;
-      const org = await this.org.getOrgById(ctx.activeOrg);
-      if (!org) return fallback;
-      const member = await this.org.getOrgMemberDetail(ctx.activeOrg, userId);
-      const role = (member?.role as OrgRole) ?? "member";
-      const tenantType = org.type === "organization" ? "company" : "individual";
+      // resolveActiveContext already carries the org snapshot (type/name, from
+      // its listOrgMembershipsForUser join) and the active-org role (roles[0] =
+      // `org:${role}`). Derive the badges from it instead of re-querying
+      // getOrgById + getOrgMemberDetail (two redundant round-trips on the /api/me
+      // session-heartbeat path).
+      const orgRole = ctx.roles
+        .find((r) => r.startsWith("org:"))
+        ?.slice("org:".length);
+      const role = (orgRole as OrgRole | undefined) ?? "member";
+      const isCompany = ctx.activeOrgType === "organization";
       return {
         role,
-        tenantType,
-        organizationName: org.type === "organization" ? org.name : null,
+        tenantType: isCompany ? "company" : "individual",
+        organizationName: isCompany ? ctx.activeOrgName : null,
       };
     } catch {
       return fallback;

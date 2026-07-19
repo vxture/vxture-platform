@@ -6,7 +6,31 @@ import { useAuthStore } from "@/stores/auth.store";
 import { buildRpLoginUrl } from "@/api/auth.api";
 
 const SESSION_RESTORE_THROTTLE_MS = 1500;
-const SESSION_SYNC_INTERVAL_MS = 2000;
+// Background heartbeat only. Foreground focus/visibilitychange already trigger an
+// immediate sync when the user returns to the tab, so this interval exists purely
+// to catch session expiry while the tab stays focused. Kept at 5 min (was 2 s) to
+// avoid every open tab hammering the shared 2C/2G host with a request every 2 s.
+const SESSION_SYNC_INTERVAL_MS = 300_000;
+// One silent prompt=none SSO attempt per browser tab session. Without this, every
+// cold visit / hard refresh by an anonymous marketing visitor triggers a full-page
+// IdP round-trip, loading the page twice.
+const SSO_ATTEMPT_STORAGE_KEY = "vx_sso_attempted";
+
+function hasAttemptedSilentSso() {
+  try {
+    return window.sessionStorage.getItem(SSO_ATTEMPT_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markSilentSsoAttempted() {
+  try {
+    window.sessionStorage.setItem(SSO_ATTEMPT_STORAGE_KEY, "1");
+  } catch {
+    /* sessionStorage unavailable (private mode / blocked) — best effort only */
+  }
+}
 
 export function AuthSessionBootstrap() {
   const pathname = usePathname();
@@ -36,7 +60,8 @@ export function AuthSessionBootstrap() {
         .getState()
         .restoreSession({ silent: false })
         .then((user) => {
-          if (!user && !silentJustFailed) {
+          if (!user && !silentJustFailed && !hasAttemptedSilentSso()) {
+            markSilentSsoAttempted();
             window.location.replace(
               buildRpLoginUrl(window.location.href, { prompt: "none" }),
             );
