@@ -122,6 +122,7 @@
 - 消费方**必须**剥 scope 前缀再判定,**禁止**拿裸 `owner`/`admin` 直接比对（会把 `org:owner`/`workspace:owner` 判为不匹配、把 `manager` 判为非管理员,导致管理面越权门控失效——`vxture-arda` `entitlement/roles.ts` 现存此 bug）。
 - "可管理本组织/空间"的判定 = role ∈ `{org:owner, workspace:owner, workspace:manager}`（owner 全授、manager 管成员/角色/设置不含账单,§6.4 能力姿态）。`member`/`readonly`/`guest` 无治理权限。
 - 三轴分离铁律:治理角色（本 claim,不入产品库）⊥ 产品功能角色（产品自库按 `(active_workspace, sub)` 解析）⊥ 订阅 tier（C2 拉取）。
+- **`workspace:owner` = 全订阅产品的 owner 基线**:持 `workspace:owner` 者在该 workspace 订阅的**每个产品**里天然有 owner/超管基线(产品鉴权 = `isWorkspaceOwner(token) || 产品自库授权`),**首登即超管**,解产品初始化"谁是第一个管理员"的 bootstrap 问题(scope 对齐:订阅是 workspace 级)。`workspace:manager` 是否给产品 admin 基线由产品自定,标准不强制。此桥不破上条三轴正交(仅 owner 短路满权)。
 
 ### 2.7 back-channel logout 接收
 
