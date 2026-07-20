@@ -213,8 +213,14 @@ GET /platform/entitlements?workspace_id={W}&product={P}
 
 `member.max` **不进 L0 共享池**,保持各产品 capability(owner 2026-07-08 裁定)。理由:席位价值与产品档位强绑定——同一 WS 内若席位池化,A 产品(低档 20 席)的成员将无门槛使用 B 产品(高档 2 席),**池化 = 跨产品席位套利通道**。
 
-- 成员**本体**归平台 tenancy(workspace_members),各产品按自己的 `member.max` 门控**自己的使用面**;
+- 成员**本体**归平台 tenancy(`tenancy.workspace_memberships`),各产品按自己的 `member.max` 门控**自己的使用面**;
 - 将来若要"全家桶席位"商业形态:以 bundled 组件在各产品**各自配** member.max 实现(套餐显式给到哪个产品几席),而非资源池化。
+
+> **席位执行与成员花名册(owner 2026-07-20 裁定,收口 product_240 §6#26/#29)**:
+>
+> 1. **上限平台 owns、执行在产品侧**:`member.max` 上限由平台经 **C2 下发**(平台 owns 数字 + 成员本体 `tenancy.workspace_memberships`);**执行必然在产品入口**——每产品席位数不同,per-product 上限无法在"加入 workspace"这一 product-agnostic 时点由平台执行,只能由产品按其自己的成员使用面门控。
+> 2. **v1 不建 roster 推送**:平台**不**为 member.max 提供成员列表推送 API;产品以登录累积的自有成员视图(`local_authz.member` 惰性子集)运作。**roster 拉取端点 + per-member 失效事件 = 预留前向能力**,待某产品需要完整"成员管理"面时再建(起步最小化)。
+> 3. **待收口(ADR-011 措辞)**:ADR-011 "member.max ~ active WorkspaceMembership 计数"描述的是 **workspace 成员轴**(平台级人数);它与 per-product 席位使用是**两个量**,不混。若另需 workspace 级总人数硬门,那是独立的平台 tenancy 门。
 
 ## 6. 配置组(profile):制单模板,盖章即拷贝值
 
