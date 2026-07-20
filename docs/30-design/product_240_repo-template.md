@@ -1,0 +1,275 @@
+# 产品仓库模板(Product Repo Template)设计(product_240)
+
+> 版本:**v0.2 规划稿** · 日期:2026-07-20 · 状态:**§8 决策主体已拍板(owner 2026-07-20,拍板记录见 §8)**;§6 标准修订 + vxture-template 实践完成后升 v1.0
+> 质量记录:已过四路对抗校验(矩阵覆盖/治理规范/arda 实仓/对接契约,27 项 findings 全部回修);业务面数据架构经账号来源/产品权限/业务用量三线程接地分析 + 交叉对账(§2.4 全带平台侧出处),析出 2 处 CONFIRMED 集成 bug(§6#27/#28)与成员花名册惰性子集硬约束。规范↔实现分歧累计并入 §6(31 项)。
+> 定位:产品架构文档族 **2xx 细化标准**——回答"新建一个产品仓,里面应该有什么、哪些统一、哪些留白"。
+> 上游依据:[`140-repo-governance-standard.md`](../10-standards/140-repo-governance-standard.md)(治理基座)· [`070-docs-taxonomy.md`](../10-standards/070-docs-taxonomy.md)(docs 编号)· [`product_100_matrix.md`](./product_100_matrix.md)(覆盖范围权威)· [`product_200_integration.md`](./product_200_integration.md) / [`product_210_tool-protocol.md`](./product_210_tool-protocol.md) / [`product_220_catalog-resource-model.md`](./product_220_catalog-resource-model.md) / [`product_230_mesh-architecture.md`](./product_230_mesh-architecture.md)(对接契约)· `data_platform_100_architecture.md` §2.3(业务面 DB 模板)· 参照实现 = **vxture-arda**(工程外壳)。
+> 入族登记:定稿时在 `product_100` 路由行追加 **240**。
+>
+> **设计约束(owner 2026-07-20)**:vxture-arda 只作**工程外壳**参照(骨架/架构/接口逻辑可复用);各产品功能差别很大,arda 的**领域功能一律不进模板**,防止把其他产品带偏。模板必须领域中立,刚性区/留白区划界见 §2.9。
+
+---
+
+## 0. 结论摘要
+
+1. **一套模板,不是两套。** 基座(治理+CI/CD+三通道+DB 治理+docs 编号)对 L1/L2/L3 完全同构;层差收敛为**模块开关**(§3 矩阵),不构成骨架分裂。治理规范 §10 本身已把源码目录写成形态槽位(`portals/` / `services/` / `agent-server/` 按形态),业务面 DB 模板(含 agent schema)本就为全产品统一预置——单模板是既定标准的自然延伸,不是新决策。
+2. **L3 可纳入,以"agent profile"形态。** 与 L2 共用全部基座,增量 = agent-server 形态槽 + 工具协议 caller 模块 + 技能装载器 + Atlas LLM 客户端四件(§4)。但 agent profile 定稿有三个前置裁决(§4.2),未裁决前 L3 仓可先用基座建仓、增量模块后补。
+3. **覆盖范围(owner 2026-07-20 拍板)**:L1/L2 六产品(atlas/ontos/runa/arda/karda/terra——通用能力与平台级产品)+ L3 四智能体(行业业务领域 agent,如文档编写/客户管理/轨迹分析/战场模拟)**全部纳入**;ruyin/umbra/hermes/varda 不适用(§5)。
+4. **模板落地形态(已定)**:owner 已建 **`vxture-template`** 仓;模板不是静态骨架,而是**可运行的验证型参照**——具备真实演示验证能力,内建**三通道(通信通道)联通验证**与**订阅档位验证**(§7);占位符 + 实例化脚本 + bootstrap checklist;新仓实例化后按自整顿 runbook 批 A–G 同一验收标准跑绿。
+5. **先补标准再出模板**:研究与对抗校验共发现规范/实现/契约之间二十余处分歧或缺口(§6),按"新缺口先补标准再各仓照做"纪律,须先修订 140/product_200 等再冻结模板,防止把偏差固化为标准。
+
+## 1. 模板的三层来源
+
+| 层       | 来源                                                             | 进模板的内容                                                                         | 性质                                                |
+| -------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| 治理基座 | `140-repo-governance-standard.md` + 自整顿 runbook               | 分支/ruleset、密钥四层、SCA 门、docs 编号、数据层治理、护栏                          | org 权威,全仓无差别                                 |
+| 工程外壳 | **vxture-arda 参照实现**                                         | 仓骨架、workflows 八件套、复合动作、compose/Dockerfile 模式、DDL 三段式、.env 编写法 | 可原样复制 [G] 或参数化 [P];**领域件 [S] 一律排除** |
+| 对接契约 | product_200/210/220/230 + `@vxture/shared` + platform-api 实端点 | 三通道模块、值域消费、门控公式、webhook 义务、S2S 凭证                               | 平台×产品契约,接口统一的核心                        |
+
+平台侧是权威与枢纽:产品仓对平台的**全部**依赖 = 已发布 npm 包(`@vxture/shared` ≥1.4.0、`@vxture/design-system` ^2.0.0)+ 内网 API 契约 + 契约文档;不引用平台仓源码、不读平台库(data_platform_100 §2.3.2 五条硬约束)。
+
+## 2. 模板内容清单(九块)
+
+### 2.1 治理基座(全产品无差别,照 140 §1–§3/§9/§10)
+
+- 根文件:`.editorconfig` `.gitattributes` `.npmrc` `.gitignore` `.gitleaks.toml` `.osv-scanner.toml`(**空忽略基线出厂**,arda 现有两条记名忽略是时点产物不复制)`.env.example` `CLAUDE.md`(产品参数化的协作纲领,照 arda 版式)`README.md` `docker-compose.yml` `.husky/pre-commit`。
+- 分支治理:`main-ruleset.json` 原样纳入;CI job 名精确产出 required checks(quality-gate/build/test-coverage/audit/gitleaks——五项集合与 arda 现行四项的差异见 §6#8);bootstrap 顺序铁律"首推 main→跑一次 CI→再 apply ruleset"写进初始化 checklist。
+- 密钥四层:secret-scan.yml(pinned gitleaks)+ pre-commit + push protection + 私有仓;SCA:ci.yml audit job(pinned osv-scanner,`--config=.osv-scanner.toml` 显式必带),清基线三分法文档随附。
+- docs:十段编号骨架(00-meta…90-memory)出厂即建 + `check-docs-numbering.mjs`(以 platform 版为底但**收紧后复制**:platform 脚本本体的域文档正则宽松、接受连字符变体,模板版收紧为严格 `{kind}_{domain}_{NNN}_{slug}`,kind∈data/design/ops)+ 空 ADR/TD 寄存器 + `00-index.md`——新仓 day-one 即过 `lint:docs-numbering --strict`。arda 连字符命名是既往豁免,新仓不再给。
+- `package.json` 预置机检契约脚本名(不可改名):`type-check:all`、各包 `lint`、`lint:docs-numbering`,有 DB 再加 `lint:data-design` / `lint:catalog-domains` / `lint:column-locks` / `lint:seed` / `lint:schema-residue`(runbook §0 工具清单为五件,批F/§2 验收命令只列四件——工具/验收口径出入随 §6#8 一并修)。
+
+### 2.2 CI/CD 构件(照 arda 范本,[G] 原样 + [P] 参数化)
+
+- workflows 七件必备:`ci.yml`(static-checks/build/audit + quality-gate 聚合)、`build.yml`(workflow_call;sha-`<short>` 不可变 tag;双 registry + retag-by-digest 去重;NPM PAT 走 BuildKit secret;Trivy report-only)、`deploy.yml`(tag→env detect;env-scoped secrets;ENV_FILE_BASE64 bootstrap-if-missing;staging 单次 rsync `--delete --exclude=VERSION`;VERSION 溯源;stdin 传密钥;deploy-failure issue 告警)、`db-init.yml`(verify/roles/migrate/apply/reset + confirm=yes + expected_sha + 环境审批门)、`rollback.yml`(共享 concurrency 组;先 imagetools 验镜像存在再 SSH)、`secret-scan.yml`、`codeql.yml`;选装 `seed-demo-data.yml`(仅有演示目录的产品);另加配置文件 `.github/dependabot.yml`(**落 .github/ 根,非 workflow**;@vxture/\* 分组且 ignore——内部包升级是显式动作)。arda 超集三件(rollback/codeql/dependabot)**升格为模板必备**(rollback 与 concurrency 设计互相咬合)。
+- 复合动作 `.github/actions/tailnet-ssh-connect` 原样复制(v4 pin 完整 commit SHA + ping 探活 + DEPLOY_KNOWN_HOSTS fail-closed)。
+- 工具链:**pnpm**(owner 2026-07-20 拍板,全栈一致)——CI 缓存键、Dockerfile deps 阶段、osv `--lockfile=pnpm-lock.yaml` 全按 pnpm 出;140 §9 与 runbook 机检命令本就 pnpm,标准侧零修改;arda 的 npm 形态构件迁移记 §9。
+- registry 双 profile:domestic(tailnet+ACR)/ overseas(GHCR+公网)按部署主机地理二选一。主源/兜底顺序存在规范↔实现分歧(140 §4 写内网 ACR→公网 ACR→GHCR 逐试;arda deploy.yml 实况 GHCR 主源 + ACR 兜底,因 worker-02 非 Aliyun VPC)——模板按主机 case 参数化,顺序裁决见 §6#18。
+- secrets/vars 清单(键名 [G]、值 [P]):共享凭证 NODE_AUTH_TOKEN / ALIYUN_ACR_USERNAME / ALIYUN_ACR_PASSWORD / TAILSCALE_OAUTH_CLIENT_ID / TAILSCALE_OAUTH_CLIENT_SECRET 按 140 §3 属 **org 级**(arda 实践配在 repo 级,层级分歧见 §6#17);vars = ALIYUN_ACR_REGISTRY / ALIYUN_ACR_NAMESPACE / VXTURE_NPM_REGISTRY / TAILSCALE_OAUTH_CLIENT_TAG;每 Environment = DEPLOY_HOST / DEPLOY_USER / DEPLOY_PORT / DEPLOY_SSH_KEY(可选 \_PASSPHRASE)/ DEPLOY_KNOWN_HOSTS / DEPLOY_DIR(命名裁决见 §6#1)/ ENV_FILE_BASE64 / `<PRODUCT>`\_DB_SVC_PASSWORD,db-init 另有 DEPLOY_HOST_TAILNET(140 §6;与 DEPLOY_HOST 是否简并入 §6#1 一并裁);操作员助手 `scripts/github/b64-*.ps1` 模式随附。
+
+### 2.3 平台对接层(接口统一的核心;全部为契约面模块,零领域内容)
+
+| 模块            | 内容                                                                                                                                                                                                                                                                                                                                                                                                    | 依据                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| OIDC RP         | 五端点 `/auth/login` `/auth/callback` `/auth/session` `/auth/logout` `/auth/backchannel-logout`;PKCE S256、RS256-only、token 只在服务端、`__Host-vx_rp_session` cookie(prod;dev http 回落 `vx_rp_session`)、Redis 键式 `vx:rp:{client_id}:*`;`/auth/switch-tenant` 选装(组织租户产品);同 apex / 跨 apex 双参数化                                                                                        | identity/080-rp-integration §2                |
+| C2 权益         | entitlement 客户端(45s TTL 缓存 + subscription_changed 失效);`quota.ts`(类型直接消费 @vxture/shared 六值/五档);门控公式内置不许放宽;CTA 分岔(null→订阅/overdue→补款/expired·cancelled·suspended→续订);未知字段/未知枚举容错;**不落库、不入 token**                                                                                                                                                      | product_220 §3、arda_200 §2                   |
+| C3 webhook      | 单端点 `/provisioning/webhook`;事件:tenant.provisioned/deprovisioned、subscription_changed 全产品,**grant.invalidated 仅资产面产品**(product_200 §6);HMAC `t=,v1=` 原始字节验签(双 secret 位是模板新增强化项——现契约与 arda 实现均单 secret,轮换机制标准化见 §6#19)、按 id 幂等、按 seq 弃旧、2xx 回执、beta-plan 过滤;deprovision 处置两权威相左("拆除" vs "归档不硬删",§6#21,模板暂按 080-rp §4 归档) | product_200 §4/§6、arda_200 §4、080-rp §4     |
+| C3 用量         | `local_usage.raw` 缓冲表 + 异步 flush job(INTERNAL_JOB_TOKEN 门 + 404 fail-closed 是 arda 先例,契约只到 230 §7 P0 "flush 守卫");metric 按 METRIC_KINDS 路由(counter→`POST /usage/consume`,gauge→`PUT /usage/gauge` 带 observed_at);409 gated 只拦 UI,禁本地判配额、禁持久 gated 标志                                                                                                                    | product_200 §4、220 §4、230 §3/§7 + arda 先例 |
+| platform 客户端 | 基址 PLATFORM_API_URL(内网,出站 host 断言);路由前缀差异内置(C2=`/platform/entitlements`、C3=`/usage/*` 无前缀、sharing=`/platform/sharing/visible-set`);凭证可切换:S2S token exchange(目标态)/ `x-vxture-internal-auth`(过渡态)——默认取向见 §6#5                                                                                                                                                        | product_230 §2、210 §3                        |
+| 转化深链        | `{NEXT_PUBLIC_CONSOLE_URL}/subscribe?product={P}&intent=…` 构造器;只挂显式点击、禁自动跳转、禁传 workspace_id;唯一转化出口                                                                                                                                                                                                                                                                              | product_200 §3.2                              |
+| 能力矩阵        | 版本化"档位→功能"文件骨架(**参考格式,非平台强制**——220 §7 明令平台不配功能键);biz 计费模型文档模板(五档骨架、bundled 组件写法、enterprise 不自助)                                                                                                                                                                                                                                                       | D12、220 §9                                   |
+| Mock 层         | MockEntitlementResolver(PLATFORM_API_URL 未配时),本地开发不依赖平台在线                                                                                                                                                                                                                                                                                                                                 | arda 先例                                     |
+
+### 2.4 业务面数据架构(自带 DB 的产品启用)
+
+> 本节经一轮接地分析坐实(账号来源/产品权限/业务用量三线程 + 交叉对账;全部结论带平台侧出处)。**先摆平台↔产品对应关系,再据此定 schema——不先定框后塞**(owner 2026-07-20 指令:业务/产品导向,数量不设限,名字随贴切)。库名 `vxturebiz_{product}_{env}`(env=beta|prod 对称双库)。
+
+#### A. 账号来源与身份对应
+
+平台 customer-realm 身份权威 = 四层稳定模型 **User→Tenant(=org,personal|organization)→Workspace→两级 Membership**(`account.users.id` / `tenancy.tenants.id` / `tenancy.workspaces.id` / `tenancy.{tenant,workspace}_memberships`,data_identity_200 §1.1/§5)。**tenant = org = 顶层,workspace 是其下一层;业务隔离键是 workspace 不是 tenant**(三线程一致核实)。产品侧**只持三个平台引用键**,均平台签发、非 FK、产品不自造,且**不镜像**四层模型本身("持引用≠镜像",data_platform_100 §2.3.2#1):
+
+| 产品侧引用键                            | 平台 SoT                | 载体                                                                     | 说明                                      |
+| --------------------------------------- | ----------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| `workspace_id`(唯一业务隔离键)          | `tenancy.workspaces.id` | token `active_workspace` / provisioning payload `workspace_id` / C2 参数 | 不接受产品自声明(§16);每业务表冠此列      |
+| `tenant_id`(仅 rollup 反查)             | `tenancy.tenants.id`    | token `active_org`(legacy `active_tenant`)/ provisioning `tenant_id`     | 非隔离键;usage/quota 路由都不带 tenant_id |
+| `user_id` = `sub`(完整 `usr_<uuid>` 串) | `account.users.id`      | token `sub`                                                              | 存完整 sub 字符串,含 `usr_` 前缀          |
+
+⚠**过渡期风险(§6#25)**:现网 token 可能尚未下发 `active_workspace` claim(080-rp §2.6 只有 `active_tenant*`,140-ruyin §8 称已改 `active_org/active_workspace`——两权威文档冲突,待平台核实 access-claims.ts)。故模板 auth 层**隔离键以 provisioning payload / C2 参数为主载体**,`active_workspace` claim 可用即用、不独赖。`account_status`(account.users.status)每请求从 token 读、**不入库**。
+
+#### B. 产品侧账号权限对应(三轴正交,不可混)
+
+| 轴             | 是什么                                 | 平台 SoT                                                                        | 载体                                   | 入产品库?                                            |
+| -------------- | -------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| ① 治理角色     | 能否管理 workspace/计费/成员           | 平台库 `access.roles`(scope=tenant\|workspace)+ `tenancy.*_memberships.role_id` | token `roles`                          | **否**,每请求 token 取(arda `isWorkspaceAdmin` 即此) |
+| ② 产品功能角色 | 能否执行本产品某操作(reviewer/editor…) | **无——产品自持**                                                                | 产品自库,按 `(workspace_id, sub)` 解析 | **是**,产品 seed 目录                                |
+| ③ 订阅 tier    | 买了什么档                             | 平台 `metering`                                                                 | C2 拉取                                | **否**,不落库不入 token                              |
+
+产品功能角色平台**有明文归产品自持**(data_identity_200 §6"治理 RBAC≠业务授权,不闸产品功能";130-decisions"业务角色绝不进 token,由应用按 (active_tenant,sub) 查自库"),且平台**刻意不给表结构规范**(边界 OUT)——模板填这个空:给统一结构、角色目录产品 seed。你的多产品场景(用户1 在 A 是 admin、B 是 reviewer)天然成立:A/B 各自独立库,两组 `(workspace_id,sub)→role` 记录在两个物理库,零冲突。
+
+**成员花名册的硬约束(分析核心发现,直接决定成员表设计)**:平台**没有成员列表下发通道**——无 roster 批量 API、provisioning webhook 粒度是 per(workspace,product) 且 payload **不含成员**、C3 introspect 只返单主体会话。所以产品成员表**只能是"登录过本产品的惰性子集"**(首见 `(workspace_id,sub)` 即 upsert),**不是**平台 `tenancy.workspace_memberships` 的完整/实时镜像:从没打开过本产品的平台成员不在其中,平台踢人也无下行事件通知产品回收。设计后果:①成员表按**惰性 upsert** 设计,不得假设是全量花名册;②成员失效靠登录时 token 校验兜底(无 per-member 失效事件,§6#29);③**member.max 门控计数基准待钉死**——平台 `workspace_memberships` 计数(ADR-011 §11.1a)vs 产品本地惰性子集计数(product_220 §5),两说冲突(§6#26)。默认业务角色由 `tenant.provisioned` 钩子初始化(app 自治、可重入,平台不拥有,identity/080 §4 步骤4)。
+
+#### C. 业务用量对应
+
+用量**唯一写入方 = 平台 consume 服务**(单事务:校验配额→记 `metering.usage_events`→更新 `metering.quota_pools`);产品**只缓冲、不判配额**(data_platform_100 §2.3.2#4)。三类用量在产品侧处理方式不同:
+
+| 类别             | 例                                                         | 产品侧处理                                                 | 平台端点 / SoT                                                   |
+| ---------------- | ---------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- |
+| ① counter 消耗型 | ai.credit(L0)、service.api.call、quality.check.run(产品级) | 写**缓冲表** → 异步 flush → consume(ai.credit=atomic 预扣) | POST /usage/consume → `metering.usage_events`                    |
+| ② gauge 水位     | storage.bytes(L0)                                          | **不入缓冲表**,直发绝对水位                                | PUT /usage/gauge(observed_at 必填)→ `metering.usage_gauges`(LWW) |
+| ③ max 型 caps    | dataset.max / member.max / retention.days                  | **不缓冲不 consume**,本地按领域对象计数准入                | C2 `limits{}`(就高合并,-1=无限)                                  |
+
+即缓冲表**只装 counter 型**;gauge 是无本地表的直发路径;caps 是 C2 拉来的上限数字、产品本地计数。**metric 键定义权全在平台注册表**(平台库 `product.platform_metrics`=L0 共享键、`product.product_metrics`=产品级键;DB 触发器 `trg_product_metrics_no_platform_shadow` + linter 双重禁止产品声明共享键)——产品缓冲表的 metric 列只是个字符串、**必须命中平台某注册表**,产品仓**不建 metric 注册表**。⚠产品级 metric 的 kind(counter/gauge)无共享注册表可查,现状靠产品本地硬编码(§6#30)。配额门控:UI 门 `tier!=null`(§6#6 待钦定统一式)、数据面 `||bundled`、`remaining≤0` 关闸;**gated 不持久**(下次 C2 拉取自动恢复)。
+
+#### D. schema 切分(按数据性质;契约面三组 + N 领域,数量不设限)
+
+三类数据 SoT 方向/职责各异,天然分三组契约 schema,加产品领域 N 个(agent 表 conversation/message/task/artifact 对 L3 即领域数据 → 降选装 DDL 组件,落产品自己领域 schema):
+
+| schema             | 出厂表(关键列标 [平台引用键]/[产品自有])                                                                                                                                                                                                                                                | 数据来源                  | 归属                             |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | -------------------------------- |
+| **`vx_provision`** | `app_instance`(workspace_id[引]、tenant_id[引]、product_code[引]、status/env/provisioned_at[产]);`webhook_delivery`(delivery_id[引=payload.id,PK 幂等]、type/occurred_at[引]、result[产]);`provision_seq`(workspace_id[引]、last_seq[引=payload.seq],UNIQUE(workspace_id,product_code)) | provisioning webhook      | 通用·刚性                        |
+| **`local_authz`**  | `member`(workspace_id[引]、sub[引]、display_name/avatar_hash[平台缓存,失效通道未定 §6#31]、status/first_seen_at[产],UNIQUE(workspace_id,sub),**惰性子集**);`role`/`permission`/`member_role`/`role_permission`([产]全自持,目录产品 seed)                                                | token 登录首见 + 产品本地 | 结构统一、目录产品填             |
+| **`local_usage`**  | `raw`(workspace_id[引]、metric[引=命中平台注册表的键]、amount[产测量]、idempotency_key[产,强制]、flushed[产水位],**只装 counter**);`checkpoint`(纯产品本地 flush 水位,无平台对应物)                                                                                                     | 产品本地缓冲 → consume    | 通用·刚性                        |
+| **{domain}** × N   | 产品业务数据,每表冠 workspace_id + 命名规范                                                                                                                                                                                                                                             | 产品自建                  | 领域·留白;不占契约 schema 保留名 |
+
+**命名(owner 2026-07-20 定案)**:前缀编码 SoT 方向——`vx_` = 平台源/平台契约面,`local_` = 产品自持;后缀点明域。① **`vx_provision`**:平台驱动的开通/绑定 + 入站事件簿(数据来自 provisioning webhook);② **`local_authz`**:产品本地授权(成员 + 功能角色/权限),`local_` 前缀**根除**了平台控制面库 `access` schema(治理 RBAC)的重名地雷——一看即知是产品本地授权、非平台治理;③ **`local_usage`**:产品本地用量缓冲,`local_` 扛住"只缓冲、非权威计量"(平台才是唯一写入方),且此名本就是 `data_platform_100 §2.3.1` 用量缓冲 schema 原名(平台侧零改)。非对称前缀是**特性**:SoT 方向直接写在 schema 名上。数量按需,不为整齐硬凑。
+
+#### E. DDL 与值域(不变)
+
+DDL 三段式单一权威:`deploy/database/ddl/00_baseline.sql`(建三契约 schema + 产品领域 schema)+ `97_service_role.sql`(`{product}_svc` 最小权限)+ `98_column_locks.sql`(列锁白名单)+ `incr/`(幂等 `CREATE TABLE / ADD COLUMN … IF NOT EXISTS` 编号增量);prisma schema 仅作 client 生成源(prisma-client generator + driver adapter,无 migrations 目录),`check-data-architecture.mjs` 三件套锁步校验;入口 entrypoint 永不 migrate,结构变更只走 db-init.yml。值域:`@vxture/shared` 唯一权威,`check-catalog-domains.mjs` 校 DDL CHECK == @shared;产品自有业务值域留域内。
+
+### 2.5 应用层形态槽(治理规范 §10 既定槽位,按 profile 取用)
+
+- **app profile(默认,arda 已验证)**:`portals/`(workspace 根)= `app`(单 Next.js 全栈:web+BFF+API 一体,一镜像 `<product>-app`)+ `packages/shared`(`@<product>/shared`:brand/locale/version 等,`__GIT_SHA__` CI 打戳模式);运行栈三容器 `<product>-app/-redis/-db`,PROJECT_NAME 驱动 prod/beta 双栈同机;边缘 vhost 源文件放 `configs/edge/`(产品栈纯内网 HTTP,TLS 归共享边缘)。
+- **agent profile(L3 增量)**:app profile 全量 + `agent-server/` 槽(独立编排进程,见 §4)。
+- **services 槽(预留)**:多服务/多镜像产品用;`build.yml` matrix 与 `06-check-deploy-contracts.py` 同步扩展(该脚本 arda 版硬编码 EXPECTED_ARDA_IMAGES、compose 引用串与 arda 哨兵,属 [P] 参数化改造件而非可原样复制)。模板默认单镜像,不超前建。
+
+### 2.6 文档骨架
+
+十段目录 + 出厂文件:`00-meta/00-index.md`、`10-standards/`(指向平台仓 org 标准的薄索引,不复制正文)、`20-specs/`(产品定义落位)、`30-design/`(域文档用 org 下划线族;产品域码入 taxonomy §5 后启用)、`60-operations/`(空 TD 寄存器 + runbook 位)、`80-liaison/`(对接回函区,YYMMDDHHMM 戳)、`90-memory/10-agent.md`(AI 入口);各 package 一个薄 `AGENTS.md` 指向 docs。
+
+### 2.7 参数表(单一 PRODUCT_CODE 级联 + 基建分配登记)
+
+- **PRODUCT_CODE 级联**(满足 `^[a-z][a-z0-9_-]{0,31}$`),一处定义全仓派生:OIDC client 对(`{code}` / `{code}-beta`)、compose 项目/容器前缀、镜像名 `<code>-app`、DB 名/角色(`vxturebiz_{code}_{env}` / `{code}_svc`)、workspace 包域 `@{code}/*`、secret 名 `{CODE}_DB_SVC_PASSWORD`、平台侧镜像键 `{CODE}_PROVISION_WEBHOOK_SECRET` / `{CODE}_WEBHOOK_BASE_URL`、deploy 契约校验 EXPECTED_IMAGES、compose 哨兵服务名(deploy.yml 交付校验 grep)。
+- **基建分配登记表(新增标准构件,放平台仓 docs)**:每产品一行——APP_PUBLISH_PORT 对(arda 已占 3230/3231)、部署主机(worker-NN)、stack_root(`/srv/mdX/<product>[-beta]`)、apex 域名、ACR namespace、tailnet 归属(定 mesh 类 1/类 2)。deploy/db-init/rollback 三个 workflow 的 stack_root case 块由此表生成。目前**无此登记表,是缺口**(§6#10)。
+- **env 键目录**(.env.example 编写法本身是交付物:prod 值 + "BETA OVERRIDES"注释块;secret 键在位留空 + 采办说明):OIDC*\* 七键(080-rp §2.11:ISSUER/CLIENT_ID/CLIENT_SECRET/REDIRECT_URI/SCOPES/POST_LOGOUT_REDIRECT_URI/RP_ENABLED;arda .env 实况仅前六键)+ RP_SESSION_TTL/RP_SESSION_COOKIE*_、REDIS*URL、DATABASE_URL(连接身份 = `{code}_svc`,**不照抄** arda 属主直连)、POSTGRES*_、PLATFORM*API_URL、PLATFORM_INTERNAL_AUTH_TOKEN、PROVISION_WEBHOOK_SECRET(轮换双键是模板强化项,§6#19)、INTERNAL_JOB_TOKEN、DATA_ENCRYPTION_KEY、NEXT_PUBLIC_APP_ENV/PROD_URL/BETA_URL/CONSOLE_URL、IMAGE*_ / FALLBACK*IMAGE*_、DATA_DIR 等(以 arda .env.example 为**版式**泛化;其 OIDC_SCOPES 仍残留已退役 `arda:subscription`、DB 名/连接角色未按契约——时点产物不照抄,见 §5 arda 反向对账)。
+
+### 2.8 平台侧登记 + GitHub bootstrap(代码外动作 checklist)
+
+每个新产品仓实例化时,模板附带两份 checklist:
+
+1. **平台侧登记(owner/平台线动作)**:目录 product 行(code/layer/type)+ plan 结构 seed;OIDC client 对注册(redirect/post_logout/back_channel_logout URI、realm=customer;scopes:arda 实登记 `openid profile email phone`,而 product_200 §2.1 契约仍含 `{product_code}` scope——取哪说见 §6#20;商业 scope 已随 D12 退役不再登);`product_webhooks` 登记(tailnet 投递地址);平台 env 加 `{CODE}_PROVISION_WEBHOOK_SECRET`;secret 全部 owner 手动转运。
+2. **GitHub bootstrap(一次性)**:建仓私有 + push protection;首推 main→CI 一跑→apply ruleset;建 Environments(beta 无审批、production **必配 Required reviewers**);录全 §2.2 secrets/vars;DEPLOY_KNOWN_HOSTS 从可信网络 ssh-keyscan 采集;部署前 SSH 核实 stack_root/etc/.env/ACR 登录在位。
+3. **验收 = product_200 §7 接入 checklist(6 项)收口**,其第 6 项为全链 e2e 五站(登录→开通→门控→consume→invalidate)+ 自整顿 runbook 一条龙总验收命令全绿。
+
+### 2.9 刚性区 / 留白区(owner 2026-07-20 约束的落实)
+
+- **刚性区(不许偏离)**:治理基座全部;CI/CD 键名、job 名、workflow 语义;三通道模块的端点/验签/幂等/门控公式/缓存纪律;值域消费;DB 治理模式(DDL 三段式+列锁+db-init 独占结构变更);docs 编号;数据面五条硬约束。
+- **留白区(每产品自决,模板只给空位)**:`app/(app)/*` 领域页面与领域组件;**N 个产品领域 schema**(命名/数量产品定,`vx_provision`/`local_authz`/`local_usage` 保留)+ `local_authz` 的角色/权限目录取值;能力矩阵与计费模型的**内容**(格式仅参考);产品级 metric 键(`{entity}.max` 命名惯例内)与费率表;`20-specs/` 产品定义;领域 guardrail。
+- **反带偏保险**:模板中的示例页面仅保留契约面(health/auth/entitlement 演示);arda 的 dataset/datasource/connector 等领域概念在模板中**零出现**;`09-check-ds-usage.py`(DS 纯度)等产品无关检查保留,arda 领域校验剔除。
+
+## 3. 模块 × 层 适用矩阵
+
+| 模块                                                                    | L1(atlas/ontos/runa)                                                       | L2(arda/karda/terra)                                                                                                    | L3(四 agent)                     |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 治理基座 + CI/CD + docs(§2.1/2.2/2.6)                                   | ✔(若独立建仓)                                                              | ✔                                                                                                                       | ✔                                |
+| OIDC RP 五端点                                                          | ✔                                                                          | ✔                                                                                                                       | ✔                                |
+| C2 权益客户端 + quota.ts + 能力矩阵                                     | ✔                                                                          | ✔                                                                                                                       | ✔                                |
+| C3 provisioning webhook(provisioned/deprovisioned/subscription_changed) | ✔                                                                          | ✔                                                                                                                       | ✔                                |
+| C3 grant.invalidated(webhook 第四事件,资产面专属)                       | runa ✔;atlas ✘;ontos 待定义                                                | ✔(三产品全,沿派生边 re-scope)                                                                                           | ✘(经 L2 入口被求值,收不到)       |
+| C3 consume(usage_raw+flush)                                             | atlas ✔(推理计量唯一入口)· ontos ✔ · **runa —**(零计量)                    | ✔                                                                                                                       | ✔(自有 metric;模型 token 不重报) |
+| C3 gauge                                                                | 按资源(storage 类才有)                                                     | ✔(arda/karda 存储面)                                                                                                    | 按资源                           |
+| visible-set + 召回层过滤(资产面)                                        | runa ✔(技能);atlas ✘;ontos 待定义                                          | ✔(三产品全)                                                                                                             | ✘(经 L2 入口被求值)              |
+| S2S provider 守卫 + `/.well-known/vxture-tools`                         | atlas/ontos ✔(供给方);**runa=分发面**(不出现在调用链路,工具清单端点不适用) | ✔(供给方)                                                                                                               | ✘(默认;预埋槽位成本≈0 可留)      |
+| S2S caller(token exchange)                                              | atlas 双向                                                                 | 选装(L2 互调)                                                                                                           | ✔(核心)                          |
+| agent-server 槽 + 技能装载器 + Atlas LLM 客户端                         | ✘                                                                          | ✘(arda 明文无常驻运行时)                                                                                                | ✔                                |
+| 业务面 DB 基线(§2.4)                                                    | atlas/runa 不用;ontos 待定义                                               | ✔(注:product_100 §2 "agent-db"列 arda/karda=否,指 **SoR 归属**;与 product_200 §7#5 "每产品建库"是两个口径,裁定见 §6#16) | ✔(核心,A 级数据 SoR)             |
+
+## 4. L3 纳入决策:单模板双 profile
+
+### 4.1 纳入的证据
+
+- 基座同构:L3 的"统一形态 = OIDC RP + agent-db + 三通道 + L0 工具协议消费方"(product_100 §3)四件中,OIDC RP 与三通道与 L2 完全同件;agent-db 对 L3 是核心、对 L2 依 product_100 逐产品而异(仅 terra=是,口径差见 §6#16)。业务面 DB 模板的 agent schema(conversation/message/task/artifact)本就全产品统一预置,对 L3 恰是核心。
+- 层差全部模块化:L3 增量四件(agent-server 槽 / caller 模块 / 技能装载器=Runa 拉取+版本 pinning+装载前验签 / Atlas LLM 客户端)与 L2 增量(provider 守卫 / 工具清单端点 / 入口求值)互为镜像,都是开关不是骨架;arda_100 §4 三条预留证明 provider 侧预埋成本≈0,反向同理。
+- mesh 无分叉:L3 全体类 2(tailnet fabric),异 apex(anlan.ai/xuanzhen.ai)只影响会话互验参数,不影响 S2S 网别。
+
+### 4.2 agent profile 的三个前置裁决(未决前 L3 仓可先建基座)
+
+1. **agent 运行时架构**:Varda 三段式(前端→BFF→agent-server;ToolRegistry 白名单、CallerContext 单一身份源、先审计后执行)是否升格为 L3 参照架构;agent-server 是否必为独立容器。现状:docs 中无任何 L3 运行时定义(仅 product_110 §6.7 技能装载纪律)。
+2. **LLM 通路**:发布 `@vxture/model-runtime-client` 供外部仓用,还是 L3 以纯 HTTP 契约直连 Atlas tailnet 网关(worker-02 varda-server 先例 MODEL_PLATFORM_URL)。现状:外部仓合法依赖面只有 @vxture/shared 与 @vxture/design-system,monorepo 内部包全部未发布。
+3. **caller SDK 参照**:T3(首个消费场景 agent→Arda)未实施,caller 模块无参照可抄——先按 product_210 规范出样例、T3 落地后回填,或等 T3。
+
+## 5. 覆盖范围(依据 product_100 矩阵 v1.0)
+
+| 产品                             | 层       | 模板适用         | 说明                                                                                                                                                                                                                          |
+| -------------------------------- | -------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| arda                             | L2       | ✔(参照源)        | 已建成;模板定稿后反向对账,偏差记 arda 仓 TD:单 public schema、库名未按 `vxturebiz_*`(实况 POSTGRES_DB=arda)、.env DATABASE_URL 属主直连非 `arda_svc`、.env/compose 残留退役 scope `arda:subscription`、连字符 docs 命名等(§6) |
+| karda / terra                    | L2       | ✔                | 模板首批实例;产品定义待建是前提(不预建空仓)                                                                                                                                                                                   |
+| raven / anlan / forge / xuanzhen | L3       | ✔(agent profile) | 基座即可建仓;增量模块随 §4.2 裁决落定                                                                                                                                                                                         |
+| atlas                            | L1       | ✔(已拍板纳入)    | 现居平台 monorepo(Model Platform);拆仓时点由产品线定,拆即按模板(provider 全套+计量唯一入口)                                                                                                                                   |
+| ontos                            | L1       | ✔(已拍板纳入)    | 产品定义空白;定义先行,建仓即按模板                                                                                                                                                                                            |
+| runa                             | L1       | ✔(已拍板纳入)    | 纯控制面无运行时(仅元数据库);模板裁剪度最高(零计量、分发面)                                                                                                                                                                   |
+| ruyin                            | client   | ✘                | desktop client 形态,模板不适用;精确说:不进 entitlement 引擎(C2/C3 下发 ✘),C1 与 consume **待产品定义**(OIDC client 已落活库 ruyin.vxture.com),非"三通道全灭"                                                                  |
+| umbra                            | 外部     | ✘                | 类 1 轻集成、外部仓只读、现状契约不动                                                                                                                                                                                         |
+| hermes                           | internal | ✘                | 平台内部服务                                                                                                                                                                                                                  |
+| varda                            | L0 内嵌  | ✘                | monorepo 内嵌,复用宿主会话;其三段式仅作 L3 运行时**内部结构**参照                                                                                                                                                             |
+
+即:模板覆盖 = **10 个产品**(L1×3 + L2×3 + L3×4,owner 2026-07-20 拍板):L1/L2 六产品为通用能力与平台级产品线,L3 为行业业务领域智能体线;各仓实例化时点由产品定义就绪度定,不预建空仓。
+
+## 6. 先补标准清单(31 项;按"新缺口先补标准再照做";修订落 140/product_200/220/230/data_platform_100/identity 或 runbook。**owner 2026-07-20 已同意补齐,按需在标准↔实现两侧修订**。#25–31 由数据架构接地分析新增,含 2 处 CONFIRMED 集成 bug)
+
+| #   | 分歧/缺口                             | 两说                                                                                                                                                                          | 模板取向建议                                                                                                                                                                   | 修订落点                               |
+| --- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| 1   | 部署目录密钥名                        | 规范 §6 `DEPLOY_DIR` vs arda `DEPLOY_REPO_DIR`                                                                                                                                | 统一 `DEPLOY_DIR`,arda 记 TD 择机回改                                                                                                                                          | 140 §6                                 |
+| 2   | build 等待机制                        | 规范"deploy 轮询 docker-build" vs arda `build.yml` workflow_call + needs 出参                                                                                                 | **arda 式定为正典**(消除竞态),同步改 runbook 工具清单文件名                                                                                                                    | 140 §4 + runbook §0                    |
+| 3   | 产品仓环境集合                        | 规范 §4 含 dev-\*→develop vs arda 仅 beta/production                                                                                                                          | 产品仓默认**两档**(beta/production),dev 档平台仓特例;runbook 批E 验收 tag 相应改                                                                                               | 140 §4                                 |
+| 4   | DEPLOY_KNOWN_HOSTS                    | 规范标可选 vs 实现 fail-closed 必填                                                                                                                                           | 升必填 + ssh-keyscan 采集步骤入 bootstrap checklist                                                                                                                            | 140 §6                                 |
+| 5   | 新产品 S2S 凭证                       | AUTH_INTERNAL_TOKEN 过渡态 vs token exchange 目标态                                                                                                                           | 模板默认 **S2S token exchange**,legacy 头留 env 开关(新仓不生在退役凭证上;产品间本就禁共享口令)                                                                                | product_200 §2.2                       |
+| 6   | 门控公式表述                          | `tier != null`(220 §3)vs `status ∈ {active,trialing,overdue}`(arda_200)                                                                                                       | 钦定一个 canonical(两式等价性由平台线确认),模板 quota.ts 只实现钦定式                                                                                                          | 220 §3                                 |
+| 7   | 信封版本标号                          | product_200 标 v3 vs arda_200 标 v2(同一线型)                                                                                                                                 | 统一标号,模板文档随之                                                                                                                                                          | 200/220                                |
+| 8   | required checks 集合                  | runbook 枚举五项(含 test-coverage;140 §1 本身未枚举,只说按 job 名匹配)vs arda 四项(无 test job)                                                                               | 模板 ci.yml 预留 test job 槽;集合定稿后规范/runbook 两处同步(连带 DB lint 四件 vs 五件口径)                                                                                    | 140 §1 + runbook 批A/批F/§2            |
+| 9   | OIDC beta client                      | product_200 "单 client 多 URI" vs arda 双 client(back-channel logout 单 URI 硬约束)                                                                                           | **双 client 定为正典**                                                                                                                                                         | product_200 §2.1                       |
+| 10  | 基建分配登记表                        | 不存在                                                                                                                                                                        | 新建(端口/主机/stack_root/域名/namespace/tailnet 归属,每产品一行)                                                                                                              | 新文档(50-deployment)                  |
+| 11  | 包管理器                              | arda npm workspaces vs 平台 pnpm                                                                                                                                              | **已裁(owner 2026-07-20):pnpm,全栈一致**;标准侧零修改(140 §9/runbook 本就 pnpm);模板按 pnpm 出,arda 迁移记 §9                                                                  | 无需修订;arda 侧整改                   |
+| 12  | intent 词表                           | product_200 三值 vs console 实现四值(含 subscribe)                                                                                                                            | 补 `subscribe` 入 200 §3.2                                                                                                                                                     | product_200                            |
+| 13  | webhook 平台侧键名                    | `{PRODUCT}_PROVISION_WEBHOOK_SECRET` 仅 arda 先例                                                                                                                             | 定为命名惯例写入标准                                                                                                                                                           | product_200 §4                         |
+| 14  | `/.well-known/vxture-tools` 归面      | 210 归 S2S 面 vs 230 把 `/.well-known/*` 划边缘                                                                                                                               | 裁定归面,模板 nginx 骨架随之                                                                                                                                                   | 230 §3                                 |
+| 15  | boot-smoke 护栏                       | TD-024 仅平台仓                                                                                                                                                               | NestJS 形态产品仓(agent-server)纳入护栏集                                                                                                                                      | 140 §8                                 |
+| 16  | 业务面 DB 口径                        | product_100 §2 "agent-db"列(arda/karda=否)vs product_200 §7#5 全产品建库                                                                                                      | 统一表述:每产品仓有自库,"agent-db"列义收窄为 SoR 归属                                                                                                                          | product_100 §2 / product_200 §7        |
+| 17  | 共享凭证层级                          | 140 §3 明定 org 级(ACR/tailscale/npm token)vs arda 实践配 repo 级                                                                                                             | 裁定一处,批B 分层核查随之                                                                                                                                                      | 140 §3                                 |
+| 18  | 镜像主源/兜底顺序                     | 140 §4 内网ACR→公网ACR→GHCR vs arda 实况 GHCR 主源+ACR 兜底                                                                                                                   | 按主机 case 写进规范(非单一顺序)                                                                                                                                               | 140 §4/§5                              |
+| 19  | webhook secret 轮换                   | 现契约与实现均单 secret(±_NEXT 双键不存在于任何现行文档)                                                                                                                      | 轮换机制(双 secret 位)标准化后,模板 day-one 支持                                                                                                                               | product_200 §4                         |
+| 20  | OIDC allowed_scopes                   | product_200 §2.1 含 `{product_code}` scope vs arda 实登记四 scope                                                                                                             | 倾向四 scope(D12 后产品 scope 无承载),修 200 §2.1                                                                                                                              | product_200 §2.1                       |
+| 21  | deprovision 处置                      | arda_200 §4.1 "拆除" vs 080-rp §4 "归档不硬删,保留复订"                                                                                                                       | 钦定归档不硬删,修 arda_200 表述                                                                                                                                                | arda_200 §4 / 080-rp §4                |
+| 22  | workspace_id 平台策展哨兵             | arda 先例 `__platform__` vs data_platform_100 无此约定(且硬约束#1 禁自声明)                                                                                                   | 标准化或禁止,二选一                                                                                                                                                            | data_platform_100 §2.3                 |
+| 23  | 业务面 DB schema 模板                 | data_platform_100 §2.3.1 现写 `context/app/agent/local_usage` 四钦定 schema(app 单桶反平台"一域一 schema"惯例)                                                                | **重写为功能切分**:模板 3 契约 schema(`vx_provision`/`local_authz`/`local_usage`;后二者复用 `local_` 前缀、`local_usage` 沿用原名)+ N 产品领域 schema;agent 表降选装组件(§2.4) | data_platform_100 §2.3.1               |
+| 24  | 产品级功能 RBAC 结构                  | 平台明文归产品自持但**刻意不给表结构规范**(边界 OUT)                                                                                                                          | 模板填空:提供统一 `local_authz` schema 骨架(member/role/permission/…),角色目录产品 seed;不入平台标准(平台仍不拥有)                                                             | product_240 §2.4(模板级,非平台标准)    |
+| 25  | token 隔离键载体 cutover              | 080-rp §2.6 现网只有 `active_tenant*`(无 active_workspace)vs 140-ruyin §8 称已改 `active_org/active_workspace` 且弃 legacy                                                    | 平台核实生产 access-claims.ts 实际下发→定终裁、修滞后文档;确认前产品隔离键以 provisioning payload/C2 为主载体,auth 层双读 active_workspace(目标)+active_tenant(兜底)           | 080-rp §2.6 / 140-ruyin §8             |
+| 26  | member.max 计数基准                   | ADR-011 §11.1a 平台 workspace_memberships 计数 vs product_220 §5 产品本地门控自己使用面                                                                                       | 因产品 `local_authz.member` 是登录惰性子集(≤平台成员数),须钉死准入基准取哪侧                                                                                                   | ADR-011 §11.1a / product_220 §5        |
+| 27  | **治理角色 code 值域(CONFIRMED bug)** | 平台 seed `owner/manager/member/readonly/guest`(用 **manager**)vs product_240 旧文+arda `owner/admin`(用 **admin**)——平台从不发 admin,manager 被判非 admin→管理面越权门控失效 | 钦定 canonical=平台 seed(owner/manager);修 §2.4 表述、arda roles.ts(§9);产品若需二元 admin 则映射 {owner,manager}→admin                                                        | data_identity_200 §6.4 / arda roles.ts |
+| 28  | token roles claim 格式                | 140-ruyin §8 发 `["org:owner","workspace:owner"]`(数组+scope 前缀)vs 080-rp/130 列 `active_tenant_role`(标量无前缀);arda 比对裸 `owner` 不剥前缀→`workspace:owner` 判非 admin | 钦定 roles 带 scope 前缀 + 数组;消费方模板统一按前缀解析                                                                                                                       | 140-ruyin §8 / 080-rp §2.6             |
+| 29  | 无成员 roster/失效通道                | 平台无 roster 批量 API、无 per-member deprovision 事件;产品成员表只能是登录惰性子集                                                                                           | 裁定是否补 roster 拉取端点或成员失效 C3 事件;否则模板 `local_authz.member` 明确为惰性子集+登录兜底                                                                             | 平台缺口(identity/commerce)            |
+| 30  | 产品级 metric kind 无注册表           | @shared 只导 METRIC_KINDS 值域,kind 实例只挂平台 platform_metrics;产品判自有 metric 是 counter/gauge 靠本地硬编码                                                             | 平台暴露 product_metrics kind 只读视图或经 C2 下发                                                                                                                             | product_220 §4 / @shared               |
+| 31  | 成员 display 缓存失效                 | `local_authz.member`.display_name/avatar 来自平台 user_profiles,但 C3 invalidate 只覆盖 entitlement/grant                                                                     | 平台定义 profile 失效通道,或产品接受 TTL 陈旧                                                                                                                                  | product_200 §4.2                       |
+
+## 7. 实施路径(owner 2026-07-20 定向:**计划1** = 在 vxture-template 仓完整实践、建立标准模板;**计划2** = arda 不一致出明确要求、arda 任务线自行修正)
+
+实践仓 = **`vxture-template`**(owner 已建;agent 当前无写权限,写入按外部仓写边界逐次显式授权)。模板仓定位 = **可运行验证型参照**,除骨架外必须能真实跑通并验证:
+
+- **通道验证**:C1 OIDC 登录全流程、C2 权益拉取+门控渲染、C3 webhook 收发(验签/幂等/seq)与 consume/gauge 上报——对平台真实端点联测;
+- **订阅档位验证**:五档 tier × 六值 status 的门控/CTA 全组合演示页(含 bundled、overdue、null 未订)——Mock 层离线可跑,接平台在线可验。
+
+批次(每批一 PR,批 A–G 同一机检验收):
+
+1. **批 0(平台仓)**:§6 31 项标准修订(owner 已同意,按需两侧修订;优先 #27/#28 两处 CONFIRMED bug)+ 本文升 v1.0。
+2. **批 1(vxture-template)**:治理基座 + CI/CD 构件 + docs 骨架(§2.1/2.2/2.6)+ 占位符与实例化脚本 + 两份 checklist(§2.8);runbook 批 A–D 自验绿。
+3. **批 2(vxture-template)**:平台对接层 + 业务面 DB 基线(§2.3/2.4)+ 两类验证能力,Mock 层离线全绿。
+4. **批 3(vxture-template)**:接平台在线联测——平台侧登记 template 演示产品行/OIDC client/webhook secret(owner 转运),三通道 + 档位真实验证跑通;agent profile 增量随 §4.2 裁决落定。
+5. **批 4**:首个真产品实例化(karda/terra,产品定义就绪者优先)全链 e2e;同步启动**计划2**:§9 整改要求清单以 liaison 回函交 arda 任务线。
+
+## 8. 决策清单(owner 2026-07-20 拍板记录)
+
+| #   | 决策                       | 裁决                                                                                                                                                                                                                                                                                                                           |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | 单模板 vs 两套             | ✅ **单模板**(先按单模板设计)                                                                                                                                                                                                                                                                                                  |
+| 2   | 业务面 DB schema 口径      | ✅ **多 schema,按数据性质切分、数量不设限**:契约面三组 `vx_provision`(平台开通/绑定)· `local_authz`(产品成员与功能授权)· `local_usage`(本地用量缓冲)+ N 产品领域 schema;前缀 `vx_`/`local_` 编码 SoT 方向;由接地对应关系分析定案(§2.4 A/B/C/D,带出处);四钦定 schema 作废;data_platform_100 §2.3.1 需重写(§6#23);arda 整改见 §9 |
+| 3   | L1 范围                    | ✅ **纳入**:L1/L2 六产品(arda/atlas/karda/ontos/runa/terra)= 通用能力与平台级产品;L3 = 行业业务领域智能体(文档编写/客户管理/轨迹分析/战场模拟等)                                                                                                                                                                               |
+| 4   | 模板落地形态               | ✅ **`vxture-template` 仓已建**;须具备真实演示验证能力,尤其通信通道验证与订阅档位验证(§7)                                                                                                                                                                                                                                      |
+| 5   | §6 标准修订(现 31 项)      | ✅ 同意补齐,按需在标准↔实现两侧修订                                                                                                                                                                                                                                                                                            |
+| 6   | 包管理器                   | ✅ **pnpm,全栈一致**(2026-07-20 追问确认,原文"npnm"为笔误)                                                                                                                                                                                                                                                                     |
+| 7   | agent profile 三前置(§4.2) | ⏳ 未裁,批 3 前推进;建议顺序:LLM 通路(包发布 or HTTP 契约)→ 运行时架构 → T3 回填 caller                                                                                                                                                                                                                                        |
+
+## 9. arda 反向整改要求清单(计划2;arda 任务线**自行修正**,平台线不代做;完成判定一律机器可验)
+
+依据 = 本文对账结论 + §6/§8 裁决。交付方式:随模板 v1.0 定稿以 80-liaison 回函送 arda 线;排期归 arda 线,涉活库项须 owner 逐次授权走 db-init 通道。
+
+| #   | 整改项                                       | 现状                                                                       | 要求                                                                                                                                                                                                                                                         | 机检口径                                  |
+| --- | -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| 1   | 库名                                         | `POSTGRES_DB=arda`                                                         | 迁 `vxturebiz_arda_{beta,prod}`                                                                                                                                                                                                                              | `psql \l` + .env.example 对账             |
+| 2   | schema 布局                                  | 单 public(WorkspaceRef/ProvisioningEvent/UsageRaw 兼职)                    | 三张契约表挪进 `vx_provision`(WorkspaceRef→app_instance、ProvisioningEvent→webhook_delivery/provision_seq)、`local_usage.raw`;领域表(Dataset/DataSource/… )归入 arda 领域 schema;arda 现无产品级 RBAC(靠 token 治理角色二元 admin,合规,`local_authz` 可暂空) | check-data-architecture 扩展规则绿        |
+| 3   | 运行态连接身份                               | .env DATABASE_URL 属主直连                                                 | 走 `arda_svc` 最小权限角色                                                                                                                                                                                                                                   | .env.example ↔ 97_service_role 对账       |
+| 4   | 退役 scope 残留                              | .env.example/compose `OIDC_SCOPES` 含 `arda:subscription`                  | 清除(活配置同查)                                                                                                                                                                                                                                             | 全仓 grep 零命中                          |
+| 5   | docs 域文档命名                              | `arda-{sub}-NNN` 连字符(既往豁免)                                          | 新增文档一律 org 下划线族;存量不强制重命名                                                                                                                                                                                                                   | 收紧版 check-docs-numbering 对新文件生效  |
+| 6   | 包管理器                                     | npm workspaces                                                             | 迁 pnpm(§8#6);CI 缓存/Dockerfile/osv 路径随改                                                                                                                                                                                                                | ci/audit 绿 + pnpm-lock.yaml 在位         |
+| 7   | 环境密钥名                                   | `DEPLOY_REPO_DIR`                                                          | §6#1 裁 `DEPLOY_DIR` 后回改                                                                                                                                                                                                                                  | deploy.yml grep                           |
+| 8   | webhook secret 轮换位                        | 单 secret 验签                                                             | §6#19 标准化后支持双 secret 试验签                                                                                                                                                                                                                           | webhook route 实现对账                    |
+| 9   | **治理角色 admin 判定(CONFIRMED bug,§6#27)** | `entitlement/roles.ts` `ADMIN_ROLES=["owner","admin"]`                     | 平台从不发 `admin`(seed=owner/**manager**);改 `{owner,manager}` 判管理面,否则 manager 用户被误判非 admin→越权门控失效                                                                                                                                        | roles.ts 对齐 data_identity_200 §6.4 seed |
+| 10  | **role scope 前缀剥离(§6#28)**               | roles.ts 用 `r.toLowerCase()` 比对裸 `owner`,不剥 `workspace:`/`org:` 前缀 | 平台发 `workspace:owner`(带前缀)→现逻辑判非 admin;改按前缀解析                                                                                                                                                                                               | roles.ts 对齐 140-ruyin §8 token 格式     |
