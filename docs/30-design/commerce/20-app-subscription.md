@@ -1,5 +1,8 @@
 # Commerce · per-app 订阅与 EntitlementProvider（commerce 邻域）
 
+> ⚠️ **SUPERSEDED · 模型级过时（2026-07-20）——本文档已被 ADR-11 + 18-schema cutover 取代，仅存档，不得作为实施依据。**
+> 取代关系：本文核心 = **per-app（tenant×application）订阅 + `EntitlementProvider` 按 tenant×app 解析**，正是 [`40-oidc-subscription.md`] banner 与 [`../decisions/ADR-011-subscription-entitlement-design.md`] 明确取代的粒度（"tenant×app 粒度与 workspace×product 权益引擎冲突，以 ADR-11 为准"）；`commerce.tenant_subscription_quota` 已退役并入 `metering.quota_pools`。接入契约以 [`../product_200_integration.md`] + [`../product_220_catalog-resource-model.md`] 为准。本文为**模型级过时**，故加 banner 而非逐条改表名。删除为独立动作，须 owner 确认。
+
 > 🧭 平台数据模型权威 = [data_platform_100_architecture.md](../data_platform_100_architecture.md) + [-schema.md](../data_platform_200_schema.md)（本文不重述平台 DDL，只述本板块内容）。
 
 > **commerce 邻域文档**（原 `identity-sso-p0.5-commerce`，已移出 identity 板块）：per-app 订阅（按应用订阅，B5 + D-1/D-2/D-5）+ 为 identity IdP（[`identity-platform-idp.md`](../identity/070-idp.md) §6.1 `EntitlementProvider` 接缝）提供真实实现。字段级见 b §commerce/§product。
