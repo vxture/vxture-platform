@@ -64,7 +64,7 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 
 - **不要过度 mask 公开标识**（把 registry host 当 secret 只会妨碍排障，无安全收益）。
 - **层级**：
-  - **org 级**：跨仓共享的凭证与 host（ACR user/password/registry/internal-host、tailscale oauth、npm token）。
+  - **org 级**：跨仓共享的凭证与 host（ACR user/password/registry/internal-host、tailscale oauth、npm token）——**权威层级 = org**：在 org 配一次、share 给选定 repo，单一轮换点、零重复（`vxture-arda` 现配在 repo 级是偏差，见其仓整改线）。
   - **repo 级**：仓库专属公开标识（镜像 `NAMESPACE`、前端公开 `*_SITE_KEY`）。
   - **environment 级**：部署目标 + 审批门（`DEPLOY_HOST_*`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`/`_PASSPHRASE`）。
 - 命名 `SCREAMING_SNAKE_CASE`；**定期审计死值/重复**（0 引用的旧凭证及时删，减攻击面）。
@@ -114,8 +114,9 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 - **原生 `ssh -i ~/.ssh/deploy_key` / `rsync -az --delete`（带 staging 目录）**做交付，不用未 pin 的第三方
   ssh/scp action；staging 让 `--delete` 原子、不会中途留下半套 compose/config。
 - **拉不可变 `sha-<short>` tag**（确定性、可精确回滚），而非可变 release tag。
-- **`docker login` 带 `timeout` + 多端点 fallback**：内网 ACR→公网 ACR→GHCR 逐个试（海外/跨 VPC 主机
-  内网端点不可达时兜底；worker-02 非 Aliyun VPC 即靠此走公网）。
+- **`docker login` 带 `timeout` + 多端点 fallback，主源按主机 profile（§5）定、非单一固定序**：Aliyun-VPC
+  同区主机 = 内网 ACR 主源 → 公网 ACR → GHCR 兜底；**非 VPC 主机**（worker-02、海外 worker-04）= GHCR 主源 →
+  公网 ACR 兜底（内网 ACR 端点不可达）。`IMAGE_REGISTRY`/`FALLBACK_IMAGE_REGISTRY` 按主机置。
 - **bootstrap `.env`**：host 无 `<stack_root>/etc/.env` 则从环境 secret base64 推入 + `chmod 600`，
   **已存在则不覆盖**（本机长驻 `.env`/secret/证书不被 CI 冲掉）。
 - **VERSION 溯源 + 交付校验**：部署 SHA 写 host `VERSION` 文件；`grep` 落地 compose 的关键服务名，
@@ -153,9 +154,10 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 - **`DEPLOY_DIR` 必须是精确的 stack 目录**（含 compose + `.env.*` 的**那一层**）——差一级（如
   `/srv/md0/varda` vs `/srv/md0/varda/deploy`）→ 镜像能拉、但 compose 找不到 env_file 失败（varda 教训）。
   workflow 用 `${DEPLOY_DIR:-<已验证默认>}` 回落。
-- **迁仓/新仓：secrets 不继承**——旧仓的 `DEPLOY_*`/ACR/tailscale secret **不会带到新仓**，必须在
-  新仓/新环境**重新创建全部**（varda "runbook 标已设、实际新仓为空、scp 报 no SSH key" 教训）。
-  迁移前先 SSH 目标主机核实 stack_root/env 文件/ACR 登录在位。
+- **迁仓/新仓：repo/env 级 secrets 不继承**——`DEPLOY_*`（env 级）与 `NAMESPACE`（repo 级）**不会带到新仓**，
+  必须在新仓/新环境**重建**（varda "runbook 标已设、实际新仓为空、scp 报 no SSH key" 教训）。**org 级共享凭证
+  （ACR/tailscale/npm）在 org 配一次、把新仓加入共享名单即可，不必逐仓重建**（§3 层级）。迁移前先 SSH 目标主机
+  核实 stack_root/env 文件/ACR 登录在位。
 - **ACR**：`registry`/`namespace` 为 repo `vars.*`（公开标识），`username`/`password` 为 secret；
   **namespace 按实际 ACR 取**（如 `vx-platform`，非想当然的 `vxture`——build/deploy 都从
   `vars.ALIYUN_ACR_NAMESPACE` 读，勿硬编码；错 namespace = pull access denied / repository does not exist）。
