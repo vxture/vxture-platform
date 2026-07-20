@@ -34,7 +34,7 @@
 
 - 根文件:`.editorconfig` `.gitattributes` `.npmrc` `.gitignore` `.gitleaks.toml` `.osv-scanner.toml`(**空忽略基线出厂**,arda 现有两条记名忽略是时点产物不复制)`.env.example` `CLAUDE.md`(产品参数化的协作纲领,照 arda 版式)`README.md` `docker-compose.yml` `.husky/pre-commit`。
 - 分支治理:`main-ruleset.json` 原样纳入;CI job 名精确产出 required checks(quality-gate/build/test-coverage/audit/gitleaks——五项集合与 arda 现行四项的差异见 §6#8);bootstrap 顺序铁律"首推 main→跑一次 CI→再 apply ruleset"写进初始化 checklist。
-- 密钥四层:secret-scan.yml(pinned gitleaks)+ pre-commit + push protection + 私有仓;SCA:ci.yml audit job(pinned osv-scanner,`--config=.osv-scanner.toml` 显式必带),清基线三分法文档随附。
+- 密钥四层:secret-scan.yml(pinned gitleaks)+ pre-commit + push protection + **公开仓(开发阶段默认,owner 2026-07-20;"凭证永不入库"为绝对铁律,secret scanning 公开仓免费全量)**;SCA:ci.yml audit job(pinned osv-scanner,`--config=.osv-scanner.toml` 显式必带),清基线三分法文档随附。
 - docs:十段编号骨架(00-meta…90-memory)出厂即建 + `check-docs-numbering.mjs`(以 platform 版为底但**收紧后复制**:platform 脚本本体的域文档正则宽松、接受连字符变体,模板版收紧为严格 `{kind}_{domain}_{NNN}_{slug}`,kind∈data/design/ops)+ 空 ADR/TD 寄存器 + `00-index.md`——新仓 day-one 即过 `lint:docs-numbering --strict`。arda 连字符命名是既往豁免,新仓不再给。
 - `package.json` 预置机检契约脚本名(不可改名):`type-check:all`、各包 `lint`、`lint:docs-numbering`,有 DB 再加 `lint:data-design` / `lint:catalog-domains` / `lint:column-locks` / `lint:seed` / `lint:schema-residue`(runbook §0 工具清单为五件,批F/§2 验收命令只列四件——工具/验收口径出入随 §6#8 一并修)。
 
@@ -139,7 +139,7 @@ DDL 三段式单一权威:`deploy/database/ddl/00_baseline.sql`(建三契约 sch
 每个新产品仓实例化时,模板附带两份 checklist:
 
 1. **平台侧登记(owner/平台线动作)**:目录 product 行(code/layer/type)+ plan 结构 seed;OIDC client 对注册(redirect/post_logout/back_channel_logout URI、realm=customer;scopes:arda 实登记 `openid profile email phone`,而 product_200 §2.1 契约仍含 `{product_code}` scope——取哪说见 §6#20;商业 scope 已随 D12 退役不再登);`product_webhooks` 登记(tailnet 投递地址);平台 env 加 `{CODE}_PROVISION_WEBHOOK_SECRET`;secret 全部 owner 手动转运。
-2. **GitHub bootstrap(一次性)**:建仓私有 + push protection;首推 main→CI 一跑→apply ruleset;建 Environments(beta 无审批、production **必配 Required reviewers**);录全 §2.2 secrets/vars;DEPLOY_KNOWN_HOSTS 从可信网络 ssh-keyscan 采集;部署前 SSH 核实 stack_root/etc/.env/ACR 登录在位。
+2. **GitHub bootstrap(一次性)**:**建仓公开(开发阶段)** + push protection(公开仓免费全量);首推 main→CI 一跑→apply ruleset;建 Environments(beta 无审批、production **必配 Required reviewers**);录全 §2.2 secrets/vars;DEPLOY_KNOWN_HOSTS 从可信网络 ssh-keyscan 采集;部署前 SSH 核实 stack_root/etc/.env/ACR 登录在位。
 3. **验收 = product_200 §7 接入 checklist(6 项)收口**,其第 6 项为全链 e2e 五站(登录→开通→门控→consume→invalidate)+ 自整顿 runbook 一条龙总验收命令全绿。
 
 ### 2.9 刚性区 / 留白区(owner 2026-07-20 约束的落实)

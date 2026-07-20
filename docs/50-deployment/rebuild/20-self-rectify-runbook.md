@@ -38,7 +38,7 @@
 
 ### 批 B — 敏感信息四层（governance §2/§3）
 
-- push protection 开 + gitleaks CI + pre-commit + `.gitleaks.toml`；仓私有；清开源残留。
+- push protection 开 + gitleaks CI + pre-commit + `.gitleaks.toml`；**仓公开（开发阶段）**；清误标开源残留。
 - secret/variable 分类正确、分层（org/repo/env）、无死值。
 - **验收**：`gitleaks detect --no-banner`（全史 0 命中）；CI `gitleaks` 绿。
 
