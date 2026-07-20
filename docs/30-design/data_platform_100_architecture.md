@@ -389,7 +389,7 @@ metering consume 服务  POST /usage/consume（单事务，唯一写入方）
                  Model Platform（vxturestudio_modelruntime_main）
 ```
 
-> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 usage*event」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*`迁入`metering._`（`usage_events`/`quota_pools`/`usage_idempotencies`/`usage_summary__`/`usage_gauges`，权威 = `deploy/database/ddl/50_metering.sql`）——本文其余处（§2.2/§8）残留 `commerce._` 旧名属 doc-lag，另批清理。
+> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 usage*event」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*`迁入`metering._`（`usage_events`/`quota_pools`/`usage_idempotencies`/`usage_summary\_\_`/`usage_gauges`，权威 = `deploy/database/ddl/50_metering.sql`）——本文其余处（§2.2/§8）残留 `commerce._` 旧名属 doc-lag，另批清理。
 
 #### 2.3.4 Beta→Prod 转换流程
 
