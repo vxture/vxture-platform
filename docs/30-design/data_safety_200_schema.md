@@ -28,7 +28,7 @@
 | 字段         | 类型         | 约束                             | 说明                                                                             |
 | ------------ | ------------ | -------------------------------- | -------------------------------------------------------------------------------- |
 | `id`         | uuid         | PK                               |                                                                                  |
-| `request_id` | varchar(128) | NULL                             | **跨库/跨域关联键**（串 reqlog ↔ commerce.usage_events ↔ 本表）；边界#1，不建 FK |
+| `request_id` | varchar(128) | NULL                             | **跨库/跨域关联键**（串 reqlog ↔ metering.usage_events ↔ 本表）；边界#1，不建 FK |
 | `direction`  | varchar(16)  | NOT NULL, CHECK(input/output)    | 输入/输出方向                                                                    |
 | `result`     | varchar(32)  | NOT NULL DEFAULT `'not_checked'` | **默认 not_checked**：区分"没查过" vs "查过通过"，勿混用                         |
 | `detail`     | jsonb        | NULL                             |                                                                                  |
