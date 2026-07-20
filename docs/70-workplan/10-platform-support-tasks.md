@@ -7,13 +7,13 @@
 
 ---
 
-## Tier 1 — 卡进度或潜在 live bug(进行中)
+## Tier 1 — 卡进度或潜在 live bug(✅ 完成 2026-07-21)
 
-| #    | 任务                                                     | 为什么(卡谁)                                                                                                                                                                                                | 落点                                                  | 状态           |
-| ---- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------- |
-| T1-1 | **core-oidc-rp 停读 active_tenant**                      | `packages/core/oidc-rp/src/claims.ts` 仍按 `active_tenant*` 翻译,而 token 已 cutover 掉 → console/website(用此包)可能读到已不下发的 claim = 潜在 live bug;且它是 RP 参照实现,不改会带偏 template 的 RP 模块 | `packages/core/oidc-rp/` + consumers                  | 🚧 调研中→实现 |
-| T1-2 | **平台"注册一个产品"runbook + 给 template 演示产品建档** | template 批 3(三通道 + 档位**在线**验证)需平台 seed:目录 product 行 + OIDC client(+beta)+ product_webhooks + webhook secret;现无此 runbook                                                                  | `docs/60-operations` runbook + `deploy/database/seed` | 🚧 调研中→实现 |
-| T1-3 | **@vxture/shared 导出 C2 信封类型**                      | 信封 v2 类型(ProductEntitlementView/SubscriptionFacts/QuotaPoolView)现只在 `bff/platform-api`,不在 @shared → template/产品 C2 客户端须手抄、漂移风险                                                        | `packages/shared` + `bff/platform-api`(回引)          | 🚧 调研中→实现 |
+| #    | 任务                                | 为什么(卡谁)                                                                                                                                                                                                                                                                                                | 落点                                          | 状态                                                                                                                                                                           |
+| ---- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T1-1 | **core-oidc-rp access-claim 对齐**  | 初判"仍读 `active_tenant`=潜在 live bug"**核查后否定**:`claims.ts` 早已(2026-07-15 迁移)读 `active_org`/`active_workspace`/`roles`,console/website 无 bug。降级为 **cosmetic**:两处 spec fixture 仍造已退役的 `active_tenant` 形状,仅因 `mapAccessClaims` 容忍未知字段而绿,误导抄样者 → 对齐真实 claim 形状 | `packages/core/oidc-rp/`(spec fixtures)       | ✅ PR #97(31 specs 绿;**无生产码改动**)                                                                                                                                        |
+| T1-2 | **平台"注册一个产品"runbook**       | template 批 3(三通道 + 档位**在线**验证)需平台 seed:目录 product 行 + OIDC client(+beta)+ product_webhooks + webhook secret;现无此 runbook                                                                                                                                                                  | `docs/60-operations/40-register-a-product.md` | ✅ PR #98(7 件清单 + agent 可做 / owner 手动切分 + SQL 验收);**演示产品活库 seeding 属 owner-gated,未代做**                                                                    |
+| T1-3 | **@vxture/shared 导出 C2 信封类型** | 信封 v2 类型(ProductEntitlementView/SubscriptionFacts/QuotaPoolView)现只在 `bff/platform-api`,不在 @shared → template/产品 C2 客户端须手抄、漂移风险                                                                                                                                                        | `packages/shared` + `bff/platform-api`(回引)  | ✅ PR #96(@shared 1.4.0→1.5.0,7 类型;platform-api 回引 re-export=零 consumer churn;type-check+build+81 specs 绿);**发包 @shared@1.5.0 到 GitHub Packages 属 owner-gated,待发** |
 
 ## Tier 2 — template 批 2 照着写的契约文档(§6 未落平台文档)
 
@@ -55,3 +55,6 @@
 ## 推进记录
 
 - 2026-07-20 立本计划;Tier 1 起(三路调研 grounding → 逐项 PR)。
+- 2026-07-21 **Tier 1 三项全完成并 PR**:T1-3 #96(@shared 信封类型)、T1-1 #97(RP fixture 对齐,
+  原判 live bug 经核查否定=已于 07-15 迁移,降级 cosmetic)、T1-2 #98(注册产品 runbook)。
+  两处 owner-gated 待办已在表内记名:@shared@1.5.0 发包、演示产品活库 seeding。下一步 Tier 2(§6 未落平台文档)。
