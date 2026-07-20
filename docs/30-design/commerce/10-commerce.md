@@ -1,5 +1,8 @@
 # Commerce 能力域设计
 
+> ⚠️ **SUPERSEDED · 模型级过时（2026-07-20）——本文档已被 18-schema cutover + ADR-11 取代，仅存档，不得作为实施依据。**
+> 取代关系：① 单 `commerce` schema 模型 → 已拆为 `metering`/`billing`/`provisioning`/`promotion` 四子域（权威 = `data_platform_100_architecture.md` §2.2 + `deploy/database/ddl/50_metering.sql` 等；本文 `commerce.tenant_*` 表名全部作废）；② per-tenant 订阅 + Feature Gating → **workspace×product 权益引擎**（[`../decisions/ADR-011-subscription-entitlement-design.md`]、[`../product_220_catalog-resource-model.md`]；`tenant_subscription_quota`/`tenant_subscription_override` 已退役）。本文为**模型级过时**（非命名 lag），故加 banner 而非逐条改表名。删除为独立动作，须 owner 确认。
+
 **版本**：1.0.0
 **更新**：2026-05-14
 **范围**：订阅管理 / 配额分配 / 用量计量 / 账单 / 付款 / 退款 / Feature Gating
