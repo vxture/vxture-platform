@@ -24,6 +24,7 @@ import {
   fetchProductSubscriptions,
   type ProductSubscriptionState,
 } from "@/api/subscription.api";
+import { fetchProductCatalog } from "@/api/product-catalog.api";
 import { useAuthStore } from "@/stores/auth.store";
 import AnimatedHeroBg from "./AnimatedHeroBg";
 
@@ -63,6 +64,31 @@ export default function ProductsOverviewPage() {
   const [subs, setSubs] = useState<Map<string, ProductSubscriptionState>>(
     () => new Map(),
   );
+  // 产品版本单一真源在 DB（product.products.release_version），公开端点，匿名亦读。
+  const [versions, setVersions] = useState<Map<string, string>>(
+    () => new Map(),
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchProductCatalog()
+      .then((list) => {
+        if (cancelled) return;
+        setVersions(
+          new Map(
+            list
+              .filter((p) => p.releaseVersion)
+              .map((p) => [p.productCode, p.releaseVersion as string]),
+          ),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setVersions(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!hasSession) {
@@ -115,8 +141,13 @@ export default function ProductsOverviewPage() {
               const loggedOutVisible = product.loggedOutVisible !== false;
               // 未登录 + 配置为不可见 → 隐藏该卡（登录后一律可见）。
               if (!hasSession && !loggedOutVisible) return null;
-              const subscribed =
-                available && subs.get(product.code)?.subscribed === true;
+              const subState = subs.get(product.code);
+              const subscribed = available && subState?.subscribed === true;
+              const tierLabel =
+                subscribed && subState?.tier
+                  ? subState.tier.charAt(0).toUpperCase() +
+                    subState.tier.slice(1)
+                  : null;
               return (
                 <article
                   key={product.code}
@@ -137,11 +168,18 @@ export default function ProductsOverviewPage() {
                       </div>
                     </div>
                     {available ? (
-                      <span className="shrink-0 rounded-full border border-vx-info-100 bg-vx-info-50 px-2.5 py-1 text-xs font-medium text-vx-info-700 dark:border-vx-info-400/20 dark:bg-vx-brand-950/30 dark:text-vx-info-200">
-                        {subscribed
-                          ? t("catalog.badges.active")
-                          : t("catalog.badges.trial")}
-                      </span>
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                        <span className="rounded-full border border-vx-info-100 bg-vx-info-50 px-2.5 py-1 text-xs font-medium text-vx-info-700 dark:border-vx-info-400/20 dark:bg-vx-brand-950/30 dark:text-vx-info-200">
+                          {subscribed
+                            ? t("catalog.badges.active")
+                            : t("catalog.badges.trial")}
+                        </span>
+                        {tierLabel ? (
+                          <span className="rounded-full border border-vx-brand-200 bg-vx-brand-50 px-2.5 py-1 text-xs font-semibold text-vx-brand-700 dark:border-vx-brand-400/30 dark:bg-vx-brand-950/40 dark:text-vx-brand-200">
+                            {tierLabel}
+                          </span>
+                        ) : null}
+                      </div>
                     ) : (
                       <span className="shrink-0 rounded-full border border-vx-gray-200 bg-vx-gray-50 px-2.5 py-1 text-xs font-medium text-vx-gray-500 dark:border-vx-gray-700 dark:bg-vx-gray-800/60 dark:text-vx-gray-400">
                         {t("catalog.badges.developing")}
@@ -163,13 +201,20 @@ export default function ProductsOverviewPage() {
 
                   {/* 底部操作区：左=产品介绍，右=动作对；justify-between 留白分隔 */}
                   <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
-                    <Link
-                      href={`/products/${product.code}`}
-                      target="_blank"
-                      className="inline-flex h-10 items-center text-sm font-medium text-vx-brand-500 underline-offset-4 transition hover:text-vx-brand-600 hover:underline dark:text-vx-brand-400 dark:hover:text-vx-brand-300"
-                    >
-                      {t("catalog.actions.detail")}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      {versions.get(product.code) ? (
+                        <span className="text-xs font-normal text-vx-gray-400 dark:text-vx-gray-500">
+                          {versions.get(product.code)}
+                        </span>
+                      ) : null}
+                      <Link
+                        href={`/products/${product.code}`}
+                        target="_blank"
+                        className="inline-flex h-10 items-center text-xs font-normal text-vx-gray-400 underline-offset-4 transition hover:text-vx-gray-600 hover:underline dark:text-vx-gray-500 dark:hover:text-vx-gray-300"
+                      >
+                        {t("catalog.actions.detail")}
+                      </Link>
+                    </div>
                     <div className="flex items-center gap-2">
                       {!available ? (
                         <Button

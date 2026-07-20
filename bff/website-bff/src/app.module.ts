@@ -25,6 +25,7 @@ import { AuthMiddleware } from "./middleware/auth.middleware";
 import { HealthRouter } from "./routers/health.router";
 import { MeRouter } from "./routers/me.router";
 import { ProductSubscriptionsRouter } from "./routers/product-subscriptions.router";
+import { ProductCatalogRouter } from "./routers/product-catalog.router";
 import { websiteBffPoolProvider } from "./providers/pg-pool.provider";
 import { OidcRpModule } from "./oidc/oidc-rp.module";
 
@@ -37,7 +38,12 @@ import { OidcRpModule } from "./oidc/oidc-rp.module";
     OrganizationModule,
     OidcRpModule,
   ],
-  controllers: [HealthRouter, MeRouter, ProductSubscriptionsRouter],
+  controllers: [
+    HealthRouter,
+    MeRouter,
+    ProductSubscriptionsRouter,
+    ProductCatalogRouter,
+  ],
   providers: [WebsiteAuthService, SessionAggregator, websiteBffPoolProvider],
 })
 export class AppModule implements NestModule {
