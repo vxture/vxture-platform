@@ -42,16 +42,19 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 
 **四层检测，缺一不可：**
 
-1. **GitHub secret scanning + push protection**（仓库 Settings 开启）——推送即拦。
+1. **GitHub secret scanning + push protection**（仓库 Settings 开启）——推送即拦。**公开仓免费全量启用**
+   （私有仓需 GHAS/付费才有 secret scanning），故公开姿态下此层反而更强。
 2. **gitleaks CI**（`.github/workflows/secret-scan.yml`）——全量 + PR 增量扫描，命中即 fail 阻断合并；
    直接跑 pinned gitleaks 二进制（org 仓免 license），规则见仓库根 **`.gitleaks.toml`**。
 3. **本地 husky pre-commit**（`.husky/pre-commit`）——提交前本地 gitleaks，早拦。
-4. **仓库私有**（可见性由 owner 定；公开期视同泄露风险，敏感内容按公开处理）。
+4. **仓库公开（开发阶段默认，owner 2026-07-20 定；不再要求私有）**——不靠私有兜底，故上"凭证永不入库"为
+   **绝对铁律**、无例外；一切敏感内容按**已公开**处理，泄露即世界可见，须源头**即刻** revoke。
 
 **重建/迁移专用**：干净树导入前先 gitleaks **全史扫描**，命中即停 → 源头 revoke 泄露凭证 →
 干净重导（orphan/丢历史包袱），不把历史里的密钥带进新仓。
 
-**代码里的开源/协议残留**（LICENSE/MIT 标记等）：私有仓一律清除。
+**代码里的开源/协议残留**（LICENSE/MIT 标记等）：**公开仓尤须清除误标**——公开仓默认 **all-rights-reserved**，
+一个残留的 MIT/开源标记会**真的授出开源权利**（比私有仓风险更高）。是否显式加 LICENSE 由 owner 另定（**公开 ≠ 开源**）。
 
 ---
 
@@ -236,7 +239,7 @@ required status check（发现新漏洞即 fail 拦合并）。
 - [ ] `docker-build`/`deploy` = tag→env；raw tag、wait-for-build、registry 同区、逐服务 recreate 全到位。
 - [ ] **稳健 CD 构件**：`tailnet-ssh-connect` 复合动作 · `@v4+ping`（或 v3+retry 退避）· 原生 ssh+rsync staging ·
       拉 sha-tag · login 多端点 fallback · bootstrap `.env` · VERSION 溯源。
-- [ ] 敏感信息四层检测（push protection + gitleaks CI + pre-commit + `.gitleaks.toml`）就位；仓私有；无开源残留。
+- [ ] 敏感信息四层检测（push protection + gitleaks CI + pre-commit + `.gitleaks.toml`）就位；**仓公开（开发阶段）**；无误标开源残留。
 - [ ] 依赖 SCA 门：`audit` = osv-scanner（pinned 二进制 + `--config`）硬阻断 + required；基线已 triage 清零，残留经 `.osv-scanner.toml` 逐版本记名接受。
 - [ ] secret/variable **分类正确**、**层级正确**（org/repo/env）、无死值/重复。
 - [ ] **每部署目标一个 Environment**，各带 `DEPLOY_*` 且 **`DEPLOY_DIR` 精确**；生产/产品环境 **Required reviewers 已配**。
