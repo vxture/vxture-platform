@@ -18,7 +18,7 @@
 **本轮两处关键修正：**
 
 1. **删除 `product_i18n` 表** —— 双名称（主名/译名）就是 `products` 上**两列** `product_name` + `product_nick`，不再拆成按 locale 的独立表（原设计过度工程）。description 亦留在 products。
-2. **新增 `plan_prices`（每周期定价）** —— 闭合订阅周期模型：一个 `plan_version` 挂 N 个周期价（月/季/年…各自价格），`commerce.subscriptions.cycle_unit/count` 从中选一。删去旧 `plan.billing_cycle`（单值）与 `plan_version.price`（单价）。
+2. **新增 `plan_prices`（每周期定价）** —— 闭合订阅周期模型：一个 `plan_version` 挂 N 个周期价（月/季/年…各自价格），`metering.subscriptions.cycle_unit/count` 从中选一。删去旧 `plan.billing_cycle`（单值）与 `plan_version.price`（单价）。
 
 ---
 
@@ -64,7 +64,7 @@
 | `metric_unit`    | varchar(32) | NULL                                           | words/calls/GB/seats                                                                                                                                                                                                             |
 | `created_at`     | timestamptz | NOT NULL DEFAULT now()                         |                                                                                                                                                                                                                                  |
 
-约束：`UNIQUE(product_id, metric_key)`；`CHECK(merge_strategy<>'pool' OR consume_mode IN ('divisible','atomic'))`。**2026-07-07 增列 `reset_period varchar(16) NOT NULL DEFAULT 'none'`（CHECK none/day/month；仅 pool 型有意义，CHECK 强制能力型恒 none）**——订阅创建物化 quota_pools 时投影为池的重置周期，周期池锚定订阅 `start_at`（period_anchor/current_period_start 同置）。供 `commerce.metering` consume 分支（§8.3）。
+约束：`UNIQUE(product_id, metric_key)`；`CHECK(merge_strategy<>'pool' OR consume_mode IN ('divisible','atomic'))`。**2026-07-07 增列 `reset_period varchar(16) NOT NULL DEFAULT 'none'`（CHECK none/day/month；仅 pool 型有意义，CHECK 强制能力型恒 none）**——订阅创建物化 quota_pools 时投影为池的重置周期，周期池锚定订阅 `start_at`（period_anchor/current_period_start 同置）。供 `metering` consume 分支（§8.3）。
 
 ## 3. `product_categories`（树形字典）
 
@@ -120,7 +120,7 @@
 
 ## 6. `plan_prices`（每周期定价，新增——闭合订阅周期模型）
 
-一个 `plan_version` 挂 **N 个周期价**（月/季/年/永久…各自价格），`commerce.subscriptions.cycle_unit/cycle_count` 订阅时从中选定一条。
+一个 `plan_version` 挂 **N 个周期价**（月/季/年/永久…各自价格），`metering.subscriptions.cycle_unit/cycle_count` 订阅时从中选定一条。
 
 | 字段              | 类型          | 约束                                           | 说明                            |
 | ----------------- | ------------- | ---------------------------------------------- | ------------------------------- |
@@ -146,7 +146,7 @@
 | `product_id`      | uuid        | NOT NULL, FK→`products.id`                                    |                                                                                                                                                                                                                                                                                                                                                                                          |
 | `tier`            | varchar(32) | NOT NULL, CHECK(free/bundled/starter/pro/business/enterprise) | **2026-07-07 修订（owner 拍板）**：商业阶梯=free<starter<pro<business<enterprise（五档，C2 就高合并的排序权威）；`bundled`（原 `standard` 改名）=**供给档**，不入阶梯（合并中 unranked，仅当无在梯直购订阅时浮出）——语义=产品作为另一产品套餐的后台支撑件（如 agent 套餐捆绑 arda 数据支撑），**订阅面不展示、权益面（C2）如实返回**；`bundled` 只出现在捆绑组件上，不做直购 plan 的档位 |
 | `billing_kind`    | varchar(32) | NOT NULL, CHECK(bundled_free/charged)                         |                                                                                                                                                                                                                                                                                                                                                                                          |
-| `priority`        | int         | NOT NULL DEFAULT 100                                          | 编排期序，投影到 `commerce.quota_pools.priority`                                                                                                                                                                                                                                                                                                                                         |
+| `priority`        | int         | NOT NULL DEFAULT 100                                          | 编排期序，投影到 `metering.quota_pools.priority`                                                                                                                                                                                                                                                                                                                                         |
 | `features`        | text[]      | DEFAULT `'{}'`                                                | 该档开放功能键                                                                                                                                                                                                                                                                                                                                                                           |
 | `quota`           | jsonb       | NULL                                                          | 业务语言配额 `{"doc.words":1000000}`（计数非金额）                                                                                                                                                                                                                                                                                                                                       |
 | `sort_order`      | int         | NOT NULL DEFAULT 0                                            |                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -187,7 +187,7 @@ CREATE TRIGGER trg_plan_component_priority BEFORE INSERT OR UPDATE
 | `webhook_secret_ref`        | varchar(128) | NULL                   | **平台自签 HMAC 验签密钥引用**（非 Provider Key，风险模型不同，正常入平台库） |
 | `created_at` / `updated_at` | timestamptz  | NOT NULL DEFAULT now() |                                                                               |
 
-被 `commerce.provisioning.webhook_deliveries` 投递时 join 取端点+密钥签名（provisioning §3）。
+被 `provisioning.webhook_deliveries` 投递时 join 取端点+密钥签名（provisioning §3）。
 
 ## 9. `launch_checklist_items` + `product_launch_statuses`（上架检查）
 
@@ -234,15 +234,15 @@ CREATE TRIGGER trg_plan_component_priority BEFORE INSERT OR UPDATE
 
 ## 11. 跨 schema FK 速查表（本域内 + 被引用）
 
-| 从                                                                                                                                                 | 到                                    | 类型              | 依据                                                  |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ----------------- | ----------------------------------------------------- |
-| `product_metrics/plan_components.product_id`、`product_webhooks.product_id`、`product_launch_statuses.product_id`                                  | `products.id`                         | 真 FK             | 同 schema                                             |
-| `products.category_id` / `product_categories.parent_id`                                                                                            | `product_categories.id`               | 真 FK             | 同 schema（smallint 代理键）                          |
-| `plan_versions.plan_id` / `plans.current_version_id`                                                                                               | `plans.id` / `plan_versions.id`       | 真 FK             | 同 schema（互相引用）                                 |
-| `plan_prices.plan_version_id` / `plan_components.plan_version_id`                                                                                  | `plan_versions.id`                    | 真 FK             | 同 schema                                             |
-| `product_launch_statuses.item_code`                                                                                                                | `launch_checklist_items.item_code`    | 真 FK             | 同 schema（code 作 PK，此处 code 即主键非可视码语义） |
-| `*.created_by`/`updated_by`/`checked_by`                                                                                                           | `admin.operator_accounts.id`          | **裸值**，不建 FK | 边界#2（产品目录运营专属，realm 确定）                |
-| **被引用**：`commerce.metering.subscriptions.plan_version_id`、`promotion.*.grant_plan_version_id`、`commerce.billing.invoice_items.product_id` 等 | 本域 `plan_versions.id`/`products.id` | 真 FK             | 跨 schema（铁律一）                                   |
+| 从                                                                                                                               | 到                                    | 类型              | 依据                                                  |
+| -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ----------------- | ----------------------------------------------------- |
+| `product_metrics/plan_components.product_id`、`product_webhooks.product_id`、`product_launch_statuses.product_id`                | `products.id`                         | 真 FK             | 同 schema                                             |
+| `products.category_id` / `product_categories.parent_id`                                                                          | `product_categories.id`               | 真 FK             | 同 schema（smallint 代理键）                          |
+| `plan_versions.plan_id` / `plans.current_version_id`                                                                             | `plans.id` / `plan_versions.id`       | 真 FK             | 同 schema（互相引用）                                 |
+| `plan_prices.plan_version_id` / `plan_components.plan_version_id`                                                                | `plan_versions.id`                    | 真 FK             | 同 schema                                             |
+| `product_launch_statuses.item_code`                                                                                              | `launch_checklist_items.item_code`    | 真 FK             | 同 schema（code 作 PK，此处 code 即主键非可视码语义） |
+| `*.created_by`/`updated_by`/`checked_by`                                                                                         | `admin.operator_accounts.id`          | **裸值**，不建 FK | 边界#2（产品目录运营专属，realm 确定）                |
+| **被引用**：`metering.subscriptions.plan_version_id`、`promotion.*.grant_plan_version_id`、`billing.invoice_items.product_id` 等 | 本域 `plan_versions.id`/`products.id` | 真 FK             | 跨 schema（铁律一）                                   |
 
 ## 12. 待办 / 开放项
 
