@@ -13,16 +13,16 @@
 
 ## 0. 可移植工具清单（从 vxture-platform 复制）
 
-| 类别            | 文件                                                                                                            | 适用          | 说明                                                    |
-| --------------- | --------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------- |
-| **密钥扫描**    | `.gitleaks.toml` · `.github/workflows/secret-scan.yml` · `.husky/pre-commit`                                    | **全仓必备**  | gitleaks pinned 二进制                                  |
-| **SCA**         | `.github/workflows/ci.yml` audit job · `.osv-scanner.toml`                                                      | **全仓必备**  | osv-scanner pinned；`--config` 必带                     |
-| **docs 编号**   | `scripts/guardrails/check-docs-numbering.mjs`（纯 node、零依赖）                                                | **全仓必备**  | `--strict` 接 CI；package.json 加 `lint:docs-numbering` |
-| **CI 变更门控** | `scripts/workflows/classify-changes.mjs` + `.test.mjs` + `images.mjs`                                           | 有多镜像时    | build/test 只建受影响组件                               |
-| **分支保护**    | `main-ruleset.json`（本目录）                                                                                   | **全仓必备**  | required checks + 禁 force-push + 线性历史              |
-| **CI/CD 模板**  | `.github/workflows/{ci,docker-build,deploy}.yml` + `actions/`                                                   | 有部署时      | 稳健 CD 构件见 governance §4                            |
-| **数据层护栏**  | `scripts/guardrails/check-{data-architecture,catalog-domains,column-locks,schema-residue,seed-idempotency}.mjs` | **仅自带 DB** | governance §7/§8                                        |
-| **前端护栏**    | `scripts/guardrails/check-design-system.mjs` · `check-i18n-keys.mjs` · `audit-env.mjs`                          | 有对应形态    | governance §8                                           |
+| 类别            | 文件                                                                                                                                             | 适用          | 说明                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------------------------------------------- |
+| **密钥扫描**    | `.gitleaks.toml` · `.github/workflows/secret-scan.yml` · `.husky/pre-commit`                                                                     | **全仓必备**  | gitleaks pinned 二进制                                  |
+| **SCA**         | `.github/workflows/ci.yml` audit job · `.osv-scanner.toml`                                                                                       | **全仓必备**  | osv-scanner pinned；`--config` 必带                     |
+| **docs 编号**   | `scripts/guardrails/check-docs-numbering.mjs`（纯 node、零依赖）                                                                                 | **全仓必备**  | `--strict` 接 CI；package.json 加 `lint:docs-numbering` |
+| **CI 变更门控** | `scripts/workflows/classify-changes.mjs` + `.test.mjs` + `images.mjs`                                                                            | 有多镜像时    | build/test 只建受影响组件                               |
+| **分支保护**    | `main-ruleset.json`（本目录）                                                                                                                    | **全仓必备**  | required checks + 禁 force-push + 线性历史              |
+| **CI/CD 模板**  | `.github/workflows/{ci,build,deploy}.yml` + `actions/`（`build.yml` = deploy 经 `workflow_call` 调的可复用 build，正典无竞态；见 governance §4） | 有部署时      | 稳健 CD 构件见 governance §4                            |
+| **数据层护栏**  | `scripts/guardrails/check-{data-architecture,catalog-domains,column-locks,schema-residue,seed-idempotency}.mjs`                                  | **仅自带 DB** | governance §7/§8                                        |
+| **前端护栏**    | `scripts/guardrails/check-design-system.mjs` · `check-i18n-keys.mjs` · `audit-env.mjs`                                                           | 有对应形态    | governance §8                                           |
 
 > 复制后按本仓实际改路径/包名/registry；**勿照抄 vxture-platform 专属值**（namespace/host/域码）。
 
@@ -57,9 +57,9 @@
 
 ### 批 E — CD + 环境 bootstrap（governance §4/§5/§6）
 
-- tag→env（dev/beta/v）；稳健 CD 构件（`tailnet-ssh-connect` 复合动作 · `@v4+ping` · 原生 ssh+rsync · sha-tag · login fallback · bootstrap `.env` · VERSION）。
+- tag→env（**产品仓默认 beta/v 两档**；`dev`/`varda` 为平台仓特有）；稳健 CD 构件（`tailnet-ssh-connect` 复合动作 · `@v4+ping` · 原生 ssh+rsync · sha-tag · login fallback · bootstrap `.env` · VERSION）。
 - 每部署目标一个 Environment（自带 `DEPLOY_*` + `DEPLOY_DIR` 精确 + **Required reviewers**）；ACR namespace 从 `vars`。
-- **验收**：真打一个 dev-\* tag → CI 全绿 + 部署过审批门 + 健康校验 200。
+- **验收**：真打一个 `beta-*` tag → CI 全绿 + 部署 + 健康校验 200（生产档 `v*.*.*` 另加必审人门）。
 
 ### 批 F —（仅自带 DB）数据层（governance §7）
 
