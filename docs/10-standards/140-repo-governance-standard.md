@@ -27,6 +27,10 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 - **分支保护 ruleset**（`rebuild/main-ruleset.json` 同款套用）：required status checks（按 job 名匹配）、
   push 前需 PR、禁 force-push、线性历史；单人仓 `required_approving_review_count=0`（靠 checks 把关），
   多人仓改 `1`；`bypass_actors` 留仓库 admin 应急。
+  - **必需 checks 集合权威 = `main-ruleset.json` 的五项**：`quality-gate` / `build` / `test-coverage` /
+    `audit` / `gitleaks`（CI job 名必须精确产出这五个 context，改 job 名 = 分支保护失效）。**无单测的产品仓仍须提供
+    一个恒绿的 `test-coverage` job**（占住该 context，零测试即通过）——不得从 required 里删该项。
+    （`vxture-arda` 现行只有四项、缺 `test-coverage`，属偏差，见其仓整改线。）
 - **落地时机（关键顺序）**：空仓先 `git init`→`main`→首推建立 `main`→跑一次 CI 让 required checks
   至少产生一次→**此时**再 apply ruleset（先加限制性 ruleset 会挡住首次代码导入）。
 
@@ -79,13 +83,19 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 | `vX.Y.Z`          | production        | 仅 v\*.\*.\* + **必审人门** |
 | `varda-\*`        | varda（自有节奏） | —                           |
 
-`docker-build.yml`（tag）build+push 镜像 → `deploy.yml`（tag）拉取部署。**踩过的坑（必须规避）：**
+> **产品仓默认两档**：新建产品仓的 tag→env 集合默认 `beta-*`→beta、`v*.*.*`→production 两档；`dev-*`→develop
+> 与 `varda-*` 是**平台仓特有**行（产品仓不建 develop/varda 环境）。
 
-- **镜像 tag 一致**：deploy 用 `github.ref_name`（如 `v0.1.0`）拉取；docker-build 的 metadata **必须带
+**CD 流水线拓扑（正典 = 可复用 build workflow）**：`deploy.yml`（tag 触发）经 `workflow_call` 调 `build.yml`
+（`needs: call-build` 取 `outputs.image_tag=sha-<short>`）——build 与 deploy 在**同一 run 内有序**，从根上消除竞态、
+无需轮询（`vxture-arda` 范本即此；caller 须显式给 `security-events: write` 否则整 run startup-fail）。**踩过的坑（必须规避）：**
+
+- **镜像 tag 一致**：deploy 用 `github.ref_name`（如 `v0.1.0`）拉取；build workflow 的 metadata **必须带
   `type=raw,value=${{ github.ref_name }}`**——semver 模式会把 `v0.1.0` 剥成 `0.1.0`，且
   `dev-*`/`beta-*`/`varda-*` 非 semver 只产出 `sha-`，没有 raw tag 会 **image not found**。
-- **deploy 等 docker-build**：二者由同 tag **并行触发无先后**；deploy 过审批门后**轮询等本 tag 的
-  docker-build 成功再拉**（需 `actions: read`），否则拉空。
+- **build 与 deploy 的时序**：正典用 `workflow_call`（上文）在同一 run 内串起 build→deploy，无竞态。**旧式**分离
+  拓扑（独立 tag 触发的 `docker-build.yml` + deploy 轮询）仍可用但需 deploy 过审批门后**轮询等本 tag 的镜像
+  构建成功再拉**（需 `actions: read`），否则拉空——新仓一律用 `workflow_call` 正典，避开此坑。
 - **registry 与部署主机同区域**：云 ACR 的 **VPC 内网端点按区域隔离**，跨区不可达。ACR 必须建在与部署
   ECS **同 region**（否则内网 login 超时，只能走公网、慢且付费）。
 - **内存受限主机（如 2C2G）逐服务替换**：整栈一次性 `compose pull + up -d`（尤其容器改名→全量重建）会
@@ -128,8 +138,13 @@ vxture-platform 只提供标准 + 参照实现 + 工具，**不代做**。新缺
 ## 6. 环境、密钥与部署 bootstrap（一次性）
 
 **GitHub Environments 是 tag→env CD 的承接点**：每个部署目标一个环境（`develop`/`beta`/`production`/
-`<product>`），各自携带本目标的 `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`(+`_PASSPHRASE`/
-`_KNOWN_HOSTS`)/`DEPLOY_DIR`——同一 deploy job 靠 `environment: <route>` 路由到正确主机。
+`<product>`），各自携带本目标的 `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`(+可选 `_PASSPHRASE`)/
+**`DEPLOY_KNOWN_HOSTS`（必填）**/`DEPLOY_DIR`——同一 deploy job 靠 `environment: <route>` 路由到正确主机。
+
+- **`DEPLOY_KNOWN_HOSTS` 必填**：复合动作 `tailnet-ssh-connect` 对空 known_hosts **fail-closed**（拒绝
+  `ssh-keyscan` TOFU 回落，防 MITM），故此键非可选。bootstrap 时从可信网络 `ssh-keyscan -p <port> <host>`
+  采集后存入环境 secret。
+- **键名权威 = `DEPLOY_DIR`**（`vxture-arda` 实现用 `DEPLOY_REPO_DIR` 是历史偏差，见其仓整改线）。
 
 - **环境保护必须配**：生产/产品环境**加 Required reviewers**——这才是 tag→env 安全的关键；
   **零保护 = tag 一推就直接部署、不停等审批**（varda 首上线教训）。agent 有 repo admin 时**可用
