@@ -367,7 +367,7 @@ schema: {domain} × N
 
 业务仓必须遵守下列硬约束，平台以此为交互契约：
 
-1. **只持引用，不复制**：业务库仅保存 `workspace_id` / `tenant_id` / `user_id`(=完整 `sub`) 引用（`vx_provision.app_instance` / `local_authz.member`），**`workspace_id` 为权威业务隔离键**（来自平台 entitlement 体系，不接受产品端自声明，见 §16）；不复制平台账号、组织/空间、订阅或配额详情。身份四层模型（org→workspace→membership→user）与 `tenant.type=personal|organization`、`realm=customer|workforce` 均属平台 `identity` 域，业务侧不得镜像（持隔离键引用 ≠ 镜像模型）。产品建 `local_authz` 的"成员→功能角色→权限"表属**业务授权**（指定落点、非镜像），但**不得复刻平台治理角色目录**（`access.roles` 的 owner/manager/…）。
+1. **只持引用，不复制**：业务库仅保存 `workspace_id` / `tenant_id` / `user_id`(=完整 `sub`) 引用（`vx_provision.app_instance` / `local_authz.member`），**`workspace_id` 为权威业务隔离键**（来自平台 entitlement 体系，不接受产品端自声明，见 §16）；不复制平台账号、组织/空间、订阅或配额详情。身份四层模型（org→workspace→membership→user）与 `tenant.type=personal|organization`、`realm=customer|workforce` 均属平台 `identity` 域，业务侧不得镜像（持隔离键引用 ≠ 镜像模型）。产品建 `local_authz` 的"成员→功能角色→权限"表属**业务授权**（指定落点、非镜像），但**不得复刻平台治理角色目录**（`access.roles` 的 owner/manager/…）。**平台策展的全局只读参考行不得用产品自造的 `workspace_id` 哨兵**（如 `__platform__`，违反"workspace_id 平台签发"铁律）——用**显式轴**表达"全局 vs workspace"：可空 `workspace_id`（NULL=平台全局）或独立 `scope` 列（`workspace`|`platform`）。（arda 现用 `__platform__` 哨兵是偏差，见其仓整改线；owner 2026-07-20 裁定，收口 product_240 §6#22。）
 2. **不读平台库**：业务服务禁止直连 `vxturestudio_platform_main`；一切平台状态经 BFF / 契约接口获取，access token 只带治理角色、不含业务 entitlement（业务侧按需实时回查）。
 3. **不持 Key**：业务库与业务 worker 不得持有 Provider Key 明文。Provider Key 与请求日志只在独立 Model Platform DB（`vxturestudio_modelruntime_main` 的 `key` / `reqlog`）；`gateway` schema 已取消，平台控制面库不接触 Key。
 4. **用量按约上报，不本地判配额**：业务侧只把原始 counter 用量写入 `local_usage.raw`，再由异步 Job 按契约调用平台**用量写入唯一入口**——`metering` consume 服务（`POST /usage/consume`，单事务写入原始事件 + 更新聚合；gauge 型 metric 如 storage.bytes 走 `PUT /usage/gauge` 绝对水位、不入缓冲表）。业务侧**不做配额判断**；配额 gate 由 Model Platform 只读平台配额执行，Model Platform 不直写用量。
@@ -389,7 +389,7 @@ metering consume 服务  POST /usage/consume（单事务，唯一写入方）
                  Model Platform（vxturestudio_modelruntime_main）
 ```
 
-> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 usage*event」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*` 迁入 `metering.*`（`usage_events` / `quota_pools` / `usage_idempotencies` / `usage_summary*_`/`usage_gauges`，权威 = `deploy/database/ddl/50_metering.sql`）——本文其余处（§2.2/§8）残留 `commerce._` 旧名属 doc-lag，另批清理。
+> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 usage*event」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*`迁入`metering._`（`usage_events`/`quota_pools`/`usage_idempotencies`/`usage_summary__`/`usage_gauges`，权威 = `deploy/database/ddl/50_metering.sql`）——本文其余处（§2.2/§8）残留 `commerce._` 旧名属 doc-lag，另批清理。
 
 #### 2.3.4 Beta→Prod 转换流程
 
