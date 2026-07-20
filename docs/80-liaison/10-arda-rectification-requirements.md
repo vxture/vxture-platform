@@ -4,7 +4,7 @@
 > **完成判定**:每项附**机器可验**命令,**非绿 = 未达标**,无需人主观判断。
 > **权威依据(全部已合 vxture-platform `main`)**:`docs/10-standards/140-repo-governance-standard.md` · `docs/30-design/product_240_repo-template.md`(§2.4 / §6 / §9)· `product_200/220/230` · `data_platform_100_architecture.md` §2.3 · `docs/30-design/identity/080-rp-integration.md` §2.11。
 > **现状核准**:2026-07-20 对 `D:\MyWebSite\vxturestudio\vxture-arda` 实读(下列"现状"带 arda 文件:行)。
-> **排期/授权**:涉活库项(库名/schema/svc 角色/**platform**)须 owner 逐次授权走 `db-init.yml` 通道;顺序建议 = 先标准侧(代码/配置/CI)后活库迁移。
+> **排期/授权**:涉活库项(库名/schema/svc 角色/`__platform__` 哨兵)须 owner 逐次授权走 `db-init.yml` 通道;顺序建议 = 先标准侧(代码/配置/CI)后活库迁移。
 > **孪生**:本清单 = product_240 §9 的交付展开;§9 有增补以本文为准。
 
 ---
