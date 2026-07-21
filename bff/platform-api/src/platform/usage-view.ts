@@ -14,6 +14,10 @@
  * can leave a positive balance that the caller should see.)
  */
 import type { QuotaPoolView } from "./entitlement-view";
+// C3 consume response body now lives in @vxture/shared (single SoT); re-export
+// so existing `from "./usage-view"` importers stay unchanged.
+import type { ConsumeResponseBody } from "@vxture/shared";
+export type { ConsumeResponseBody } from "@vxture/shared";
 
 /** Engine result shape (services/commerce/subscription consume.types). */
 export interface EngineConsumeResult {
@@ -29,20 +33,6 @@ export interface PoolIdentity {
   poolId: string;
   subscriptionId: string | null;
   view: QuotaPoolView;
-}
-
-export interface ConsumeResponseBody {
-  gated: boolean;
-  reason?: "quota_exhausted";
-  consumed: number;
-  remaining_total: number;
-  per_pool_breakdown: {
-    subscription_id: string | null;
-    metric: string;
-    took: number;
-    remaining: number;
-  }[];
-  replayed?: true;
 }
 
 export function buildConsumeResponse(
