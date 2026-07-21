@@ -39,10 +39,17 @@
    不带商业字段**，不要加 `<code>:subscription` scope（C2-only，`arda` 已退役该 scope）。
 3. `product_webhooks` upsert：`webhook_url = {WEBHOOK_BASE}/provisioning/webhook`，
    `webhook_secret_ref` 填 env 变量名（不填值）。
-4. `plans` / `plan_versions` / `plan_prices` / `plan_components` 售卖图 + `launch_checklist` 门。
+4. `plans` / `plan_versions` / `plan_prices` / `plan_components` 售卖图 + `product_metrics`
+   （每 metric 的 `merge_strategy` / `kind`——决定信封 `limits`（`max` 键）与 `quota_pools`（池键）形态）
+   - `launch_checklist` 门。
 5. `kyc.verification_policies`（可选）。
 6. 在 `B` / `betaB` map 里加 `{CODE}_BASE_URL` / `{CODE}_BETA_BASE_URL` 的**引用**（env 名，
    本地默认回落 `localhost:<port>`）。**只写 env 名，不写生产值。**
+7. **档位在线验证 fixtures（template 批3「档位在线联测」所需）**：为演示 workspace 造一条
+   `metering.subscriptions`（选一档位、`status='active'`）+ 对应 `metering.quota_pools`，使 C2 信封对该 ws
+   返回真实 `tier` / `status` / `limits` / 池；五档全覆盖则每档一条（含 `trialing`/`overdue` 等状态样本）。
+   **仅落 `seed-demo-data` 面（非目录主 seed）**，活库注入经 `seed-demo-data.yml`、同属 owner-gated（§3）。
+   缺此则只验得了"未订阅=null"分支,验不了档位门控与 quota 消耗。
 
 > 值域不够用时（新 tier 等）：**先改 `@vxture/shared`**（权威）→ 发版 → 再在 seed 引用，
 > 不在 seed 里硬编码域外值。
@@ -76,8 +83,9 @@ select home_url, webhook_url, webhook_secret_ref from product.product_webhooks
   where product_id = (select id from product.products where product_code = '<code>');
 ```
 
-- **C2 探针**：`GET` platform-api `/entitlements?workspace_id=<ws>&product=<code>` 返回信封
-  （未订阅 → `status:null` / `tier:null` / 空 `limits`+`quota_pools`，§11.4）。
+- **C2 探针**：`GET` platform-api `/entitlements?workspace_id=<ws>&product=<code>` 返回信封——
+  未订阅 ws → `status:null` / `tier:null` / 空 `limits`+`quota_pools`（§11.4）；**有演示订阅的 ws
+  （item 7 fixtures）→ 真实 `tier` / `status:active` / `limits` 数字 / 池**（这才验到档位在线门控与 quota）。
 - 产品侧 OIDC 登录闭环；provisioning webhook 实测 `delivered` / `200`。
 - `launch_checklist` 两门（`verification_policy` / `pricing_set`）满足才算可售。
 
