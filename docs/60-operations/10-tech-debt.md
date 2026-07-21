@@ -96,7 +96,7 @@
 | [TD-037](#td-037--无安全重建单个平台服务重载-env-的运维通道)                          | 无安全重建单个平台服务/重载 env 的运维通道（registry+tag 解析陷阱） | Implementation Gap | Resolved    | 🟡 MED                      |
 | [TD-038](#td-038--platform-env-变更后依赖整栈重建无单键热更或影响面收窄)              | platform.env 变更后依赖整栈重建，无单键热更或影响面收窄             | Architecture       | Open        | 🟢 LOW                      |
 | [TD-039](#td-039--疑似死-ci-凭证待审计清理需全域确认)                                 | 疑似死 CI 凭证待审计清理（需全域确认）                              | Security Hygiene   | Open        | 🟢 LOW                      |
-| [TD-040](#td-040--变更门控方法论未沉淀进-cicd-optimization-playbook)                  | 变更门控方法论未沉淀进 cicd-optimization-playbook                   | Documentation      | Open        | 🟢 LOW                      |
+| [TD-040](#td-040--变更门控方法论未沉淀进-cicd-optimization-playbook)                  | 变更门控方法论未沉淀进 cicd-optimization-playbook                   | Documentation      | Resolved    | 🟢 LOW                      |
 | [TD-041](#td-041--admin-订阅动作写路径绕过-provisioning-派发与-c3-invalidate)         | admin 订阅动作写路径绕过 provisioning 派发与 C3 invalidate          | Architecture       | Open        | 🟡 MED                      |
 
 ---
@@ -922,7 +922,7 @@
 | 字段         | 内容                                                                                        |
 | ------------ | ------------------------------------------------------------------------------------------- |
 | **分类**     | Documentation                                                                               |
-| **状态**     | Open                                                                                        |
+| **状态**     | Resolved（2026-07-21，PR #103）                                                             |
 | **登记日期** | 2026-07-16                                                                                  |
 | **来源**     | GitHub Actions workflow 审查（本轮）；`ci.yml` build/test 变更门控 + `classify-changes.mjs` |
 
@@ -931,6 +931,8 @@
 **影响**：可迁移的提效方法论停留在本仓实现里，[[reference_repo_governance_standard]] 的"CI 提效"一环缺文档支撑，跨仓复用需逐仓逆向。属文档缺口。
 
 **解决方向**：把变更门控模式补进 `cicd-optimization-playbook.md`（触发门控/最小重建/覆盖缺口章节）。低风险纯文档，但**与全域整顿节奏对齐后再统一补**（避免文档与其它仓落地节奏脱节），故随 TD-039 一并列"待全域确认"批次。
+
+**销号（2026-07-21，PR #103）**：挂起条件"与全域整顿节奏对齐"已成立（template/arda 正照标准重构、template 批 1 复制 CI/CD 套件），方法论以 **playbook 手法 F** 落地 `010-cicd-optimization-playbook.md` §3（step 级门控/依赖图推导 watch-paths/fail-open 兜底/docs-only 轻量通道/单一规则源/分类器自测六要点 + 实测验收清单）。TD-039（死凭证审计）不受影响，仍待全域确认。
 
 ### TD-041 — admin 订阅动作写路径绕过 provisioning 派发与 C3 invalidate
 
