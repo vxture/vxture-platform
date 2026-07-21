@@ -47,7 +47,8 @@ function fakeClient(opts: {
     refresh: opts.refresh ?? (async () => ({}) as OidcTokenSet),
     verifyIdToken: async () => ({}) as never,
     verifyAccessToken:
-      opts.verify ?? (async () => ({ sub: "usr_1", active_tenant: "tn1" })),
+      opts.verify ??
+      (async () => ({ sub: "usr_1", active_org: "org_1", roles: [] })),
     verifyLogoutToken: async () => ({ sid: "sidA" }),
     buildEndSessionUrl: () => "",
   };
@@ -61,7 +62,7 @@ function session(overrides: Partial<RpSession> = {}): RpSession {
     accessToken: "acc",
     refreshToken: "ref",
     accessExpiresAt: now() + 3600,
-    activeOrg: "tn1",
+    activeOrg: "org_1",
     ...overrides,
   };
 }

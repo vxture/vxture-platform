@@ -31,3 +31,14 @@ export type { ErrorMetadata } from "./error.types";
 
 // Portal Context Types - 跨 Portal 导航上下文
 export type { PortalSource, PortalNavContext } from "./portal-context.types";
+
+// Entitlement envelope contracts - C2/C3 response face (product_220 §3 / product_310)
+export type {
+  SubscriptionFacts,
+  SaleAxes,
+  QuotaPoolView,
+  ProductEntitlementView,
+  EntitlementResponseSingle,
+  EntitlementResponseBatch,
+  ConsumeResponseBody,
+} from "./entitlement.types";

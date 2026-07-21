@@ -33,6 +33,14 @@ export type {
   // Portal Context Types
   PortalSource,
   PortalNavContext,
+  // C2/C3 entitlement envelope contract (product_220 §3 / product_310)
+  SubscriptionFacts,
+  SaleAxes,
+  QuotaPoolView,
+  ProductEntitlementView,
+  EntitlementResponseSingle,
+  EntitlementResponseBatch,
+  ConsumeResponseBody,
 } from "./types";
 
 // Catalog value-domain types — platform contract (product_220 §1/§2/§3)
