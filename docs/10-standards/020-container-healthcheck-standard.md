@@ -3,6 +3,7 @@
 **用途**：给任意服务补齐 Docker healthcheck，作为部署就绪闸门 + 状态可视 + 排障入口。零一项目可直接套用。
 **来源**：从 vxture 实战萃取，含 Next.js standalone 的真实大坑。
 **版本**：1.0.0 ｜ **更新**：2026-06-09
+**配套**：本标准管**探活机制**；健康端点**响应体契约**（返回什么字段、构建期溯源注入）见 [`025-service-health-endpoint-contract`](./025-service-health-endpoint-contract.md)。
 
 ---
 

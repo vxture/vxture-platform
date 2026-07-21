@@ -44,6 +44,18 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Build provenance (standard 025) — runtime ENV read by the /healthz identity
+# block. Honest defaults so builds never break when args aren't passed; CI
+# injects real values from the git tag / sha / build time.
+ARG APP_VERSION=dev
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ARG DEPLOY_STAGE=dev
+ENV APP_VERSION=${APP_VERSION} \
+    GIT_SHA=${GIT_SHA} \
+    BUILD_TIME=${BUILD_TIME} \
+    DEPLOY_STAGE=${DEPLOY_STAGE}
+
 RUN apk add --no-cache curl \
   && addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nodeapp
