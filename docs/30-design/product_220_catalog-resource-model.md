@@ -115,7 +115,7 @@ GET /platform/entitlements?workspace_id={W}&product={P}
 3. **配额池 = 独立账本**,瀑布/幂等/失效语义零变更。
 
 - **无覆盖回落**:`status: null` + `tier: null, bundled: false, limits: {}` + 空池(从无订阅);
-- **消费方门控公式**(一行判完,不得自定义放宽):产品 UI 门控 = `tier != null`;后端/agent 数据取用门控 = `tier != null || bundled`;
+- **消费方门控公式**(canonical 单式,一行判完,不得自定义放宽):产品 UI 门控 = `tier != null`;后端/agent 数据取用门控 = `tier != null || bundled`;**等价性(平台线确认,§6#6)**:代表订阅规则下 `tier != null` 定义等价于 `status ∈ {active,trialing,overdue}`(有可售档位 ⟺ 处于活跃/试用/宽限)——两式同真,消费方只实现 `tier != null` 一式,不各自展开 status 集合;
 - **演进容错通则(双方义务)**:产品必须容忍信封**新增字段**与 `status` **新枚举值**(未知即降级隐藏/保守渲染)——决策位/资格位永不入信封(能不能试用、该买什么=console 深链的事),描述性事实按"产品无需理解平台策略即可逐字渲染"判据准入;
 - **`status` = 订阅状态轴**(正交于 `tier` 能力轴与 `bundled` 来源轴):`tier != null` 只说"现在能干什么",不区分"从未订阅 vs 曾订已过期"——后者是"订阅 vs 续订"两种 CTA 的分岔。取值 = 该产品**直购(primary)订阅**的**真实状态**(代表选取见上),或 **`null` = 从无直购订阅**。**"无订阅"由 `null`(字段为空)表达,不是状态值**(订阅视角:没订阅就没有"这条订阅",何来状态);**捆绑覆盖不产生直购**,故"捆绑但无直购"= `status: null` + `bundled: true`(见 §2 示例);状态归 C2(权益不入 token 铁律使然),不从 access_token claim 读;
   - **值域权威 = `@vxture/shared` 的 `SUBSCRIPTION_STATUSES`**(= DB `metering.subscriptions.status` = 六个真实状态 `active/trialing/overdue/suspended/expired/cancelled`;owner 2026-07-13 裁定扩入 `overdue` = 欠费宽限——扣款失败、催缴中、**权益保留**,与 `expired`(权益已停)、`suspended`(运营拦停)语义正交;命名取单词格式统一,不用 `past_due`;**支付面落地前平台不产出该值**,预留系防契约再动;进入=扣款失败,退出=补款→`active` / 宽限到期→`expired`,宽限时长=支付面参数)。**不折叠、不改名、无 `none` 假状态**——"从没订过"用 `null` 表达;要不要对外简化展示是产品/引擎自己的事,不回写值域。**所有产品(含 arda)照此值域写;不符 = 产品改自己对齐 `@shared`,`@shared` 不派生别名去迁就**。字段名:v2 曾定 `subscription_status`(不叫 state),v3 随订阅事实块整并改短为 **`status`**(块内语境自明,时间戳字段同块同源);
