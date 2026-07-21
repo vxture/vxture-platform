@@ -39,9 +39,9 @@
    不带商业字段**，不要加 `<code>:subscription` scope（C2-only，`arda` 已退役该 scope）。
 3. `product_webhooks` upsert：`webhook_url = {WEBHOOK_BASE}/provisioning/webhook`，
    `webhook_secret_ref` 填 env 变量名（不填值）。
-4. `plans` / `plan_versions` / `plan_prices` / `plan_components` 售卖图 + `product_metrics`
-   （每 metric 的 `merge_strategy` / `kind`——决定信封 `limits`（`max` 键）与 `quota_pools`（池键）形态）
-   - `launch_checklist` 门。
+4. 售卖目录图 `plans` / `plan_versions` / `plan_prices` / `plan_components`，加 `product_metrics`
+   （每 metric 的 `merge_strategy` / `kind` 决定信封 `limits`（`max` 键）与 `quota_pools`（池键）形态），
+   及 `launch_checklist` 放行门。
 5. `kyc.verification_policies`（可选）。
 6. 在 `B` / `betaB` map 里加 `{CODE}_BASE_URL` / `{CODE}_BETA_BASE_URL` 的**引用**（env 名，
    本地默认回落 `localhost:<port>`）。**只写 env 名，不写生产值。**
