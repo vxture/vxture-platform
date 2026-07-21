@@ -136,19 +136,13 @@ sync_env_from_example() {
     fi
   done < <(active_env_keys "$runtime_file")
 
+  # Advisory only — printed to stdout, never appended to the runtime file.
+  # (The old file-append had no idempotency check, so every run stacked another
+  # WARN block into the file — worker-01's .env.auth-bff accumulated 60+ of
+  # them. Cleanup/realign is 14-normalize-runtime-env.sh's job.)
   if [ "${#deprecated_keys[@]}" -gt 0 ]; then
-    {
-      printf '\n'
-      printf '# ============================================================================\n'
-      printf '# WARN: 以下配置项已不在 .example 中，可以删除 / 已废弃待删除。\n'
-      printf '# 说明：脚本只提示，不自动删除，避免破坏手动维护的运行参数。\n'
-      printf '# Example source: %s\n' "$(basename "$example_file")"
-      for key in "${deprecated_keys[@]}"; do
-        printf '# - %s\n' "$key"
-      done
-      printf '# ============================================================================\n'
-    } >> "$runtime_file"
-    echo "[WARN] Deprecated key(s) found in $runtime_file: ${deprecated_keys[*]}"
+    echo "[WARN] Deprecated key(s) in $runtime_file (not in example): ${deprecated_keys[*]}"
+    echo "       Run: APPLY=1 bash scripts/14-normalize-runtime-env.sh to strictly realign."
   fi
 }
 
