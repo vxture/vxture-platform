@@ -95,6 +95,9 @@
 | [TD-036](#td-036--admin-首页总览大面积硬编码-mock-数据)                               | admin 首页总览大面积硬编码 mock 数据                                | Implementation Gap | Resolved    | 🟡 MED                      |
 | [TD-037](#td-037--无安全重建单个平台服务重载-env-的运维通道)                          | 无安全重建单个平台服务/重载 env 的运维通道（registry+tag 解析陷阱） | Implementation Gap | Resolved    | 🟡 MED                      |
 | [TD-038](#td-038--platform-env-变更后依赖整栈重建无单键热更或影响面收窄)              | platform.env 变更后依赖整栈重建，无单键热更或影响面收窄             | Architecture       | Open        | 🟢 LOW                      |
+| [TD-039](#td-039--疑似死-ci-凭证待审计清理需全域确认)                                 | 疑似死 CI 凭证待审计清理（需全域确认）                              | Security Hygiene   | Open        | 🟢 LOW                      |
+| [TD-040](#td-040--变更门控方法论未沉淀进-cicd-optimization-playbook)                  | 变更门控方法论未沉淀进 cicd-optimization-playbook                   | Documentation      | Open        | 🟢 LOW                      |
+| [TD-041](#td-041--admin-订阅动作写路径绕过-provisioning-派发与-c3-invalidate)         | admin 订阅动作写路径绕过 provisioning 派发与 C3 invalidate          | Architecture       | Open        | 🟡 MED                      |
 
 ---
 
@@ -928,3 +931,18 @@
 **影响**：可迁移的提效方法论停留在本仓实现里，[[reference_repo_governance_standard]] 的"CI 提效"一环缺文档支撑，跨仓复用需逐仓逆向。属文档缺口。
 
 **解决方向**：把变更门控模式补进 `cicd-optimization-playbook.md`（触发门控/最小重建/覆盖缺口章节）。低风险纯文档，但**与全域整顿节奏对齐后再统一补**（避免文档与其它仓落地节奏脱节），故随 TD-039 一并列"待全域确认"批次。
+
+### TD-041 — admin 订阅动作写路径绕过 provisioning 派发与 C3 invalidate
+
+| 字段         | 内容                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------ |
+| **分类**     | Architecture                                                                                           |
+| **状态**     | Open                                                                                                   |
+| **登记日期** | 2026-07-21                                                                                             |
+| **来源**     | product_320 §8#5（明记"同类 provisioning 旁路 → tech-debt 登记"）；平台配套任务线全量对账审计（T4-10） |
+
+**描述**：admin-bff `subscriptions.router.ts` 的 `runSubscriptionAction`（`POST :id/actions`，renew/suspend/resume/cancel）在事务内裸 SQL 直改 `metering.subscriptions`（`SELECT … FOR UPDATE` → UPDATE status/auto_renew/end_at → append `subscription_histories`），**不经订阅服务主路径**——既不派发 provisioning webhook（如 resume: suspended→active 不触发产品侧恢复指令），也不推 C3 invalidate（产品端 entitlement 缓存要等 TTL 自然过期才看到新状态）。与 §7 主单路径（下单/确认→provisioning 派发→invalidate）行为不一致。
+
+**影响**：运营在 admin 执行订阅动作后，产品侧感知滞后（缓存 TTL 内旧门控继续生效）且 provisioning 状态机可能与订阅状态脱节（suspend/resume 无对应 webhook 事件）。低频运营操作、TTL 短（秒级 invalidate 缺失退化为短 TTL 缓存），故 MED 非 HIGH。
+
+**解决方向**：订阅动作改走（或复用）subscription 服务的状态变更入口，统一带出 provisioning 派发 + C3 invalidate；或最小修——在 `runSubscriptionAction` 提交后补发 invalidate 与（需要时）provisioning 事件。修复时同步核对 renew 的 `end_at` 延长是否需要 webhook 通知产品侧。
