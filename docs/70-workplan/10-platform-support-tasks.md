@@ -17,20 +17,22 @@
 
 ## Tier 2 — template 批 2 照着写的契约文档(§6 未落平台文档)
 
-| #     | 任务(§6#)                                                                           | 落点                                                            | 状态                                                                                                                            |
-| ----- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| T2-1  | 新产品 S2S 凭证默认 = token exchange(#5)                                            | product_200 §2.2                                                | ✅ PR #99                                                                                                                       |
-| T2-2  | 门控公式钦定 canonical + 两式等价确认(#6)                                           | product_220 §3                                                  | ✅ PR #99(§3 早已 pin `tier != null`,本次补等价性确认)                                                                          |
-| T2-3  | 信封版本标号统一 v2/v3(#7)                                                          | product_200 / 220                                               | ⏸ 平台侧已 v3 一致(免改);arda 系列(product_310/arda_200/300)仍 v2 = 一次标号裁决,涉 arda 契约面 → **arda 线/owner 点定**,不擅改 |
-| T2-4  | OIDC 双 client 定正典(#9)                                                           | product_200 §2.1                                                | ✅ PR #99                                                                                                                       |
-| T2-5  | intent 词表补 subscribe(#12)                                                        | product_200 §3.2                                                | ✅ PR #99(**同时解锁 product_320 console + arda 深链容错**)                                                                     |
-| T2-6  | webhook 平台侧键名惯例(#13)                                                         | product_200 §4.3                                                | ✅ PR #99                                                                                                                       |
-| T2-7  | agent-db 口径措辞收窄=SoR 归属(#16)                                                 | product_100 §2 / product_200 §7                                 | ✅ PR #99(§7 顺修退役 schema 名残留=§6#23)                                                                                      |
-| T2-8  | OIDC allowed_scopes 去 `{product_code}`(#20)                                        | product_200 §2.1                                                | ✅ PR #99(并闭 arda letter D1/F)                                                                                                |
-| T2-9  | **基建分配登记表**(#10,新建:每产品 端口/主机/stack_root/域名/namespace/tailnet)     | 新文档 50-deployment                                            | 待起(真产品部署前必需 → T-批4)                                                                                                  |
-| T2-10 | §6 tracker 同步:#1/#2/#3/#4/#8 标 ✅(#85 已改标准、tracker 未标)                    | product_240 §6                                                  | 待起(cosmetic,无外部消费方)                                                                                                     |
-| T2-11 | 平台仓 `.gitattributes` 补 `*.md text eol=lf` 等(liaison F:平台仓待补自证)          | `.gitattributes`                                                | ⏳ **已在 PR #94(未合)** → 合 #94 即闭                                                                                          |
-| T2-12 | `commerce.*→metering.*` 文档改名残留(§6#23)+ deprovision "拆除"措辞对齐(§6#21 可选) | data_platform_100 §2.2/§8;data_commerce_220 / data_platform_200 | 待起(cosmetic;§6#21 平台侧语义已满足=080-rp §4 归档不硬删,仅措辞)                                                               |
+| #     | 任务(§6#)                                                                                                                                             | 落点                                                                     | 状态                                                                                                                            |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| T2-1  | 新产品 S2S 凭证默认 = token exchange(#5)                                                                                                              | product_200 §2.2                                                         | ✅ PR #99                                                                                                                       |
+| T2-2  | 门控公式钦定 canonical + 两式等价确认(#6)                                                                                                             | product_220 §3                                                           | ✅ PR #99(§3 早已 pin `tier != null`,本次补等价性确认)                                                                          |
+| T2-3  | 信封版本标号统一 v2/v3(#7)                                                                                                                            | product_200 / 220                                                        | ⏸ 平台侧已 v3 一致(免改);arda 系列(product_310/arda_200/300)仍 v2 = 一次标号裁决,涉 arda 契约面 → **arda 线/owner 点定**,不擅改 |
+| T2-4  | OIDC 双 client 定正典(#9)                                                                                                                             | product_200 §2.1                                                         | ✅ PR #99                                                                                                                       |
+| T2-5  | intent 词表补 subscribe(#12)                                                                                                                          | product_200 §3.2                                                         | ✅ PR #99(**同时解锁 product_320 console + arda 深链容错**)                                                                     |
+| T2-6  | webhook 平台侧键名惯例(#13)                                                                                                                           | product_200 §4.3                                                         | ✅ PR #99                                                                                                                       |
+| T2-7  | agent-db 口径措辞收窄=SoR 归属(#16)                                                                                                                   | product_100 §2 / product_200 §7                                          | ✅ PR #99(§7 顺修退役 schema 名残留=§6#23)                                                                                      |
+| T2-8  | OIDC allowed_scopes 去 `{product_code}`(#20)                                                                                                          | product_200 §2.1                                                         | ✅ PR #99(并闭 arda letter D1/F)                                                                                                |
+| T2-9  | **基建分配登记表**(#10,新建:每产品 端口/主机/stack_root/域名/namespace/tailnet)                                                                       | 新文档 50-deployment                                                     | 待起(真产品部署前必需 → T-批4)                                                                                                  |
+| T2-10 | §6 tracker 同步:#1/#2/#3/#4/#8 标 ✅(#85 已改标准、tracker 未标;**#8 的 runbook 实质修订另立 T2-14**)                                                 | product_240 §6                                                           | 待起(cosmetic,无外部消费方)                                                                                                     |
+| T2-11 | 平台仓 `.gitattributes` 补 `*.md text eol=lf` 等(liaison F:平台仓待补自证)                                                                            | `.gitattributes`                                                         | ⏳ **已在 PR #94(未合)** → 合 #94 即闭                                                                                          |
+| T2-12 | `commerce.*→metering.*` 文档改名残留(§6#23)+ deprovision "拆除"措辞对齐(§6#21 可选)                                                                   | data_platform_100 §2.2/§8;data_commerce_220 / data_platform_200          | 待起(cosmetic;§6#21 平台侧语义已满足=080-rp §4 归档不硬删,仅措辞)                                                               |
+| T2-13 | product_210 §4.2 工具发现端点措辞对齐 tailnet 面(§6#14/#89 裁定):discovery 归 tailnet、S2S 绝不公网,删"按 provider 公网域名直连(arda.vxture.com)"表述 | `product_210` §4.2                                                       | 待起(§6 表仅标 230 已改、§4.2 显式欠账;→ T-批2)                                                                                 |
+| T2-14 | 自整顿 runbook 批F/§2 补 `lint:schema-residue`,收口 DB-lint 四→五件口径(§6#8 实质残留)                                                                | `docs/50-deployment/rebuild/20-self-rectify-runbook.md` 批F(:67)/§2(:83) | 待起(#85 只改 §0/批E/140 §1,漏 :67/:83;→ T-批F)                                                                                 |
 
 ## Tier 3 — L3 agent profile 启用(卡 L3,不卡 L2 template 基座)
 
@@ -41,16 +43,20 @@
 
 ## Tier 4 — 平台能力缺口 / 安全 tech-debt(reserved,有消费方再做)
 
-| #    | 任务                                                                           | 落点                           | 状态      |
-| ---- | ------------------------------------------------------------------------------ | ------------------------------ | --------- |
-| T4-1 | 成员 roster 拉取 API + per-member 失效事件(#29,v1 已裁延后)                    | platform-api / commerce        | reserved  |
-| T4-2 | 成员 display 缓存失效通道(#31)                                                 | product_200 §4.2 + platform    | reserved  |
-| T4-3 | 产品级 metric kind 视图/C2 下发(#30)                                           | product_220 §4 / @shared       | reserved  |
-| T4-4 | webhook 双 secret 轮换机制(#19)                                                | services/commerce/provisioning | reserved  |
-| T4-5 | S2S 签发审计(TD-034)                                                           | bff/auth-bff                   | tech-debt |
-| T4-6 | platform router 自报 product/workspace_id 绑 token(TD-035)                     | bff/platform-api               | tech-debt |
-| T4-7 | frozen 冻结态 claim 源 + switch-tenant 服务端查成员(080-rp §2.11 cutover 缺口) | bff/auth-bff                   | tech-debt |
-| T4-8 | boot-smoke 护栏(#15,若上 NestJS agent-server 形态)                             | 140 §8                         | 待判      |
+| #     | 任务                                                                                                                        | 落点                                                        | 状态                                                           |
+| ----- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------- |
+| T4-1  | 成员 roster 拉取 API + per-member 失效事件(#29,v1 已裁延后)                                                                 | platform-api / commerce                                     | reserved                                                       |
+| T4-2  | 成员 display 缓存失效通道(#31)                                                                                              | product_200 §4.2 + platform                                 | reserved                                                       |
+| T4-3  | 产品级 metric kind 视图/C2 下发(#30)                                                                                        | product_220 §4 / @shared                                    | reserved                                                       |
+| T4-4  | webhook 双 secret 轮换机制(#19)                                                                                             | services/commerce/provisioning                              | reserved                                                       |
+| T4-5  | S2S 签发审计(TD-034)                                                                                                        | bff/auth-bff                                                | tech-debt                                                      |
+| T4-6  | platform router 自报 product/workspace_id 绑 token(TD-035)                                                                  | bff/platform-api                                            | tech-debt                                                      |
+| T4-7  | frozen 冻结态 claim 源 + switch-tenant 服务端查成员(080-rp §2.11 cutover 缺口)                                              | bff/auth-bff                                                | tech-debt                                                      |
+| T4-8  | boot-smoke 护栏(#15,若上 NestJS agent-server 形态)                                                                          | 140 §8                                                      | 待判                                                           |
+| T4-9  | order_no 部分唯一索引进 DDL 治理(`WHERE order_no IS NOT NULL`),订单幂等                                                     | `deploy/database/ddl`(98_column_locks / 50_metering)        | reserved(product_320 §8#3/§O2 待办;现仅列锁不可变、无唯一索引) |
+| T4-10 | admin `subscriptions.router` renew/resume 裸 SQL provisioning 旁路 → 登记新 TD                                              | `10-tech-debt.md` + `bff/admin-bff` subscriptions.router.ts | tech-debt(product_320 §8#5;现至 TD-040 无此条)                 |
+| T4-11 | promotion.vouchers 可用券查询补部分索引(V1 延后,量起后 `(assigned_workspace_id, assigned_user_id) WHERE status='assigned'`) | `deploy/database/ddl`(promotion)                            | reserved(product_321 §10#9;**待核=文档定位、未跑活库**)        |
+| T4-12 | 变更门控方法论 `classify-changes.mjs` 沉淀进 cicd playbook(TD-040 纳入本表跟踪)                                             | `docs/10-standards/010-cicd-optimization-playbook.md`       | tech-debt(TD-040 Open;弱依赖 T-批1)                            |
 
 ---
 
@@ -58,28 +64,36 @@
 
 消费方三线:**T-批** = vxture-template 计划1 批 0–4(product_240 §7)·**Arda** = 整改函 groups A–G(`docs/80-liaison/10-arda-rectification-requirements.md`)·**320** = product_320 PR0–PR6(线下订单/CD)。
 
-| 任务       | 解锁的外部消费方                                                                                                    |
-| ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| T1-1       | T-批2(RP 模块参照);闭 §6#25 core-oidc-rp 消费侧滞后                                                                 |
-| T1-2       | T-批3(在线联测需平台 seed product/OIDC/webhook)、T-批4(首个真产品)                                                  |
-| T1-3       | T-批2 C2 client(消除每产品 C2 手抄漂移)                                                                             |
-| T2-1/2/6/7 | T-批2(platform-client / quota.ts / C3 webhook / DB 基座)                                                            |
-| T2-4       | T-批1/2 OIDC RP;**Arda 已合规**(letter F)                                                                           |
-| **T2-5**   | **320 §4.4/§8.4(console 加 subscribe,合入知会 arda 线)+ Arda intent 容错 + T-批2 深链**——唯一同时解锁 320+arda 的项 |
-| T2-8       | Arda(letter D1/F 退 `{product_code}` scope)+ T-批1 平台登记                                                         |
-| T2-9       | T-批4(首次真部署前必需)                                                                                             |
-| T3-1       | L3 仓(raven/anlan/forge/xuanzhen)+ T-批3 agent 增量(product_240 §4.2 前置#2)                                        |
-| T3-2       | product_240 §4.2 前置#3(caller SDK 参照)+ Arda 为消费方                                                             |
-| **T4-4**   | **Arda group D3**——直接卡 arda day-one webhook 双 secret 接线(letter :43,待平台 §6#19 标准化)                       |
-| T4-7       | 闭 §6#25 cutover 缺口 ①②(frozen 态 claim / switch-tenant 预检)+ 外部 RP 消费方                                      |
-| T4-1/2/3   | 产品成员表 / local_authz / local_usage(v1 已裁延后)                                                                 |
+| 任务       | 解锁的外部消费方                                                                                                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T1-1       | T-批2(RP 模块参照);闭 §6#25 core-oidc-rp 消费侧滞后                                                                                                                                                               |
+| T1-2       | T-批3(在线联测需平台 seed product/OIDC/webhook)、T-批4(首个真产品);**refine:档位在线门控还需 metering fixtures=plan_versions×5 档+product_metrics+六值 status/quota,runbook(#98)现仅记 identity/webhook 面,待补** |
+| T1-3       | T-批2 C2 client(消除每产品 C2 手抄漂移)                                                                                                                                                                           |
+| T2-1/2/6/7 | T-批2(platform-client / quota.ts / C3 webhook / DB 基座)                                                                                                                                                          |
+| T2-4       | T-批1/2 OIDC RP;**Arda 已合规**(letter F)                                                                                                                                                                         |
+| **T2-5**   | **320 §4.4/§8.4(console 加 subscribe,合入知会 arda 线)+ Arda intent 容错 + T-批2 深链**——唯一同时解锁 320+arda 的项                                                                                               |
+| T2-8       | Arda(letter D1/F 退 `{product_code}` scope)+ T-批1 平台登记                                                                                                                                                       |
+| T2-9       | T-批4(首次真部署)+ T-批3(三通道在线联测需 tailnet 可达演示产品,同依赖登记)                                                                                                                                        |
+| T3-1       | L3 仓(raven/anlan/forge/xuanzhen)+ T-批3 agent 增量(product_240 §4.2 前置#2)                                                                                                                                      |
+| T3-2       | product_240 §4.2 前置#3(caller SDK 参照)+ Arda 为消费方                                                                                                                                                           |
+| **T4-4**   | **Arda group D3**——直接卡 arda day-one webhook 双 secret 接线(letter :43,待平台 §6#19 标准化)+ template 批2 day-one dual-secret 消费                                                                              |
+| T4-7       | 闭 §6#25 cutover 缺口 ①②(frozen 态 claim / switch-tenant 预检)+ 外部 RP 消费方                                                                                                                                    |
+| T4-1/2/3   | 产品成员表 / local_authz / local_usage(v1 已裁延后)                                                                                                                                                               |
 
-**纯平台内部、无外部消费方**:T2-10、T4-5、T4-6。
+| T2-13 | T-批2(tool-protocol 参照) |
+| T2-14 | T-批F(自整顿 runbook 逐字复制) |
+| T4-9 | product_320 后续 PR(订单幂等治理) |
+| T4-12 | T-批1(CI/CD 复制,弱依赖:批1 逐字复制 arda ci.yml,不必先有 playbook) |
+
+**纯平台内部、无外部消费方**:T2-10、T4-5、T4-6、T4-10、T4-11。
 
 **有意不列为平台任务**(边界外,记明防漏判):
 
 - **§6#24 产品级功能 RBAC `local_authz` schema 骨架** = **template 侧**(product_240 §2.4,明标"非平台标准";平台仍不拥有产品 RBAC 表结构)→ 归 vxture-template 批2,不是平台义务。
 - **§6#21 deprovision "归档不硬删"** 平台侧**已满足**(`080-rp` §4 明写"降级只读/归档,不硬删");arda_200 §4.1 "拆除"措辞属 arda 线(letter E2);平台 provisioning schema 文档(data_commerce_220/data_platform_200)的"拆除"措辞仅是可选对齐(行本就复用不硬删)= T2-12 尾项。
+- **seed 7 未接入 agent 产品的 `{code}:subscription` scope "清理"** = **否决**(前提被推翻):D12 退 `arda:subscription` 是 **arda 专属契约例外**(C2-only token,回函 06 §3;liaison 明限 arda),**非全目录政策**——活库产品 umbra 仍保留同型 scope。T2-8 处理的是 `product_200 §2.1` 裸 `{product_code}` **文档措辞**,不是 seed `:subscription` 行;7 产品为未接入占位,scope 随各自集成/owner 契约逐一定。
+- **97_service_roles svc 白名单扩(console-bff/platform-api/admin-bff 加 promotion/provisioning/billing)** = **已就位**(97_service_roles.sql:138/141/146 已授,含 product_321 引注),非缺口;唯一残留 = TD-020 逐进程 `DATABASE_URL` cutover(owner-gated 批量生产动作)。
+- **订单申报/确认/驳回邮件通知** = 已在 product_321 §10#1 / product_320 PR6 按 V1 刻意延后并跟踪,commerce/console-bff 内部特性,不解锁任何 template/arda 消费方,不入本 workplan。
 
 ## 推进记录
 
@@ -88,3 +102,4 @@
 - 2026-07-21 **Tier 1 三项全完成并 PR**:T1-3 #96(@shared 信封类型)、T1-1 #97(RP fixture 对齐,
   原判 live bug 经核查否定=已于 07-15 迁移,降级 cosmetic)、T1-2 #98(注册产品 runbook)。
   两处 owner-gated 待办已在表内记名:@shared@1.5.0 发包、演示产品活库 seeding。下一步 Tier 2(§6 未落平台文档)。
+- 2026-07-21 **全量对账审计**(18-agent 工作流:七路 obligation sweep → reconcile → 对抗式 verify → report)。产出 6 CONFIRMED 新任务:T2-13(product_210 §4.2 tailnet 措辞欠账,§6#14)、T2-14(自整顿 runbook 补 `lint:schema-residue`,§6#8 实质残留)、T4-9(order_no 部分唯一索引)、T4-10(admin subscriptions.router 旁路登记 TD)、T4-11(voucher 部分索引,待核)、T4-12(TD-040 变更门控进 playbook)。对抗式**否决**两个诱人候选:seed `:subscription` 清理(arda 专属例外非全目录政策)、订单邮件(V1 已延后无消费方);查实 97_service_roles 白名单**已就位**(仅剩 TD-020 owner-gated cutover)。relationship map 精化:T4-4 +template 批2、T2-9 +T-批3、T1-2 +metering fixtures 缺口。残余不确定:工作树 PRE-#99(T2-1..8/T1-3 按 PR 记 DONE)、T4-11 文档定位未跑活库。
