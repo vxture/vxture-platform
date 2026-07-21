@@ -141,7 +141,7 @@ sync_env_from_example() {
   # WARN block into the file — worker-01's .env.auth-bff accumulated 60+ of
   # them. Cleanup/realign is 14-normalize-runtime-env.sh's job.)
   if [ "${#deprecated_keys[@]}" -gt 0 ]; then
-    echo "[WARN] Deprecated key(s) in $runtime_file (not in example): ${deprecated_keys[*]}"
+    echo "[WARN] $runtime_file 存在已废弃待删除配置项（已不在 .example 中）：${deprecated_keys[*]}"
     echo "       Run: APPLY=1 bash scripts/14-normalize-runtime-env.sh to strictly realign."
   fi
 }
