@@ -90,7 +90,7 @@ S2S access token = **RS256 JWT**(header 带 `kid`,与用户级同一 JWKS/轮换
 
 ### 4.2 发现(无中心注册表)
 
-provider 在自己的服务面暴露清单端点 `GET /.well-known/vxture-tools`(S2S token 鉴权,返回工具描述符数组 + `protocol_version`)。**平台不建中心工具注册表**——"平台知道哪里有数据"归 Arda 目录、"技能引用哪些工具"归 Runa 技能定义,各自以 `{product_code}.{tool_name}` 字符串松引用,调用时按 provider 域名直连(域名约定 = C1 站点表,如 `arda.vxture.com`)。
+provider 在自己的服务面暴露清单端点 `GET /.well-known/vxture-tools`(**tailnet 面,S2S 绝不公网**,#89 裁定;区别于边缘 `/.well-known/openid-configuration` 仅供浏览器)——S2S token 鉴权,返回工具描述符数组 + `protocol_version`。**平台不建中心工具注册表**——"平台知道哪里有数据"归 Arda 目录、"技能引用哪些工具"归 Runa 技能定义,各自以 `{product_code}.{tool_name}` 字符串松引用,调用时按 provider **在平台 tailnet 内网**直连(类 2 产品 S2S 一律 tailnet、绝不公网,权威 = product_230 §1;`arda.vxture.com` 等域名仅是缺省信号,判类以是否在 tailnet 为准)。
 
 ### 4.3 版本纪律
 
