@@ -314,6 +314,36 @@ interface SubscriptionActionBody {
   immediate?: boolean;
 }
 
+// ── console "my subscriptions" view (distinct from SubscriptionRecord) ─────
+
+interface MySubscriptionRow {
+  id: string;
+  tenant_id: string;
+  plan_id: string;
+  plan_name: string;
+  status: string;
+  pay_amount: string | null;
+  currency: string;
+  cycle_unit: string;
+  end_at: Date | null;
+  auto_renew: boolean;
+  subscription_kind: string;
+}
+
+export interface ConsoleSubscriptionView {
+  id: string;
+  tenantId: string;
+  planId: string;
+  planName: string;
+  status: string;
+  price: number;
+  currency: string;
+  cycle: string;
+  nextBillingDate: string | null;
+  autoRenew: boolean;
+  isTrial: boolean;
+}
+
 // ============================================================================
 // Router
 // ============================================================================
@@ -551,17 +581,46 @@ export class SubscriptionRouter {
 
   // --------------------------------------------------------------------------
   // GET /api/subscription/my — 查询当前租户的全部订阅
+  //
+  // Deliberately bypasses SubscriptionService.listSubscriptions: that method
+  // returns the raw metering.subscriptions row (SubscriptionRecord — no plan
+  // name/price/cycle, shared with the admin BFF) and was previously handed to
+  // the client typed as ConsoleSubscription, a distinct view-model contract.
+  // The mismatch left planName/price/nextBillingDate undefined client-side,
+  // crashing the page on amount.toLocaleString(). Query + map to the actual
+  // contract here, same join pattern as ORDER_ROW_SELECT above.
   // --------------------------------------------------------------------------
 
   @Get("my")
   async getMySubscriptions(
     @Req() req: Request & RequestContext,
-  ): Promise<SubscriptionRecord[]> {
+  ): Promise<ConsoleSubscriptionView[]> {
     if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
-    const result = await this.subscriptionService.listSubscriptions({
-      tenantId: req.tenant.id,
-    });
-    return result.items;
+    const res = await this.pool.query<MySubscriptionRow>(
+      `select ts.id, ts.tenant_id, pl.id as plan_id, pl.plan_name, ts.status,
+              ts.pay_amount, ts.currency, ts.cycle_unit, ts.end_at, ts.auto_renew,
+              ts.subscription_kind
+         from metering.subscriptions ts
+         join product.plan_versions pv on pv.id = ts.plan_version_id
+         join product.plans pl on pl.id = pv.plan_id
+        where ts.tenant_id = $1 and ts.deleted_at is null
+        order by ts.created_at desc
+        limit 100`,
+      [req.tenant.id],
+    );
+    return res.rows.map((r) => ({
+      id: r.id,
+      tenantId: r.tenant_id,
+      planId: r.plan_id,
+      planName: r.plan_name,
+      status: r.status,
+      price: Number(r.pay_amount ?? 0),
+      currency: r.currency,
+      cycle: r.cycle_unit,
+      nextBillingDate: r.end_at ? r.end_at.toISOString() : null,
+      autoRenew: r.auto_renew,
+      isTrial: r.subscription_kind === "trial",
+    }));
   }
 
   // --------------------------------------------------------------------------

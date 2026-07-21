@@ -35,7 +35,8 @@ import type { ModuleCardStat } from "@/entities/console";
 // 数据格式化工具
 // ============================================================================
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "—";
   try {
     return new Date(dateStr).toLocaleDateString("zh-CN", {
       month: "short",

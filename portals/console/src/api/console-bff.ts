@@ -31,7 +31,8 @@ export interface ConsoleSubscription {
   price: number;
   currency: string;
   cycle: string;
-  nextBillingDate: string;
+  /** null = perpetual/free subscription with no scheduled renewal. */
+  nextBillingDate: string | null;
   autoRenew: boolean;
   isTrial: boolean;
 }
