@@ -35,12 +35,16 @@ jobs:
 
       - name: Run platform alert check via SSH
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          # 部署目录来自环境级 var（治理标准 §6），未设回落已验证默认。
+          DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
         with:
           host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 10m
+          envs: DEPLOY_DIR
           script: |
             set -e
-            bash /srv/vxture/deploy/scripts/51-check-platform-alerts.sh
+            bash "${DEPLOY_DIR:-/srv/vxture/deploy}/scripts/51-check-platform-alerts.sh"

@@ -177,11 +177,16 @@ const ENV_FILE_RULES = [
     requiredActual: STRICT_RUNTIME,
     requiredExample: true,
     // Optional operator-MFA secrets: empty does not block the deploy. TOTP key
-    // is fail-closed (provisioned by 27-provision-client-secrets), and the
-    // superadmin hash falls back to the seed default + force-change when unset.
+    // is fail-closed (provisioned by 27-provision-client-secrets). The
+    // superadmin hash falls back to the seed default + force-change in
+    // NON-production only — production seeding requires it (23/29 gate +
+    // db-init preflight, 2026-07-21).
     placeholderOptionalKeys: new Set([
       'OPERATOR_TOTP_ENC_KEY',
       'OPERATOR_SUPERADMIN_PASSWORD_HASH',
+      // superadmin contact: optional seed projection (empty = keep DB values)
+      'OPERATOR_SUPERADMIN_EMAIL',
+      'OPERATOR_SUPERADMIN_PHONE',
     ]),
     forbiddenKeys: new Set([
       ...SHARED_SECRET_KEYS,
