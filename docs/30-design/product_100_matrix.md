@@ -51,6 +51,8 @@ L3  行业 agent 应用(消费同一套 L1/L2 能力面,差异仅来自数据与
 | `hermes`     | Hermes   | internal  | —                                                       | 否                                                                 | 否                                          | 否                                    | —                               | —                                                                               | 平台内部服务,不变                                                  |
 | (varda)      | Varda    | L0 内嵌   | —                                                       | —                                                                  | 否(平台内嵌副驾,非独立产品,无 product code) | 否                                    | —                               | 独立 datasource                                                                 | 已上生产                                                           |
 
+> **`agent-db` 列语义(§6#16 收窄)**:每产品仓均自建业务库(product_200 §7),该列答的是"该产品**业务数据的 SoR 是否落自有 agent-db**"——`是` = 业务权威在自库;`否` = SoR 在平台侧/别处或无独立业务数据,**非"无库"**(atlas 的 Model Platform DB、runa 的元数据库仍是自有库,只是业务 SoR 归属不同)。
+>
 > 中文品牌名与 i18n 文案由运营后补(product_name/nick 双列机制已就绪);`product_code` 即本表,为稳定锚点。
 > 新增域名(arda/karda/terra)为按 `{code}.vxture.com` 规则的建议值,DNS/证书随各产品接入排期。
 

@@ -64,7 +64,7 @@
 ### 批 F —（仅自带 DB）数据层（governance §7）
 
 - DDL 单一权威 + @shared 值域 + 最小权限/列锁 + 活库增量幂等。
-- **验收**：`pnpm lint:data-design && pnpm lint:catalog-domains && pnpm lint:column-locks && pnpm lint:seed`（全 0 error）。
+- **验收**：`pnpm lint:data-design && pnpm lint:catalog-domains && pnpm lint:column-locks && pnpm lint:schema-residue && pnpm lint:seed`（全 0 error；五件齐，对齐 §0 数据层护栏清单，§6#8）。
 
 ### 批 G — 仓库骨架（governance §10）
 
@@ -80,7 +80,7 @@ gitleaks detect --no-banner \
   && osv-scanner --config=.osv-scanner.toml --lockfile=pnpm-lock.yaml \
   && node scripts/guardrails/check-docs-numbering.mjs --strict \
   && pnpm type-check:all && pnpm --recursive --if-present lint
-# 有 DB 再加 lint:data-design / catalog-domains / column-locks / seed
+# 有 DB 再加 lint:data-design / catalog-domains / column-locks / schema-residue / seed
 ```
 
 CI 侧：`main` 的 required checks（`quality-gate`/`build`/`test-coverage`/`audit`/`gitleaks`）全绿即分支保护达标。

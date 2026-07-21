@@ -389,7 +389,7 @@ metering consume 服务  POST /usage/consume（单事务，唯一写入方）
                  Model Platform（vxturestudio_modelruntime_main）
 ```
 
-> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 usage*event」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*`迁入`metering._`（`usage_events`/`quota_pools`/`usage_idempotencies`/`usage_summary_\_`/`usage*gauges`，权威 = `deploy/database/ddl/50_metering.sql`）。本文 §2.2/§8 原残留的 `commerce.*` 表引用已按 DDL 逐条迁至对应子域（`metering._`/`billing._`/`provisioning.\_`/`kyc.verification_policies`）。
+> 与旧稿差异：① 旧版把 Model Platform 记为「用量唯一写入者」/「直写平台 `usage_events`」——v2 已校正，**唯一写入方是 metering consume 服务**，Model Platform 仅作只读配额 gate；② 平台用量表已随 18-schema cutover 从 `commerce.*` 迁入 `metering.*`（`usage_events` / `quota_pools` / `usage_idempotencies` / `usage_summary_*` / `usage_gauges`，权威 = `deploy/database/ddl/50_metering.sql`）。本文 §2.2/§8 原残留的 `commerce.*` 表引用已按 DDL 逐条迁至对应子域（`metering.*` / `billing.*` / `provisioning.*` / `kyc.verification_policies`）。
 
 #### 2.3.4 Beta→Prod 转换流程
 
