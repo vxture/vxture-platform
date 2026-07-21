@@ -1,1 +1,23 @@
-*.sh text eol=lf
+# Normalize line endings to LF for all text (prevents Windows CRLF drift
+# vs Linux CI / prettier --check). Binary files auto-detected and left alone.
+* text=auto eol=lf
+
+*.sh        text eol=lf
+*.py        text eol=lf
+*.mjs       text eol=lf
+*.cjs       text eol=lf
+*.js        text eol=lf
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.css       text eol=lf
+*.sql       text eol=lf
+*.prisma    text eol=lf
+*.conf      text eol=lf
+*.template  text eol=lf
+*.example   text eol=lf
+.gitignore  text eol=lf
+Makefile    text eol=lf
