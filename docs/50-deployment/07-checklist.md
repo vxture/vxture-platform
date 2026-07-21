@@ -69,12 +69,15 @@
    - CI secret：设置 `CF_TURNSTILE_TENANT_SITE_KEY`、`CF_TURNSTILE_ADMIN_SITE_KEY`（site key 在 accounts 构建期 baked 进前端，见 [`05-ci-cd.md`](./05-ci-cd.md)）。
    - hostname：`CF_TURNSTILE_TENANT_ALLOWED_HOSTNAMES` 含 `accounts.vxture.com`；`CF_TURNSTILE_ADMIN_ALLOWED_HOSTNAMES=accounts.vxture.com`。
 2. **阿里云短信（手机验证码登录）**
-   - `secrets/platform-sms.env`：`ALIYUN_SMS_ACCESS_KEY_ID/SECRET/SIGN_NAME/TEMPLATE_CODE` 填真值。缺失会降级 `console.log`（不真发）。
-3. **RS256 签名密钥（migrate 之后，deploy 之前）**
+   - `secrets/platform-sms.env`：`ALIYUN_SMS_ACCESS_KEY_ID/SECRET/SIGN_NAME/TEMPLATE_CODE` 填真值。缺失时非生产降级 `console.log`（不真发）；**生产 fail-closed**（发码抛错、验码全拒，2026-07-21 起）。注入 auth-bff 与 console-bff（换绑手机流程）。
+3. **运营超管口令（任何 seed 之前）**
+   - `.env.auth-bff`：`OPERATOR_SUPERADMIN_PASSWORD_HASH` 填 owner 自选口令的 Argon2id PHC hash（hash-wasm argon2id，m=65536 t=3 p=1），**值须单引号包裹**（seed 脚本以 shell source 读取，未加引号的 `$argon2id$...` 会被展开成垃圾）。
+   - 默认口令 Admin@2026 已随公开仓公开：`NODE_ENV=production` 未填此值时 23/29 seed 脚本与 db-init preflight 直接拒绝（2026-07-21 门）。
+4. **RS256 签名密钥（migrate 之后，deploy 之前）**
    - 跑 `25-provision-signing-key.sh`（或经 `24` 聚合自动调用）：公钥写入 `iam.signing_key`，终端打印 `OIDC_ACTIVE_KID` + `OIDC_SIGNING_PRIVATE_KEY`。
    - 把这两个值粘贴进 `secrets/platform-identity.env`，再重跑（`24` / `25` 幂等，已存在 active key 不轮换）。
    - ⚠️ 私钥仅存于该 secret 文件，不入库；`25` 打印到**交互式终端**（首发由人工执行，非 CI），勿把该输出留进 CI 日志或聊天记录。
-4. **社交登录（DingTalk / Feishu）**：保持 `CHANGEME` —— 重建后的回调端点尚未接线，填了也不会启用（future work）。
+5. **社交登录（DingTalk / Feishu）**：保持 `CHANGEME` —— 重建后的回调端点尚未接线，填了也不会启用（future work）。
 
 ---
 

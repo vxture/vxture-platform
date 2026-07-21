@@ -8,6 +8,9 @@
  *     - CheckSmsVerifyCode 校验：阿里云服务端校验，Model.VerifyResult === "PASS" 通过。
  *   平台不再自行生成 / 存储 / 比对验证码（旧的 Redis 验证码逻辑已下线）。
  *   未配置凭据时降级为控制台输出 + 固定开发验证码 DEV_CODE，便于本地与自动化联调。
+ *   Fail-closed in production: when NODE_ENV=production and credentials are
+ *   missing, sending throws and verification rejects every code — the public
+ *   dev code must never authenticate anyone in production.
  *
  *   端点 dypnsapi.aliyuncs.com，apiVersion 2017-05-25（RPC 风格，沿用通用客户端
  *   @alicloud/pop-core，无需引入产品专用 SDK）。CountryCode 默认 86，手机号传裸 11
@@ -44,7 +47,7 @@ const DEFAULT_CODE_LENGTH = 6;
 /** 验证码有效期秒；同步用于模板 ${min} 变量。可被 env 覆盖。 */
 const DEFAULT_VALID_SECONDS = 300;
 
-/** 未配置凭据时的开发降级验证码（仅 isConfigured() === false 生效）。 */
+/** Dev fallback code when credentials are unset (non-production only; production fails closed). */
 const DEV_CODE = "888888";
 
 // ─── 类型 ─────────────────────────────────────────────────────────────────────
@@ -73,6 +76,12 @@ export class SmsService {
    */
   async sendVerifyCode(phone: string): Promise<void> {
     if (!this.isConfigured()) {
+      // Fail closed in production: never fall back to the public dev code.
+      if (process.env["NODE_ENV"] === "production") {
+        throw new Error(
+          "短信服务未配置（ALIYUN_SMS_*），生产环境拒绝发送验证码",
+        );
+      }
       console.log(
         `[SMS Dev] send code to phone=${phone} (dev code=${DEV_CODE})`,
       );
@@ -120,6 +129,14 @@ export class SmsService {
    */
   async checkVerifyCode(phone: string, code: string): Promise<boolean> {
     if (!this.isConfigured()) {
+      // Fail closed in production: missing SMS credentials must never let the
+      // publicly-known dev code pass phone-code login.
+      if (process.env["NODE_ENV"] === "production") {
+        console.error(
+          "[SMS] ALIYUN_SMS_* not configured in production — rejecting all verification codes",
+        );
+        return false;
+      }
       return code.trim() === DEV_CODE;
     }
 

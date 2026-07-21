@@ -9,6 +9,8 @@
 #   secret CLOUDFLARE_DNS_API_TOKEN — a scoped CF API token: Zone:DNS:Edit +
 #     Zone:Zone:Read, limited to the vxture.com zone (the "Edit zone DNS" template).
 #     Add it at repo level (the job also sees it with environment: production).
+#   variable ACME_EMAIL — ACME/Let's Encrypt registration email (repo-level var;
+#     kept out of the repo so the workflow carries no personal contact PII).
 # Reuses existing secrets: TAILSCALE_OAUTH_CLIENT_ID/SECRET (org) and the
 #   production-environment secrets DEPLOY_HOST_TAILNET / DEPLOY_USER /
 #   DEPLOY_SSH_KEY / DEPLOY_SSH_PASSPHRASE, plus var TAILSCALE_OAUTH_CLIENT_TAG.
@@ -42,7 +44,7 @@ permissions:
 env:
   CERT_DOMAINS: "-d vxture.com -d *.vxture.com"
   CERT_NAME: vxture.com
-  ACME_EMAIL: yanhaoguo@gmail.com
+  ACME_EMAIL: ${{ vars.ACME_EMAIL }}
 
 jobs:
   cert:
@@ -54,6 +56,10 @@ jobs:
       - name: Issue / renew LE wildcard cert (DNS-01 via Cloudflare)
         run: |
           set -euo pipefail
+          if [ -z "${ACME_EMAIL:-}" ]; then
+            echo "::error::repo variable ACME_EMAIL is not set — refusing to run certbot without a registration email"
+            exit 1
+          fi
           umask 077
           mkdir -p "$HOME/cf"
           cat > "$HOME/cf/cloudflare.ini" <<EOF

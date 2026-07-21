@@ -193,6 +193,24 @@ jobs:
               done
             fi
 
+            # ── Superadmin-hash preflight (2026-07-21 fail-closed gate) ──────
+            # 29-seed refuses to seed a production DB while the public
+            # Admin@2026 default would apply. Check BEFORE any destructive
+            # step so `reset` can never leave the DB dropped-but-unseeded
+            # midway. Single-quoted PHC form required (sourcing expands an
+            # unquoted/double-quoted hash into garbage).
+            if [ "$DB_ACTION" != "verify" ]; then
+              # [$] bracket expression = literal $ in ERE, robust across the
+              # YAML->ssh->shell quoting layers (a backslashed \$ collapses to a
+              # mid-pattern anchor that can never match). Single quote REQUIRED:
+              # an unquoted/double-quoted PHC value is $-expanded into garbage
+              # when 29-seed sources the file, so only the quoted form is safe.
+              if ! grep -qE "^OPERATOR_SUPERADMIN_PASSWORD_HASH='[$]argon2" "$RT/.env.auth-bff" 2>/dev/null; then
+                echo "preflight FAILED: OPERATOR_SUPERADMIN_PASSWORD_HASH in $RT/.env.auth-bff is not a single-quoted argon2 PHC hash — provision it first, or the 29-seed gate aborts mid-action." >&2
+                exit 1
+              fi
+            fi
+
             case "$DB_ACTION" in
               seed)
                 # Reseed platform catalog (+ sample) with the new DDL seed, then audit.

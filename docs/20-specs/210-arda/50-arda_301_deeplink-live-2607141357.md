@@ -40,4 +40,4 @@ GET https://console.vxture.com/subscribe?product=arda&intent={upgrade|renew|addo
 
 ## 5. 联系
 
-平台侧：Stone Smoker（yanhaoguo@gmail.com）。
+平台侧：Stone Smoker。
