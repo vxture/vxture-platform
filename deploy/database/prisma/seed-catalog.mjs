@@ -60,7 +60,9 @@ export async function seedCatalog(client) {
   //   • superadmin  — account_type=system, status=active: the ONLY username+password
   //     login at bootstrap (sign in before phone/email OTP is wired). Password
   //     defaults to Admin@2026 (force_password_change=true → change after first
-  //     login); a deploy MAY override via OPERATOR_SUPERADMIN_PASSWORD_HASH.
+  //     login) in NON-production only — the default is public in this repo, so
+  //     the 23/29 seed runners fail closed unless OPERATOR_SUPERADMIN_PASSWORD_HASH
+  //     is set (2026-07-21 gate).
   //   The seed container has no hashing libs, so the default is a precomputed
   //   Argon2id PHC string (hash-wasm, m=65536 t=3 p=1, self-verified).
   const DEFAULT_SUPERADMIN_HASH =
@@ -103,7 +105,10 @@ export async function seedCatalog(client) {
       updated_at = now()
   `, [ID.adminSystem, ID.adminSuperAdmin,
       opsRoleMap['sys_config'] ?? ID.roleSystem, opsRoleMap['super_admin'] ?? ID.roleSuperAdmin,
-      'yanhaoguo@gmail.com', '18092907523']);
+      // Contact env-projected (owner PII no longer hardcoded, 2026-07-21);
+      // null keeps existing DB values via the coalesce in on-conflict.
+      process.env.OPERATOR_SUPERADMIN_EMAIL || null,
+      process.env.OPERATOR_SUPERADMIN_PHONE || null]);
 
   // Credential (Argon2id; 1-1). Only superadmin gets one (systemadmin never auths).
   // do-nothing on conflict so an idempotent re-seed never resets a changed password.

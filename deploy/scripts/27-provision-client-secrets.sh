@@ -116,8 +116,11 @@ check_file "$DATABASE_PRISMA_DIR/provision-client-secrets.mjs"
 # operator TOTP enroll/verify is fail-closed. 64 hex chars = 32 bytes; no shell
 # metachars, so 23-seed sources it safely without quoting. Runs before the
 # client-secret early-exit so it provisions even when all clients are present.
-# (OPERATOR_SUPERADMIN_PASSWORD_HASH is deliberately NOT provisioned here — when
-# unset the seed uses the bootstrap default + force-password-change.)
+# (OPERATOR_SUPERADMIN_PASSWORD_HASH is deliberately NOT provisioned here — the
+# password must be owner-chosen, never minted on the box. When unset the seed
+# uses the bootstrap default + force-password-change in non-production only;
+# since 2026-07-21 the 23/29 seed runners fail closed on a production DB
+# without a real hash.)
 operator_totp_key="$(read_kv "$AUTH_ENV_FILE" OPERATOR_TOTP_ENC_KEY)"
 if [ "$FORCE" = "1" ] || is_unset "$operator_totp_key"; then
   upsert_kv "$AUTH_ENV_FILE" OPERATOR_TOTP_ENC_KEY "$(openssl rand -hex 32)"

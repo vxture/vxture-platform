@@ -275,6 +275,7 @@ services:
         /srv/vxture/runtime/secrets/platform.env,
         /srv/vxture/runtime/secrets/platform-app.env,
         /srv/vxture/runtime/secrets/platform-mail.env,
+        /srv/vxture/runtime/secrets/platform-sms.env,
         /srv/vxture/runtime/.env.console-bff,
       ]
     depends_on:

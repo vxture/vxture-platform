@@ -205,6 +205,9 @@ const ENV_FILE_RULES = [
     requiredExample: true,
     // Optional keys: empty does not block the deploy.
     // - Operator-MFA secrets: fail-closed feature flags provisioned separately.
+    // - OPERATOR_SUPERADMIN_PASSWORD_HASH: deploy-time optional; seed-time
+    //   REQUIRED in production (23/29 gate + db-init preflight, 2026-07-21 —
+    //   the Admin@2026 default is public).
     // - BETA_BASE_URL variants: empty = beta app not yet deployed; the IdP seed
     //   omits the beta redirect_uri when the value is unset.
     // - OIDC_FUTURE_APP_HASH_KEYS: saas app RP hashes documented for tracking
@@ -212,6 +215,9 @@ const ENV_FILE_RULES = [
     placeholderOptionalKeys: new Set([
       "OPERATOR_TOTP_ENC_KEY",
       "OPERATOR_SUPERADMIN_PASSWORD_HASH",
+      // superadmin contact: optional seed projection (empty = keep DB values)
+      "OPERATOR_SUPERADMIN_EMAIL",
+      "OPERATOR_SUPERADMIN_PHONE",
       // beta base URLs (optional until beta deployment is live)
       "RUYIN_BETA_BASE_URL",
       "RUNA_BETA_BASE_URL",

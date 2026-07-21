@@ -82,6 +82,7 @@ if [ -f "$AUTH_ENV_FILE" ]; then
            FEISHU_APP_ID FEISHU_APP_SECRET FEISHU_REDIRECT_URI \
            OIDC_CLIENT_SECRET_HASH_WEBSITE OIDC_CLIENT_SECRET_HASH_CONSOLE OIDC_CLIENT_SECRET_HASH_ADMIN \
            OIDC_CLIENT_SECRET_HASH_RUYIN OIDC_CLIENT_SECRET_HASH_ARDA OIDC_CLIENT_SECRET_HASH_ARDA_BETA OPERATOR_SUPERADMIN_PASSWORD_HASH \
+           OPERATOR_SUPERADMIN_EMAIL OPERATOR_SUPERADMIN_PHONE \
            WEBSITE_BASE_URL CONSOLE_BASE_URL ADMIN_BASE_URL RUYIN_BASE_URL ACCOUNTS_BASE_URL \
            RUNA_BASE_URL NOCUS_BASE_URL ATLAS_BASE_URL ONTOS_BASE_URL RAVEN_BASE_URL \
            ANLAN_BASE_URL FORGE_BASE_URL XUANZHEN_BASE_URL ARDA_BASE_URL \
@@ -95,6 +96,29 @@ if [ -f "$AUTH_ENV_FILE" ]; then
 else
   echo "==> 未找到 $AUTH_ENV_FILE，SSO 与 oidc_client redirect 将落默认（localhost）"
 fi
+
+# Production fail-closed gate (2026-07-21 security audit): the bootstrap
+# superadmin default password (Admin@2026) is public in this repo, so a
+# production DB must never be seeded with it. Provision a real Argon2id hash in
+# .env.auth-bff (OPERATOR_SUPERADMIN_PASSWORD_HASH, single-quoted — the PHC
+# string is $-expanded into garbage when sourced unquoted) first. When
+# $AUTH_ENV_FILE is absent the environment (NODE_ENV) is unknowable → also fail
+# closed. Non-production bootstrap stays reachable via the explicit escape
+# hatch SEED_ALLOW_DEFAULT_SUPERADMIN=yes.
+case "${OPERATOR_SUPERADMIN_PASSWORD_HASH:-}" in
+  '$argon2'*) : ;; # valid override (sourced from the env file or ambient env)
+  *)
+    if [ "${SEED_ALLOW_DEFAULT_SUPERADMIN:-}" != "yes" ]; then
+      if [ "${NODE_ENV:-}" = "production" ]; then
+        echo "错误：NODE_ENV=production 但 OPERATOR_SUPERADMIN_PASSWORD_HASH 未设置有效 \$argon2 hash（值须单引号包裹）——拒绝以公开默认口令 seed 生产库。" >&2
+        exit 1
+      elif [ ! -f "$AUTH_ENV_FILE" ]; then
+        echo "错误：$AUTH_ENV_FILE 不存在，无法判定 NODE_ENV——默认拒绝 seed。确属非生产 bootstrap 请以 SEED_ALLOW_DEFAULT_SUPERADMIN=yes 重跑。" >&2
+        exit 1
+      fi
+    fi
+    ;;
+esac
 
 echo "==> 执行平台初始 seed（$SEED_ENTRY）"
 docker run --rm \

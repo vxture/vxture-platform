@@ -30,21 +30,22 @@ build/
 dist/
 **/dist/
 
-# Environment variables
+# Environment variables — deny-by-default: every .env* at any level is ignored
+# except *.example templates (real values live in runtime/ locally or
+# /srv/vxture/runtime on hosts).
 .env
+.env.*
 .env*.local
-.env.production
-.env.development
-.env.test
+!.env.example
+!.env.*.example
 # Deploy bundle must keep templates only; real runtime secrets belong to runtime/ or /srv/vxture/runtime.
 deploy/**/.env
 deploy/**/.env.*
 !deploy/**/.env.example
 !deploy/**/.env.*.example
-deploy/**/secrets/pg-password
-deploy/**/secrets/redis-password
-deploy/**/secrets/platform.env
-deploy/**/secrets/platform-mail.env
+# Deploy secrets dirs: deny-by-default (filename enumeration left platform-app/
+# platform-identity/platform-sms/varda-pg-password committable — 2026-07-21 audit).
+deploy/**/secrets/*
 !deploy/**/secrets/*.example
 !deploy/**/secrets/.gitkeep
 
@@ -124,6 +125,9 @@ storybook-static/
 # Temporary folders
 tmp/
 temp/
+
+# Session-local SSH helper scripts (ops sessions write these at repo root)
+.tmp-*.sh
 
 # Python (for backend)
 __pycache__/

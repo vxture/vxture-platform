@@ -438,8 +438,10 @@ export async function seedCatalog(client) {
   //   • systemadmin — account_type=system_builtin, status=disabled, NO credential:
   //     a meta anchor / created_by for system-init rows; never logs in.
   //   • superadmin  — account_type=system, status=active: the ONLY username+password
-  //     login at bootstrap. Password defaults to Admin@2026 (force_password_change=true);
-  //     a deploy MAY override via OPERATOR_SUPERADMIN_PASSWORD_HASH.
+  //     login at bootstrap. Password defaults to Admin@2026 (force_password_change=true)
+  //     in NON-production only — the default is public in this repo, so the 23/29
+  //     seed runners fail closed unless OPERATOR_SUPERADMIN_PASSWORD_HASH is set
+  //     (2026-07-21 gate).
   //   The seed container has no hashing libs, so the default is a precomputed Argon2id PHC.
   const DEFAULT_SUPERADMIN_HASH =
     "$argon2id$v=19$m=65536,t=3,p=1$Z2riL/tYwCUFpQK5jq/uVQ$l6hiSqwHPlc8IgK5DDBT9qPAveujOQak9lHVHUI+icE"; // Admin@2026
@@ -507,7 +509,7 @@ export async function seedCatalog(client) {
     values
       ($1, $3, 'systemadmin', 'systemadmin', 'disabled', 'system_builtin', null, false, null, false, null,
        'Platform meta account / created_by for system-init data. Disabled, no credential — never logs in.', 0, false, now(), now()),
-      ($2, $4, 'superadmin',  'Super Admin', 'active',   'system',         $5,   true,  $6,   true,  $1,
+      ($2, $4, 'superadmin',  'Super Admin', 'active',   'system',         $5,   $5 is not null,  $6,   $6 is not null,  $1,
        'Built-in super admin. Bootstrap username+password login; all platform permissions.', 1, true, now(), now())
     on conflict (username) do update set
       email = coalesce(excluded.email, admin.operator_account.email),
@@ -520,8 +522,11 @@ export async function seedCatalog(client) {
       ID.adminSuperAdmin,
       opsRoleMap["sys_config"] ?? ID.roleSystem,
       opsRoleMap["super_admin"] ?? ID.roleSuperAdmin,
-      "yanhaoguo@gmail.com",
-      "18092907523",
+      // Contact env-projected by 23/29 (owner PII no longer hardcoded in the
+      // repo, 2026-07-21). null → fresh seed leaves them unset and a re-seed
+      // keeps the existing DB values via the coalesce in on-conflict.
+      process.env.OPERATOR_SUPERADMIN_EMAIL || null,
+      process.env.OPERATOR_SUPERADMIN_PHONE || null,
     ],
   );
 

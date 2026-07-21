@@ -296,10 +296,10 @@
 
 ### 4.5 两个系统账号（哨兵锚点）
 
-| username      | UUID(哨兵)       | role          | status     | 用途                                         | 凭据                                                                                            |
-| ------------- | ---------------- | ------------- | ---------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `systemadmin` | `…-000000000010` | `sys_config`  | `disabled` | 初始化数据 `created_by` 元锚点，**永不登录** | 无                                                                                              |
-| `superadmin`  | `…-000000000011` | `super_admin` | `active`   | 真正第一个超管，由 `systemadmin` 创建        | Argon2id(默认口令，`force_password_change=true`)，可经 `OPERATOR_SUPERADMIN_PASSWORD_HASH` 覆盖 |
+| username      | UUID(哨兵)       | role          | status     | 用途                                         | 凭据                                                                                                                                                                                                                          |
+| ------------- | ---------------- | ------------- | ---------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `systemadmin` | `…-000000000010` | `sys_config`  | `disabled` | 初始化数据 `created_by` 元锚点，**永不登录** | 无                                                                                                                                                                                                                            |
+| `superadmin`  | `…-000000000011` | `super_admin` | `active`   | 真正第一个超管，由 `systemadmin` 创建        | Argon2id(默认口令，`force_password_change=true`)，可经 `OPERATOR_SUPERADMIN_PASSWORD_HASH` 覆盖；**生产 seed 必须覆盖**——默认口令已随公开仓公开，23/29 seed 脚本在 `NODE_ENV=production` 且未覆盖时 fail-closed（2026-07-21） |
 
 - `sys_config` = 平台自治配置元角色（rank=999，见 §4.1；仅作 seed actor 归属）；分配它 + `disabled` 使该身份**可审计追溯又杜绝登录利用**。
 - **展示可见性（2026-07-06，§3.2.6 双列）**：`admin.operator_role`/`operator_permission`/`operator_account` 三表统一加 `is_customer_visible`（铁律七恒 false）+ `is_workforce_visible`；**`sys_config` 角色与 `systemadmin` 账号置 `is_workforce_visible=false`**——存在且被 `created_by` 引用，但不进运营名册/角色下拉（运行时 `where is_workforce_visible`）。`superadmin`/`super_admin` 等真实运营身份保持可见。`is_system`（禁改删保护）与可见性是独立轴。
