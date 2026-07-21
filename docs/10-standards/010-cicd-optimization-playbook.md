@@ -57,6 +57,19 @@
 
 删本地/远端无用分支（如只读、只经发布流前进的 `main` 本地副本）；退役的 workflow 从契约检查**登记为"不可重现"**。
 
+### F. 变更门控（build/test 只处理受影响组件；TD-040 沉淀，参照实现 = vxture-platform `scripts/workflows/classify-changes.mjs`）
+
+把 CI 的 build/test 从"无条件全量"改为**按变更影响面门控**。核心是一个集中式路径分类脚本（单一规则源），PR/push 时算出两个输出供全部 workflow 消费：`docs_only`（布尔）+ `affected_images`（受影响构件数组）。可迁移要点：
+
+1. **required check 稳定性铁律**：门控做在 **job 内部的 step 级**（`if: outputs.docs_only != 'true'`），**绝不用 workflow 级 `paths:` 过滤**——后者会让 required check 卡 pending 永不出结果，分支保护直接锁死。docs-only 时重活 step 全跳、job 本体照常跑完出绿（`::notice` 说明跳过原因），required 集合零变形。
+2. **影响面从 workspace 依赖图推导，不手维护路径表**：每个构件的 watch-paths = 自身源码 + Dockerfile + **全部传递 `@vxture/*` workspace 依赖**，由脚本现场解析 pnpm workspace 得出。手维护路径表会在包迁移/加依赖时静默漂移；图推导让"包挪了位置"自动跟上。
+3. **全局规则兜底（fail-open）**：workspace 元数据（`package.json`/`pnpm-lock.yaml`/`tsconfig.base.json`/workflow 本体）或 shared/core 包变更 → **build-all**；分类不出的未知路径宁可全量，不可静默 SKIP（同手法 B 的安全兜底）。allow-list 只用于判"安全可跳"（纯文档路径），默认方向永远是"多建不漏建"。
+4. **docs-only 轻量通道**：纯文档变更走秒级空跑，重型步骤（build/test/scan）全跳但 check 面不变——文档 PR 不再排队等全量构建。
+5. **单一规则源跨 workflow 复用**：`ci.yml` 与 `docker-build.yml` 消费**同一脚本**的输出，规则改一处两边生效；规避"CI 门控和镜像门控各一套路径表"的双源漂移。
+6. **分类脚本自带测试且在同 job 内跑**（`classify-changes.test.mjs`）：门控脚本自身出错的代价是漏建，必须有用例护栏，规则回归即刻拦截。
+
+**验收**（照 §6 纪律，实测非推断）：① docs-only PR 的 CI 用时对比全量；② 触碰单一 service 的 PR 只构建该链路构件；③ 改 `packages/shared` 触发 build-all；④ 三种情形下 required checks 全部正常出结果。
+
 ---
 
 ## 4. 必避坑（真实踩过，带 why + 检测）
