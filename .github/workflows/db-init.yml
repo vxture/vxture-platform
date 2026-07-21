@@ -129,17 +129,20 @@ jobs:
         uses: appleboy/ssh-action@v1.2.5
         env:
           DB_ACTION: ${{ inputs.action }}
+          # 主机布局来自环境级 vars（治理标准 §6），未设回落已验证默认。
+          DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+          DEPLOY_RUNTIME_DIR: ${{ vars.DEPLOY_RUNTIME_DIR }}
         with:
           host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 30m
-          envs: DB_ACTION
+          envs: DB_ACTION,DEPLOY_DIR,DEPLOY_RUNTIME_DIR
           script: |
             set -e
             SRC=/tmp/vxture-deploy/deploy
-            DEPLOY_DIR=/srv/vxture/deploy
+            DEPLOY_DIR="${DEPLOY_DIR:-/srv/vxture/deploy}"
             mkdir -p "$DEPLOY_DIR" "$DEPLOY_DIR/secrets"
 
             # Sync only the deploy code (scripts/database/guardrails/examples);
@@ -159,7 +162,7 @@ jobs:
             # seed action so 29-seed can never bind the new ruyin client to
             # ruyin.ai or to the legacy secret hash. Idempotent; append-only
             # backfill of non-secret base URLs from the SCP'd example.
-            RT=/srv/vxture/runtime
+            RT="${DEPLOY_RUNTIME_DIR:-/srv/vxture/runtime}"
             if [ -f "$RT/.env.auth-bff" ]; then
               # 1) RUYIN_BASE_URL still holding ruyin.ai → that value is umbra's.
               if grep -qE '^RUYIN_BASE_URL=.*ruyin\.ai' "$RT/.env.auth-bff"; then

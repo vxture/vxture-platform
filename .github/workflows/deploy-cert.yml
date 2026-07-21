@@ -11,6 +11,8 @@
 #     Add it at repo level (the job also sees it with environment: production).
 #   variable ACME_EMAIL — ACME/Let's Encrypt registration email (repo-level var;
 #     kept out of the repo so the workflow carries no personal contact PII).
+#   variables CERT_DOMAINS / CERT_NAME — product domain config (repo-level vars
+#     for the repo-governance template line; fall back to the vxture defaults).
 # Reuses existing secrets: TAILSCALE_OAUTH_CLIENT_ID/SECRET (org) and the
 #   production-environment secrets DEPLOY_HOST_TAILNET / DEPLOY_USER /
 #   DEPLOY_SSH_KEY / DEPLOY_SSH_PASSPHRASE, plus var TAILSCALE_OAUTH_CLIENT_TAG.
@@ -42,8 +44,8 @@ permissions:
   contents: read
 
 env:
-  CERT_DOMAINS: "-d vxture.com -d *.vxture.com"
-  CERT_NAME: vxture.com
+  CERT_DOMAINS: ${{ vars.CERT_DOMAINS || '-d vxture.com -d *.vxture.com' }}
+  CERT_NAME: ${{ vars.CERT_NAME || 'vxture.com' }}
   ACME_EMAIL: ${{ vars.ACME_EMAIL }}
 
 jobs:
@@ -121,15 +123,18 @@ jobs:
       - name: Install cert + reload nginx (with backup + rollback)
         if: env.deploy == 'true'
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          CERT_NAME: ${{ env.CERT_NAME }}
         with:
           host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 5m
+          envs: CERT_NAME
           script: |
             set -e
-            SSLDIR=/srv/vxture/data/nginx/ssl/live/vxture.com
+            SSLDIR="/srv/vxture/data/nginx/ssl/live/${CERT_NAME:-vxture.com}"
             SRC=/tmp/vxture-cert/cert-out
 
             BK="/srv/vxture/data/nginx/ssl/backup-$(date +%Y%m%d-%H%M%S)"
@@ -144,7 +149,7 @@ jobs:
             if docker exec vxture-nginx nginx -t; then
               docker exec vxture-nginx nginx -s reload
               echo "cert installed + nginx reloaded"
-              echo | openssl s_client -connect 127.0.0.1:443 -servername vxture.com 2>/dev/null \
+              echo | openssl s_client -connect 127.0.0.1:443 -servername "${CERT_NAME:-vxture.com}" 2>/dev/null \
                 | openssl x509 -noout -issuer -enddate || true
             else
               echo "nginx -t FAILED after cert swap — rolling back to $BK"

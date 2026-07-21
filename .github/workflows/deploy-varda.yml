@@ -234,8 +234,10 @@ jobs:
           VX_IMAGE_NAMESPACE: ${{ steps.registry.outputs.acr_namespace }}
           ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
-          # 服务器 varda 部署目录（worker-02 本机路径）；未设则回落已验证的默认。
-          VARDA_DEPLOY_DIR: ${{ secrets.VARDA_DEPLOY_DIR }}
+          # 服务器 varda 部署目录（worker-02 本机路径）；来自 varda 环境级 var
+          # DEPLOY_DIR（治理标准 §6 键名权威；路径非敏感值，2026-07-21 由
+          # secret VARDA_DEPLOY_DIR 迁为 var），未设则回落已验证的默认。
+          VARDA_DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
         with:
           host: ${{ secrets.VARDA_DEPLOY_HOST }}
           username: ${{ secrets.VARDA_DEPLOY_USER }}

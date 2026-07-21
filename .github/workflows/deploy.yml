@@ -126,18 +126,22 @@ jobs:
           VX_IMAGE_NAMESPACE: ${{ steps.registry.outputs.acr_namespace }}
           ALIYUN_ACR_USERNAME: ${{ secrets.ALIYUN_ACR_USERNAME }}
           ALIYUN_ACR_PASSWORD: ${{ secrets.ALIYUN_ACR_PASSWORD }}
+          # 主机布局来自环境级 vars（治理标准 §6：DEPLOY_DIR 精确到 stack 目录）；
+          # 未设时回落已验证默认（标准 §4 认可的 ${VAR:-<已验证默认>} 形态）。
+          DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+          DEPLOY_RUNTIME_DIR: ${{ vars.DEPLOY_RUNTIME_DIR }}
         with:
           host: ${{ secrets.DEPLOY_HOST_TAILNET }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           command_timeout: 60m
-          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY_INTERNAL,VX_IMAGE_REGISTRY_PUBLIC,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD
+          envs: VX_IMAGE_TAG,VX_ACR_ENABLED,VX_IMAGE_REGISTRY_INTERNAL,VX_IMAGE_REGISTRY_PUBLIC,VX_IMAGE_NAMESPACE,ALIYUN_ACR_USERNAME,ALIYUN_ACR_PASSWORD,DEPLOY_DIR,DEPLOY_RUNTIME_DIR
           script: |
             set -e
 
             # 服务端只同步部署包，实际 .env、secrets、证书保持在 worker-01 本机。
-            DEPLOY_DIR=/srv/vxture/deploy
+            DEPLOY_DIR="${DEPLOY_DIR:-/srv/vxture/deploy}"
             mkdir -p "$DEPLOY_DIR"
             cp -f /tmp/vxture-deploy/deploy/compose.platform.yml "$DEPLOY_DIR/compose.platform.yml"
             cp -f /tmp/vxture-deploy/deploy/compose.nginx.yml "$DEPLOY_DIR/compose.nginx.yml"
@@ -188,7 +192,7 @@ jobs:
             # (results carry no old substring) + longest-first (so vx-admin
             # never mangles vx-admin-bff). Shipped nginx confs already carry the
             # new names; this only fixes host-side runtime env.
-            RT=/srv/vxture/runtime
+            RT="${DEPLOY_RUNTIME_DIR:-/srv/vxture/runtime}"
             for envf in "$RT"/.env.*; do
               [ -f "$envf" ] || continue
               sed -i \
