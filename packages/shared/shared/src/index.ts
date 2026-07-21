@@ -97,7 +97,13 @@ export {
   // Portal Context utils
   encodePortalContext,
   decodePortalContext,
+  // Health / identity endpoint contract (standard 025)
+  serviceIdentity,
+  buildHealthIdentity,
 } from "./utils";
+
+// Health / identity endpoint contract types (standard 025)
+export type { ServiceIdentity, HealthLiveResponse } from "./utils";
 
 // Errors
 export {

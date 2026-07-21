@@ -160,6 +160,28 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      # 健康端点身份块（standard 025）的构建期溯源值：version/sha/stage/buildTime。
+      # 作为 build-args 注入镜像 ENV；health route 运行时读取。非 tag 构建诚实兜底 dev。
+      - name: Resolve build provenance
+        id: prov
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "git_sha=$(printf '%s' '${{ github.sha }}' | cut -c1-8)" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "app_version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "app_version=dev" >> "$GITHUB_OUTPUT"
+          fi
+          case "${{ github.ref_name }}" in
+            v*)     stage=production ;;
+            beta-*) stage=beta ;;
+            dev-*)  stage=dev ;;
+            *)      stage=dev ;;
+          esac
+          echo "deploy_stage=$stage" >> "$GITHUB_OUTPUT"
+          echo "build_time=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
       # B8: build+push 首发失败容错（GHCR/ACR/buildx 抖动），失败则重试一次。
       # 重试幂等：push 同 tag 覆盖；cache-to 同 scope 覆盖。重试步骤无 continue-on-error，
       # 二次仍失败即让该镜像 matrix 腿失败（fail-fast:false，不影响其它镜像）。
@@ -175,6 +197,10 @@ jobs:
             NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ vars.CF_TURNSTILE_TENANT_SITE_KEY }}
             NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
             NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            APP_VERSION=${{ steps.prov.outputs.app_version }}
+            GIT_SHA=${{ steps.prov.outputs.git_sha }}
+            BUILD_TIME=${{ steps.prov.outputs.build_time }}
+            DEPLOY_STAGE=${{ steps.prov.outputs.deploy_stage }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.image-tags.outputs.tags }}
@@ -194,6 +220,10 @@ jobs:
             NEXT_PUBLIC_CF_TURNSTILE_TENANT_SITE_KEY=${{ vars.CF_TURNSTILE_TENANT_SITE_KEY }}
             NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_ID=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
             NEXT_PUBLIC_CF_TURNSTILE_ADMIN_SITE_KEY=${{ vars.CF_TURNSTILE_ADMIN_SITE_KEY }}
+            APP_VERSION=${{ steps.prov.outputs.app_version }}
+            GIT_SHA=${{ steps.prov.outputs.git_sha }}
+            BUILD_TIME=${{ steps.prov.outputs.build_time }}
+            DEPLOY_STAGE=${{ steps.prov.outputs.deploy_stage }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.image-tags.outputs.tags }}
