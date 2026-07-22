@@ -75,7 +75,8 @@
 用域**全词**（非生僻缩写），与 `@vxture/*` 包域、DDL schema 对齐：
 
 `platform` · `identity` · `commerce` · `metering` · `billing` · `provisioning` · `promotion` ·
-`sharing` · `model` · `notification` · `support` · `safety` · `product` · `admin` · `varda` · `arda`
+`sharing` · `model` · `notification` · `support` · `safety` · `product` · `admin` · `varda` · `arda` ·
+`karda`
 
 新增域先入本表再用。
 
