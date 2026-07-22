@@ -9,3 +9,4 @@ Current assets:
 - `ai/ai-agent-icon-32.gif`: unified animated AI agent identity icon for toolbar/header usage.
 - `ai/ai-agent-icon-48.gif`, `ai/ai-agent-icon-64.gif`, `ai/ai-agent-icon-128.gif`: larger runtime variants for higher-density placements.
 - `ai/ai-agent-icon.gif`: original/full-size source.
+- `icons/tenant-default.png` (`icons/tenant-default.svg` source): default tenant/organization avatar — a building glyph shown when a tenant has not uploaded a custom logo, instead of the generic person silhouette.
