@@ -509,7 +509,7 @@ export async function seedCatalog(client) {
     values
       ($1, $3, 'systemadmin', 'systemadmin', 'disabled', 'system_builtin', null, false, null, false, null,
        'Platform meta account / created_by for system-init data. Disabled, no credential — never logs in.', 0, false, now(), now()),
-      ($2, $4, 'superadmin',  'Super Admin', 'active',   'system',         $5,   $5 is not null,  $6,   $6 is not null,  $1,
+      ($2, $4, 'superadmin',  'Super Admin', 'active',   'system',         $5::varchar,   $5 is not null,  $6::varchar,   $6 is not null,  $1,
        'Built-in super admin. Bootstrap username+password login; all platform permissions.', 1, true, now(), now())
     on conflict (username) do update set
       email = coalesce(excluded.email, admin.operator_account.email),
