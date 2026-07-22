@@ -51,6 +51,14 @@
 
 ## 3. 域文档编号 `{kind}_{domain}_{NNN}_{slug}`
 
+**作用域（owner 2026-07-22 定调）：本编码仅用于 vxture-platform 仓内部。** platform 仓的
+`docs/` 是扁平目录，多个域（identity/commerce/metering/… 以及 arda/karda/varda 这些产品域）
+的设计文档挤在同一层，域码前缀是唯一的防撞手段。独立仓库之间（platform 与各产品仓）本该
+平级——产品一旦有了自己的独立仓库，**仓库内部**文档改用该仓库自己的编号惯例（目录分层 +
+`NN-slug.md` 之类），不套用 `{domain}` 前缀；单一域仓库里域前缀是纯噪音。platform 仓里仍会
+保留一部分该产品的文档（对接契约、entitlement/commerce 集成设计等平台视角、需跨域引用的部
+分），这部分继续用域码前缀，不因产品有了自己的仓库就整体撤下平台仓。
+
 数据/域设计类文档用此扁平命名（不靠目录层级区分域），已在 `data_` 系列证明、`lint:data-design` 已校：
 
 - **`kind`** ∈ `data`（数据架构）· `design`（域设计）· `ops`（域运维）
@@ -78,7 +86,9 @@
 `sharing` · `model` · `notification` · `support` · `safety` · `product` · `admin` · `varda` · `arda` ·
 `karda`
 
-新增域先入本表再用。
+新增域先入本表再用。本表只登记「platform 仓内部仍需引用/托管该域文档」的域——产品仓已独立
+后若该域文档整体搬空，本表词条可保留（不追溯撤销既有引用），但**不代表该产品仓内部也要用此
+编码**（见 §3 作用域）。
 
 ---
 
