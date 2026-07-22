@@ -117,6 +117,9 @@ const OIDC_FUTURE_APP_HASH_KEYS = new Set([
   "OIDC_CLIENT_SECRET_HASH_ARDA",
   // arda-beta is a separate confidential client (beta release channel)
   "OIDC_CLIENT_SECRET_HASH_ARDA_BETA",
+  "OIDC_CLIENT_SECRET_HASH_KARDA",
+  // karda-beta deferred (TD-001 in vxture-karda, no beta host yet); documented now.
+  "OIDC_CLIENT_SECRET_HASH_KARDA_BETA",
 ]);
 
 const LEGACY_BANNED_PATTERNS = [
@@ -234,6 +237,9 @@ const ENV_FILE_RULES = [
       "ARDA_WEBHOOK_BASE_URL",
       // beta client hash rides the beta deployment (empty until then)
       "OIDC_CLIENT_SECRET_HASH_ARDA_BETA",
+      // karda beta base URL — deferred, no beta host assigned yet (TD-001)
+      "KARDA_BETA_BASE_URL",
+      "OIDC_CLIENT_SECRET_HASH_KARDA_BETA",
       // future saas app RP hashes (required when each RP goes live)
       ...OIDC_FUTURE_APP_HASH_KEYS,
     ]),
@@ -361,6 +367,7 @@ const ENV_FILE_RULES = [
       ...OIDC_FUTURE_APP_HASH_KEYS,
       // moved to platform-api with the provisioning dispatcher (D13).
       "ARDA_PROVISION_WEBHOOK_SECRET",
+      "KARDA_PROVISION_WEBHOOK_SECRET",
     ]),
     requiredKeys: new Set([
       "NODE_ENV",
@@ -382,7 +389,10 @@ const ENV_FILE_RULES = [
     requiredActual: STRICT_RUNTIME,
     requiredExample: true,
     // Webhook signing degrades to retry/dead-letter when unset — never blocks deploy.
-    placeholderOptionalKeys: new Set(["ARDA_PROVISION_WEBHOOK_SECRET"]),
+    placeholderOptionalKeys: new Set([
+      "ARDA_PROVISION_WEBHOOK_SECRET",
+      "KARDA_PROVISION_WEBHOOK_SECRET",
+    ]),
     forbiddenKeys: new Set([
       ...SHARED_SECRET_KEYS,
       "REDIS_PASSWORD",

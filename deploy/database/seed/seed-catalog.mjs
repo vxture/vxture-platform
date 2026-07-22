@@ -751,6 +751,7 @@ export async function seedCatalog(client) {
     forge: process.env.FORGE_BASE_URL || "http://localhost:3087",
     xuanzhen: process.env.XUANZHEN_BASE_URL || "http://localhost:3088",
     arda: process.env.ARDA_BASE_URL || "http://localhost:3089",
+    karda: process.env.KARDA_BASE_URL || "http://localhost:3090",
   };
   const betaB = {
     ruyin: process.env.RUYIN_BETA_BASE_URL || null,
@@ -762,6 +763,8 @@ export async function seedCatalog(client) {
     forge: process.env.FORGE_BETA_BASE_URL || null,
     xuanzhen: process.env.XUANZHEN_BETA_BASE_URL || null,
     arda: process.env.ARDA_BETA_BASE_URL || null,
+    // deferred — no beta host assigned yet (TD-001 in vxture-karda)
+    karda: process.env.KARDA_BETA_BASE_URL || null,
   };
 
   const accountsBase = process.env.ACCOUNTS_BASE_URL || "http://localhost:3040";
@@ -913,6 +916,33 @@ export async function seedCatalog(client) {
             // D12: `arda:subscription` retired (see the stable client above).
             scopes: ["openid", "profile", "email", "phone"],
             postLogoutUris: [`${betaB.arda}/`, postLogout],
+          },
+        ]
+      : []),
+    // karda — registration request A段 (docs/80-liaison/20-2607222338-karda-
+    // platform-registration-a.md §3.2). No `karda:subscription` scope — D12
+    // products are C2-only.
+    {
+      clientId: "karda",
+      name: "Karda",
+      displayName: "Karda",
+      realm: "customer",
+      redirectUris: [`${B.karda}/auth/callback`],
+      scopes: ["openid", "profile", "email", "phone"],
+      postLogoutUris: [`${B.karda}/`, postLogout],
+    },
+    // karda-beta — deferred (TD-001); only registers once KARDA_BETA_BASE_URL is set.
+    ...(betaB.karda
+      ? [
+          {
+            clientId: "karda-beta",
+            name: "Karda Beta",
+            displayName: "Karda (Beta)",
+            realm: "customer",
+            releaseChannel: "beta",
+            redirectUris: [`${betaB.karda}/auth/callback`],
+            scopes: ["openid", "profile", "email", "phone"],
+            postLogoutUris: [`${betaB.karda}/`, postLogout],
           },
         ]
       : []),
@@ -1086,6 +1116,14 @@ export async function seedCatalog(client) {
       name: "数据平台",
       nick: "Arda",
       desc: "Enterprise data platform.",
+    },
+    {
+      code: "karda",
+      type: "knowledge_platform",
+      cat: 2,
+      name: "知识平台",
+      nick: "Karda",
+      desc: "Enterprise knowledge platform.",
     },
   ];
   for (const p of PRODUCTS) {
@@ -1704,6 +1742,77 @@ export async function seedCatalog(client) {
       // v2 stays UNLOCKED and current_version_id is NOT repointed — the admin
       // backend sets the real values and publishes the version.
     }
+  }
+
+  // ── karda catalog — SKELETON ONLY (registration request A段 §3.1,
+  // docs/80-liaison/20-2607222338-karda-platform-registration-a.md) ──────────
+  // karda's own product-definition doc (docs/20-specs/10-product-definition.md
+  // in vxture-karda) is still in draft; there is no metrics/entitlement mapping
+  // to seed yet. This only creates the 5 tier plan rows + a DRAFT, UNLOCKED,
+  // UNPUBLISHED v1 (empty features/quota, no price) so the admin backend has
+  // something to open and fill in once karda supplies the real mapping.
+  // plans.current_version_id is intentionally left unset — C2 resolves nothing
+  // for karda until a real version is published.
+  const kardaId = prodMap["karda"];
+  if (kardaId) {
+    // [plan_code, plan_name, tier, is_public]
+    const KARDA_PLANS = [
+      ["karda-free", "Karda Free", "free", true],
+      ["karda-starter", "Karda Starter", "starter", true],
+      ["karda-pro", "Karda Pro", "pro", true],
+      ["karda-business", "Karda Business", "business", true],
+      ["karda-enterprise", "Karda Enterprise", "enterprise", true],
+    ];
+    for (const [code, name, tier, isPublic] of KARDA_PLANS) {
+      await client.query(
+        `
+        insert into product.plans
+          (id, plan_code, plan_name, plan_name_key, description, description_key, is_public, status, created_by, created_at, updated_at)
+        values (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 'active', $7, now(), now())
+        on conflict (plan_code) do nothing
+      `,
+        [
+          code,
+          name,
+          "product.plan." + code,
+          name + " tier for Karda.",
+          "product.plan." + code + ".desc",
+          isPublic,
+          SYS,
+        ],
+      );
+      const planRow = await client.query(
+        `select id from product.plans where plan_code = $1 limit 1`,
+        [code],
+      );
+      const pId = planRow.rows[0]?.id;
+      if (!pId) continue;
+      // draft v1: unlocked, unpublished, empty component — never overwritten
+      // once inserted (admin owns everything past this point).
+      const v1Ins = await client.query(
+        `
+        insert into product.plan_versions (id, plan_id, version_no, status, is_locked, created_by, created_at)
+        values (gen_random_uuid(), $1, 1, 'draft', false, $2, now())
+        on conflict (plan_id, version_no) do nothing
+        returning id
+      `,
+        [pId, SYS],
+      );
+      if (v1Ins.rows.length === 0) continue;
+      const v1Id = v1Ins.rows[0].id;
+      await client.query(
+        `
+        insert into product.plan_components
+          (id, plan_version_id, product_id, tier, component_role, priority, features, quota, sort_order, created_at)
+        values (gen_random_uuid(), $1, $2, $3, 'primary', 100, '[]'::jsonb, '{}'::jsonb, 0, now())
+        on conflict (plan_version_id, product_id, tier) do nothing
+      `,
+        [v1Id, kardaId, tier],
+      );
+    }
+    console.log(
+      "✓  product — karda catalog skeleton (5 plans; v1 DRAFT/unlocked/unpublished, empty features+quota — admin fills in once karda's product definition lands)",
+    );
   }
 
   console.log(
