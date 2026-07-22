@@ -1804,7 +1804,7 @@ export async function seedCatalog(client) {
         `
         insert into product.plan_components
           (id, plan_version_id, product_id, tier, component_role, priority, features, quota, sort_order, created_at)
-        values (gen_random_uuid(), $1, $2, $3, 'primary', 100, '[]'::jsonb, '{}'::jsonb, 0, now())
+        values (gen_random_uuid(), $1, $2, $3, 'primary', 100, ARRAY[]::text[], '{}'::jsonb, 0, now())
         on conflict (plan_version_id, product_id, tier) do nothing
       `,
         [v1Id, kardaId, tier],
