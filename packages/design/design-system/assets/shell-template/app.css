@@ -236,6 +236,20 @@ body { background: var(--bg-shell); color: var(--fg); font-family: var(--font-sa
 .vxh-bill .vxh-bill-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vxh-bill-copy strong { font: 600 var(--vx-admin-shell-body-size) var(--font-cjk); color: var(--fg-strong); }
 .vxh-bill-copy small { font: 400 var(--vx-admin-shell-caption-size) var(--font-cjk); color: var(--fg-muted); }
+
+/* 配额 / usage quota block */
+.vxh-quota-block { display: flex; flex-direction: column; gap: 10px; padding: 4px 8px 10px; }
+.vxh-quota-row { display: flex; flex-direction: column; gap: 6px; }
+.vxh-quota-head { display: flex; align-items: center; gap: 6px; font: 500 var(--vx-admin-shell-caption-size) var(--font-cjk); color: var(--fg-muted); }
+.vxh-quota-head i { font-size: var(--vx-icon-size-sm); color: var(--fg-muted); }
+.vxh-quota-label { flex: 1; }
+.vxh-quota-value { font: 600 var(--vx-admin-shell-caption-size) var(--font-number); color: var(--fg-strong); }
+.vxh-quota-track { position: relative; width: 100%; height: 6px; border-radius: var(--vx-radius-full); background: var(--bg-muted); overflow: hidden; }
+.vxh-quota-fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: var(--vx-radius-full); background: var(--primary); transition: width 240ms ease; }
+
+/* 组织 / 工作空间 两级切换 */
+.vxh-scope-sub-label { padding: 6px 8px 2px; font: 600 var(--vx-admin-shell-tag-size) var(--font-cjk); color: var(--fg-disabled); text-transform: uppercase; letter-spacing: 0.04em; }
+.vxh-scope-tag { margin-left: auto; padding: 1px 7px; border-radius: var(--vx-radius-full); background: var(--bg-muted); color: var(--fg-muted); font: 500 var(--vx-admin-shell-tag-size) var(--font-cjk); }
 .vxh-context { display: inline-flex; align-items: center; max-width: 12rem; font: 500 var(--vx-admin-shell-item-size) var(--font-cjk); color: var(--fg-muted); overflow: hidden; text-overflow: ellipsis; }
 .vxh-context::before { content: "/"; margin: 0 10px 0 2px; color: var(--fg-disabled); font-weight: 400; }
 

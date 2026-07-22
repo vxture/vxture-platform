@@ -720,6 +720,25 @@ export async function fetchCredits(): Promise<{
   );
 }
 
+export interface ConsoleQuotaMetric {
+  used: number;
+  limit: number;
+}
+
+export interface ConsoleQuotaUsage {
+  storage: ConsoleQuotaMetric;
+  aiCredit: ConsoleQuotaMetric;
+}
+
+const EMPTY_QUOTA_METRIC: ConsoleQuotaMetric = { used: 0, limit: 0 };
+
+export async function fetchQuotaUsage(): Promise<ConsoleQuotaUsage> {
+  return readJson<ConsoleQuotaUsage>("/api/subscription/quota-usage", {
+    storage: EMPTY_QUOTA_METRIC,
+    aiCredit: EMPTY_QUOTA_METRIC,
+  });
+}
+
 export async function fetchSubscribeContext(params: {
   product?: string | undefined;
   intent?: string | undefined;
