@@ -7,7 +7,7 @@
 >
 > 🧭 **产品架构文档族路由(`product_{NNN}`,2026-07-06 立族)**:编号对齐 `data_{domain}_{NNN}` 惯例——**1\*\* 架构 / 2\*\* 细化标准 / 3\*\* 实施**,编号预留扩展空间。
 > **100** 本文(矩阵与分层总纲,族入口)｜**110** [`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md)(共享与隔离模型)｜**200** [`product_200_integration.md`](./product_200_integration.md)(平台×产品三通道对接标准)｜**210** [`product_210_tool-protocol.md`](./product_210_tool-protocol.md)(L0 工具协议规范,**v1.0 已定稿**)｜**220** [`product_220_catalog-resource-model.md`](./product_220_catalog-resource-model.md)(目录·权益与资源模型,**v1.0 已定稿**)｜**230** [`product_230_mesh-architecture.md`](./product_230_mesh-architecture.md)(登录后跨产品通信 fabric/mesh 架构,**v1.0 已定稿**)｜**300** [`product_300_naming-migration.md`](./product_300_naming-migration.md)(目录定名迁移 runbook,规划稿)｜**310** [`product_310_arda-integration.md`](./product_310_arda-integration.md)(Arda 对接实施总纲,规划稿)。
-> 族外:决策记录 = ADR-11/ADR-12(ADR 自有编号线);评审/过程留档([`sharing-isolation-review.md`](./design_sharing_100_isolation-review.md))与 owner 原稿([`inputs/`](./inputs/README.md))**不进编号体系**;各产品定义文档归 `docs/20-specs/` 产品文档线。
+> 族外:决策记录 = ADR-11/ADR-12(ADR 自有编号线);评审/过程留档([`sharing-isolation-review.md`](./design_sharing_100_isolation-review.md))与 owner 原稿([`inputs/`](./inputs/00-index.md))**不进编号体系**;各产品定义文档归 `docs/20-specs/` 产品文档线。
 
 ---
 
