@@ -53,7 +53,10 @@ CLIENTS_ALL="website console admin"
 # (umbra → worker-04 env). NOTE: umbra currently reuses the legacy ruyin secret
 # (hash migrated to OIDC_CLIENT_SECRET_HASH_UMBRA by db-init; product_300 §2.4),
 # so this script only mints one on FORCE rotation or a fresh install.
-REMOTE_CLIENTS_ALL="umbra arda arda-beta"
+# karda-beta intentionally excluded — deferred until a beta host is assigned
+# (TD-001 in vxture-karda); adding it here now would provision a secret for a
+# client no host can use yet.
+REMOTE_CLIENTS_ALL="umbra arda arda-beta karda"
 
 is_remote() {
   case " $REMOTE_CLIENTS_ALL " in *" $1 "*) return 0 ;; *) return 1 ;; esac
