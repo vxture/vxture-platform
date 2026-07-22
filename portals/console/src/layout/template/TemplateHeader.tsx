@@ -3,7 +3,7 @@
 /* 1:1 转写自设计稿 shell.jsx Header(.vxh) — 类名/DOM 不改，演示数据换成真实
  * 会话 / 租户 / 主题 / 语言。账单·计划行无 BFF 数据，保留为静态占位。 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatTenantDisplay } from "@/features/tenant/tenant-display";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
@@ -17,8 +17,35 @@ import type { Locale, Theme } from "@vxture/shared";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
 import { useConsoleSession } from "@/features/session/ConsoleSessionProvider";
 import { useTenant } from "@/features/tenant";
-import { buildLogoutUrl, buildSwitchUrl } from "@/api/console-bff";
+import {
+  buildLogoutUrl,
+  buildSwitchUrl,
+  fetchMyWorkspaces,
+  fetchQuotaUsage,
+  type ConsoleQuotaUsage,
+} from "@/api/console-bff";
 import type { ShellView } from "../shell/types";
+
+const BYTE_UNITS = ["B", "KB", "MB", "GB", "TB", "PB"] as const;
+
+function formatBytes(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return "0 B";
+  const exp = Math.min(
+    Math.floor(Math.log(value) / Math.log(1024)),
+    BYTE_UNITS.length - 1,
+  );
+  const size = value / 1024 ** exp;
+  return `${exp === 0 ? size : size.toFixed(1)} ${BYTE_UNITS[exp]}`;
+}
+
+function formatCount(value: number): string {
+  return Number.isFinite(value) ? value.toLocaleString() : "0";
+}
+
+function quotaPercent(used: number, limit: number): number {
+  if (!Number.isFinite(limit) || limit <= 0) return 0;
+  return Math.max(0, Math.min(100, (used / limit) * 100));
+}
 
 /* 用户级别标识 · 5 级（1:1 自设计稿 shell.jsx USER_LEVELS）。 */
 const USER_LEVELS: Record<number, { name: string; icon: string; cls: string }> =
@@ -102,7 +129,35 @@ export function TemplateHeader({
   const [fontSize, setFontSize] = useState<"small" | "default" | "large">(
     "default",
   );
+  const [quotaUsage, setQuotaUsage] = useState<ConsoleQuotaUsage | null>(null);
+  const [currentWorkspaceName, setCurrentWorkspaceName] = useState<
+    string | null
+  >(null);
   const t = useTranslations("shell");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchQuotaUsage().then((usage) => {
+      if (!cancelled) setQuotaUsage(usage);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [session.tenant?.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchMyWorkspaces().then((items) => {
+      if (cancelled) return;
+      const current =
+        items.find((w) => w.tenantId === session.tenant?.id) ??
+        items.find((w) => w.isCurrent);
+      setCurrentWorkspaceName(current?.workspaceName ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [session.tenant?.id]);
   // 用户等级：暂无真实等级数据，按设计默认 fallback L01。
   const userLevel = 1;
   const lv = USER_LEVELS[userLevel];
@@ -283,6 +338,48 @@ export function TemplateHeader({
                 <i className="ph ph-caret-right vxh-acct-go"></i>
               </button>
               <div className="vxh-acct-div"></div>
+              <div className="vxh-prefs-title">{t("usageQuota")}</div>
+              <div className="vxh-quota-block">
+                <div className="vxh-quota-row">
+                  <div className="vxh-quota-head">
+                    <i className="ph ph-hard-drives"></i>
+                    <span className="vxh-quota-label">{t("storageQuota")}</span>
+                    <span className="vxh-quota-value">
+                      {quotaUsage
+                        ? `${formatBytes(quotaUsage.storage.used)} / ${formatBytes(quotaUsage.storage.limit)}`
+                        : "—"}
+                    </span>
+                  </div>
+                  <div className="vxh-quota-track">
+                    <div
+                      className="vxh-quota-fill"
+                      style={{
+                        width: `${quotaUsage ? quotaPercent(quotaUsage.storage.used, quotaUsage.storage.limit) : 0}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="vxh-quota-row">
+                  <div className="vxh-quota-head">
+                    <i className="ph ph-sparkle"></i>
+                    <span className="vxh-quota-label">{t("aiCredits")}</span>
+                    <span className="vxh-quota-value">
+                      {quotaUsage
+                        ? `${formatCount(quotaUsage.aiCredit.used)} / ${formatCount(quotaUsage.aiCredit.limit)}`
+                        : "—"}
+                    </span>
+                  </div>
+                  <div className="vxh-quota-track">
+                    <div
+                      className="vxh-quota-fill"
+                      style={{
+                        width: `${quotaUsage ? quotaPercent(quotaUsage.aiCredit.used, quotaUsage.aiCredit.limit) : 0}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="vxh-acct-div"></div>
               <div className="vxh-prefs-title">{t("billing")}</div>
               <button
                 className="vxh-acct-row vxh-bill"
@@ -356,6 +453,8 @@ export function TemplateHeader({
                 <span className="vxh-acct-label">{t("freePlan")}</span>
               </button>
               <div className="vxh-acct-div"></div>
+              <div className="vxh-prefs-title">{t("switchScope")}</div>
+              <div className="vxh-scope-sub-label">{t("organization")}</div>
               <button
                 className={
                   "vxh-acct-row" + (isSingleTenant ? " is-disabled" : "")
@@ -373,6 +472,18 @@ export function TemplateHeader({
                 <span className="vxh-acct-label">{labels.switchOrg}</span>
                 <i className="ph ph-caret-right vxh-acct-go"></i>
               </button>
+              <div className="vxh-scope-sub-label">{t("workspace")}</div>
+              <div
+                className="vxh-acct-row is-disabled"
+                style={{ opacity: 0.6, cursor: "default" }}
+                title={t("workspaceSwitchComingSoon")}
+              >
+                <i className="ph ph-cube"></i>
+                <span className="vxh-acct-label">
+                  {currentWorkspaceName || t("defaultWorkspace")}
+                </span>
+                <span className="vxh-scope-tag">{t("defaultTag")}</span>
+              </div>
             </div>
           )}
         </div>

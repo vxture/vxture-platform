@@ -344,6 +344,62 @@ export interface ConsoleSubscriptionView {
   isTrial: boolean;
 }
 
+// ── workspace quota usage (header "配额 / Usage Quota" panel) ──────────────
+
+interface QuotaMetricView {
+  used: number;
+  limit: number;
+}
+
+export interface QuotaUsageView {
+  storage: QuotaMetricView;
+  aiCredit: QuotaMetricView;
+}
+
+interface QuotaPoolRow {
+  quota_limit: string;
+  quota_used: string;
+  reset_period: string;
+  current_period_start: Date | null;
+}
+
+/** Same period-floor comparison as platform-api's entitlement-view (UTC day/month). */
+function quotaNeedsReset(
+  resetPeriod: string,
+  currentPeriodStart: Date | null,
+  now: Date,
+): boolean {
+  if (resetPeriod === "none") return false;
+  if (currentPeriodStart === null) return true;
+  const floor = currentPeriodStart;
+  if (resetPeriod === "day") {
+    return (
+      floor.getUTCFullYear() !== now.getUTCFullYear() ||
+      floor.getUTCMonth() !== now.getUTCMonth() ||
+      floor.getUTCDate() !== now.getUTCDate()
+    );
+  }
+  return (
+    floor.getUTCFullYear() !== now.getUTCFullYear() ||
+    floor.getUTCMonth() !== now.getUTCMonth()
+  );
+}
+
+/** Live (subscription-backed or perpetual) quota_pools rows for a workspace × metric. */
+const QUOTA_POOL_SQL = `
+  select qp.quota_limit, qp.quota_used, qp.reset_period, qp.current_period_start
+    from metering.quota_pools qp
+   where qp.workspace_id = $1
+     and qp.metric_key = $2
+     and qp.status = 'active'
+     and (qp.expires_at is null or qp.expires_at > now())
+     and (qp.subscription_id is null or exists (
+           select 1 from metering.subscriptions ts
+            where ts.id = qp.subscription_id
+              and ts.status in ('active', 'trialing')
+              and ts.deleted_at is null
+         ))`;
+
 // ============================================================================
 // Router
 // ============================================================================
@@ -379,6 +435,69 @@ export class SubscriptionRouter {
       balance: record?.balance ?? "0.00",
       currency: record?.currency ?? "CNY",
     };
+  }
+
+  // --------------------------------------------------------------------------
+  // GET /api/subscription/quota-usage — 当前租户默认工作空间的配额用量
+  // (header "配额 / Usage Quota" 面板；storage.bytes + ai.credit 是 L0 平台指标,
+  // 与具体产品无关, 故按 workspace 聚合展示, 不做 product 归属区分)
+  // --------------------------------------------------------------------------
+
+  @Get("quota-usage")
+  async getQuotaUsage(
+    @Req() req: Request & RequestContext,
+  ): Promise<QuotaUsageView> {
+    if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
+    const workspaceId = await this.resolveDefaultWorkspace(req.tenant.id);
+
+    const [storage, aiCredit] = await Promise.all([
+      this.queryGaugeQuota(workspaceId, "storage.bytes"),
+      this.queryCounterQuota(workspaceId, "ai.credit"),
+    ]);
+
+    return { storage, aiCredit };
+  }
+
+  /** Gauge metric (e.g. storage.bytes): limit = Σ pool limits, used = Σ live gauge reading. */
+  private async queryGaugeQuota(
+    workspaceId: string,
+    metricKey: string,
+  ): Promise<QuotaMetricView> {
+    const [pools, gauge] = await Promise.all([
+      this.pool.query<QuotaPoolRow>(QUOTA_POOL_SQL, [workspaceId, metricKey]),
+      this.pool.query<{ total: string | null }>(
+        `select sum(value)::text as total from metering.usage_gauges
+          where workspace_id = $1 and metric_key = $2`,
+        [workspaceId, metricKey],
+      ),
+    ]);
+    const limit = pools.rows.reduce(
+      (sum, row) => sum + Number(row.quota_limit),
+      0,
+    );
+    const used = Number(gauge.rows[0]?.total ?? 0);
+    return { used, limit };
+  }
+
+  /** Counter metric (e.g. ai.credit): reset-aware quota_used summed across live pools. */
+  private async queryCounterQuota(
+    workspaceId: string,
+    metricKey: string,
+  ): Promise<QuotaMetricView> {
+    const res = await this.pool.query<QuotaPoolRow>(QUOTA_POOL_SQL, [
+      workspaceId,
+      metricKey,
+    ]);
+    const now = new Date();
+    let limit = 0;
+    let used = 0;
+    for (const row of res.rows) {
+      limit += Number(row.quota_limit);
+      used += quotaNeedsReset(row.reset_period, row.current_period_start, now)
+        ? 0
+        : Number(row.quota_used);
+    }
+    return { used, limit };
   }
 
   // --------------------------------------------------------------------------
