@@ -294,7 +294,9 @@ export function TenantInfoPage() {
   const language = languageLabel(profile?.language);
   const timezone = formatTimezone(profile?.timezone, empty);
   const currency = displayValue(profile?.currency, empty);
-  const logoSrc = profile?.logoHash ? orgLogoUrl(profile.logoHash) : null;
+  const logoSrc = profile?.logoHash
+    ? orgLogoUrl(profile.logoHash)
+    : "/assets/icons/tenant-default.png";
   const tenantWorkspaces = workspaces.filter(
     (ws) => ws.tenantId === profile?.tenantId,
   );
