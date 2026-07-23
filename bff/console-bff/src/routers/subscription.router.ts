@@ -39,8 +39,14 @@ import type {
   DeclarePaymentResult,
   SubscriptionRecord,
 } from "@vxture/service-subscription";
-import { SUBSCRIPTION_STATUSES, TIERS, type Tier } from "@vxture/shared";
+import {
+  SUBSCRIPTION_STATUSES,
+  TIERS,
+  type ProductEntitlementView,
+  type Tier,
+} from "@vxture/shared";
 import type { RequestContext } from "../types/console.types";
+import { PlatformEntitlementsClient } from "../platform/platform-entitlements.client";
 
 // Inline the DI token (repo-wide pattern): SubscriptionModule provides the pool.
 const COMMERCE_PG_POOL = "COMMERCE_PG_POOL";
@@ -356,49 +362,15 @@ export interface QuotaUsageView {
   aiCredit: QuotaMetricView;
 }
 
-interface QuotaPoolRow {
-  quota_limit: string;
-  quota_used: string;
-  reset_period: string;
-  current_period_start: Date | null;
-}
+// ── workspace entitlements (product_220 §3 C2 envelope, console-facing view) ─
 
-/** Same period-floor comparison as platform-api's entitlement-view (UTC day/month). */
-function quotaNeedsReset(
-  resetPeriod: string,
-  currentPeriodStart: Date | null,
-  now: Date,
-): boolean {
-  if (resetPeriod === "none") return false;
-  if (currentPeriodStart === null) return true;
-  const floor = currentPeriodStart;
-  if (resetPeriod === "day") {
-    return (
-      floor.getUTCFullYear() !== now.getUTCFullYear() ||
-      floor.getUTCMonth() !== now.getUTCMonth() ||
-      floor.getUTCDate() !== now.getUTCDate()
-    );
-  }
-  return (
-    floor.getUTCFullYear() !== now.getUTCFullYear() ||
-    floor.getUTCMonth() !== now.getUTCMonth()
-  );
+export interface WorkspaceEntitlementView {
+  productCode: string;
+  tier: string | null;
+  status: string | null;
+  bundled: boolean;
+  limits: Record<string, number>;
 }
-
-/** Live (subscription-backed or perpetual) quota_pools rows for a workspace × metric. */
-const QUOTA_POOL_SQL = `
-  select qp.quota_limit, qp.quota_used, qp.reset_period, qp.current_period_start
-    from metering.quota_pools qp
-   where qp.workspace_id = $1
-     and qp.metric_key = $2
-     and qp.status = 'active'
-     and (qp.expires_at is null or qp.expires_at > now())
-     and (qp.subscription_id is null or exists (
-           select 1 from metering.subscriptions ts
-            where ts.id = qp.subscription_id
-              and ts.status in ('active', 'trialing')
-              and ts.deleted_at is null
-         ))`;
 
 // ============================================================================
 // Router
@@ -419,6 +391,8 @@ export class SubscriptionRouter {
     private readonly mailService: MailService,
     @Inject(COMMERCE_PG_POOL)
     private readonly pool: Pool,
+    @Inject(PlatformEntitlementsClient)
+    private readonly entitlementsClient: PlatformEntitlementsClient,
   ) {}
 
   // --------------------------------------------------------------------------
@@ -450,54 +424,75 @@ export class SubscriptionRouter {
     if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
     const workspaceId = await this.resolveDefaultWorkspace(req.tenant.id);
 
-    const [storage, aiCredit] = await Promise.all([
-      this.queryGaugeQuota(workspaceId, "storage.bytes"),
-      this.queryCounterQuota(workspaceId, "ai.credit"),
-    ]);
-
-    return { storage, aiCredit };
-  }
-
-  /** Gauge metric (e.g. storage.bytes): limit = Σ pool limits, used = Σ live gauge reading. */
-  private async queryGaugeQuota(
-    workspaceId: string,
-    metricKey: string,
-  ): Promise<QuotaMetricView> {
-    const [pools, gauge] = await Promise.all([
-      this.pool.query<QuotaPoolRow>(QUOTA_POOL_SQL, [workspaceId, metricKey]),
-      this.pool.query<{ total: string | null }>(
-        `select sum(value)::text as total from metering.usage_gauges
-          where workspace_id = $1 and metric_key = $2`,
-        [workspaceId, metricKey],
-      ),
-    ]);
-    const limit = pools.rows.reduce(
-      (sum, row) => sum + Number(row.quota_limit),
-      0,
+    const entitlements = await this.resolveWorkspaceEntitlements(workspaceId);
+    // No live subscriptions (or platform-api unreachable) → zero display,
+    // never a 500: the quota header panel must degrade, not break the page.
+    return aggregateWorkspaceQuota(
+      entitlements ? Object.values(entitlements) : [],
     );
-    const used = Number(gauge.rows[0]?.total ?? 0);
-    return { used, limit };
   }
 
-  /** Counter metric (e.g. ai.credit): reset-aware quota_used summed across live pools. */
-  private async queryCounterQuota(
+  // --------------------------------------------------------------------------
+  // GET /api/subscription/entitlements — 当前租户默认工作空间的权益概览
+  // (TD-042 remediation: sources tier/status/bundled/limits from the C2
+  // `/platform/entitlements` contract instead of leaving console blind to them)
+  // --------------------------------------------------------------------------
+
+  @Get("entitlements")
+  async getEntitlements(
+    @Req() req: Request & RequestContext,
+  ): Promise<WorkspaceEntitlementView[]> {
+    if (!req.tenant) throw new UnauthorizedException("租户上下文缺失");
+    const workspaceId = await this.resolveDefaultWorkspace(req.tenant.id);
+
+    const entitlements = await this.resolveWorkspaceEntitlements(workspaceId);
+    if (!entitlements) return [];
+    return Object.entries(entitlements).map(([productCode, view]) => ({
+      productCode,
+      tier: view.tier,
+      status: view.status,
+      bundled: view.bundled,
+      limits: view.limits,
+    }));
+  }
+
+  /**
+   * C2 resolution for this workspace's ever-subscribed products, or `null` on
+   * failure (platform-api unreachable / malformed response) — callers degrade
+   * rather than propagate a 500.
+   */
+  private async resolveWorkspaceEntitlements(
     workspaceId: string,
-    metricKey: string,
-  ): Promise<QuotaMetricView> {
-    const res = await this.pool.query<QuotaPoolRow>(QUOTA_POOL_SQL, [
+  ): Promise<Record<string, ProductEntitlementView> | null> {
+    const productCodes = await this.queryWorkspaceProductCodes(workspaceId);
+    if (productCodes.length === 0) return {};
+    return this.entitlementsClient.resolveWorkspaceEntitlements(
       workspaceId,
-      metricKey,
-    ]);
-    const now = new Date();
-    let limit = 0;
-    let used = 0;
-    for (const row of res.rows) {
-      limit += Number(row.quota_limit);
-      used += quotaNeedsReset(row.reset_period, row.current_period_start, now)
-        ? 0
-        : Number(row.quota_used);
-    }
-    return { used, limit };
+      productCodes,
+    );
+  }
+
+  /**
+   * Distinct product codes this workspace has ever had ANY plan_component
+   * coverage for — primary (standalone purchase) OR bundled (product_220
+   * §2: a product can carry real entitlement, e.g. `bundled: true`, with no
+   * primary subscription of its own ever existing). Restricting to
+   * `component_role = 'primary'` would silently hide bundled-only coverage
+   * from the entitlements panel — the exact "both facts survive" case §2
+   * calls out as the reason the bundled boolean exists in the first place.
+   */
+  private async queryWorkspaceProductCodes(
+    workspaceId: string,
+  ): Promise<string[]> {
+    const res = await this.pool.query<{ product_code: string }>(
+      `select distinct prod.product_code
+         from metering.subscriptions ts
+         join product.plan_components pc on pc.plan_version_id = ts.plan_version_id
+         join product.products prod on prod.id = pc.product_id
+        where ts.workspace_id = $1 and ts.deleted_at is null`,
+      [workspaceId],
+    );
+    return res.rows.map((r) => r.product_code);
   }
 
   // --------------------------------------------------------------------------
@@ -1429,6 +1424,58 @@ function buildPaymentInstructions(orderNo: string): OfflinePaymentInstructions {
     reference: orderNo,
   };
 }
+
+/**
+ * Workspace-total {used, limit} for the two WS-level platform metrics
+ * (storage.bytes gauge, ai.credit counter) — product-agnostic by design (this
+ * is the header panel, product_220 §4.4), but the two metric kinds must be
+ * aggregated differently across the per-product C2 views, or the result is
+ * wrong rather than merely imprecise:
+ *
+ * - storage.bytes (gauge, WS-uniform): `platform-entitlements.service.ts`
+ *   computes ONE workspace-wide row and injects the identical object into
+ *   EVERY requested product's `quota_pools` (§4.4 — "same for every
+ *   product"). Summing it across N subscribed products would multiply the
+ *   true total by N. Read it once from whichever product view carries it.
+ * - ai.credit (counter, per-product reserved pool, §4.3): each product's
+ *   view shows only pools it can see — currently exactly its OWN
+ *   contribution, because no tenant sharing-policy config UI exists yet to
+ *   populate `metering.resource_sharing_policies` (TD-033, `Open`, no write
+ *   path). Under that real invariant, summing every product's entry is safe
+ *   and matches the pre-TD-042 workspace-total semantics with zero
+ *   double-count risk. **Revisit this sum if/when TD-033 ships a sharing
+ *   config UI** — a populated policy could then make one shared pool appear
+ *   in more than one product's view, which this sum would double-count.
+ */
+function aggregateWorkspaceQuota(
+  views: ProductEntitlementView[],
+): QuotaUsageView {
+  const allPools = views.flatMap((v) => v.quota_pools);
+
+  const storagePool = allPools.find((p) => p.metric === "storage.bytes");
+  const storage: QuotaMetricView = storagePool
+    ? {
+        used: storagePool.limit - storagePool.remaining,
+        limit: storagePool.limit,
+      }
+    : EMPTY_QUOTA_METRIC;
+
+  let aiLimit = 0;
+  let aiUsed = 0;
+  for (const p of allPools) {
+    if (p.metric !== "ai.credit") continue;
+    aiLimit += p.limit;
+    aiUsed += p.limit - p.remaining;
+  }
+  const aiCredit: QuotaMetricView =
+    aiLimit === 0 && aiUsed === 0
+      ? EMPTY_QUOTA_METRIC
+      : { used: aiUsed, limit: aiLimit };
+
+  return { storage, aiCredit };
+}
+
+const EMPTY_QUOTA_METRIC: QuotaMetricView = { used: 0, limit: 0 };
 
 interface OrderRow {
   order_id: string;

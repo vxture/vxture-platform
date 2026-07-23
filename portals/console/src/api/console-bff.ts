@@ -739,6 +739,24 @@ export async function fetchQuotaUsage(): Promise<ConsoleQuotaUsage> {
   });
 }
 
+/**
+ * Per-product commercial entitlement view (product_220 §3 C2 envelope, TD-042
+ * remediation). `tier`/`status` are `null` when the workspace has never
+ * subscribed to that product (§11.4 no-coverage fallback) — never a status
+ * value, per the platform's null-vs-lapsed distinction.
+ */
+export interface WorkspaceEntitlement {
+  productCode: string;
+  tier: string | null;
+  status: string | null;
+  bundled: boolean;
+  limits: Record<string, number>;
+}
+
+export async function fetchEntitlements(): Promise<WorkspaceEntitlement[]> {
+  return readJson<WorkspaceEntitlement[]>("/api/subscription/entitlements", []);
+}
+
 export async function fetchSubscribeContext(params: {
   product?: string | undefined;
   intent?: string | undefined;

@@ -18,6 +18,7 @@ import { ConsoleAuthService } from "./auth/auth.service";
 import { SessionAggregator } from "./aggregators/session.aggregator";
 import { PhoneChangeService } from "./services/phone-change.service";
 import { EmailChangeService } from "./services/email-change.service";
+import { PlatformEntitlementsClient } from "./platform/platform-entitlements.client";
 import { AuthMiddleware } from "./middleware/auth.middleware";
 import { PermissionMiddleware } from "./middleware/permission.middleware";
 import { TenantMiddleware } from "./middleware/tenant.middleware";
@@ -62,6 +63,7 @@ import { TenantContextRouter } from "./routers/tenant-context.router";
     SessionAggregator,
     PhoneChangeService,
     EmailChangeService,
+    PlatformEntitlementsClient,
   ],
 })
 export class AppModule implements NestModule {
