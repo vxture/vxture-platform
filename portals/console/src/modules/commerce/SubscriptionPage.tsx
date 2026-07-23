@@ -15,12 +15,14 @@ import {
   cancelSubscriptionOrder,
   fetchBillingInvoices,
   fetchCredits,
+  fetchEntitlements,
   fetchMyOrders,
   fetchMySubscriptions,
   ConsoleBffError,
   type ConsoleInvoice,
   type ConsoleSubscription,
   type MyOrder,
+  type WorkspaceEntitlement,
 } from "@/api/console-bff";
 import { useConsoleSession } from "@/features/session/ConsoleSessionProvider";
 import {
@@ -114,6 +116,46 @@ const ORDER_STATUS_BADGES: Record<MyOrder["orderStatus"], string> = {
   expired: "vx-badge-muted",
 };
 
+// C2 subscription-status six-value domain (@vxture/shared SUBSCRIPTION_STATUSES)
+// + null = never subscribed (product_220 §3 — absence, not a status value).
+const ENTITLEMENT_STATUS_BADGES: Record<string, string> = {
+  active: "vx-badge-positive",
+  trialing: "vx-badge-info",
+  overdue: "vx-badge-warning",
+  suspended: "vx-badge-warning",
+  expired: "vx-badge-muted",
+  cancelled: "vx-badge-muted",
+};
+
+/**
+ * `status: null` means "no standalone (primary) subscription" — it does NOT
+ * mean "no access" when `bundled` is true (product_220 §2/§3: a product can
+ * carry real bundled-only coverage with no primary subscription of its own,
+ * e.g. a raven-pro plan bundling arda). Labeling that combination "Not
+ * subscribed" would read as an error to a workspace admin who does have
+ * working access via the bundle, so the two facts are distinguished here.
+ */
+function formatEntitlementStatus(
+  status: string | null,
+  bundled: boolean,
+): string {
+  if (status === null) return bundled ? "Bundled access" : "Not subscribed";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+function formatTier(tier: string | null): string {
+  if (tier === null) return "—";
+  return tier.charAt(0).toUpperCase() + tier.slice(1);
+}
+
+function formatLimits(limits: Record<string, number>): string {
+  const entries = Object.entries(limits);
+  if (entries.length === 0) return "—";
+  return entries
+    .map(([key, value]) => `${key}: ${value === -1 ? "unlimited" : value}`)
+    .join(" · ");
+}
+
 // ============================================================================
 // SubscriptionPage
 // ============================================================================
@@ -154,6 +196,7 @@ export function SubscriptionPage() {
     balance: string;
     currency: string;
   } | null>(null);
+  const [entitlements, setEntitlements] = useState<WorkspaceEntitlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
@@ -165,12 +208,14 @@ export function SubscriptionPage() {
       fetchBillingInvoices(10),
       fetchMyOrders(),
       fetchCredits(),
+      fetchEntitlements(),
     ])
-      .then(([subs, invs, ords, creditRecord]) => {
+      .then(([subs, invs, ords, creditRecord, entitlementRecords]) => {
         setSubscriptions(subs);
         setInvoices(invs);
         setOrders(ords);
         setCredits(creditRecord);
+        setEntitlements(entitlementRecords);
       })
       .finally(() => setLoading(false));
   }, [session.tenant?.id]);
@@ -220,6 +265,34 @@ export function SubscriptionPage() {
       description:
         "Most variable spend comes from burst model access rather than additional seat growth.",
     },
+  ];
+
+  const entitlementColumns: DataTableColumn<WorkspaceEntitlement>[] = [
+    { id: "product", header: "Product", cell: (e) => e.productCode },
+    { id: "tier", header: "Tier", cell: (e) => formatTier(e.tier) },
+    {
+      id: "status",
+      header: "Status",
+      cell: (e) => (
+        <Badge
+          className={
+            e.status
+              ? (ENTITLEMENT_STATUS_BADGES[e.status] ?? "vx-badge-muted")
+              : e.bundled
+                ? "vx-badge-info"
+                : "vx-badge-muted"
+          }
+        >
+          {formatEntitlementStatus(e.status, e.bundled)}
+        </Badge>
+      ),
+    },
+    {
+      id: "bundled",
+      header: "Bundled",
+      cell: (e) => (e.bundled ? "Yes" : "—"),
+    },
+    { id: "limits", header: "Limits", cell: (e) => formatLimits(e.limits) },
   ];
 
   const orderColumns: DataTableColumn<MyOrder>[] = [
@@ -409,6 +482,22 @@ export function SubscriptionPage() {
             <SignalList items={planningSignals} />
           </PageSection>
         </DashboardSplit>
+      ) : null}
+
+      {tab === "overview" ? (
+        <PageSection
+          title="Current entitlements"
+          description="Per-product tier, status, and pooled-resource ceilings resolved from the platform's commercial contract (product_220 §3)."
+        >
+          <DataTable
+            columns={entitlementColumns}
+            rows={entitlements}
+            rowKey={(e) => e.productCode}
+            loading={loading}
+            loadingLabel="Loading entitlements…"
+            empty="No product entitlements yet."
+          />
+        </PageSection>
       ) : null}
 
       {tab === "overview" ? (

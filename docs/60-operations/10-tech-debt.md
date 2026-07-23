@@ -1,7 +1,7 @@
 # 技术债登记表
 
-**版本**: 1.8.0
-**更新**: 2026-07-16（GitHub Actions workflow 审查衍生两项，均**待全域确认后执行**：**TD-039** 疑似死 CI 凭证审计清理（跨 org 全仓核引用后 revoke）；**TD-040** 变更门控方法论补进 cicd-optimization-playbook。此前 2026-07-14：backlog 对当前架构审计后修正——**TD-010 作废**、**TD-001 改写**、**TD-033 文档 bug 修复**）
+**版本**: 1.9.1
+**更新**: 2026-07-23（**TD-042** 三阶段整改（S2S 改走 C2 + console 权益展示 + 验收）全部完成，已销号）。此前同日：console 权益展示缺口调研衍生 **TD-042**：console-bff quota-usage 端点绕开 C2 契约直查 DB 并重复实现 reset 逻辑。此前 2026-07-16：GitHub Actions workflow 审查衍生两项，均**待全域确认后执行**：**TD-039** 疑似死 CI 凭证审计清理（跨 org 全仓核引用后 revoke）；**TD-040** 变更门控方法论补进 cicd-optimization-playbook。此前 2026-07-14：backlog 对当前架构审计后修正——**TD-010 作废**、**TD-001 改写**、**TD-033 文档 bug 修复**）
 **维护人**: 架构组
 
 ---
@@ -98,6 +98,7 @@
 | [TD-039](#td-039--疑似死-ci-凭证待审计清理需全域确认)                                 | 疑似死 CI 凭证待审计清理（需全域确认）                              | Security Hygiene   | Open        | 🟢 LOW                      |
 | [TD-040](#td-040--变更门控方法论未沉淀进-cicd-optimization-playbook)                  | 变更门控方法论未沉淀进 cicd-optimization-playbook                   | Documentation      | Resolved    | 🟢 LOW                      |
 | [TD-041](#td-041--admin-订阅动作写路径绕过-provisioning-派发与-c3-invalidate)         | admin 订阅动作写路径绕过 provisioning 派发与 C3 invalidate          | Architecture       | Open        | 🟡 MED                      |
+| [TD-042](#td-042--console-bff-quota-usage-绕开-c2-契约直查-db-并重复实现-reset-逻辑)  | console-bff quota-usage 绕开 C2 契约，直查 DB 并重复实现 reset 逻辑 | Architecture       | Resolved    | 🟢 LOW                      |
 
 ---
 
@@ -948,3 +949,25 @@
 **影响**：运营在 admin 执行订阅动作后，产品侧感知滞后（缓存 TTL 内旧门控继续生效）且 provisioning 状态机可能与订阅状态脱节（suspend/resume 无对应 webhook 事件）。低频运营操作、TTL 短（秒级 invalidate 缺失退化为短 TTL 缓存），故 MED 非 HIGH。
 
 **解决方向**：订阅动作改走（或复用）subscription 服务的状态变更入口，统一带出 provisioning 派发 + C3 invalidate；或最小修——在 `runSubscriptionAction` 提交后补发 invalidate 与（需要时）provisioning 事件。修复时同步核对 renew 的 `end_at` 延长是否需要 webhook 通知产品侧。
+
+---
+
+### TD-042 — console-bff quota-usage 绕开 C2 契约，直查 DB 并重复实现 reset 逻辑
+
+| 字段         | 内容                                                                                                  |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| **分类**     | Architecture                                                                                          |
+| **状态**     | ✅ Resolved                                                                                           |
+| **登记日期** | 2026-07-23                                                                                            |
+| **解决日期** | 2026-07-23                                                                                            |
+| **来源**     | console 权益展示缺口调研；`bff/console-bff/src/routers/subscription.router.ts`（`quotaNeedsReset()`） |
+
+**描述**：console-bff 的 `GET /api/subscription/quota-usage` 端点（`SubscriptionPage.tsx` 消费）未调用平台权威的 C2 `GET /platform/entitlements`（`bff/platform-api/src/platform/platform-entitlements.service.ts` + `entitlement-view.ts`），而是自己直查 `metering.quota_pools`（`QUOTA_POOL_SQL`），并自写了一份 `quotaNeedsReset()`——该函数的注释自己承认"Same period-floor comparison as platform-api's entitlement-view"，即明知逻辑与 `entitlement-view.ts::needsReset()` 应保持一致，却各写一份。当前该端点只覆盖 `storage.bytes`/`ai.credit` 两个 WS 级平台指标，未展示任何 tier/limits/bundled/status 等产品级销售轴信息（该部分是纯空白，非本条技术债范围，另见 console 权益展示页 workplan）。
+
+**影响**：reset 判定逻辑（UTC 日/月周期边界）存在两处独立实现，C2 引擎一侧的规则变化（如未来调整 reset 边界语义、新增 reset_period 取值）不会自动同步到 console-bff，属逻辑漂移风险；此外该端点仍是直查 DB 而非走契约化的 S2S 接口，与 `admin-bff → platform-api`（`AUTH_INTERNAL_TOKEN` S2S 模式，见 `bff/admin-bff/src/providers/commerce-services.provider.ts`）已验证的先例不一致。
+
+**解决方向**：console-bff 改为通过 S2S 调用 C2 `GET /platform/entitlements`（复用 `AUTH_INTERNAL_TOKEN` S2S 调用模式），退役自写的 DB 直查与 `quotaNeedsReset()`；随该改造一并补上产品级 tier/limits/bundled/status 的 console 展示（见 workplan）。
+
+**销号（2026-07-23）**：`workplans/console-entitlement-display.md` 三阶段全部完成。验收方法：①代码级审查确认 console-bff 侧（`getEntitlements`/`sumQuotaPools`）对 C2 返回值只做逐字段直传/求和聚合，不存在任何独立 tier/limits/reset 再推导逻辑；②上游合并算法既有单测 `entitlement-view.spec.ts` 27/27 通过（含 product_220 §2 primary+bundled 共存例、needsReset day/month 边界）；③全仓 grep 确认 `needsReset`/`quotaNeedsReset` 仅 `entitlement-view.ts` 一处实现，`console-bff` 侧零残留。真实多租户浏览器冒烟留给部署后由 owner 视需要验证，不阻塞本条销号（本条追踪的是"重复实现"技术债，已消除）。
+
+**进展（2026-07-23，阶段1完成，见 `workplans/console-entitlement-display.md`）**：console-bff 新增 `PlatformEntitlementsClient`，`quota-usage` 端点已完全改走 C2 响应聚合（`sumQuotaPools()`），`QUOTA_POOL_SQL`/`quotaNeedsReset()` 已删除——重复实现的根因已消除。新增 `GET /api/subscription/entitlements` 暴露 tier/status/bundled/limits。**进展（2026-07-23，阶段2完成）**：console 前端 `SubscriptionPage.tsx` overview tab 新增 "Current entitlements" 区块（`DataTable`），消费阶段1新增的 `GET /api/subscription/entitlements`，展示每产品 tier/status（六值+null 直接透传，不折叠）/bundled/limits。`console-bff.ts` 新增 `fetchEntitlements()`。
