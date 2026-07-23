@@ -240,6 +240,8 @@ const ENV_FILE_RULES = [
       // karda beta base URL — deferred, no beta host assigned yet (TD-001)
       "KARDA_BETA_BASE_URL",
       "OIDC_CLIENT_SECRET_HASH_KARDA_BETA",
+      // tailnet webhook delivery target — same pattern as ARDA_WEBHOOK_BASE_URL
+      "KARDA_WEBHOOK_BASE_URL",
       // future saas app RP hashes (required when each RP goes live)
       ...OIDC_FUTURE_APP_HASH_KEYS,
     ]),

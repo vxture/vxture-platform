@@ -1199,6 +1199,32 @@ export async function seedCatalog(client) {
   );
   console.log("✓  product — product_webhooks (arda provisioning endpoint)");
 
+  // karda — registration request B段 (docs/80-liaison/40-2607230909-karda-
+  // platform-registration-b.md §3.2): tailnet delivery target explicitly given
+  // (http://vx-worker-02:3233), not derived from B.karda (which stays public
+  // for the OIDC redirect_uris). Only seeded once karda's product row exists.
+  if (prodMap["karda"]) {
+    const kardaWebhookBase =
+      process.env.KARDA_WEBHOOK_BASE_URL || B.karda;
+    await client.query(
+      `
+      insert into product.product_webhooks (product_id, home_url, webhook_url, webhook_secret_ref, created_at, updated_at)
+      select id, $1, $2, $3, now(), now() from product.products where product_code = 'karda'
+      on conflict (product_id) do update set
+        home_url = excluded.home_url,
+        webhook_url = excluded.webhook_url,
+        webhook_secret_ref = excluded.webhook_secret_ref,
+        updated_at = now()
+    `,
+      [
+        B.karda,
+        `${kardaWebhookBase}/provisioning/webhook`,
+        "KARDA_PROVISION_WEBHOOK_SECRET",
+      ],
+    );
+    console.log("✓  product — product_webhooks (karda provisioning endpoint)");
+  }
+
   // launch checklist catalog
   await client.query(`
     insert into product.launch_checklist_items
