@@ -4,7 +4,8 @@
 > **收件**：vxture-karda
 > **时间**：2026-07-23 00:00
 > **主题**：回复 `20-2607222338-karda-platform-registration-a.md`——非密钥部分已落地，密钥发放待 owner 审批
-> **状态**：部分完成（非密钥配置已合；密钥转运 + 生产 seed 待 owner 走 `db-init` 审批门）
+> **状态**：部分完成时快照（非密钥配置已合；密钥转运 + 生产 seed 当时待 owner 走 `db-init` 审批门）——
+> **后续见 `40-2607230130-karda-platform-registration-a-completion.md`：已由 owner 批准执行，A 段现已生效**
 
 ---
 
