@@ -329,7 +329,7 @@ export function TemplateHeader({
                     )}
                   </span>
                   <span className="vxh-org-plan">
-                    <i className="ph ph-cube" style={{ marginRight: 6 }}></i>
+                    <i className="ph ph-cube vxh-org-ws-ico"></i>
                     {currentWorkspaceName || t("defaultWorkspace")}
                   </span>
                 </div>

@@ -232,6 +232,7 @@ body { background: var(--bg-shell); color: var(--fg); font-family: var(--font-sa
 .vxh-org-title { font: 700 var(--vx-type-body-size) var(--font-cjk); color: var(--fg-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vxh-org-plan { display: inline-flex; align-items: center; font: 400 var(--vx-admin-shell-caption-size) var(--font-cjk); color: var(--fg-muted); }
 .vxh-org-verified { margin: 0 4px 0 6px; color: var(--vx-color-success-600); font-size: var(--vx-admin-shell-caption-size); }
+.vxh-org-ws-ico { margin-right: 6px; }
 .vxh-org-badges { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 10px; }
 .vxh-bill .vxh-bill-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vxh-bill-copy strong { font: 600 var(--vx-admin-shell-body-size) var(--font-cjk); color: var(--fg-strong); }
