@@ -133,6 +133,7 @@ export function TemplateHeader({
   const [currentWorkspaceName, setCurrentWorkspaceName] = useState<
     string | null
   >(null);
+  const [switchPanelOpen, setSwitchPanelOpen] = useState(false);
   const t = useTranslations("shell");
 
   useEffect(() => {
@@ -167,7 +168,11 @@ export function TemplateHeader({
       ? t("personalTenant")
       : t("orgTenant");
   const toggle = (p: "launcher" | "tenant" | "user") =>
-    setPanel((cur) => (cur === p ? null : p));
+    setPanel((cur) => {
+      const next = cur === p ? null : p;
+      if (next !== "tenant") setSwitchPanelOpen(false);
+      return next;
+    });
 
   const user = session.user;
   const tenant = session.tenant;
@@ -290,6 +295,7 @@ export function TemplateHeader({
           </button>
           {panel === "tenant" && (
             <div className="vxh-panel vxh-org-panel">
+              {/* 1. 租户基本信息 */}
               <div className="vxh-org-head">
                 <span className="vxh-org-avatar">
                   <i className="ph-fill ph-buildings"></i>
@@ -322,22 +328,15 @@ export function TemplateHeader({
                       </>
                     )}
                   </span>
+                  <span className="vxh-org-plan">
+                    <i className="ph ph-cube" style={{ marginRight: 6 }}></i>
+                    {currentWorkspaceName || t("defaultWorkspace")}
+                  </span>
                 </div>
               </div>
               <div className="vxh-acct-div"></div>
-              <button
-                className="vxh-acct-row"
-                onClick={() => {
-                  setPanel(null);
-                  setView("console");
-                  onNavigate("/tenant-settings");
-                }}
-              >
-                <i className="ph ph-sliders-horizontal"></i>
-                <span className="vxh-acct-label">{labels.tenantSettings}</span>
-                <i className="ph ph-caret-right vxh-acct-go"></i>
-              </button>
-              <div className="vxh-acct-div"></div>
+
+              {/* 2. WS 主要配额 */}
               <div className="vxh-prefs-title">{t("usageQuota")}</div>
               <div className="vxh-quota-block">
                 <div className="vxh-quota-row">
@@ -379,7 +378,21 @@ export function TemplateHeader({
                   </div>
                 </div>
               </div>
+              <button
+                className="vxh-acct-row"
+                onClick={() => {
+                  setPanel(null);
+                  setView("console");
+                  onNavigate("/quotas");
+                }}
+              >
+                <i className="ph ph-gauge"></i>
+                <span className="vxh-acct-label">{t("usageLimit")}</span>
+                <i className="ph ph-caret-right vxh-acct-go"></i>
+              </button>
               <div className="vxh-acct-div"></div>
+
+              {/* 3. 余额和账单信息 */}
               <div className="vxh-prefs-title">{t("billing")}</div>
               <button
                 className="vxh-acct-row vxh-bill"
@@ -411,35 +424,9 @@ export function TemplateHeader({
                   <small>{t("payBillDesc")}</small>
                 </span>
               </button>
-              <button
-                className="vxh-acct-row vxh-bill"
-                onClick={() => {
-                  setPanel(null);
-                  setView("console");
-                  onNavigate("/quotas");
-                }}
-              >
-                <i className="ph ph-wave-sine"></i>
-                <span className="vxh-bill-copy">
-                  <strong>{t("trafficUsage")}</strong>
-                  <small>{t("trafficUsageDesc")}</small>
-                </span>
-              </button>
-              <button
-                className="vxh-acct-row vxh-bill"
-                onClick={() => {
-                  setPanel(null);
-                  setView("console");
-                  onNavigate("/quotas");
-                }}
-              >
-                <i className="ph ph-gauge"></i>
-                <span className="vxh-bill-copy">
-                  <strong>{t("usageLimit")}</strong>
-                  <small>{t("usageLimitDesc")}</small>
-                </span>
-              </button>
               <div className="vxh-acct-div"></div>
+
+              {/* 4. 免费计划 */}
               <div className="vxh-prefs-title">{t("plan")}</div>
               <button
                 className="vxh-acct-row"
@@ -453,36 +440,68 @@ export function TemplateHeader({
                 <span className="vxh-acct-label">{t("freePlan")}</span>
               </button>
               <div className="vxh-acct-div"></div>
-              <div className="vxh-prefs-title">{t("switchScope")}</div>
-              <div className="vxh-scope-sub-label">{t("organization")}</div>
+
+              {/* 5. 租户管理 + 切换组织/工作区 */}
               <button
-                className={
-                  "vxh-acct-row" + (isSingleTenant ? " is-disabled" : "")
-                }
-                disabled={isSingleTenant}
-                style={isSingleTenant ? { opacity: 0.45 } : undefined}
+                className="vxh-acct-row"
                 onClick={() => {
-                  if (isSingleTenant) return;
-                  const next = tenantList.find((opt) => !opt.isCurrent);
                   setPanel(null);
-                  if (next) void switchTenantContext(next.id);
+                  setView("console");
+                  onNavigate("/tenant-settings");
                 }}
               >
-                <i className="ph ph-arrows-left-right"></i>
-                <span className="vxh-acct-label">{labels.switchOrg}</span>
+                <i className="ph ph-sliders-horizontal"></i>
+                <span className="vxh-acct-label">{labels.tenantSettings}</span>
                 <i className="ph ph-caret-right vxh-acct-go"></i>
               </button>
-              <div className="vxh-scope-sub-label">{t("workspace")}</div>
-              <div
-                className="vxh-acct-row is-disabled"
-                style={{ opacity: 0.6, cursor: "default" }}
-                title={t("workspaceSwitchComingSoon")}
-              >
-                <i className="ph ph-cube"></i>
-                <span className="vxh-acct-label">
-                  {currentWorkspaceName || t("defaultWorkspace")}
-                </span>
-                <span className="vxh-scope-tag">{t("defaultTag")}</span>
+              <div className="vxh-pop-anchor" style={{ width: "100%" }}>
+                <button
+                  className={
+                    "vxh-acct-row" + (switchPanelOpen ? " is-active" : "")
+                  }
+                  onClick={() => setSwitchPanelOpen((o) => !o)}
+                >
+                  <i className="ph ph-arrows-left-right"></i>
+                  <span className="vxh-acct-label">{t("switchScope")}</span>
+                  <i className="ph ph-caret-right vxh-acct-go"></i>
+                </button>
+                {switchPanelOpen && (
+                  <div className="vxh-panel vxh-switch-panel">
+                    <div className="vxh-scope-sub-label">
+                      {t("organization")}
+                    </div>
+                    <button
+                      className={
+                        "vxh-acct-row" + (isSingleTenant ? " is-disabled" : "")
+                      }
+                      disabled={isSingleTenant}
+                      style={isSingleTenant ? { opacity: 0.45 } : undefined}
+                      onClick={() => {
+                        if (isSingleTenant) return;
+                        const next = tenantList.find((opt) => !opt.isCurrent);
+                        setPanel(null);
+                        setSwitchPanelOpen(false);
+                        if (next) void switchTenantContext(next.id);
+                      }}
+                    >
+                      <i className="ph ph-arrows-left-right"></i>
+                      <span className="vxh-acct-label">{labels.switchOrg}</span>
+                      <i className="ph ph-caret-right vxh-acct-go"></i>
+                    </button>
+                    <div className="vxh-scope-sub-label">{t("workspace")}</div>
+                    <div
+                      className="vxh-acct-row is-disabled"
+                      style={{ opacity: 0.6, cursor: "default" }}
+                      title={t("workspaceSwitchComingSoon")}
+                    >
+                      <i className="ph ph-cube"></i>
+                      <span className="vxh-acct-label">
+                        {currentWorkspaceName || t("defaultWorkspace")}
+                      </span>
+                      <span className="vxh-scope-tag">{t("defaultTag")}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
