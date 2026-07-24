@@ -104,6 +104,7 @@ services:
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
+      PORT: "3020"
       NEXT_PUBLIC_API_URL: https://api.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
       # Server-only internal address the console SSR uses to fetch the session
@@ -111,7 +112,7 @@ services:
       # keeps using the public same-origin path. See lib/server/bff-server.ts (#7).
       CONSOLE_BFF_INTERNAL_URL: http://vx-platform-console-bff:3021
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3020/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -126,10 +127,11 @@ services:
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
+      PORT: "3040"
       NEXT_PUBLIC_API_URL: https://api.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3040/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -146,10 +148,11 @@ services:
     networks: [vxture-prod]
     environment:
       NODE_ENV: production
+      PORT: "3060"
       NEXT_PUBLIC_OIDC_API_BASE: https://accounts.vxture.com
       NODE_OPTIONS: --max-old-space-size=192
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3060/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -165,11 +168,12 @@ services:
     memswap_limit: 192m
     networks: [vxture-prod]
     ports:
-      - "100.100.197.42:3090:3090" # 绑定 Tailscale 接口，仅 Tailscale 对端可达
+      - "100.100.197.42:3061:3061" # 绑定 Tailscale 接口，仅 Tailscale 对端可达（原3090，2026-07-24 L0端口迁移）
     # Overrides any NODE_OPTIONS from env_file (inline wins). Owner: confirm no
     # host .env.* already sets NODE_OPTIONS flags that would be clobbered.
     environment:
       NODE_OPTIONS: --max-old-space-size=144
+      AUTH_BFF_PORT: "3061"
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -183,7 +187,7 @@ services:
       postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3090/healthz"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3061/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -215,6 +219,7 @@ services:
     networks: [vxture-prod]
     environment:
       NODE_OPTIONS: --max-old-space-size=144
+      WEBSITE_BFF_PORT: "3001"
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -227,7 +232,7 @@ services:
       redis: { condition: service_healthy }
       auth-bff: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3011/healthz"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3001/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -299,6 +304,7 @@ services:
     networks: [vxture-prod]
     environment:
       NODE_OPTIONS: --max-old-space-size=144
+      ADMIN_BFF_PORT: "3043"
     env_file:
       [
         /srv/vxture/runtime/secrets/platform.env,
@@ -311,7 +317,7 @@ services:
       redis: { condition: service_healthy }
       auth-bff: { condition: service_healthy }
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3031/healthz"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3043/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3

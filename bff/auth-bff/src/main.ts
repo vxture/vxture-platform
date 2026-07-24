@@ -59,7 +59,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = Number(process.env.AUTH_BFF_PORT ?? 3090);
+  const port = Number(process.env.AUTH_BFF_PORT ?? 3061);
   await app.listen(port);
   Logger.log(`✅ auth-bff listening on http://localhost:${port}`, "Bootstrap");
 }

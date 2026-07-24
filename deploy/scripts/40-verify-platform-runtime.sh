@@ -79,13 +79,13 @@ check_service_health() {
 
 check_platform_health() {
   check_service_health "website" "http://localhost:3000/"
-  check_service_health "console" "http://localhost:3000/"
-  check_service_health "admin" "http://localhost:3000/"
+  check_service_health "console" "http://localhost:3020/"
+  check_service_health "admin" "http://localhost:3040/"
   check_service_health "gateway-bff" "http://localhost:8000/healthz"
-  check_service_health "auth-bff" "http://localhost:3090/healthz"
-  check_service_health "website-bff" "http://localhost:3011/healthz"
+  check_service_health "auth-bff" "http://localhost:3061/healthz"
+  check_service_health "website-bff" "http://localhost:3001/healthz"
   check_service_health "console-bff" "http://localhost:3021/healthz"
-  check_service_health "admin-bff" "http://localhost:3031/healthz"
+  check_service_health "admin-bff" "http://localhost:3043/healthz"
   check_service_health "model-platform" "http://localhost:3100/model-platform/health/live"
 }
 

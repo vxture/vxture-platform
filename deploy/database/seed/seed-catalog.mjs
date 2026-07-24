@@ -850,7 +850,9 @@ export async function seedCatalog(client) {
       displayName: "Atlas",
       realm: "customer",
       redirectUris: appUris(B.atlas, betaB.atlas),
-      scopes: ["openid", "profile", "email", "atlas:subscription"],
+      // D12: product commercial scope retired, no {product}:subscription carried in
+      // product tokens; aligned to karda's actual 4-scope registration (product_240 §6#20).
+      scopes: ["openid", "profile", "email", "phone"],
     },
     {
       clientId: "ontos",
@@ -1125,6 +1127,18 @@ export async function seedCatalog(client) {
       nick: "Karda",
       desc: "Enterprise knowledge platform.",
     },
+    {
+      // Atlas repo-split prep (see docs/30-design/platform/40-model-platform.md §13):
+      // v1 DRAFT/unlocked/unpublished, same two-phase pattern as karda's A段 registration —
+      // catalog row + OIDC client land now, plan tiers stay empty until Atlas's own repo
+      // and product definition are ready. C2 resolves atlas as "unsubscribed" until published.
+      code: "atlas",
+      type: "model_platform",
+      cat: 1,
+      name: "模型平台",
+      nick: "Atlas",
+      desc: "Unified model access, routing, quota and metering platform.",
+    },
   ];
   for (const p of PRODUCTS) {
     await client.query(
@@ -1201,7 +1215,8 @@ export async function seedCatalog(client) {
 
   // karda — registration request B段 (docs/80-liaison/40-2607230909-karda-
   // platform-registration-b.md §3.2): tailnet delivery target explicitly given
-  // (http://vx-worker-02:3233), not derived from B.karda (which stays public
+  // (http://vx-worker-02:3240, migrated from :3233 on 2026-07-24 port-plan
+  // revision), not derived from B.karda (which stays public
   // for the OIDC redirect_uris). Only seeded once karda's product row exists.
   if (prodMap["karda"]) {
     const kardaWebhookBase =
@@ -1838,6 +1853,77 @@ export async function seedCatalog(client) {
     }
     console.log(
       "✓  product — karda catalog skeleton (5 plans; v1 DRAFT/unlocked/unpublished, empty features+quota — admin fills in once karda's product definition lands)",
+    );
+  }
+
+  // ── atlas catalog — SKELETON ONLY (Atlas repo-split prep, same A段 pattern as
+  // karda above: docs/30-design/platform/40-model-platform.md §13 / product_240 §5) ──
+  // Atlas's own product definition (plan tiers, quota semantics for the four
+  // call types embedding/parse/rerank/generation) is not decided yet — this only
+  // creates the 5 tier plan rows + a DRAFT, UNLOCKED, UNPUBLISHED v1 (empty
+  // features/quota, no price) so the admin backend has something to open once
+  // the Atlas repo lands its own product definition. plans.current_version_id
+  // is intentionally left unset — C2 resolves nothing for atlas until a real
+  // version is published.
+  const atlasId = prodMap["atlas"];
+  if (atlasId) {
+    // [plan_code, plan_name, tier, is_public]
+    const ATLAS_PLANS = [
+      ["atlas-free", "Atlas Free", "free", true],
+      ["atlas-starter", "Atlas Starter", "starter", true],
+      ["atlas-pro", "Atlas Pro", "pro", true],
+      ["atlas-business", "Atlas Business", "business", true],
+      ["atlas-enterprise", "Atlas Enterprise", "enterprise", true],
+    ];
+    for (const [code, name, tier, isPublic] of ATLAS_PLANS) {
+      await client.query(
+        `
+        insert into product.plans
+          (id, plan_code, plan_name, plan_name_key, description, description_key, is_public, status, created_by, created_at, updated_at)
+        values (gen_random_uuid(), $1, $2, $3, $4, $5, $6, 'active', $7, now(), now())
+        on conflict (plan_code) do nothing
+      `,
+        [
+          code,
+          name,
+          "product.plan." + code,
+          name + " tier for Atlas.",
+          "product.plan." + code + ".desc",
+          isPublic,
+          SYS,
+        ],
+      );
+      const planRow = await client.query(
+        `select id from product.plans where plan_code = $1 limit 1`,
+        [code],
+      );
+      const pId = planRow.rows[0]?.id;
+      if (!pId) continue;
+      // draft v1: unlocked, unpublished, empty component — never overwritten
+      // once inserted (admin owns everything past this point).
+      const v1Ins = await client.query(
+        `
+        insert into product.plan_versions (id, plan_id, version_no, status, is_locked, created_by, created_at)
+        values (gen_random_uuid(), $1, 1, 'draft', false, $2, now())
+        on conflict (plan_id, version_no) do nothing
+        returning id
+      `,
+        [pId, SYS],
+      );
+      if (v1Ins.rows.length === 0) continue;
+      const v1Id = v1Ins.rows[0].id;
+      await client.query(
+        `
+        insert into product.plan_components
+          (id, plan_version_id, product_id, tier, component_role, priority, features, quota, sort_order, created_at)
+        values (gen_random_uuid(), $1, $2, $3, 'primary', 100, ARRAY[]::text[], '{}'::jsonb, 0, now())
+        on conflict (plan_version_id, product_id, tier) do nothing
+      `,
+        [v1Id, atlasId, tier],
+      );
+    }
+    console.log(
+      "✓  product — atlas catalog skeleton (5 plans; v1 DRAFT/unlocked/unpublished, empty features+quota — admin fills in once Atlas repo-split lands a product definition)",
     );
   }
 

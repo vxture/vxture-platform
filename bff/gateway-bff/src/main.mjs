@@ -2,10 +2,10 @@ import http from 'node:http';
 import { Readable } from 'node:stream';
 
 const PORT = Number(process.env.GATEWAY_PORT ?? 8000);
-const WEBSITE_BFF_ORIGIN = (process.env.WEBSITE_BFF_ORIGIN ?? 'http://localhost:3011').replace(/\/+$/, '');
+const WEBSITE_BFF_ORIGIN = (process.env.WEBSITE_BFF_ORIGIN ?? 'http://localhost:3001').replace(/\/+$/, '');
 const CONSOLE_BFF_ORIGIN = (process.env.CONSOLE_BFF_ORIGIN ?? 'http://localhost:3021').replace(/\/+$/, '');
-const ADMIN_BFF_ORIGIN = (process.env.ADMIN_BFF_ORIGIN ?? 'http://localhost:3031').replace(/\/+$/, '');
-const AUTH_BFF_ORIGIN = (process.env.AUTH_BFF_ORIGIN ?? 'http://localhost:3090').replace(/\/+$/, '');
+const ADMIN_BFF_ORIGIN = (process.env.ADMIN_BFF_ORIGIN ?? 'http://localhost:3043').replace(/\/+$/, '');
+const AUTH_BFF_ORIGIN = (process.env.AUTH_BFF_ORIGIN ?? 'http://localhost:3061').replace(/\/+$/, '');
 const ALLOWED_ORIGINS = new Set(
   (process.env.GATEWAY_ALLOWED_ORIGINS ??
     'http://localhost:3010,http://localhost:3020,http://localhost:3030,http://127.0.0.1:3010,http://127.0.0.1:3020,http://127.0.0.1:3030')
