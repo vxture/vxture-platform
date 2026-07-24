@@ -1,5 +1,9 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- 28_model.sql — schema model（模型治理配置，平台库，5 表）
+-- ⚠ Atlas 拆仓迁移中（见 deploy/database/ddl-modelruntime/40_model.sql）：这 5 张表已在
+--   目标独立物理库 vxturestudio_modelruntime_main 重新定义（tenant_id 跨库 FK 降级为裸值）。
+--   本文件是迁移前的活产状态，Atlas 割接验证通过前不得删除；割接后（拆仓计划 Phase 7）
+--   本文件与本 schema 一并从平台库退役，不得同时保留两处权威。
 -- 设计权威：docs/design/data_model_200_schema.md §1
 -- 定位：平台库 model 治理配置面；Model Platform DB(key/reqlog/routing) 在独立库，不在此文件。
 -- 域内 FK（models.provider_id / grant·price·policy.model_id）内联；
