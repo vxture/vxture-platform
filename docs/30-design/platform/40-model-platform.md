@@ -14,7 +14,9 @@ Model Platform is Vxture's platform-level model capability domain. It solves two
 
 The current implementation is still named `@vxture/service-model-platform` and deployed as `vx-model-platform`. That name is retained for compatibility. Architecturally, it is an early combined implementation of Model Platform, not the final domain name.
 
-> 📌 **终态产品名 = Atlas**（2026-07-06 定名，[`product_100_matrix.md`](../product_100_matrix.md) v1.0，L1 模型平台）：统一模型接入/路由/配额/用量治理，大模型与**专用小模型**唯一宿主、唯一 LLM 出口与计量口径（[`product_110_sharing-isolation.md`](../product_110_sharing-isolation.md) v1.0 §6.6/§13）。注意与 schema 迁移工具 `ariga/atlas`（`data_platform_320` 引用）同名不同物。服务/包改名为独立实施项，本文暂沿用 model-platform 称呼。
+> 📌 **终态产品名 = Atlas**（2026-07-06 定名，[`product_100_matrix.md`](../product_100_matrix.md) v1.0，L1 模型平台）：统一模型接入/路由/配额/用量治理，大模型与**专用小模型**唯一宿主、唯一 LLM 出口与计量口径（[`product_110_sharing-isolation.md`](../product_110_sharing-isolation.md) v1.0 §6.6/§13）。注意与 schema 迁移工具 `ariga/atlas`（`data_platform_320` 引用）同名不同物。
+>
+> **2026-07-24 更新：Atlas 已拆分为独立仓 `vxture-atlas`**（历史随 `git filter-repo` 迁移，`services/model/platform` 在本仓的定位改为待退役）。本仓与 Atlas 的对接关系（platform 运营台/varda/karda 及同构 L2/L3 agent 各自怎么接 Atlas）见 [`41-atlas-integration-topology.md`](./41-atlas-integration-topology.md)；Atlas 自身的 S2S 供给面契约（embedding/parse/rerank/generation）正本在 `vxture-atlas` 仓 `docs/30-design/200-s2s-provider-surface.md`，不在本仓维护。
 
 Target naming:
 
@@ -590,3 +592,24 @@ Next recommended work:
 - Provider retry policy and provider health scoring.
 - Usage dashboard and provider cost dashboard.
 - Stage 4 / P5 production observability hardening for metrics, SLOs, and alert pipeline.
+
+---
+
+## 13. Consumer-Requested Call Types (Karda Contract Request, 2026-07-23)
+
+Karda's liaison letter (`vxture-karda` `docs/80-liaison/70-2607232158-karda-atlas-contract-request.md`, 2026-07-23 21:58) asks Atlas for a formal contract covering four call types. Only generation is implemented today (§7 `ChatRequest`). The other three are registered here as target scope for future design, not yet built:
+
+| #   | Call type                                                       | Current state                  | Target contract notes (from karda's request)                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --- | --------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | Embedding                                                       | Not implemented                | Batch vectorization for ingestion pipelines. Contract must expose an enumerable, pinnable model version identifier — callers lock a version per corpus/index, and a version change is a controlled rebuild, not a silent swap.                                                                                                                                                                                                                                                                             |
+| A2  | Parsing small models (layout / OCR / table structure / formula) | Not implemented                | High-frequency, small-request, latency-sensitive — one document can trigger dozens to hundreds of calls. Needs (a) a batch endpoint accepting multiple pages/regions per request, and (b) deployment affinity (parsing endpoint colocated with the calling worker's domain), so throughput is bounded by the model rather than network round trips. If neither is feasible, that must be stated explicitly so callers can rebudget throughput and concurrency-tier design around per-call round-trip cost. |
+| A3  | Rerank (cross-encoder)                                          | Not implemented                | v1 candidate pool cap 100. Caller's stated P95 budget for this hop is < 400ms — Atlas should flag early if that is unrealistic at 100 candidates so the caller can shrink pool size instead of discovering it in production.                                                                                                                                                                                                                                                                               |
+| A4  | Generation                                                      | Implemented (§7 `ChatRequest`) | —                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+Cross-cutting semantics any of A1-A3 must confirm or correct once designed (not decided yet):
+
+- Credential posture for background/batch processing: service-mode call, tenant/workspace attribution = the asset-owning workspace, not the triggering caller, so processing cost lands on the asset owner.
+- Metering stays single-sourced in Atlas; the caller only aggregates for its own dashboards, no double counting.
+- Rate-limit vs quota-exhaustion must be distinguishable in the error response, so a caller can choose retry-with-backoff (rate limit) vs suspend-until-renewal (quota exhausted) instead of guessing from a bare `429`.
+
+This section records requirement scope from a specific consumer. It is not a committed design — the actual contract (endpoint / auth / schema / error envelope / rate-limit semantics) is added here only once A1-A3 are designed and, per §11, likely lands after Atlas splits out of the combined `@vxture/service-model-platform` implementation.

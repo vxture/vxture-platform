@@ -46,7 +46,7 @@ async function bootstrap() {
     origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     credentials: true,
   });
-  await app.listen(Number(process.env.WEBSITE_BFF_PORT ?? 3011));
+  await app.listen(Number(process.env.WEBSITE_BFF_PORT ?? 3001));
 }
 
 void bootstrap();

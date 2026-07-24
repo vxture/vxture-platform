@@ -11,6 +11,7 @@
 CREATE SCHEMA IF NOT EXISTS key;      -- provider 密钥（AES-256 密文，平台库永不接触明文）
 CREATE SCHEMA IF NOT EXISTS reqlog;   -- 高频 AI 请求日志 / 错误明细（按月 RANGE 分区，append-only）
 CREATE SCHEMA IF NOT EXISTS routing;  -- 连接 / 路由 / 降级配置
+CREATE SCHEMA IF NOT EXISTS model;    -- 模型治理配置（provider/model/grant/price_rule/policy，Atlas 拆仓迁入，原平台库 model schema）
 
 -- ── 全局可视码序列 ──────────────────────────────────────────────────────────
 -- 无：本库无对外可视码需求（跨库关联键 request_id 由平台侧生成，裸值关联，边界#1）。

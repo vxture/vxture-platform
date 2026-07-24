@@ -232,6 +232,7 @@ body { background: var(--bg-shell); color: var(--fg); font-family: var(--font-sa
 .vxh-org-title { font: 700 var(--vx-type-body-size) var(--font-cjk); color: var(--fg-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vxh-org-plan { display: inline-flex; align-items: center; font: 400 var(--vx-admin-shell-caption-size) var(--font-cjk); color: var(--fg-muted); }
 .vxh-org-verified { margin: 0 4px 0 6px; color: var(--vx-color-success-600); font-size: var(--vx-admin-shell-caption-size); }
+.vxh-org-ws-ico { margin-right: 6px; }
 .vxh-org-badges { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 10px; }
 .vxh-bill .vxh-bill-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .vxh-bill-copy strong { font: 600 var(--vx-admin-shell-body-size) var(--font-cjk); color: var(--fg-strong); }
@@ -247,7 +248,8 @@ body { background: var(--bg-shell); color: var(--fg); font-family: var(--font-sa
 .vxh-quota-track { position: relative; width: 100%; height: 6px; border-radius: var(--vx-radius-full); background: var(--bg-muted); overflow: hidden; }
 .vxh-quota-fill { position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: var(--vx-radius-full); background: var(--primary); transition: width 240ms ease; }
 
-/* 组织 / 工作空间 两级切换 */
+/* 组织 / 工作空间 两级切换（收纳进单条菜单项的弹出子面板） */
+.vxh-switch-panel { left: calc(100% + 8px); top: 0; width: 260px; }
 .vxh-scope-sub-label { padding: 6px 8px 2px; font: 600 var(--vx-admin-shell-tag-size) var(--font-cjk); color: var(--fg-disabled); text-transform: uppercase; letter-spacing: 0.04em; }
 .vxh-scope-tag { margin-left: auto; padding: 1px 7px; border-radius: var(--vx-radius-full); background: var(--bg-muted); color: var(--fg-muted); font: 500 var(--vx-admin-shell-tag-size) var(--font-cjk); }
 .vxh-context { display: inline-flex; align-items: center; max-width: 12rem; font: 500 var(--vx-admin-shell-item-size) var(--font-cjk); color: var(--fg-muted); overflow: hidden; text-overflow: ellipsis; }
