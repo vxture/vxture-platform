@@ -1,6 +1,6 @@
 # L0 工具协议规范:产品间直连的身份·授权·计量标准(Tool Protocol)(product_210)
 
-> 版本:**v1.1** · 日期:2026-07-07(v1.0 定稿) / **2026-07-27 补 §11** · 状态:**已定稿**(决策点 D1–D3 已于 2026-07-07 owner 拍板,见 §9;**实施逐项授权**,切分见 §8;**T1/T2 已实施(2026-07-12)**,T3 未实施;§11 治理检查单为新增,不改变已定稿的 §1–§10)
+> 版本:**v1.2** · 日期:2026-07-07(v1.0 定稿) / 2026-07-27 补 §11 / **2026-07-28 补 §4.1a**(`endpoint` 字段,回应 `vxture-atlas` liaison platform#159) · 状态:**已定稿**(决策点 D1–D3 已于 2026-07-07 owner 拍板,见 §9;**实施逐项授权**,切分见 §8;**T1/T2 已实施(2026-07-12)**,T3 未实施;§11 治理检查单、§4.1a `endpoint` 字段均为新增,不改变已定稿的 §1–§10 核心决策)
 > 文档族:产品架构族 `product_{NNN}`,本文 = **210**(细化标准位);族路由见 [`product_100_matrix.md`](./product_100_matrix.md) §0 头部
 > 定位:**产品 ↔ 产品直连调用的平台技术标准**——工具形态(MCP 风格)、S2S 身份透传(token exchange)、grant ∧ entitlement 求值时点、审计与计量归属、错误与版本演进。补齐 [`product_200_integration.md`](./product_200_integration.md) 三通道之外的"第四面":C1/C2/C3 管"产品对平台",本文管"产品对产品"。
 > 上游:[`product_110_sharing-isolation.md`](./product_110_sharing-isolation.md) §7(唯一直连通道,已固化)、product_200 §2.2/§5(登记项)、[`identity-platform-idp.md`](./identity/070-idp.md)(token 设施:RS256/JWKS/`/oidc/token`)、ADR-11/ADR-12、[`data_sharing_100_architecture.md`](./data_sharing_100_architecture.md)(可见集)。
