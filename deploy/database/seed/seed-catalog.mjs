@@ -156,10 +156,7 @@ const OPERATOR_PERMISSIONS = [
   ["commerce:subscription.manage", "Manage subscriptions"],
   ["commerce:order.read", "View orders"],
   ["commerce:order.void", "Void / reject an unpaid offline order (high-risk)"],
-  [
-    "commerce:order.restore",
-    "Restore a voided/expired offline order back to pending (high-risk)",
-  ],
+  ["commerce:order.restore", "Restore a voided offline order (high-risk)"],
   ["commerce:billing.read", "View bills"],
   ["commerce:billing.manage", "Manage bills"],
   ["commerce:billing.discount", "Discount / write off a bill (high-risk)"],
