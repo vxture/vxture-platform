@@ -64,13 +64,16 @@ function checkFile(file) {
   }
 
   // ── ② perm_code 三段式 + ③ perm_name 长度（仅 OPERATOR_PERMISSIONS 运营 realm）──
-  const PERM_NAME_MAX = 64; // 80_admin.sql: admin.operator_permission.perm_name varchar(64)
+  // 80_admin.sql: admin.operator_permission.perm_name varchar(128)（2026-07-30 64→128）。
+  // 每项 [code, name] 或 [code, name, description]（description 独立列 varchar(255)，不受此限）。
+  const PERM_NAME_MAX = 128;
   const opBlock = content.match(/const\s+OPERATOR_PERMISSIONS\s*=\s*\[([\s\S]*?)\]\s*;/);
   if (opBlock) {
     const body = opBlock[1];
     const baseLine = lineOf(content, opBlock.index);
-    // 逐项（非逐行）解析：一个 [code, name] 项可能跨多行（长 name 换行书写）。
-    const itemRe = /\[\s*['"]([^'"]+)['"]\s*,\s*['"]((?:[^'"\\]|\\.)*)['"]\s*,?\s*\]/g;
+    // 逐项（非逐行）解析：一个项可能跨多行（长 name/description 换行书写）。
+    const itemRe =
+      /\[\s*['"]([^'"]+)['"]\s*,\s*['"]((?:[^'"\\]|\\.)*)['"]\s*(?:,\s*['"](?:[^'"\\]|\\.)*['"]\s*)?,?\s*\]/g;
     let im;
     while ((im = itemRe.exec(body))) {
       const [, code, name] = im;
