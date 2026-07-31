@@ -1,0 +1,3608 @@
+{
+  "color": {
+    "base": {
+      "white": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1, 1, 1],
+          "alpha": 1,
+          "hex": "#FFFFFF"
+        },
+        "$description": "基础绝对色。仅供 neutral 阶与遮罩层派生使用,不应被语义层直接消费。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1174",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-base-white)"
+          }
+        }
+      },
+      "black": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0, 0, 0],
+          "alpha": 1,
+          "hex": "#000000"
+        },
+        "$description": "基础绝对色。仅供 neutral 阶与遮罩层派生使用,不应被语义层直接消费。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1175",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-base-black)"
+          }
+        }
+      }
+    },
+    "brand": {
+      "main": {
+        "50": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.9330000281333923, 0.9490000009536743, 1],
+            "alpha": 1,
+            "hex": "#EEF2FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1101",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-50)"
+            }
+          }
+        },
+        "100": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.859000027179718, 0.8899999856948853, 1],
+            "alpha": 1,
+            "hex": "#DBE3FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1102",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-100)"
+            }
+          }
+        },
+        "200": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.722000002861023, 0.7730000019073486, 1],
+            "alpha": 1,
+            "hex": "#B8C5FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1103",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-200)"
+            }
+          }
+        },
+        "300": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.5220000147819519, 0.5920000076293945, 1],
+            "alpha": 1,
+            "hex": "#8597FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1104",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-300)"
+            }
+          }
+        },
+        "400": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.3529999852180481, 0.44699999690055847, 1],
+            "alpha": 1,
+            "hex": "#5A72FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1105",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-400)"
+            }
+          }
+        },
+        "500": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [0.18799999356269836, 0.3409999907016754, 1],
+            "alpha": 1,
+            "hex": "#3057FF"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1106",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-500)"
+            }
+          }
+        },
+        "600": {
+          "alpha-08": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [0.11800000071525574, 0.3179999887943268, 1],
+              "alpha": 0.07999999821186066,
+              "hex": "#1E51FF"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1112",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-600-alpha-08)"
+              }
+            }
+          },
+          "alpha-10": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [0.11800000071525574, 0.3179999887943268, 1],
+              "alpha": 0.10000000149011612,
+              "hex": "#1E51FF"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1113",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-600-alpha-10)"
+              }
+            }
+          },
+          "alpha-15": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [0.11764705926179886, 0.3176470696926117, 1],
+              "alpha": 0.15000000596046448,
+              "hex": "#1E51FF"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1114",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-600-alpha-15)"
+              }
+            }
+          },
+          "alpha-22": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [0.11764705926179886, 0.3176470696926117, 1],
+              "alpha": 0.2199999988079071,
+              "hex": "#1E51FF"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1115",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-600-alpha-22)"
+              }
+            }
+          },
+          "$root": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [0.11800000071525574, 0.3179999887943268, 1],
+              "alpha": 1,
+              "hex": "#1E51FF"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1107",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-600)"
+              }
+            }
+          }
+        },
+        "700": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.09000000357627869, 0.25099998712539673, 0.8309999704360962
+            ],
+            "alpha": 1,
+            "hex": "#1740D4"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1108",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-700)"
+            }
+          }
+        },
+        "800": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.18039216101169586, 0.6705882549285889
+            ],
+            "alpha": 1,
+            "hex": "#0D2EAB"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1109",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-800)"
+            }
+          }
+        },
+        "900": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.024000000208616257, 0.10599999874830246, 0.45899999141693115
+            ],
+            "alpha": 1,
+            "hex": "#061B75"
+          },
+          "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1110",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-brand-main-900)"
+            }
+          }
+        },
+        "950": {
+          "alpha-45": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [
+                0.007843137718737125, 0.03921568766236305, 0.239215686917305
+              ],
+              "alpha": 0.44999998807907104,
+              "hex": "#020A3D"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 遮罩层 (scrim):用于 modal / drawer 背景压暗。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:164:384",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-950-alpha-45)"
+              }
+            }
+          },
+          "$root": {
+            "$type": "color",
+            "$value": {
+              "colorSpace": "srgb",
+              "components": [
+                0.00800000037997961, 0.039000000804662704, 0.23899999260902405
+              ],
+              "alpha": 1,
+              "hex": "#020A3D"
+            },
+            "$description": "主品牌色 (brand)。Vxture 定制蓝,非 Tailwind 标准阶 — 请勿按 Tailwind 值修改。600 为品牌锚点 #1e51ff。由 vx-Color 的 brand/* 语义族消费,并兼任 chart/categorical/1。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:17:1111",
+              "com.figma.hiddenFromPublishing": true,
+              "com.figma.codeSyntax": {
+                "WEB": "var(--color-brand-main-950)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "neutral": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9803921580314636, 0.9803921580314636, 0.9803921580314636
+          ],
+          "alpha": 1,
+          "hex": "#FAFAFA"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1118",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9607843160629272, 0.9607843160629272, 0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#F5F5F5"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1119",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8980392217636108, 0.8980392217636108, 0.8980392217636108
+          ],
+          "alpha": 1,
+          "hex": "#E5E5E5"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1120",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8313725590705872, 0.8313725590705872, 0.8313725590705872
+          ],
+          "alpha": 1,
+          "hex": "#D4D4D4"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1121",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6392157077789307, 0.6392157077789307, 0.6392157077789307
+          ],
+          "alpha": 1,
+          "hex": "#A3A3A3"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1122",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.45098039507865906, 0.45098039507865906, 0.45098039507865906
+          ],
+          "alpha": 1,
+          "hex": "#737373"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1123",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.32156863808631897, 0.32156863808631897, 0.32156863808631897
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#525252"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:132:106",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.32156863808631897, 0.32156863808631897, 0.32156863808631897
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#525252"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:132:111",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.32156863808631897, 0.32156863808631897, 0.32156863808631897
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#525252"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:132:114",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.32156863808631897, 0.32156863808631897, 0.32156863808631897
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#525252"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:132:117",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.32156863808631897, 0.32156863808631897, 0.32156863808631897
+            ],
+            "alpha": 1,
+            "hex": "#525252"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1124",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.250980406999588, 0.250980406999588, 0.250980406999588
+          ],
+          "alpha": 1,
+          "hex": "#404040"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1125",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.14901961386203766, 0.14901961386203766, 0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#262626"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1126",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.09019608050584793, 0.09019608050584793, 0.09019608050584793
+          ],
+          "alpha": 1,
+          "hex": "#171717"
+        },
+        "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1127",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-neutral-900)"
+          }
+        }
+      },
+      "950": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B)。 || alpha 变体由 neutral/950 派生,专供阴影色使用 — 阴影必须是接近黑的中性色,不可用 600 级。数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:259:2",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B)。 || alpha 变体由 neutral/950 派生,专供阴影色使用 — 阴影必须是接近黑的中性色,不可用 600 级。数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:259:3",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B)。 || alpha 变体由 neutral/950 派生,专供阴影色使用 — 阴影必须是接近黑的中性色,不可用 600 级。数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:259:4",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B)。 || alpha 变体由 neutral/950 派生,专供阴影色使用 — 阴影必须是接近黑的中性色,不可用 600 级。数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:259:5",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-22)"
+            }
+          }
+        },
+        "alpha-30": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.3019607961177826,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B)。 || alpha 变体由 neutral/950 派生,专供阴影色使用 — 阴影必须是接近黑的中性色,不可用 600 级。数字为不透明度百分比。⚠ 本档为补齐 elevation Light 五级严格递增(08/10/15/22/30)而增设 — 此前只有四档 alpha,五个层级槽必然重复一档。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:280:2",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-30)"
+            }
+          }
+        },
+        "alpha-45": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 0.45098039507865906,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 遮罩层 (scrim):用于 modal / drawer 背景压暗。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:164:388",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950-alpha-45)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.03921568766236305, 0.03921568766236305, 0.03921568766236305
+            ],
+            "alpha": 1,
+            "hex": "#0A0A0A"
+          },
+          "$description": "中性基底 (neutral)。Tailwind neutral 纯灰 (R=G=B),刻意不带色偏,以突出高饱和品牌蓝。由 background/*、text/*、border/* 消费,承载界面 60–80% 面积。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1128",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-neutral-950)"
+            }
+          }
+        }
+      }
+    },
+    "purple": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9803921580314636, 0.9607843160629272, 1],
+          "alpha": 1,
+          "hex": "#FAF5FF"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1129",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9529411792755127, 0.9098039269447327, 1],
+          "alpha": 1,
+          "hex": "#F3E8FF"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1130",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9137254953384399, 0.8352941274642944, 1],
+          "alpha": 1,
+          "hex": "#E9D5FF"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1131",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.847000002861023, 0.7059999704360962, 0.9959999918937683
+          ],
+          "alpha": 1,
+          "hex": "#D8B4FE"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1132",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.753000020980835, 0.5180000066757202, 0.9879999756813049
+          ],
+          "alpha": 1,
+          "hex": "#C084FC"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1133",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6589999794960022, 0.3330000042915344, 0.968999981880188
+          ],
+          "alpha": 1,
+          "hex": "#A855F7"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1134",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5764706134796143, 0.20000000298023224, 0.9176470637321472
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#9333EA"
+          },
+          "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1137",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-purple-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5764706134796143, 0.20000000298023224, 0.9176470637321472
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#9333EA"
+          },
+          "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:163:364",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-purple-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5764706134796143, 0.20000000298023224, 0.9176470637321472
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#9333EA"
+          },
+          "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1139",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-purple-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5764706134796143, 0.20000000298023224, 0.9176470637321472
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#9333EA"
+          },
+          "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1140",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-purple-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.5759999752044678, 0.20000000298023224, 0.9179999828338623
+            ],
+            "alpha": 1,
+            "hex": "#9333EA"
+          },
+          "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1135",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-purple-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4941176474094391, 0.13333334028720856, 0.8078431487083435
+          ],
+          "alpha": 1,
+          "hex": "#7E22CE"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1136",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.41960784792900085, 0.12941177189350128, 0.658823549747467
+          ],
+          "alpha": 1,
+          "hex": "#6B21A8"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1472",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3450980484485626, 0.10980392247438431, 0.529411792755127
+          ],
+          "alpha": 1,
+          "hex": "#581C87"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1473",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.23137255012989044, 0.027450980618596077, 0.3921568691730499
+          ],
+          "alpha": 1,
+          "hex": "#3B0764"
+        },
+        "$description": "AI 语义色,视同第二品牌色。Tailwind purple。用于 AI / Agent 相关界面。勿作普通强调色使用 — 普通强调请用 brand/main。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:229:6",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-purple-950)"
+          }
+        }
+      }
+    },
+    "emerald": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618, 0.9921568632125854, 0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#ECFDF5"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1152",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8196078538894653, 0.9803921580314636, 0.8980392217636108
+          ],
+          "alpha": 1,
+          "hex": "#D1FAE5"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1153",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6549019813537598, 0.9529411792755127, 0.8156862854957581
+          ],
+          "alpha": 1,
+          "hex": "#A7F3D0"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1154",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4313725531101227, 0.9058823585510254, 0.7176470756530762
+          ],
+          "alpha": 1,
+          "hex": "#6EE7B7"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:39",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.20392157137393951, 0.8274509906768799, 0.6000000238418579
+          ],
+          "alpha": 1,
+          "hex": "#34D399"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1155",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06300000101327896, 0.7250000238418579, 0.5059999823570251
+          ],
+          "alpha": 1,
+          "hex": "#10B981"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1156",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019607843831181526, 0.5882353186607361, 0.4117647111415863
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#059669"
+          },
+          "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1160",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-emerald-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019607843831181526, 0.5882353186607361, 0.4117647111415863
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#059669"
+          },
+          "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:163:348",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-emerald-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019607843831181526, 0.5882353186607361, 0.4117647111415863
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#059669"
+          },
+          "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1161",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-emerald-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019607843831181526, 0.5882353186607361, 0.4117647111415863
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#059669"
+          },
+          "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1162",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-emerald-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.019607843831181526, 0.5882353186607361, 0.4117647111415863
+            ],
+            "alpha": 1,
+            "hex": "#059669"
+          },
+          "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1157",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-emerald-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425, 0.47058823704719543, 0.34117648005485535
+          ],
+          "alpha": 1,
+          "hex": "#047857"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1158",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.024000000208616257, 0.37299999594688416, 0.2750000059604645
+          ],
+          "alpha": 1,
+          "hex": "#065F46"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1159",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0235294122248888, 0.30588236451148987, 0.23137255012989044
+          ],
+          "alpha": 1,
+          "hex": "#064E3B"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:40",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137718737125, 0.1725490242242813, 0.13333334028720856
+          ],
+          "alpha": 1,
+          "hex": "#022C22"
+        },
+        "$description": "状态语义色 — success。Tailwind emerald。成功、完成、健康态。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:229:3",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-emerald-950)"
+          }
+        }
+      }
+    },
+    "amber": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1, 0.984000027179718, 0.921999990940094],
+          "alpha": 1,
+          "hex": "#FFFBEB"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1163",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9959999918937683, 0.953000009059906, 0.7799999713897705
+          ],
+          "alpha": 1,
+          "hex": "#FEF3C7"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1164",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9921568632125854, 0.9019607901573181, 0.5411764979362488
+          ],
+          "alpha": 1,
+          "hex": "#FDE68A"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1165",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9882352948188782, 0.8274509906768799, 0.3019607961177826
+          ],
+          "alpha": 1,
+          "hex": "#FCD34D"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:41",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.984000027179718, 0.7490000128746033, 0.14100000262260437
+          ],
+          "alpha": 1,
+          "hex": "#FBBF24"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1166",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9610000252723694, 0.6200000047683716, 0.0430000014603138
+          ],
+          "alpha": 1,
+          "hex": "#F59E0B"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1167",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8509804010391235, 0.46666666865348816, 0.0235294122248888
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#D97706"
+          },
+          "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1171",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-amber-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8509804010391235, 0.46666666865348816, 0.0235294122248888
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#D97706"
+          },
+          "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:163:352",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-amber-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8509804010391235, 0.46666666865348816, 0.0235294122248888
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#D97706"
+          },
+          "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1172",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-amber-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8509804010391235, 0.46666666865348816, 0.0235294122248888
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#D97706"
+          },
+          "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1173",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-amber-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8510000109672546, 0.46700000762939453, 0.024000000208616257
+            ],
+            "alpha": 1,
+            "hex": "#D97706"
+          },
+          "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1168",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-amber-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7058823704719543, 0.32549020648002625, 0.03529411926865578
+          ],
+          "alpha": 1,
+          "hex": "#B45309"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1169",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.572549045085907, 0.250980406999588, 0.054901961237192154
+          ],
+          "alpha": 1,
+          "hex": "#92400E"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1170",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.47058823704719543, 0.2078431397676468, 0.05882352963089943
+          ],
+          "alpha": 1,
+          "hex": "#78350F"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:42",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2705882489681244, 0.10196078568696976, 0.0117647061124444
+          ],
+          "alpha": 1,
+          "hex": "#451A03"
+        },
+        "$description": "状态语义色 — warning。Tailwind amber。警告、限流、待处理。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:229:4",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-amber-950)"
+          }
+        }
+      }
+    },
+    "red": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927, 0.9490196108818054, 0.9490196108818054
+          ],
+          "alpha": 1,
+          "hex": "#FEF2F2"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1141",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927, 0.886274516582489, 0.886274516582489
+          ],
+          "alpha": 1,
+          "hex": "#FEE2E2"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1142",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927, 0.7921568751335144, 0.7921568751335144
+          ],
+          "alpha": 1,
+          "hex": "#FECACA"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1143",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9882352948188782, 0.6470588445663452, 0.6470588445663452
+          ],
+          "alpha": 1,
+          "hex": "#FCA5A5"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:45",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9725490212440491, 0.4431372582912445, 0.4431372582912445
+          ],
+          "alpha": 1,
+          "hex": "#F87171"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1144",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9372549057006836, 0.2666666805744171, 0.2666666805744171
+          ],
+          "alpha": 1,
+          "hex": "#EF4444"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1145",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8627451062202454, 0.14901961386203766, 0.14901961386203766
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#DC2626"
+          },
+          "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1149",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-red-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8627451062202454, 0.14901961386203766, 0.14901961386203766
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#DC2626"
+          },
+          "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:163:356",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-red-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8627451062202454, 0.14901961386203766, 0.14901961386203766
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#DC2626"
+          },
+          "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1150",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-red-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8627451062202454, 0.14901961386203766, 0.14901961386203766
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#DC2626"
+          },
+          "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1151",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-red-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.8627451062202454, 0.14901961386203766, 0.14901961386203766
+            ],
+            "alpha": 1,
+            "hex": "#DC2626"
+          },
+          "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1146",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-red-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7254902124404907, 0.10980392247438431, 0.10980392247438431
+          ],
+          "alpha": 1,
+          "hex": "#B91C1C"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1147",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579, 0.10588235408067703, 0.10588235408067703
+          ],
+          "alpha": 1,
+          "hex": "#991B1B"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1148",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.49803921580314636, 0.11372549086809158, 0.11372549086809158
+          ],
+          "alpha": 1,
+          "hex": "#7F1D1D"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:46",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2705882489681244, 0.03921568766236305, 0.03921568766236305
+          ],
+          "alpha": 1,
+          "hex": "#450A0A"
+        },
+        "$description": "状态语义色 — danger。Tailwind red。错误、失败、破坏性操作。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:229:5",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-red-950)"
+          }
+        }
+      }
+    },
+    "sky": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9411764740943909, 0.9764705896377563, 1],
+          "alpha": 1,
+          "hex": "#F0F9FF"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:476",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8784313797950745, 0.9490196108818054, 0.9960784316062927
+          ],
+          "alpha": 1,
+          "hex": "#E0F2FE"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:477",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.729411780834198, 0.9019607901573181, 0.9921568632125854
+          ],
+          "alpha": 1,
+          "hex": "#BAE6FD"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:478",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4901960790157318, 0.8274509906768799, 0.9882352948188782
+          ],
+          "alpha": 1,
+          "hex": "#7DD3FC"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:479",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.21960784494876862, 0.7411764860153198, 0.9725490212440491
+          ],
+          "alpha": 1,
+          "hex": "#38BDF8"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:480",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.054901961237192154, 0.6470588445663452, 0.9137254953384399
+          ],
+          "alpha": 1,
+          "hex": "#0EA5E9"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:481",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.007843137718737125, 0.5176470875740051, 0.7803921699523926
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#0284C7"
+          },
+          "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:531",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-sky-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.007843137718737125, 0.5176470875740051, 0.7803921699523926
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#0284C7"
+          },
+          "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:532",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-sky-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.007843137718737125, 0.5176470875740051, 0.7803921699523926
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#0284C7"
+          },
+          "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:533",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-sky-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.007843137718737125, 0.5176470875740051, 0.7803921699523926
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#0284C7"
+          },
+          "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:534",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-sky-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.007843137718737125, 0.5176470875740051, 0.7803921699523926
+            ],
+            "alpha": 1,
+            "hex": "#0284C7"
+          },
+          "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:482",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-sky-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0117647061124444, 0.4117647111415863, 0.6313725709915161
+          ],
+          "alpha": 1,
+          "hex": "#0369A1"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:483",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027450980618596077, 0.3490196168422699, 0.5215686559677124
+          ],
+          "alpha": 1,
+          "hex": "#075985"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:484",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0470588244497776, 0.29019609093666077, 0.4313725531101227
+          ],
+          "alpha": 1,
+          "hex": "#0C4A6E"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:485",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0313725508749485, 0.18431372940540314, 0.2862745225429535
+          ],
+          "alpha": 1,
+          "hex": "#082F49"
+        },
+        "$description": "状态语义色 — info。Tailwind sky。刻意区别于品牌蓝,勿与 brand/main 混用。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:486",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-sky-950)"
+          }
+        }
+      }
+    },
+    "cyan": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9254902005195618, 0.9960784316062927, 1],
+          "alpha": 1,
+          "hex": "#ECFEFF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:47",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8117647171020508, 0.9803921580314636, 0.9960784316062927
+          ],
+          "alpha": 1,
+          "hex": "#CFFAFE"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1474",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6470588445663452, 0.9529411792755127, 0.9882352948188782
+          ],
+          "alpha": 1,
+          "hex": "#A5F3FC"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:48",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.40392157435417175, 0.9098039269447327, 0.9764705896377563
+          ],
+          "alpha": 1,
+          "hex": "#67E8F9"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1475",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.13333334028720856, 0.8274509906768799, 0.9333333373069763
+          ],
+          "alpha": 1,
+          "hex": "#22D3EE"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1476",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0235294122248888, 0.7137255072593689, 0.8313725590705872
+          ],
+          "alpha": 1,
+          "hex": "#06B6D4"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:17:1477",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0313725508749485, 0.5686274766921997, 0.6980392336845398
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#0891B2"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:144:58",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-cyan-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0313725508749485, 0.5686274766921997, 0.6980392336845398
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#0891B2"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:163:368",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-cyan-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0313725508749485, 0.5686274766921997, 0.6980392336845398
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#0891B2"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:144:62",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-cyan-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0313725508749485, 0.5686274766921997, 0.6980392336845398
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#0891B2"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:144:66",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-cyan-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.0313725508749485, 0.5686274766921997, 0.6980392336845398
+            ],
+            "alpha": 1,
+            "hex": "#0891B2"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:17:1478",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-cyan-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.054901961237192154, 0.45490196347236633, 0.5647059082984924
+          ],
+          "alpha": 1,
+          "hex": "#0E7490"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:49",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.08235294371843338, 0.3686274588108063, 0.4588235318660736
+          ],
+          "alpha": 1,
+          "hex": "#155E75"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:50",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.08627451211214066, 0.30588236451148987, 0.38823530077934265
+          ],
+          "alpha": 1,
+          "hex": "#164E63"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:144:51",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0313725508749485, 0.20000000298023224, 0.2666666805744171
+          ],
+          "alpha": 1,
+          "hex": "#083344"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/6 消费。⚠ 与 teal 色相接近,同一图表内出现时必须叠加非颜色编码。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:229:2",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-cyan-950)"
+          }
+        }
+      }
+    },
+    "orange": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1, 0.9686274528503418, 0.929411768913269],
+          "alpha": 1,
+          "hex": "#FFF7ED"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:487",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [1, 0.929411768913269, 0.8352941274642944],
+          "alpha": 1,
+          "hex": "#FFEDD5"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:488",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927, 0.843137264251709, 0.6666666865348816
+          ],
+          "alpha": 1,
+          "hex": "#FED7AA"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:489",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9921568632125854, 0.729411780834198, 0.45490196347236633
+          ],
+          "alpha": 1,
+          "hex": "#FDBA74"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:490",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9843137264251709, 0.572549045085907, 0.23529411852359772
+          ],
+          "alpha": 1,
+          "hex": "#FB923C"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:491",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9764705896377563, 0.45098039507865906, 0.08627451211214066
+          ],
+          "alpha": 1,
+          "hex": "#F97316"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:492",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9176470637321472, 0.3450980484485626, 0.0470588244497776
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#EA580C"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:2",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-orange-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9176470637321472, 0.3450980484485626, 0.0470588244497776
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#EA580C"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:3",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-orange-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9176470637321472, 0.3450980484485626, 0.0470588244497776
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#EA580C"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:4",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-orange-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9176470637321472, 0.3450980484485626, 0.0470588244497776
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#EA580C"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:5",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-orange-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.9176470637321472, 0.3450980484485626, 0.0470588244497776
+            ],
+            "alpha": 1,
+            "hex": "#EA580C"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:493",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-orange-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7607843279838562, 0.2549019753932953, 0.0470588244497776
+          ],
+          "alpha": 1,
+          "hex": "#C2410C"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:494",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6039215922355652, 0.20392157137393951, 0.07058823853731155
+          ],
+          "alpha": 1,
+          "hex": "#9A3412"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:495",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.48627451062202454, 0.1764705926179886, 0.07058823853731155
+          ],
+          "alpha": 1,
+          "hex": "#7C2D12"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:496",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.26274511218070984, 0.0784313753247261, 0.027450980618596077
+          ],
+          "alpha": 1,
+          "hex": "#431407"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/2 消费。不承载状态语义 — 勿用于 warning,warning 请用 amber。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:497",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-orange-950)"
+          }
+        }
+      }
+    },
+    "teal": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909, 0.9921568632125854, 0.9803921580314636
+          ],
+          "alpha": 1,
+          "hex": "#F0FDFA"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:498",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.800000011920929, 0.9843137264251709, 0.9450980424880981
+          ],
+          "alpha": 1,
+          "hex": "#CCFBF1"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:499",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579, 0.9647058844566345, 0.8941176533699036
+          ],
+          "alpha": 1,
+          "hex": "#99F6E4"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:500",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3686274588108063, 0.9176470637321472, 0.8313725590705872
+          ],
+          "alpha": 1,
+          "hex": "#5EEAD4"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:501",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1764705926179886, 0.8313725590705872, 0.7490196228027344
+          ],
+          "alpha": 1,
+          "hex": "#2DD4BF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:502",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0784313753247261, 0.7215686440467834, 0.6509804129600525
+          ],
+          "alpha": 1,
+          "hex": "#14B8A6"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:503",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.5803921818733215, 0.5333333611488342
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#0D9488"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:6",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-teal-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.5803921818733215, 0.5333333611488342
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#0D9488"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:7",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-teal-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.5803921818733215, 0.5333333611488342
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#0D9488"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:8",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-teal-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.5803921818733215, 0.5333333611488342
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#0D9488"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:9",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-teal-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.05098039284348488, 0.5803921818733215, 0.5333333611488342
+            ],
+            "alpha": 1,
+            "hex": "#0D9488"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:504",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-teal-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.05882352963089943, 0.4627451002597809, 0.4313725531101227
+          ],
+          "alpha": 1,
+          "hex": "#0F766E"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:505",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.06666667014360428, 0.3686274588108063, 0.3490196168422699
+          ],
+          "alpha": 1,
+          "hex": "#115E59"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:506",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.07450980693101883, 0.30588236451148987, 0.29019609093666077
+          ],
+          "alpha": 1,
+          "hex": "#134E4A"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:507",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425, 0.18431372940540314, 0.18039216101169586
+          ],
+          "alpha": 1,
+          "hex": "#042F2E"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/3 消费。⚠ 与 cyan 色相仅差约 15°,同一图表内出现时必须叠加线型/标记形状等非颜色编码。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:508",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-teal-950)"
+          }
+        }
+      }
+    },
+    "fuchsia": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9921568632125854, 0.95686274766922, 1],
+          "alpha": 1,
+          "hex": "#FDF4FF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:509",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [0.9803921580314636, 0.9098039269447327, 1],
+          "alpha": 1,
+          "hex": "#FAE8FF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:510",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9607843160629272, 0.8156862854957581, 0.9960784316062927
+          ],
+          "alpha": 1,
+          "hex": "#F5D0FE"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:511",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909, 0.6705882549285889, 0.9882352948188782
+          ],
+          "alpha": 1,
+          "hex": "#F0ABFC"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:512",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9098039269447327, 0.4745098054409027, 0.9764705896377563
+          ],
+          "alpha": 1,
+          "hex": "#E879F9"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:513",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8509804010391235, 0.27450981736183167, 0.9372549057006836
+          ],
+          "alpha": 1,
+          "hex": "#D946EF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:514",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7529411911964417, 0.14901961386203766, 0.8274509906768799
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#C026D3"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:10",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-fuchsia-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7529411911964417, 0.14901961386203766, 0.8274509906768799
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#C026D3"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:11",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-fuchsia-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7529411911964417, 0.14901961386203766, 0.8274509906768799
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#C026D3"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:12",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-fuchsia-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7529411911964417, 0.14901961386203766, 0.8274509906768799
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#C026D3"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:13",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-fuchsia-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.7529411911964417, 0.14901961386203766, 0.8274509906768799
+            ],
+            "alpha": 1,
+            "hex": "#C026D3"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:515",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-fuchsia-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6352941393852234, 0.10980392247438431, 0.686274528503418
+          ],
+          "alpha": 1,
+          "hex": "#A21CAF"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:516",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5254902243614197, 0.09803921729326248, 0.5607843399047852
+          ],
+          "alpha": 1,
+          "hex": "#86198F"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:517",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.43921568989753723, 0.10196078568696976, 0.4588235318660736
+          ],
+          "alpha": 1,
+          "hex": "#701A75"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:518",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.29019609093666077, 0.01568627543747425, 0.30588236451148987
+          ],
+          "alpha": 1,
+          "hex": "#4A044E"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/4 消费。不承载状态语义。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:519",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-fuchsia-950)"
+          }
+        }
+      }
+    },
+    "lime": {
+      "50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686274528503418, 0.9960784316062927, 0.9058823585510254
+          ],
+          "alpha": 1,
+          "hex": "#F7FEE7"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:520",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-50)"
+          }
+        }
+      },
+      "100": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618, 0.9882352948188782, 0.7960784435272217
+          ],
+          "alpha": 1,
+          "hex": "#ECFCCB"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:521",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-100)"
+          }
+        }
+      },
+      "200": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8509804010391235, 0.9764705896377563, 0.615686297416687
+          ],
+          "alpha": 1,
+          "hex": "#D9F99D"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:522",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-200)"
+          }
+        }
+      },
+      "300": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7450980544090271, 0.9490196108818054, 0.3921568691730499
+          ],
+          "alpha": 1,
+          "hex": "#BEF264"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:523",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-300)"
+          }
+        }
+      },
+      "400": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6392157077789307, 0.9019607901573181, 0.2078431397676468
+          ],
+          "alpha": 1,
+          "hex": "#A3E635"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:524",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-400)"
+          }
+        }
+      },
+      "500": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5176470875740051, 0.800000011920929, 0.08627451211214066
+          ],
+          "alpha": 1,
+          "hex": "#84CC16"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:525",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-500)"
+          }
+        }
+      },
+      "600": {
+        "alpha-08": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3960784375667572, 0.6392157077789307, 0.05098039284348488
+            ],
+            "alpha": 0.0784313753247261,
+            "hex": "#65A30D"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:14",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-lime-600-alpha-08)"
+            }
+          }
+        },
+        "alpha-10": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3960784375667572, 0.6392157077789307, 0.05098039284348488
+            ],
+            "alpha": 0.10196078568696976,
+            "hex": "#65A30D"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:15",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-lime-600-alpha-10)"
+            }
+          }
+        },
+        "alpha-15": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3960784375667572, 0.6392157077789307, 0.05098039284348488
+            ],
+            "alpha": 0.14901961386203766,
+            "hex": "#65A30D"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:16",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-lime-600-alpha-15)"
+            }
+          }
+        },
+        "alpha-22": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3960784375667572, 0.6392157077789307, 0.05098039284348488
+            ],
+            "alpha": 0.21960784494876862,
+            "hex": "#65A30D"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || alpha 变体统一由本色相 600 级派生,与实色填充基准对齐。用于 hover 覆盖、focus 环、选中态、图表面积填充;数字为不透明度百分比。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:235:17",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-lime-600-alpha-22)"
+            }
+          }
+        },
+        "$root": {
+          "$type": "color",
+          "$value": {
+            "colorSpace": "srgb",
+            "components": [
+              0.3960784375667572, 0.6392157077789307, 0.05098039284348488
+            ],
+            "alpha": 1,
+            "hex": "#65A30D"
+          },
+          "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:234:526",
+            "com.figma.hiddenFromPublishing": true,
+            "com.figma.codeSyntax": {
+              "WEB": "var(--color-lime-600)"
+            }
+          }
+        }
+      },
+      "700": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3019607961177826, 0.48627451062202454, 0.05882352963089943
+          ],
+          "alpha": 1,
+          "hex": "#4D7C0F"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:527",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-700)"
+          }
+        }
+      },
+      "800": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.24705882370471954, 0.3843137323856354, 0.07058823853731155
+          ],
+          "alpha": 1,
+          "hex": "#3F6212"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:528",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-800)"
+          }
+        }
+      },
+      "900": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.21176470816135406, 0.32549020648002625, 0.0784313753247261
+          ],
+          "alpha": 1,
+          "hex": "#365314"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:529",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-900)"
+          }
+        }
+      },
+      "950": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.10196078568696976, 0.18039216101169586, 0.019607843831181526
+          ],
+          "alpha": 1,
+          "hex": "#1A2E05"
+        },
+        "$description": "分类色池 (categorical)。由 chart/categorical/5 消费。不承载状态语义 — 勿用于 success,success 请用 emerald。 || 基准级:实色填充/图标/边框/图表标记 Light 用 600、Dark 用 400;浅底文字 Light 用 700。500 是 Tailwind 的色阶中点,非界面基准 — 白底上 12 支色相仅 2 支达 4.5 对比度,勿作填充色使用。 || L1 原子层:scopes 已清空,不可直接绑定图层;仅供 L2 语义层 alias。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:234:530",
+          "com.figma.hiddenFromPublishing": true,
+          "com.figma.codeSyntax": {
+            "WEB": "var(--color-lime-950)"
+          }
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "vx-Color-Primitive"
+  }
+}

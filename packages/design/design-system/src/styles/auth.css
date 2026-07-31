@@ -11,4 +11,4 @@
  * 收敛约定见 docs/10-standards/040-design-system-package-convergence.md。
  */
 
-@import "./tokens.css";
+@import "@vxture/design-tokens/styles/tokens.css";

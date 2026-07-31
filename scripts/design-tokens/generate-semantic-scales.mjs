@@ -46,7 +46,7 @@ import {
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
-const PKG = path.join(ROOT, "packages/design/design-system");
+const PKG = path.join(ROOT, "packages/design/design-tokens");
 const EXPORT_DIR = path.join(PKG, "Figma-Token");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
 const FOUNDATION = path.join(PKG, "src/styles/foundation");
@@ -409,7 +409,7 @@ function render(rows, indent = "  ") {
 function header(file, label, source, extra = "") {
   return `/**
  * semantic/${file} - T2 语义层 · ${label}。
- * @package @vxture/design-system
+ * @package @vxture/design-tokens
  * @layer Presentation
  * @category styles
  * @author AI-Generated

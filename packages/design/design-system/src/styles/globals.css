@@ -1,5 +1,5 @@
-@import "./tailwind.css";
-@import "./tokens.css";
+@import "@vxture/design-tokens/styles/tailwind.css";
+@import "@vxture/design-tokens/styles/tokens.css";
 @import "./brand.css";
 @import "./platform.css";
 @import "./auth.css";

@@ -1,0 +1,482 @@
+{
+  "layout": {
+    "breakpoint": {
+      "xs": {
+        "$type": "number",
+        "$value": 375,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:61",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-xs)"
+          }
+        }
+      },
+      "sm": {
+        "$type": "number",
+        "$value": 640,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:62",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 768,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:63",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 1024,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:64",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 1280,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:65",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-xl)"
+          }
+        }
+      },
+      "2xl": {
+        "$type": "number",
+        "$value": 1536,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:66",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-2xl)"
+          }
+        }
+      },
+      "3xl": {
+        "$type": "number",
+        "$value": 1920,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:639:834",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-2xl)"
+          }
+        }
+      },
+      "4xl": {
+        "$type": "number",
+        "$value": 2560,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:639:837",
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-breakpoint-2xl)"
+          }
+        }
+      },
+      "5xl": {
+        "$type": "number",
+        "$value": 3840,
+        "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 响应式断点,对齐 Tailwind screens。 ⚠ 新增档位:对齐真实 4K UHD 分辨率宽度(3840px)。此前最高档 4xl=2560 只到 QHD,未覆盖 4K。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:705:22"
+        }
+      }
+    },
+    "container": {
+      "sm": {
+        "$type": "number",
+        "$value": 640,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对齐 breakpoint/sm。 本档与 layout/breakpoint/sm 一致,未改动。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:67",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 768,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对齐 breakpoint/md。 ⚠ 由 720 校正为 768,与 layout/breakpoint/md 完全一致 —— 遵循 Tailwind 默认 container 行为(同名档位 max-width = 断点值,不再额外收窄)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:68",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 1024,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对齐 breakpoint/lg。 ⚠ 由 960 校正为 1024,与 layout/breakpoint/lg 完全一致 —— 遵循 Tailwind 默认 container 行为(同名档位 max-width = 断点值)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:69",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 1280,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对齐 breakpoint/xl。 本档与 layout/breakpoint/xl 一致,未改动。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:70",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-xl)"
+          }
+        }
+      },
+      "2xl": {
+        "$type": "number",
+        "$value": 1536,
+        "$description": "布局常量。⚠ 修正对齐错误 —— 此前为 1440，与同名断点 breakpoint/2xl(1536) 不一致，违反 container=breakpoint 的对齐原则（sm/md/lg/xl/3xl 均已对齐）；现已修正为 1536。 内容容器最大宽，对齐 Tailwind screens 2xl 断点。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:71",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-2xl)"
+          }
+        }
+      },
+      "3xl": {
+        "$type": "number",
+        "$value": 1920,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对齐 breakpoint/3xl(Full HD),同时是内容容器的封顶起点。 ⚠ 由 1680 校正为 1920,与 layout/breakpoint/3xl 完全一致。⚠ 4K 兼容策略:内容容器宽度增长到此为止 —— 超过 Full HD 视口(QHD/4K)后,容器不再继续变宽,多余空间转为页面留白,避免超宽屏下单行内容拉伸到不可读。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:639:841",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-2xl)"
+          }
+        }
+      },
+      "4xl": {
+        "$type": "number",
+        "$value": 1920,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对应 breakpoint/4xl(QHD 2560 视口)下的容器封顶值。 ⚠ 刻意与 container/3xl 相同(1920,不再增长)—— QHD/4K 等超宽视口下容器主动封顶,多余宽度转为页面留白,这是内容型容器在超宽屏的行业常见做法。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:639:845",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-container-2xl)"
+          }
+        }
+      },
+      "5xl": {
+        "$type": "number",
+        "$value": 1920,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 内容容器最大宽,对应 breakpoint/5xl(4K UHD 3840 视口)下的容器封顶值。 ⚠ 新增档位,与 container/3xl、container/4xl 同为 1920(封顶)—— 4K 视口下容器同样不再增长,呼应 breakpoint/5xl 的新增,补全 4K 兼容的完整档位链。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:705:23",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      }
+    },
+    "content": {
+      "narrow-lg": {
+        "$type": "number",
+        "$value": "{layout.container.lg}",
+        "$description": "布局常量。⚠ 由裸值改为别名至 container/lg —— 此前 content/* 是独立裸值,与 container 同值但未建立引用关系(容易随 container 调整而静默产生分歧);现在是真实的活引用,container 变、content 自动跟着变。 正文栏宽,对齐 container/lg(1024),取消此前孤立的 960 裸值。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:83",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-content-default)"
+          }
+        }
+      },
+      "base-xl": {
+        "$type": "number",
+        "$value": "{layout.container.xl}",
+        "$description": "布局常量。⚠ 由裸值改为别名至 container/xl —— 此前 content/* 是独立裸值,与 container 同值但未建立引用关系(容易随 container 调整而静默产生分歧);现在是真实的活引用,container 变、content 自动跟着变。 正文栏宽,对齐 container/xl(1280),取消此前孤立的 1200 裸值(该值不落在任何断点或容器阶梯上,来源不明)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:84",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-content-wide)"
+          }
+        }
+      },
+      "wide-2xl": {
+        "$type": "number",
+        "$value": "{layout.container.2xl}",
+        "$description": "布局常量。⚠ 由裸值改为别名至 container/2xl —— 此前 content/* 是独立裸值,与 container 同值但未建立引用关系(容易随 container 调整而静默产生分歧);现在是真实的活引用,container 变、content 自动跟着变。 正文栏宽,对齐 container/2xl(1536),此前虽然数值凑巧与 breakpoint/2xl 相同,但引用的其实不是同档 container(1440),现已改为真实别名到 container/2xl。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:689:2516",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-content-wide)"
+          }
+        }
+      }
+    },
+    "field": {
+      "3xs": {
+        "$type": "number",
+        "$value": 120,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:708:92",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "2xs": {
+        "$type": "number",
+        "$value": 140,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:708:88",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "xs": {
+        "$type": "number",
+        "$value": 160,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:708:84",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "sm": {
+        "$type": "number",
+        "$value": 180,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:553:2",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 200,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:553:3",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 240,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:553:4",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 280,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:553:5",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "2xl": {
+        "$type": "number",
+        "$value": 320,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:553:6",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      },
+      "3xl": {
+        "$type": "number",
+        "$value": 360,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:708:96",
+          "com.figma.scopes": ["WIDTH_HEIGHT"]
+        }
+      }
+    },
+    "panel": {
+      "xs": {
+        "$type": "number",
+        "$value": 320,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。 右侧面板宽度。⚠ 首版将五档砍为三档,与画布实际用值(400)脱节,现恢复完整阶。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:75",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-panel-xs)"
+          }
+        }
+      },
+      "sm": {
+        "$type": "number",
+        "$value": 400,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 右侧面板宽度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:76",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-panel-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 480,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 右侧面板宽度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:77",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-panel-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 640,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 右侧面板宽度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:78",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-panel-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 800,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。 右侧面板宽度。⚠ 首版将五档砍为三档,与画布实际用值(400)脱节,现恢复完整阶。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:79",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-panel-xl)"
+          }
+        }
+      }
+    },
+    "sidebar": {
+      "expanded": {
+        "$type": "number",
+        "$value": 256,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 侧边栏宽度。expanded 由 252 校正为 256(spacing/64 对齐)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:72",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-sidebar-expanded)"
+          }
+        }
+      },
+      "collapsed": {
+        "$type": "number",
+        "$value": 64,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 侧边栏宽度。expanded 由 252 校正为 256(spacing/64 对齐)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:73",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-sidebar-collapsed)"
+          }
+        }
+      },
+      "mini": {
+        "$type": "number",
+        "$value": 48,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 侧边栏宽度。expanded 由 252 校正为 256(spacing/64 对齐)。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:74",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-sidebar-mini)"
+          }
+        }
+      }
+    },
+    "topbar": {
+      "sm": {
+        "$type": "number",
+        "$value": 48,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 顶栏高度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:80",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-topbar-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 56,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 顶栏高度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:81",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-topbar-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 64,
+        "$description": "布局常量。⚠ 刻意不别名 L1 —— 这些是视口与产品尺寸决策,单次使用,非可复用度量。收进原子层只会让长度阶膨胀。 顶栏高度。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:82",
+          "com.figma.scopes": ["WIDTH_HEIGHT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--layout-topbar-lg)"
+          }
+        }
+      }
+    },
+    "docs": {
+      "inset": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "【D · 文档 chrome】⚠ 本 token 不属于设计系统语义,也不参与代码导出(已刻意无 codeSyntax)。它只约束 Figma 文件内组件集外框的排版,使 45 个图标组件集保持一致而不散落硬编码。⚠ 刻意放在无模式轴的 vx-Layout 中 —— 图标库的文档排版不应随产品密度模式变化。⚠ 归类说明:按 A(双端有效)/ B(Figma 实现产物)/ C(仅代码可用)三分法,本类均不属于,故单列 D。 组件集外框内边距。 当前值 20px,沿用图标库原有排版。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:317:2",
+          "com.figma.scopes": ["GAP"],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e4221d101bb80c5d15d5abd63871e314d3efc4d7/-1:-1",
+            "targetVariableName": "spacing/8",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "gap": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "【D · 文档 chrome】⚠ 本 token 不属于设计系统语义,也不参与代码导出(已刻意无 codeSyntax)。它只约束 Figma 文件内组件集外框的排版,使 45 个图标组件集保持一致而不散落硬编码。⚠ 刻意放在无模式轴的 vx-Layout 中 —— 图标库的文档排版不应随产品密度模式变化。⚠ 归类说明:按 A(双端有效)/ B(Figma 实现产物)/ C(仅代码可用)三分法,本类均不属于,故单列 D。 组件集内变体之间的间距。 当前值 20px,沿用图标库原有排版。 || L2 语义层 · 无模式轴。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:317:3",
+          "com.figma.scopes": ["GAP"],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e4221d101bb80c5d15d5abd63871e314d3efc4d7/-1:-1",
+            "targetVariableName": "spacing/8",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "vx-Layout"
+  }
+}

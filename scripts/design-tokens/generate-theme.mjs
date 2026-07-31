@@ -32,7 +32,7 @@ import { EXTENSIONS, OVERRIDES } from "./foundation-policy.mjs";
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
-const PKG = path.join(ROOT, "packages/design/design-system");
+const PKG = path.join(ROOT, "packages/design/design-tokens");
 const SEMANTIC = path.join(PKG, "src/styles/semantic");
 const FOUNDATION = path.join(PKG, "src/styles/foundation");
 const TARGET = path.join(PKG, "src/styles/theme.css");
@@ -195,7 +195,7 @@ stats.push(`spacing ${spaceLines.length}`);
 
 const css = `/**
  * theme.css - Tailwind v4 @theme 注册。
- * @package @vxture/design-system
+ * @package @vxture/design-tokens
  * @layer Presentation
  * @category styles
  * @author AI-Generated

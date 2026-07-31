@@ -28,7 +28,7 @@ import { DEVIATIONS } from "./deviations.mjs";
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
-const PKG = path.join(ROOT, "packages/design/design-system");
+const PKG = path.join(ROOT, "packages/design/design-tokens");
 const EXPORT_DIR = path.join(PKG, "Figma-Token");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
 const T1_COLOR_FILES = [
@@ -182,7 +182,7 @@ function render(rows, indent = "  ") {
 
 const css = `/**
  * semantic/color-semantic.css - T2 语义层 · 色彩。
- * @package @vxture/design-system
+ * @package @vxture/design-tokens
  * @layer Presentation
  * @category styles
  * @author AI-Generated

@@ -35,6 +35,7 @@ const { compile } = await import(
 
 const PKG = path.join(ROOT, "packages/design/design-system");
 const STYLES = path.join(PKG, "src/styles");
+const TOKENS_STYLES = path.join(ROOT, "packages/design/design-tokens/src/styles");
 
 /**
  * 从 DS 的 `globals.css` 起编，而不是只编 `tokens.css`。
@@ -47,9 +48,15 @@ async function loadStylesheet(id, base) {
     const p = path.join(TW, "index.css");
     return { path: p, base: TW, content: await readFile(p, "utf8") };
   }
-  if (id.startsWith("@vxture/design-system/styles/")) {
-    const p = path.join(STYLES, id.replace("@vxture/design-system/styles/", ""));
-    return { path: p, base: path.dirname(p), content: await readFile(p, "utf8") };
+  // 样式链跨包：globals.css 引 @vxture/design-tokens/styles/*
+  for (const [prefix, dir] of [
+    ["@vxture/design-tokens/styles/", TOKENS_STYLES],
+    ["@vxture/design-system/styles/", STYLES],
+  ]) {
+    if (id.startsWith(prefix)) {
+      const p = path.join(dir, id.slice(prefix.length));
+      return { path: p, base: path.dirname(p), content: await readFile(p, "utf8") };
+    }
   }
   const p = path.isAbsolute(id)
     ? id

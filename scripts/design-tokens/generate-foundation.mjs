@@ -31,14 +31,14 @@ import {
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
-const OUT_DIR = path.join(ROOT, "packages/design/design-system/src/styles/foundation");
+const OUT_DIR = path.join(ROOT, "packages/design/design-tokens/src/styles/foundation");
 
 const notes = [];
 
 function header(title, utility) {
   return `/**
  * ${title}
- * @package @vxture/design-system
+ * @package @vxture/design-tokens
  * @layer Presentation
  * @category styles
  * @author AI-Generated

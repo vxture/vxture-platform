@@ -1,0 +1,425 @@
+{
+  "elevation": {
+    "0": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 0,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。无阴影,显式取消继承 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:16",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-0-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e2dbb549489f64804bdd6f684b4b6a603fe85237/-1:-1",
+            "targetVariableName": "spacing/0",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 0,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:17",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-0-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e2dbb549489f64804bdd6f684b4b6a603fe85237/-1:-1",
+            "targetVariableName": "spacing/0",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    },
+    "1": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。微浮:输入框聚焦、hover 卡片 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:19",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-1-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:b1551be7b5f53e4707da4c6feff0bb1d000a8910/-1:-1",
+            "targetVariableName": "spacing/px",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:20",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-1-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:799b6ef6cd514671dbd7f605102e4e1a3b5d9199/-1:-1",
+            "targetVariableName": "spacing/0-5",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    },
+    "2": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。卡片、下拉 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:22",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-2-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:799b6ef6cd514671dbd7f605102e4e1a3b5d9199/-1:-1",
+            "targetVariableName": "spacing/0-5",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:23",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-2-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:28f4939c73160ad0d4845890c57d18bc16b48754/-1:-1",
+            "targetVariableName": "spacing/1",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    },
+    "3": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。气泡、菜单 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:25",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-3-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:28f4939c73160ad0d4845890c57d18bc16b48754/-1:-1",
+            "targetVariableName": "spacing/1",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:26",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-3-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:32ac47fc61c03da390b202a25b6b150de23a5724/-1:-1",
+            "targetVariableName": "spacing/2",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    },
+    "4": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。模态、抽屉 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:28",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-4-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:32ac47fc61c03da390b202a25b6b150de23a5724/-1:-1",
+            "targetVariableName": "spacing/2",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:29",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-4-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:8f68e2d8652562595d3ea3248edac65331ff537e/-1:-1",
+            "targetVariableName": "spacing/4",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    },
+    "5": {
+      "offset-y": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 纵向偏移。全屏浮层 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:31",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-5-offset-y)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:8f68e2d8652562595d3ea3248edac65331ff537e/-1:-1",
+            "targetVariableName": "spacing/4",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      },
+      "blur": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "阴影几何。⚠ 阴影颜色不在此处 —— 颜色随主题变化,归 vx-Color 的 elevation/*/color。暗色模式下阴影几乎不可见,层级表达应主要依赖 surface/* 的明度递增与描边。 模糊半径。 ⚠ 两处修正:scope 由空值改为 EFFECT_FLOAT(此前无法在效果面板绑定);值由裸值改为别名 L1 spacing(此前是本层唯一违反「长度量须别名 L1」的一组)。 ⚠ 本系统为单层阴影,spread 恒为 0 故不设 token,在效果面板中留空即可。若将来改用双层阴影(如 Tailwind shadow-md 的第二层用 -1px spread),再补回。 || L2 语义层。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:277:32",
+          "com.figma.scopes": ["EFFECT_FLOAT"],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--elevation-5-blur)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e4221d101bb80c5d15d5abd63871e314d3efc4d7/-1:-1",
+            "targetVariableName": "spacing/8",
+            "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+            "targetVariableSetName": "vx-Spacing-Primitive"
+          }
+        }
+      }
+    }
+  },
+  "z": {
+    "base": {
+      "$type": "number",
+      "$value": 0,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 页面内容基准。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:34",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-base)"
+        }
+      }
+    },
+    "raised": {
+      "$type": "number",
+      "$value": 10,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 卡片抬升。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:35",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-raised)"
+        }
+      }
+    },
+    "dropdown": {
+      "$type": "number",
+      "$value": 100,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 下拉、自动补全。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:36",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-dropdown)"
+        }
+      }
+    },
+    "sticky": {
+      "$type": "number",
+      "$value": 200,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 吸顶表头、工具栏。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:37",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-sticky)"
+        }
+      }
+    },
+    "overlay": {
+      "$type": "number",
+      "$value": 300,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 遮罩层。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:38",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-overlay)"
+        }
+      }
+    },
+    "modal": {
+      "$type": "number",
+      "$value": 400,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 模态、抽屉。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:39",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-modal)"
+        }
+      }
+    },
+    "popover": {
+      "$type": "number",
+      "$value": 500,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 气泡、右键菜单。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:40",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-popover)"
+        }
+      }
+    },
+    "toast": {
+      "$type": "number",
+      "$value": 600,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 轻提示。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:41",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-toast)"
+        }
+      }
+    },
+    "tooltip": {
+      "$type": "number",
+      "$value": 700,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 工具提示。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:42",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-tooltip)"
+        }
+      }
+    },
+    "max": {
+      "$type": "number",
+      "$value": 9999,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 最高层,慎用。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:43",
+        "com.figma.codeSyntax": {
+          "WEB": "var(--z-max)"
+        }
+      }
+    },
+    "notification": {
+      "$type": "number",
+      "$value": 600,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 通知横幅,与 z/toast 同层级——Notification 与 Toast 均为短暂性反馈层,彼此不会发生层叠冲突。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:718:22"
+      }
+    },
+    "drawer": {
+      "$type": "number",
+      "$value": 400,
+      "$description": "【C · 仅代码可用】⚠ 本 token 在 Figma 内无任何属性可消费,是 CSS 的真相来源,不可因\"无人使用\"而删除。 层级序数。无量纲,不别名 L1。相邻档位间隔 100,预留插入空间。 抽屉,与 z/modal 同层级——Drawer 是自带遮罩的模态阻断式交互,与 Modal 属同一层叠语义类别。 ⚠ 与 elevation 配对使用:z 决定谁盖住谁(逻辑序数),elevation 决定看起来浮多高(视觉深度)。两者不一致会出现「看起来很浮却被压在下面」。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:718:23"
+      }
+    }
+  },
+  "opacity": {
+    "disabled": {
+      "$type": "number",
+      "$value": 0.44999998807907104,
+      "$description": "不透明度比率。无量纲,不别名 L1。 禁用元素整体。⚠ Figma 以 float32 存储,读回带精度尾数,须在导出管线取整。 ⚠ scope 由空值修正为 OPACITY —— 此前无法绑定到图层不透明度。 || L2 语义层。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:44",
+        "com.figma.scopes": ["OPACITY"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--opacity-disabled)"
+        }
+      }
+    },
+    "subtle": {
+      "$type": "number",
+      "$value": 0.6000000238418579,
+      "$description": "不透明度比率。无量纲,不别名 L1。 弱化但仍可读。⚠ Figma 以 float32 存储,读回带精度尾数,须在导出管线取整。 ⚠ scope 由空值修正为 OPACITY —— 此前无法绑定到图层不透明度。 || L2 语义层。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:45",
+        "com.figma.scopes": ["OPACITY"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--opacity-subtle)"
+        }
+      }
+    },
+    "muted": {
+      "$type": "number",
+      "$value": 0.75,
+      "$description": "不透明度比率。无量纲,不别名 L1。 轻度弱化。⚠ Figma 以 float32 存储,读回带精度尾数,须在导出管线取整。 ⚠ scope 由空值修正为 OPACITY —— 此前无法绑定到图层不透明度。 || L2 语义层。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:46",
+        "com.figma.scopes": ["OPACITY"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--opacity-muted)"
+        }
+      }
+    },
+    "overlay": {
+      "$type": "number",
+      "$value": 0.5,
+      "$description": "不透明度比率。无量纲,不别名 L1。 遮罩。⚠ Figma 以 float32 存储,读回带精度尾数,须在导出管线取整。 ⚠ scope 由空值修正为 OPACITY —— 此前无法绑定到图层不透明度。 || L2 语义层。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:47",
+        "com.figma.scopes": ["OPACITY"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--opacity-overlay)"
+        }
+      }
+    },
+    "full": {
+      "$type": "number",
+      "$value": 1,
+      "$description": "不透明度比率。无量纲,不别名 L1。 完全不透明,显式取消继承。⚠ Figma 以 float32 存储,读回带精度尾数,须在导出管线取整。 ⚠ scope 由空值修正为 OPACITY —— 此前无法绑定到图层不透明度。 || L2 语义层。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:48",
+        "com.figma.scopes": ["OPACITY"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--opacity-full)"
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "vx-Depth"
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "icon": {
+    "2xs": {
+      "$type": "number",
+      "$value": 10,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 10px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:86",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-2xs)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:02dbfc10e55b76eefe9b1d55a2cec78501377b5e/-1:-1",
+          "targetVariableName": "spacing/2-5",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "xs": {
+      "$type": "number",
+      "$value": 12,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 12px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:87",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-xs)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:f0b5c9d67844deae8329d0967d1980c9711b51c6/-1:-1",
+          "targetVariableName": "spacing/3",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "sm": {
+      "$type": "number",
+      "$value": 14,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 14px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:88",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-sm)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:364c066f49c767892da51538ed2a7c0a21cdf081/-1:-1",
+          "targetVariableName": "spacing/3-5",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "md": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 16px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:89",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-md)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:8f68e2d8652562595d3ea3248edac65331ff537e/-1:-1",
+          "targetVariableName": "spacing/4",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "lg": {
+      "$type": "number",
+      "$value": 20,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 20px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:90",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-lg)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:6339190141d3feb824d496a931ec5c284bff2510/-1:-1",
+          "targetVariableName": "spacing/5",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "xl": {
+      "$type": "number",
+      "$value": 24,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 24px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:91",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2179f78e134da611cf611bb3c48ca7054b9412a3/-1:-1",
+          "targetVariableName": "spacing/6",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "2xl": {
+      "$type": "number",
+      "$value": 32,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 32px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:92",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-2xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:e4221d101bb80c5d15d5abd63871e314d3efc4d7/-1:-1",
+          "targetVariableName": "spacing/8",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "3xl": {
+      "$type": "number",
+      "$value": 48,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 48px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:277:93",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-3xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:f852d58f1839a030a6263638c5eff946a2cdd9f8/-1:-1",
+          "targetVariableName": "spacing/12",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "4xl": {
+      "$type": "number",
+      "$value": 56,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 48px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:693:2233",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-3xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:85b9e2a4517c3a0374827d513b6e175a4ca2279d/-1:-1",
+          "targetVariableName": "spacing/14",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "5xl": {
+      "$type": "number",
+      "$value": 64,
+      "$description": "图形元素的渲染尺寸阶 —— 单色符号,属界面 chrome。 ⚠ 刻意不随密度缩放:图标有可读性下限,且描边按 16/20/24 网格设计,非整数缩放会使描边发虚。缩放由组件自身的 size 变体承担。 ⚠ 与 media/* 档位名对齐但取值无固定倍数关系,切勿互相推算。 本档 48px。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:693:2237",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--icon-3xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:0836bf655f5ee25efecf6d56ec348a9cf10fc321/-1:-1",
+          "targetVariableName": "spacing/16",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    }
+  },
+  "media": {
+    "xs": {
+      "$type": "number",
+      "$value": 24,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 24px —— 列表项、导航栏内联。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:3",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-xs)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2179f78e134da611cf611bb3c48ca7054b9412a3/-1:-1",
+          "targetVariableName": "spacing/6",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "sm": {
+      "$type": "number",
+      "$value": 32,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 32px —— 列表默认档。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:4",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-sm)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:e4221d101bb80c5d15d5abd63871e314d3efc4d7/-1:-1",
+          "targetVariableName": "spacing/8",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "md": {
+      "$type": "number",
+      "$value": 40,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 40px —— 卡片头部。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:5",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-md)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7276443b7c79f1c49b640b7d6959c0607297d41a/-1:-1",
+          "targetVariableName": "spacing/10",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "lg": {
+      "$type": "number",
+      "$value": 48,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 48px —— 资料摘要、登录页。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:6",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-lg)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:f852d58f1839a030a6263638c5eff946a2cdd9f8/-1:-1",
+          "targetVariableName": "spacing/12",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "xl": {
+      "$type": "number",
+      "$value": 64,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 64px —— 页面头部、启动页。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:7",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:0836bf655f5ee25efecf6d56ec348a9cf10fc321/-1:-1",
+          "targetVariableName": "spacing/16",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "2xl": {
+      "$type": "number",
+      "$value": 96,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 96px —— 空状态。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:8",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-2xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:98bf642e4efc0b0783460928bf7612cbf7b96127/-1:-1",
+          "targetVariableName": "spacing/24",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    },
+    "3xl": {
+      "$type": "number",
+      "$value": 128,
+      "$description": "内容图形尺寸阶。涵盖头像、品牌标识、缩略图 —— 代表某个实体(用户 / 租户 / 品牌)的图形,可为位图或多层矢量。 ⚠ 与 icon/* 的关系:两条阶档位名部分重叠,但**取值无固定倍数关系**,各档按自身使用场景独立定档,切勿互相推算。 ⚠ 职责区别:icon 是单色符号,属界面 chrome;media 是内容,量级更大。 ⚠ 本阶为 7 档,起点 24px —— 不设 2xs(20px):三个消费组件的尺寸并集中并无此档,首版由推理补齐对称而非实际需要,已移除。 ⚠ 本阶由原 avatar/* 与 logo/* 合并而来 —— 二者 8 档中 7 档取值相同,分离只制造重复。 本档 128px —— 个人主页 / 租户大图。 || L2 语义层 · 无模式轴。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:331:9",
+        "com.figma.scopes": ["WIDTH_HEIGHT"],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--media-3xl)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:0aa8352698975f61c2fdc8c10cc92bcc104e1725/-1:-1",
+          "targetVariableName": "spacing/32",
+          "targetVariableSetId": "VariableCollectionId:7c79f40de22de27b4e70462a79f3fd51c4d0fce3/-1:-1",
+          "targetVariableSetName": "vx-Spacing-Primitive"
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "vx-Element"
+  }
+}

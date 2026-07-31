@@ -3,7 +3,7 @@
  * @package @vxture/design-system
  */
 
-export * from "./tokens";
+export * from "@vxture/design-tokens";
 export type * from "./types";
 
 // ---------------------------------------------------------------------------
