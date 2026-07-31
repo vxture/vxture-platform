@@ -6,14 +6,22 @@
 
 ## 决策
 
-| #   | 决策                                  | 理由                                                                |
-| --- | ------------------------------------- | ------------------------------------------------------------------- |
-| D1  | Token 分层用 **T1–T4**                | 避开 `060` 中已被 `lint:design` 强制的 L0–L5 组件归属分层，两者正交 |
-| D2  | **不做删除**，纯增量                  | 已有外部消费者；删除公开入口 = major                                |
-| D3  | 分发仅 **npm Package**，不建 Registry | Registry 的 copy-in 必然漂移，违背"改一个颜色全产品生效"            |
-| D4  | **T3 公开只读，禁止覆写**             | 引用 `var(--vx-t3-*)` 允许，赋值由 guardrail 拦截                   |
-| D5  | 基座 **shadcn 惯例 + Radix + cva**    | shadcn 作源码生成器，非分发机制                                     |
-| D6  | Phase 4 试点 **Button**               | 双轨打架最严重                                                      |
+| #   | 决策                                                             | 理由                                                                                                                                 |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Token 分层用 **T1–T4**                                           | 避开 `060` 中已被 `lint:design` 强制的 L0–L5 组件归属分层，两者正交                                                                  |
+| D2  | **不做删除**，纯增量                                             | 已有外部消费者；删除公开入口 = major                                                                                                 |
+| D3  | 分发仅 **npm Package**，不建 Registry                            | Registry 的 copy-in 必然漂移，违背"改一个颜色全产品生效"                                                                             |
+| D4  | **T3 公开只读，禁止覆写**                                        | 引用 `var(--vx-t3-*)` 允许，赋值由 guardrail 拦截                                                                                    |
+| D5  | 基座 **shadcn 惯例 + Radix + cva**                               | shadcn 作源码生成器，非分发机制                                                                                                      |
+| D6  | Phase 4 试点 **Button**                                          | 双轨打架最严重                                                                                                                       |
+| D7  | T2 规范名采用 **shadcn 约定**                                    | `--background`/`--primary`/`--border`/`--radius` 等；与 Figma、shadcn 组件、preset 三方对齐，Phase 4 零桥接。`--vx-*` 全部保留为别名 |
+| D8  | **命名不带层号**                                                 | shadcn/Tailwind/Figma 三家都靠命名空间而非 `t1/t2` 前缀区分层级；T1–T4 只作文档与守卫的概念                                          |
+| D9  | 取值以 **Figma brand 为准**，preset 仅作结构参考                 | preset `--primary` 是 violet，Vxture 品牌是 #1e51ff（蓝）；套用 preset 取值会把平台刷成紫色并把 chart 语义模型降级为单色阶           |
+| D10 | 中性色**全面切到 neutral**                                       | 与 Figma、shadcn `baseColor=neutral` 对齐；现有 gray 带蓝调，色相不同，属可感知视觉变更                                              |
+| D11 | 缺口补齐顺序：**Figma 框架优先，Figma 也缺的由我参考补齐并汇报** | 枚举有上限，Figma 本身亦非全覆盖                                                                                                     |
+| D12 | **T1 必须自身完整**，不依赖既有 primitives 兜底                  | 旧资源将陆续退役删除，底层须先夯实                                                                                                   |
+
+**⚠ T1 不得使用 Tailwind v4 内置调色板**：v4 已迁 P3 广色域，饱和色与设计稿不等值（实测 red-600 `#dc2626`→`#e7000b`、emerald-600 `#059669`→`#009966`、purple-600 `#9333ea`→`#9810fa`、amber-500 `#f59e0b`→`#fe9a00`、sky-600 `#0284c7`→`#0084d1`）。中性色两者等值。shadcn 生成的 theme 用的是 v4 值，按 D9 一律以 Figma 为准。
 
 层级定义与取值约束见 `060-design-system.md` §1.1（已落地）。
 
@@ -27,6 +35,64 @@
 - T4 纪律已破：4 处 portal 文件直接引用 T1。
 - 基座为 Radix 手工样式化，`cva` 全仓零依赖零用法。
 - 组件缺口：Figma 129 vs 代码 52，其中仅约 17 个被按名消费。
+
+### T1 取值模型（Phase 1 探测结论）
+
+Figma 的原子层**就是 Tailwind 调色板本身**（`color/neutral/*`、`color/emerald/*`），语义映射发生在 L2（`intent/success/fill → color/emerald/700`，并附 WCAG 实测依据：emerald-600 配白字仅 3.77 不达标，故用 700）。
+
+代码现有"原子"绝大多数同样只是 Tailwind 调色板的别名：
+
+| 代码别名                | 实际调色板    | 备注                                |
+| ----------------------- | ------------- | ----------------------------------- |
+| `success-*`             | emerald       | 与 Figma 一致                       |
+| `warning-*` / `spark-*` | amber / amber | **重复两份**                        |
+| `danger-*` / `error-*`  | rose / red    | **两套并存**                        |
+| `info-*`                | sky           |                                     |
+| `ai-*` / `ai-cyan-*`    | purple / cyan |                                     |
+| `gray-*`                | gray          | **与 Figma/shadcn 的 neutral 分歧** |
+| `brand-*`               | 无            | **唯一真正自定义**，#1e51ff 家族    |
+
+推论：T1 只需自建 brand 一族，其余直接用 Tailwind 内置；hue→intent 的映射交给 T2，与 Figma 同构。
+
+### 需汇报的取值分歧（D11 要求）
+
+| 项                      | 现状                                           | Figma / 权威值                          | 影响                                           |
+| ----------------------- | ---------------------------------------------- | --------------------------------------- | ---------------------------------------------- |
+| 中性色                  | `gray-*`（带蓝调，#6b7280）                    | `neutral-*`（纯中性，#737373）          | 全平台文字/边框/表面可感知变化（D10 已定切换） |
+| `--vx-color-orange-400` | `#ff7a45`（**非 Tailwind**，疑 Ant Design 橙） | orange-400 `#fb923c`                    | chart categorical/2                            |
+| `--vx-color-lime-500`   | `#1aad19`（**非 Tailwind**，疑微信绿）         | lime-400 `#a3e635` / lime-600 `#65a30d` | chart categorical/5                            |
+| `danger-*`              | rose 色阶                                      | Figma 无 rose，danger 用 **red**        | 危险态色相改变                                 |
+| `spark-*`               | amber（与 warning 完全重复）                   | Figma 无 spark                          | AI 生成态视觉                                  |
+| 饱和色 950 阶           | 缺失（代码只到 900）                           | 已从 Tailwind v3 补齐                   | 暗色模式 muted 底色需要                        |
+
+T1 色相清单（承 Figma）：neutral、brand、emerald、amber、red、sky、purple、orange、teal、cyan、fuchsia、lime、base/white。**不含 rose**——Figma 未使用。
+
+### ⚠ Figma 文档自身的错误（以实测解析值为准）
+
+反查组件节点实测发现三处描述与实际绑定不符，**Phase 2 必须按实测值实现，不能照抄描述**：
+
+| 项                    | 描述所写    | 实测解析                                                                   | 佐证                                                                                |
+| --------------------- | ----------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `intent/*/muted` 阶梯 | `<hue>/100` | 全部落在 **`<hue>/50`**（#fef2f2 / #ecfdf5 / #fffbeb / #f0f9ff / #faf5ff） | `on-muted` 自己的描述写的是"muted 阶梯为 50/100/200"，与 muted token 的描述自相矛盾 |
+| `content/disabled`    | neutral/400 | **neutral-300** `#d4d4d4`                                                  | 同方向 off-by-one                                                                   |
+| `stroke/control`      | neutral/500 | **neutral-400** `#a3a3a3`                                                  | 同方向 off-by-one                                                                   |
+
+结论：muted / muted-hover / muted-active 的正确阶梯是 **50 / 100 / 200**。
+
+另注：`--foreground` 解析为 `#525252`(neutral-600)，但 `content/primary` 描述为 neutral/900 —— 二者并非同一 token，**不可用 `--foreground` 锚定 neutral/900**。
+
+### T1 取值来源与覆盖缺口
+
+96 个 token / 13 色相。标注：`[F]` Figma 实测 · `[T]` Tailwind v3 · `[C]` 沿用既有代码。
+
+- **实测确认 29 项**，且每一项都在 2–5 个独立节点上取得同一值，无冲突。
+- chromatic 色阶凡可验证者**全部精确落在 Tailwind v3 原值**上，故未实测步阶按 v3 补齐可信度高，但**未经实测**。
+- `brand/main` 是唯一例外（自定义色相，无法由调色板推导），未实测步阶沿用既有代码。
+- **orange / teal / fuchsia / lime / cyan 零实测**——Figma 无图表组件。
+
+Figma 侧无法进一步实测的三个硬阻塞：①组件库只有 `default/disabled/selected/external/visited` 变体，**无 hover/active**，而 200/300、700/800、500 阶只经由这些状态可达；②`A08 · Data Display` 无任何图表组件；③文档只有 3 个页面，**无色板页**。补齐需设计侧补 hover 变体或色板页，或改读 Dark 模式（可得 300/400/500/900/950 配对阶）。
+
+另需复核：`--surface-1` 解析为 `#dbe3ff`（蓝调），提示该次读取处于品牌主题模式而非中性默认；chromatic 值不受影响（fill 双模式同值），但 neutral surface 读数在 Phase 2 复用前需抽检。
 
 ## 阶段
 

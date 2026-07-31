@@ -54,8 +54,11 @@ const DS_TOKEN_PATHS = [
   normalize("packages/design/design-system/src/tokens"),
   normalize("packages/design/design-system/src/styles/tokens.css"),
 ];
+// 顶层 tokens*.css 是历史平铺形态；foundation/ semantic/ components/ 是
+// docs/10-standards/040-design-system-package-convergence.md §3 的目标结构，
+// T1–T4 分层落地后 token 文件迁入这些子目录，同样属 DS token 层。
 const DS_RUNTIME_TOKEN_STYLE_PATTERN =
-  /^packages\/design\/design-system\/src\/styles\/tokens(?:-[\w-]+)?\.css$/;
+  /^packages\/design\/design-system\/src\/styles\/(?:tokens(?:-[\w-]+)?\.css|(?:foundation|semantic|components)\/[\w-]+\.css)$/;
 const DS_RUNTIME_SCALE_BRIDGE_VAR_PATTERN =
   /var\(--vx-(?:scale|platform-scale|auth-scale|console-scale|component-scale)-/;
 const DS_RUNTIME_COMPONENT_METRIC_VAR_PATTERN = /var\(--vx-component-metric-/;
