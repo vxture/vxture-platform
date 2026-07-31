@@ -5,6 +5,15 @@
 
 ---
 
+## 2.1.0 — 2026-07-31
+
+### ✨ Added
+
+- **`@vxture/design-system/next`** —— 按 shadcn 惯例（cva + Radix）重写、只绑 T2 语义层的组件并行入口。首个组件为 `Button`。根入口的既有组件保持不变，消费方可按自身节奏迁移；两处同名导出属预期。
+- T1/T2/T3 三层 token 已完整落入 `src/styles/{foundation,semantic,components}`，并通过 `styles/tokens.css` 聚合。本版本尚无组件消费新层，**无视觉变更**。
+
+---
+
 ## 2.0.0 — 2026-06-29
 
 外壳样式体系统一 + 旧 console 外壳包下线。**包含一处破坏性变更（删除 `styles/console.css` 入口）**，故升 major。当前外部消费者（多个业务智能体）均在早期开发阶段，影响有限——请按下方迁移建议一次性切齐，避免遗留技术债。

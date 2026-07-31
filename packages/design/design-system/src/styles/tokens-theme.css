@@ -9,6 +9,7 @@
 
 @import "./tokens-theme-colors-brand-ai.css";
 @import "./tokens-theme-colors-status.css";
+@import "./tokens-theme-shadcn.css";
 
 @theme {
   --color-vx-background: var(--vx-color-background);

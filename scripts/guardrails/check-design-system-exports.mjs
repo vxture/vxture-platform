@@ -34,8 +34,16 @@ const SNAPSHOT_PATH = path.join(
   "scripts/guardrails/design-system-exports.snapshot.json",
 );
 
-/** 需要枚举具名导出的 JS 入口（CSS 子路径无运行时导出）。 */
-const RUNTIME_ENTRIES = [".", "./tokens", "./types", "./server"];
+/**
+ * 需要枚举具名导出的 JS 入口，由 exports map 动态推导——凡目标是 .mjs/.cjs 的
+ * 子路径都算（CSS 子路径无运行时导出）。写死清单会让新增入口的具名导出脱管。
+ */
+function runtimeEntries(exportsMap) {
+  return Object.keys(exportsMap ?? {}).filter((subpath) => {
+    const target = resolveRuntimeFile(exportsMap, subpath);
+    return typeof target === "string" && /\.(mjs|cjs)$/.test(target);
+  });
+}
 
 const problems = [];
 
@@ -89,7 +97,7 @@ async function collectRuntimeSurface(pkg) {
   const exportsMap = pkg.exports ?? {};
   const surface = {};
 
-  for (const subpath of RUNTIME_ENTRIES) {
+  for (const subpath of runtimeEntries(exportsMap)) {
     const relative = resolveRuntimeFile(exportsMap, subpath);
     if (!relative) continue;
 

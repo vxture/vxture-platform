@@ -21,7 +21,7 @@ const useClientPlugin = {
 
     for (const file of writtenFiles) {
       const normalized = file.name.replaceAll("\\", "/");
-      if (/\/index\.(mjs|cjs)$/.test(normalized)) {
+      if (/\/(index|next)\.(mjs|cjs)$/.test(normalized)) {
         const content = readFileSync(file.name, "utf8");
         if (!content.startsWith('"use client"')) {
           writeFileSync(file.name, `"use client";\n${content}`);
@@ -37,6 +37,7 @@ export default defineConfig({
     tokens: "src/tokens-entry.ts",
     types: "src/types-entry.ts",
     server: "src/server.ts",
+    next: "src/next.ts",
   },
   format: ["esm", "cjs"],
   outExtension({ format }) {

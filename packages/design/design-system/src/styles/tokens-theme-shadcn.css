@@ -1,0 +1,55 @@
+/**
+ * tokens-theme-shadcn.css - T2 语义色 → Tailwind 工具类桥接。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * 把 T2 的 shadcn 约定名注册进 Tailwind theme，得到 bg-primary /
+ * text-foreground / border-border 等标准工具类，供 cva 组件消费。
+ *
+ * ⚠ 只桥接**颜色**。
+ *   Tailwind 无 primary / background / card 等同名内置色，注册不产生冲突。
+ *   但 spacing 与 radius 有内置刻度且取值不同——T2 的 --radius-md 是 8px，
+ *   Tailwind 内置 rounded-md 是 6px——桥接会改掉仓库中所有既有 rounded-md /
+ *   h-9 等工具类的观感。故尺寸类 token 一律在组件内直接引用 CSS 变量
+ *   （h-(--control-height-md) / rounded-(--radius-md)），不进 @theme。
+ *
+ * `inline` 关键字使工具类展开为对原变量的引用而非快照，
+ * 因此 .dark 与密度/字号模式切换能自动跟随。
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-muted: var(--primary-muted);
+  --color-primary-border: var(--primary-border);
+  --color-primary-text: var(--primary-text);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-active: var(--destructive-active);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-ai: var(--ai);
+  --color-ai-foreground: var(--ai-foreground);
+}
