@@ -51,6 +51,14 @@ const EXPECTED = [
   ["text-heading-1", "排版角色"],
   ["font-brand", "字体族"],
   ["font-mono", "字体族"],
+  // 以下各族曾整族哑火（无对应 theme 命名空间 / 漏注册 / 只有几何分量），
+  // 逐族留一个样例守住。
+  ["duration-fast", "自定义工具类"],
+  ["opacity-disabled", "自定义工具类"],
+  ["border-thin", "自定义工具类"],
+  ["z-modal", "自定义工具类"],
+  ["shadow-1", "合成阴影"],
+  ["max-w-page-lg", "内容宽度"],
 ];
 
 /** 排版角色须一次落齐四个属性，只出 font-size 等于注册没生效。 */
@@ -76,9 +84,23 @@ const entry = [
 ].join("\n");
 
 const compiled = await compile(entry, { base: ROOT, loadStylesheet });
-const out = compiled.build(EXPECTED.map(([u]) => u));
 
-const missing = EXPECTED.filter(([u]) => !out.includes(u.replace(":", "\\:")));
+/**
+ * 判定工具类是否真的产出。
+ *
+ * ⚠ 不能用 `out.includes("duration-fast")`：`:root` 里的 `--duration-fast:` 声明
+ *   含同样的子串，未生成工具类也会判过。`duration-fast` 就是这么假绿了一轮的
+ *   ——`--duration-*` 根本不是 v4 命名空间，工具类从未产出。
+ *   故必须在 `@layer utilities` 内匹配**类选择器**。
+ */
+function generated(util) {
+  const out = compiled.build([util]);
+  const i = out.indexOf("@layer utilities {");
+  if (i < 0) return false;
+  return out.slice(i).includes(`.${util.replace(/:/g, "\\:")} {`);
+}
+
+const missing = EXPECTED.filter(([u]) => !generated(u));
 
 if (missing.length > 0) {
   console.error("工具类未生成——T2 注册有缺口：\n");
@@ -89,7 +111,8 @@ if (missing.length > 0) {
 
 // `--text-*` 的修饰子键写错时工具类仍会生成，只是少落几个属性——
 // 只断言类名存在会漏掉这种半哑火，故单独校验属性齐备。
-const roleCss = compiled.build(["text-body-md"]);
+const roleOut = compiled.build(["text-body-md"]);
+const roleCss = roleOut.slice(roleOut.indexOf("@layer utilities {"));
 const lacking = TEXT_ROLE_PROPS.filter((p) => !roleCss.includes(`${p}:`));
 if (lacking.length > 0) {
   console.error(`text-body-md 只落了部分属性，缺：${lacking.join(" / ")}`);

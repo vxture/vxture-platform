@@ -258,14 +258,17 @@ const quoteFamily = (v) => (/\s/.test(v) ? `"${v}"` : v);
 
 /**
  * 排版原子按 Tailwind 命名空间拆成独立文件，与 T2 的分文件规则一致：
- * 一个命名空间对应一族工具类。行高与字距沿用排版通用术语 leading / tracking
- * （亦即 Tailwind 的 --leading-* / --tracking-*），不再挂 font- 前缀。
+ * 一个命名空间对应一族工具类。
+ *
+ * 文件名即命名空间名——`font-*` / `text-*` / `weight-*` / `leading-*` /
+ * `tracking-*`，与 Tailwind 的 theme 命名空间逐一对应。不用 `font-family` /
+ * `font-size` 这类 CSS 属性名：属性名与命名空间并非一一对应（字号落在
+ * `--text-*` 而非 `--font-size-*`），按属性命名会让人找错文件。
  */
 const TYPE_GROUPS = [
-  ["family", "字族", quoteFamily, "font-family-primitive.css", "font-family", "font-*"],
-  ["stack", "完整字体栈（含 CJK 与系统回退）", (v) => v, "font-family-primitive.css", "font-stack", "font-*"],
-  ["size", "字号", (v) => `${v}px`, "font-size-primitive.css", "font-size", "text-*"],
-  ["weight", "字重", (v) => String(v), "font-weight-primitive.css", "font-weight", "font-*"],
+  ["family", "字族", quoteFamily, "font-primitive.css", "font-family", "font-*"],
+  ["stack", "完整字体栈（含 CJK 与系统回退）", (v) => v, "font-primitive.css", "font-stack", "font-*"],
+  ["weight", "字重", (v) => String(v), "weight-primitive.css", "font-weight", "font-*"],
   ["lineHeight", "行高。导出为百分比×100，此处转为无单位倍数", (v) => String(trim(v / 100)), "leading-primitive.css", "leading", "leading-*"],
   // 字距用 em 而非 px：本系统有三档字号模式，px 字距不随字号缩放，大字号下会
   // 显得偏紧；em 自动跟随。设计稿只能存绝对值（Figma 字距字段限制），但按 16px
@@ -275,6 +278,61 @@ const TYPE_GROUPS = [
 ];
 
 const addedPaths = [];
+
+/**
+ * 字号阶梯 —— **由 DS 认定，不取自设计稿**。
+ *
+ * 设计稿导出的是 Figma 的 12 档 px 值；DS 判定字号直接采用 Tailwind 的标准刻度：
+ * - 用 rem 而非 px：能跟随用户浏览器字号设置，px 会把无障碍设置直接锁死；
+ * - 档名与取值与 Tailwind 逐档一致，消除"同名不同值"的跨团队歧义。
+ *
+ * `3xs` / `2xs` 是 DS 扩展（Tailwind 最小档为 `xs`=12px），供密集表格与角标使用。
+ *
+ * 变量名为 `--vx-text-*` 而非裸 `--text-*`：后者是 Tailwind 的 theme 命名空间，
+ * 在 `:root` 裸声明会覆盖内置字号刻度，并让产品绕开 T2 的 24 档角色直接用 T1。
+ */
+const FONT_SIZE_LADDER = [
+  ["扩展档（Tailwind 无，供密集表格与角标）", [
+    ["3xs", "0.5rem", 8],
+    ["2xs", "0.625rem", 10],
+  ]],
+  ["Tailwind 标准档", [
+    ["xs", "0.75rem", 12],
+    ["sm", "0.875rem", 14],
+    ["base", "1rem", 16],
+    ["lg", "1.125rem", 18],
+    ["xl", "1.25rem", 20],
+    ["2xl", "1.5rem", 24],
+    ["3xl", "1.875rem", 30],
+    ["4xl", "2.25rem", 36],
+    ["5xl", "3rem", 48],
+    ["6xl", "3.75rem", 60],
+    ["7xl", "4.5rem", 72],
+    ["8xl", "6rem", 96],
+    ["9xl", "8rem", 128],
+  ]],
+];
+
+function buildFontSizes() {
+  const blocks = [];
+  let count = 0;
+  // 声明宽度取全表最长，使两个分组的 px 注释对齐在同一列。
+  const pad =
+    Math.max(
+      ...FONT_SIZE_LADDER.flatMap(([, steps]) =>
+        steps.map(([step, rem]) => `--vx-text-${step}: ${rem};`.length),
+      ),
+    ) + 1;
+  for (const [note, steps] of FONT_SIZE_LADDER) {
+    const rows = steps.map(
+      ([step, rem, px]) =>
+        `  ${`--vx-text-${step}: ${rem};`.padEnd(pad)}/* ${px}px */`,
+    );
+    blocks.push(`  /* ${note}。 */\n${rows.join("\n")}`);
+    count += steps.length;
+  }
+  return { blocks, count };
+}
 
 function buildTypography() {
   const all = flatten(loadCollection("vx-Typography-Primitive")).filter(([p]) =>
@@ -306,8 +364,16 @@ function buildTypography() {
     entry.count += rows.length;
   }
 
+  // 字号不走设计稿，由 DS 认定的 Tailwind 刻度直接产出。
+  const sizes = buildFontSizes();
+  files.set("text-primitive.css", {
+    family: "text-*",
+    blocks: sizes.blocks,
+    count: sizes.count,
+  });
+
   // 排版原子归入 foundation/typography/ 子目录——排版是一个大类，
-  // 内部再分 font-family / font-size / font-weight / leading / tracking 五个命名空间。
+  // 内部再分 font / text / weight / leading / tracking 五个命名空间。
   const outputs = [...files].map(([file, entry]) => [
     `typography/${file}`,
     header(`foundation/typography/${file} - T1 原子层 · 排版（工具类族 ${entry.family}）。`) +

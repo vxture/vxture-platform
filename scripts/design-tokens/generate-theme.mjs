@@ -30,6 +30,7 @@ const CHECK = process.argv.includes("--check");
 const PKG = path.join(ROOT, "packages/design/design-system");
 const SEMANTIC = path.join(PKG, "src/styles/semantic");
 const TARGET = path.join(PKG, "src/styles/theme.css");
+const UTIL_TARGET = path.join(PKG, "src/styles/utilities.css");
 
 /**
  * T2 文件 → Tailwind theme 命名空间。
@@ -51,6 +52,44 @@ const NAMESPACES = [
   { file: "spacing-semantic.css", ns: "--spacing-", note: "p-* / gap-* / h-* / w-* / m-*", strip: /^--space-/ },
   { file: "size-semantic.css", ns: "--spacing-", note: "size-*（图标与媒体）" },
   { file: "breakpoint-semantic.css", ns: "--breakpoint-", note: "sm: / md: / …", strip: /^--layout-breakpoint-/ },
+  // 内容宽度刻度进 `--container-*`，产出 max-w-page-* / max-w-content-*。
+  // layout-semantic 里还有 field / panel / sidebar / topbar，那些是组件尺寸不是
+  // 容器刻度，不注册。
+  {
+    file: "layout-semantic.css",
+    ns: "--container-",
+    note: "max-w-page-* / max-w-content-*",
+    only: /^--layout-(page|content)-/,
+    strip: /^--layout-/,
+  },
+];
+
+/**
+ * 无对应 theme 命名空间的族 → v4 的 `@utility` 自定义工具类。
+ *
+ * v4 的 theme 命名空间是**固定的一套**（color / font / text / tracking / leading /
+ * breakpoint / container / spacing / radius / shadow / ease / animate / …）。
+ * 下面四族不在其中：`--duration-*`、`--opacity-*`、`--border-width-*`、`--z-*`
+ * 写进 `@theme` 只会变成普通变量，**不产出任何工具类且不报错**。
+ *
+ * 这正是 `duration-fast` 哑火一轮而检查器判过的原因。凡不在命名空间内的族，
+ * 一律走 `@utility` 显式声明。
+ */
+const UTILITY_FAMILIES = [
+  {
+    file: "duration-semantic.css",
+    util: "duration",
+    prop: "transition-duration",
+    strip: /^--duration-/,
+  },
+  { file: "opacity-semantic.css", util: "opacity", prop: "opacity", strip: /^--opacity-/ },
+  {
+    file: "border-semantic.css",
+    util: "border",
+    prop: "border-width",
+    strip: /^--border-width-/,
+  },
+  { file: "z-index-semantic.css", util: "z", prop: "z-index", strip: /^--z-/ },
 ];
 
 /**
@@ -98,7 +137,9 @@ const stats = [];
 
 for (const entry of NAMESPACES) {
   if (!entry.ns) continue;
-  const vars = declaredVars(entry.file);
+  const vars = declaredVars(entry.file).filter(
+    (name) => !entry.only || entry.only.test(name),
+  );
   const lines = vars.map((name) => {
     const step = entry.strip ? name.replace(entry.strip, "") : name.slice(2);
     return `  ${entry.ns}${step}: var(${name});`;
@@ -131,6 +172,32 @@ for (const role of roles) {
 blocks.push(`  /* text-*（24 档角色，含行高 / 字距 / 字重修饰） */\n${textLines.join("\n")}`);
 stats.push(`text ${roles.length} 档`);
 
+/**
+ * 阴影：T2 只有**几何分量**（offset-y / blur 在 shadow-semantic，color 在
+ * color-semantic），没有可直接使用的 box-shadow 值，故 `shadow-*` 工具类此前
+ * 一个都产不出。此处合成后注册。
+ *
+ * 颜色来自 color-semantic，天然带暗色变体；`inline` 保留 var() 引用，
+ * 故暗色下阴影自动跟随，无需第二套注册。
+ *
+ * elevation-0 无颜色档（设计上即"无阴影"），映射为 `none`。
+ */
+const elevationSteps = [
+  ...new Set(
+    declaredVars("shadow-semantic.css")
+      .map((n) => /^--elevation-(\d+)-/.exec(n)?.[1])
+      .filter(Boolean),
+  ),
+];
+const colorVars = new Set(declaredVars("color-semantic.css"));
+const shadowLines = elevationSteps.map((n) =>
+  colorVars.has(`--elevation-${n}-color`)
+    ? `  --shadow-${n}: 0 var(--elevation-${n}-offset-y) var(--elevation-${n}-blur) var(--elevation-${n}-color);`
+    : `  --shadow-${n}: none;`,
+);
+blocks.push(`  /* shadow-*（由几何分量与颜色合成） */\n${shadowLines.join("\n")}`);
+stats.push(`shadow ${shadowLines.length}`);
+
 const css = `/**
  * theme.css - T2 → Tailwind v4 @theme 注册。
  * @package @vxture/design-system
@@ -154,6 +221,39 @@ ${blocks.join("\n\n")}
 }
 `;
 
+/* ── 自定义工具类（无对应 theme 命名空间的族）───────────────────────────── */
+
+const utilBlocks = [];
+for (const entry of UTILITY_FAMILIES) {
+  const rules = declaredVars(entry.file)
+    .filter((name) => entry.strip.test(name))
+    .map((name) => {
+      const step = name.replace(entry.strip, "");
+      return `@utility ${entry.util}-${step} {\n  ${entry.prop}: var(${name});\n}`;
+    });
+  if (rules.length === 0) continue;
+  utilBlocks.push(`/* ${entry.util}-* → ${entry.prop} */\n${rules.join("\n\n")}`);
+  stats.push(`${entry.util} ${rules.length}`);
+}
+
+const utilCss = `/**
+ * utilities.css - T2 → Tailwind v4 自定义工具类。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-theme.mjs
+ *
+ * v4 的 theme 命名空间是固定的一套，下列各族不在其中——写进 \`@theme\` 只会
+ * 得到普通变量，工具类不产出且无任何报错。故用 \`@utility\` 显式声明。
+ */
+
+${utilBlocks.join("\n\n")}
+`;
+
 if (CHECK) {
   let current = "";
   try {
@@ -161,12 +261,19 @@ if (CHECK) {
   } catch {
     /* 缺文件即视为不同步 */
   }
-  if (current !== css) {
+  let currentUtil = "";
+  try {
+    currentUtil = readFileSync(UTIL_TARGET, "utf8");
+  } catch {
+    /* 缺文件即视为不同步 */
+  }
+  if (current !== css || currentUtil !== utilCss) {
     console.error("@theme 注册与 T2 不同步。运行：node scripts/design-tokens/generate-theme.mjs");
     process.exit(1);
   }
   console.log(`@theme 注册一致（${stats.join(" · ")}）`);
 } else {
   writeFileSync(TARGET, css, "utf8");
+  writeFileSync(UTIL_TARGET, utilCss, "utf8");
   console.log(`已生成 @theme 注册：${stats.join(" · ")}`);
 }

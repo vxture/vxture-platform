@@ -196,6 +196,20 @@
   --breakpoint-4xl: var(--layout-breakpoint-4xl);
   --breakpoint-5xl: var(--layout-breakpoint-5xl);
 
+  /* max-w-page-* / max-w-content-* */
+  --container-page-sm: var(--layout-page-sm);
+  --container-page-md: var(--layout-page-md);
+  --container-page-lg: var(--layout-page-lg);
+  --container-page-xl: var(--layout-page-xl);
+  --container-page-2xl: var(--layout-page-2xl);
+  --container-page-3xl: var(--layout-page-3xl);
+  --container-page-4xl: var(--layout-page-4xl);
+  --container-page-5xl: var(--layout-page-5xl);
+  --container-content-narrow-lg: var(--layout-content-narrow-lg);
+  --container-content-base-xl: var(--layout-content-base-xl);
+  --container-content-wide-2xl: var(--layout-content-wide-2xl);
+  --container-content-ultra-3xl: var(--layout-content-ultra-3xl);
+
   /* font-sans / font-brand / font-cjk / font-mono */
   --font-sans: var(--vx-font-stack-sans);
   --font-brand: var(--vx-font-stack-brand);
@@ -299,4 +313,12 @@
   --text-overline--line-height: var(--overline-line-height);
   --text-overline--letter-spacing: var(--overline-letter-spacing);
   --text-overline--font-weight: var(--overline-font-weight);
+
+  /* shadow-*（由几何分量与颜色合成） */
+  --shadow-0: none;
+  --shadow-1: 0 var(--elevation-1-offset-y) var(--elevation-1-blur) var(--elevation-1-color);
+  --shadow-2: 0 var(--elevation-2-offset-y) var(--elevation-2-blur) var(--elevation-2-color);
+  --shadow-3: 0 var(--elevation-3-offset-y) var(--elevation-3-blur) var(--elevation-3-color);
+  --shadow-4: 0 var(--elevation-4-offset-y) var(--elevation-4-blur) var(--elevation-4-color);
+  --shadow-5: 0 var(--elevation-5-offset-y) var(--elevation-5-blur) var(--elevation-5-color);
 }

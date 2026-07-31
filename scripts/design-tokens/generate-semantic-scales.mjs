@@ -53,6 +53,8 @@ const PATH_RENAMES = [
   [/^motion\/duration\//, "--duration-"],
   [/^motion\/easing\//, "--ease-"],
   [/^layout\/container\//, "--layout-page-"],
+  // 字号 T1 已改名对齐 Tailwind 命名空间：`font/size/xs` → `--vx-text-xs`。
+  [/^font\/size\//, "--vx-text-"],
 ];
 
 function renamedVar(tokenPath) {
@@ -212,8 +214,11 @@ function primitiveVar(target) {
   }
   if (target.startsWith("font/")) {
     const [, group, name] = target.split("/");
-    // 排版原子已按命名空间拆分并改用通用术语：lineHeight→leading、letterSpacing→tracking。
-    const prefix = { lineHeight: "leading", letterSpacing: "tracking" }[group] ?? `font-${kebab(group)}`;
+    // 排版原子按 Tailwind theme 命名空间命名，而非 CSS 属性名：
+    // lineHeight→leading、letterSpacing→tracking、size→text、family/stack→font。
+    const prefix =
+      { lineHeight: "leading", letterSpacing: "tracking", size: "text" }[group] ??
+      `font-${kebab(group)}`;
     return `--vx-${prefix}-${name}`;
   }
   return null;
@@ -406,13 +411,15 @@ function toLineHeightRatio(rows) {
   const sizeOf = new Map();
   for (const [, value, tokenPath] of rows) {
     if (!tokenPath.endsWith("/fontSize")) continue;
-    const m = /var\(--vx-font-size-([\w-]+)\)/.exec(value);
+    const m = /var\(--vx-text-([\w-]+)\)/.exec(value);
     if (m) sizeOf.set(tokenPath.replace(/\/fontSize$/, ""), m[1]);
   }
+  // T1 字号已改 rem（跟随浏览器字号设置）；此处换算回 px 以求行高比例，
+  // 基准 16px 即 rem 的定义值。
   const px = {};
-  for (const m of readFileSync(path.join(FOUNDATION, "typography/font-size-primitive.css"), "utf8")
-    .matchAll(/--vx-font-size-([\w-]+):\s*(\d+)px/g)) {
-    px[m[1]] = Number(m[2]);
+  for (const m of readFileSync(path.join(FOUNDATION, "typography/text-primitive.css"), "utf8")
+    .matchAll(/--vx-text-([\w-]+):\s*([\d.]+)rem/g)) {
+    px[m[1]] = Number(m[2]) * 16;
   }
 
   return rows.map((row) => {

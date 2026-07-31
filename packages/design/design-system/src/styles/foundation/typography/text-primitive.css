@@ -1,0 +1,36 @@
+/**
+ * foundation/typography/text-primitive.css - T1 原子层 · 排版（工具类族 text-*）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-primitives.mjs
+ *   源：Figma-Token/（过程文件，迁移完成后删除；届时本文件转为手工维护的真值源）
+ *
+ * T1 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* 扩展档（Tailwind 无，供密集表格与角标）。 */
+  --vx-text-3xs: 0.5rem;   /* 8px */
+  --vx-text-2xs: 0.625rem; /* 10px */
+
+  /* Tailwind 标准档。 */
+  --vx-text-xs: 0.75rem;   /* 12px */
+  --vx-text-sm: 0.875rem;  /* 14px */
+  --vx-text-base: 1rem;    /* 16px */
+  --vx-text-lg: 1.125rem;  /* 18px */
+  --vx-text-xl: 1.25rem;   /* 20px */
+  --vx-text-2xl: 1.5rem;   /* 24px */
+  --vx-text-3xl: 1.875rem; /* 30px */
+  --vx-text-4xl: 2.25rem;  /* 36px */
+  --vx-text-5xl: 3rem;     /* 48px */
+  --vx-text-6xl: 3.75rem;  /* 60px */
+  --vx-text-7xl: 4.5rem;   /* 72px */
+  --vx-text-8xl: 6rem;     /* 96px */
+  --vx-text-9xl: 8rem;     /* 128px */
+}

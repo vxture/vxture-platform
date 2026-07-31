@@ -19,9 +19,9 @@
 @import "./foundation/radius-primitive.css";
 @import "./foundation/shadow-primitive.css";
 @import "./foundation/spacing-primitive.css";
-@import "./foundation/typography/font-family-primitive.css";
-@import "./foundation/typography/font-size-primitive.css";
-@import "./foundation/typography/font-weight-primitive.css";
+@import "./foundation/typography/font-primitive.css";
+@import "./foundation/typography/text-primitive.css";
+@import "./foundation/typography/weight-primitive.css";
 @import "./foundation/typography/leading-primitive.css";
 @import "./foundation/typography/tracking-primitive.css";
 @import "./semantic/border-semantic.css";
@@ -39,3 +39,4 @@
 @import "./semantic/z-index-semantic.css";
 @import "./components/index.css";
 @import "./theme.css";
+@import "./utilities.css";
