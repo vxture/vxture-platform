@@ -5,9 +5,9 @@ import {
   type Locale,
   type Theme,
 } from "@vxture/shared";
-import { Icon } from "../../icons";
-import type { IconName } from "../../icons";
-import { cn } from "../../utils";
+import { Icon } from "@vxture/design-ui";
+import type { IconName } from "@vxture/design-ui";
+import { cn } from "@vxture/design-ui";
 import {
   Avatar,
   AvatarFallback,
@@ -16,9 +16,9 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../ui";
-import { useFullscreen } from "../layout/fullscreen";
-import type { FullscreenMode } from "../../types";
+} from "@vxture/design-ui";
+import { useFullscreen } from "@vxture/design-ui";
+import type { FullscreenMode } from "@vxture/design-ui";
 import type { Density } from "../../density";
 
 export type ShellFontSizePreference = "small" | "default" | "large";

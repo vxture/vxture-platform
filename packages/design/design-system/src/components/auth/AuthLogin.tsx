@@ -16,7 +16,7 @@ import {
   type LocaleSelectOption,
   type ShellLegalFooterLink,
 } from "../shell";
-import { Button } from "../ui/Button";
+import { Button } from "@vxture/design-ui";
 
 export type AuthLoginScreen = "login" | "phone" | "forgot";
 export type AuthLoginTab = Exclude<AuthLoginScreen, "forgot">;

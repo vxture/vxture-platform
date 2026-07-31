@@ -57,6 +57,17 @@ const IGNORED_PARTS = new Set([
 ]);
 
 const DS_ROOT = normalize("packages/design/design-system");
+/**
+ * 设计三包。凡"这是 DS 自己的代码，不受应用层规则约束"的判断都要认全三个，
+ * 否则拆包之后 design-ui / design-tokens 会被当成业务代码误报。
+ */
+const DS_PACKAGE_ROOTS = [
+  DS_ROOT,
+  normalize("packages/design/design-ui"),
+  normalize("packages/design/design-tokens"),
+];
+const isDsPackage = (file) =>
+  DS_PACKAGE_ROOTS.some((root) => normalize(file).startsWith(`${root}/`));
 const DS_TOKEN_PATHS = [
   normalize("packages/design/design-system/src/tokens"),
   normalize("packages/design/design-tokens/src/styles/tokens.css"),
@@ -1087,7 +1098,7 @@ const rules = [
     description: "颜色、字号、圆角等 token 文件只能存在于 DS token 包。",
     checkFile(file) {
       const normalized = normalize(file);
-      if (normalized.startsWith(`${DS_ROOT}/`)) return [];
+      if (isDsPackage(file)) return [];
       if (
         /\/tokens\/(colors|typography|radius|spacing|shadow)\.(ts|tsx|js|mjs|css)$/.test(
           normalized,

@@ -35,6 +35,11 @@ const { compile } = await import(
 
 const PKG = path.join(ROOT, "packages/design/design-system");
 const STYLES = path.join(PKG, "src/styles");
+/** 组件分居两包：无状态的在 design-ui，需要运行时接线的两个留在伞包。 */
+const COMPONENT_ROOTS = [
+  path.join(ROOT, "packages/design/design-ui/src/components"),
+  path.join(PKG, "src/components"),
+];
 const TOKENS_STYLES = path.join(ROOT, "packages/design/design-tokens/src/styles");
 
 /**
@@ -162,9 +167,23 @@ const PENDING = new Set([
   "PromptInput.tsx", "TokenCounter.tsx",
 ]);
 
-const files = (await walk(path.join(PKG, "src/components"))).filter(
-  (f) => !PENDING.has(path.basename(f)),
-);
+const discovered = [];
+for (const root of COMPONENT_ROOTS) discovered.push(...(await walk(root)));
+const files = discovered.filter((f) => !PENDING.has(path.basename(f)));
+
+/**
+ * 一个都没扫到就是错，不是"通过"。
+ *
+ * 拆包时组件从 design-system 迁到 design-ui，本检查还指着旧路径，于是安静地
+ * 报出"0 个组件 / 全部生成"——空集永远全绿。零结果必须当失败。
+ */
+if (files.length === 0) {
+  console.error(
+    "没有扫到任何组件——组件目录可能移动过而本清单没跟上。\n" +
+      `已查：${COMPONENT_ROOTS.map((r) => path.relative(ROOT, r)).join(", ")}`,
+  );
+  process.exit(1);
+}
 
 const dead = [];
 let scanned = 0;

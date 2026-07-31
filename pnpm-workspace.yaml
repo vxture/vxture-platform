@@ -10,5 +10,6 @@ packages:
   - 'packages/ai/model-runtime-client'
   - 'packages/platform/*'
   - 'packages/design/design-tokens'
+  - 'packages/design/design-ui'
   - 'packages/design/design-system'
   - 'tools/*'
