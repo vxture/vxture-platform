@@ -1,5 +1,5 @@
 /**
- * semantic/radius-primitive.css - T2 语义层 · 圆角（T1 原子刻度）。
+ * foundation/radius-primitive.css - T1 原子层 · 圆角。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -7,20 +7,21 @@
  * @date 2026-07-31
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
- *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
- *   源：Figma-Token/vx-Shape/（过程文件，迁移完成后删除）
+ *   生成：node scripts/design-tokens/generate-foundation.mjs
  *
- * T2 定义见 docs/10-standards/060-design-system.md §1.1。
- * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ * T1 是 Tailwind v4 theme 的镜像，取值与之逐项一致；偏离登记在
+ * scripts/design-tokens/foundation-policy.mjs。工具类族：rounded-*
  */
 
 :root {
-  --vx-radius-none: 0px;
-  --vx-radius-xs: 2px;
-  --vx-radius-sm: 4px;
-  --vx-radius-md: 6px;
-  --vx-radius-lg: 8px;
-  --vx-radius-xl: 12px;
-  --vx-radius-2xl: 16px;
-  --vx-radius-full: 9999px;
+  /* 圆角。 */
+  --vx-radius-xs: 0.125rem;
+  --vx-radius-sm: 0.25rem;
+  --vx-radius-md: 0.375rem;
+  --vx-radius-lg: 0.5rem;
+  --vx-radius-xl: 0.75rem;
+  --vx-radius-2xl: 1rem;
+  --vx-radius-3xl: 1.5rem;
+  --vx-radius-4xl: 2rem;
+  --vx-radius: 0.25rem;
 }

@@ -1,5 +1,5 @@
 /**
- * foundation/color-primitive.css - T1 原子层 · 色彩。
+ * foundation/color-primitive.css - T1 原子层 · 色板。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -7,231 +7,80 @@
  * @date 2026-07-31
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
- *   生成：node scripts/design-tokens/generate-primitives.mjs
- *   源：Figma-Token/（过程文件，迁移完成后删除；届时本文件转为手工维护的真值源）
+ *   生成：node scripts/design-tokens/generate-foundation.mjs
  *
- * T1 定义见 docs/10-standards/060-design-system.md §1.1。
- * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
- *
- * ⚠ 不得改用 Tailwind v4 内置 --color-<hue>-<step>：v4 调色板已迁 P3 广色域，
- *   饱和色与设计稿不等值（red-600 #dc2626 vs v4 #e7000b 等）。中性色两者等值。
- *
- * 色相清单不含 rose——设计稿未使用。
+ * T1 是 Tailwind v4 theme 的镜像，取值与之逐项一致；偏离登记在
+ * scripts/design-tokens/foundation-policy.mjs。工具类族：bg-* / text-* / border-*
  */
 
 :root {
-  /* 黑白基点。 */
-  --vx-color-base-white: #ffffff;
-  --vx-color-base-black: #000000;
-
-  /* 中性阶。取代既有 gray-*（带蓝调），切换由 T2 执行。 */
-  --vx-color-neutral-50: #fafafa;
-  --vx-color-neutral-100: #f5f5f5;
-  --vx-color-neutral-200: #e5e5e5;
-  --vx-color-neutral-300: #d4d4d4;
-  --vx-color-neutral-400: #a3a3a3;
-  --vx-color-neutral-500: #737373;
-  --vx-color-neutral-600: #525252;
-  --vx-color-neutral-600-alpha-08: rgb(82 82 82 / 0.0784);
-  --vx-color-neutral-600-alpha-10: rgb(82 82 82 / 0.102);
-  --vx-color-neutral-600-alpha-15: rgb(82 82 82 / 0.149);
-  --vx-color-neutral-600-alpha-22: rgb(82 82 82 / 0.2196);
-  --vx-color-neutral-700: #404040;
-  --vx-color-neutral-800: #262626;
-  --vx-color-neutral-900: #171717;
-  --vx-color-neutral-950: #0a0a0a;
-  --vx-color-neutral-950-alpha-08: rgb(10 10 10 / 0.0784);
-  --vx-color-neutral-950-alpha-10: rgb(10 10 10 / 0.102);
-  --vx-color-neutral-950-alpha-15: rgb(10 10 10 / 0.149);
-  --vx-color-neutral-950-alpha-22: rgb(10 10 10 / 0.2196);
-  --vx-color-neutral-950-alpha-30: rgb(10 10 10 / 0.302);
-  --vx-color-neutral-950-alpha-45: rgb(10 10 10 / 0.451);
-
-  /* 品牌阶。Vxture 唯一自定义色相。 */
-  --vx-color-brand-50: #eef2ff;
-  --vx-color-brand-100: #dbe3ff;
-  --vx-color-brand-200: #b8c5ff;
-  --vx-color-brand-300: #8597ff;
-  --vx-color-brand-400: #5a72ff;
-  --vx-color-brand-500: #3057ff;
-  --vx-color-brand-600: #1e51ff;
-  --vx-color-brand-600-alpha-08: rgb(30 81 255 / 0.08);
-  --vx-color-brand-600-alpha-10: rgb(30 81 255 / 0.1);
-  --vx-color-brand-600-alpha-15: rgb(30 81 255 / 0.15);
-  --vx-color-brand-600-alpha-22: rgb(30 81 255 / 0.22);
-  --vx-color-brand-700: #1740d4;
-  --vx-color-brand-800: #0d2eab;
-  --vx-color-brand-900: #061b75;
-  --vx-color-brand-950: #020a3d;
-  --vx-color-brand-950-alpha-45: rgb(2 10 61 / 0.45);
-
-  /* 成功 / 健康态。 */
-  --vx-color-emerald-50: #ecfdf5;
-  --vx-color-emerald-100: #d1fae5;
-  --vx-color-emerald-200: #a7f3d0;
-  --vx-color-emerald-300: #6ee7b7;
-  --vx-color-emerald-400: #34d399;
-  --vx-color-emerald-500: #10b981;
-  --vx-color-emerald-600: #059669;
-  --vx-color-emerald-600-alpha-08: rgb(5 150 105 / 0.0784);
-  --vx-color-emerald-600-alpha-10: rgb(5 150 105 / 0.102);
-  --vx-color-emerald-600-alpha-15: rgb(5 150 105 / 0.149);
-  --vx-color-emerald-600-alpha-22: rgb(5 150 105 / 0.2196);
-  --vx-color-emerald-700: #047857;
-  --vx-color-emerald-800: #065f46;
-  --vx-color-emerald-900: #064e3b;
-  --vx-color-emerald-950: #022c22;
-
-  /* 警告态。 */
-  --vx-color-amber-50: #fffbeb;
-  --vx-color-amber-100: #fef3c7;
-  --vx-color-amber-200: #fde68a;
-  --vx-color-amber-300: #fcd34d;
-  --vx-color-amber-400: #fbbf24;
-  --vx-color-amber-500: #f59e0b;
-  --vx-color-amber-600: #d97706;
-  --vx-color-amber-600-alpha-08: rgb(217 119 6 / 0.0784);
-  --vx-color-amber-600-alpha-10: rgb(217 119 6 / 0.102);
-  --vx-color-amber-600-alpha-15: rgb(217 119 6 / 0.149);
-  --vx-color-amber-600-alpha-22: rgb(217 119 6 / 0.2196);
-  --vx-color-amber-700: #b45309;
-  --vx-color-amber-800: #92400e;
-  --vx-color-amber-900: #78350f;
-  --vx-color-amber-950: #451a03;
-
-  /* 危险态。设计稿用 red，非既有代码的 rose。 */
-  --vx-color-red-50: #fef2f2;
-  --vx-color-red-100: #fee2e2;
-  --vx-color-red-200: #fecaca;
-  --vx-color-red-300: #fca5a5;
-  --vx-color-red-400: #f87171;
-  --vx-color-red-500: #ef4444;
-  --vx-color-red-600: #dc2626;
-  --vx-color-red-600-alpha-08: rgb(220 38 38 / 0.0784);
-  --vx-color-red-600-alpha-10: rgb(220 38 38 / 0.102);
-  --vx-color-red-600-alpha-15: rgb(220 38 38 / 0.149);
-  --vx-color-red-600-alpha-22: rgb(220 38 38 / 0.2196);
-  --vx-color-red-700: #b91c1c;
-  --vx-color-red-800: #991b1b;
-  --vx-color-red-900: #7f1d1d;
-  --vx-color-red-950: #450a0a;
-
-  /* 信息态。 */
-  --vx-color-sky-50: #f0f9ff;
-  --vx-color-sky-100: #e0f2fe;
-  --vx-color-sky-200: #bae6fd;
-  --vx-color-sky-300: #7dd3fc;
-  --vx-color-sky-400: #38bdf8;
-  --vx-color-sky-500: #0ea5e9;
-  --vx-color-sky-600: #0284c7;
-  --vx-color-sky-600-alpha-08: rgb(2 132 199 / 0.0784);
-  --vx-color-sky-600-alpha-10: rgb(2 132 199 / 0.102);
-  --vx-color-sky-600-alpha-15: rgb(2 132 199 / 0.149);
-  --vx-color-sky-600-alpha-22: rgb(2 132 199 / 0.2196);
-  --vx-color-sky-700: #0369a1;
-  --vx-color-sky-800: #075985;
-  --vx-color-sky-900: #0c4a6e;
-  --vx-color-sky-950: #082f49;
-
-  /* AI 专属。 */
-  --vx-color-purple-50: #faf5ff;
-  --vx-color-purple-100: #f3e8ff;
-  --vx-color-purple-200: #e9d5ff;
-  --vx-color-purple-300: #d8b4fe;
-  --vx-color-purple-400: #c084fc;
-  --vx-color-purple-500: #a855f7;
-  --vx-color-purple-600: #9333ea;
-  --vx-color-purple-600-alpha-08: rgb(147 51 234 / 0.0784);
-  --vx-color-purple-600-alpha-10: rgb(147 51 234 / 0.102);
-  --vx-color-purple-600-alpha-15: rgb(147 51 234 / 0.149);
-  --vx-color-purple-600-alpha-22: rgb(147 51 234 / 0.2196);
-  --vx-color-purple-700: #7e22ce;
-  --vx-color-purple-800: #6b21a8;
-  --vx-color-purple-900: #581c87;
-  --vx-color-purple-950: #3b0764;
-
-  /* 与 AI 主色成对使用的青色层次。 */
-  --vx-color-cyan-50: #ecfeff;
-  --vx-color-cyan-100: #cffafe;
-  --vx-color-cyan-200: #a5f3fc;
-  --vx-color-cyan-300: #67e8f9;
-  --vx-color-cyan-400: #22d3ee;
-  --vx-color-cyan-500: #06b6d4;
-  --vx-color-cyan-600: #0891b2;
-  --vx-color-cyan-600-alpha-08: rgb(8 145 178 / 0.0784);
-  --vx-color-cyan-600-alpha-10: rgb(8 145 178 / 0.102);
-  --vx-color-cyan-600-alpha-15: rgb(8 145 178 / 0.149);
-  --vx-color-cyan-600-alpha-22: rgb(8 145 178 / 0.2196);
-  --vx-color-cyan-700: #0e7490;
-  --vx-color-cyan-800: #155e75;
-  --vx-color-cyan-900: #164e63;
-  --vx-color-cyan-950: #083344;
-
-  /* 图表分类色。 */
-  --vx-color-orange-50: #fff7ed;
-  --vx-color-orange-100: #ffedd5;
-  --vx-color-orange-200: #fed7aa;
-  --vx-color-orange-300: #fdba74;
-  --vx-color-orange-400: #fb923c;
-  --vx-color-orange-500: #f97316;
-  --vx-color-orange-600: #ea580c;
-  --vx-color-orange-600-alpha-08: rgb(234 88 12 / 0.0784);
-  --vx-color-orange-600-alpha-10: rgb(234 88 12 / 0.102);
-  --vx-color-orange-600-alpha-15: rgb(234 88 12 / 0.149);
-  --vx-color-orange-600-alpha-22: rgb(234 88 12 / 0.2196);
-  --vx-color-orange-700: #c2410c;
-  --vx-color-orange-800: #9a3412;
-  --vx-color-orange-900: #7c2d12;
-  --vx-color-orange-950: #431407;
-
-  /* 图表分类色。 */
-  --vx-color-teal-50: #f0fdfa;
-  --vx-color-teal-100: #ccfbf1;
-  --vx-color-teal-200: #99f6e4;
-  --vx-color-teal-300: #5eead4;
-  --vx-color-teal-400: #2dd4bf;
-  --vx-color-teal-500: #14b8a6;
-  --vx-color-teal-600: #0d9488;
-  --vx-color-teal-600-alpha-08: rgb(13 148 136 / 0.0784);
-  --vx-color-teal-600-alpha-10: rgb(13 148 136 / 0.102);
-  --vx-color-teal-600-alpha-15: rgb(13 148 136 / 0.149);
-  --vx-color-teal-600-alpha-22: rgb(13 148 136 / 0.2196);
-  --vx-color-teal-700: #0f766e;
-  --vx-color-teal-800: #115e59;
-  --vx-color-teal-900: #134e4a;
-  --vx-color-teal-950: #042f2e;
-
-  /* 图表分类色。 */
-  --vx-color-fuchsia-50: #fdf4ff;
-  --vx-color-fuchsia-100: #fae8ff;
-  --vx-color-fuchsia-200: #f5d0fe;
-  --vx-color-fuchsia-300: #f0abfc;
-  --vx-color-fuchsia-400: #e879f9;
-  --vx-color-fuchsia-500: #d946ef;
-  --vx-color-fuchsia-600: #c026d3;
-  --vx-color-fuchsia-600-alpha-08: rgb(192 38 211 / 0.0784);
-  --vx-color-fuchsia-600-alpha-10: rgb(192 38 211 / 0.102);
-  --vx-color-fuchsia-600-alpha-15: rgb(192 38 211 / 0.149);
-  --vx-color-fuchsia-600-alpha-22: rgb(192 38 211 / 0.2196);
-  --vx-color-fuchsia-700: #a21caf;
-  --vx-color-fuchsia-800: #86198f;
-  --vx-color-fuchsia-900: #701a75;
-  --vx-color-fuchsia-950: #4a044e;
-
-  /* 图表分类色。 */
-  --vx-color-lime-50: #f7fee7;
-  --vx-color-lime-100: #ecfccb;
-  --vx-color-lime-200: #d9f99d;
-  --vx-color-lime-300: #bef264;
-  --vx-color-lime-400: #a3e635;
-  --vx-color-lime-500: #84cc16;
-  --vx-color-lime-600: #65a30d;
-  --vx-color-lime-600-alpha-08: rgb(101 163 13 / 0.0784);
-  --vx-color-lime-600-alpha-10: rgb(101 163 13 / 0.102);
-  --vx-color-lime-600-alpha-15: rgb(101 163 13 / 0.149);
-  --vx-color-lime-600-alpha-22: rgb(101 163 13 / 0.2196);
-  --vx-color-lime-700: #4d7c0f;
-  --vx-color-lime-800: #3f6212;
-  --vx-color-lime-900: #365314;
-  --vx-color-lime-950: #1a2e05;
+  /* 色板。 */
+  --vx-color-red-50: oklch(97.1% 0.013 17.38);
+  --vx-color-red-100: oklch(93.6% 0.032 17.717);
+  --vx-color-red-200: oklch(88.5% 0.062 18.334);
+  --vx-color-red-300: oklch(80.8% 0.114 19.571);
+  --vx-color-red-400: oklch(70.4% 0.191 22.216);
+  --vx-color-red-500: oklch(63.7% 0.237 25.331);
+  --vx-color-red-600: oklch(57.7% 0.245 27.325);
+  --vx-color-red-700: oklch(50.5% 0.213 27.518);
+  --vx-color-red-800: oklch(44.4% 0.177 26.899);
+  --vx-color-red-900: oklch(39.6% 0.141 25.723);
+  --vx-color-red-950: oklch(25.8% 0.092 26.042);
+  --vx-color-amber-50: oklch(98.7% 0.022 95.277);
+  --vx-color-amber-100: oklch(96.2% 0.059 95.617);
+  --vx-color-amber-200: oklch(92.4% 0.12 95.746);
+  --vx-color-amber-300: oklch(87.9% 0.169 91.605);
+  --vx-color-amber-400: oklch(82.8% 0.189 84.429);
+  --vx-color-amber-500: oklch(76.9% 0.188 70.08);
+  --vx-color-amber-600: oklch(66.6% 0.179 58.318);
+  --vx-color-amber-700: oklch(55.5% 0.163 48.998);
+  --vx-color-amber-800: oklch(47.3% 0.137 46.201);
+  --vx-color-amber-900: oklch(41.4% 0.112 45.904);
+  --vx-color-amber-950: oklch(27.9% 0.077 45.635);
+  --vx-color-emerald-50: oklch(97.9% 0.021 166.113);
+  --vx-color-emerald-100: oklch(95% 0.052 163.051);
+  --vx-color-emerald-200: oklch(90.5% 0.093 164.15);
+  --vx-color-emerald-300: oklch(84.5% 0.143 164.978);
+  --vx-color-emerald-400: oklch(76.5% 0.177 163.223);
+  --vx-color-emerald-500: oklch(69.6% 0.17 162.48);
+  --vx-color-emerald-600: oklch(59.6% 0.145 163.225);
+  --vx-color-emerald-700: oklch(50.8% 0.118 165.612);
+  --vx-color-emerald-800: oklch(43.2% 0.095 166.913);
+  --vx-color-emerald-900: oklch(37.8% 0.077 168.94);
+  --vx-color-emerald-950: oklch(26.2% 0.051 172.552);
+  --vx-color-sky-50: oklch(97.7% 0.013 236.62);
+  --vx-color-sky-100: oklch(95.1% 0.026 236.824);
+  --vx-color-sky-200: oklch(90.1% 0.058 230.902);
+  --vx-color-sky-300: oklch(82.8% 0.111 230.318);
+  --vx-color-sky-400: oklch(74.6% 0.16 232.661);
+  --vx-color-sky-500: oklch(68.5% 0.169 237.323);
+  --vx-color-sky-600: oklch(58.8% 0.158 241.966);
+  --vx-color-sky-700: oklch(50% 0.134 242.749);
+  --vx-color-sky-800: oklch(44.3% 0.11 240.79);
+  --vx-color-sky-900: oklch(39.1% 0.09 240.876);
+  --vx-color-sky-950: oklch(29.3% 0.066 243.157);
+  --vx-color-purple-50: oklch(97.7% 0.014 308.299);
+  --vx-color-purple-100: oklch(94.6% 0.033 307.174);
+  --vx-color-purple-200: oklch(90.2% 0.063 306.703);
+  --vx-color-purple-300: oklch(82.7% 0.119 306.383);
+  --vx-color-purple-400: oklch(71.4% 0.203 305.504);
+  --vx-color-purple-500: oklch(62.7% 0.265 303.9);
+  --vx-color-purple-600: oklch(55.8% 0.288 302.321);
+  --vx-color-purple-700: oklch(49.6% 0.265 301.924);
+  --vx-color-purple-800: oklch(43.8% 0.218 303.724);
+  --vx-color-purple-900: oklch(38.1% 0.176 304.987);
+  --vx-color-purple-950: oklch(29.1% 0.149 302.717);
+  --vx-color-neutral-50: oklch(98.5% 0 0);
+  --vx-color-neutral-100: oklch(97% 0 0);
+  --vx-color-neutral-200: oklch(92.2% 0 0);
+  --vx-color-neutral-300: oklch(87% 0 0);
+  --vx-color-neutral-400: oklch(70.8% 0 0);
+  --vx-color-neutral-500: oklch(55.6% 0 0);
+  --vx-color-neutral-600: oklch(43.9% 0 0);
+  --vx-color-neutral-700: oklch(37.1% 0 0);
+  --vx-color-neutral-800: oklch(26.9% 0 0);
+  --vx-color-neutral-900: oklch(20.5% 0 0);
+  --vx-color-neutral-950: oklch(14.5% 0 0);
+  --vx-color-black: #000;
+  --vx-color-white: #fff;
 }
