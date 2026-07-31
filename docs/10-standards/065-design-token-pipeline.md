@@ -104,6 +104,21 @@ src/styles/foundation/*.css
 
 13 个 token 的 `codeSyntax.WEB` 写作 `var(elevation-1-color)` 而非 `var(--elevation-1-color)`（全部 `elevation/*/color` 与 `gradient/*/{from,to}`）。生成器规范化后继续，并在输出中逐条列出以便回报设计侧修正——**不得静默修正**。
 
+### 3.1.2 偏离机制
+
+DS 是真值源，设计稿只是输入且已证实会出错，因此**必须允许有依据地覆盖导出值**。覆盖只能写在生成器的 `DEVIATIONS` 表中，逐条给出理由；生成物在对应行留下 `/* 偏离设计稿：… */` 注释，生成时逐条打印。
+
+**禁止直接编辑生成物**——会被 `--check` 拦下，且理由无处可查。每新增一条偏离，都应回报设计侧修正设计稿。
+
+当前偏离（`vx-Color-Light`，4 条）：明色表面阶梯去品牌调。设计稿用 `surface/B-*` 的品牌浅蓝与 `surface/N-*` 的中性拉开层次，但该区分在暗色下完全塌缩（四级全为中性明度阶），且实践中 console 早已用 `--vx-color-shell-bg: #f5f7fb` 绕过较重的品牌底色。明色可用档位只有 `white / 50 / 100 / 200` 四个、恰好四级，故整体重排而非单点替换，否则页面底与卡内凹陷面会撞成同值。
+
+| token          | 设计稿      | DS 取值     |
+| -------------- | ----------- | ----------- |
+| `--background` | brand-50    | neutral-100 |
+| `--surface-1`  | brand-100   | neutral-200 |
+| `--card`       | neutral-50  | white       |
+| `--surface-3`  | neutral-100 | neutral-50  |
+
 ### 3.2 命名映射
 
 Figma 路径 → CSS 变量名，规则确定且不可自由发挥：

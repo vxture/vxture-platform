@@ -22,10 +22,10 @@
 
 :root {
   /* surface */
-  --background: var(--vx-color-brand-50);
-  --surface-1: var(--vx-color-brand-100);
-  --card: var(--vx-color-neutral-50);
-  --surface-3: var(--vx-color-neutral-100);
+  --background: var(--vx-color-neutral-100);  /* 偏离设计稿：页面底改中性 */
+  --surface-1: var(--vx-color-neutral-200);  /* 偏离设计稿：页面级凹陷面 */
+  --card: var(--vx-color-base-white);  /* 偏离设计稿：卡片提为纯白，与灰底页面拉开层次 */
+  --surface-3: var(--vx-color-neutral-50);  /* 偏离设计稿：卡内凹陷面下移一档，避让页面底 */
   --popover: var(--vx-color-base-white);
   --scrim: var(--vx-color-neutral-950-alpha-45);
   --accent: var(--vx-color-neutral-600-alpha-08);

@@ -52,6 +52,31 @@ function loadMode(collection, mode) {
 
 const ext = (token, key) => token.$extensions?.[`com.figma.${key}`];
 
+/**
+ * 有依据地偏离导出值。
+ *
+ * DS 是唯一真值源，设计稿只是输入且已证实会出错，因此必须允许覆盖——
+ * 但覆盖只能发生在此处，逐条写明理由，并在生成物中留痕。
+ * 禁止直接编辑生成物：那会被 --check 拦下，且理由无处可查。
+ *
+ * 每次新增条目，都应同步回报设计侧修正设计稿。
+ */
+const DEVIATIONS = {
+  "vx-Color-Light": {
+    // 明色表面阶梯去品牌调。设计稿用 surface/B-* 的品牌浅蓝与 surface/N-* 的中性
+    // 拉开层次，但该区分在暗色下完全塌缩（四级全为中性明度阶），且实践中 console
+    // 早已用 --vx-color-shell-bg: #f5f7fb 绕过较重的品牌底色。
+    // 明色可用档位只有 white/50/100/200 四个，恰好four级，故整体重排而非单点替换，
+    // 否则页面底与卡内凹陷面会撞成同值。
+    "surface/B-1": { to: "color/neutral/100", why: "页面底改中性" },
+    "surface/B-2": { to: "color/neutral/200", why: "页面级凹陷面" },
+    "surface/N-1": { to: "color/base/white", why: "卡片提为纯白，与灰底页面拉开层次" },
+    "surface/N-2": { to: "color/neutral/50", why: "卡内凹陷面下移一档，避让页面底" },
+  },
+};
+
+const appliedDeviations = [];
+
 /** 设计稿中 codeSyntax 漏写 `--` 前缀的 token，规范化时登记在此。 */
 const malformedSyntax = [];
 
@@ -94,14 +119,19 @@ function buildMode(collection, mode) {
       if (mode === "vx-Color-Light") skipped.push(tokenPath);
       continue;
     }
-    const target = ext(token, "aliasData")?.targetVariableName;
+    const override = DEVIATIONS[mode]?.[tokenPath];
+    const target = override?.to ?? ext(token, "aliasData")?.targetVariableName;
     if (target) {
       const ref = primitiveVar(target);
       if (!t1Vars.has(ref)) {
         errors.push(`${tokenPath} → ${target}：T1 中不存在 ${ref}`);
         continue;
       }
-      rows.push([name, `var(${ref})`, tokenPath]);
+      if (override) {
+        const from = ext(token, "aliasData")?.targetVariableName ?? "（裸值）";
+        appliedDeviations.push(`${mode} ${tokenPath}: ${from} → ${override.to}（${override.why}）`);
+      }
+      rows.push([name, `var(${ref})`, tokenPath, override?.why]);
     } else {
       const value = token.$value;
       if (value && typeof value === "object" && value.hex) {
@@ -127,10 +157,10 @@ if (errors.length > 0) {
 const GROUP_ORDER = ["surface", "content", "stroke", "intent", "chart", "gradient", "elevation"];
 function render(rows, indent = "  ") {
   const groups = new Map();
-  for (const [name, value, tokenPath] of rows) {
+  for (const [name, value, tokenPath, why] of rows) {
     const g = tokenPath.split("/")[0];
     if (!groups.has(g)) groups.set(g, []);
-    groups.get(g).push(`${indent}${name}: ${value};`);
+    groups.get(g).push(`${indent}${name}: ${value};${why ? `  /* 偏离设计稿：${why} */` : ""}`);
   }
   const ordered = [
     ...GROUP_ORDER.filter((g) => groups.has(g)),
@@ -191,6 +221,10 @@ if (CHECK) {
 } else {
   writeFileSync(target, css, "utf8");
   console.log(`已生成 T2 色彩：light ${light.length} · dark ${dark.length} 项`);
+  if (appliedDeviations.length > 0) {
+    console.log(`已应用偏离 ${appliedDeviations.length} 条（DS 为真值源，逐条留痕）：`);
+    for (const d of appliedDeviations) console.log(`    · ${d}`);
+  }
   if (malformedSyntax.length > 0) {
     console.log(
       `⚠ 设计稿 codeSyntax 漏写 -- 前缀，已规范化（需回报设计侧修正）：` +
