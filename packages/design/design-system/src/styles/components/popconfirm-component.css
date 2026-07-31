@@ -16,6 +16,6 @@
  */
 
 :root {
-  --popconfirm-inset: var(--inset-lg);
-  --popconfirm-gap: var(--gap-md);
+  --popconfirm-inset: var(--space-lg);
+  --popconfirm-gap: var(--space-md);
 }

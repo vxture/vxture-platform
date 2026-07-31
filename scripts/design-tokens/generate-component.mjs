@@ -25,6 +25,7 @@ import path from "node:path";
 import process from "node:process";
 import { RADIUS_DROPPED, radiusVarName } from "./radius-map.mjs";
 import { DEVIATED_PATHS } from "./deviations.mjs";
+import { mergedSpacingVar } from "./spacing-merge.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -86,9 +87,12 @@ function buildT2NameMap() {
       for (const [tokenPath, token] of tokens) {
         if (RADIUS_DROPPED.has(tokenPath)) continue;
         const radius = radiusVarName(tokenPath);
+        const merged = mergedSpacingVar(tokenPath);
         let varName;
         if (radius) {
           varName = radius;
+        } else if (merged) {
+          varName = merged;
         } else if (useCodeSyntax) {
           const web = ext(token, "codeSyntax")?.WEB;
           const m = typeof web === "string" ? web.match(/^var\(\s*(--)?([\w-]+)\s*\)$/) : null;

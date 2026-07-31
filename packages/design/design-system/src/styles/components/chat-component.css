@@ -17,11 +17,11 @@
 
 :root {
   --chat-bubble-max-width: 680px;
-  --chat-bubble-inset: var(--inset-md);
+  --chat-bubble-inset: var(--space-md);
   --chat-bubble-radius: var(--radius-2xl);
-  --chat-bubble-gap: var(--gap-md);
+  --chat-bubble-gap: var(--space-md);
   --chat-bubble-user-bg: var(--primary-muted);
   --chat-bubble-agent-bg: var(--card);
-  --chat-composer-min-height: var(--row-height-md);
+  --chat-composer-min-height: var(--space-row-md);
   --chat-composer-max-height: 240px;
 }

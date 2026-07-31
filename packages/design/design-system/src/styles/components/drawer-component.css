@@ -23,8 +23,8 @@
   --drawer-shadow-offset-y: var(--elevation-5-offset-y);
   --drawer-shadow-blur: var(--elevation-5-blur);
   --drawer-shadow-color: var(--elevation-5-color);
-  --drawer-inset: var(--inset-xl);
-  --drawer-gap: var(--gap-md);
+  --drawer-inset: var(--space-xl);
+  --drawer-gap: var(--space-md);
   --drawer-width-sm: 320px;
   --drawer-width-md: 480px;
   --drawer-width-lg: var(--layout-panel-xl);

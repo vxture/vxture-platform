@@ -23,8 +23,8 @@
   --tooltip-shadow-offset-y: var(--elevation-2-offset-y);
   --tooltip-shadow-blur: var(--elevation-2-blur);
   --tooltip-shadow-color: var(--elevation-2-color);
-  --tooltip-inset-sm: var(--inset-sm);
-  --tooltip-inset-md: var(--inset-md);
-  --tooltip-inset-lg: var(--inset-lg);
-  --tooltip-inset-xl: var(--inset-xl);
+  --tooltip-inset-sm: var(--space-sm);
+  --tooltip-inset-md: var(--space-md);
+  --tooltip-inset-lg: var(--space-lg);
+  --tooltip-inset-xl: var(--space-xl);
 }

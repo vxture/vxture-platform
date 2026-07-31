@@ -17,8 +17,8 @@
 
 :root {
   --toast-width: 360px;
-  --toast-gap: var(--gap-sm);
-  --toast-inset: var(--inset-md);
+  --toast-gap: var(--space-sm);
+  --toast-inset: var(--space-md);
   --toast-bg: var(--popover);
   --toast-text: var(--foreground);
   --toast-radius: var(--radius-lg);

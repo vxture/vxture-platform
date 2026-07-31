@@ -16,7 +16,7 @@
  */
 
 :root {
-  --code-block-inset: var(--inset-md);
+  --code-block-inset: var(--space-md);
   --code-block-bg: var(--surface-3);
   --code-block-radius: var(--radius-lg);
 }

@@ -21,6 +21,7 @@ import path from "node:path";
 import process from "node:process";
 import { RADIUS_TO_TAILWIND, RADIUS_DROPPED, radiusVarName } from "./radius-map.mjs";
 import { SCALE_DEVIATIONS, SCALE_ADDITIONS } from "./deviations.mjs";
+import { SPACING_BASE, SPACING_MERGED, SPACING_HEIGHTS } from "./spacing-merge.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -155,6 +156,8 @@ const PRIMITIVE_NAMESPACES = {
   //   故不属 T1；也不属 T3——图标尺寸跨组件复用（Button / Alert / Table 都用），
   //   放进组件层意味着每族各存一份。它是 T2 语义名，引用 T1 的长度刻度。
 };
+
+// 间距合并表与 T3 生成器共用，理由见 spacing-merge.mjs。
 
 /**
  * T1 一律裸值，**不得引用其他 T1**。
@@ -349,6 +352,36 @@ function buildRows(collection, file) {
   return rows;
 }
 
+/**
+ * 应用间距族合并：七个族折叠为 `--spacing-*`（取 base 族的阶梯），
+ * 高度族改挂 `--spacing-<kind>-*` 以便注册进 v4 的单一 spacing 命名空间。
+ */
+function mergeSpacing(rows) {
+  const out = [];
+  const seen = new Set();
+  for (const row of rows) {
+    const [name, value, tokenPath, why] = row;
+    const fam = tokenPath.split("/").slice(0, -1).join("-");
+    const step = tokenPath.split("/").pop();
+
+    if (SPACING_MERGED.includes(fam)) {
+      if (fam !== SPACING_BASE) continue; // 非基准族整族丢弃
+      const merged = `--space-${step}`;
+      if (seen.has(merged)) continue;
+      seen.add(merged);
+      out.push([merged, value, tokenPath, why]);
+      continue;
+    }
+    const kind = SPACING_HEIGHTS[fam];
+    if (kind) {
+      out.push([`--space-${kind}-${step}`, value, tokenPath, why]);
+      continue;
+    }
+    out.push(row);
+  }
+  return out;
+}
+
 /** 渲染前的最后一道断言：同一块内不得出现重名，防止改名逻辑引入静默覆盖。 */
 function assertUnique(rows, label) {
   const seen = new Set();
@@ -455,7 +488,7 @@ for (const col of COLLECTIONS) {
       continue;
     }
     const rows = buildRows(col.name, file);
-    const rows2 = toLineHeightRatio(rows);
+    const rows2 = mergeSpacing(toLineHeightRatio(rows));
     assertUnique(rows2, mode ? `${col.name}/${mode}` : col.name);
     assertZIndexDistinct(rows2);
 
@@ -510,7 +543,16 @@ for (const route of ROUTES) {
     stats.push(`${primitive.file.replace("-primitive.css", "")}(T1) ${atoms.length}`);
   }
 
-  const body = blocks.map(([selector, rows]) => `${selector} {\n${render(rows)}\n}`).join("\n\n");
+  // radius / duration / ease 的 T2 名已等于 Tailwind theme 名，直接写进 @theme：
+  // 一处声明即完成注册。若改由 theme.css 再注册一次，会写出指向自己的声明
+  // （形如 duration-fast 引用 duration-fast），CSS 判定为循环、变量整个失效且不报错。
+  const SELF_NAMED = new Set(["radius-semantic.css", "duration-semantic.css", "ease-semantic.css"]);
+  // 用 `@theme` 而非 `@theme inline`：inline 会把值内联展开，而这里的值是指向 T1 的
+  // var() 引用，内联时解析不到、工具类不会生成。这三族无模式轴，本就不需要 inline。
+  const wrapper = SELF_NAMED.has(route.file) ? "@theme" : null;
+  const body = blocks
+    .map(([selector, rows]) => `${wrapper ?? selector} {\n${render(rows)}\n}`)
+    .join("\n\n");
   const count = blocks[0][1].length;
   outputs.push([
     route.file,

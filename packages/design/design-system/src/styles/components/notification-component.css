@@ -24,8 +24,8 @@
   --notification-shadow-offset-y: var(--elevation-3-offset-y);
   --notification-shadow-blur: var(--elevation-3-blur);
   --notification-shadow-color: var(--elevation-3-color);
-  --notification-inset: var(--inset-sm);
-  --notification-gap: var(--gap-sm);
+  --notification-inset: var(--space-sm);
+  --notification-gap: var(--space-sm);
   --notification-max-width: 360px;
   --notification-icon-size: var(--icon-md);
   --notification-success-bg: var(--success-muted);

@@ -17,8 +17,8 @@
 
 :root {
   --message-radius: var(--radius-md);
-  --message-inset: var(--inset-sm);
-  --message-gap: var(--gap-sm);
+  --message-inset: var(--space-sm);
+  --message-gap: var(--space-sm);
   --message-icon-size: var(--icon-md);
   --message-max-width: var(--layout-panel-xs);
   --message-success-bg: var(--success-muted);

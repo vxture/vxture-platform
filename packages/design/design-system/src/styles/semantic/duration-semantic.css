@@ -14,7 +14,7 @@
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  */
 
-:root {
+@theme {
   /* motion */
   --duration-instant: var(--vx-duration-instant);
   --duration-fast: var(--vx-duration-fast);

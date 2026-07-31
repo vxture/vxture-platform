@@ -23,7 +23,7 @@
   --popover-shadow-offset-y: var(--elevation-3-offset-y);
   --popover-shadow-blur: var(--elevation-3-blur);
   --popover-shadow-color: var(--elevation-3-color);
-  --popover-inset: var(--inset-md);
+  --popover-inset: var(--space-md);
   --popover-max-width: 360px;
-  --popover-gap: var(--gap-2xs);
+  --popover-gap: var(--space-2xs);
 }

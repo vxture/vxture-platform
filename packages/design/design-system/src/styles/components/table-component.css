@@ -19,6 +19,6 @@
   --table-border: var(--border);
   --table-header-bg: var(--surface-3);
   --table-row-stripe-bg: var(--accent);
-  --table-cell-inset-x: var(--inset-md);
+  --table-cell-inset-x: var(--space-md);
   --table-column-width-icon: var(--media-xl);
 }

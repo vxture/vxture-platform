@@ -35,6 +35,7 @@
 @import "./semantic/typography-semantic.css";
 @import "./semantic/z-index-semantic.css";
 @import "./components/index.css";
+@import "./theme.css";
 @import "./tokens-theme.css";
 @import "./tokens-colors-primitives.css";
 @import "./tokens-gradients.css";

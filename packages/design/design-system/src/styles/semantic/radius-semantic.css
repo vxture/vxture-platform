@@ -14,7 +14,7 @@
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  */
 
-:root {
+@theme {
   /* radius */
   --radius-none: var(--vx-radius-none);
   --radius-xs: var(--vx-radius-xs);
