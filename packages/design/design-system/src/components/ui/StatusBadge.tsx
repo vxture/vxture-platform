@@ -27,12 +27,12 @@ export interface StatusBadgeProps extends Omit<BadgeProps, "variant"> {
 }
 
 const statusBadgeToneClasses: Record<StatusBadgeTone, string> = {
-  neutral: "border-vx-border bg-vx-surface-muted text-vx-text-secondary",
-  brand: "border-transparent bg-vx-primary-soft text-vx-primary-strong",
-  info: "border-transparent bg-vx-info-surface text-vx-info",
-  success: "border-transparent bg-vx-success-surface text-vx-success",
-  warning: "border-transparent bg-vx-warning-surface text-vx-warning",
-  danger: "border-transparent bg-vx-danger-surface text-vx-danger",
+  neutral: "border-border bg-accent text-muted-foreground",
+  brand: "border-transparent bg-primary-muted text-primary-hover",
+  info: "border-transparent bg-info-muted text-info",
+  success: "border-transparent bg-success-muted text-success",
+  warning: "border-transparent bg-warning-muted text-warning",
+  danger: "border-transparent bg-destructive-muted text-destructive",
 };
 
 const StatusBadge = React.forwardRef<HTMLDivElement, StatusBadgeProps>(

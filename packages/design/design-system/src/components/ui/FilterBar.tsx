@@ -32,7 +32,7 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
       <section
         ref={ref}
         className={cn(
-          "vx-filter-bar flex flex-wrap items-end justify-between gap-4 rounded-lg border border-vx-border bg-vx-surface p-4",
+          "vx-filter-bar flex flex-wrap items-end justify-between gap-4 rounded-lg border border-border bg-card p-4",
           className,
         )}
         {...props}
@@ -41,12 +41,12 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
           {hasCopy ? (
             <div className="mb-3 grid gap-1">
               {title ? (
-                <h2 className="text-base font-semibold text-vx-text-primary">
+                <h2 className="text-base font-semibold text-foreground">
                   {title}
                 </h2>
               ) : null}
               {description ? (
-                <p className="text-sm text-vx-text-muted">{description}</p>
+                <p className="text-sm text-muted-foreground">{description}</p>
               ) : null}
             </div>
           ) : null}

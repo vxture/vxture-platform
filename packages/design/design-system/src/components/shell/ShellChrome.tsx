@@ -782,7 +782,7 @@ function ShellUserAvatar({
       key={user.avatarSrc ?? "__default__"}
       className={cn(
         "vx-shell-user-avatar",
-        "text-vx-text-muted",
+        "text-muted-foreground",
         size === "lg" && "vx-shell-user-avatar--lg",
       )}
     >

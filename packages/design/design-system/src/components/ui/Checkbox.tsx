@@ -1,10 +1,13 @@
 /**
- * checkbox.tsx - Checkbox 组件
+ * Checkbox.tsx - 复选框。
  * @package @vxture/design-system
  *
  * @copyright Vxture Team
  * @layer Presentation
  * @category Components - Form
+ *
+ * 结构照 shadcn 官方 Checkbox，只把取值换成 DS 的 T2 语义类。不加 shadcn 没有
+ * 的变体：尺寸由调用方经 className 覆写，与上游一致。
  */
 
 import * as React from "react";
@@ -22,7 +25,10 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       <CheckboxPrimitive.Root
         ref={ref}
         className={cn(
-          "peer h-4 w-4 shrink-0 rounded-sm border border-vx-text-primary ring-offset-vx-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vx-ring-strong focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-vx-primary data-[state=checked]:text-vx-text-inverse",
+          "peer size-icon-md shrink-0 rounded-sm border border-foreground",
+          "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "disabled:cursor-not-allowed disabled:opacity-disabled",
+          "data-[state=checked]:bg-primary data-[state=checked]:text-content-on-fill",
           className,
         )}
         {...props}

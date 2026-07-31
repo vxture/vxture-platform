@@ -60,7 +60,7 @@ function Pagination({
       aria-label="Pagination"
       {...props}
     >
-      <div className="text-sm text-vx-text-muted">
+      <div className="text-sm text-muted-foreground">
         {typeof from === "number" &&
         typeof to === "number" &&
         typeof total === "number"

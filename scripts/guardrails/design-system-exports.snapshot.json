@@ -7,11 +7,6 @@
         "require": "./dist/index.cjs",
         "types": "./dist/index.d.ts"
       },
-      "./next": {
-        "import": "./dist/next.mjs",
-        "require": "./dist/next.cjs",
-        "types": "./dist/next.d.ts"
-      },
       "./server": {
         "import": "./dist/server.mjs",
         "require": "./dist/server.cjs",
@@ -224,7 +219,6 @@
       "useTheme",
       "useToast"
     ],
-    "./next": ["Button", "buttonVariants"],
     "./server": [
       "Badge",
       "Banner",

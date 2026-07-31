@@ -31,8 +31,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
     <AvatarPrimitive.Root
       ref={ref}
       className={cn(
-        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-        "vx-avatar",
+        "relative flex size-media-md shrink-0 overflow-hidden rounded-full",
         className,
       )}
       {...props}
@@ -58,8 +57,7 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(
       <AvatarPrimitive.Fallback
         ref={ref}
         className={cn(
-          "flex h-full w-full items-center justify-center rounded-full bg-vx-surface-muted",
-          "vx-avatar__fallback",
+          "flex h-full w-full items-center justify-center rounded-full bg-accent",
           className,
         )}
         {...props}
@@ -116,7 +114,7 @@ const UserAvatar = React.forwardRef<HTMLSpanElement, UserAvatarProps>(
       <Avatar
         key={src ?? "__default__"}
         ref={ref}
-        className={cn("text-vx-text-muted", className)}
+        className={cn("text-muted-foreground", className)}
         {...props}
       >
         {src ? <AvatarImage src={src} alt={alt ?? ""} /> : null}

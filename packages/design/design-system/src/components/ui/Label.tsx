@@ -1,5 +1,5 @@
 /**
- * label.tsx - Label 组件
+ * Label.tsx - 表单标签。
  * @package @vxture/design-system
  *
  * @copyright Vxture Team
@@ -21,8 +21,8 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
       <LabelPrimitive.Root
         ref={ref}
         className={cn(
-          "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-          "vx-label",
+          "text-label-md text-foreground",
+          "peer-disabled:cursor-not-allowed peer-disabled:opacity-disabled",
           className,
         )}
         {...props}

@@ -83,7 +83,7 @@ function ActionMenu({
                 : {})}
               className={cn(
                 "vx-action-menu__item gap-2",
-                item.danger && "text-vx-danger focus:text-vx-danger",
+                item.danger && "text-destructive focus:text-destructive",
               )}
             >
               {item.icon ? <span className="shrink-0">{item.icon}</span> : null}

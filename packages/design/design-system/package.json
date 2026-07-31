@@ -25,11 +25,6 @@
       "import": "./dist/server.mjs",
       "require": "./dist/server.cjs"
     },
-    "./next": {
-      "types": "./dist/next.d.ts",
-      "import": "./dist/next.mjs",
-      "require": "./dist/next.cjs"
-    },
     "./styles/auth.css": "./src/styles/auth.css",
     "./styles/brand.css": "./src/styles/brand.css",
     "./styles/fullscreen.css": "./src/styles/fullscreen.css",

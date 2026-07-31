@@ -77,8 +77,7 @@ export function FullscreenToggle({
       className={cn(
         "transition-colors duration-200",
         {
-          "bg-vx-primary text-vx-text-inverse hover:bg-vx-primary-strong":
-            isActive,
+          "bg-primary text-content-on-fill hover:bg-primary-hover": isActive,
         },
         className,
       )}

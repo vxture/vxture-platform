@@ -63,14 +63,14 @@ function DataTable<TRow>({
   return (
     <div
       className={cn(
-        "vx-data-table overflow-hidden rounded-lg border border-vx-border bg-vx-surface",
+        "vx-data-table overflow-hidden rounded-lg border border-border bg-card",
         className,
       )}
       {...props}
     >
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
-          <thead className="bg-vx-surface-muted text-vx-text-muted">
+          <thead className="bg-accent text-muted-foreground">
             <tr>
               {columns.map((column) => {
                 const align = column.align ?? "left";
@@ -91,12 +91,12 @@ function DataTable<TRow>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-vx-border">
+          <tbody className="divide-y divide-border">
             {loading ? (
               <tr>
                 <td
                   colSpan={colSpan}
-                  className="px-4 py-8 text-center text-vx-text-muted"
+                  className="px-4 py-8 text-center text-muted-foreground"
                 >
                   {loadingLabel}
                 </td>
@@ -106,7 +106,7 @@ function DataTable<TRow>({
                 <tr
                   key={rowKey(row, rowIndex)}
                   className={cn(
-                    "transition-colors hover:bg-vx-surface-muted/60",
+                    "transition-colors hover:bg-accent/60",
                     onRowClick && "cursor-pointer",
                     getRowClassName?.(row, rowIndex),
                   )}
@@ -120,7 +120,7 @@ function DataTable<TRow>({
                       <td
                         key={column.id}
                         className={cn(
-                          "px-4 py-3 align-middle text-vx-text-primary",
+                          "px-4 py-3 align-middle text-foreground",
                           alignClasses[align],
                           column.className,
                           column.cellClassName,
@@ -136,7 +136,7 @@ function DataTable<TRow>({
               <tr>
                 <td
                   colSpan={colSpan}
-                  className="px-4 py-8 text-center text-vx-text-muted"
+                  className="px-4 py-8 text-center text-muted-foreground"
                 >
                   {empty}
                 </td>

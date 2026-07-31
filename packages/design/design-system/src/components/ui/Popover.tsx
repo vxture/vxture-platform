@@ -1,5 +1,5 @@
 /**
- * popover.tsx - Popover 组件
+ * Popover.tsx - 气泡浮层。
  * @package @vxture/design-system
  *
  * @copyright Vxture Team
@@ -28,8 +28,8 @@ export interface PopoverCloseProps extends React.ComponentPropsWithoutRef<
 > {}
 
 const Popover = PopoverPrimitive.Root;
-
 const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverClose = PopoverPrimitive.Close;
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
   function PopoverContent(
@@ -43,7 +43,14 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
           align={align}
           sideOffset={sideOffset}
           className={cn(
-            "z-50 w-72 rounded-md border border-vx-border bg-vx-surface p-4 text-vx-text-primary shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+            // w-72 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 060 §1.2，
+            // 组件尺寸归 cva / 组件自身，不进 T2。
+            "z-popover w-72 rounded-lg border border-border bg-popover p-lg text-foreground shadow-overlay outline-none",
+            "duration-fast ease-enter data-[state=open]:animate-in data-[state=closed]:animate-out",
+            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+            "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
             className,
           )}
           {...props}
@@ -52,8 +59,6 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
     );
   },
 );
-
-const PopoverClose = PopoverPrimitive.Close;
 
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 

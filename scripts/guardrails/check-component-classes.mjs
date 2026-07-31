@@ -1,0 +1,192 @@
+#!/usr/bin/env node
+
+/**
+ * check-component-classes.mjs — 把组件里写的每个类名喂给 Tailwind，报出哑火的。
+ *
+ * ── 补的是哪个盲区 ──
+ * DS 包用 tsup 打包，**自身从不跑 Tailwind 编译**。组件里写错或写了已退役的类名，
+ * 包内 build 全绿、eslint 全绿、类型全绿，只在消费方渲染时无声失效——元素照样
+ * 挂着那个 class，只是没有任何规则匹配。
+ *
+ * 遗留 token 层退役后这类失效有 130 处（`bg-vx-surface` 之类整族哑火），全是
+ * 靠人眼发现的。本脚本把它变成机器可查。
+ *
+ * check-utilities.mjs 查的是"token 注册有没有产出工具类"（自下而上取样），
+ * 本脚本查的是"组件用的类是不是都存在"（自上而下全量）。两者不重叠。
+ *
+ * 用法：node scripts/guardrails/check-component-classes.mjs
+ */
+
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
+
+const ROOT = process.cwd();
+const PNPM = path.join(ROOT, "node_modules/.pnpm");
+const twDir = (await readdir(PNPM)).find((d) => /^tailwindcss@\d/.test(d));
+if (!twDir) {
+  console.error("未找到 tailwindcss 安装目录，跳过组件类名实测。");
+  process.exit(0);
+}
+const TW = path.join(PNPM, twDir, "node_modules/tailwindcss");
+const { compile } = await import(
+  new URL(`file://${path.join(TW, "dist/lib.mjs").split(path.sep).join("/")}`).href
+);
+
+const PKG = path.join(ROOT, "packages/design/design-system");
+const STYLES = path.join(PKG, "src/styles");
+
+/**
+ * 从 DS 的 `globals.css` 起编，而不是只编 `tokens.css`。
+ *
+ * 消费方引的就是 globals.css，链上还有 `@plugin "tailwindcss-animate"`——
+ * 只编 tokens.css 会把 `animate-in` / `fade-in-0` 这类 shadcn 标配全判成哑火。
+ */
+async function loadStylesheet(id, base) {
+  if (id === "tailwindcss") {
+    const p = path.join(TW, "index.css");
+    return { path: p, base: TW, content: await readFile(p, "utf8") };
+  }
+  if (id.startsWith("@vxture/design-system/styles/")) {
+    const p = path.join(STYLES, id.replace("@vxture/design-system/styles/", ""));
+    return { path: p, base: path.dirname(p), content: await readFile(p, "utf8") };
+  }
+  const p = path.isAbsolute(id)
+    ? id
+    : id.startsWith(".")
+      ? path.resolve(base, id)
+      : path.join(TW, id);
+  return { path: p, base: path.dirname(p), content: await readFile(p, "utf8") };
+}
+
+const compiled = await compile(
+  `@import "${path.join(STYLES, "globals.css").split(path.sep).join("/")}";`,
+  {
+    base: ROOT,
+    loadStylesheet,
+    // `@plugin "tailwindcss-animate"` 走这里。仓根不直接依赖它，故从 pnpm store 解析。
+    loadModule: async (id) => {
+      const dir = (await readdir(PNPM)).find((d) => d.startsWith(`${id}@`));
+      if (!dir) throw new Error(`未找到插件 ${id}`);
+      const entry = path.join(PNPM, dir, "node_modules", id);
+      // CJS 包无 exports 字段时目录导入不被 ESM 支持，须显式指到入口文件。
+      const pkg = JSON.parse(await readFile(path.join(entry, "package.json"), "utf8"));
+      const main = path.join(entry, pkg.main ?? "index.js");
+      const mod = await import(new URL(`file://${main.split(path.sep).join("/")}`).href);
+      return { base: entry, module: mod.default ?? mod };
+    },
+  },
+);
+
+/** CSS 选择器转义：数字开头须写成十六进制码点加空格（`2xl:p-4` → `\32 xl\:p-4`）。 */
+function cssIdent(name) {
+  const escaped = name.replace(/[:.[\]()&>/%'=,#!+*~$^|?]/g, (c) => `\\${c}`);
+  return /^\d/.test(escaped) ? `\\3${escaped[0]} ${escaped.slice(1)}` : escaped;
+}
+
+/**
+ * 标记类：Tailwind 用它们做选择器锚点（`peer-checked:` / `group-hover:`），
+ * 本身**不产出任何规则**，故按存在处理，否则会被误报成哑火。
+ */
+const MARKERS = /^(peer|group)(\/[\w-]+)?$/;
+
+const cache = new Map();
+function generated(cls) {
+  if (cache.has(cls)) return cache.get(cls);
+  let ok = MARKERS.test(cls);
+  try {
+    if (ok) throw new Error("marker");
+    const out = compiled.build([cls]);
+    const i = out.indexOf("@layer utilities {");
+    ok = i >= 0 && out.slice(i).includes(`.${cssIdent(cls)} {`);
+  } catch {
+    /* 标记类走上面的短路；编译异常按未生成处理 */
+  }
+  cache.set(cls, ok);
+  return ok;
+}
+
+/**
+ * 判定一个字符串字面量是不是类名列表。
+ *
+ * 源码里字符串还有 import 路径、prop 取值、displayName、SVG path 等等。判据用
+ * "多数 token 能被编译器认出"：`"flex items-center gap-md"` 全中；`"react"`、
+ * `"horizontal"` 一个都不中，直接跳过。半数以上命中才逐个报缺失的那几个。
+ */
+function classListOf(text) {
+  const tokens = text.split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return null;
+  if (tokens.some((t) => /[<>{}"`;]|^\.{1,2}\//.test(t))) return null;
+  const hits = tokens.filter((t) => generated(t));
+  if (hits.length === 0) return null;
+  if (hits.length * 2 <= tokens.length) return null;
+  return tokens.filter((t) => !generated(t));
+}
+
+async function walk(dir, out = []) {
+  for (const f of await readdir(dir, { withFileTypes: true })) {
+    const p = path.join(dir, f.name);
+    if (f.isDirectory()) await walk(p, out);
+    else if (/\.tsx$/.test(f.name)) out.push(p);
+  }
+  return out;
+}
+
+/**
+ * 只查已按 shadcn 惯例 + cva 重写完的组件。
+ *
+ * 其余组件仍依赖遗留样式层的 BEM 类名（`.vx-card` / `.vx-page-header__title-row`），
+ * 那些类随 155 个遗留 CSS 文件一并删除，现在**全部无定义**——纳入检查会一次报出
+ * 几百条，把真实回归淹掉。它们的去向是 C2（以工具类重写为 cva 组件）；
+ * 每重写完一个就从 PENDING 移走，清空即可删掉这份名单。
+ */
+const PENDING = new Set([
+  "ActionButton.tsx", "ActionMenu.tsx", "Badge.tsx", "Banner.tsx", "BulkActionBar.tsx",
+  "Card.tsx", "DataTable.tsx", "DetailDrawer.tsx", "DetailPanel.tsx",
+  "DetailSectionHeading.tsx", "DialogForm.tsx", "Drawer.tsx", "EmptyState.tsx",
+  "EntityListPage.tsx", "EntityTableSection.tsx", "FilterBar.tsx", "Input.tsx",
+  "MetricCard.tsx", "MetricGrid.tsx", "NativeSelect.tsx", "PageActions.tsx",
+  "PageHeader.tsx", "PageSection.tsx", "PageSizePicker.tsx", "PageStack.tsx",
+  "Pagination.tsx", "SectionCard.tsx", "SectionNav.tsx", "SettingsSplitPage.tsx",
+  "Skeleton.tsx", "StatusBadge.tsx", "Switch.tsx", "TableToolbar.tsx",
+  "Textarea.tsx", "Toast.tsx", "ViewModeSwitch.tsx",
+  "AuthLogin.tsx", "ShellChrome.tsx",
+  "AIAssistantBubble.tsx", "GenerationStream.tsx", "ModelBadge.tsx",
+  "PromptInput.tsx", "TokenCounter.tsx",
+]);
+
+const files = (await walk(path.join(PKG, "src/components"))).filter(
+  (f) => !PENDING.has(path.basename(f)),
+);
+
+const dead = [];
+let scanned = 0;
+for (const file of files) {
+  const src = await readFile(file, "utf8");
+  const body = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const lines = body.split("\n");
+  lines.forEach((line, i) => {
+    for (const m of line.matchAll(/"([^"\n]{2,})"/g)) {
+      const missing = classListOf(m[1]);
+      if (missing === null) continue;
+      scanned++;
+      for (const cls of missing) {
+        dead.push({ file: path.relative(ROOT, file), line: i + 1, cls });
+      }
+    }
+  });
+}
+
+if (dead.length > 0) {
+  console.error("组件用到未生成的类名——这些元素会静默无样式：\n");
+  for (const d of dead) console.error(`  ✗ ${d.file}:${d.line}  ${d.cls}`);
+  console.error(
+    "\n改用 T2 语义名产出的工具类；族清单见 docs/10-standards/060-design-system.md §1.1。",
+  );
+  process.exit(1);
+}
+
+console.log(
+  `组件类名实测通过（${files.length} 个已重写组件 / ${scanned} 处类名列表，全部生成；` +
+    `${PENDING.size} 个待 C2 重写的组件暂不纳入）`,
+);

@@ -1,5 +1,5 @@
 /**
- * separator.tsx - Separator 组件
+ * Separator.tsx - 分隔线。
  * @package @vxture/design-system
  *
  * @copyright Vxture Team
@@ -26,8 +26,10 @@ export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
         decorative={decorative}
         orientation={orientation}
         className={cn(
-          "shrink-0 bg-vx-border",
-          orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
+          "shrink-0 bg-border",
+          // 1px 线用内置的 h-px / w-px：--border-width-* 只产出 border-* 工具类，
+          // 落不到 height / width 上。
+          orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
           className,
         )}
         {...props}

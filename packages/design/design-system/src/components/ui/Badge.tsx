@@ -18,15 +18,15 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const badgeVariants = ({ variant }: { variant: BadgeVariant }) => {
   return cn(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-vx-ring-strong focus:ring-offset-2",
+    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
     {
-      "border-transparent bg-vx-primary text-vx-text-inverse hover:bg-vx-primary-strong":
+      "border-transparent bg-primary text-content-on-fill hover:bg-primary-hover":
         variant === "default",
-      "border-transparent bg-vx-surface-muted text-vx-text-primary hover:bg-vx-primary-soft":
+      "border-transparent bg-accent text-foreground hover:bg-primary-muted":
         variant === "secondary",
-      "border-transparent bg-vx-danger text-vx-text-inverse hover:bg-vx-danger":
+      "border-transparent bg-destructive text-content-on-fill hover:bg-destructive":
         variant === "destructive",
-      "text-vx-text-primary": variant === "outline",
+      "text-foreground": variant === "outline",
     },
   );
 };
