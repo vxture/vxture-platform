@@ -1,0 +1,43 @@
+/**
+ * components/notification-component.css - T3 组件层 · notification（24 项）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-component.mjs
+ *   源：Figma-Token/vx-Component/（过程文件，迁移完成后删除）
+ *
+ * T3 只引用 T2。定义与建立门槛见 docs/10-standards/060-design-system.md §1.1，
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ * 应用侧可 var() 引用，**禁止赋值**。
+ */
+
+:root {
+  --notification-bg: var(--popover);
+  --notification-text: var(--foreground);
+  --notification-title-color: var(--foreground);
+  --notification-border: var(--border);
+  --notification-radius: var(--radius-md);
+  --notification-shadow-offset-y: var(--elevation-3-offset-y);
+  --notification-shadow-blur: var(--elevation-3-blur);
+  --notification-shadow-color: var(--elevation-3-color);
+  --notification-inset: var(--inset-sm);
+  --notification-gap: var(--gap-sm);
+  --notification-max-width: 360px;
+  --notification-icon-size: var(--icon-md);
+  --notification-success-bg: var(--success-muted);
+  --notification-success-text: var(--success-muted-foreground);
+  --notification-success-icon: var(--success);
+  --notification-danger-bg: var(--destructive-muted);
+  --notification-danger-text: var(--destructive-muted-foreground);
+  --notification-danger-icon: var(--destructive);
+  --notification-warning-bg: var(--warning-muted);
+  --notification-warning-text: var(--warning-muted-foreground);
+  --notification-warning-icon: var(--warning);
+  --notification-info-bg: var(--info-muted);
+  --notification-info-text: var(--info-muted-foreground);
+  --notification-info-icon: var(--info);
+}

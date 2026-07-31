@@ -1,0 +1,45 @@
+/**
+ * components/toast-component.css - T3 组件层 · toast（26 项）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-component.mjs
+ *   源：Figma-Token/vx-Component/（过程文件，迁移完成后删除）
+ *
+ * T3 只引用 T2。定义与建立门槛见 docs/10-standards/060-design-system.md §1.1，
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ * 应用侧可 var() 引用，**禁止赋值**。
+ */
+
+:root {
+  --toast-width: 360px;
+  --toast-gap: var(--gap-sm);
+  --toast-inset: var(--inset-md);
+  --toast-bg: var(--popover);
+  --toast-text: var(--foreground);
+  --toast-radius: var(--radius-md);
+  --toast-shadow-offset-y: var(--elevation-3-offset-y);
+  --toast-shadow-blur: var(--elevation-3-blur);
+  --toast-shadow-color: var(--elevation-3-color);
+  --toast-max-width: 480px;
+  --toast-success-bg: var(--success-muted);
+  --toast-success-text: var(--success-muted-foreground);
+  --toast-success-icon: var(--success);
+  --toast-success-border: var(--success-border);
+  --toast-danger-bg: var(--destructive-muted);
+  --toast-danger-text: var(--destructive-muted-foreground);
+  --toast-danger-icon: var(--destructive);
+  --toast-danger-border: var(--destructive-border);
+  --toast-warning-bg: var(--warning-muted);
+  --toast-warning-text: var(--warning-muted-foreground);
+  --toast-warning-icon: var(--warning);
+  --toast-warning-border: var(--warning-border);
+  --toast-info-bg: var(--info-muted);
+  --toast-info-text: var(--info-muted-foreground);
+  --toast-info-icon: var(--info);
+  --toast-info-border: var(--info-border);
+}

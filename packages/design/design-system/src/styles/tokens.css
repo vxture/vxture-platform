@@ -18,6 +18,7 @@
 @import "./semantic/layout-semantic.css";
 @import "./semantic/space-semantic.css";
 @import "./semantic/typography-semantic.css";
+@import "./components/index.css";
 @import "./tokens-theme.css";
 @import "./tokens-colors-primitives.css";
 @import "./tokens-gradients.css";

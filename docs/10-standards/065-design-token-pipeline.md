@@ -225,6 +225,20 @@ Figma MCP 的页面枚举会漏列页面，且 `search_design_system` 只返回�
 | `vx-Element`                              | T2  | `semantic/element-semantic.css`    | **已迁入** |
 | `vx-Layout`                               | T2  | `semantic/layout-semantic.css`     | **已迁入** |
 | `vx-Motion`                               | T2  | `semantic/motion-semantic.css`     | **已迁入** |
-| `vx-Component`                            | T3  | `components/*.css`                 | 待迁       |
+| `vx-Component`                            | T3  | `components/*-component.css`       | **已迁入** |
 
-**11 / 12 已迁。** 仅剩 `vx-Component`（T3，Phase 3）；迁完后按 §1.1 的四步退役过程文件。
+**12 / 12 已迁 —— 删除条件已满足。** `Figma-Token/` 可按 §1.1 的四步退役，该动作需 owner 明确授权后执行。
+
+退役前需一并处理的遗留：
+
+| 项                            | 数量          | 说明                                  |
+| ----------------------------- | ------------- | ------------------------------------- |
+| `$description` 与实际绑定不符 | 5             | §3.1                                  |
+| `codeSyntax` 漏写 `--` 前缀   | 13            | §3.1.1                                |
+| `codeSyntax` 撞名             | 22 组 / 62 项 | §3.2.1                                |
+| `codeSyntax` 缺失             | 198           | T2 50 + T3 148                        |
+| 表面阶梯偏离                  | 4             | §3.1.2，设计稿应跟随 DS 改为中性      |
+| `modal` 违反自身 T3 门槛      | 12 项         | 治理称「无需 T3、直接绑 T2」却建了 T3 |
+| `surface/danger` 无名无别名   | 1             | 无法生成，已跳过                      |
+
+这些都应回报设计侧修正设计稿——**修的是设计稿，不是 DS**：DS 已是真值源，设计稿需向 DS 对齐。

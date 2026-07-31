@@ -1,0 +1,31 @@
+/**
+ * components/index.css - T3 组件层聚合入口。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ */
+
+@import "./alert-component.css";
+@import "./avatar-component.css";
+@import "./chat-component.css";
+@import "./code-block-component.css";
+@import "./control-component.css";
+@import "./drawer-component.css";
+@import "./focus-ring-component.css";
+@import "./message-component.css";
+@import "./modal-component.css";
+@import "./notification-component.css";
+@import "./popconfirm-component.css";
+@import "./popover-component.css";
+@import "./progress-component.css";
+@import "./scrollbar-component.css";
+@import "./skeleton-component.css";
+@import "./status-dot-component.css";
+@import "./table-component.css";
+@import "./textarea-component.css";
+@import "./toast-component.css";
+@import "./tooltip-component.css";
