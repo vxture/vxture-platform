@@ -174,13 +174,14 @@ const scaleDeviated = [];
 const added = [];
 const errors = [];
 
-/** 裸值 → CSS 值。 */
+/** 裸值 → CSS 值。数值一律去浮点噪声：导出里 0.45 存成 0.44999998807907104。 */
 function literal(tokenPath, value) {
   if (typeof value === "string") return value;
   if (typeof value !== "number") return null;
-  if (UNITLESS.test(tokenPath) || /fontWeight$/.test(tokenPath)) return String(value);
-  if (MS.test(tokenPath)) return `${value}ms`;
-  return `${value}px`;
+  const n = Number(value.toFixed(4));
+  if (UNITLESS.test(tokenPath) || /fontWeight$/.test(tokenPath)) return String(n);
+  if (MS.test(tokenPath)) return `${n}ms`;
+  return `${n}px`;
 }
 
 function buildRows(collection, file) {
@@ -242,6 +243,13 @@ function buildRows(collection, file) {
       const aliasVar = dtcgAlias(token.$value);
       if (aliasVar) {
         rows.push([name, `var(${aliasVar})`, tokenPath]);
+        continue;
+      }
+      // 页面层级恒等于同名断点——恢复严格对应后两者逐档同值，写死两份字面量必然漂移，
+      // 故显式别名。这也让"页面最大宽度跟随断点"这条规则在产物里自解释。
+      const pageStep = /^layout\/container\/(.+)$/.exec(tokenPath);
+      if (pageStep) {
+        rows.push([name, `var(--layout-breakpoint-${pageStep[1]})`, tokenPath]);
         continue;
       }
       const override = SCALE_DEVIATIONS[tokenPath];

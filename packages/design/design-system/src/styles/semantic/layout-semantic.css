@@ -16,14 +16,14 @@
 
 :root {
   /* layout */
-  --layout-page-sm: 640px;
-  --layout-page-md: 768px;
-  --layout-page-lg: 1024px;
-  --layout-page-xl: 1280px;
-  --layout-page-2xl: 1536px;
-  --layout-page-3xl: 1920px;
-  --layout-page-4xl: 2560px;
-  --layout-page-5xl: 3840px;
+  --layout-page-sm: var(--layout-breakpoint-sm);
+  --layout-page-md: var(--layout-breakpoint-md);
+  --layout-page-lg: var(--layout-breakpoint-lg);
+  --layout-page-xl: var(--layout-breakpoint-xl);
+  --layout-page-2xl: var(--layout-breakpoint-2xl);
+  --layout-page-3xl: var(--layout-breakpoint-3xl);
+  --layout-page-4xl: var(--layout-breakpoint-4xl);
+  --layout-page-5xl: var(--layout-breakpoint-5xl);
   --layout-content-narrow-lg: var(--layout-page-lg);
   --layout-content-base-xl: var(--layout-page-xl);
   --layout-content-wide-2xl: var(--layout-page-2xl);

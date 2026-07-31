@@ -24,21 +24,8 @@ export const DEVIATIONS = {
   },
 };
 
-/**
- * 非色彩刻度的取值偏离（裸值覆盖）。
- *
- * `layout/container/{3xl,4xl,5xl}` 在设计稿中同为 1920px——是"兼容 2K/4K"的
- * 权宜写法，但三档同值等于没有档位，且破坏了 container 与 breakpoint 的一一对应
- * （sm–2xl 本来是严格相等的）。
- *
- * 根因是把两个概念混在了一个刻度里：**视口容器**（应跟随断点）与**可读内容宽度**
- * （应有上限）。故拆开处理——container 恢复与断点严格对齐，可读上限交给
- * `layout/content/*`，后者另加 3xl 档承接 2K/4K 的数据密集型页面。
- */
-export const SCALE_DEVIATIONS = {
-  "layout/container/4xl": { value: 2560, why: "与断点 4xl 对齐（QHD/2K）" },
-  "layout/container/5xl": { value: 3840, why: "与断点 5xl 对齐（UHD/4K）" },
-};
+/** 非色彩刻度的取值偏离（裸值覆盖）。当前无——container 已改为别名断点，不再需要覆盖。 */
+export const SCALE_DEVIATIONS = {};
 
 /**
  * DS 增补的 token（设计稿中不存在）。需回报设计侧补进设计稿。

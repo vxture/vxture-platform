@@ -16,8 +16,8 @@
 
 :root {
   /* opacity */
-  --opacity-disabled: 0.44999998807907104;
-  --opacity-subtle: 0.6000000238418579;
+  --opacity-disabled: 0.45;
+  --opacity-subtle: 0.6;
   --opacity-muted: 0.75;
   --opacity-overlay: 0.5;
   --opacity-full: 1;
