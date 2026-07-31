@@ -133,6 +133,10 @@ jobs:
         if: steps.changes.outputs.docs_only != 'true'
         run: pnpm lint:design-exports
 
+      - name: Design tokens in sync with Figma export
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm lint:design-tokens
+
       - name: Env audit (deploy bundle + runtime template contract)
         if: steps.changes.outputs.docs_only != 'true'
         run: |

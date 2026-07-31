@@ -1,0 +1,4317 @@
+{
+  "table": {
+    "border": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8980392217636108,
+          0.8980392217636108,
+          0.8980392217636108
+        ],
+        "alpha": 1,
+        "hex": "#E5E5E5"
+      },
+      "$description": "表格线。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:6",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--table-border)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:307e45fd3ca6bc056fd6fe90498cd6d534f766d0/-1:-1",
+          "targetVariableName": "stroke/divider",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "header": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9607843160629272,
+            0.9607843160629272,
+            0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#F5F5F5"
+        },
+        "$description": "表头底色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:3",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--table-header-bg)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0d583f5b7e55244f87448289c848656e4d1b7335/-1:-1",
+            "targetVariableName": "surface/N-2",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "row": {
+      "stripe-bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.32156863808631897,
+            0.32156863808631897,
+            0.32156863808631897
+          ],
+          "alpha": 0.0784313753247261,
+          "hex": "#525252"
+        },
+        "$description": "斑马纹底色。⚠ 既非 hover 态也不属于 surface 层级序列,是表格特有的静态装饰。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:4",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--table-row-stripe-bg)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e40e9253c4506acfc862afdf57352c80e3b4ad95/-1:-1",
+            "targetVariableName": "surface/hover",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "cell": {
+      "inset-x": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "单元格横向内边距。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:5",
+          "com.figma.scopes": [
+            "GAP"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--table-cell-inset-x)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+            "targetVariableName": "inset/md",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      }
+    },
+    "column-width": {
+      "icon": {
+        "$type": "number",
+        "$value": 64,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:800:2276",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:916c42fdd4a51722b8f722350eaea29e7adb9258/-1:-1",
+            "targetVariableName": "media/xl",
+            "targetVariableSetId": "VariableCollectionId:e6795512504e7e91f8cda4527237d3207436fb6d/-1:-1",
+            "targetVariableSetName": "vx-Element"
+          }
+        }
+      }
+    }
+  },
+  "control": {
+    "box": {
+      "sm": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "勾选框 / 单选框边长 —— 小档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:12",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-box-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "勾选框 / 单选框边长 —— 默认档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:13",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-box-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "勾选框 / 单选框边长 —— 大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:14",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-box-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "勾选框 / 单选框边长 —— 超大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–32px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:777:22",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    },
+    "switch-w": {
+      "sm": {
+        "$type": "number",
+        "$value": 28,
+        "$description": "开关轨道宽 —— 小档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:15",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-w-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 36,
+        "$description": "开关轨道宽 —— 默认档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:16",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-w-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 44,
+        "$description": "开关轨道宽 —— 大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:17",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-w-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 52,
+        "$description": "开关轨道宽 —— 超大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:775:2281",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    },
+    "switch-h": {
+      "sm": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "开关轨道高 —— 小档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:18",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-h-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "开关轨道高 —— 默认档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:19",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-h-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "开关轨道高 —— 大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:20",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-switch-h-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 28,
+        "$description": "开关轨道高 —— 超大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:775:2282",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    },
+    "knob": {
+      "sm": {
+        "$type": "number",
+        "$value": 12,
+        "$description": "开关滑块直径 —— 小档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:21",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-knob-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "开关滑块直径 —— 默认档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:22",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-knob-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "开关滑块直径 —— 大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:389:23",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--control-knob-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "开关滑块直径 —— 超大档。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 control/height(那是可点击控件的整体高度,勾选框只有 16–24px)、不是 icon(不是符号)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ 开关的轨道宽高比固定为 1.8:1,滑块直径 = 轨道高 − 4px(上下各留 2px 余量)。改动其一必须同步另两个。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:775:2283",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    }
+  },
+  "textarea": {
+    "min-height": {
+      "sm": {
+        "$type": "number",
+        "$value": 72,
+        "$description": "多行输入框最小高度(约 3 行)。⚠ 本 token 持有裸值:L2 无对应表达 —— control/height 是单行控件高度,而多行框的高度由「行数 × 行高 + 上下内边距」决定,行数是组件语义不是空间语义。 ⚠ 用户可向下拖拽扩展,本值只是下限。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:392:2",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--textarea-min-height-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 88,
+        "$description": "多行输入框最小高度(约 3 行)。⚠ 本 token 持有裸值:L2 无对应表达 —— control/height 是单行控件高度,而多行框的高度由「行数 × 行高 + 上下内边距」决定,行数是组件语义不是空间语义。 ⚠ 用户可向下拖拽扩展,本值只是下限。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:392:3",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--textarea-min-height-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 104,
+        "$description": "多行输入框最小高度(约 3 行)。⚠ 本 token 持有裸值:L2 无对应表达 —— control/height 是单行控件高度,而多行框的高度由「行数 × 行高 + 上下内边距」决定,行数是组件语义不是空间语义。 ⚠ 用户可向下拖拽扩展,本值只是下限。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:392:4",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--textarea-min-height-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 120,
+        "$description": "多行输入框最小高度(约 4 行)。⚠ 本 token 持有裸值:L2 无对应表达 —— control/height 是单行控件高度,而多行框的高度由「行数 × 行高 + 上下内边距」决定,行数是组件语义不是空间语义。 ⚠ 用户可向下拖拽扩展,本值只是下限。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:748:2229",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    }
+  },
+  "skeleton": {
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 0.0784313753247261,
+        "hex": "#525252"
+      },
+      "$description": "骨架屏底色。加载占位不属于任何语义角色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:10",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--skeleton-bg)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:e40e9253c4506acfc862afdf57352c80e3b4ad95/-1:-1",
+          "targetVariableName": "surface/hover",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "shimmer": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 0.14901961386203766,
+        "hex": "#525252"
+      },
+      "$description": "骨架屏流光高亮。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:11",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--skeleton-shimmer)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:46da5d00e181ab46001d4430c52031e33f179d6c/-1:-1",
+          "targetVariableName": "surface/active",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "骨架屏圆角。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:12",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--skeleton-radius)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c7bcba8d89ecacce793ef7ff94d670eb5edb2d2e/-1:-1",
+          "targetVariableName": "radius/sm",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    }
+  },
+  "focus-ring": {
+    "width": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "焦点环粗细。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:7",
+        "com.figma.scopes": [
+          "STROKE_FLOAT"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--focus-ring-width)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:5053801ad186cbc312f58225768d886517d942e0/-1:-1",
+          "targetVariableName": "border/width/medium",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "offset": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "焦点环与控件的间距。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:8",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--focus-ring-offset)"
+        }
+      }
+    },
+    "color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.11800000071525574,
+          0.3179999887943268,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#1E51FF"
+      },
+      "$description": "焦点环颜色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:9",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--focus-ring-color)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:97913b26664c3ccd6abab0368258f3ec939b6062/-1:-1",
+          "targetVariableName": "stroke/focus",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    }
+  },
+  "code-block": {
+    "inset": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "代码块内边距。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:35",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--code-block-inset)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+          "targetVariableName": "inset/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9607843160629272,
+          0.9607843160629272,
+          0.9607843160629272
+        ],
+        "alpha": 1,
+        "hex": "#F5F5F5"
+      },
+      "$description": "代码块底色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:36",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--code-block-bg)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:0d583f5b7e55244f87448289c848656e4d1b7335/-1:-1",
+          "targetVariableName": "surface/N-2",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "代码块圆角。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:37",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--code-block-radius)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d25980d0d80cccf968ceda680ca02e16597dd33e/-1:-1",
+          "targetVariableName": "radius/md",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    }
+  },
+  "progress": {
+    "track-height": {
+      "sm": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "细进度条 —— 内联于文字行。⚠ 本 token 持有裸值:L2 无对应表达 —— 进度条轨道高度不是控件高度(control/height 最小 20px)、不是间距、也不是图标尺寸,它是一条装饰性度量条的厚度。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:461:2",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--progress-track-height-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "默认进度条。⚠ 本 token 持有裸值:L2 无对应表达 —— 进度条轨道高度不是控件高度(control/height 最小 20px)、不是间距、也不是图标尺寸,它是一条装饰性度量条的厚度。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:461:3",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--progress-track-height-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 12,
+        "$description": "强调进度条 —— 独立展示。⚠ 本 token 持有裸值:L2 无对应表达 —— 进度条轨道高度不是控件高度(control/height 最小 20px)、不是间距、也不是图标尺寸,它是一条装饰性度量条的厚度。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:461:4",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--progress-track-height-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "超大进度条 —— 关键指标强调展示。⚠ 本 token 持有裸值:L2 无对应表达 —— 进度条轨道高度不是控件高度(control/height 最小 20px)、不是间距、也不是图标尺寸,它是一条装饰性度量条的厚度。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:776:22",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    }
+  },
+  "scrollbar": {
+    "width": {
+      "$type": "number",
+      "$value": 10,
+      "$description": "滚动条宽度。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:13",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--scrollbar-width)"
+        }
+      }
+    },
+    "thumb": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.6392157077789307,
+          0.6392157077789307,
+          0.6392157077789307
+        ],
+        "alpha": 1,
+        "hex": "#A3A3A3"
+      },
+      "$description": "滚动条滑块。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:14",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--scrollbar-thumb)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:705489134909e056eb1c095b9de693277545a06f/-1:-1",
+          "targetVariableName": "stroke/control",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "track": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9607843160629272,
+          0.9607843160629272,
+          0.9607843160629272
+        ],
+        "alpha": 1,
+        "hex": "#F5F5F5"
+      },
+      "$description": "滚动条轨道。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:15",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--scrollbar-track)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:0d583f5b7e55244f87448289c848656e4d1b7335/-1:-1",
+          "targetVariableName": "surface/N-2",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    }
+  },
+  "avatar": {
+    "radius": {
+      "$type": "number",
+      "$value": 9999,
+      "$description": "头像圆角,默认全圆。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:21",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--avatar-radius)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:8674a9bf4c0606fb65e300f753295865aa7f38c1/-1:-1",
+          "targetVariableName": "radius/full",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "status-size": {
+      "xs": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:2",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-xs)"
+          }
+        }
+      },
+      "sm": {
+        "$type": "number",
+        "$value": 10,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:3",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-sm)"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 12,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:4",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-md)"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 14,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:5",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-lg)"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:6",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-xl)"
+          }
+        }
+      },
+      "2xl": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:7",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-2xl)"
+          }
+        }
+      },
+      "3xl": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "头像状态点直径,按头像档位递进(约头像的 25–33%)。⚠ 本 token 持有裸值:L2 无对应表达 —— 它不是 icon(不是 Phosphor 符号)、不是 media(不是内容图形)、也不是 spacing(它是元素尺寸)。且 L3 不得跨层引用 L1。 ⚠ xs 档 8px 已接近可辨识下限,密集场景建议不显示状态点。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:363:8",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--avatar-status-3xl)"
+          }
+        }
+      }
+    }
+  },
+  "chat": {
+    "bubble": {
+      "max-width": {
+        "$type": "number",
+        "$value": 680,
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 最大宽度。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:27",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-max-width)"
+          }
+        }
+      },
+      "inset": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 内边距。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:28",
+          "com.figma.scopes": [
+            "GAP"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-inset)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+            "targetVariableName": "inset/md",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "radius": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 圆角。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:29",
+          "com.figma.scopes": [
+            "CORNER_RADIUS"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-radius)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:71bb7dec7b106eada85abb923c3a4f79ac65fe7f/-1:-1",
+            "targetVariableName": "radius/xl",
+            "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+            "targetVariableSetName": "vx-Shape"
+          }
+        }
+      },
+      "gap": {
+        "$type": "number",
+        "$value": 8,
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 气泡之间的间隙。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:30",
+          "com.figma.scopes": [
+            "GAP"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-gap)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7f1cb20599d38f082874a9a797a0db33a29d51f7/-1:-1",
+            "targetVariableName": "gap/md",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "user-bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9330000281333923,
+            0.9490000009536743,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#EEF2FF"
+        },
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 用户侧底色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:31",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-user-bg)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:3b92124096498f8eb86105ab4ec3ba10eb0c3be5/-1:-1",
+            "targetVariableName": "intent/brand/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "agent-bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9803921580314636,
+            0.9803921580314636,
+            0.9803921580314636
+          ],
+          "alpha": 1,
+          "hex": "#FAFAFA"
+        },
+        "$description": "对话气泡。Agent 平台的核心组件,其宽度约束与左右差异 L2 无从表达。 Agent 侧底色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:32",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-bubble-agent-bg)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:dcb9bfc9158614e47af64e60d188df68f6ce27e4/-1:-1",
+            "targetVariableName": "surface/N-1",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "composer": {
+      "min-height": {
+        "$type": "number",
+        "$value": 40,
+        "$description": "输入区最小高度。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:33",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-composer-min-height)"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:3d86fee448a4253df0cf3defe1f748435ff39307/-1:-1",
+            "targetVariableName": "row/height/md",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "max-height": {
+        "$type": "number",
+        "$value": 240,
+        "$description": "输入区最大高度,超出内部滚动。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:267:34",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "var(--chat-composer-max-height)"
+          }
+        }
+      }
+    }
+  },
+  "tooltip": {
+    "max-width": {
+      "$type": "number",
+      "$value": 320,
+      "$description": "工具提示最大宽度,文本换行阈值。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:22",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--tooltip-max-width)"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.09019608050584793,
+          0.09019608050584793,
+          0.09019608050584793
+        ],
+        "alpha": 1,
+        "hex": "#171717"
+      },
+      "$description": "工具提示背景色。别名 surface/float —— 浮层语义色,与下拉、气泡、菜单共用同一表面 token。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:22",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:4ceb725684eb3f5187e6c67f04852715f241c3ad/-1:-1",
+          "targetVariableName": "surface/inverse",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9803921580314636,
+          0.9803921580314636,
+          0.9803921580314636
+        ],
+        "alpha": 1,
+        "hex": "#FAFAFA"
+      },
+      "$description": "工具提示文字颜色。别名 content/primary —— 标准正文/标题中性色,对比承诺 ≥7。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:23",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:8687d28edfd883b4c8e1f40b472100d9238a7d51/-1:-1",
+          "targetVariableName": "content/on-inverse",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "工具提示圆角。别名 radius/sm —— 小型浮层控件圆角阶。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:24",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c7bcba8d89ecacce793ef7ff94d670eb5edb2d2e/-1:-1",
+          "targetVariableName": "radius/sm",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "工具提示阴影纵向偏移。别名 elevation/2/offset-y —— 与卡片、下拉同级阴影几何。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:25",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:78ba676de26a87da7773713d683128b808564b8f/-1:-1",
+          "targetVariableName": "elevation/2/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 4,
+      "$description": "工具提示阴影模糊半径。别名 elevation/2/blur。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:26",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:3ad746029343219a4f357f34021f8bf77a3e647b/-1:-1",
+          "targetVariableName": "elevation/2/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.10196078568696976,
+        "hex": "#0A0A0A"
+      },
+      "$description": "工具提示阴影颜色。别名 elevation/2/color —— scope 与源变量一致(EFFECT_COLOR)。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:27",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:26ceed64997f7c0734f798dbeb8692ea018da8bb/-1:-1",
+          "targetVariableName": "elevation/2/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "inset": {
+      "sm": {
+        "$type": "number",
+        "$value": 6,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:814:3221",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT",
+            "GAP"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:11ef4bbe14c7cbd769ceee333d7d8a42b504d8a1/-1:-1",
+            "targetVariableName": "inset/sm",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 8,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:814:3222",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT",
+            "GAP"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+            "targetVariableName": "inset/md",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:814:3223",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT",
+            "GAP"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:56f540262e35d590384faf9ae21b70687fb3d15f/-1:-1",
+            "targetVariableName": "inset/lg",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:814:3224",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT",
+            "GAP"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a05b4ab82d792169fc4c318f2315c6e4af62bd75/-1:-1",
+            "targetVariableName": "inset/xl",
+            "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+            "targetVariableSetName": "vx-Space"
+          }
+        }
+      }
+    }
+  },
+  "toast": {
+    "width": {
+      "$type": "number",
+      "$value": 360,
+      "$description": "轻提示宽度。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:24",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--toast-width)"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "多条轻提示之间的间隙。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:25",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--toast-gap)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:90864557a80227dbdfe080a3a0da77c7372debaf/-1:-1",
+          "targetVariableName": "gap/sm",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "轻提示内边距。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:267:26",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "var(--toast-inset)"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+          "targetVariableName": "inset/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#FFFFFF"
+      },
+      "$description": "轻提示默认(无 intent)背景色,如\"复制成功\"。别名 surface/float。临时反馈,自动消失,与 Message(表单级、不自动消失)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:38",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56702b83e9c3dc0240d60210061ab4c0b08fb340/-1:-1",
+          "targetVariableName": "surface/float",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "轻提示默认文字颜色。别名 content/primary。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:39",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "轻提示圆角。别名 radius/md。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:40",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d25980d0d80cccf968ceda680ca02e16597dd33e/-1:-1",
+          "targetVariableName": "radius/md",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 4,
+      "$description": "轻提示阴影纵向偏移。别名 elevation/3/offset-y。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:41",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c567ce7bcc33025dcbb09eb4104cf8d951e0ef64/-1:-1",
+          "targetVariableName": "elevation/3/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "轻提示阴影模糊半径。别名 elevation/3/blur。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:42",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:6ff7dc4a0ddf951bdf953ee6791a4397863fc50e/-1:-1",
+          "targetVariableName": "elevation/3/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.14901961386203766,
+        "hex": "#0A0A0A"
+      },
+      "$description": "轻提示阴影颜色。别名 elevation/3/color —— scope 与源变量一致(EFFECT_COLOR)。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:43",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b4eb9b4b2ce169cee53c287eac1d5f2587b082ba/-1:-1",
+          "targetVariableName": "elevation/3/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 480,
+      "$description": "轻提示响应式最大宽度上限。既有 toast/width=360 仍为默认固定宽度,本 token 仅作弹性布局下的上限约束。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:44",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ]
+      }
+    },
+    "success": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618,
+            0.9921568632125854,
+            0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#ECFDF5"
+        },
+        "$description": "轻提示(success)背景色。别名 intent/success/muted —— 弱填充,承载轻提示的低强度反馈底色。临时反馈,自动消失,如复制成功提示;与 Message 的表单级、常驻更久反馈区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:45",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:499025fc87081d9d4bf941ec871ff71d9776b315/-1:-1",
+            "targetVariableName": "intent/success/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.024000000208616257,
+            0.37299999594688416,
+            0.2750000059604645
+          ],
+          "alpha": 1,
+          "hex": "#065F46"
+        },
+        "$description": "轻提示(success)文字颜色。别名 intent/success/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:46",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:968667eb7dee759bd6a2b47f6fe67a6fa43712b0/-1:-1",
+            "targetVariableName": "intent/success/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425,
+            0.47058823704719543,
+            0.34117648005485535
+          ],
+          "alpha": 1,
+          "hex": "#047857"
+        },
+        "$description": "轻提示(success)图标颜色。别名 intent/success/fill —— 实色填充,用于强调态图标。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:47",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7849c500816697020ecd831a01ea5a64fc3da0e4/-1:-1",
+            "targetVariableName": "intent/success/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.019607843831181526,
+            0.5882353186607361,
+            0.4117647111415863
+          ],
+          "alpha": 1,
+          "hex": "#059669"
+        },
+        "$description": "轻提示(success)描边。别名 intent/success/border —— Toast 采用浮层阴影风格,描边作为辅助边界,与 Message/Alert 的扁平/描边风格区分。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1277",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:3c9cb5b1f9dc9d9ffdcbcb48abd49de772345b43/-1:-1",
+            "targetVariableName": "intent/success/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "danger": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927,
+            0.9490196108818054,
+            0.9490196108818054
+          ],
+          "alpha": 1,
+          "hex": "#FEF2F2"
+        },
+        "$description": "轻提示(danger)背景色。别名 intent/danger/muted —— 弱填充,承载轻提示的低强度反馈底色。临时反馈,自动消失,如复制成功提示;与 Message 的表单级、常驻更久反馈区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:48",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:6f50617083d674c8eaef81b7a3269731e2365379/-1:-1",
+            "targetVariableName": "intent/danger/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579,
+            0.10588235408067703,
+            0.10588235408067703
+          ],
+          "alpha": 1,
+          "hex": "#991B1B"
+        },
+        "$description": "轻提示(danger)文字颜色。别名 intent/danger/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:49",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e741bf3554f891555446047dfadf8f47252934c4/-1:-1",
+            "targetVariableName": "intent/danger/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "轻提示(danger)图标颜色。别名 intent/danger/fill —— 实色填充,用于强调态图标。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:50",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0610b56b99d59e3e2543a0a128fb00e39b6d497b/-1:-1",
+            "targetVariableName": "intent/danger/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "轻提示(danger)描边。别名 intent/danger/border —— Toast 采用浮层阴影风格,描边作为辅助边界,与 Message/Alert 的扁平/描边风格区分。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1278",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2c15681fe50ef60be2dd089f547b007958bbceae/-1:-1",
+            "targetVariableName": "intent/danger/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "warning": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.984000027179718,
+            0.921999990940094
+          ],
+          "alpha": 1,
+          "hex": "#FFFBEB"
+        },
+        "$description": "轻提示(warning)背景色。别名 intent/warning/muted —— 弱填充,承载轻提示的低强度反馈底色。临时反馈,自动消失,如复制成功提示;与 Message 的表单级、常驻更久反馈区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:51",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:21908906acc0331bd7c981f992a6c326ce11e100/-1:-1",
+            "targetVariableName": "intent/warning/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.572549045085907,
+            0.250980406999588,
+            0.054901961237192154
+          ],
+          "alpha": 1,
+          "hex": "#92400E"
+        },
+        "$description": "轻提示(warning)文字颜色。别名 intent/warning/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:52",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1f400df7b2b2f296e54ce9aa7dd9513fd4a2d053/-1:-1",
+            "targetVariableName": "intent/warning/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.984000027179718,
+            0.7490000128746033,
+            0.14100000262260437
+          ],
+          "alpha": 1,
+          "hex": "#FBBF24"
+        },
+        "$description": "轻提示(warning)图标颜色。别名 intent/warning/fill —— 实色填充,用于强调态图标。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:53",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:81ba74ac5cf5f420ef678206cd0e60f7aa0dcbb3/-1:-1",
+            "targetVariableName": "intent/warning/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8510000109672546,
+            0.46700000762939453,
+            0.024000000208616257
+          ],
+          "alpha": 1,
+          "hex": "#D97706"
+        },
+        "$description": "轻提示(warning)描边。别名 intent/warning/border —— Toast 采用浮层阴影风格,描边作为辅助边界,与 Message/Alert 的扁平/描边风格区分。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1279",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:ecc1f4e5a25118aeb99eed6b7308b11933cff08e/-1:-1",
+            "targetVariableName": "intent/warning/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "info": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909,
+            0.9764705896377563,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#F0F9FF"
+        },
+        "$description": "轻提示(info)背景色。别名 intent/info/muted —— 弱填充,承载轻提示的低强度反馈底色。临时反馈,自动消失,如复制成功提示;与 Message 的表单级、常驻更久反馈区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:54",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:89b0a94eabfbfb7b4aabf78fa634dae5383fbd04/-1:-1",
+            "targetVariableName": "intent/info/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027450980618596077,
+            0.3490196168422699,
+            0.5215686559677124
+          ],
+          "alpha": 1,
+          "hex": "#075985"
+        },
+        "$description": "轻提示(info)文字颜色。别名 intent/info/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:55",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:812d6502c045218eb20ecd4a71aba1461b9ea9fa/-1:-1",
+            "targetVariableName": "intent/info/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0117647061124444,
+            0.4117647111415863,
+            0.6313725709915161
+          ],
+          "alpha": 1,
+          "hex": "#0369A1"
+        },
+        "$description": "轻提示(info)图标颜色。别名 intent/info/fill —— 实色填充,用于强调态图标。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:56",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7b2b7b6a800aaacd8470f4c2cb221a1b1eb18a46/-1:-1",
+            "targetVariableName": "intent/info/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137718737125,
+            0.5176470875740051,
+            0.7803921699523926
+          ],
+          "alpha": 1,
+          "hex": "#0284C7"
+        },
+        "$description": "轻提示(info)描边。别名 intent/info/border —— Toast 采用浮层阴影风格,描边作为辅助边界,与 Message/Alert 的扁平/描边风格区分。临时反馈,自动消失,如复制成功提示;与 Message 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1280",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1a94fa7bbf3db9ae53e9bfbc0ddbf318cb3b4288/-1:-1",
+            "targetVariableName": "intent/info/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    }
+  },
+  "popover": {
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#FFFFFF"
+      },
+      "$description": "气泡卡片背景色。别名 surface/float —— 浮层语义色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:28",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56702b83e9c3dc0240d60210061ab4c0b08fb340/-1:-1",
+          "targetVariableName": "surface/float",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "气泡卡片文字颜色。别名 content/primary —— 标准正文/标题中性色。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:29",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8980392217636108,
+          0.8980392217636108,
+          0.8980392217636108
+        ],
+        "alpha": 1,
+        "hex": "#E5E5E5"
+      },
+      "$description": "气泡卡片描边。别名 stroke/divider —— 与浮层背景对比不足时的边界辅助线,装饰性。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:30",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:307e45fd3ca6bc056fd6fe90498cd6d534f766d0/-1:-1",
+          "targetVariableName": "stroke/divider",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "气泡卡片圆角。别名 radius/md —— 承载更丰富内容(如资料卡),圆角阶高于 Tooltip 的 radius/sm。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:31",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d25980d0d80cccf968ceda680ca02e16597dd33e/-1:-1",
+          "targetVariableName": "radius/md",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 4,
+      "$description": "气泡卡片阴影纵向偏移。别名 elevation/3/offset-y —— 气泡、右键菜单同级阴影几何。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:32",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c567ce7bcc33025dcbb09eb4104cf8d951e0ef64/-1:-1",
+          "targetVariableName": "elevation/3/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "气泡卡片阴影模糊半径。别名 elevation/3/blur。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:33",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:6ff7dc4a0ddf951bdf953ee6791a4397863fc50e/-1:-1",
+          "targetVariableName": "elevation/3/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.14901961386203766,
+        "hex": "#0A0A0A"
+      },
+      "$description": "气泡卡片阴影颜色。别名 elevation/3/color —— scope 与源变量一致(EFFECT_COLOR)。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:34",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b4eb9b4b2ce169cee53c287eac1d5f2587b082ba/-1:-1",
+          "targetVariableName": "elevation/3/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "气泡卡片内边距。别名 inset/sm —— 沿用 tooltip/inset 所属的 L2 spacing 家族,取比 Tooltip 稍大的一档以容纳更丰富内容。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:35",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:655cd7bb68e9a18dc4b96a99b953a748991eff9a/-1:-1",
+          "targetVariableName": "inset/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 360,
+      "$description": "气泡卡片最大宽度,文本/内容换行阈值。较 Tooltip 的 320 更大,因 Popover 承载资料卡等更丰富内容。 ⚠ 本 token 持有裸值:L2 无对应表达,且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:36",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ]
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "气泡卡片内部元素间隙。别名 gap/sm —— 标准同级元素间隙阶。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:37",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c029526f128f9700777c976187f064449d511b11/-1:-1",
+          "targetVariableName": "gap/2xs",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    }
+  },
+  "message": {
+    "radius": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "表单级消息圆角。别名 radius/sm —— 扁平/描边风格,采用与 Tooltip 同级的小圆角阶。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:69",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c7bcba8d89ecacce793ef7ff94d670eb5edb2d2e/-1:-1",
+          "targetVariableName": "radius/sm",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "表单级消息内边距。别名 inset/sm —— 与 popover/inset 同族 L2 spacing token。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:70",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:11ef4bbe14c7cbd769ceee333d7d8a42b504d8a1/-1:-1",
+          "targetVariableName": "inset/sm",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "表单级消息内部元素间隙。别名 gap/sm —— 与 popover/gap 同族 L2 spacing token。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:71",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:90864557a80227dbdfe080a3a0da77c7372debaf/-1:-1",
+          "targetVariableName": "gap/sm",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "icon-size": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "表单级消息图标尺寸。别名 icon/md(vx-Element,解析为 16px)—— 复用既有图标尺度阶,而非新建裸值。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:715:72",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:9ae0f558496b82167489ffeffb5340cc5f41db45/-1:-1",
+          "targetVariableName": "icon/md",
+          "targetVariableSetId": "VariableCollectionId:e6795512504e7e91f8cda4527237d3207436fb6d/-1:-1",
+          "targetVariableSetName": "vx-Element"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 320,
+      "$description": "表单级消息面板宽度上限。别名 layout/panel/xs(320px)—— 与组件当前实际绑定一致,直接复用既有面板宽度阶,不重复裸值。单行、页面顶部临时反馈,与 Alert(标题+描述两行结构)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:794:1276",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7a86e1237dd6a9cd7e8310b4270dcef10824e064/-1:-1",
+          "targetVariableName": "layout/panel/xs",
+          "targetVariableSetId": "VariableCollectionId:79478a0acff9a08cc8319ad74bf2a5ae6c85a274/-1:-1",
+          "targetVariableSetName": "vx-Layout"
+        }
+      }
+    },
+    "success": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618,
+            0.9921568632125854,
+            0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#ECFDF5"
+        },
+        "$description": "表单级消息(success)背景色。别名 intent/success/muted —— 弱填充底色,扁平/描边风格而非阴影浮层。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast(临时反馈,自动消失,如复制成功提示)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:57",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:499025fc87081d9d4bf941ec871ff71d9776b315/-1:-1",
+            "targetVariableName": "intent/success/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.024000000208616257,
+            0.37299999594688416,
+            0.2750000059604645
+          ],
+          "alpha": 1,
+          "hex": "#065F46"
+        },
+        "$description": "表单级消息(success)文字颜色。别名 intent/success/on-muted。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:58",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:968667eb7dee759bd6a2b47f6fe67a6fa43712b0/-1:-1",
+            "targetVariableName": "intent/success/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.019607843831181526,
+            0.5882353186607361,
+            0.4117647111415863
+          ],
+          "alpha": 1,
+          "hex": "#059669"
+        },
+        "$description": "表单级消息(success)描边。别名 intent/success/border —— Message 采用扁平/描边风格而非阴影,以此与 Toast 的浮层阴影风格区分。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:59",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:3c9cb5b1f9dc9d9ffdcbcb48abd49de772345b43/-1:-1",
+            "targetVariableName": "intent/success/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425,
+            0.47058823704719543,
+            0.34117648005485535
+          ],
+          "alpha": 1,
+          "hex": "#047857"
+        },
+        "$description": "表单级消息(success)图标颜色。别名 intent/success/fill —— 实色填充,用于强调态图标。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1272",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7849c500816697020ecd831a01ea5a64fc3da0e4/-1:-1",
+            "targetVariableName": "intent/success/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "danger": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927,
+            0.9490196108818054,
+            0.9490196108818054
+          ],
+          "alpha": 1,
+          "hex": "#FEF2F2"
+        },
+        "$description": "表单级消息(danger)背景色。别名 intent/danger/muted —— 弱填充底色,扁平/描边风格而非阴影浮层。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast(临时反馈,自动消失,如复制成功提示)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:60",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:6f50617083d674c8eaef81b7a3269731e2365379/-1:-1",
+            "targetVariableName": "intent/danger/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579,
+            0.10588235408067703,
+            0.10588235408067703
+          ],
+          "alpha": 1,
+          "hex": "#991B1B"
+        },
+        "$description": "表单级消息(danger)文字颜色。别名 intent/danger/on-muted。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:61",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e741bf3554f891555446047dfadf8f47252934c4/-1:-1",
+            "targetVariableName": "intent/danger/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "表单级消息(danger)描边。别名 intent/danger/border —— Message 采用扁平/描边风格而非阴影,以此与 Toast 的浮层阴影风格区分。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:62",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2c15681fe50ef60be2dd089f547b007958bbceae/-1:-1",
+            "targetVariableName": "intent/danger/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "表单级消息(danger)图标颜色。别名 intent/danger/fill —— 实色填充,用于强调态图标。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1273",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0610b56b99d59e3e2543a0a128fb00e39b6d497b/-1:-1",
+            "targetVariableName": "intent/danger/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "warning": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.984000027179718,
+            0.921999990940094
+          ],
+          "alpha": 1,
+          "hex": "#FFFBEB"
+        },
+        "$description": "表单级消息(warning)背景色。别名 intent/warning/muted —— 弱填充底色,扁平/描边风格而非阴影浮层。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast(临时反馈,自动消失,如复制成功提示)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:63",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:21908906acc0331bd7c981f992a6c326ce11e100/-1:-1",
+            "targetVariableName": "intent/warning/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.572549045085907,
+            0.250980406999588,
+            0.054901961237192154
+          ],
+          "alpha": 1,
+          "hex": "#92400E"
+        },
+        "$description": "表单级消息(warning)文字颜色。别名 intent/warning/on-muted。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:64",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1f400df7b2b2f296e54ce9aa7dd9513fd4a2d053/-1:-1",
+            "targetVariableName": "intent/warning/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8510000109672546,
+            0.46700000762939453,
+            0.024000000208616257
+          ],
+          "alpha": 1,
+          "hex": "#D97706"
+        },
+        "$description": "表单级消息(warning)描边。别名 intent/warning/border —— Message 采用扁平/描边风格而非阴影,以此与 Toast 的浮层阴影风格区分。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:65",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:ecc1f4e5a25118aeb99eed6b7308b11933cff08e/-1:-1",
+            "targetVariableName": "intent/warning/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.984000027179718,
+            0.7490000128746033,
+            0.14100000262260437
+          ],
+          "alpha": 1,
+          "hex": "#FBBF24"
+        },
+        "$description": "表单级消息(warning)图标颜色。别名 intent/warning/fill —— 实色填充,用于强调态图标。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1274",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:81ba74ac5cf5f420ef678206cd0e60f7aa0dcbb3/-1:-1",
+            "targetVariableName": "intent/warning/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "info": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909,
+            0.9764705896377563,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#F0F9FF"
+        },
+        "$description": "表单级消息(info)背景色。别名 intent/info/muted —— 弱填充底色,扁平/描边风格而非阴影浮层。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast(临时反馈,自动消失,如复制成功提示)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:66",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:89b0a94eabfbfb7b4aabf78fa634dae5383fbd04/-1:-1",
+            "targetVariableName": "intent/info/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027450980618596077,
+            0.3490196168422699,
+            0.5215686559677124
+          ],
+          "alpha": 1,
+          "hex": "#075985"
+        },
+        "$description": "表单级消息(info)文字颜色。别名 intent/info/on-muted。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:67",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:812d6502c045218eb20ecd4a71aba1461b9ea9fa/-1:-1",
+            "targetVariableName": "intent/info/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137718737125,
+            0.5176470875740051,
+            0.7803921699523926
+          ],
+          "alpha": 1,
+          "hex": "#0284C7"
+        },
+        "$description": "表单级消息(info)描边。别名 intent/info/border —— Message 采用扁平/描边风格而非阴影,以此与 Toast 的浮层阴影风格区分。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:715:68",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1a94fa7bbf3db9ae53e9bfbc0ddbf318cb3b4288/-1:-1",
+            "targetVariableName": "intent/info/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0117647061124444,
+            0.4117647111415863,
+            0.6313725709915161
+          ],
+          "alpha": 1,
+          "hex": "#0369A1"
+        },
+        "$description": "表单级消息(info)图标颜色。别名 intent/info/fill —— 实色填充,用于强调态图标。表单级操作反馈,如保存成功,通常出现在页面顶部,不自动消失或停留更久,与 Toast 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:794:1275",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7b2b7b6a800aaacd8470f4c2cb221a1b1eb18a46/-1:-1",
+            "targetVariableName": "intent/info/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    }
+  },
+  "notification": {
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#FFFFFF"
+      },
+      "$description": "通知卡片背景色。别名 surface/float —— 浮层表面,与 Toast/Popover 共用同一表面语义。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:22",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56702b83e9c3dc0240d60210061ab4c0b08fb340/-1:-1",
+          "targetVariableName": "surface/float",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "通知正文文字色。别名 content/primary —— 系统统一正文色阶。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:23",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "title-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "通知标题文字色。别名 content/primary —— 系统内未建立独立的\"强调文本\"色阶(content/emphasis 不存在),标题与正文同色;标题的视觉更重由 fontWeight(如 SemiBold)承担,而非颜色区分。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:24",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8980392217636108,
+          0.8980392217636108,
+          0.8980392217636108
+        ],
+        "alpha": 1,
+        "hex": "#E5E5E5"
+      },
+      "$description": "通知卡片描边色。别名 stroke/divider —— 与其余浮层组件保持一致的弱描边。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:25",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:307e45fd3ca6bc056fd6fe90498cd6d534f766d0/-1:-1",
+          "targetVariableName": "stroke/divider",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "通知卡片圆角。别名 radius/md。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:26",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d25980d0d80cccf968ceda680ca02e16597dd33e/-1:-1",
+          "targetVariableName": "radius/md",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 4,
+      "$description": "通知阴影纵向偏移。别名 elevation/3/offset-y —— 与 Popover 同级浮层阴影几何。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:27",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c567ce7bcc33025dcbb09eb4104cf8d951e0ef64/-1:-1",
+          "targetVariableName": "elevation/3/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "通知阴影模糊半径。别名 elevation/3/blur。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:28",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:6ff7dc4a0ddf951bdf953ee6791a4397863fc50e/-1:-1",
+          "targetVariableName": "elevation/3/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.14901961386203766,
+        "hex": "#0A0A0A"
+      },
+      "$description": "通知阴影颜色。别名 elevation/3/color —— 随主题变化的阴影色,几何值在 vx-Depth。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:29",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b4eb9b4b2ce169cee53c287eac1d5f2587b082ba/-1:-1",
+          "targetVariableName": "elevation/3/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "通知卡片内边距。别名 inset/sm。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:30",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:11ef4bbe14c7cbd769ceee333d7d8a42b504d8a1/-1:-1",
+          "targetVariableName": "inset/sm",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 6,
+      "$description": "通知标题与正文之间的内部间隙。别名 gap/sm —— 与 Popover/Message 同族 L2 spacing token。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:31",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:90864557a80227dbdfe080a3a0da77c7372debaf/-1:-1",
+          "targetVariableName": "gap/sm",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 360,
+      "$description": "通知卡片最大宽度。裸值 360 —— 与 popover/max-width 同档,适合右侧堆叠的紧凑列表;窄于 toast/max-width(480),因 Notification 是多条堆叠的短卡片而非单条横幅。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:32",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ]
+      }
+    },
+    "icon-size": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "通知图标尺寸。别名 icon/md(16px)—— 与 Message/icon-size 一致。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:33",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:9ae0f558496b82167489ffeffb5340cc5f41db45/-1:-1",
+          "targetVariableName": "icon/md",
+          "targetVariableSetId": "VariableCollectionId:e6795512504e7e91f8cda4527237d3207436fb6d/-1:-1",
+          "targetVariableSetName": "vx-Element"
+        }
+      }
+    },
+    "success": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618,
+            0.9921568632125854,
+            0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#ECFDF5"
+        },
+        "$description": "通知(success)背景色。别名 intent/success/muted —— 弱填充,与 Toast/Message 的意图色用法一致。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:34",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:499025fc87081d9d4bf941ec871ff71d9776b315/-1:-1",
+            "targetVariableName": "intent/success/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.024000000208616257,
+            0.37299999594688416,
+            0.2750000059604645
+          ],
+          "alpha": 1,
+          "hex": "#065F46"
+        },
+        "$description": "通知(success)文字色。别名 intent/success/on-muted —— 压在 muted 背景上的可读文字。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:35",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:968667eb7dee759bd6a2b47f6fe67a6fa43712b0/-1:-1",
+            "targetVariableName": "intent/success/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425,
+            0.47058823704719543,
+            0.34117648005485535
+          ],
+          "alpha": 1,
+          "hex": "#047857"
+        },
+        "$description": "通知(success)图标色。别名 intent/success/fill —— 高辨识度实色,用于图标而非大面积背景。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:36",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL",
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7849c500816697020ecd831a01ea5a64fc3da0e4/-1:-1",
+            "targetVariableName": "intent/success/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "danger": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927,
+            0.9490196108818054,
+            0.9490196108818054
+          ],
+          "alpha": 1,
+          "hex": "#FEF2F2"
+        },
+        "$description": "通知(danger)背景色。别名 intent/danger/muted —— 弱填充,与 Toast/Message 的意图色用法一致。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:37",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:6f50617083d674c8eaef81b7a3269731e2365379/-1:-1",
+            "targetVariableName": "intent/danger/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579,
+            0.10588235408067703,
+            0.10588235408067703
+          ],
+          "alpha": 1,
+          "hex": "#991B1B"
+        },
+        "$description": "通知(danger)文字色。别名 intent/danger/on-muted —— 压在 muted 背景上的可读文字。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:38",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e741bf3554f891555446047dfadf8f47252934c4/-1:-1",
+            "targetVariableName": "intent/danger/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "通知(danger)图标色。别名 intent/danger/fill —— 高辨识度实色,用于图标而非大面积背景。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:39",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL",
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0610b56b99d59e3e2543a0a128fb00e39b6d497b/-1:-1",
+            "targetVariableName": "intent/danger/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "warning": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.984000027179718,
+            0.921999990940094
+          ],
+          "alpha": 1,
+          "hex": "#FFFBEB"
+        },
+        "$description": "通知(warning)背景色。别名 intent/warning/muted —— 弱填充,与 Toast/Message 的意图色用法一致。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:40",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:21908906acc0331bd7c981f992a6c326ce11e100/-1:-1",
+            "targetVariableName": "intent/warning/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.572549045085907,
+            0.250980406999588,
+            0.054901961237192154
+          ],
+          "alpha": 1,
+          "hex": "#92400E"
+        },
+        "$description": "通知(warning)文字色。别名 intent/warning/on-muted —— 压在 muted 背景上的可读文字。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:41",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1f400df7b2b2f296e54ce9aa7dd9513fd4a2d053/-1:-1",
+            "targetVariableName": "intent/warning/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.984000027179718,
+            0.7490000128746033,
+            0.14100000262260437
+          ],
+          "alpha": 1,
+          "hex": "#FBBF24"
+        },
+        "$description": "通知(warning)图标色。别名 intent/warning/fill —— 高辨识度实色,用于图标而非大面积背景。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:42",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL",
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:81ba74ac5cf5f420ef678206cd0e60f7aa0dcbb3/-1:-1",
+            "targetVariableName": "intent/warning/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "info": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909,
+            0.9764705896377563,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#F0F9FF"
+        },
+        "$description": "通知(info)背景色。别名 intent/info/muted —— 弱填充,与 Toast/Message 的意图色用法一致。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:43",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:89b0a94eabfbfb7b4aabf78fa634dae5383fbd04/-1:-1",
+            "targetVariableName": "intent/info/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027450980618596077,
+            0.3490196168422699,
+            0.5215686559677124
+          ],
+          "alpha": 1,
+          "hex": "#075985"
+        },
+        "$description": "通知(info)文字色。别名 intent/info/on-muted —— 压在 muted 背景上的可读文字。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:44",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:812d6502c045218eb20ecd4a71aba1461b9ea9fa/-1:-1",
+            "targetVariableName": "intent/info/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0117647061124444,
+            0.4117647111415863,
+            0.6313725709915161
+          ],
+          "alpha": 1,
+          "hex": "#0369A1"
+        },
+        "$description": "通知(info)图标色。别名 intent/info/fill —— 高辨识度实色,用于图标而非大面积背景。系统级/后台任务推送,可堆叠多条,通常停留更久或需手动关闭,与 Toast(短暂反馈) 和 Message(表单级页面顶部反馈) 区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:45",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL",
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7b2b7b6a800aaacd8470f4c2cb221a1b1eb18a46/-1:-1",
+            "targetVariableName": "intent/info/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    }
+  },
+  "modal": {
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#FFFFFF"
+      },
+      "$description": "模态框背景色。别名 surface/float —— 浮层表面语义,与 Popover/Notification/Toast 共用。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:46",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56702b83e9c3dc0240d60210061ab4c0b08fb340/-1:-1",
+          "targetVariableName": "surface/float",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "scrim": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.45098039507865906,
+        "hex": "#0A0A0A"
+      },
+      "$description": "模态框背后的遮罩层。别名 surface/scrim —— 双模式同值的压暗遮罩,用于阻断背景交互。Drawer 组件应直接复用本 token(modal/scrim),不单独建 drawer/scrim。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:47",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:3fae567241127de065b9da2bbdc990840d35c237/-1:-1",
+          "targetVariableName": "surface/scrim",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "模态框正文/标题文字色。别名 content/primary。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:48",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "divider": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8980392217636108,
+          0.8980392217636108,
+          0.8980392217636108
+        ],
+        "alpha": 1,
+        "hex": "#E5E5E5"
+      },
+      "$description": "模态框头部/主体/底部区块之间的分隔线色。别名 stroke/divider。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:49",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:307e45fd3ca6bc056fd6fe90498cd6d534f766d0/-1:-1",
+          "targetVariableName": "stroke/divider",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 12,
+      "$description": "模态框圆角。别名 radius/lg —— 弹层类容器采用较大圆角档,与 Button/Card 一致。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:50",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:bb6b4adf15fb1e52d749d08b51cb74c3a659dd7e/-1:-1",
+          "targetVariableName": "radius/lg",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "模态框阴影纵向偏移。别名 elevation/4/offset-y —— elevation/4 为\"模态、抽屉\"专用层级,Modal 与 Drawer 共用同一阴影几何。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:51",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:3839c7fd38eced578067a18958dbc3399fa575c9/-1:-1",
+          "targetVariableName": "elevation/4/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "模态框阴影模糊半径。别名 elevation/4/blur。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:52",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7f601f6e164f5bc8618fe107f7d27a4d0c02fb7f/-1:-1",
+          "targetVariableName": "elevation/4/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.21960784494876862,
+        "hex": "#0A0A0A"
+      },
+      "$description": "模态框阴影颜色。别名 elevation/4/color —— 随主题变化的阴影色,几何值在 vx-Depth。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:53",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:6cc894d054a9c7323a163c20c82d2855922cd038/-1:-1",
+          "targetVariableName": "elevation/4/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "模态框内边距。别名 inset/md —— 较大内边距档,适合弹层级容器的呼吸感。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:54",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:a05b4ab82d792169fc4c318f2315c6e4af62bd75/-1:-1",
+          "targetVariableName": "inset/xl",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "模态框内部区块(标题/正文/操作栏)之间的间隙。别名 gap/sm —— 与 Popover/Message/Notification 同族 L2 spacing token。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:55",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7f1cb20599d38f082874a9a797a0db33a29d51f7/-1:-1",
+          "targetVariableName": "gap/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 640,
+      "$description": "模态框最大宽度。裸值 640 —— 典型确认/表单弹窗宽度。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:56",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ]
+      }
+    },
+    "min-width": {
+      "$type": "number",
+      "$value": 400,
+      "$description": "模态框最小宽度。裸值 400 —— 保证短内容弹窗不至过窄。居中弹层,用于阻断性确认/表单,内容通常较短,与 Drawer(侧边滑出、内容较长)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:57",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ]
+      }
+    }
+  },
+  "drawer": {
+    "bg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "alpha": 1,
+        "hex": "#FFFFFF"
+      },
+      "$description": "抽屉面板背景色。别名 surface/float。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:58",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56702b83e9c3dc0240d60210061ab4c0b08fb340/-1:-1",
+          "targetVariableName": "surface/float",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.32156863808631897,
+          0.32156863808631897,
+          0.32156863808631897
+        ],
+        "alpha": 1,
+        "hex": "#525252"
+      },
+      "$description": "抽屉正文/标题文字色。别名 content/primary。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:59",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:61f3ccacb2991ad495b335887f8a3c7c7d4cd9da/-1:-1",
+          "targetVariableName": "content/primary",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "divider": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8980392217636108,
+          0.8980392217636108,
+          0.8980392217636108
+        ],
+        "alpha": 1,
+        "hex": "#E5E5E5"
+      },
+      "$description": "抽屉头部/主体/底部区块之间的分隔线色。别名 stroke/divider。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:60",
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:307e45fd3ca6bc056fd6fe90498cd6d534f766d0/-1:-1",
+          "targetVariableName": "stroke/divider",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "radius": {
+      "$type": "number",
+      "$value": 0,
+      "$description": "抽屉圆角。裸值 0 —— ⚠ 这是刻意的设计决策,不是遗漏或占位符:抽屉是贴合视口边缘(顶/右/底/左)的边缘锚定面板,与视口边界视觉融合,任何圆角都会在贴边处产生违和的镂空视觉,因此明确不设圆角。请勿在后续迭代中\"修复\"此值为 radius/md 或 radius/lg。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:61",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ]
+      }
+    },
+    "shadow-offset-y": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "抽屉阴影纵向偏移。别名 elevation/4/offset-y —— elevation/4 为\"模态、抽屉\"专用层级,与 Modal 共用同一阴影几何。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:62",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:77df3b790d5c5ae83ac75a397bdcc51bd50d2b99/-1:-1",
+          "targetVariableName": "elevation/5/offset-y",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-blur": {
+      "$type": "number",
+      "$value": 32,
+      "$description": "抽屉阴影模糊半径。别名 elevation/4/blur。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:63",
+        "com.figma.scopes": [
+          "EFFECT_FLOAT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:29da06534bd3c1388bb77662e9ef679a4428ef78/-1:-1",
+          "targetVariableName": "elevation/5/blur",
+          "targetVariableSetId": "VariableCollectionId:83946e0f8a4cf9df0d486828843a54fb77a6d7df/-1:-1",
+          "targetVariableSetName": "vx-Depth"
+        }
+      }
+    },
+    "shadow-color": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.03921568766236305,
+          0.03921568766236305,
+          0.03921568766236305
+        ],
+        "alpha": 0.3019607961177826,
+        "hex": "#0A0A0A"
+      },
+      "$description": "抽屉阴影颜色。别名 elevation/4/color —— 随主题变化的阴影色,几何值在 vx-Depth。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:64",
+        "com.figma.scopes": [
+          "EFFECT_COLOR"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:72caa8d991df17b421c082d4129d84b48c081fc2/-1:-1",
+          "targetVariableName": "elevation/5/color",
+          "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+          "targetVariableSetName": "vx-Color"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "抽屉内边距。别名 inset/md —— 与 Modal 同档,保持弹层级容器呼吸感一致。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:65",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:a05b4ab82d792169fc4c318f2315c6e4af62bd75/-1:-1",
+          "targetVariableName": "inset/xl",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "抽屉内部区块(标题/正文/操作栏)之间的间隙。别名 gap/sm —— 与 modal/gap 同源。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:717:66",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7f1cb20599d38f082874a9a797a0db33a29d51f7/-1:-1",
+          "targetVariableName": "gap/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "width": {
+      "sm": {
+        "$type": "number",
+        "$value": 320,
+        "$description": "抽屉窄档宽度。裸值 320 —— 适合简单表单/详情预览。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:67",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 480,
+        "$description": "抽屉中档宽度。裸值 480 —— 适合中等复杂度的编辑任务,默认档。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:68",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 800,
+        "$description": "抽屉宽档宽度。裸值 640 —— 适合复杂详情编辑或多分区内容。侧边滑出面板,用于阻断性但内容较长的任务(如详情编辑),与 Modal(居中、内容较短)区分;固定宽度分档,遮罩直接复用 modal/scrim,不单独建 drawer/scrim。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:717:69",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:dde8e8258055bcc355343554b78729d0de52c162/-1:-1",
+            "targetVariableName": "layout/panel/xl",
+            "targetVariableSetId": "VariableCollectionId:79478a0acff9a08cc8319ad74bf2a5ae6c85a274/-1:-1",
+            "targetVariableSetName": "vx-Layout"
+          }
+        }
+      }
+    }
+  },
+  "status-dot": {
+    "size": {
+      "sm": {
+        "$type": "number",
+        "$value": 4,
+        "$description": "状态点直径 —— 小档,用于紧凑列表/表格行内标识。 ⚠ 本 token 持有裸值:L2 无对应表达 —— 状态点直径不是图标尺寸(不是符号)、不是控件高度、也不是间距,它是一枚独立装饰性圆点的度量。且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:786:22",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      },
+      "md": {
+        "$type": "number",
+        "$value": 6,
+        "$description": "状态点直径 —— 默认档,用于常规头像/标签旁的在线状态标识。 ⚠ 本 token 持有裸值:L2 无对应表达 —— 状态点直径不是图标尺寸(不是符号)、不是控件高度、也不是间距,它是一枚独立装饰性圆点的度量。且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:786:23",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      },
+      "lg": {
+        "$type": "number",
+        "$value": 10,
+        "$description": "状态点直径 —— 大档,用于强调展示场景(如个人资料页头像)。 ⚠ 本 token 持有裸值:L2 无对应表达 —— 状态点直径不是图标尺寸(不是符号)、不是控件高度、也不是间距,它是一枚独立装饰性圆点的度量。且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:786:24",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      },
+      "xl": {
+        "$type": "number",
+        "$value": 14,
+        "$description": "状态点直径 —— 超大档,用于大尺寸头像/卡片等需要更强视觉存在感的场景。 ⚠ 本 token 持有裸值:L2 无对应表达 —— 状态点直径不是图标尺寸(不是符号)、不是控件高度、也不是间距,它是一枚独立装饰性圆点的度量。且 L3 不得跨层引用 L1。 || L3 组件层 · 无模式轴。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:786:25",
+          "com.figma.scopes": [
+            "WIDTH_HEIGHT"
+          ]
+        }
+      }
+    }
+  },
+  "alert": {
+    "radius": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "Alert 圆角。别名 radius/md —— 与组件当前实际绑定一致(8px),沿用 tinted-card 风格圆角阶。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:38",
+        "com.figma.scopes": [
+          "CORNER_RADIUS"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d25980d0d80cccf968ceda680ca02e16597dd33e/-1:-1",
+          "targetVariableName": "radius/md",
+          "targetVariableSetId": "VariableCollectionId:cb2774a914ba2ce2628bfc32d584602e31547be5/-1:-1",
+          "targetVariableSetName": "vx-Shape"
+        }
+      }
+    },
+    "inset": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "Alert 内边距。别名 inset/xl —— 与组件当前实际绑定一致(16px),两行文案+关闭图标需要更宽松的内边距。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:39",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:a05b4ab82d792169fc4c318f2315c6e4af62bd75/-1:-1",
+          "targetVariableName": "inset/xl",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "Alert 图标与内容区之间的间隙。别名 gap/md —— 与组件当前实际绑定一致(8px)。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:40",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7f1cb20599d38f082874a9a797a0db33a29d51f7/-1:-1",
+          "targetVariableName": "gap/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "title-gap": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "Alert 标题与描述之间的行间距。别名 gap/2xs —— 与组件当前实际绑定一致(2px),与 alert/gap(图标-内容间隙)区分,因 Alert 是两行结构而 Message/Toast 均为单行,故需独立的行间距 token。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:41",
+        "com.figma.scopes": [
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c029526f128f9700777c976187f064449d511b11/-1:-1",
+          "targetVariableName": "gap/2xs",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "icon-size": {
+      "$type": "number",
+      "$value": 16,
+      "$description": "Alert 图标尺寸。别名 icon/md(16px)—— 与组件当前实际绑定一致,复用既有图标尺度阶。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:42",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:9ae0f558496b82167489ffeffb5340cc5f41db45/-1:-1",
+          "targetVariableName": "icon/md",
+          "targetVariableSetId": "VariableCollectionId:e6795512504e7e91f8cda4527237d3207436fb6d/-1:-1",
+          "targetVariableSetName": "vx-Element"
+        }
+      }
+    },
+    "close-icon-size": {
+      "$type": "number",
+      "$value": 14,
+      "$description": "Alert 关闭按钮图标尺寸。别名 icon/sm(14px)—— 与组件当前实际绑定一致,关闭图标略小于状态图标。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:43",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:ffdbf37cd33f0fe66014efe87b5a3ae8ac1b840c/-1:-1",
+          "targetVariableName": "icon/sm",
+          "targetVariableSetId": "VariableCollectionId:e6795512504e7e91f8cda4527237d3207436fb6d/-1:-1",
+          "targetVariableSetName": "vx-Element"
+        }
+      }
+    },
+    "max-width": {
+      "$type": "number",
+      "$value": 480,
+      "$description": "Alert 面板宽度上限。别名 layout/panel/md(480px)—— 与组件当前实际绑定一致,直接复用既有面板宽度阶,不重复裸值。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:791:44",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:54f4ab526d69a214d26bc12c8e3a66d39cc7f7ad/-1:-1",
+          "targetVariableName": "layout/panel/md",
+          "targetVariableSetId": "VariableCollectionId:79478a0acff9a08cc8319ad74bf2a5ae6c85a274/-1:-1",
+          "targetVariableSetName": "vx-Layout"
+        }
+      }
+    },
+    "success": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9254902005195618,
+            0.9921568632125854,
+            0.9607843160629272
+          ],
+          "alpha": 1,
+          "hex": "#ECFDF5"
+        },
+        "$description": "Alert(success)背景色。别名 intent/success/muted —— 弱填充(tinted-card),承载强调性提示的低强度反馈底色。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:22",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:499025fc87081d9d4bf941ec871ff71d9776b315/-1:-1",
+            "targetVariableName": "intent/success/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.024000000208616257,
+            0.37299999594688416,
+            0.2750000059604645
+          ],
+          "alpha": 1,
+          "hex": "#065F46"
+        },
+        "$description": "Alert(success)文字颜色,覆盖标题与描述两行(当前二者共用同一文字色)。别名 intent/success/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:23",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:968667eb7dee759bd6a2b47f6fe67a6fa43712b0/-1:-1",
+            "targetVariableName": "intent/success/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.019607843831181526,
+            0.5882353186607361,
+            0.4117647111415863
+          ],
+          "alpha": 1,
+          "hex": "#059669"
+        },
+        "$description": "Alert(success)描边。别名 intent/success/border。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:24",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:3c9cb5b1f9dc9d9ffdcbcb48abd49de772345b43/-1:-1",
+            "targetVariableName": "intent/success/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.01568627543747425,
+            0.47058823704719543,
+            0.34117648005485535
+          ],
+          "alpha": 1,
+          "hex": "#047857"
+        },
+        "$description": "Alert(success)图标颜色。别名 intent/success/fill —— 实色填充,用于强调态图标,与 toast/success/icon、notification/success/icon 同族命名。⚠ 与当前 Figma 实际绑定不同:组件实例当前图标仍绑定通用 content/tertiary(灰色),未按 intent 着色 —— 本 token 为按 intent 家族补齐后的目标值,后续需回填组件实例绑定。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:25",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7849c500816697020ecd831a01ea5a64fc3da0e4/-1:-1",
+            "targetVariableName": "intent/success/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "danger": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9960784316062927,
+            0.9490196108818054,
+            0.9490196108818054
+          ],
+          "alpha": 1,
+          "hex": "#FEF2F2"
+        },
+        "$description": "Alert(danger)背景色。别名 intent/danger/muted —— 弱填充(tinted-card),承载强调性提示的低强度反馈底色。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:26",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:6f50617083d674c8eaef81b7a3269731e2365379/-1:-1",
+            "targetVariableName": "intent/danger/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6000000238418579,
+            0.10588235408067703,
+            0.10588235408067703
+          ],
+          "alpha": 1,
+          "hex": "#991B1B"
+        },
+        "$description": "Alert(danger)文字颜色,覆盖标题与描述两行(当前二者共用同一文字色)。别名 intent/danger/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:27",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e741bf3554f891555446047dfadf8f47252934c4/-1:-1",
+            "targetVariableName": "intent/danger/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "Alert(danger)描边。别名 intent/danger/border。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:28",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2c15681fe50ef60be2dd089f547b007958bbceae/-1:-1",
+            "targetVariableName": "intent/danger/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8627451062202454,
+            0.14901961386203766,
+            0.14901961386203766
+          ],
+          "alpha": 1,
+          "hex": "#DC2626"
+        },
+        "$description": "Alert(danger)图标颜色。别名 intent/danger/fill —— 实色填充,用于强调态图标,与 toast/danger/icon、notification/danger/icon 同族命名。⚠ 与当前 Figma 实际绑定不同:组件实例当前图标仍绑定通用 content/tertiary(灰色),未按 intent 着色 —— 本 token 为按 intent 家族补齐后的目标值,后续需回填组件实例绑定。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:29",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0610b56b99d59e3e2543a0a128fb00e39b6d497b/-1:-1",
+            "targetVariableName": "intent/danger/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "warning": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            0.984000027179718,
+            0.921999990940094
+          ],
+          "alpha": 1,
+          "hex": "#FFFBEB"
+        },
+        "$description": "Alert(warning)背景色。别名 intent/warning/muted —— 弱填充(tinted-card),承载强调性提示的低强度反馈底色。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:30",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:21908906acc0331bd7c981f992a6c326ce11e100/-1:-1",
+            "targetVariableName": "intent/warning/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.572549045085907,
+            0.250980406999588,
+            0.054901961237192154
+          ],
+          "alpha": 1,
+          "hex": "#92400E"
+        },
+        "$description": "Alert(warning)文字颜色,覆盖标题与描述两行(当前二者共用同一文字色)。别名 intent/warning/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:31",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1f400df7b2b2f296e54ce9aa7dd9513fd4a2d053/-1:-1",
+            "targetVariableName": "intent/warning/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8510000109672546,
+            0.46700000762939453,
+            0.024000000208616257
+          ],
+          "alpha": 1,
+          "hex": "#D97706"
+        },
+        "$description": "Alert(warning)描边。别名 intent/warning/border。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:32",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:ecc1f4e5a25118aeb99eed6b7308b11933cff08e/-1:-1",
+            "targetVariableName": "intent/warning/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.984000027179718,
+            0.7490000128746033,
+            0.14100000262260437
+          ],
+          "alpha": 1,
+          "hex": "#FBBF24"
+        },
+        "$description": "Alert(warning)图标颜色。别名 intent/warning/fill —— 实色填充,用于强调态图标,与 toast/warning/icon、notification/warning/icon 同族命名。⚠ 与当前 Figma 实际绑定不同:组件实例当前图标仍绑定通用 content/tertiary(灰色),未按 intent 着色 —— 本 token 为按 intent 家族补齐后的目标值,后续需回填组件实例绑定。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:33",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:81ba74ac5cf5f420ef678206cd0e60f7aa0dcbb3/-1:-1",
+            "targetVariableName": "intent/warning/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    },
+    "info": {
+      "bg": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9411764740943909,
+            0.9764705896377563,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#F0F9FF"
+        },
+        "$description": "Alert(info)背景色。别名 intent/info/muted —— 弱填充(tinted-card),承载强调性提示的低强度反馈底色。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:34",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "SHAPE_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:89b0a94eabfbfb7b4aabf78fa634dae5383fbd04/-1:-1",
+            "targetVariableName": "intent/info/muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.027450980618596077,
+            0.3490196168422699,
+            0.5215686559677124
+          ],
+          "alpha": 1,
+          "hex": "#075985"
+        },
+        "$description": "Alert(info)文字颜色,覆盖标题与描述两行(当前二者共用同一文字色)。别名 intent/info/on-muted —— 压在 muted 底色上的文字,对比承诺已验证。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:35",
+          "com.figma.scopes": [
+            "TEXT_FILL"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:812d6502c045218eb20ecd4a71aba1461b9ea9fa/-1:-1",
+            "targetVariableName": "intent/info/on-muted",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137718737125,
+            0.5176470875740051,
+            0.7803921699523926
+          ],
+          "alpha": 1,
+          "hex": "#0284C7"
+        },
+        "$description": "Alert(info)描边。别名 intent/info/border。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:36",
+          "com.figma.scopes": [
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:1a94fa7bbf3db9ae53e9bfbc0ddbf318cb3b4288/-1:-1",
+            "targetVariableName": "intent/info/border",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      },
+      "icon": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0117647061124444,
+            0.4117647111415863,
+            0.6313725709915161
+          ],
+          "alpha": 1,
+          "hex": "#0369A1"
+        },
+        "$description": "Alert(info)图标颜色。别名 intent/info/fill —— 实色填充,用于强调态图标,与 toast/info/icon、notification/info/icon 同族命名。⚠ 与当前 Figma 实际绑定不同:组件实例当前图标仍绑定通用 content/tertiary(灰色),未按 intent 着色 —— 本 token 为按 intent 家族补齐后的目标值,后续需回填组件实例绑定。标题+描述两行结构,常驻于内容区块内(非浮层),用于强调性提示,与 Message(单行、页面顶部临时反馈)区分。 || L3 组件层 · 无模式轴(明暗/密度/字号由所引用的 L2 token 自动跟随)。⚠ 建立门槛:仅当某值会可预见地偏离其 L2 来源、或 L2 根本无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown 无需 L3,直接绑 L2。",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:791:37",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:7b2b7b6a800aaacd8470f4c2cb221a1b1eb18a46/-1:-1",
+            "targetVariableName": "intent/info/fill",
+            "targetVariableSetId": "VariableCollectionId:1e683f8f5a67de7d35c9ce05674e009bc4235c15/-1:-1",
+            "targetVariableSetName": "vx-Color"
+          }
+        }
+      }
+    }
+  },
+  "popconfirm": {
+    "inset": {
+      "$type": "number",
+      "$value": 12,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:814:3225",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT",
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:56f540262e35d590384faf9ae21b70687fb3d15f/-1:-1",
+          "targetVariableName": "inset/lg",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    },
+    "gap": {
+      "$type": "number",
+      "$value": 8,
+      "$extensions": {
+        "com.figma.variableId": "VariableID:814:3226",
+        "com.figma.scopes": [
+          "WIDTH_HEIGHT",
+          "GAP"
+        ],
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:7f1cb20599d38f082874a9a797a0db33a29d51f7/-1:-1",
+          "targetVariableName": "gap/md",
+          "targetVariableSetId": "VariableCollectionId:d311af76d7cfc7912772a3e8c1ee4e4cf9548dda/-1:-1",
+          "targetVariableSetName": "vx-Space"
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "vx-Component"
+  }
+}

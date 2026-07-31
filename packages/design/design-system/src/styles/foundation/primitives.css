@@ -6,33 +6,27 @@
  * @author AI-Generated
  * @date 2026-07-31
  *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   源：Figma-Token/vx-Color-Primitive/vx-Color-Primitive.tokens.json
+ *   生成：node scripts/design-tokens/generate-primitives.mjs
+ *
  * T1 定义见 docs/10-standards/060-design-system.md §1.1。
- * 色相清单承 Figma Vxture-Design-System，**不含 rose**（Figma 未使用）。
+ * 色相清单承 Figma，**不含 rose**（设计稿未使用）。
  *
- * ⚠ 不得改用 Tailwind v4 内置 --color-<hue>-<step>。
- *   v4 调色板已迁 P3 广色域，饱和色与设计稿不等值（实测：red-600
- *   v4 #e7000b vs 设计稿 #dc2626；emerald-600 #009966 vs #059669；
- *   purple-600 #9810fa vs #9333ea；amber-500 #fe9a00 vs #f59e0b）。
- *   中性色两者等值。shadcn 生成的 theme 用的是 v4 值，一律以设计稿为准。
- *
- * 取值来源（provenance）：
- *   [F] 已从 Figma 组件节点实测解析确认
- *   [T] Tailwind v3 调色板（设计稿的 chromatic 色阶经实测证实即 v3 原值）
- *   [C] 沿用既有 tokens-colors-primitives.css，无独立复核
- *   逐项标注见下方各色相注释。
+ * ⚠ 不得改用 Tailwind v4 内置 --color-<hue>-<step>：v4 调色板已迁 P3 广色域，
+ *   饱和色与设计稿不等值（red-600 #dc2626 vs v4 #e7000b 等）。中性色两者等值。
  *
  * 约束：
- * - T1 不进 package exports，应用侧禁止引用（守卫见 Phase 5）。
- * - hue → intent 映射属 T2，不在本层表达。
- * - 透明度变体在 T2 用 color-mix() 就地表达，本层不建 alpha 原子。
+ * - T1 不进 package exports，应用侧禁止引用。
+ * - hue → intent 的映射属 T2，不在本层表达。
  */
 
 :root {
-  --vx-color-base-white: #ffffff; /* [F] */
+  /* 黑白基点。 */
+  --vx-color-base-white: #ffffff;
+  --vx-color-base-black: #000000;
 
-  /* 中性阶。[F] 50/100/200/300/400/500/600/900/950 实测；[T] 700/800。
-     Figma 与 Tailwind v3/v4 三方等值。取代既有 gray-*（带蓝调），
-     切换由 T2 在 Phase 2 执行。 */
+  /* 中性阶。取代既有 gray-*（带蓝调），切换由 T2 执行。 */
   --vx-color-neutral-50: #fafafa;
   --vx-color-neutral-100: #f5f5f5;
   --vx-color-neutral-200: #e5e5e5;
@@ -40,13 +34,22 @@
   --vx-color-neutral-400: #a3a3a3;
   --vx-color-neutral-500: #737373;
   --vx-color-neutral-600: #525252;
+  --vx-color-neutral-600-alpha-08: rgb(82 82 82 / 0.0784);
+  --vx-color-neutral-600-alpha-10: rgb(82 82 82 / 0.102);
+  --vx-color-neutral-600-alpha-15: rgb(82 82 82 / 0.149);
+  --vx-color-neutral-600-alpha-22: rgb(82 82 82 / 0.2196);
   --vx-color-neutral-700: #404040;
   --vx-color-neutral-800: #262626;
   --vx-color-neutral-900: #171717;
   --vx-color-neutral-950: #0a0a0a;
+  --vx-color-neutral-950-alpha-08: rgb(10 10 10 / 0.0784);
+  --vx-color-neutral-950-alpha-10: rgb(10 10 10 / 0.102);
+  --vx-color-neutral-950-alpha-15: rgb(10 10 10 / 0.149);
+  --vx-color-neutral-950-alpha-22: rgb(10 10 10 / 0.2196);
+  --vx-color-neutral-950-alpha-30: rgb(10 10 10 / 0.302);
+  --vx-color-neutral-950-alpha-45: rgb(10 10 10 / 0.451);
 
-  /* 品牌阶。Vxture 唯一自定义色相，无法由调色板推导。
-     [F] 50/600/800 实测；[C] 其余沿用既有定义。 */
+  /* 品牌阶。Vxture 唯一自定义色相。 */
   --vx-color-brand-50: #eef2ff;
   --vx-color-brand-100: #dbe3ff;
   --vx-color-brand-200: #b8c5ff;
@@ -54,12 +57,17 @@
   --vx-color-brand-400: #5a72ff;
   --vx-color-brand-500: #3057ff;
   --vx-color-brand-600: #1e51ff;
+  --vx-color-brand-600-alpha-08: rgb(30 81 255 / 0.08);
+  --vx-color-brand-600-alpha-10: rgb(30 81 255 / 0.1);
+  --vx-color-brand-600-alpha-15: rgb(30 81 255 / 0.15);
+  --vx-color-brand-600-alpha-22: rgb(30 81 255 / 0.22);
   --vx-color-brand-700: #1740d4;
   --vx-color-brand-800: #0d2eab;
   --vx-color-brand-900: #061b75;
   --vx-color-brand-950: #020a3d;
+  --vx-color-brand-950-alpha-45: rgb(2 10 61 / 0.45);
 
-  /* 成功 / 健康态。[F] 50/600/700/800 实测；[T] 其余。 */
+  /* 成功 / 健康态。 */
   --vx-color-emerald-50: #ecfdf5;
   --vx-color-emerald-100: #d1fae5;
   --vx-color-emerald-200: #a7f3d0;
@@ -67,12 +75,16 @@
   --vx-color-emerald-400: #34d399;
   --vx-color-emerald-500: #10b981;
   --vx-color-emerald-600: #059669;
+  --vx-color-emerald-600-alpha-08: rgb(5 150 105 / 0.0784);
+  --vx-color-emerald-600-alpha-10: rgb(5 150 105 / 0.102);
+  --vx-color-emerald-600-alpha-15: rgb(5 150 105 / 0.149);
+  --vx-color-emerald-600-alpha-22: rgb(5 150 105 / 0.2196);
   --vx-color-emerald-700: #047857;
   --vx-color-emerald-800: #065f46;
   --vx-color-emerald-900: #064e3b;
   --vx-color-emerald-950: #022c22;
 
-  /* 警告态。[F] 50/400/600/800 实测；[T] 其余。 */
+  /* 警告态。 */
   --vx-color-amber-50: #fffbeb;
   --vx-color-amber-100: #fef3c7;
   --vx-color-amber-200: #fde68a;
@@ -80,12 +92,16 @@
   --vx-color-amber-400: #fbbf24;
   --vx-color-amber-500: #f59e0b;
   --vx-color-amber-600: #d97706;
+  --vx-color-amber-600-alpha-08: rgb(217 119 6 / 0.0784);
+  --vx-color-amber-600-alpha-10: rgb(217 119 6 / 0.102);
+  --vx-color-amber-600-alpha-15: rgb(217 119 6 / 0.149);
+  --vx-color-amber-600-alpha-22: rgb(217 119 6 / 0.2196);
   --vx-color-amber-700: #b45309;
   --vx-color-amber-800: #92400e;
   --vx-color-amber-900: #78350f;
   --vx-color-amber-950: #451a03;
 
-  /* 危险态。设计稿用 red（非既有代码的 rose）。[F] 50/600/800 实测；[T] 其余。 */
+  /* 危险态。设计稿用 red，非既有代码的 rose。 */
   --vx-color-red-50: #fef2f2;
   --vx-color-red-100: #fee2e2;
   --vx-color-red-200: #fecaca;
@@ -93,12 +109,16 @@
   --vx-color-red-400: #f87171;
   --vx-color-red-500: #ef4444;
   --vx-color-red-600: #dc2626;
+  --vx-color-red-600-alpha-08: rgb(220 38 38 / 0.0784);
+  --vx-color-red-600-alpha-10: rgb(220 38 38 / 0.102);
+  --vx-color-red-600-alpha-15: rgb(220 38 38 / 0.149);
+  --vx-color-red-600-alpha-22: rgb(220 38 38 / 0.2196);
   --vx-color-red-700: #b91c1c;
   --vx-color-red-800: #991b1b;
   --vx-color-red-900: #7f1d1d;
   --vx-color-red-950: #450a0a;
 
-  /* 信息态。[F] 50/600/700/800 实测；[T] 其余。 */
+  /* 信息态。 */
   --vx-color-sky-50: #f0f9ff;
   --vx-color-sky-100: #e0f2fe;
   --vx-color-sky-200: #bae6fd;
@@ -106,12 +126,16 @@
   --vx-color-sky-400: #38bdf8;
   --vx-color-sky-500: #0ea5e9;
   --vx-color-sky-600: #0284c7;
+  --vx-color-sky-600-alpha-08: rgb(2 132 199 / 0.0784);
+  --vx-color-sky-600-alpha-10: rgb(2 132 199 / 0.102);
+  --vx-color-sky-600-alpha-15: rgb(2 132 199 / 0.149);
+  --vx-color-sky-600-alpha-22: rgb(2 132 199 / 0.2196);
   --vx-color-sky-700: #0369a1;
   --vx-color-sky-800: #075985;
   --vx-color-sky-900: #0c4a6e;
   --vx-color-sky-950: #082f49;
 
-  /* AI 专属。[F] 50/600/800 实测；[T] 其余。 */
+  /* AI 专属。 */
   --vx-color-purple-50: #faf5ff;
   --vx-color-purple-100: #f3e8ff;
   --vx-color-purple-200: #e9d5ff;
@@ -119,12 +143,16 @@
   --vx-color-purple-400: #c084fc;
   --vx-color-purple-500: #a855f7;
   --vx-color-purple-600: #9333ea;
+  --vx-color-purple-600-alpha-08: rgb(147 51 234 / 0.0784);
+  --vx-color-purple-600-alpha-10: rgb(147 51 234 / 0.102);
+  --vx-color-purple-600-alpha-15: rgb(147 51 234 / 0.149);
+  --vx-color-purple-600-alpha-22: rgb(147 51 234 / 0.2196);
   --vx-color-purple-700: #7e22ce;
   --vx-color-purple-800: #6b21a8;
   --vx-color-purple-900: #581c87;
   --vx-color-purple-950: #3b0764;
 
-  /* 与 AI 主色成对使用的青色层次。[C] 沿用既有 ai-cyan-*；950 阶设计稿未用，暂缺。 */
+  /* 与 AI 主色成对使用的青色层次。 */
   --vx-color-cyan-50: #ecfeff;
   --vx-color-cyan-100: #cffafe;
   --vx-color-cyan-200: #a5f3fc;
@@ -132,20 +160,80 @@
   --vx-color-cyan-400: #22d3ee;
   --vx-color-cyan-500: #06b6d4;
   --vx-color-cyan-600: #0891b2;
+  --vx-color-cyan-600-alpha-08: rgb(8 145 178 / 0.0784);
+  --vx-color-cyan-600-alpha-10: rgb(8 145 178 / 0.102);
+  --vx-color-cyan-600-alpha-15: rgb(8 145 178 / 0.149);
+  --vx-color-cyan-600-alpha-22: rgb(8 145 178 / 0.2196);
   --vx-color-cyan-700: #0e7490;
   --vx-color-cyan-800: #155e75;
   --vx-color-cyan-900: #164e63;
+  --vx-color-cyan-950: #083344;
 
-  /* 图表分类色。设计稿只用 400 / 600 两阶，故只建两阶。
-     [T] 全部——Figma 无图表组件，无法实测（见工作计划"覆盖缺口"）。
-     ⚠ 既有 --vx-color-orange-400 (#ff7a45) 与 --vx-color-lime-500 (#1aad19)
-       并非调色板值，是混入原子层的品牌色，与此处不同。 */
+  /* 图表分类色。 */
+  --vx-color-orange-50: #fff7ed;
+  --vx-color-orange-100: #ffedd5;
+  --vx-color-orange-200: #fed7aa;
+  --vx-color-orange-300: #fdba74;
   --vx-color-orange-400: #fb923c;
+  --vx-color-orange-500: #f97316;
   --vx-color-orange-600: #ea580c;
+  --vx-color-orange-600-alpha-08: rgb(234 88 12 / 0.0784);
+  --vx-color-orange-600-alpha-10: rgb(234 88 12 / 0.102);
+  --vx-color-orange-600-alpha-15: rgb(234 88 12 / 0.149);
+  --vx-color-orange-600-alpha-22: rgb(234 88 12 / 0.2196);
+  --vx-color-orange-700: #c2410c;
+  --vx-color-orange-800: #9a3412;
+  --vx-color-orange-900: #7c2d12;
+  --vx-color-orange-950: #431407;
+
+  /* 图表分类色。 */
+  --vx-color-teal-50: #f0fdfa;
+  --vx-color-teal-100: #ccfbf1;
+  --vx-color-teal-200: #99f6e4;
+  --vx-color-teal-300: #5eead4;
   --vx-color-teal-400: #2dd4bf;
+  --vx-color-teal-500: #14b8a6;
   --vx-color-teal-600: #0d9488;
+  --vx-color-teal-600-alpha-08: rgb(13 148 136 / 0.0784);
+  --vx-color-teal-600-alpha-10: rgb(13 148 136 / 0.102);
+  --vx-color-teal-600-alpha-15: rgb(13 148 136 / 0.149);
+  --vx-color-teal-600-alpha-22: rgb(13 148 136 / 0.2196);
+  --vx-color-teal-700: #0f766e;
+  --vx-color-teal-800: #115e59;
+  --vx-color-teal-900: #134e4a;
+  --vx-color-teal-950: #042f2e;
+
+  /* 图表分类色。 */
+  --vx-color-fuchsia-50: #fdf4ff;
+  --vx-color-fuchsia-100: #fae8ff;
+  --vx-color-fuchsia-200: #f5d0fe;
+  --vx-color-fuchsia-300: #f0abfc;
   --vx-color-fuchsia-400: #e879f9;
+  --vx-color-fuchsia-500: #d946ef;
   --vx-color-fuchsia-600: #c026d3;
+  --vx-color-fuchsia-600-alpha-08: rgb(192 38 211 / 0.0784);
+  --vx-color-fuchsia-600-alpha-10: rgb(192 38 211 / 0.102);
+  --vx-color-fuchsia-600-alpha-15: rgb(192 38 211 / 0.149);
+  --vx-color-fuchsia-600-alpha-22: rgb(192 38 211 / 0.2196);
+  --vx-color-fuchsia-700: #a21caf;
+  --vx-color-fuchsia-800: #86198f;
+  --vx-color-fuchsia-900: #701a75;
+  --vx-color-fuchsia-950: #4a044e;
+
+  /* 图表分类色。 */
+  --vx-color-lime-50: #f7fee7;
+  --vx-color-lime-100: #ecfccb;
+  --vx-color-lime-200: #d9f99d;
+  --vx-color-lime-300: #bef264;
   --vx-color-lime-400: #a3e635;
+  --vx-color-lime-500: #84cc16;
   --vx-color-lime-600: #65a30d;
+  --vx-color-lime-600-alpha-08: rgb(101 163 13 / 0.0784);
+  --vx-color-lime-600-alpha-10: rgb(101 163 13 / 0.102);
+  --vx-color-lime-600-alpha-15: rgb(101 163 13 / 0.149);
+  --vx-color-lime-600-alpha-22: rgb(101 163 13 / 0.2196);
+  --vx-color-lime-700: #4d7c0f;
+  --vx-color-lime-800: #3f6212;
+  --vx-color-lime-900: #365314;
+  --vx-color-lime-950: #1a2e05;
 }
