@@ -93,6 +93,7 @@ const MODE_BLOCKS = [
   ["typography-semantic.css", ["html.vx-font-small", "html.vx-font-large"], "字号三档"],
   ["spacing-semantic.css", [".density-compact", ".density-comfortable"], "密度三档"],
   ["color-semantic.css", [".dark"], "暗色"],
+  ["typography-semantic.css", [":lang(zh)", "--vx-cjk-leading-add"], "中文修正轴"],
 ];
 
 /** 排版角色须一次落齐四个属性，只出 font-size 等于注册没生效。 */

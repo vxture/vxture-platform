@@ -54,6 +54,9 @@ import {
   TIGHT_LEADING_ROLES,
   CAPS_ROLES,
   CAPS_TRACKING,
+  CJK_SELECTOR,
+  CJK_LEADING_ADD,
+  CJK_TRACKING_ADD,
 } from "./typography-policy.mjs";
 
 const ROOT = process.cwd();
@@ -161,18 +164,20 @@ function buildRoles(modeIndex) {
     rows.push([`--${name}-font-weight`, t1(`--vx-font-weight-${weight}`, where), group]);
     rows.push([
       `--${name}-line-height`,
-      tightLeading
-        ? t1("--vx-leading-tight", where)
-        : t1(`--vx-text-${step}--line-height`, where),
+      `calc(${
+        tightLeading
+          ? t1("--vx-leading-tight", where)
+          : t1(`--vx-text-${step}--line-height`, where)
+      } + var(--vx-cjk-leading-add))`,
       group,
     ]);
     // 字距跟字号档，不跟角色；全大写是唯一与尺寸无关的例外。
     rows.push([
       `--${name}-letter-spacing`,
-      t1(
+      `calc(${t1(
         CAPS_ROLES.has(name) ? CAPS_TRACKING : `--vx-text-${step}--letter-spacing`,
         where,
-      ),
+      )} + var(--vx-cjk-tracking-add))`,
       group,
     ]);
   }
@@ -397,7 +402,12 @@ const outputs = [
     ) +
       "\n" +
       typoBlocks.map(([sel, rows]) => `${sel} {\n${render(rows)}\n}`).join("\n\n") +
-      "\n",
+      "\n\n" +
+      // 中文修正轴：默认零，由 :lang(zh) 打开。写成加法故与字号三档正交，
+      // 三个模式块无需各自复制一遍。
+      `:root {\n  --vx-cjk-leading-add: 0;\n  --vx-cjk-tracking-add: 0em;\n}\n\n` +
+      `${CJK_SELECTOR} {\n  --vx-cjk-leading-add: ${CJK_LEADING_ADD};\n` +
+      `  --vx-cjk-tracking-add: ${CJK_TRACKING_ADD};\n}\n`,
   ],
   [
     "spacing-semantic.css",
