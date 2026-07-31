@@ -14,7 +14,7 @@
  */
 
 :root {
-  /* 品牌与合成色。设计稿提供，非 Tailwind 镜像。 */
+  /* 品牌与合成色。DS 自有，非 Tailwind 镜像。 */
   --vx-color-neutral-600-alpha-08: rgb(82 82 82 / 0.0784);
   --vx-color-neutral-600-alpha-10: rgb(82 82 82 / 0.102);
   --vx-color-neutral-600-alpha-15: rgb(82 82 82 / 0.149);

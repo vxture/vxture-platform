@@ -1,16 +1,23 @@
 /**
- * typography-policy.mjs — 24 个排版角色的输入。DS 自有，取代 Figma 的 vx-Typography 导出。
+ * typography-policy.mjs — 24 个排版角色的定义。
  *
- * ── 为什么不是把 360 行导出照抄过来 ──
- * 导出把 24 角色 × 5 属性 × 3 个字号模式全部摊平。但**模式之间只有字号在变**，
- * 其余四项完全相同；而字号的变化是在 T1 字号阶梯上整体平移一档。摊平之后，
- * "哪些角色不跟着平移"这种真正的决策淹没在 360 行里看不见。
+ * 一个角色回答的是"这段文字在版面里是什么身份"，四项属性随之确定：字体族、
+ * 字重、字号档、以及行高与字距该怎么取。
  *
- * 按 {族, 字重, 默认档, 行盒, 字距} 表达之后是 24 行，且平移规则与它的两处例外
- * 成为显式条目。
+ * ── 行高与字距不逐角色写死 ──
+ * 两者都由**规则**给出，规则只有两条，取值全部来自 T1，没有任何自造数字：
+ *
+ *   行高  默认取字号档自带的行高（T1 每一档都有 `--vx-text-<step>--line-height`，
+ *         是一条随字号增大而收紧的阶梯，正是排版惯例）；display 与品牌标题
+ *         统一收紧到 `--vx-leading-tight`。
+ *   字距  默认 0；display 与品牌标题收紧一档；overline 是全大写微型标签，放开。
+ *
+ * 逐角色写死过一版，结果是同一字号在不同角色上出现七组互不相同的行高
+ * （heading-5 在 12px 上是 2.0，而 body-sm 同样 12px 是 1.33），且没有任何依据
+ * 能解释差异。规则化之后这类分歧在结构上不可能存在。
  */
 
-/** T1 字号阶梯，模式平移沿此表进行。 */
+/** T1 字号阶梯，字号三档沿此表平移。 */
 export const TEXT_LADDER = [
   "3xs", "2xs", "xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl",
 ];
@@ -19,60 +26,55 @@ export const TEXT_LADDER = [
 export const SIZE_MODE_SHIFT = [-1, 0, 1];
 
 /**
- * 排版角色。列依次为：
- *   角色名, 字体族, 字重, 默认字号档, 行盒(px)[小/默认/大], 字距(px), 例外标记
+ * 需要收紧行高与字距的角色：大字号标题。
  *
- * ── 行盒 ──
- * 记的是**绝对行盒 px**（三档各一个），而不是折算后的 1.4286：前者是设计意图
- * （全部落在 4px 栅格上：12/16/20/24/28/36/44/56/72），后者是它与字号的商，
- * 读不出栅格。生成时折算为无单位比值——绝对 px 扛不住字号三档与浏览器缩放。
+ * 大字的字面间空隙在视觉上被放大，按正文的行高与字距排会显得松散断裂。
+ * 收紧只作用于 display 全族与两级品牌标题——heading-3 及以下用的是正文字体
+ * 与正文字号区间，按正文规则处理才对。
+ */
+export const TIGHT_ROLES = /^(display-|heading-[12]$)/;
+
+/**
+ * 排版角色。列依次为：角色名, 字体族, 字重, 默认字号档, 例外标记。
  *
- * ⚠ 三档的行盒**逐档独立，推不出来**。大号档普遍是 +1 格，小号档却不是：
- *   display-xl 从 72 掉到 56（−4 格），body-sm 则保持 16 不变。试过用"随字号档
- *   同步平移一格"推导，大号档全中、小号档 18 个角色全错。故三列照列。
- *   （小号档的收敛是有道理的：字号已经压到下限，行距再按比例缩会碎掉。）
- *
- * ── 字距 ──
- * ⚠ 设计稿给**所有** display / heading / overline 的字距都是同一个 1.6px，
- *   与字号无关。折算成 em 后：display-xl(60px) 是 0.027em，overline(12px) 是
- *   0.133em——同一条"规则"在两端相差近五倍。排版惯例恰恰相反：大字收紧、
- *   小字放开。这更像是设计稿里一个共享样式被套给了所有大字号角色。
- *
- *   此处**照录 1.6px 以保持现有呈现不变**（导出里的 1.598~1.602 是浮点噪声，
- *   已归一）。要修的话应改成按尺寸分级的 em 值，那是一次可感知的视觉变更，
- *   需单独评审、单独提交。
- *
- * ── 例外标记 ──
- *   noGrow   大号模式不再放大。display-xl 已是 60px，再大挤压版面而非改善阅读。
- *   noShrink 小号模式不再缩小。代码与元信息低于 12px 失去可读性，
- *            而字号偏好本就是无障碍设置，不该把它们推到不可读。
+ * 例外标记（字号三档的边界）：
+ *   noGrow    大号档不再放大。display-xl 默认已是 60px，再大是挤压版面而非改善阅读。
+ *   noShrink  小号档不再缩小。代码与元信息低于 12px 失去可读性；字号偏好是无障碍
+ *             设置，不该把这类文字推到读不了。
  */
 export const TYPE_ROLES = [
-  ["display-xl", "brand", "bold", "6xl", [56, 72, 72], 1.6, "noGrow"],
-  ["display-lg", "brand", "bold", "5xl", [44, 56, 72], 1.6],
-  ["display-md", "brand", "bold", "4xl", [36, 44, 56], 1.6],
-  ["display-sm", "brand", "bold", "3xl", [28, 36, 44], 1.6],
-  ["display-xs", "brand", "bold", "2xl", [24, 28, 32], 1.6],
-  ["heading-1", "brand", "semibold", "3xl", [28, 36, 44], 1.6],
-  ["heading-2", "brand", "semibold", "2xl", [24, 28, 36], 1.6],
-  ["heading-3", "sans", "semibold", "base", [20, 24, 28], 1.6],
-  ["heading-4", "sans", "semibold", "sm", [20, 20, 24], 1.6],
-  ["heading-5", "sans", "semibold", "xs", [20, 20, 24], 1.6],
-  ["body-lg", "sans", "normal", "base", [20, 24, 28], 0],
-  ["body-md", "sans", "normal", "sm", [16, 20, 24], 0],
-  ["body-sm", "sans", "normal", "xs", [16, 16, 20], 0],
-  ["body-xs", "sans", "normal", "2xs", [16, 16, 20], 0],
-  ["body-xl", "sans", "normal", "lg", [24, 28, 32], 0],
-  ["label-lg", "sans", "medium", "base", [20, 24, 24], 0],
-  ["label-md", "sans", "medium", "sm", [16, 20, 24], 0],
-  ["label-sm", "sans", "medium", "xs", [16, 16, 20], 0],
-  ["label-xs", "sans", "medium", "2xs", [16, 16, 20], 0],
-  ["label-xl", "sans", "medium", "lg", [24, 28, 28], 0],
-  ["code-md", "mono", "normal", "sm", [16, 20, 24], 0],
-  ["code-sm", "mono", "normal", "xs", [16, 16, 20], 0, "noShrink"],
-  ["caption", "sans", "normal", "xs", [16, 16, 20], 0, "noShrink"],
-  ["overline", "sans", "semibold", "xs", [16, 16, 20], 1.6, "noShrink"],
+  ["display-xl", "brand", "bold", "6xl", "noGrow"],
+  ["display-lg", "brand", "bold", "5xl"],
+  ["display-md", "brand", "bold", "4xl"],
+  ["display-sm", "brand", "bold", "3xl"],
+  ["display-xs", "brand", "bold", "2xl"],
+
+  ["heading-1", "brand", "semibold", "3xl"],
+  ["heading-2", "brand", "semibold", "2xl"],
+  ["heading-3", "sans", "semibold", "base"],
+  ["heading-4", "sans", "semibold", "sm"],
+  ["heading-5", "sans", "semibold", "xs"],
+
+  ["body-xl", "sans", "normal", "lg"],
+  ["body-lg", "sans", "normal", "base"],
+  ["body-md", "sans", "normal", "sm"],
+  ["body-sm", "sans", "normal", "xs"],
+  ["body-xs", "sans", "normal", "2xs"],
+
+  ["label-xl", "sans", "medium", "lg"],
+  ["label-lg", "sans", "medium", "base"],
+  ["label-md", "sans", "medium", "sm"],
+  ["label-sm", "sans", "medium", "xs"],
+  ["label-xs", "sans", "medium", "2xs"],
+
+  ["code-md", "mono", "normal", "sm"],
+  ["code-sm", "mono", "normal", "xs", "noShrink"],
+
+  ["caption", "sans", "normal", "xs", "noShrink"],
+  ["overline", "sans", "semibold", "xs", "noShrink"],
 ];
 
 /** 产物里的分组顺序，与角色名前缀一致。 */
-export const TYPE_GROUP_ORDER = ["display", "heading", "body", "label", "code", "caption", "overline"];
+export const TYPE_GROUP_ORDER = [
+  "display", "heading", "body", "label", "code", "caption", "overline",
+];

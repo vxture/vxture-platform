@@ -3,9 +3,9 @@
 /**
  * generate-foundation.mjs — 生成 T1 原子层：Tailwind theme 的完整镜像 + DS 偏离。
  *
- * 取代原先"由 Figma 导出派生 T1"的做法。原做法下"T1 取值等于 Tailwind"只能靠
- * 人工核对维持，实测已漂成两套（色板是 Tailwind v3 的 hex，v4 早已改用 oklch；
- * shadow 与 ease 各自另起一套）。改以 theme.css 为输入后，一致性由构造保证。
+ * T1 直接读上游的 theme.css 生成，一致性由构造保证。靠人工核对维持"取值等于
+ * Tailwind"是不行的——实测漂成过两套（色板停在 v3 的 hex，而 v4 早已改用 oklch；
+ * shadow 与 ease 各自另起一套）。
  *
  * 偏离全部集中在 foundation-policy.mjs，逐条带理由，生成时打印。
  *
@@ -82,7 +82,7 @@ try {
     brandRows.push({ step: m[1], value: m[2].trim() });
   }
 } catch {
-  // 首次生成：从旧的 Figma 派生色板里迁移
+  // 首次生成：从旧色板里挑出品牌与 alpha 合成色
   try {
     const legacy = readFileSync(path.join(OUT_DIR, "color-primitive.css"), "utf8");
     for (const m of legacy.matchAll(/^\s*--vx-color-([\w-]+):\s*([^;]+);/gm)) {
@@ -95,7 +95,7 @@ try {
   }
 }
 if (brandRows.length === 0) throw new Error("未取得品牌 / 合成色，中止（避免生成残缺色板）");
-notes.push(`品牌与合成色 ${brandRows.length} 项（设计稿提供，Tailwind 无对应）`);
+notes.push(`品牌与合成色 ${brandRows.length} 项（DS 自有，上游无对应）`);
 
 /* ── 组装各命名空间文件 ── */
 const outputs = new Map();
@@ -123,7 +123,7 @@ for (const ns of NAMESPACES) {
     // 品牌色单独成文件，避免与镜像混在一起看不出哪些是我们的
     addBlock(
       "color-brand-primitive.css",
-      `  /* 品牌与合成色。设计稿提供，非 Tailwind 镜像。 */\n` +
+      `  /* 品牌与合成色。DS 自有，非 Tailwind 镜像。 */\n` +
         brandRows.map((r) => `  --vx-color-${r.step}: ${r.value};`).join("\n"),
     );
   }

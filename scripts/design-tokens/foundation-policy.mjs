@@ -46,9 +46,14 @@ export const EXTENSIONS = {
       "中文优先栈，用于需强制中文字形的场合（正文栈里中文是回退位）",
     ],
   ],
+  // Tailwind 每个字号档自带行高子键（`--text-sm--line-height`），扩展档必须补齐，
+  // 否则排版角色落到这两档时行高无处可取。取值延续同一条 4px 行盒栅格：
+  // 10px→16px、8px→12px。
   text: [
     ["3xs", "0.5rem", "密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大"],
+    ["3xs--line-height", "1.5", "12px 行盒 / 8px 字号"],
     ["2xs", "0.625rem", "同上，介于 3xs 与 xs 之间"],
+    ["2xs--line-height", "1.6", "16px 行盒 / 10px 字号"],
   ],
   // v4 的 duration-* 是裸数值工具类，theme.css 里没有这一族，T2 的 fast / base /
   // slow 因此无 T1 可指。档位表本身是 Tailwind 文档给定的封闭集合，照录即可。
@@ -93,7 +98,7 @@ export const OVERRIDES = {
 };
 
 /**
- * 品牌与合成色：Tailwind 不可能有，取自设计稿，属 DS 私有。
- * 前缀在此登记，生成器据此从 Figma 派生的色板里挑出这部分。
+ * 品牌与合成色：上游没有对应物，属 DS 私有。前缀在此登记，生成器据此把这部分
+ * 从色板里分出来单独成文件。
  */
 export const BRAND_COLOR_PATTERNS = [/^brand-/, /-alpha-\d+$/];

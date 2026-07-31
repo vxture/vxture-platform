@@ -70,8 +70,7 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 这不是分层的例外，是那一维本就没有原子层。容器宽度同样落字面量，原因是**容器查询里
 var() 不参与求值**。
 
-**T3 已退役**。组件尺寸改由 cva variant 承担——见 §1.2 的三根轴。设计稿的组件尺寸留在
-`Figma-Token/vx-Component/` 作记录。
+**T3 已退役**。组件尺寸改由 cva variant 承担——见 §1.2 的三根轴。
 
 **取值约束**：
 
@@ -272,7 +271,8 @@ DS 已在 `@vxture/design-system/tokens` 暴露 `colors.semantic.ai*` 与 `gradi
 写理由，生成时逐条打印。就地写死一律不接受。
 
 事实来源只有四处：`src/styles/foundation|semantic/*`（生成物）、`foundation-policy.mjs`
-（T1 相对上游的偏离）、`semantic-policy.mjs`（T2 里设计稿给不出的语义映射）与本规范文档。
+（T1 相对上游的偏离）、`semantic-policy.mjs` / `color-policy.mjs` / `typography-policy.mjs`（T2 的全部输入）
+与本规范文档。
 生成物不得手工编辑，改动会被下一次生成静默覆盖。
 
 ## 7. 品牌标识组合

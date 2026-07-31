@@ -3,9 +3,8 @@
 /**
  * generate-semantic.mjs — 生成 T2 色彩语义层。
  *
- * 输入是 color-policy.mjs（DS 自有），不再是 Figma 导出。改动的不只是数据放在哪：
- * 六个意图族原先是 60 行摊平的映射，现在是"色相 + 阶型"，**族间不一致在结构上
- * 不可能发生**；而阶型本身携带了对比度依据，那是导出格式表达不了的。
+ * 输入是 color-policy.mjs。六个意图族由"色相 × 阶型"派生，故族间不一致在结构上
+ * 不可能发生；阶型本身携带对比度依据。
  *
  * 出：packages/design/design-tokens/src/styles/semantic/color-semantic.css
  *
@@ -41,7 +40,7 @@ const errors = [];
 /**
  * T1 已生成的色板变量——用于断言 T2 不会引用不存在的原子。
  *
- * 两个文件：镜像 Tailwind 的色阶，与设计稿提供的品牌 / 合成色。分开存放是为了
+ * 两个文件：镜像 Tailwind 的色阶，与 DS 自有的品牌 / 合成色。分开存放是为了
  * 一眼能看出哪些是我们的；读的时候必须都读，否则品牌色会被误判为不存在。
  */
 function loadT1Vars() {

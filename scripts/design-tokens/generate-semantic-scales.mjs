@@ -3,9 +3,9 @@
 /**
  * generate-semantic-scales.mjs — 生成 T2 语义层的非色彩部分。
  *
- * 输入全部来自 DS 自有的 semantic-policy.mjs / typography-policy.mjs——Figma 导出
- * 已退役。生成器本身留下：行盒与字距的折算、T1 存在性断言、z 互异与阶梯单调性
- * 断言都是真活，且 1500 行重复的模式块 CSS 手工维护必然漂移。
+ * 输入来自 semantic-policy.mjs 与 typography-policy.mjs。生成器承担的是断言与
+ * 派生：T1 存在性、z 逐档互异、elevation 与间距的单调性，以及排版角色在字号
+ * 三档之间的平移——1500 行重复的模式块 CSS 手工维护必然漂移。
  *
  * ── T2 为什么要覆盖全部刻度族 ──
  * T1 是 Tailwind theme 的镜像，回答"有哪些数可选"；T2 回答"哪个数用在什么场合"。
@@ -51,6 +51,7 @@ import {
   SIZE_MODE_SHIFT,
   TYPE_ROLES,
   TYPE_GROUP_ORDER,
+  TIGHT_ROLES,
 } from "./typography-policy.mjs";
 
 const ROOT = process.cwd();
@@ -137,38 +138,44 @@ function stepFor(role, shift) {
   return TEXT_LADDER[Math.min(TEXT_LADDER.length - 1, Math.max(0, i + shift))];
 }
 
-/** T1 字号档 → px，用于把行盒与字距折算成相对单位。 */
-function sizePx(step, where) {
-  const value = t1Literals.get(`--vx-text-${step}`);
-  const rem = value && /^([\d.]+)rem$/.exec(value);
-  if (!rem) {
-    errors.push(`${where}：拿不到 --vx-text-${step} 的 rem 取值`);
-    return 16;
-  }
-  return Number(rem[1]) * 16;
-}
-
 /**
- * 行盒与字距一律换算为**相对单位**（行高无单位比值、字距 em）。绝对 px 扛不住
- * 字号三档与浏览器缩放，且 Tailwind 的 `--text-*--line-height` 本身就是比值。
+ * 一个角色在某个字号档下的五项属性。
+ *
+ * 行高与字距按规则取，不逐角色写死——规则见 typography-policy。行高默认引字号档
+ * 自带的子键，故角色在三档之间自动跟随，无需为每档存一个数。
  */
 function buildRoles(modeIndex) {
   const rows = [];
   for (const role of TYPE_ROLES) {
-    const [name, family, weight, , lineBoxes, trackingPx] = role;
+    const [name, family, weight] = role;
     const where = `字号模式 ${modeIndex} ${name}`;
-    const shift = shiftFor(role, modeIndex);
-    const step = stepFor(role, shift);
-    const px = sizePx(step, where);
-    const box = lineBoxes[modeIndex];
-    const group = TYPE_GROUP_ORDER.find((g) => name === g || name.startsWith(`${g}-`)) ?? name;
-    const ratio = (v) => Number((v / px).toFixed(4));
+    const step = stepFor(role, shiftFor(role, modeIndex));
+    const tight = TIGHT_ROLES.test(name);
+    const group =
+      TYPE_GROUP_ORDER.find((g) => name === g || name.startsWith(`${g}-`)) ?? name;
 
     rows.push([`--${name}-font-family`, t1(`--vx-font-${family}`, where), group]);
     rows.push([`--${name}-font-size`, t1(`--vx-text-${step}`, where), group]);
     rows.push([`--${name}-font-weight`, t1(`--vx-font-weight-${weight}`, where), group]);
-    rows.push([`--${name}-line-height`, String(ratio(box)), group]);
-    rows.push([`--${name}-letter-spacing`, `${ratio(trackingPx)}em`, group]);
+    rows.push([
+      `--${name}-line-height`,
+      tight
+        ? t1("--vx-leading-tight", where)
+        : t1(`--vx-text-${step}--line-height`, where),
+      group,
+    ]);
+    rows.push([
+      `--${name}-letter-spacing`,
+      t1(
+        tight
+          ? "--vx-tracking-tight"
+          : name === "overline"
+            ? "--vx-tracking-widest"
+            : "--vx-tracking-normal",
+        where,
+      ),
+      group,
+    ]);
   }
   return rows;
 }
@@ -304,8 +311,7 @@ function buildSize() {
  *   参与求值**。写成引用不报错，只是该档的所有容器变体静默失效。这是本层唯一
  *   一处不写 var() 的地方，原因是 CSS 的限制而非分层的例外。
  *
- * 页面宽度逐档等于同名断点；内容宽度是可读行长上限，设计稿只给到 wide-2xl（1536），
- * 2K / 4K 视口下明显偏窄，故 DS 补 ultra-3xl = 1920 收口。
+ * 页面宽度逐档等于同名断点；内容宽度是可读行长上限，分档依据见 semantic-policy。
  */
 const layoutLiterals = new Map();
 function buildLayout() {
@@ -355,7 +361,7 @@ function header(file, label, source, extra = "") {
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
- *   源：${source}
+ *   输入：${source}
  *
  * T2 定义见 docs/10-standards/060-design-system.md §1.1。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。${extra}

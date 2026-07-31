@@ -1,11 +1,11 @@
 /**
- * semantic-policy.mjs — T2 里**由 DS 决定、设计稿无法提供**的语义映射。
+ * semantic-policy.mjs — T2 各刻度族的语义定义。
  *
- * 设计稿给的是档位（elevation/0..5、motion/easing/standard），档位只回答"有几级"，
- * 不回答"哪一级用在什么上"。后者是 DS 的判断，写在这里，逐条带理由。
+ * 每一族回答的都是同一个问题："这个挡位用在什么场合"。取值尽量引 T1（即上游），
+ * 上游没有对应维度的（叠放次序、透明度、描边宽度）才落字面量。
  *
- * 与 deviations.mjs 的分工：那里是"设计稿给了值、DS 判定要改"；这里是"设计稿
- * 没给这层意思、DS 自己定"。
+ * 本文件与 color-policy / typography-policy 三者构成 T2 的**全部输入**，
+ * 每条决策带理由。生成物不得手工编辑。
  */
 
 /**
@@ -14,8 +14,7 @@
  * 无 T1 可指：v4 的 z-* 是裸数值工具类，上游 theme 里没有 z 这一族，而且叠放次序
  * 本来也不是"量纲"——500 不是某个测量值的第 500 档，它只是一个序。故 T2 落字面量。
  *
- * 逐档必须互异：同值时叠放次序取决于 DOM 顺序而非设计意图，是静默的层级 bug。
- * 设计稿出现过两组同值（drawer=modal、notification=toast），已在此重排。
+ * 逐档必须互异：同值时叠放次序由 DOM 顺序决定而非层级意图，是静默的 bug。
  *
  * 依据取 Bootstrap / MUI / Ant Design 三家共识：
  * - tooltip 最高——否则会被它所描述的元素遮挡（三家一致）
@@ -42,8 +41,8 @@ export const Z_LADDER = [
 /**
  * ── 视觉高度阶梯（elevation → shadow）──
  *
- * 设计稿的 elevation/0..5 是纯序数几何（offset-y 与 blur 逐级翻倍），没有语义：
- * "elevation-3" 不告诉任何人它该用在哪。故按组件角色重新命名，与叠放阶梯同构。
+ * 按组件角色命名而非序数档位。序数不携带信息——"elevation-3"不告诉任何人它该
+ * 用在哪，而"dialog"会。
  *
  * ⚠ 它与 z-index 是**两条独立的阶梯，不能互相推导**——这正是要两条语义阶梯的理由。
  *   直觉上"叠得越高、看起来越浮"，但 tooltip 是现成的反例：它叠放最高（必须压过
@@ -73,8 +72,7 @@ export const ELEVATION = [
 /**
  * ── 缓动语义 ──
  *
- * 取值一律用 Tailwind 的 in / out / in-out（设计稿的 Material 三条曲线已按
- * "扩展不是修改"的原则退回上游取值）。这里定的是**哪个方向用哪条曲线**——
+ * 取值一律用 Tailwind 的 in / out / in-out。这里定的是**哪个方向用哪条曲线**——
  * 这是决策，不是取值：入场减速、退场加速是动效常识，但它得写下来才成为规则。
  */
 export const EASE_ROLES = [
@@ -86,7 +84,7 @@ export const EASE_ROLES = [
 /**
  * ── 时长语义 ──
  *
- * 设计稿给的 75 / 150 / 200 / 300 / 500 恰好全部落在 Tailwind 时长档上，无需偏离。
+ * 五档全部落在 Tailwind 的时长档上，故 T1 有对应原子可指。
  */
 export const DURATION_ROLES = [
   ["instant", "75", "状态色切换等无位移反馈"],
@@ -95,68 +93,6 @@ export const DURATION_ROLES = [
   ["slow", "300", "浮层进出、抽屉滑动"],
   ["slower", "500", "页面级转场"],
 ];
-
-/**
- * ── 圆角标签对齐 ──
- *
- * v4 的 rounded-* 编译为 `border-radius: var(--radius-<label>)`，与主题变量同名。
- * 设计稿的 radius 刻度比 Tailwind 整体错位一档（设计稿 md=8px，Tailwind md=6px），
- * 直接按设计稿标签注册会静默改掉仓库中全部 rounded-*（实测 83 处）。两条刻度的
- * **取值集合本就相同**（2/4/6/8/12/16），只是标签错位，故按值对齐。
- *
- * ⚠ radius 是九族里唯一目前零增益的：对齐之后 T2 就是 T1 的恒等别名。保留它是为
- *   分层完整——所有刻度都经 T2 出口，消费方不必区分"这族有语义名、那族没有"。
- *   它会在引入角色名（rounded-control / rounded-card）时长出内容。
- */
-export const RADIUS_TO_TAILWIND = {
-  "radius/2xs": "xs",
-  "radius/xs": "sm",
-  "radius/sm": "md",
-  "radius/md": "lg",
-  "radius/lg": "xl",
-  "radius/xl": "2xl",
-};
-
-/**
- * 不发的档位：设计稿 radius/2xl（20px）在 Tailwind 刻度上无对应（16 之后为 24），
- * 且无任何 token 引用。radius/none 与 radius/full 同样不发——v4 把 rounded-none /
- * rounded-full 实现为静态工具类，不读主题变量，注册了也不会被用到。
- */
-export const RADIUS_DROPPED = new Set(["radius/2xl", "radius/none", "radius/full"]);
-
-/**
- * ── 间距族合并 ──
- *
- * 设计稿有九个间距族，重叠严重：inset 与 gap 十一档里仅五档同值，control-inset-x
- * 基本等于 inset 只在高端收窄，control-gap / section-gap / container-inset 再次重叠。
- * 差异看着像漂移而非设计。
- *
- * 且 v4 的 `--spacing-*` 是单一命名空间，九族里每族都有 "md"，不合并就只能带前缀
- * 注册（`--spacing-gap-md` → `gap-gap-md`）。
- *
- * 故七族合并为一条，取 inset 的阶梯为基准：它最完整（12 档）且三档密度下都严格单调。
- * 高度族量级不同，单列为 `--space-<kind>-*`，注册后得 `h-control-md` / `h-row-lg`。
- */
-export const SPACING_BASE = "inset";
-export const SPACING_MERGED = [
-  "inset",
-  "gap",
-  "control-inset-x",
-  "control-inset-y",
-  "control-gap",
-  "section-gap",
-  "container-inset",
-];
-export const SPACING_HEIGHTS = { "control-height": "control", "row-height": "row" };
-
-/**
- * ── 无 T1 可指的两族 ──
- *
- * opacity 与 border-width 在上游既没有 theme 变量、也没有封闭档位表：v4 接受任意
- * `opacity-<0-100>` 与 `border-<n>`。没有"原子刻度"这回事，T2 落字面量即是终点。
- * 与 z-index 同理，登记在此以免被误认为漏了 T1 引用。
- */
-export const LITERAL_ONLY_FAMILIES = ["opacity", "border-width", "z-index"];
 
 /**
  * 视觉高度阶梯自身必须严格递增。
@@ -186,17 +122,11 @@ export function assertElevationOrdered(errors) {
   }
 }
 
-/* ────────────────────────────────────────────────────────────────────────────
- * 以下五族的输入已从 Figma 导出迁入本文件（DS 自有）。
- * 迁移不是照搬——逐族重新判断过挡位是否该存在，删掉的记在各自注释里。
- * ──────────────────────────────────────────────────────────────────────────── */
-
 /**
- * 圆角挡位。
+ * 圆角挡位，按 Tailwind 标签列。
  *
- * 设计稿此前贡献的只有"有几档"，标签对齐表本就在本文件里；迁移后连那张对齐表
- * 也不需要了——直接按 Tailwind 标签列档。取值仍来自 T1（即上游），故本族目前是
- * 恒等别名，保留它是为分层边界完整，见 060 §1.1。
+ * 取值来自 T1（即上游），故本族目前是恒等别名；保留它是为分层边界完整，
+ * 见 060 §1.1，将来引入角色名（rounded-control / rounded-card）时长出内容。
  *
  * 未列 `none` 与 `full`：v4 把 `rounded-none` / `rounded-full` 实现为**静态工具类**，
  * 不读主题变量，注册了也不会被用到。
@@ -206,9 +136,9 @@ export const RADIUS_STEPS = ["xs", "sm", "md", "lg", "xl", "2xl"];
 /**
  * 描边宽度。
  *
- * ⚠ 设计稿的 `border/width/none`（0px）**已删**。v4 的 `border-none` 是
- *   `border-style: none` 的静态工具类；注册 `--border-width-none` 会让同一个类名
- *   同时有"无边框样式"和"零宽度"两种来源，语义打架。要零宽度用 `border-0`。
+ * 不设 `none` 档：v4 的 `border-none` 是 `border-style: none` 的静态工具类，
+ * 注册 `--border-width-none` 会让同一个类名同时有"无边框样式"与"零宽度"两种
+ * 来源，语义打架。要零宽度用 `border-0`。
  */
 export const BORDER_WIDTHS = [
   ["thin", "1px", "默认描边：卡片、输入框、分隔"],
@@ -217,12 +147,13 @@ export const BORDER_WIDTHS = [
 ];
 
 /**
- * 透明度语义。
+ * 透明度语义。上游对 opacity 既无 theme 变量也无封闭档位表（接受任意 0–100），
+ * 没有原子层可指，故本族落字面量。
  *
- * ⚠ 设计稿的 `opacity/full`（1）**已删**：它不表达任何决策，`opacity-100` 即是。
+ * 不设 `full`（1）档：它不表达任何决策，`opacity-100` 即是。
  *
- * ⚠ 留意 overlay(0.5) 低于 subtle(0.6)——本族不是单调阶梯而是角色表，
- *   遮罩要压住底下的内容，比"次要文字"更不透明是正常的。
+ * ⚠ overlay(0.5) 低于 subtle(0.6)——本族是角色表不是单调阶梯，
+ *   遮罩要压住底下的内容，比"次要文字"更不透明是对的。
  */
 export const OPACITIES = [
   ["disabled", 0.45, "禁用态：控件与其文字整体压暗"],
@@ -268,7 +199,7 @@ export const MEDIA_SIZES = [
  * 页面宽度不在此列——它逐档等于 T1 的断点，从断点派生即可，不需要第二份清单。
  *
  * 分档依据是行长而非视口：正文类 640–768、应用内容 1280–1536、数据密集型面板
- * 至多 1920。设计稿只给到 wide-2xl（1536），2K / 4K 视口下明显偏窄，故补 ultra-3xl。
+ * 至多 1920；再宽应改分栏而非加宽。
  */
 export const CONTENT_WIDTHS = [
   ["narrow-lg", "lg", "正文与表单：单栏阅读"],

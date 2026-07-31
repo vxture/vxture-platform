@@ -173,6 +173,10 @@
   --text-heading-5--line-height: var(--heading-5-line-height);
   --text-heading-5--letter-spacing: var(--heading-5-letter-spacing);
   --text-heading-5--font-weight: var(--heading-5-font-weight);
+  --text-body-xl: var(--body-xl-font-size);
+  --text-body-xl--line-height: var(--body-xl-line-height);
+  --text-body-xl--letter-spacing: var(--body-xl-letter-spacing);
+  --text-body-xl--font-weight: var(--body-xl-font-weight);
   --text-body-lg: var(--body-lg-font-size);
   --text-body-lg--line-height: var(--body-lg-line-height);
   --text-body-lg--letter-spacing: var(--body-lg-letter-spacing);
@@ -189,10 +193,10 @@
   --text-body-xs--line-height: var(--body-xs-line-height);
   --text-body-xs--letter-spacing: var(--body-xs-letter-spacing);
   --text-body-xs--font-weight: var(--body-xs-font-weight);
-  --text-body-xl: var(--body-xl-font-size);
-  --text-body-xl--line-height: var(--body-xl-line-height);
-  --text-body-xl--letter-spacing: var(--body-xl-letter-spacing);
-  --text-body-xl--font-weight: var(--body-xl-font-weight);
+  --text-label-xl: var(--label-xl-font-size);
+  --text-label-xl--line-height: var(--label-xl-line-height);
+  --text-label-xl--letter-spacing: var(--label-xl-letter-spacing);
+  --text-label-xl--font-weight: var(--label-xl-font-weight);
   --text-label-lg: var(--label-lg-font-size);
   --text-label-lg--line-height: var(--label-lg-line-height);
   --text-label-lg--letter-spacing: var(--label-lg-letter-spacing);
@@ -209,10 +213,6 @@
   --text-label-xs--line-height: var(--label-xs-line-height);
   --text-label-xs--letter-spacing: var(--label-xs-letter-spacing);
   --text-label-xs--font-weight: var(--label-xs-font-weight);
-  --text-label-xl: var(--label-xl-font-size);
-  --text-label-xl--line-height: var(--label-xl-line-height);
-  --text-label-xl--letter-spacing: var(--label-xl-letter-spacing);
-  --text-label-xl--font-weight: var(--label-xl-font-weight);
   --text-code-md: var(--code-md-font-size);
   --text-code-md--line-height: var(--code-md-line-height);
   --text-code-md--letter-spacing: var(--code-md-letter-spacing);
@@ -273,5 +273,7 @@
   --font-mono: var(--vx-font-mono);
   --font-sans: var(--vx-font-sans);
   --text-2xs: var(--vx-text-2xs);
+  --text-2xs--line-height: var(--vx-text-2xs--line-height);
   --text-3xs: var(--vx-text-3xs);
+  --text-3xs--line-height: var(--vx-text-3xs--line-height);
 }
