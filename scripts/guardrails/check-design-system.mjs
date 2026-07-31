@@ -108,73 +108,15 @@ const DS_SEMANTIC_STYLE_PATHS = new Set([
   normalize("packages/design/design-system/src/styles/components.css"),
   normalize("packages/design/design-system/src/styles/platform.css"),
 ]);
+/*
+ * 原有 16 条 auth-* / components-* / platform-* 例外随遗留样式层退役而清空，
+ * 仅 fullscreen.css 存活。清单不留已删路径：陈旧条目会让规则永远报 stale。
+ */
 const DS_EFFECT_LOCKED_STYLE_PATHS = new Set([
-  normalize("packages/design/design-system/src/styles/auth-actions-social.css"),
-  normalize(
-    "packages/design/design-system/src/styles/auth-fields-controls.css",
-  ),
-  normalize("packages/design/design-system/src/styles/auth-header-locale.css"),
-  normalize("packages/design/design-system/src/styles/auth-signup.css"),
-  normalize("packages/design/design-system/src/styles/auth-visual-panel.css"),
-  normalize("packages/design/design-system/src/styles/components-ai.css"),
-  normalize("packages/design/design-system/src/styles/components-button.css"),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-footer-switch.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-preferences.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-tools.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-user-menu.css",
-  ),
   normalize("packages/design/design-system/src/styles/fullscreen.css"),
-  normalize(
-    "packages/design/design-system/src/styles/platform-shell-assistant.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-shell-header-buttons.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-access-list.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-models-actions.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-models-list.css",
-  ),
 ]);
 const DS_SHADOW_LOCKED_STYLE_PATHS = new Set([
-  normalize("packages/design/design-system/src/styles/auth-actions-social.css"),
-  normalize(
-    "packages/design/design-system/src/styles/auth-fields-controls.css",
-  ),
-  normalize("packages/design/design-system/src/styles/auth-header-locale.css"),
-  normalize("packages/design/design-system/src/styles/auth-signup.css"),
-  normalize("packages/design/design-system/src/styles/auth-visual-panel.css"),
-  normalize("packages/design/design-system/src/styles/components-ai.css"),
-  normalize("packages/design/design-system/src/styles/components-button.css"),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-footer-switch.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-preferences.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/components-shell-user-menu.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-access-list.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-models-actions.css",
-  ),
-  normalize(
-    "packages/design/design-system/src/styles/platform-models-list.css",
-  ),
+  /* 全部条目随遗留样式层退役，无存活项。 */
 ]);
 const IMPORT_ONLY_STYLE_ENTRIES = new Map([
   [normalize("agent-studio/varda/src/app/globals.css"), "Varda globals.css"],
@@ -192,47 +134,10 @@ const IMPORT_ONLY_STYLE_ENTRIES = new Map([
     normalize("packages/design/design-system/src/styles/globals.css"),
     "DS globals.css",
   ],
-  [
-    normalize("packages/design/design-system/src/styles/platform-access.css"),
-    "DS platform access.css",
-  ],
-  [
-    normalize("packages/design/design-system/src/styles/platform-account.css"),
-    "DS platform account.css",
-  ],
+  /* 八条 platform-* 子模块随遗留样式层退役，仅保留聚合入口 platform.css。 */
   [
     normalize("packages/design/design-system/src/styles/platform.css"),
     "DS platform.css",
-  ],
-  [
-    normalize("packages/design/design-system/src/styles/platform-layout.css"),
-    "DS platform layout.css",
-  ],
-  [
-    normalize("packages/design/design-system/src/styles/platform-models.css"),
-    "DS platform models.css",
-  ],
-  [
-    normalize(
-      "packages/design/design-system/src/styles/platform-notifications.css",
-    ),
-    "DS platform notifications.css",
-  ],
-  [
-    normalize("packages/design/design-system/src/styles/platform-shell.css"),
-    "DS platform shell.css",
-  ],
-  [
-    normalize(
-      "packages/design/design-system/src/styles/platform-shell-header.css",
-    ),
-    "DS platform shell header.css",
-  ],
-  [
-    normalize(
-      "packages/design/design-system/src/styles/platform-tenant-settings.css",
-    ),
-    "DS platform tenant settings.css",
   ],
   [
     normalize("packages/design/design-system/src/styles/tokens.css"),

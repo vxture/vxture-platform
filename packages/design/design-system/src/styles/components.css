@@ -1,18 +1,12 @@
 /**
- * components.css - DS components style pack entry.
+ * components.css - 已退役的组件样式入口（空壳）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
+ *
+ * 组件样式改由 cva 变体函数 + Tailwind 工具类承担，不再有独立 CSS。
+ * 保留空文件仅为使既有 import 解析成功，避免各 portal 在收敛前构建失败；
+ * 组件迁完后本文件连同 package.json 的 `./styles/components.css` 导出一并删除。
+ *
+ * 收敛约定见 docs/10-standards/040-design-system-package-convergence.md。
  */
-
-@import "./components-button.css";
-@import "./components-fields.css";
-@import "./components-display.css";
-@import "./components-ai.css";
-@import "./components-toast-drawer-skeleton.css";
-@import "./components-banner.css";
-@import "./components-shell-tools.css";
-@import "./components-shell-preferences.css";
-@import "./components-shell-user-menu.css";
-@import "./components-shell-user-status-tag.css";
-@import "./components-shell-footer-switch.css";

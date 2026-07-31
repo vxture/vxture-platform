@@ -180,44 +180,17 @@ ${render(dark)}
 }
 `;
 
-/**
- * Tailwind theme 桥接：把 T2 色名注册为工具类（bg-primary / text-foreground …）。
+/*
+ * 本生成器**不再**产出 Tailwind theme 桥接。
  *
- * 必须生成而非手写——手写会漏。首版手写时就漏了 link / link-hover /
- * primary-muted-hover / primary-muted-foreground 四个，而 DS 包不跑 Tailwind
- * 编译，build 全绿却会在消费方静默失效。
- *
- * ⚠ 只桥接颜色。Tailwind 无 primary / background / card 等同名内置色，注册无冲突；
- *   但 spacing 与 radius 有内置刻度且取值不同（T2 --radius-md 8px vs 内置 6px），
- *   桥接会改掉仓库既有 rounded-md / h-9 的观感，故尺寸类一律在组件内直接
- *   引用 CSS 变量。
- *
- * `inline` 使工具类展开为对原变量的引用而非快照，故 .dark 与密度/字号模式自动跟随。
+ * 曾有一份 tokens-theme-shadcn.css 把 T2 色名注册成工具类，但 generate-theme.mjs
+ * 现在统一承担全部命名空间的 `@theme` 注册（含这 117 条颜色），两者逐字重复，
+ * 且桥接文件没有任何地方 import——留着只会成为第二处真值。注册一律去
+ * generate-theme.mjs 改。
  */
-const bridgeLines = light.map(([name]) => `  --color-${name.slice(2)}: var(${name});`);
-const bridgeCss = `/**
- * tokens-theme-shadcn.css - T2 语义色 → Tailwind 工具类桥接。
- * @package @vxture/design-system
- * @layer Presentation
- * @category styles
- * @author AI-Generated
- * @date 2026-07-31
- *
- * ⚠ 本文件由脚本生成，请勿手工编辑。
- *   生成：node scripts/design-tokens/generate-semantic.mjs
- *
- * 只桥接颜色；尺寸与圆角不进 @theme，理由见生成器注释与
- * docs/10-standards/065-design-token-pipeline.md。
- */
-
-@theme inline {
-${bridgeLines.join("\n")}
-}
-`;
 
 mkdirSync(OUT_DIR, { recursive: true });
 const target = path.join(OUT_DIR, "color-semantic.css");
-const bridgeTarget = path.join(PKG, "src/styles/tokens-theme-shadcn.css");
 
 if (CHECK) {
   let current = "";
@@ -226,24 +199,15 @@ if (CHECK) {
   } catch {
     /* 缺文件即视为不同步 */
   }
-  let currentBridge = "";
-  try {
-    currentBridge = readFileSync(bridgeTarget, "utf8");
-  } catch {
-    /* 缺文件即视为不同步 */
-  }
-  if (current !== css || currentBridge !== bridgeCss) {
+  if (current !== css) {
     console.error(
       "T2 语义层与导出不同步。运行：node scripts/design-tokens/generate-semantic.mjs",
     );
     process.exit(1);
   }
-  console.log(
-    `T2 语义层一致（light ${light.length} · dark ${dark.length} · 桥接 ${bridgeLines.length}）`,
-  );
+  console.log(`T2 语义层一致（light ${light.length} · dark ${dark.length}）`);
 } else {
   writeFileSync(target, css, "utf8");
-  writeFileSync(bridgeTarget, bridgeCss, "utf8");
   console.log(`已生成 T2 色彩：light ${light.length} · dark ${dark.length} 项`);
   if (appliedDeviations.length > 0) {
     console.log(`已应用偏离 ${appliedDeviations.length} 条（DS 为真值源，逐条留痕）：`);
