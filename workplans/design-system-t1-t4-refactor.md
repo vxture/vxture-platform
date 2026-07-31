@@ -52,7 +52,9 @@ Figma 的原子层**就是 Tailwind 调色板本身**（`color/neutral/*`、`col
 | `gray-*`                | gray          | **与 Figma/shadcn 的 neutral 分歧** |
 | `brand-*`               | 无            | **唯一真正自定义**，#1e51ff 家族    |
 
-推论：T1 只需自建 brand 一族，其余直接用 Tailwind 内置；hue→intent 的映射交给 T2，与 Figma 同构。
+推论：hue→intent 的映射交给 T2，与 Figma 同构。
+
+~~早期推论"T1 只需自建 brand，其余直接用 Tailwind 内置"已作废~~ —— 该结论对 Tailwind **v3** 成立，对仓库实际使用的 **v4** 不成立（见上方 P3 色域告警）。T1 必须显式声明全部色相。
 
 ### 需汇报的取值分歧（D11 要求）
 
