@@ -16,7 +16,7 @@
  */
 
 :root {
-  --alert-radius: var(--radius-md);
+  --alert-radius: var(--radius-lg);
   --alert-inset: var(--inset-xl);
   --alert-gap: var(--gap-md);
   --alert-title-gap: var(--gap-2xs);

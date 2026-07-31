@@ -132,6 +132,16 @@ Figma 路径 → CSS 变量名，规则确定且不可自由发挥：
 
 T2/T3 采用 shadcn 约定名（`--background`/`--primary`/`--border`…），shadcn 无对应概念的沿用 Figma 自有名（`--gap-*`/`--inset-*`/`--content-*`）。既有 `--vx-*` 名一律保留为别名，不删除。
 
+### 3.1.3 变量名不得遮蔽 Tailwind 主题变量
+
+Tailwind v4 的工具类编译为对同名主题变量的引用——`rounded-md` 即 `border-radius: var(--radius-md)`。因此在 `:root` 定义同名变量会**直接改掉仓库中该工具类的全部用法**，无需任何"桥接"动作。
+
+设计稿的 radius 刻度比 Tailwind 整体错位一档（设计稿 md=8px、Tailwind md=6px），实测影响 83 处 `rounded-*`。两条刻度的取值集合本就相同（2/4/6/8/12/16），仅标签错位，故按**取值**对齐即可——对齐后同名同值，遮蔽无害化，且与既有 `--vx-radius-*` 一致（它一直是 Tailwind 语义）。收敛表在 `scripts/design-tokens/radius-map.mjs`，由 T2 与 T3 生成器共用。
+
+设计稿的 `radius/2xl`（20px）在 Tailwind 刻度上无对应（16 之后为 24）且无人引用，故不发——需回报设计侧确认并入 24px 还是删除。
+
+**排查方法**：把 T2/T3 全部变量名与 `tailwindcss/theme.css` 的变量名取交集。当前 601 个 T2/T3 变量中，仅 radius 一族 6 个同名，且已同值。新增 token 时应重跑该比对。
+
 ### 3.2.1 非色彩集合的命名由 DS 定义
 
 `vx-Shape / vx-Depth / vx-Element / vx-Motion / vx-Layout / vx-Space / vx-Typography` 共 292 个 token，其 `codeSyntax` **38% 不可用**：50 个缺失，62 个分属 22 组撞名（如 `inset/2xl`–`inset/6xl` 五档全部声明为 `--inset-2xl`，`vx-Typography` 有 12 组）。该字段已不足以充当这些集合的命名权威。

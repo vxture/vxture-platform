@@ -23,6 +23,7 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { DEVIATIONS } from "./deviations.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -52,29 +53,7 @@ function loadMode(collection, mode) {
 
 const ext = (token, key) => token.$extensions?.[`com.figma.${key}`];
 
-/**
- * 有依据地偏离导出值。
- *
- * DS 是唯一真值源，设计稿只是输入且已证实会出错，因此必须允许覆盖——
- * 但覆盖只能发生在此处，逐条写明理由，并在生成物中留痕。
- * 禁止直接编辑生成物：那会被 --check 拦下，且理由无处可查。
- *
- * 每次新增条目，都应同步回报设计侧修正设计稿。
- */
-const DEVIATIONS = {
-  "vx-Color-Light": {
-    // 明色表面阶梯去品牌调。设计稿用 surface/B-* 的品牌浅蓝与 surface/N-* 的中性
-    // 拉开层次，但该区分在暗色下完全塌缩（四级全为中性明度阶），且实践中 console
-    // 早已用 --vx-color-shell-bg: #f5f7fb 绕过较重的品牌底色。
-    // 明色可用档位只有 white/50/100/200 四个，恰好four级，故整体重排而非单点替换，
-    // 否则页面底与卡内凹陷面会撞成同值。
-    "surface/B-1": { to: "color/neutral/100", why: "页面底改中性" },
-    "surface/B-2": { to: "color/neutral/200", why: "页面级凹陷面" },
-    "surface/N-1": { to: "color/base/white", why: "卡片提为纯白，与灰底页面拉开层次" },
-    "surface/N-2": { to: "color/neutral/50", why: "卡内凹陷面下移一档，避让页面底" },
-  },
-};
-
+// 偏离表与 T3 生成器共用，理由见 deviations.mjs。
 const appliedDeviations = [];
 
 /** 设计稿中 codeSyntax 漏写 `--` 前缀的 token，规范化时登记在此。 */

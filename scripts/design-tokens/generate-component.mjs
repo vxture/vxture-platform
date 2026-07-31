@@ -23,6 +23,8 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { RADIUS_DROPPED, radiusVarName } from "./radius-map.mjs";
+import { DEVIATED_PATHS } from "./deviations.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -65,24 +67,37 @@ const ext = (token, key) => token.$extensions?.[`com.figma.${key}`];
 const kebab = (s) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 const derivedName = (tokenPath) => `--${kebab(tokenPath).replace(/\//g, "-")}`;
 
-/** vx-Color 的变量名以 codeSyntax 为准（§3.2.1 例外），其余集合按路径推导。 */
+/**
+ * vx-Color 的变量名以 codeSyntax 为准（§3.2.1 例外），其余集合按路径推导；
+ * radius 另按 radius-map.mjs 对齐 Tailwind 刻度——与 T2 生成器共用同一张表。
+ *
+ * 同时记录每个 T2 token 的 $value，供下方的**取值一致性断言**使用。
+ * 仅断言"名字存在"是不够的：radius 对齐 Tailwind 时，radius/md 解析出的
+ * --radius-md 依然存在，只是已改指另一档（8px→6px），存在性检查完全看不出来。
+ */
 function buildT2NameMap() {
   const map = new Map();
   for (const dir of readdirSync(EXPORT_DIR)) {
     if (dir.endsWith("-Primitive") || dir === "vx-Component") continue;
     const useCodeSyntax = dir === "vx-Color";
-    for (const file of readdirSync(path.join(EXPORT_DIR, dir))) {
-      if (!file.endsWith(".json")) continue;
+    const files = readdirSync(path.join(EXPORT_DIR, dir)).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
       const tokens = flatten(JSON.parse(readFileSync(path.join(EXPORT_DIR, dir, file), "utf8")));
       for (const [tokenPath, token] of tokens) {
-        if (map.has(tokenPath)) continue;
-        if (useCodeSyntax) {
+        if (RADIUS_DROPPED.has(tokenPath)) continue;
+        const radius = radiusVarName(tokenPath);
+        let varName;
+        if (radius) {
+          varName = radius;
+        } else if (useCodeSyntax) {
           const web = ext(token, "codeSyntax")?.WEB;
           const m = typeof web === "string" ? web.match(/^var\(\s*(--)?([\w-]+)\s*\)$/) : null;
-          if (m) map.set(tokenPath, `--${m[2]}`);
+          varName = m ? `--${m[2]}` : null;
         } else {
-          map.set(tokenPath, derivedName(tokenPath));
+          varName = derivedName(tokenPath);
         }
+        if (!varName) continue;
+        if (!map.has(tokenPath)) map.set(tokenPath, varName);
       }
     }
   }
@@ -100,12 +115,69 @@ function loadT2Vars() {
   return vars;
 }
 
+/**
+ * T2 变量名 → 该变量在各模式下**实际解析出的字面值**集合。
+ *
+ * 关键：值必须从**已生成的 T1/T2 CSS** 里解析，不能在本文件里再推导一遍。
+ * 早先的版本用同一套命名逻辑同时算出「名字」和「值」，两者一起漂移就自洽，
+ * 负向测试证实它抓不到任何漂移——等于摆设。改为读产物后，
+ * 任何一侧改名都会让取值对不上而报错。
+ *
+ * 用集合而非单值：vx-Color 有明暗两档、vx-Space / vx-Typography 各三档，
+ * 而 T3 无模式轴、其解析值只对应导出时所处的那一档（实测为 Compact）。
+ * 故断言为「T3 的值必须命中该变量的某一档」。
+ */
+function loadResolvedVarValues() {
+  const decls = new Map(); // var → Set(原始声明值)
+  const collect = (dir) => {
+    for (const file of readdirSync(dir)) {
+      if (!file.endsWith(".css")) continue;
+      const css = readFileSync(path.join(dir, file), "utf8");
+      for (const m of css.matchAll(/^\s*(--[\w-]+)\s*:\s*([^;]+);/gm)) {
+        if (!decls.has(m[1])) decls.set(m[1], new Set());
+        decls.get(m[1]).add(m[2].trim());
+      }
+    }
+  };
+  collect(path.join(PKG, "src/styles/foundation"));
+  collect(SEMANTIC_DIR);
+
+  const resolve = (raw, depth = 0) => {
+    const ref = /^var\(\s*(--[\w-]+)\s*\)$/.exec(raw);
+    if (!ref || depth > 8) return [raw];
+    const next = decls.get(ref[1]);
+    return next ? [...next].flatMap((v) => resolve(v, depth + 1)) : [raw];
+  };
+
+  const resolved = new Map();
+  for (const [name, raws] of decls) {
+    resolved.set(name, new Set([...raws].flatMap((r) => resolve(r))));
+  }
+  return resolved;
+}
+
+/** 把设计稿的 $value 归一为「与生成的 CSS 字面值可比」的形式。 */
+function asCssLiteral(tokenPath, value) {
+  if (value && typeof value === "object" && value.hex) {
+    const hex = value.hex.toLowerCase();
+    if (value.alpha === 1) return [hex];
+    const [r, g, b] = value.components.map((c) => Math.round(c * 255));
+    return [`rgb(${r} ${g} ${b} / ${Number(value.alpha.toFixed(4))})`, hex];
+  }
+  const lit = literal(tokenPath, value);
+  return lit === null ? [] : [lit];
+}
+
+const fmt = (v) => (v && typeof v === "object" ? (v.hex ?? JSON.stringify(v)) : String(v));
+
 const t2Names = buildT2NameMap();
+const varValues = loadResolvedVarValues();
 const t2Vars = loadT2Vars();
 const errors = [];
 const derived = [];
 const converged = [];
 const kept = [];
+const deviatedRefs = [];
 
 function literal(tokenPath, value) {
   if (typeof value === "string") return value;
@@ -146,6 +218,20 @@ for (const [tokenPath, token] of tokens) {
     }
     if (!t2Vars.has(t2)) {
       errors.push(`${tokenPath} → ${target} → ${t2}：该变量不存在于已生成的 T2 中`);
+      continue;
+    }
+    // 取值一致性：T3 的解析值必须命中 t2 这个变量名实际承载的某一档取值。
+    // 仅查名字存在是不够的——名字仍在、却已改指另一个 token 时，存在性检查看不出来。
+    const carried = varValues.get(t2);
+    const own = asCssLiteral(tokenPath, token.$value);
+    if (DEVIATED_PATHS.has(target)) {
+      // 该 T2 token 已被有依据地偏离，设计稿原值必然对不上产物——跳过断言并记录。
+      deviatedRefs.push(`${tokenPath} → ${target}`);
+    } else if (carried && own.length > 0 && !own.some((v) => carried.has(v))) {
+      errors.push(
+        `${tokenPath} → ${target} → ${t2}：取值未命中（自身 ${fmt(token.$value)}，` +
+          `而 ${t2} 在产物中解析为 ${[...carried].join(" / ")}）`,
+      );
       continue;
     }
     value = `var(${t2})`;
@@ -252,6 +338,11 @@ if (CHECK) {
 } else {
   for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
   console.log(`已生成 T3 组件层：${families.size} 族 / ${emittedCount} 项`);
+  if (deviatedRefs.length > 0) {
+    console.log(
+      `${deviatedRefs.length} 项引用了已偏离的 T2 token，跳过取值断言（偏离见 deviations.mjs）`,
+    );
+  }
   if (converged.length > 0) {
     console.log(
       `已按治理门槛收敛回 T2 ${converged.length} 项（纯别名，消费方直接绑 T2）；` +

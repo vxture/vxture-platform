@@ -20,7 +20,7 @@
   --notification-text: var(--foreground);
   --notification-title-color: var(--foreground);
   --notification-border: var(--border);
-  --notification-radius: var(--radius-md);
+  --notification-radius: var(--radius-lg);
   --notification-shadow-offset-y: var(--elevation-3-offset-y);
   --notification-shadow-blur: var(--elevation-3-blur);
   --notification-shadow-color: var(--elevation-3-color);

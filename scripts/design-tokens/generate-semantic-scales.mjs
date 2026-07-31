@@ -19,6 +19,7 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import { RADIUS_TO_TAILWIND, RADIUS_DROPPED } from "./radius-map.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -33,6 +34,8 @@ const FOUNDATION = path.join(PKG, "src/styles/foundation");
 /** 单位规则：按 token 路径首段（或路径片段）决定。 */
 const UNITLESS = /^(z\/|opacity\/)|fontWeight$/;
 const MS = /^motion\/duration\//;
+
+// radius 向 Tailwind 刻度对齐的表与 T3 共用，理由见 radius-map.mjs。
 
 const COLLECTIONS = [
   { name: "vx-Shape", out: "shape-semantic.css", title: "形状", modes: null },
@@ -106,6 +109,8 @@ function loadT1Vars() {
 const t1Vars = loadT1Vars();
 const derived = [];
 const overridden = [];
+const radiusRemapped = [];
+const radiusDropped = [];
 const errors = [];
 
 /** 裸值 → CSS 值。 */
@@ -125,10 +130,16 @@ function buildRows(collection, file) {
   const seen = new Map();
 
   for (const [tokenPath, token] of tokens) {
+    if (RADIUS_DROPPED.has(tokenPath)) {
+      radiusDropped.push(tokenPath);
+      continue;
+    }
     // 这些集合的 codeSyntax 有 38% 不可用（缺失或多档撞名），已不足以充当命名权威，
     // 故变量名一律由 DS 按路径机械推导——唯一性由路径本身保证。
     // 详见 docs/10-standards/065-design-token-pipeline.md §3.2.1。
-    const name = derivedName(tokenPath);
+    const remapped = RADIUS_TO_TAILWIND[tokenPath];
+    const name = remapped ? `--radius-${remapped}` : derivedName(tokenPath);
+    if (remapped) radiusRemapped.push(`${tokenPath} → --radius-${remapped}`);
     const web = ext(token, "codeSyntax")?.WEB;
     if (typeof web === "string") {
       const m = web.match(/^var\(\s*(--)?([\w-]+)\s*\)$/);
@@ -276,6 +287,14 @@ if (CHECK) {
 } else {
   for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
   console.log(`已生成 T2 非色彩层：${stats.join(" · ")}`);
+  if (radiusRemapped.length > 0) {
+    console.log(
+      `radius 已按取值对齐 Tailwind 刻度 ${radiusRemapped.length} 项（消除工具类遮蔽）：${radiusRemapped.join(", ")}`,
+    );
+  }
+  if (radiusDropped.length > 0) {
+    console.log(`⚠ Tailwind 刻度无对应且无人引用，未发：${radiusDropped.join(", ")}——需回报设计侧`);
+  }
   if (overridden.length > 0) {
     console.log(
       `⚠ codeSyntax 与 DS 命名规则不符，已按路径推导覆盖 ${overridden.length} 项（需回报设计侧修正）`,

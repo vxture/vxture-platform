@@ -18,5 +18,5 @@
 :root {
   --skeleton-bg: var(--accent);
   --skeleton-shimmer: var(--surface-active);
-  --skeleton-radius: var(--radius-sm);
+  --skeleton-radius: var(--radius-md);
 }

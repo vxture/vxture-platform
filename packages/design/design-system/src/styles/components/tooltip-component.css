@@ -19,7 +19,7 @@
   --tooltip-max-width: 320px;
   --tooltip-bg: var(--surface-inverse);
   --tooltip-text: var(--content-on-inverse);
-  --tooltip-radius: var(--radius-sm);
+  --tooltip-radius: var(--radius-md);
   --tooltip-shadow-offset-y: var(--elevation-2-offset-y);
   --tooltip-shadow-blur: var(--elevation-2-blur);
   --tooltip-shadow-color: var(--elevation-2-color);

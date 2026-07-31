@@ -27,7 +27,9 @@ import { cn } from "../../utils/cn";
 const buttonVariants = cva(
   cn(
     "inline-flex shrink-0 items-center justify-center whitespace-nowrap",
-    "gap-(--gap-xs) rounded-(--radius-md)",
+    // radius 已按取值对齐 Tailwind 刻度（见 scripts/design-tokens/radius-map.mjs），
+    // 故可直接用标准工具类，与 shadcn 组件源码一致。
+    "gap-(--gap-xs) rounded-md",
     "text-sm font-medium transition-colors outline-none",
     "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
     "disabled:pointer-events-none disabled:opacity-50",

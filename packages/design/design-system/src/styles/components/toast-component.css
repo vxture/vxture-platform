@@ -21,7 +21,7 @@
   --toast-inset: var(--inset-md);
   --toast-bg: var(--popover);
   --toast-text: var(--foreground);
-  --toast-radius: var(--radius-md);
+  --toast-radius: var(--radius-lg);
   --toast-shadow-offset-y: var(--elevation-3-offset-y);
   --toast-shadow-blur: var(--elevation-3-blur);
   --toast-shadow-color: var(--elevation-3-color);

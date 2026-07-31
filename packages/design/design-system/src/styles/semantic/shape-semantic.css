@@ -17,13 +17,12 @@
 :root {
   /* radius */
   --radius-none: var(--vx-spacing-0);
-  --radius-2xs: var(--vx-spacing-0-5);
-  --radius-xs: var(--vx-spacing-1);
-  --radius-sm: var(--vx-spacing-1-5);
-  --radius-md: var(--vx-spacing-2);
-  --radius-lg: var(--vx-spacing-3);
-  --radius-xl: var(--vx-spacing-4);
-  --radius-2xl: var(--vx-spacing-5);
+  --radius-xs: var(--vx-spacing-0-5);
+  --radius-sm: var(--vx-spacing-1);
+  --radius-md: var(--vx-spacing-1-5);
+  --radius-lg: var(--vx-spacing-2);
+  --radius-xl: var(--vx-spacing-3);
+  --radius-2xl: var(--vx-spacing-4);
   --radius-full: 9999px;
 
   /* border */

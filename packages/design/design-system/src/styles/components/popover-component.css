@@ -19,7 +19,7 @@
   --popover-bg: var(--popover);
   --popover-text: var(--foreground);
   --popover-border: var(--border);
-  --popover-radius: var(--radius-md);
+  --popover-radius: var(--radius-lg);
   --popover-shadow-offset-y: var(--elevation-3-offset-y);
   --popover-shadow-blur: var(--elevation-3-blur);
   --popover-shadow-color: var(--elevation-3-color);
