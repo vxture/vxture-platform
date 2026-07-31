@@ -46,14 +46,44 @@ export const EXTENSIONS = {
       "中文优先栈，用于需强制中文字形的场合（正文栈里中文是回退位）",
     ],
   ],
-  // Tailwind 每个字号档自带行高子键（`--text-sm--line-height`），扩展档必须补齐，
-  // 否则排版角色落到这两档时行高无处可取。取值延续同一条 4px 行盒栅格：
-  // 10px→16px、8px→12px。
+  /**
+   * 字号档的两个附属子键：行高与字距。
+   *
+   * ── 行高 ──
+   * 上游给每个内置档都配了行高子键；两个扩展档必须补齐，否则排版角色落到这两档时
+   * 行高无处可取。取值延续同一条 4px 行盒栅格：8px→12px、10px→16px。
+   *
+   * ── 字距 ──
+   * 上游把 `--text-*--letter-spacing` **刻意留空**，填它正是这个槽位的用途。
+   *
+   * 字距是**字号的函数，不是角色的函数**：字体按某个视觉尺寸绘制（Inter 是 16px），
+   * 放大后字面间隙按比例跟着放大，而人眼对松紧的感知不是线性的——大字显松要收，
+   * 小字显挤要放。全大写另论，那与尺寸无关，留在角色层处理。
+   *
+   * 曲线锚定 Inter 自己发布的 dynamic metrics（约 11px 时 +0.02em，16–18px 归零，
+   * 32px 约 −0.02em），与 Apple HIG 给 SF 的逐尺寸表形状一致。
+   *
+   * ⚠ 负端收敛到 −0.025em 为止，比通用表保守。`letter-spacing` 对中西文一视同仁，
+   *   而汉字是全宽方块——Noto Sans SC 在更负的字距下会字字相撞。这是我们比
+   *   纯拉丁字体的表多出来的约束。
+   */
   text: [
     ["3xs", "0.5rem", "密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大"],
     ["3xs--line-height", "1.5", "12px 行盒 / 8px 字号"],
+    ["3xs--letter-spacing", "0.04em", "8px：字面挤在一起，需明显放开"],
     ["2xs", "0.625rem", "同上，介于 3xs 与 xs 之间"],
     ["2xs--line-height", "1.6", "16px 行盒 / 10px 字号"],
+    ["2xs--letter-spacing", "0.03em", "10px"],
+    ["xs--letter-spacing", "0.01em", "12px：微放"],
+    ["sm--letter-spacing", "0em", "14px"],
+    ["base--letter-spacing", "0em", "16px：Inter 的设计尺寸，不调"],
+    ["lg--letter-spacing", "0em", "18px"],
+    ["xl--letter-spacing", "-0.01em", "20px：起点，开始收紧"],
+    ["2xl--letter-spacing", "-0.01em", "24px"],
+    ["3xl--letter-spacing", "-0.015em", "30px"],
+    ["4xl--letter-spacing", "-0.02em", "36px"],
+    ["5xl--letter-spacing", "-0.025em", "48px"],
+    ["6xl--letter-spacing", "-0.025em", "60px：负端到此为止，再紧汉字会撞"],
   ],
   // v4 的 duration-* 是裸数值工具类，theme.css 里没有这一族，T2 的 fast / base /
   // slow 因此无 T1 可指。档位表本身是 Tailwind 文档给定的封闭集合，照录即可。

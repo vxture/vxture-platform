@@ -51,7 +51,9 @@ import {
   SIZE_MODE_SHIFT,
   TYPE_ROLES,
   TYPE_GROUP_ORDER,
-  TIGHT_ROLES,
+  TIGHT_LEADING_ROLES,
+  CAPS_ROLES,
+  CAPS_TRACKING,
 } from "./typography-policy.mjs";
 
 const ROOT = process.cwd();
@@ -150,7 +152,7 @@ function buildRoles(modeIndex) {
     const [name, family, weight] = role;
     const where = `字号模式 ${modeIndex} ${name}`;
     const step = stepFor(role, shiftFor(role, modeIndex));
-    const tight = TIGHT_ROLES.test(name);
+    const tightLeading = TIGHT_LEADING_ROLES.test(name);
     const group =
       TYPE_GROUP_ORDER.find((g) => name === g || name.startsWith(`${g}-`)) ?? name;
 
@@ -159,19 +161,16 @@ function buildRoles(modeIndex) {
     rows.push([`--${name}-font-weight`, t1(`--vx-font-weight-${weight}`, where), group]);
     rows.push([
       `--${name}-line-height`,
-      tight
+      tightLeading
         ? t1("--vx-leading-tight", where)
         : t1(`--vx-text-${step}--line-height`, where),
       group,
     ]);
+    // 字距跟字号档，不跟角色；全大写是唯一与尺寸无关的例外。
     rows.push([
       `--${name}-letter-spacing`,
       t1(
-        tight
-          ? "--vx-tracking-tight"
-          : name === "overline"
-            ? "--vx-tracking-widest"
-            : "--vx-tracking-normal",
+        CAPS_ROLES.has(name) ? CAPS_TRACKING : `--vx-text-${step}--letter-spacing`,
         where,
       ),
       group,

@@ -45,6 +45,18 @@
   /* DS 扩展（Tailwind 无此挡位）。 */
   --vx-text-3xs: 0.5rem; /* 密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大 */
   --vx-text-3xs--line-height: 1.5; /* 12px 行盒 / 8px 字号 */
+  --vx-text-3xs--letter-spacing: 0.04em; /* 8px：字面挤在一起，需明显放开 */
   --vx-text-2xs: 0.625rem; /* 同上，介于 3xs 与 xs 之间 */
   --vx-text-2xs--line-height: 1.6; /* 16px 行盒 / 10px 字号 */
+  --vx-text-2xs--letter-spacing: 0.03em; /* 10px */
+  --vx-text-xs--letter-spacing: 0.01em; /* 12px：微放 */
+  --vx-text-sm--letter-spacing: 0em; /* 14px */
+  --vx-text-base--letter-spacing: 0em; /* 16px：Inter 的设计尺寸，不调 */
+  --vx-text-lg--letter-spacing: 0em; /* 18px */
+  --vx-text-xl--letter-spacing: -0.01em; /* 20px：起点，开始收紧 */
+  --vx-text-2xl--letter-spacing: -0.01em; /* 24px */
+  --vx-text-3xl--letter-spacing: -0.015em; /* 30px */
+  --vx-text-4xl--letter-spacing: -0.02em; /* 36px */
+  --vx-text-5xl--letter-spacing: -0.025em; /* 48px */
+  --vx-text-6xl--letter-spacing: -0.025em; /* 60px：负端到此为止，再紧汉字会撞 */
 }

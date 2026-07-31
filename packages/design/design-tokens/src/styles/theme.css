@@ -272,8 +272,20 @@
   --font-cjk: var(--vx-font-cjk);
   --font-mono: var(--vx-font-mono);
   --font-sans: var(--vx-font-sans);
+  --text-2xl--letter-spacing: var(--vx-text-2xl--letter-spacing);
   --text-2xs: var(--vx-text-2xs);
+  --text-2xs--letter-spacing: var(--vx-text-2xs--letter-spacing);
   --text-2xs--line-height: var(--vx-text-2xs--line-height);
+  --text-3xl--letter-spacing: var(--vx-text-3xl--letter-spacing);
   --text-3xs: var(--vx-text-3xs);
+  --text-3xs--letter-spacing: var(--vx-text-3xs--letter-spacing);
   --text-3xs--line-height: var(--vx-text-3xs--line-height);
+  --text-4xl--letter-spacing: var(--vx-text-4xl--letter-spacing);
+  --text-5xl--letter-spacing: var(--vx-text-5xl--letter-spacing);
+  --text-6xl--letter-spacing: var(--vx-text-6xl--letter-spacing);
+  --text-base--letter-spacing: var(--vx-text-base--letter-spacing);
+  --text-lg--letter-spacing: var(--vx-text-lg--letter-spacing);
+  --text-sm--letter-spacing: var(--vx-text-sm--letter-spacing);
+  --text-xl--letter-spacing: var(--vx-text-xl--letter-spacing);
+  --text-xs--letter-spacing: var(--vx-text-xs--letter-spacing);
 }
