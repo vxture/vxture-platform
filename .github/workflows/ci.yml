@@ -129,6 +129,10 @@ jobs:
         if: steps.changes.outputs.docs_only != 'true'
         run: pnpm lint:design
 
+      - name: Design system public exports snapshot
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm lint:design-exports
+
       - name: Env audit (deploy bundle + runtime template contract)
         if: steps.changes.outputs.docs_only != 'true'
         run: |

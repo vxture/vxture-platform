@@ -1,7 +1,7 @@
 # Design System 使用规范
 
-版本：1.3.2
-日期：2026-06-23
+版本：1.4.0
+日期：2026-07-31
 范围：`portals/*`、`agent-studio/*` 以及通过包发布接入的外部业务前端消费者
 
 Design System 是平台 UI 的规则层、基准层和通用能力层。应用端负责业务语义组装，不负责重新定义基础控件、底层 UI 引擎、设计 token 或通用模式。
@@ -18,6 +18,28 @@ Design System 是平台 UI 的规则层、基准层和通用能力层。应用�
 | L5 Runtime Dynamic   | 调用现场 | 坐标、进度、背景图 URL、动画延迟等运行时值                                                                    |
 
 应用可以组装 DS 能力，但不能把组装写成新的基础定义。
+
+### 1.1 Token 取值分层 T1–T4
+
+L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层另用 **T1–T4**，两者正交，编号不可混用。
+
+| 层           | 定义                                         | 载体                                         | 公开契约     | 应用侧                        |
+| ------------ | -------------------------------------------- | -------------------------------------------- | ------------ | ----------------------------- |
+| T1 Primitive | 原子值：色阶、spacing 刻度、字号刻度；无语义 | `styles/foundation/`                         | 否           | 禁止引用                      |
+| T2 Semantic  | 意义绑定，引用 T1                            | `styles/semantic/` + `/tokens`               | 是（主契约） | 可引用                        |
+| T3 Component | 组件域 token，引用 T2                        | `styles/components/` + `tokens/component.ts` | 是（只读）   | 可 `var()` 引用，**禁止赋值** |
+| T4 Page      | 页面/实例样式                                | 各产品仓库，不在 DS 包内                     | 不适用       | —                             |
+
+**T3 建立门槛**：仅当某值可预见地偏离其 T2 来源、或 T2 无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown **不建 T3，直接绑 T2**。
+
+**取值约束**：
+
+- 长度量（圆角、描边宽度、阴影 blur）须别名 T1，不允许裸值。
+- 布局常量（侧边栏宽度等一次性视口决策）刻意不别名 T1。
+- 阴影几何与阴影颜色分离：几何归 Depth，颜色随主题走 Color。
+- 暗色层级由 surface 明度递增与描边承担，不靠阴影递增。
+
+T3 不允许覆写。特殊需求两条路径：①产品在 T4 引用 T3/T2 组合自有样式；②更新 DS 本体。
 
 ## 2. 合法使用方式
 
@@ -224,10 +246,13 @@ AI 修改前端代码时必须：
 
 ```bash
 pnpm lint:design
+pnpm lint:design-exports
 pnpm --filter @vxture/design-system lint
 pnpm --filter @vxture/design-system type-check
 pnpm --filter @vxture/design-system build
 ```
+
+`lint:design-exports` 守卫 DS 公开入口（exports 子路径 + 具名导出 + files + peerDependencies）。入口变化必须先按 `050-design-system-release.md` 判定 SemVer，再用 `--update` 显式更新快照。
 
 消费者变更还要运行对应应用的 `lint` / `type-check` / `build`。
 

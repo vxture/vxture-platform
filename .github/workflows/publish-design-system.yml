@@ -53,6 +53,9 @@ jobs:
       - name: Build design system package
         run: pnpm --filter @vxture/design-system build
 
+      - name: Verify public exports snapshot
+        run: node scripts/guardrails/check-design-system-exports.mjs --strict
+
       - name: Verify publish payloads
         run: |
           pnpm --filter @vxture/shared pack --dry-run
