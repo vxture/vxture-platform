@@ -54,11 +54,6 @@ const IGNORED_PARTS = new Set([
   // no-illegal-font-family legitimately don't apply. Excluded to keep the
   // guardrail green on a clean tree.
   "design-system-gallery",
-  // DTCG token source — this package IS the source of truth for tokens. Raw
-  // values are the point; T1 CSS is generated from it by
-  // scripts/design-tokens/generate-primitives.mjs. Not published (outside the
-  // package files whitelist).
-  "Figma-Token",
 ]);
 
 const DS_ROOT = normalize("packages/design/design-system");

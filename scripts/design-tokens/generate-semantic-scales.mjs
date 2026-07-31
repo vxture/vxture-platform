@@ -3,8 +3,9 @@
 /**
  * generate-semantic-scales.mjs — 生成 T2 语义层的非色彩部分。
  *
- * ⚠ 与 generate-semantic.mjs 同为一次性**迁移工具**，随过程文件一并退役。
- *   权威边界见 docs/10-standards/065-design-token-pipeline.md。
+ * 输入全部来自 DS 自有的 semantic-policy.mjs / typography-policy.mjs——Figma 导出
+ * 已退役。生成器本身留下：行盒与字距的折算、T1 存在性断言、z 互异与阶梯单调性
+ * 断言都是真活，且 1500 行重复的模式块 CSS 手工维护必然漂移。
  *
  * ── T2 为什么要覆盖全部刻度族 ──
  * T1 是 Tailwind theme 的镜像，回答"有哪些数可选"；T2 回答"哪个数用在什么场合"。
@@ -41,17 +42,21 @@ import {
   ICON_SIZES,
   MEDIA_SIZES,
   CONTENT_WIDTHS,
-  SPACING_BASE,
-  SPACING_MERGED,
-  SPACING_HEIGHTS,
+  SPACING_SCALE,
+  SPACING_KINDS,
   assertElevationOrdered,
 } from "./semantic-policy.mjs";
+import {
+  TEXT_LADDER,
+  SIZE_MODE_SHIFT,
+  TYPE_ROLES,
+  TYPE_GROUP_ORDER,
+} from "./typography-policy.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
 const PKG = path.join(ROOT, "packages/design/design-tokens");
-const EXPORT_DIR = path.join(PKG, "Figma-Token");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
 const FOUNDATION = path.join(PKG, "src/styles/foundation");
 
@@ -100,113 +105,70 @@ function resolve(name, where) {
   return "0";
 }
 
-/* ── Figma DTCG ─────────────────────────────────────────────── */
-
-function flatten(node, prefix = "", out = []) {
-  for (const key of Object.keys(node)) {
-    if (key.startsWith("$")) continue;
-    const value = node[key];
-    if (!value || typeof value !== "object") continue;
-    const next = prefix ? `${prefix}/${key}` : key;
-    if ("$value" in value) out.push([next, value]);
-    if (Object.keys(value).some((k) => !k.startsWith("$"))) flatten(value, next, out);
-  }
-  return out;
-}
-
-const aliasOf = (token) =>
-  token.$extensions?.["com.figma.aliasData"]?.targetVariableName ?? null;
-
-const load = (collection, file) =>
-  flatten(JSON.parse(readFileSync(path.join(EXPORT_DIR, collection, file), "utf8")));
-
-/**
- * 设计稿的 `spacing/N` 别名 → T1 表达式。
- *
- * T1 的间距只有一个乘数 `--vx-spacing`（0.25rem），这正是 v4 的做法：`p-4` 编译为
- * `calc(var(--spacing) * 4)`。故 T2 的每一档写成同形的 calc，仍然只引 T1。
- */
-function spacingExpr(target, where) {
-  const step = target.replace(/^spacing\//, "");
-  if (step === "px") return "1px";
-  const n = Number(step.replace("-", "."));
-  if (!Number.isFinite(n)) {
-    errors.push(`${where}：无法解析间距档 ${target}`);
-    return "0";
-  }
-  if (n === 0) return "0px";
-  return `calc(${t1("--vx-spacing", where)} * ${n})`;
-}
-
 /* ── 排版角色（字号三档）───────────────────────────────────── */
 
 const FONT_SIZE_MODES = [
-  ["Small", "html.vx-font-small"],
-  ["Default", ":root, html.vx-font-default"],
-  ["Large", "html.vx-font-large"],
+  [0, "html.vx-font-small"],
+  [1, ":root, html.vx-font-default"],
+  [2, "html.vx-font-large"],
 ];
 
-function typographyT1(target) {
-  const [, group, name] = target.split("/");
-  if (group === "family") return `--vx-font-${name}`;
-  if (group === "size") return `--vx-text-${name}`;
-  if (group === "weight") return `--vx-font-weight-${name}`;
-  return null;
+/**
+ * 角色在某个字号模式下的档位。
+ *
+ * 平移沿 T1 字号阶梯进行；`noShrink` / `noGrow` 是角色自己声明的例外，理由见
+ * typography-policy。越界一律夹到端点而不是报错——阶梯两端本来就是硬边界。
+ */
+function shiftFor(role, modeIndex) {
+  const flag = role[6];
+  let shift = SIZE_MODE_SHIFT[modeIndex];
+  if (flag === "noShrink" && shift < 0) shift = 0;
+  if (flag === "noGrow" && shift > 0) shift = 0;
+  return shift;
 }
 
-function sizePxTable() {
-  const px = new Map();
-  for (const [name, value] of t1Literals) {
-    const m = /^--vx-text-([\w-]+)$/.exec(name);
-    const rem = /^([\d.]+)rem$/.exec(value);
-    if (m && rem) px.set(name, Number(rem[1]) * 16);
+function stepFor(role, shift) {
+  const base = role[3];
+  const i = TEXT_LADDER.indexOf(base);
+  if (i < 0) {
+    errors.push(`${role[0]}：默认档 ${base} 不在字号阶梯上`);
+    return base;
   }
-  return px;
+  return TEXT_LADDER[Math.min(TEXT_LADDER.length - 1, Math.max(0, i + shift))];
+}
+
+/** T1 字号档 → px，用于把行盒与字距折算成相对单位。 */
+function sizePx(step, where) {
+  const value = t1Literals.get(`--vx-text-${step}`);
+  const rem = value && /^([\d.]+)rem$/.exec(value);
+  if (!rem) {
+    errors.push(`${where}：拿不到 --vx-text-${step} 的 rem 取值`);
+    return 16;
+  }
+  return Number(rem[1]) * 16;
 }
 
 /**
- * 行高与字距一律换算为**相对单位**（行高无单位比值、字距 em）。绝对 px 扛不住
+ * 行盒与字距一律换算为**相对单位**（行高无单位比值、字距 em）。绝对 px 扛不住
  * 字号三档与浏览器缩放，且 Tailwind 的 `--text-*--line-height` 本身就是比值。
- *
- * ⚠ 字距**不可**沿用设计稿的别名。设计稿把 1.6px 挂在 `font/letterSpacing/widest`
- *   上，而 T1 镜像后 `--vx-tracking-widest` 是 Tailwind 的 0.1em——同名不同义：
- *   0.1em 在 60px 的 display 上是 6px，近设计意图的四倍。故按各角色字号折算。
  */
-function buildRoles(mode) {
+function buildRoles(modeIndex) {
   const rows = [];
-  const byRole = new Map();
-  for (const [tokenPath, token] of load("vx-Typography", `${mode}.tokens.json`)) {
-    const role = tokenPath.split("/").slice(0, -1).join("-");
-    const prop = tokenPath.split("/").pop();
-    if (!byRole.has(role)) byRole.set(role, {});
-    byRole.get(role)[prop] = token;
-  }
+  for (const role of TYPE_ROLES) {
+    const [name, family, weight, , lineBoxes, trackingPx] = role;
+    const where = `字号模式 ${modeIndex} ${name}`;
+    const shift = shiftFor(role, modeIndex);
+    const step = stepFor(role, shift);
+    const px = sizePx(step, where);
+    const box = lineBoxes[modeIndex];
+    const group = TYPE_GROUP_ORDER.find((g) => name === g || name.startsWith(`${g}-`)) ?? name;
+    const ratio = (v) => Number((v / px).toFixed(4));
 
-  for (const [role, props] of byRole) {
-    const where = `${mode} ${role}`;
-    for (const [prop, suffix] of [
-      ["fontFamily", "font-family"],
-      ["fontSize", "font-size"],
-      ["fontWeight", "font-weight"],
-    ]) {
-      const target = aliasOf(props[prop]);
-      const ref = target && typographyT1(target);
-      if (!ref) {
-        errors.push(`${where}/${prop}：设计稿未给可解析的别名`);
-        continue;
-      }
-      rows.push([`--${role}-${suffix}`, t1(ref, where), role]);
-    }
-
-    const sizeVar = typographyT1(aliasOf(props.fontSize) ?? "");
-    const basePx = sizePx.get(sizeVar);
-    if (!basePx) {
-      errors.push(`${where}：拿不到字号 px，行高与字距无法折算`);
-      continue;
-    }
-    const ratio = (v) => Number((v / basePx).toFixed(4));
-    rows.push([`--${role}-line-height`, String(ratio(props.lineHeight.$value)), role]);
-    rows.push([`--${role}-letter-spacing`, `${ratio(props.letterSpacing.$value)}em`, role]);
+    rows.push([`--${name}-font-family`, t1(`--vx-font-${family}`, where), group]);
+    rows.push([`--${name}-font-size`, t1(`--vx-text-${step}`, where), group]);
+    rows.push([`--${name}-font-weight`, t1(`--vx-font-weight-${weight}`, where), group]);
+    rows.push([`--${name}-line-height`, String(ratio(box)), group]);
+    rows.push([`--${name}-letter-spacing`, `${ratio(trackingPx)}em`, group]);
   }
   return rows;
 }
@@ -214,9 +176,9 @@ function buildRoles(mode) {
 /* ── 间距（密度三档）───────────────────────────────────────── */
 
 const DENSITY_MODES = [
-  ["Compact", ".density-compact"],
-  ["Default", ":root, .density-default"],
-  ["Comfortable", ".density-comfortable"],
+  [0, ".density-compact"],
+  [1, ":root, .density-default"],
+  [2, ".density-comfortable"],
 ];
 
 /**
@@ -224,35 +186,32 @@ const DENSITY_MODES = [
  * 自己的注册（`--spacing-md: var(--spacing-md)`），CSS 判定为循环、整族失效且不报错。
  * 注册由 generate-theme.mjs 改名完成。
  */
-function buildSpacing(mode) {
-  const rows = [];
-  const seen = new Set();
-  for (const [tokenPath, token] of load("vx-Space", `${mode}.tokens.json`)) {
-    const parts = tokenPath.split("/");
-    const step = parts.pop();
-    const family = parts.join("-");
-    const where = `${mode} ${tokenPath}`;
-    const target = aliasOf(token);
-    if (!target) {
-      errors.push(`${where}：设计稿未给别名`);
-      continue;
-    }
+function buildSpacing(modeIndex) {
+  return SPACING_SCALE.map(([step, ...mults]) => {
+    const kind = SPACING_KINDS.find((k) => step.startsWith(`${k}-`)) ?? "inset";
+    const n = mults[modeIndex];
+    const value =
+      n === 0 ? "0px" : `calc(${t1("--vx-spacing", `spacing/${step}`)} * ${n})`;
+    return [`--space-${step}`, value, kind];
+  });
+}
 
-    let name = null;
-    if (SPACING_MERGED.includes(family)) {
-      if (family !== SPACING_BASE) continue; // 非基准族整族丢弃
-      name = `--space-${step}`;
-    } else if (SPACING_HEIGHTS[family]) {
-      name = `--space-${SPACING_HEIGHTS[family]}-${step}`;
-    } else {
-      errors.push(`${where}：间距族 ${family} 未在合并表中登记`);
-      continue;
+/** 同一行三档非递减、同一档沿族内递增——挡的是改表时把某一档写反。 */
+function assertSpacingMonotonic() {
+  const last = {};
+  for (const [step, ...mults] of SPACING_SCALE) {
+    const kind = SPACING_KINDS.find((k) => step.startsWith(`${k}-`)) ?? "inset";
+    for (let i = 1; i < mults.length; i++) {
+      if (mults[i] < mults[i - 1]) {
+        errors.push(`间距 ${step}：密度三档非递减被打破（${mults.join(" / ")}）`);
+      }
     }
-    if (seen.has(name)) continue;
-    seen.add(name);
-    rows.push([name, spacingExpr(target, where), family]);
+    const prev = last[kind];
+    if (prev && mults.some((m, i) => m < prev[i])) {
+      errors.push(`间距 ${step}：某一档低于族内上一档（${mults.join(" / ")} < ${prev.join(" / ")}）`);
+    }
+    last[kind] = mults;
   }
-  return rows;
 }
 
 /* ── 无模式轴的各族 ─────────────────────────────────────────── */
@@ -412,11 +371,11 @@ function staticFile(file, label, source, rows, extra = "") {
 /* ── 生成 ───────────────────────────────────────────────────── */
 
 const t1Literals = loadT1();
-const sizePx = sizePxTable();
 
-const typoBlocks = FONT_SIZE_MODES.map(([mode, sel]) => [sel, buildRoles(mode)]);
-const spaceBlocks = DENSITY_MODES.map(([mode, sel]) => [sel, buildSpacing(mode)]);
-const roleCount = new Set(typoBlocks[0][1].map(([, , role]) => role)).size;
+assertSpacingMonotonic();
+const typoBlocks = FONT_SIZE_MODES.map(([i, sel]) => [sel, buildRoles(i)]);
+const spaceBlocks = DENSITY_MODES.map(([i, sel]) => [sel, buildSpacing(i)]);
+const roleCount = TYPE_ROLES.length;
 
 const outputs = [
   [
@@ -424,7 +383,7 @@ const outputs = [
     header(
       "typography-semantic.css",
       "排版角色（工具类族 text-*）",
-      "Figma-Token/vx-Typography/",
+      "scripts/design-tokens/typography-policy.mjs",
       `
  *
  * 每个角色一次落齐字号 / 行高 / 字距 / 字重，由 theme.css 注册为 v4 的
@@ -440,7 +399,7 @@ const outputs = [
     header(
       "spacing-semantic.css",
       "间距与控件高度（工具类族 p-* / gap-* / h-*）",
-      "Figma-Token/vx-Space/",
+      "scripts/design-tokens/semantic-policy.mjs",
       `
  *
  * 密度三档是**用户偏好轴**，与组件自身的尺寸变体（cva size）正交：前者由祖先
@@ -456,17 +415,17 @@ const outputs = [
   staticFile(
     "layout-semantic.css",
     "页面与内容宽度（工具类族 max-w-*）",
-    "Figma-Token/vx-Layout/",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildLayout(),
     `
  *
  * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。`,
   ),
-  staticFile("radius-semantic.css", "圆角（工具类族 rounded-*）", "Figma-Token/vx-Shape/", buildRadius()),
+  staticFile("radius-semantic.css", "圆角（工具类族 rounded-*）", "scripts/design-tokens/semantic-policy.mjs", buildRadius()),
   staticFile(
     "shadow-semantic.css",
     "视觉高度（工具类族 shadow-*）",
-    "Figma-Token/vx-Depth/ + semantic-policy.mjs",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildShadow(),
     `
  *
@@ -486,13 +445,13 @@ const outputs = [
   staticFile(
     "motion-semantic.css",
     "时长与缓动（工具类族 duration-* / ease-*）",
-    "Figma-Token/vx-Motion/ + semantic-policy.mjs",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildMotion(),
   ),
   staticFile(
     "opacity-semantic.css",
     "透明度（工具类族 opacity-*）",
-    "Figma-Token/vx-Depth/",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildOpacity(),
     `
  *
@@ -501,7 +460,7 @@ const outputs = [
   staticFile(
     "border-semantic.css",
     "描边宽度（工具类族 border-*）",
-    "Figma-Token/vx-Shape/",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildBorder(),
     `
  *
@@ -510,7 +469,7 @@ const outputs = [
   staticFile(
     "size-semantic.css",
     "图标与媒体尺寸（工具类族 size-*）",
-    "Figma-Token/vx-Element/",
+    "scripts/design-tokens/semantic-policy.mjs",
     buildSize(),
     `
  *

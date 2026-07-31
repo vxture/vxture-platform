@@ -4,28 +4,28 @@
  * @layer Presentation
  * @category styles
  * @author AI-Generated
- * @date 2026-07-31
+ * @date 2026-08-01
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
  *   生成：node scripts/design-tokens/generate-semantic.mjs
- *   源：Figma-Token/vx-Color/（过程文件，迁移完成后删除）
+ *   输入：scripts/design-tokens/color-policy.mjs
  *
  * T2 定义见 docs/10-standards/060-design-system.md §1.1。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  *
- * 变量名取自 Figma codeSyntax：shadcn 有对应概念的用 shadcn 名
- * （--background / --foreground / --primary / --border …），
- * shadcn 无对应概念的沿用设计稿自有名（--surface-* / --content-* / --link …）。
+ * 命名沿用 shadcn 约定（--background / --foreground / --primary / --border …），
+ * shadcn 无对应概念的用 DS 自有名（--surface-* / --content-* / --link …）。
  *
- * 本层只引用 T1，不含裸值（surface/danger 例外，设计稿未给别名）。
+ * 六个意图族由"色相 × 阶型"派生，故族间必然一致；阶型的对比度依据见 color-policy。
+ * 本层只引用 T1。
  */
 
 :root {
   /* surface */
-  --background: var(--vx-color-neutral-100);  /* 偏离设计稿：页面底改中性 */
-  --surface-1: var(--vx-color-neutral-200);  /* 偏离设计稿：页面级凹陷面 */
-  --card: var(--vx-color-white);  /* 偏离设计稿：卡片提为纯白，与灰底页面拉开层次 */
-  --surface-3: var(--vx-color-neutral-50);  /* 偏离设计稿：卡内凹陷面下移一档，避让页面底 */
+  --background: var(--vx-color-neutral-100);
+  --surface-1: var(--vx-color-neutral-200);
+  --card: var(--vx-color-white);
+  --surface-3: var(--vx-color-neutral-50);
   --popover: var(--vx-color-white);
   --scrim: var(--vx-color-neutral-950-alpha-45);
   --accent: var(--vx-color-neutral-600-alpha-08);
@@ -72,36 +72,6 @@
   --destructive-muted-foreground: var(--vx-color-red-800);
   --destructive-border: var(--vx-color-red-600);
   --destructive-text: var(--vx-color-red-600);
-  --success: var(--vx-color-emerald-700);
-  --success-hover: var(--vx-color-emerald-800);
-  --success-active: var(--vx-color-emerald-900);
-  --success-foreground: var(--vx-color-white);
-  --success-muted: var(--vx-color-emerald-50);
-  --success-muted-hover: var(--vx-color-emerald-100);
-  --success-muted-active: var(--vx-color-emerald-200);
-  --success-muted-foreground: var(--vx-color-emerald-800);
-  --success-border: var(--vx-color-emerald-600);
-  --success-text: var(--vx-color-emerald-700);
-  --warning: var(--vx-color-amber-400);
-  --warning-hover: var(--vx-color-amber-500);
-  --warning-active: var(--vx-color-amber-600);
-  --warning-foreground: var(--vx-color-neutral-900);
-  --warning-muted: var(--vx-color-amber-50);
-  --warning-muted-hover: var(--vx-color-amber-100);
-  --warning-muted-active: var(--vx-color-amber-200);
-  --warning-muted-foreground: var(--vx-color-amber-800);
-  --warning-border: var(--vx-color-amber-600);
-  --warning-text: var(--vx-color-amber-700);
-  --info: var(--vx-color-sky-700);
-  --info-hover: var(--vx-color-sky-800);
-  --info-active: var(--vx-color-sky-900);
-  --info-foreground: var(--vx-color-white);
-  --info-muted: var(--vx-color-sky-50);
-  --info-muted-hover: var(--vx-color-sky-100);
-  --info-muted-active: var(--vx-color-sky-200);
-  --info-muted-foreground: var(--vx-color-sky-800);
-  --info-border: var(--vx-color-sky-600);
-  --info-text: var(--vx-color-sky-700);
   --ai: var(--vx-color-purple-600);
   --ai-hover: var(--vx-color-purple-700);
   --ai-active: var(--vx-color-purple-800);
@@ -112,6 +82,36 @@
   --ai-muted-foreground: var(--vx-color-purple-800);
   --ai-border: var(--vx-color-purple-600);
   --ai-text: var(--vx-color-purple-600);
+  --success: var(--vx-color-emerald-700);
+  --success-hover: var(--vx-color-emerald-800);
+  --success-active: var(--vx-color-emerald-900);
+  --success-foreground: var(--vx-color-white);
+  --success-muted: var(--vx-color-emerald-50);
+  --success-muted-hover: var(--vx-color-emerald-100);
+  --success-muted-active: var(--vx-color-emerald-200);
+  --success-muted-foreground: var(--vx-color-emerald-800);
+  --success-border: var(--vx-color-emerald-600);
+  --success-text: var(--vx-color-emerald-700);
+  --info: var(--vx-color-sky-700);
+  --info-hover: var(--vx-color-sky-800);
+  --info-active: var(--vx-color-sky-900);
+  --info-foreground: var(--vx-color-white);
+  --info-muted: var(--vx-color-sky-50);
+  --info-muted-hover: var(--vx-color-sky-100);
+  --info-muted-active: var(--vx-color-sky-200);
+  --info-muted-foreground: var(--vx-color-sky-800);
+  --info-border: var(--vx-color-sky-600);
+  --info-text: var(--vx-color-sky-700);
+  --warning: var(--vx-color-amber-400);
+  --warning-hover: var(--vx-color-amber-500);
+  --warning-active: var(--vx-color-amber-600);
+  --warning-foreground: var(--vx-color-neutral-900);
+  --warning-muted: var(--vx-color-amber-50);
+  --warning-muted-hover: var(--vx-color-amber-100);
+  --warning-muted-active: var(--vx-color-amber-200);
+  --warning-muted-foreground: var(--vx-color-amber-800);
+  --warning-border: var(--vx-color-amber-600);
+  --warning-text: var(--vx-color-amber-700);
 
   /* chart */
   --chart-other: var(--vx-color-neutral-400);
@@ -119,11 +119,11 @@
   --chart-axis: var(--vx-color-neutral-400);
   --chart-tooltip-bg: var(--vx-color-neutral-900);
   --chart-1: var(--vx-color-brand-600);
-  --chart-2: var(--vx-color-amber-600);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-3: var(--vx-color-emerald-600);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-4: var(--vx-color-purple-600);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-5: var(--vx-color-sky-600);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-6: var(--vx-color-red-600);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
+  --chart-2: var(--vx-color-amber-600);
+  --chart-3: var(--vx-color-emerald-600);
+  --chart-4: var(--vx-color-purple-600);
+  --chart-5: var(--vx-color-sky-600);
+  --chart-6: var(--vx-color-red-600);
   --chart-seq-1: var(--vx-color-brand-100);
   --chart-seq-2: var(--vx-color-brand-300);
   --chart-seq-3: var(--vx-color-brand-500);
@@ -139,7 +139,7 @@
   --gradient-brand-from: var(--vx-color-brand-600);
   --gradient-brand-to: var(--vx-color-brand-800);
   --gradient-ai-from: var(--vx-color-purple-600);
-  --gradient-ai-to: var(--vx-color-purple-800);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
+  --gradient-ai-to: var(--vx-color-purple-800);
   --gradient-surface-from: var(--vx-color-neutral-50);
   --gradient-surface-to: var(--vx-color-white);
   --gradient-glow-from: var(--vx-color-brand-600-alpha-22);
@@ -199,36 +199,6 @@
   --destructive-muted-foreground: var(--vx-color-red-300);
   --destructive-border: var(--vx-color-red-500);
   --destructive-text: var(--vx-color-red-400);
-  --success: var(--vx-color-emerald-700);
-  --success-hover: var(--vx-color-emerald-800);
-  --success-active: var(--vx-color-emerald-900);
-  --success-foreground: var(--vx-color-white);
-  --success-muted: var(--vx-color-emerald-950);
-  --success-muted-hover: var(--vx-color-emerald-900);
-  --success-muted-active: var(--vx-color-emerald-800);
-  --success-muted-foreground: var(--vx-color-emerald-300);
-  --success-border: var(--vx-color-emerald-500);
-  --success-text: var(--vx-color-emerald-400);
-  --warning: var(--vx-color-amber-400);
-  --warning-hover: var(--vx-color-amber-500);
-  --warning-active: var(--vx-color-amber-600);
-  --warning-foreground: var(--vx-color-neutral-900);
-  --warning-muted: var(--vx-color-amber-950);
-  --warning-muted-hover: var(--vx-color-amber-900);
-  --warning-muted-active: var(--vx-color-amber-800);
-  --warning-muted-foreground: var(--vx-color-amber-300);
-  --warning-border: var(--vx-color-amber-500);
-  --warning-text: var(--vx-color-amber-400);
-  --info: var(--vx-color-sky-700);
-  --info-hover: var(--vx-color-sky-800);
-  --info-active: var(--vx-color-sky-900);
-  --info-foreground: var(--vx-color-white);
-  --info-muted: var(--vx-color-sky-950);
-  --info-muted-hover: var(--vx-color-sky-900);
-  --info-muted-active: var(--vx-color-sky-800);
-  --info-muted-foreground: var(--vx-color-sky-300);
-  --info-border: var(--vx-color-sky-500);
-  --info-text: var(--vx-color-sky-400);
   --ai: var(--vx-color-purple-600);
   --ai-hover: var(--vx-color-purple-700);
   --ai-active: var(--vx-color-purple-800);
@@ -239,6 +209,36 @@
   --ai-muted-foreground: var(--vx-color-purple-300);
   --ai-border: var(--vx-color-purple-500);
   --ai-text: var(--vx-color-purple-400);
+  --success: var(--vx-color-emerald-700);
+  --success-hover: var(--vx-color-emerald-800);
+  --success-active: var(--vx-color-emerald-900);
+  --success-foreground: var(--vx-color-white);
+  --success-muted: var(--vx-color-emerald-950);
+  --success-muted-hover: var(--vx-color-emerald-900);
+  --success-muted-active: var(--vx-color-emerald-800);
+  --success-muted-foreground: var(--vx-color-emerald-300);
+  --success-border: var(--vx-color-emerald-500);
+  --success-text: var(--vx-color-emerald-400);
+  --info: var(--vx-color-sky-700);
+  --info-hover: var(--vx-color-sky-800);
+  --info-active: var(--vx-color-sky-900);
+  --info-foreground: var(--vx-color-white);
+  --info-muted: var(--vx-color-sky-950);
+  --info-muted-hover: var(--vx-color-sky-900);
+  --info-muted-active: var(--vx-color-sky-800);
+  --info-muted-foreground: var(--vx-color-sky-300);
+  --info-border: var(--vx-color-sky-500);
+  --info-text: var(--vx-color-sky-400);
+  --warning: var(--vx-color-amber-400);
+  --warning-hover: var(--vx-color-amber-500);
+  --warning-active: var(--vx-color-amber-600);
+  --warning-foreground: var(--vx-color-neutral-900);
+  --warning-muted: var(--vx-color-amber-950);
+  --warning-muted-hover: var(--vx-color-amber-900);
+  --warning-muted-active: var(--vx-color-amber-800);
+  --warning-muted-foreground: var(--vx-color-amber-300);
+  --warning-border: var(--vx-color-amber-500);
+  --warning-text: var(--vx-color-amber-400);
 
   /* chart */
   --chart-other: var(--vx-color-neutral-500);
@@ -246,11 +246,11 @@
   --chart-axis: var(--vx-color-neutral-600);
   --chart-tooltip-bg: var(--vx-color-neutral-800);
   --chart-1: var(--vx-color-brand-400);
-  --chart-2: var(--vx-color-amber-400);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-3: var(--vx-color-emerald-400);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-4: var(--vx-color-purple-400);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-5: var(--vx-color-sky-400);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
-  --chart-6: var(--vx-color-red-400);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
+  --chart-2: var(--vx-color-amber-400);
+  --chart-3: var(--vx-color-emerald-400);
+  --chart-4: var(--vx-color-purple-400);
+  --chart-5: var(--vx-color-sky-400);
+  --chart-6: var(--vx-color-red-400);
   --chart-seq-1: var(--vx-color-brand-900);
   --chart-seq-2: var(--vx-color-brand-700);
   --chart-seq-3: var(--vx-color-brand-500);
@@ -266,7 +266,7 @@
   --gradient-brand-from: var(--vx-color-brand-500);
   --gradient-brand-to: var(--vx-color-brand-700);
   --gradient-ai-from: var(--vx-color-purple-500);
-  --gradient-ai-to: var(--vx-color-purple-700);  /* 偏离设计稿：色板已减至六色相，原色相被弃用 */
+  --gradient-ai-to: var(--vx-color-purple-700);
   --gradient-surface-from: var(--vx-color-neutral-800);
   --gradient-surface-to: var(--vx-color-neutral-900);
   --gradient-glow-from: var(--vx-color-brand-600-alpha-22);

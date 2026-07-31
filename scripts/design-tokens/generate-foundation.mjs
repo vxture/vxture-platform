@@ -72,7 +72,9 @@ const droppedHues = [...new Set(rows.filter((r) => r.ns === "color").map((r) => 
   .filter((h) => !KEEP_HUES.includes(h) && !KEEP_COLOR_SINGLES.includes(h));
 notes.push(`色板保留 ${KEEP_HUES.length} 色相，弃用 ${droppedHues.length} 个：${droppedHues.join(" ")}`);
 
-/* ── 品牌与合成色：Tailwind 不可能有，从既有 Figma 派生色板里取回 ── */
+/* ── 品牌与合成色：Tailwind 不可能有，取自既有产物 ── */
+/* 这一族没有上游对应物，只能自持。生成时从上一版产物读回，故它既是输入也是输出——
+   要改品牌色请直接改 color-brand-primitive.css，它是本族唯一的真值源。 */
 const brandRows = [];
 try {
   const prev = readFileSync(path.join(OUT_DIR, "color-brand-primitive.css"), "utf8");

@@ -276,3 +276,56 @@ export const CONTENT_WIDTHS = [
   ["wide-2xl", "2xl", "数据密集型面板"],
   ["ultra-3xl", "3xl", "2K / 4K 上限；再宽应改分栏而非加宽"],
 ];
+
+/**
+ * ── 间距刻度（密度三档）──
+ *
+ * 三列是 `--vx-spacing` 的**倍数**（compact / default / comfortable），与 v4 的
+ * `p-4 → calc(var(--spacing) * 4)` 同构。
+ *
+ * ⚠ 三档之间是**档位平移**而非等比缩放，且平移量不一致：control 族多为 ±1，
+ *   row 族在低端 ±2、高端 ±4，inset 族基本是"沿本族阶梯挪一格"。曾试图用单一
+ *   乘数推导，实测比值在 1.0–1.5 之间浮动，推不出来——故必须逐档列表。
+ *   这也是密度轴不能做成 `--spacing` 单乘数的原因。
+ *
+ * ⚠ `2xs` 在 default 与 comfortable 同为 1：最小一档已经贴到 4px，再放大就与
+ *   `xs` 撞档。底部出现平台是刻意的，不是漏填。
+ *
+ * 断言（generate-semantic-scales）：同一行三档非递减、同一档沿族内递增。
+ */
+export const SPACING_SCALE = [
+  /* inset */
+  ["none", 0, 0, 0],
+  ["2xs", 0.5, 1, 1],
+  ["xs", 1, 1.5, 2],
+  ["sm", 1.5, 2, 2.5],
+  ["md", 2, 3, 4],
+  ["lg", 3, 4, 6],
+  ["xl", 4, 6, 8],
+  ["2xl", 6, 8, 10],
+  ["3xl", 8, 10, 12],
+  ["4xl", 10, 12, 14],
+  ["5xl", 12, 14, 16],
+  ["6xl", 14, 16, 20],
+  /* row */
+  ["row-sm", 8, 10, 12],
+  ["row-md", 10, 12, 14],
+  ["row-lg", 12, 14, 16],
+  ["row-xl", 14, 16, 20],
+  ["row-2xl", 16, 20, 24],
+  ["row-3xl", 20, 24, 28],
+  ["row-4xl", 24, 28, 32],
+  /* control */
+  ["control-3xs", 3, 4, 5],
+  ["control-2xs", 4, 5, 6],
+  ["control-xs", 5, 6, 7],
+  ["control-sm", 6, 7, 8],
+  ["control-md", 7, 8, 9],
+  ["control-lg", 8, 9, 10],
+  ["control-xl", 9, 10, 11],
+  ["control-2xl", 10, 12, 14],
+  ["control-3xl", 12, 14, 16],
+];
+
+/** 高度族的前缀 → 注册后的工具类中缀（`--space-control-md` → `h-control-md`）。 */
+export const SPACING_KINDS = ["row", "control"];
