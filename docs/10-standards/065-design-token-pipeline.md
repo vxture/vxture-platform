@@ -8,40 +8,70 @@
 
 ## 1. 权威边界
 
-| 角色                              | 定位                                         | 是否权威         |
-| --------------------------------- | -------------------------------------------- | ---------------- |
-| Figma 文件                        | **设计与展示**：视觉推演、组件排布、设计评审 | 否               |
-| Figma DTCG 导出（`Figma-Token/`） | **工程真值源**：入仓、可 diff、可回溯        | **是**           |
-| 生成的 CSS / TS                   | 导出的确定性投影                             | 否（可随时重建） |
-| 手写 token                        | ——                                           | **禁止**         |
+**`@vxture/design-system` 的 token 产出即唯一真值源。** 其余一切都是应用方——**Figma 也是应用方**，它最终要应用本包的 token 来做产品设计。
 
-Figma 里的值只有**导出并入仓之后**才成为工程真值。未导出的改动不存在。
+| 角色                                            | 定位                                     | 是否权威            |
+| ----------------------------------------------- | ---------------------------------------- | ------------------- |
+| `src/styles/foundation\|semantic\|components/*` | **DS token 真值源**                      | **是**              |
+| `src/tokens/*.ts`                               | 真值源的 TS 投影                         | 否（由 CSS 层决定） |
+| Figma 文件                                      | **应用方**：用 DS token 做视觉推演与设计 | 否                  |
+| `Figma-Token/`（DTCG 导出）                     | **过程文件**：首次播种用，迁移完成后删除 | 否（临时）          |
+| 手写非生成态 token                              | 迁移完成后即为常态                       | **是**              |
 
-**单向**：Figma → 导出 → 生成物 → 消费。生成物不回写 Figma，代码侧不反向定义 token。
+方向：**DS → Figma / 产品**。不是 Figma → DS。
+
+### 1.1 迁移期的临时倒置
+
+当前值源自 Figma 的一次性导出，因此存在一个**临时的反向依赖**：`Figma-Token/` 暂时充当播种源，生成器从它产出 CSS。这是过渡态，不是目标态。
+
+迁移完成的判据是**全部集合都已落入 `src/styles/`**。届时：
+
+1. 删除 `Figma-Token/`。
+2. 退役 `scripts/design-tokens/generate-primitives.mjs` 与 `lint:design-tokens` 门。
+3. 生成物头部的"勿手工编辑"改为常规文件头，此后由人维护。
+4. 反向补一条 DS → Figma 的导出，供设计侧导入。
+
+迁移进度见第 8 节。
 
 ## 2. 管线
 
+**目标态**：
+
 ```
-Figma variables
-  ↓ 手动导出（DTCG JSON）
-packages/design/design-system/Figma-Token/<collection>/*.tokens.json   ← 真值源，入仓
-  ↓ scripts/design-tokens/*.mjs
-packages/design/design-system/src/styles/foundation|semantic|components/*.css
-  ↓ tokens.css 聚合
-消费方（T4 / 产品仓库）
+packages/design/design-system/src/styles/foundation|semantic|components/*.css   ← 真值源
+  ↓ tokens.css 聚合            ↓ 导出 DTCG
+消费方（产品仓库 / T4）        Figma（导入后用于设计）
 ```
 
-### 2.1 导出约定
+**迁移期**（临时）：
+
+```
+Figma-Token/<collection>/*.tokens.json   ← 过程文件
+  ↓ scripts/design-tokens/*.mjs
+src/styles/foundation/*.css
+```
+
+### 2.1 过程文件约定（迁移期有效）
 
 - 导出**全部集合**，不做裁剪——裁剪会让"缺失"与"未导出"无法区分。
 - 目录结构保持 Figma 集合原样：`<collection>/<mode>.tokens.json`。
-- 导出文件**逐字入仓，禁止格式化**（已加入 `.prettierignore`）。格式化会破坏与下次重新导出的可比性。
-- 导出目录不参与 DS 守卫扫描（`check-design-system.mjs` 的 `IGNORED_PARTS`），因为裸值正是它的本体。
-- 不随包发布：`package.json` 的 `files` 白名单未含 `Figma-Token/`。
+- **逐字入仓，禁止格式化**（已加入 `.prettierignore`），否则无法与重新导出比对。
+- 不参与 DS 守卫扫描（`check-design-system.mjs` 的 `IGNORED_PARTS`），裸值正是它的本体。
+- 不随包发布：`package.json` 的 `files` 白名单未含该目录。
 
-### 2.2 生成物约定
+### 2.2 文件组织
 
-- 生成物**头部必须标注"由脚本生成，勿手工编辑"**并写明源文件与生成命令。
+`src/styles/foundation/` 下按**主语在前、层级在后**命名，与 Figma 集合命名一致：
+
+| 文件                       | 内容                                      | 数量 |
+| -------------------------- | ----------------------------------------- | ---- |
+| `color-primitive.css`      | 13 色相、alpha 变体                       | 189  |
+| `spacing-primitive.css`    | 长度刻度（含 0.5 / 1.5 等半档与 `px`）    | 24   |
+| `typography-primitive.css` | 字族 / 字体栈 / 字号 / 字重 / 行高 / 字距 | 37   |
+
+### 2.3 生成物约定（迁移期有效）
+
+- 头部标注"由脚本生成，勿手工编辑"，写明源与生成命令。
 - 生成器必须提供 `--check`：只校验不写入，用于 CI。
 - 每个生成器对应一个 `lint:design-*` 脚本并接入 `ci.yml`。
 
@@ -115,16 +145,23 @@ Figma MCP 的页面枚举会漏列页面，且 `search_design_system` 只返回�
 
 因此：**取值一律走导出文件，不走 MCP**。MCP 仅用于设计评审、截图、结构探查。
 
-## 5. 同步流程
+## 5. 变更流程
 
-1. 设计侧在 Figma 改动 variables。
-2. 导出全部集合，覆盖 `Figma-Token/`。
-3. 运行生成器（不带 `--check`）。
-4. **审阅两处 diff**：导出文件的 diff 说明设计改了什么；生成物的 diff 说明工程受什么影响。
-5. 按 `050-design-system-release.md` 判定 SemVer——token 值变化属行为变更，即使公开入口未变。
-6. PR 合入，CI 的 `lint:design-tokens` 保证二者不漂移。
+### 5.1 目标态
 
-禁止只改生成物不改导出，也禁止只更新导出不重新生成——CI 会拦截，但更重要的是这会让真值源失效。
+1. 在 `src/styles/` 直接改 token。
+2. 按 `050-design-system-release.md` 判定 SemVer——**token 值变化属行为变更**，即使公开入口未变。
+3. PR 合入、发布。
+4. 设计侧从 DS 导出的 DTCG 重新导入 Figma，使设计稿跟上实现。
+
+### 5.2 迁移期
+
+1. 若值需从 Figma 侧补充：重新导出全部集合，覆盖 `Figma-Token/`。
+2. 运行生成器（不带 `--check`）。
+3. **审阅两处 diff**：过程文件的 diff 说明设计侧改了什么，生成物的 diff 说明工程受什么影响。
+4. 同 5.1 的第 2–3 步。
+
+禁止只改生成物不改过程文件，也禁止只更新过程文件不重新生成——CI 会拦截。
 
 ## 6. 守卫
 
@@ -142,3 +179,24 @@ Figma MCP 的页面枚举会漏列页面，且 `search_design_system` 只返回�
 - `docs/10-standards/050-design-system-release.md` —— 发布与 SemVer
 - `docs/10-standards/040-design-system-package-convergence.md` —— 目录结构目标
 - `workplans/design-system-t1-t4-refactor.md` —— 本次重构的推进记录
+
+## 8. 迁移进度
+
+`Figma-Token/` 是过程文件，**全部集合迁入 `src/styles/` 后即可删除**。当前状态：
+
+| 集合                                      | 层  | 去向                        | 状态       |
+| ----------------------------------------- | --- | --------------------------- | ---------- |
+| `vx-Color-Primitive`                      | T1  | `color-primitive.css`       | **已迁入** |
+| `vx-Spacing-Primitive`                    | T1  | `spacing-primitive.css`     | **已迁入** |
+| `vx-Typography-Primitive`                 | T1  | `typography-primitive.css`  | **已迁入** |
+| `vx-Color`（Light / Dark）                | T2  | `semantic/color-*.css`      | 待迁       |
+| `vx-Shape`                                | T2  | `semantic/shape-*.css`      | 待迁       |
+| `vx-Depth`                                | T2  | `semantic/depth-*.css`      | 待迁       |
+| `vx-Space`（Compact/Default/Comfortable） | T2  | `semantic/space-*.css`      | 待迁       |
+| `vx-Typography`（Small/Default/Large）    | T2  | `semantic/typography-*.css` | 待迁       |
+| `vx-Element`                              | T2  | `semantic/element-*.css`    | 待迁       |
+| `vx-Layout`                               | T2  | `semantic/layout-*.css`     | 待迁       |
+| `vx-Motion`                               | T2  | `semantic/motion-*.css`     | 待迁       |
+| `vx-Component`                            | T3  | `components/*.css`          | 待迁       |
+
+**3 / 12 已迁。** 剩余 9 个集合迁完后，按 §1.1 的四步退役过程文件。

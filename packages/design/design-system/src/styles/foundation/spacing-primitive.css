@@ -1,0 +1,45 @@
+/**
+ * foundation/spacing-primitive.css - T1 原子层 · 长度刻度。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-primitives.mjs
+ *   源：Figma-Token/（过程文件，迁移完成后删除；届时本文件转为手工维护的真值源）
+ *
+ * T1 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ *
+ * 长度量（间距、圆角、描边宽度、阴影 blur）一律别名本刻度，不允许裸值。
+ * 键名 0-5 / 1-5 等代表 0.5 / 1.5 档（Figma 导出把小数点转为连字符）。
+ */
+
+:root {
+  --vx-spacing-0: 0px;
+  --vx-spacing-0-5: 2px;
+  --vx-spacing-1: 4px;
+  --vx-spacing-1-5: 6px;
+  --vx-spacing-2: 8px;
+  --vx-spacing-2-5: 10px;
+  --vx-spacing-3: 12px;
+  --vx-spacing-3-5: 14px;
+  --vx-spacing-4: 16px;
+  --vx-spacing-5: 20px;
+  --vx-spacing-6: 24px;
+  --vx-spacing-7: 28px;
+  --vx-spacing-8: 32px;
+  --vx-spacing-9: 36px;
+  --vx-spacing-10: 40px;
+  --vx-spacing-11: 44px;
+  --vx-spacing-12: 48px;
+  --vx-spacing-14: 56px;
+  --vx-spacing-16: 64px;
+  --vx-spacing-20: 80px;
+  --vx-spacing-24: 96px;
+  --vx-spacing-28: 112px;
+  --vx-spacing-32: 128px;
+  --vx-spacing-px: 1px;
+}

@@ -47,8 +47,8 @@ const IGNORED_PARTS = new Set([
   // no-illegal-font-family legitimately don't apply. Excluded to keep the
   // guardrail green on a clean tree.
   "design-system-gallery",
-  // Figma DTCG export — the upstream design source of truth. Raw values are the
-  // whole point; T1 CSS is generated from it by
+  // DTCG token source — this package IS the source of truth for tokens. Raw
+  // values are the point; T1 CSS is generated from it by
   // scripts/design-tokens/generate-primitives.mjs. Not published (outside the
   // package files whitelist).
   "Figma-Token",
