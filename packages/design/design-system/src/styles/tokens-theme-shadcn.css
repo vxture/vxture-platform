@@ -6,50 +6,129 @@
  * @author AI-Generated
  * @date 2026-07-31
  *
- * 把 T2 的 shadcn 约定名注册进 Tailwind theme，得到 bg-primary /
- * text-foreground / border-border 等标准工具类，供 cva 组件消费。
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic.mjs
  *
- * ⚠ 只桥接**颜色**。
- *   Tailwind 无 primary / background / card 等同名内置色，注册不产生冲突。
- *   但 spacing 与 radius 有内置刻度且取值不同——T2 的 --radius-md 是 8px，
- *   Tailwind 内置 rounded-md 是 6px——桥接会改掉仓库中所有既有 rounded-md /
- *   h-9 等工具类的观感。故尺寸类 token 一律在组件内直接引用 CSS 变量
- *   （h-(--control-height-md) / rounded-(--radius-md)），不进 @theme。
- *
- * `inline` 关键字使工具类展开为对原变量的引用而非快照，
- * 因此 .dark 与密度/字号模式切换能自动跟随。
+ * 只桥接颜色；尺寸与圆角不进 @theme，理由见生成器注释与
+ * docs/10-standards/065-design-token-pipeline.md。
  */
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface-1: var(--surface-1);
   --color-card: var(--card);
+  --color-surface-3: var(--surface-3);
   --color-popover: var(--popover);
+  --color-scrim: var(--scrim);
+  --color-accent: var(--accent);
+  --color-surface-active: var(--surface-active);
+  --color-surface-selected: var(--surface-selected);
+  --color-surface-selected-hover: var(--surface-selected-hover);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-content-tertiary: var(--content-tertiary);
+  --color-content-disabled: var(--content-disabled);
+  --color-content-on-fill: var(--content-on-fill);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-content-on-inverse: var(--content-on-inverse);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-stroke-emphasis: var(--stroke-emphasis);
   --color-ring: var(--ring);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-
+  --color-stroke-disabled: var(--stroke-disabled);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-muted: var(--primary-muted);
+  --color-primary-muted-hover: var(--primary-muted-hover);
+  --color-primary-muted-active: var(--primary-muted-active);
+  --color-primary-muted-foreground: var(--primary-muted-foreground);
   --color-primary-border: var(--primary-border);
   --color-primary-text: var(--primary-text);
-
   --color-destructive: var(--destructive);
   --color-destructive-hover: var(--destructive-hover);
   --color-destructive-active: var(--destructive-active);
   --color-destructive-foreground: var(--destructive-foreground);
-
+  --color-destructive-muted: var(--destructive-muted);
+  --color-destructive-muted-hover: var(--destructive-muted-hover);
+  --color-destructive-muted-active: var(--destructive-muted-active);
+  --color-destructive-muted-foreground: var(--destructive-muted-foreground);
+  --color-destructive-border: var(--destructive-border);
+  --color-destructive-text: var(--destructive-text);
   --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-active: var(--success-active);
   --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
+  --color-success-muted-hover: var(--success-muted-hover);
+  --color-success-muted-active: var(--success-muted-active);
+  --color-success-muted-foreground: var(--success-muted-foreground);
+  --color-success-border: var(--success-border);
+  --color-success-text: var(--success-text);
   --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-active: var(--warning-active);
   --color-warning-foreground: var(--warning-foreground);
+  --color-warning-muted: var(--warning-muted);
+  --color-warning-muted-hover: var(--warning-muted-hover);
+  --color-warning-muted-active: var(--warning-muted-active);
+  --color-warning-muted-foreground: var(--warning-muted-foreground);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
   --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  --color-info-active: var(--info-active);
   --color-info-foreground: var(--info-foreground);
+  --color-info-muted: var(--info-muted);
+  --color-info-muted-hover: var(--info-muted-hover);
+  --color-info-muted-active: var(--info-muted-active);
+  --color-info-muted-foreground: var(--info-muted-foreground);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
   --color-ai: var(--ai);
+  --color-ai-hover: var(--ai-hover);
+  --color-ai-active: var(--ai-active);
   --color-ai-foreground: var(--ai-foreground);
+  --color-ai-muted: var(--ai-muted);
+  --color-ai-muted-hover: var(--ai-muted-hover);
+  --color-ai-muted-active: var(--ai-muted-active);
+  --color-ai-muted-foreground: var(--ai-muted-foreground);
+  --color-ai-border: var(--ai-border);
+  --color-ai-text: var(--ai-text);
+  --color-chart-other: var(--chart-other);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+  --color-chart-tooltip-bg: var(--chart-tooltip-bg);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-seq-1: var(--chart-seq-1);
+  --color-chart-seq-2: var(--chart-seq-2);
+  --color-chart-seq-3: var(--chart-seq-3);
+  --color-chart-seq-4: var(--chart-seq-4);
+  --color-chart-seq-5: var(--chart-seq-5);
+  --color-chart-div-1: var(--chart-div-1);
+  --color-chart-div-2: var(--chart-div-2);
+  --color-chart-div-3: var(--chart-div-3);
+  --color-chart-div-4: var(--chart-div-4);
+  --color-chart-div-5: var(--chart-div-5);
+  --color-elevation-1-color: var(--elevation-1-color);
+  --color-elevation-2-color: var(--elevation-2-color);
+  --color-elevation-3-color: var(--elevation-3-color);
+  --color-elevation-4-color: var(--elevation-4-color);
+  --color-elevation-5-color: var(--elevation-5-color);
+  --color-gradient-brand-from: var(--gradient-brand-from);
+  --color-gradient-brand-to: var(--gradient-brand-to);
+  --color-gradient-ai-from: var(--gradient-ai-from);
+  --color-gradient-ai-to: var(--gradient-ai-to);
+  --color-gradient-surface-from: var(--gradient-surface-from);
+  --color-gradient-surface-to: var(--gradient-surface-to);
+  --color-gradient-glow-from: var(--gradient-glow-from);
+  --color-gradient-glow-to: var(--gradient-glow-to);
 }
