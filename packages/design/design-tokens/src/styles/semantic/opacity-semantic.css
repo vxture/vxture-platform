@@ -18,9 +18,8 @@
 
 @theme {
   /* opacity */
-  --opacity-disabled: 0.45;
-  --opacity-subtle: 0.6;
-  --opacity-muted: 0.75;
-  --opacity-overlay: 0.5;
-  --opacity-full: 1;
+  --opacity-disabled: 0.45;  /* 禁用态：控件与其文字整体压暗 */
+  --opacity-overlay: 0.5;  /* 遮罩：盖住底层内容但仍可辨认 */
+  --opacity-subtle: 0.6;  /* 次要信息：时间戳、辅助说明 */
+  --opacity-muted: 0.75;  /* 弱化但仍需阅读：占位、提示 */
 }

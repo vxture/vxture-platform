@@ -35,8 +35,12 @@ import {
   ELEVATION,
   EASE_ROLES,
   DURATION_ROLES,
-  RADIUS_TO_TAILWIND,
-  RADIUS_DROPPED,
+  RADIUS_STEPS,
+  BORDER_WIDTHS,
+  OPACITIES,
+  ICON_SIZES,
+  MEDIA_SIZES,
+  CONTENT_WIDTHS,
   SPACING_BASE,
   SPACING_MERGED,
   SPACING_HEIGHTS,
@@ -254,44 +258,29 @@ function buildSpacing(mode) {
 /* ── 无模式轴的各族 ─────────────────────────────────────────── */
 
 function buildRadius() {
-  const rows = [];
-  const dropped = [];
-  for (const [tokenPath] of load("vx-Shape", "vx-Shape.tokens.json")) {
-    if (!tokenPath.startsWith("radius/")) continue;
-    if (RADIUS_DROPPED.has(tokenPath)) {
-      dropped.push(tokenPath);
-      continue;
-    }
-    const label = RADIUS_TO_TAILWIND[tokenPath];
-    if (!label) {
-      errors.push(`${tokenPath}：未在 RADIUS_TO_TAILWIND 中登记，无法对齐 Tailwind 标签`);
-      continue;
-    }
-    rows.push([`--radius-${label}`, t1(`--vx-radius-${label}`, tokenPath), "radius"]);
-  }
-  if (dropped.length > 0) notes.push(`radius 未发 ${dropped.length} 档：${dropped.join(" ")}`);
-  return rows;
+  return RADIUS_STEPS.map((step) => [
+    `--radius-${step}`,
+    t1(`--vx-radius-${step}`, `radius/${step}`),
+    "radius",
+  ]);
 }
 
 function buildBorder() {
-  const rows = [];
-  for (const [tokenPath, token] of load("vx-Shape", "vx-Shape.tokens.json")) {
-    const m = /^border\/width\/(.+)$/.exec(tokenPath);
-    if (!m) continue;
-    rows.push([`--border-width-${m[1]}`, `${token.$value}px`, "border-width"]);
-  }
-  return rows;
+  return BORDER_WIDTHS.map(([name, value, why]) => [
+    `--border-width-${name}`,
+    value,
+    "border-width",
+    why,
+  ]);
 }
 
 function buildOpacity() {
-  const rows = [];
-  for (const [tokenPath, token] of load("vx-Depth", "vx-Depth.tokens.json")) {
-    const m = /^opacity\/(.+)$/.exec(tokenPath);
-    if (!m) continue;
-    // 导出里 0.45 存成 0.44999998807907104
-    rows.push([`--opacity-${m[1]}`, String(Number(token.$value.toFixed(4))), "opacity"]);
-  }
-  return rows;
+  return OPACITIES.map(([name, value, why]) => [
+    `--opacity-${name}`,
+    String(value),
+    "opacity",
+    why,
+  ]);
 }
 
 function buildZIndex() {
@@ -334,15 +323,17 @@ function buildMotion() {
 
 function buildSize() {
   const rows = [];
-  for (const [tokenPath, token] of load("vx-Element", "vx-Element.tokens.json")) {
-    const m = /^(icon|media)\/(.+)$/.exec(tokenPath);
-    if (!m) continue;
-    const target = aliasOf(token);
-    if (!target) {
-      errors.push(`${tokenPath}：设计稿未给别名`);
-      continue;
+  for (const [kind, list] of [
+    ["icon", ICON_SIZES],
+    ["media", MEDIA_SIZES],
+  ]) {
+    for (const [step, mult] of list) {
+      rows.push([
+        `--spacing-${kind}-${step}`,
+        `calc(${t1("--vx-spacing", `${kind}/${step}`)} * ${mult})`,
+        kind,
+      ]);
     }
-    rows.push([`--spacing-${m[1]}-${m[2]}`, spacingExpr(target, tokenPath), m[1]]);
   }
   return rows;
 }
@@ -362,7 +353,7 @@ function buildLayout() {
   const rows = [];
   const bp = [...t1Literals.entries()]
     .map(([n, v]) => [/^--vx-breakpoint-(.+)$/.exec(n)?.[1], v])
-    .filter(([s]) => s)
+    .filter(([s_]) => s_)
     .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]));
 
   for (const [step] of bp) {
@@ -370,24 +361,12 @@ function buildLayout() {
     layoutLiterals.set(`--container-page-${step}`, value);
     rows.push([`--container-page-${step}`, value, "page"]);
   }
-  const declared = new Set(
-    load("vx-Layout", "vx-Layout.tokens.json")
-      .map(([p]) => /^layout\/container\/(.+)$/.exec(p)?.[1])
-      .filter(Boolean),
-  );
-  const missing = [...declared].filter((s) => !bp.some(([b]) => b === s));
-  if (missing.length > 0) errors.push(`layout/container 有断点无对应档：${missing.join(", ")}`);
-
-  for (const [name, step] of [
-    ["narrow-lg", "lg"],
-    ["base-xl", "xl"],
-    ["wide-2xl", "2xl"],
-    ["ultra-3xl", "3xl"],
-  ]) {
+  for (const [name, step, why] of CONTENT_WIDTHS) {
     rows.push([
       `--container-content-${name}`,
       resolve(`--container-page-${step}`, `layout/content/${name}`),
       "content",
+      why,
     ]);
   }
   return rows;

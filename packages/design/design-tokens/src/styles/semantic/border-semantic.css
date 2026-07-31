@@ -18,8 +18,7 @@
 
 @theme {
   /* border-width */
-  --border-width-none: 0px;
-  --border-width-thin: 1px;
-  --border-width-medium: 2px;
-  --border-width-thick: 4px;
+  --border-width-thin: 1px;  /* 默认描边：卡片、输入框、分隔 */
+  --border-width-medium: 2px;  /* 强调描边：选中态、焦点框 */
+  --border-width-thick: 4px;  /* 结构性描边：侧栏指示条、状态色条 */
 }

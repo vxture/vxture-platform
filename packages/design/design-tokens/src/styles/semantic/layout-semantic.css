@@ -29,8 +29,8 @@
   --container-page-5xl: 240rem;
 
   /* content */
-  --container-content-narrow-lg: 64rem;
-  --container-content-base-xl: 80rem;
-  --container-content-wide-2xl: 96rem;
-  --container-content-ultra-3xl: 120rem;
+  --container-content-narrow-lg: 64rem;  /* 正文与表单：单栏阅读 */
+  --container-content-base-xl: 80rem;  /* 应用内容：列表与详情 */
+  --container-content-wide-2xl: 96rem;  /* 数据密集型面板 */
+  --container-content-ultra-3xl: 120rem;  /* 2K / 4K 上限；再宽应改分栏而非加宽 */
 }
