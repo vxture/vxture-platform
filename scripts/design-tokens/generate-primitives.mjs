@@ -18,16 +18,17 @@
  *   node scripts/design-tokens/generate-primitives.mjs --check   # 只校验不写入
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
+const EXPORT_DIR = path.join(ROOT, "packages/design/design-system/Figma-Token");
 const SOURCE = path.join(
-  ROOT,
-  "packages/design/design-system/Figma-Token/vx-Color-Primitive/vx-Color-Primitive.tokens.json",
+  EXPORT_DIR,
+  "vx-Color-Primitive/vx-Color-Primitive.tokens.json",
 );
 const TARGET = path.join(
   ROOT,
@@ -82,10 +83,37 @@ function toRgba(value) {
   return `rgb(${r} ${g} ${b} / ${Number(value.alpha.toFixed(4))})`;
 }
 
+/** 收集所有非原子集合里 aliasData 指向的原子名——这是回收值的唯一旁证。 */
+function collectReferencedPrimitives() {
+  const referenced = new Set();
+  const walkAlias = (node) => {
+    if (!node || typeof node !== "object") return;
+    const target =
+      node?.$extensions?.["com.figma.aliasData"]?.targetVariableName;
+    if (typeof target === "string" && target.startsWith("color/")) {
+      referenced.add(target);
+    }
+    for (const key of Object.keys(node)) {
+      if (!key.startsWith("$") || key === "$extensions") walkAlias(node[key]);
+    }
+  };
+  for (const dir of readdirSync(EXPORT_DIR)) {
+    if (dir === "vx-Color-Primitive") continue;
+    for (const file of readdirSync(path.join(EXPORT_DIR, dir))) {
+      if (!file.endsWith(".json")) continue;
+      walkAlias(JSON.parse(readFileSync(path.join(EXPORT_DIR, dir, file), "utf8")));
+    }
+  }
+  return referenced;
+}
+
 const tokens = flatten(JSON.parse(readFileSync(SOURCE, "utf8")));
 
-/** hue → step → { hex, alphas: Map<alphaKey, cssValue> } */
+/** hue → step → { hex, source: "direct"|"recovered", alphas: Map<alphaKey, cssValue> } */
 const palette = new Map();
+const recovered = [];
+const errors = [];
+
 for (const [tokenPath, value] of tokens) {
   if (!value || typeof value !== "object" || !value.hex) continue;
   const parsed = parsePath(tokenPath);
@@ -93,15 +121,71 @@ for (const [tokenPath, value] of tokens) {
   const { hue, step, alpha } = parsed;
   if (!palette.has(hue)) palette.set(hue, new Map());
   const steps = palette.get(hue);
-  if (!steps.has(step)) steps.set(step, { hex: null, alphas: new Map() });
+  if (!steps.has(step)) {
+    steps.set(step, { hex: null, source: null, alphas: new Map(), alphaHexes: new Set() });
+  }
   const entry = steps.get(step);
   if (alpha) {
     entry.alphas.set(alpha, toRgba(value));
-    // 回收被导出降级的不透明本体值
-    entry.hex ??= value.hex.toLowerCase();
+    entry.alphaHexes.add(value.hex.toLowerCase());
   } else {
     entry.hex = value.hex.toLowerCase();
+    entry.source = "direct";
   }
+}
+
+// 回收被导出降级为「组」的不透明本体值，并对每一步做断言。
+const referencedPrimitives = collectReferencedPrimitives();
+const toFigmaPath = (hue, step) =>
+  hue === "brand" ? `color/brand/main/${step}` : `color/${hue}/${step}`;
+
+for (const [hue, steps] of palette) {
+  for (const [step, entry] of steps) {
+    if (entry.hex) continue;
+    if (entry.alphaHexes.size === 0) continue;
+
+    // 断言 1：同一步阶下所有 alpha 变体必须同色，否则本体值无从判定。
+    if (entry.alphaHexes.size > 1) {
+      errors.push(
+        `${toFigmaPath(hue, step)}: alpha 变体色值不一致（${[...entry.alphaHexes].join(", ")}），无法回收不透明本体值`,
+      );
+      continue;
+    }
+
+    // 断言 2：回收出的本体必须真的被某个 L2/L3 token 引用，
+    // 否则说明该步阶在 Figma 中并无不透明本体，不得凭空生成。
+    const figmaPath = toFigmaPath(hue, step);
+    if (!referencedPrimitives.has(figmaPath)) {
+      errors.push(
+        `${figmaPath}: 导出中只有 alpha 变体，且无任何 L2/L3 引用该步阶本体——拒绝凭空生成`,
+      );
+      continue;
+    }
+
+    entry.hex = [...entry.alphaHexes][0];
+    entry.source = "recovered";
+    recovered.push(figmaPath);
+  }
+}
+
+// 断言 3：凡被 L2/L3 引用的原子，生成物必须覆盖。
+const emittedPaths = new Set();
+for (const [hue, steps] of palette) {
+  for (const [step, entry] of steps) {
+    if (entry.hex) emittedPaths.add(toFigmaPath(hue, step));
+    for (const alphaKey of entry.alphas.keys()) {
+      emittedPaths.add(`${toFigmaPath(hue, step)}/alpha-${alphaKey}`);
+    }
+  }
+}
+for (const ref of referencedPrimitives) {
+  if (!emittedPaths.has(ref)) errors.push(`${ref}: 被引用但未生成`);
+}
+
+if (errors.length > 0) {
+  console.error("T1 生成失败——导出结构不满足断言：\n");
+  for (const e of errors) console.error(`  ✗ ${e}`);
+  process.exit(1);
 }
 
 const orderedHues = [
@@ -174,5 +258,9 @@ if (CHECK) {
   writeFileSync(TARGET, output, "utf8");
   console.log(
     `已生成 ${path.relative(ROOT, TARGET).replaceAll("\\", "/")}：${emitted} tokens / ${orderedHues.length} 色相`,
+  );
+  console.log(
+    `断言通过：回收本体值 ${recovered.length} 项（均有 L2/L3 引用佐证）；` +
+      `被引用原子 ${referencedPrimitives.size} 项全部覆盖。`,
   );
 }
