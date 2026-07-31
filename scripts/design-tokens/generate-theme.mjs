@@ -113,8 +113,18 @@ const stats = [];
 
 /* ── 1. T1 偏离：扩展档与覆盖值 ─────────────────────────────── */
 
+/**
+ * 不注册的扩展命名空间。
+ *
+ * `transition-duration` 整族是 DS 补的 T1 原子（上游 theme 里没有这一族），供 T2 的
+ * fast / base / slow 指向；档位本身不需要工具类——`duration-150` 作为裸数值工具类
+ * 上游已经产出，再注册一遍只会给同一个类名造出第二个来源。
+ */
+const UNREGISTERED_EXTENSIONS = new Set(["transition-duration"]);
+
 const deviations = [];
 for (const [ns, list] of Object.entries(EXTENSIONS)) {
+  if (UNREGISTERED_EXTENSIONS.has(ns)) continue;
   for (const [step] of list) deviations.push([ns, step]);
 }
 for (const key of Object.keys(OVERRIDES)) {
@@ -165,14 +175,21 @@ inlineBlocks.push(
 );
 stats.push(`text ${roles.length} 档`);
 
-/* ── 4. T2 语义：页面与内容宽度 ─────────────────────────────── */
+/* ── 4. T2 语义：间距（密度三档）─────────────────────────────── */
 
-// 容器宽度进容器查询，必须落字面量，理由见 LITERAL_NAMESPACES。
-const layoutLines = declaredVars("layout-semantic.css").map(
-  (name) => `  --container-${name.replace(/^--layout-/, "")}: ${literal(name)};`,
+const spaceLines = declaredVars("spacing-semantic.css").map(
+  (name) => `  --spacing-${name.replace(/^--space-/, "")}: var(${name});`,
 );
-staticBlocks.push(`  /* max-w-page-* / max-w-content-* */\n${layoutLines.join("\n")}`);
-stats.push(`container ${layoutLines.length}`);
+inlineBlocks.push(
+  `  /* p-* / gap-* / h-control-* / h-row-*（跟随密度三档） */\n${spaceLines.join("\n")}`,
+);
+stats.push(`spacing ${spaceLines.length}`);
+
+/*
+ * 其余各族（radius / shadow / z-index / motion / opacity / border-width / size /
+ * layout）不在此注册：它们无模式轴，T2 名即命名空间名，在各自的 semantic 文件里
+ * 用 `@theme` 一处声明即完成注册。少一跳，也少一类"声明了忘记注册"的静默失效。
+ */
 
 /* ── 输出 ───────────────────────────────────────────────────── */
 

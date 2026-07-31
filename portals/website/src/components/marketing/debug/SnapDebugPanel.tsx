@@ -67,7 +67,7 @@ export interface SnapDebugPanelProps {
 const DEFAULT_POSITION = {
   top: "80px",
   right: "20px",
-  zIndex: 700,
+  zIndex: "var(--z-index-toast)",
 };
 /** 默认可见性 */
 const DEFAULT_VISIBLE = true;

@@ -13,11 +13,13 @@
  * 全族导入而非按需——`--vx-*` 是 DS 对外的完整词汇表，缺档会让"哪些能引用"
  * 变成要逐个试出来的事。
  *
- * T2 只剩三族：色彩语义、24 档排版角色、页面与内容宽度。其余刻度
- * （radius / shadow / ease / duration / opacity / border-width / z-index /
- * spacing / size）已随 T1 镜像上游一并退役，直接用 Tailwind 内置工具类
- * （`rounded-lg` / `shadow-md` / `ease-out` / `duration-150` / `opacity-45` /
- * `border-2` / `z-50` / `p-4` / `size-4`）。
+ * T2 覆盖全部刻度族，名字一律落在 v4 的真实命名空间上，故每一族都产出真工具类
+ * （`shadow-raised` / `z-modal` / `duration-fast` / `ease-enter` / `p-md` /
+ * `size-icon-md` / `opacity-disabled` / `border-thin`）。即使某族当下与 T1 一一
+ * 对应、零增益（radius），仍然经 T2 出口——分层边界要么处处成立要么不成立。
+ *
+ * 带模式轴的三族在模式选择器下声明、由 theme.css 注册：色彩（明暗）、
+ * 排版角色（字号三档）、间距（密度三档）。其余各族在自己的文件里 `@theme` 自注册。
  */
 
 @import "./foundation/animate-primitive.css";
@@ -35,12 +37,21 @@
 @import "./foundation/shadow-primitive.css";
 @import "./foundation/spacing-primitive.css";
 @import "./foundation/text-shadow-primitive.css";
+@import "./foundation/transition-duration-primitive.css";
 @import "./foundation/typography/font-primitive.css";
 @import "./foundation/typography/leading-primitive.css";
 @import "./foundation/typography/text-primitive.css";
 @import "./foundation/typography/tracking-primitive.css";
 @import "./foundation/typography/weight-primitive.css";
+@import "./semantic/border-semantic.css";
 @import "./semantic/color-semantic.css";
 @import "./semantic/layout-semantic.css";
+@import "./semantic/motion-semantic.css";
+@import "./semantic/opacity-semantic.css";
+@import "./semantic/radius-semantic.css";
+@import "./semantic/shadow-semantic.css";
+@import "./semantic/size-semantic.css";
+@import "./semantic/spacing-semantic.css";
 @import "./semantic/typography-semantic.css";
+@import "./semantic/zindex-semantic.css";
 @import "./theme.css";

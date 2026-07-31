@@ -6,21 +6,20 @@
  * ⚠ 与 generate-semantic.mjs 同为一次性**迁移工具**，随过程文件一并退役。
  *   权威边界见 docs/10-standards/065-design-token-pipeline.md。
  *
- * ── 为什么只剩两个产物 ──
- * T1 已是 Tailwind v4 theme 的完整镜像，`radius / shadow / ease / duration /
- * opacity / border-width / z-index / spacing / size` 九族的语义层因此全部退役：
- * 它们当初存在的理由是"给无意义的档位起个名"，而 Tailwind 的内置档位本就自带
- * 名字与工具类（`rounded-lg`、`shadow-md`、`ease-out`、`duration-150`、
- * `opacity-45`、`border-2`、`z-50`、`p-4`、`size-4`）。再包一层只是把
- * `duration-150` 改叫 `duration-fast`，不产生任何语义，却多一处真值。
+ * ── T2 为什么要覆盖全部刻度族 ──
+ * T1 是 Tailwind theme 的镜像，回答"有哪些数可选"；T2 回答"哪个数用在什么场合"。
+ * 即使某族的语义名与 T1 一一对应、当下零增益（radius 就是），仍然经 T2 出口：
+ * 分层边界要么处处成立、要么不成立，消费方不该需要记住"这族有语义名、那族没有"。
  *
- * 剩下的两族是 Tailwind 确实没有的：
- *   typography  24 个排版角色（字号 / 行高 / 字距 / 字重 / 字体族的组合）
- *   layout      页面与内容的最大宽度（Tailwind 的 --container-* 只到 80rem）
+ * 命名一律落在 v4 的真实命名空间上（`--transition-duration-*` 而非 `--duration-*`、
+ * `--z-index-*` 而非 `--z-*`、`--spacing-*` 而非 `--space-*`），否则变量声明成功、
+ * 工具类却不产出，且不报错——`duration-fast` 曾这样哑火一整轮。
  *
- * 密度轴（原 .density-* 三档）随 spacing 语义层一并退役：实测三档之间是**档位
- * 平移**而非等比缩放（比值 1.0–1.5 不等），平移是组件的事，属 cva variant，
- * 不是 token 层能表达的。
+ * ── 两种落法 ──
+ * 有模式轴的（字号三档 / 密度三档）：在模式选择器下声明 DS 侧名字，由
+ *   generate-theme.mjs 注册进命名空间，`@theme inline` 使模式切换自动跟随。
+ * 无模式轴的：直接在本文件的 `@theme` 块里用最终命名空间名声明，一处声明即完成
+ *   注册——少一跳，也少一类"声明了忘记注册"的静默失效。
  *
  * 用法：
  *   node scripts/design-tokens/generate-semantic-scales.mjs
@@ -30,6 +29,19 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
+
+import {
+  Z_LADDER,
+  ELEVATION,
+  EASE_ROLES,
+  DURATION_ROLES,
+  RADIUS_TO_TAILWIND,
+  RADIUS_DROPPED,
+  SPACING_BASE,
+  SPACING_MERGED,
+  SPACING_HEIGHTS,
+  assertElevationOrdered,
+} from "./semantic-policy.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -44,7 +56,6 @@ const notes = [];
 
 /* ── 读 T1 ──────────────────────────────────────────────────── */
 
-/** T1 变量名 → 字面值（递归扫 foundation/，含 typography/ 子目录）。 */
 function loadT1() {
   const literals = new Map();
   const walk = (dir) => {
@@ -60,6 +71,29 @@ function loadT1() {
   };
   walk(FOUNDATION);
   return literals;
+}
+
+/** 引用 T1，并断言目标存在——指向不存在的原子在 CSS 里是静默失效。 */
+function t1(name, where) {
+  if (!t1Literals.has(name)) errors.push(`${where}：T1 中不存在 ${name}`);
+  return `var(${name})`;
+}
+
+/** 顺 var() 链解到字面量，用于必须落字面量的场合（容器查询）。 */
+function resolve(name, where) {
+  let cur = name;
+  for (let i = 0; i < 8; i++) {
+    const value = t1Literals.get(cur) ?? layoutLiterals.get(cur);
+    if (value === undefined) {
+      errors.push(`${where}：无法解析 ${cur}`);
+      return "0";
+    }
+    const m = /^var\((--[\w-]+)\)$/.exec(value);
+    if (!m) return value;
+    cur = m[1];
+  }
+  errors.push(`${where}：var() 引用过深或成环`);
+  return "0";
 }
 
 /* ── Figma DTCG ─────────────────────────────────────────────── */
@@ -82,7 +116,25 @@ const aliasOf = (token) =>
 const load = (collection, file) =>
   flatten(JSON.parse(readFileSync(path.join(EXPORT_DIR, collection, file), "utf8")));
 
-/* ── 排版角色 ───────────────────────────────────────────────── */
+/**
+ * 设计稿的 `spacing/N` 别名 → T1 表达式。
+ *
+ * T1 的间距只有一个乘数 `--vx-spacing`（0.25rem），这正是 v4 的做法：`p-4` 编译为
+ * `calc(var(--spacing) * 4)`。故 T2 的每一档写成同形的 calc，仍然只引 T1。
+ */
+function spacingExpr(target, where) {
+  const step = target.replace(/^spacing\//, "");
+  if (step === "px") return "1px";
+  const n = Number(step.replace("-", "."));
+  if (!Number.isFinite(n)) {
+    errors.push(`${where}：无法解析间距档 ${target}`);
+    return "0";
+  }
+  if (n === 0) return "0px";
+  return `calc(${t1("--vx-spacing", where)} * ${n})`;
+}
+
+/* ── 排版角色（字号三档）───────────────────────────────────── */
 
 const FONT_SIZE_MODES = [
   ["Small", "html.vx-font-small"],
@@ -90,12 +142,7 @@ const FONT_SIZE_MODES = [
   ["Large", "html.vx-font-large"],
 ];
 
-/**
- * 设计稿别名目标 → T1 变量名。三族都已按 Tailwind 命名空间落在 T1：
- * `font/family/brand` → `--vx-font-brand`、`font/size/6xl` → `--vx-text-6xl`、
- * `font/weight/bold` → `--vx-font-weight-bold`。
- */
-function t1VarFor(target) {
+function typographyT1(target) {
   const [, group, name] = target.split("/");
   if (group === "family") return `--vx-font-${name}`;
   if (group === "size") return `--vx-text-${name}`;
@@ -103,13 +150,9 @@ function t1VarFor(target) {
   return null;
 }
 
-/**
- * 字号 px：T1 存 rem（跟随浏览器字号设置），换算基准 16px 即 rem 的定义值。
- * 行高与字距都要按各自角色的字号折算，故必须能拿到 px。
- */
-function sizePxTable(t1) {
+function sizePxTable() {
   const px = new Map();
-  for (const [name, value] of t1) {
+  for (const [name, value] of t1Literals) {
     const m = /^--vx-text-([\w-]+)$/.exec(name);
     const rem = /^([\d.]+)rem$/.exec(value);
     if (m && rem) px.set(name, Number(rem[1]) * 16);
@@ -118,17 +161,14 @@ function sizePxTable(t1) {
 }
 
 /**
- * 排版角色的行高与字距一律换算为**相对单位**（行高无单位比值、字距 em）。
- *
- * 设计稿存的是绝对 px（Figma 字段限制）。绝对值扛不住字号三档模式与浏览器缩放，
- * 且 Tailwind 的 `--text-*--line-height` 本身就是 `calc(1.25 / 0.875)` 这样的
- * 比值，同构才能互相替换。
+ * 行高与字距一律换算为**相对单位**（行高无单位比值、字距 em）。绝对 px 扛不住
+ * 字号三档与浏览器缩放，且 Tailwind 的 `--text-*--line-height` 本身就是比值。
  *
  * ⚠ 字距**不可**沿用设计稿的别名。设计稿把 1.6px 挂在 `font/letterSpacing/widest`
  *   上，而 T1 镜像后 `--vx-tracking-widest` 是 Tailwind 的 0.1em——同名不同义：
- *   0.1em 在 60px 的 display 上是 6px，是设计意图的近四倍。故按各角色字号折算。
+ *   0.1em 在 60px 的 display 上是 6px，近设计意图的四倍。故按各角色字号折算。
  */
-function buildRoles(mode, t1, px) {
+function buildRoles(mode) {
   const rows = [];
   const byRole = new Map();
   for (const [tokenPath, token] of load("vx-Typography", `${mode}.tokens.json`)) {
@@ -139,81 +179,217 @@ function buildRoles(mode, t1, px) {
   }
 
   for (const [role, props] of byRole) {
-    const emit = (suffix, value) => rows.push([`--${role}-${suffix}`, value, role]);
-
+    const where = `${mode} ${role}`;
     for (const [prop, suffix] of [
       ["fontFamily", "font-family"],
       ["fontSize", "font-size"],
       ["fontWeight", "font-weight"],
     ]) {
       const target = aliasOf(props[prop]);
-      if (!target) {
-        errors.push(`${mode} ${role}/${prop}：设计稿未给别名，无法落到 T1`);
+      const ref = target && typographyT1(target);
+      if (!ref) {
+        errors.push(`${where}/${prop}：设计稿未给可解析的别名`);
         continue;
       }
-      const ref = t1VarFor(target);
-      if (!ref || !t1.has(ref)) {
-        errors.push(`${mode} ${role}/${prop} → ${target}：T1 中不存在 ${ref}`);
-        continue;
-      }
-      emit(suffix, `var(${ref})`);
+      rows.push([`--${role}-${suffix}`, t1(ref, where), role]);
     }
 
-    const sizeVar = t1VarFor(aliasOf(props.fontSize) ?? "");
-    const basePx = px.get(sizeVar);
+    const sizeVar = typographyT1(aliasOf(props.fontSize) ?? "");
+    const basePx = sizePx.get(sizeVar);
     if (!basePx) {
-      errors.push(`${mode} ${role}：拿不到字号 px，行高与字距无法折算`);
+      errors.push(`${where}：拿不到字号 px，行高与字距无法折算`);
       continue;
     }
-    emit("line-height", String(Number((props.lineHeight.$value / basePx).toFixed(4))));
-    emit("letter-spacing", `${Number((props.letterSpacing.$value / basePx).toFixed(4))}em`);
+    const ratio = (v) => Number((v / basePx).toFixed(4));
+    rows.push([`--${role}-line-height`, String(ratio(props.lineHeight.$value)), role]);
+    rows.push([`--${role}-letter-spacing`, `${ratio(props.letterSpacing.$value)}em`, role]);
   }
   return rows;
 }
 
-/* ── 布局宽度 ───────────────────────────────────────────────── */
+/* ── 间距（密度三档）───────────────────────────────────────── */
+
+const DENSITY_MODES = [
+  ["Compact", ".density-compact"],
+  ["Default", ":root, .density-default"],
+  ["Comfortable", ".density-comfortable"],
+];
 
 /**
- * 页面最大宽度逐档等于同名断点，故写成对 T1 断点的引用而非字面量——两份字面量
- * 必然漂移，且"页面宽度跟随断点"这条规则在产物里自解释。
+ * T2 变量名用 `--space-*` 而非 `--spacing-*`：后者是命名空间名，同名会写出指向
+ * 自己的注册（`--spacing-md: var(--spacing-md)`），CSS 判定为循环、整族失效且不报错。
+ * 注册由 generate-theme.mjs 改名完成。
+ */
+function buildSpacing(mode) {
+  const rows = [];
+  const seen = new Set();
+  for (const [tokenPath, token] of load("vx-Space", `${mode}.tokens.json`)) {
+    const parts = tokenPath.split("/");
+    const step = parts.pop();
+    const family = parts.join("-");
+    const where = `${mode} ${tokenPath}`;
+    const target = aliasOf(token);
+    if (!target) {
+      errors.push(`${where}：设计稿未给别名`);
+      continue;
+    }
+
+    let name = null;
+    if (SPACING_MERGED.includes(family)) {
+      if (family !== SPACING_BASE) continue; // 非基准族整族丢弃
+      name = `--space-${step}`;
+    } else if (SPACING_HEIGHTS[family]) {
+      name = `--space-${SPACING_HEIGHTS[family]}-${step}`;
+    } else {
+      errors.push(`${where}：间距族 ${family} 未在合并表中登记`);
+      continue;
+    }
+    if (seen.has(name)) continue;
+    seen.add(name);
+    rows.push([name, spacingExpr(target, where), family]);
+  }
+  return rows;
+}
+
+/* ── 无模式轴的各族 ─────────────────────────────────────────── */
+
+function buildRadius() {
+  const rows = [];
+  const dropped = [];
+  for (const [tokenPath] of load("vx-Shape", "vx-Shape.tokens.json")) {
+    if (!tokenPath.startsWith("radius/")) continue;
+    if (RADIUS_DROPPED.has(tokenPath)) {
+      dropped.push(tokenPath);
+      continue;
+    }
+    const label = RADIUS_TO_TAILWIND[tokenPath];
+    if (!label) {
+      errors.push(`${tokenPath}：未在 RADIUS_TO_TAILWIND 中登记，无法对齐 Tailwind 标签`);
+      continue;
+    }
+    rows.push([`--radius-${label}`, t1(`--vx-radius-${label}`, tokenPath), "radius"]);
+  }
+  if (dropped.length > 0) notes.push(`radius 未发 ${dropped.length} 档：${dropped.join(" ")}`);
+  return rows;
+}
+
+function buildBorder() {
+  const rows = [];
+  for (const [tokenPath, token] of load("vx-Shape", "vx-Shape.tokens.json")) {
+    const m = /^border\/width\/(.+)$/.exec(tokenPath);
+    if (!m) continue;
+    rows.push([`--border-width-${m[1]}`, `${token.$value}px`, "border-width"]);
+  }
+  return rows;
+}
+
+function buildOpacity() {
+  const rows = [];
+  for (const [tokenPath, token] of load("vx-Depth", "vx-Depth.tokens.json")) {
+    const m = /^opacity\/(.+)$/.exec(tokenPath);
+    if (!m) continue;
+    // 导出里 0.45 存成 0.44999998807907104
+    rows.push([`--opacity-${m[1]}`, String(Number(token.$value.toFixed(4))), "opacity"]);
+  }
+  return rows;
+}
+
+function buildZIndex() {
+  const byValue = new Map();
+  const rows = [];
+  for (const [name, value, why] of Z_LADDER) {
+    if (byValue.has(value)) {
+      errors.push(
+        `z-index 同值：${byValue.get(value)} 与 ${name} 都是 ${value}——叠放次序未定义`,
+      );
+    }
+    byValue.set(value, name);
+    rows.push([`--z-index-${name}`, String(value), "z-index", why]);
+  }
+  return rows;
+}
+
+function buildShadow() {
+  assertElevationOrdered(errors);
+  return ELEVATION.map(([role, step, , why]) => [
+    `--shadow-${role}`,
+    step === "none" ? "none" : t1(`--vx-shadow-${step}`, `elevation/${role}`),
+    "shadow",
+    why,
+  ]);
+}
+
+function buildMotion() {
+  const rows = DURATION_ROLES.map(([role, step, why]) => [
+    `--transition-duration-${role}`,
+    t1(`--vx-transition-duration-${step}`, `duration/${role}`),
+    "duration",
+    why,
+  ]);
+  for (const [role, step, why] of EASE_ROLES) {
+    rows.push([`--ease-${role}`, t1(`--vx-ease-${step}`, `ease/${role}`), "ease", why]);
+  }
+  return rows;
+}
+
+function buildSize() {
+  const rows = [];
+  for (const [tokenPath, token] of load("vx-Element", "vx-Element.tokens.json")) {
+    const m = /^(icon|media)\/(.+)$/.exec(tokenPath);
+    if (!m) continue;
+    const target = aliasOf(token);
+    if (!target) {
+      errors.push(`${tokenPath}：设计稿未给别名`);
+      continue;
+    }
+    rows.push([`--spacing-${m[1]}-${m[2]}`, spacingExpr(target, tokenPath), m[1]]);
+  }
+  return rows;
+}
+
+/**
+ * 页面与内容宽度。
  *
- * ⚠ 设计稿把 container/{3xl,4xl,5xl} 都填成 1920，是"内容不再加宽"的意思填错了
- *   位置：那是 content 的封顶规则，不是 page 的。page 恢复与断点严格对应，
- *   封顶规则由 content/ultra-3xl 承担。
+ * ⚠ 必须落字面量：容器宽度进 `@container (width >= …)`，而**容器查询里 var() 不
+ *   参与求值**。写成引用不报错，只是该档的所有容器变体静默失效。这是本层唯一
+ *   一处不写 var() 的地方，原因是 CSS 的限制而非分层的例外。
  *
- * 内容宽度是**可读行长上限**：正文类 640–768、应用内容 1280–1536、数据密集型
- * 面板至多 1920；再宽则行长失控，应改用分栏。设计稿只给到 wide-2xl（1536），
+ * 页面宽度逐档等于同名断点；内容宽度是可读行长上限，设计稿只给到 wide-2xl（1536），
  * 2K / 4K 视口下明显偏窄，故 DS 补 ultra-3xl = 1920 收口。
  */
-function buildLayout(t1) {
+const layoutLiterals = new Map();
+function buildLayout() {
   const rows = [];
-  const steps = [];
-  for (const [tokenPath] of load("vx-Layout", "vx-Layout.tokens.json")) {
-    const m = /^layout\/container\/(.+)$/.exec(tokenPath);
-    if (m) steps.push(m[1]);
-  }
-  // 断点全档都给页面宽度，含设计稿未列的 xs——页面宽度与断点是同一把尺。
-  const bp = [...t1.entries()]
-    .map(([n, v]) => [/^--vx-breakpoint-(.+)$/.exec(n)?.[1], parseFloat(v)])
+  const bp = [...t1Literals.entries()]
+    .map(([n, v]) => [/^--vx-breakpoint-(.+)$/.exec(n)?.[1], v])
     .filter(([s]) => s)
-    .sort((a, b) => a[1] - b[1])
-    .map(([s]) => s);
-  for (const step of bp) {
-    rows.push([`--layout-page-${step}`, `var(--vx-breakpoint-${step})`, "page"]);
+    .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]));
+
+  for (const [step] of bp) {
+    const value = resolve(`--vx-breakpoint-${step}`, `layout/page/${step}`);
+    layoutLiterals.set(`--container-page-${step}`, value);
+    rows.push([`--container-page-${step}`, value, "page"]);
   }
-  const missing = steps.filter((s) => !bp.includes(s));
+  const declared = new Set(
+    load("vx-Layout", "vx-Layout.tokens.json")
+      .map(([p]) => /^layout\/container\/(.+)$/.exec(p)?.[1])
+      .filter(Boolean),
+  );
+  const missing = [...declared].filter((s) => !bp.some(([b]) => b === s));
   if (missing.length > 0) errors.push(`layout/container 有断点无对应档：${missing.join(", ")}`);
 
-  const content = [
+  for (const [name, step] of [
     ["narrow-lg", "lg"],
     ["base-xl", "xl"],
     ["wide-2xl", "2xl"],
     ["ultra-3xl", "3xl"],
-  ];
-  for (const [name, step] of content) {
-    rows.push([`--layout-content-${name}`, `var(--layout-page-${step})`, "content"]);
+  ]) {
+    rows.push([
+      `--container-content-${name}`,
+      resolve(`--container-page-${step}`, `layout/content/${name}`),
+      "content",
+    ]);
   }
-  notes.push(`布局宽度：页面 ${bp.length} 档 · 内容 ${content.length} 档（ultra-3xl 为 DS 增补）`);
   return rows;
 }
 
@@ -221,10 +397,9 @@ function buildLayout(t1) {
 
 function render(rows, indent = "  ") {
   const groups = new Map();
-  for (const [name, value, group] of rows) {
-    const g = group.split("-")[0];
-    if (!groups.has(g)) groups.set(g, []);
-    groups.get(g).push(`${indent}${name}: ${value};`);
+  for (const [name, value, group, why] of rows) {
+    if (!groups.has(group)) groups.set(group, []);
+    groups.get(group).push(`${indent}${name}: ${value};${why ? `  /* ${why} */` : ""}`);
   }
   return [...groups]
     .map(([g, lines]) => `${indent}/* ${g} */\n${lines.join("\n")}`)
@@ -238,11 +413,11 @@ function header(file, label, source, extra = "") {
  * @layer Presentation
  * @category styles
  * @author AI-Generated
- * @date 2026-07-31
+ * @date 2026-08-01
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
- *   源：Figma-Token/${source}/（过程文件，迁移完成后删除）
+ *   源：${source}
  *
  * T2 定义见 docs/10-standards/060-design-system.md §1.1。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。${extra}
@@ -250,18 +425,120 @@ function header(file, label, source, extra = "") {
 `;
 }
 
+/** 无模式轴的族：名字即命名空间名，在 `@theme` 里一处声明即完成注册。 */
+function staticFile(file, label, source, rows, extra = "") {
+  return [file, header(file, label, source, extra) + `\n@theme {\n${render(rows)}\n}\n`];
+}
+
 /* ── 生成 ───────────────────────────────────────────────────── */
 
-const t1 = loadT1();
-const px = sizePxTable(t1);
+const t1Literals = loadT1();
+const sizePx = sizePxTable();
 
-const typoBlocks = FONT_SIZE_MODES.map(([mode, selector]) => {
-  const rows = buildRoles(mode, t1, px);
-  return [selector, rows];
-});
+const typoBlocks = FONT_SIZE_MODES.map(([mode, sel]) => [sel, buildRoles(mode)]);
+const spaceBlocks = DENSITY_MODES.map(([mode, sel]) => [sel, buildSpacing(mode)]);
 const roleCount = new Set(typoBlocks[0][1].map(([, , role]) => role)).size;
 
-const layoutRows = buildLayout(t1);
+const outputs = [
+  [
+    "typography-semantic.css",
+    header(
+      "typography-semantic.css",
+      "排版角色（工具类族 text-*）",
+      "Figma-Token/vx-Typography/",
+      `
+ *
+ * 每个角色一次落齐字号 / 行高 / 字距 / 字重，由 theme.css 注册为 v4 的
+ * \`--text-<role>\` 及其修饰子键；字体族不在修饰子键之列，仍由独立的
+ * \`font-*\` 工具类承担。`,
+    ) +
+      "\n" +
+      typoBlocks.map(([sel, rows]) => `${sel} {\n${render(rows)}\n}`).join("\n\n") +
+      "\n",
+  ],
+  [
+    "spacing-semantic.css",
+    header(
+      "spacing-semantic.css",
+      "间距与控件高度（工具类族 p-* / gap-* / h-*）",
+      "Figma-Token/vx-Space/",
+      `
+ *
+ * 密度三档是**用户偏好轴**，与组件自身的尺寸变体（cva size）正交：前者由祖先
+ * 类重定向变量、任意深度生效，后者由类名逐处指定。组件不需要知道密度存在。
+ *
+ * 三档之间是档位平移而非等比缩放（比值 1.0–1.5 不等），故必须逐档列表，
+ * 不能靠一个乘数推导。`,
+    ) +
+      "\n" +
+      spaceBlocks.map(([sel, rows]) => `${sel} {\n${render(rows)}\n}`).join("\n\n") +
+      "\n",
+  ],
+  staticFile(
+    "layout-semantic.css",
+    "页面与内容宽度（工具类族 max-w-*）",
+    "Figma-Token/vx-Layout/",
+    buildLayout(),
+    `
+ *
+ * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。`,
+  ),
+  staticFile("radius-semantic.css", "圆角（工具类族 rounded-*）", "Figma-Token/vx-Shape/", buildRadius()),
+  staticFile(
+    "shadow-semantic.css",
+    "视觉高度（工具类族 shadow-*）",
+    "Figma-Token/vx-Depth/ + semantic-policy.mjs",
+    buildShadow(),
+    `
+ *
+ * 按组件角色命名而非序数档位。允许多角色共用一档——可辨识的视觉高度本就比叠放
+ * 层级少；与 z-index 的单调一致由生成器断言。暗色不另设一套，层次由 surface
+ * 明度与描边承担。`,
+  ),
+  staticFile(
+    "zindex-semantic.css",
+    "叠放次序（工具类族 z-*）",
+    "semantic-policy.mjs",
+    buildZIndex(),
+    `
+ *
+ * 无 T1 可指：叠放次序不是量纲，500 不是某个测量值的第 500 档，只是一个序。`,
+  ),
+  staticFile(
+    "motion-semantic.css",
+    "时长与缓动（工具类族 duration-* / ease-*）",
+    "Figma-Token/vx-Motion/ + semantic-policy.mjs",
+    buildMotion(),
+  ),
+  staticFile(
+    "opacity-semantic.css",
+    "透明度（工具类族 opacity-*）",
+    "Figma-Token/vx-Depth/",
+    buildOpacity(),
+    `
+ *
+ * 无 T1 可指：上游对 opacity 既无 theme 变量也无封闭档位表，接受任意 0–100。`,
+  ),
+  staticFile(
+    "border-semantic.css",
+    "描边宽度（工具类族 border-*）",
+    "Figma-Token/vx-Shape/",
+    buildBorder(),
+    `
+ *
+ * 无 T1 可指：同 opacity，上游接受任意 border-<n>，没有原子刻度这回事。`,
+  ),
+  staticFile(
+    "size-semantic.css",
+    "图标与媒体尺寸（工具类族 size-*）",
+    "Figma-Token/vx-Element/",
+    buildSize(),
+    `
+ *
+ * 落在 spacing 命名空间下，产出 size-icon-md / size-media-lg。不随密度轴变化——
+ * 图标缩小会先失去可辨识度，密度收紧应体现在留白而非图形本身。`,
+  ),
+];
 
 if (errors.length > 0) {
   console.error("T2 非色彩层生成失败：\n");
@@ -269,33 +546,9 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-const outputs = [
-  [
-    "typography-semantic.css",
-    header(
-      "typography-semantic.css",
-      `排版角色（工具类族 text-*）`,
-      "vx-Typography",
-      `
- *
- * 每个角色一次落齐字号 / 行高 / 字距 / 字重，由 theme.css 注册成 v4 的
- * \`--text-<role>\` 及其修饰子键；字体族不在 v4 修饰子键之列，仍由独立的
- * \`font-*\` 工具类承担。
- *
- * 行高为无单位比值、字距为 em——绝对 px 扛不住字号三档与浏览器缩放。`,
-    ) +
-      "\n" +
-      typoBlocks.map(([sel, rows]) => `${sel} {\n${render(rows)}\n}`).join("\n\n") +
-      "\n",
-  ],
-  [
-    "layout-semantic.css",
-    header("layout-semantic.css", "页面与内容宽度（工具类族 max-w-*）", "vx-Layout") +
-      `\n:root {\n${render(layoutRows)}\n}\n`,
-  ],
-];
-
 mkdirSync(OUT_DIR, { recursive: true });
+
+const stat = `排版 ${roleCount} 角色 × 3 档 · 间距 ${spaceBlocks[0][1].length} × 3 档 · 其余 ${outputs.length - 2} 族`;
 
 if (CHECK) {
   const stale = outputs.filter(([name, css]) => {
@@ -312,9 +565,9 @@ if (CHECK) {
     );
     process.exit(1);
   }
-  console.log(`T2 非色彩层一致（排版 ${roleCount} 角色 × 3 档 · 布局 ${layoutRows.length}）`);
+  console.log(`T2 非色彩层一致（${stat}）`);
 } else {
   for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
-  console.log(`已生成 T2 非色彩层：排版 ${roleCount} 角色 × 3 档 · 布局 ${layoutRows.length} 项`);
+  console.log(`已生成 T2 非色彩层：${stat}`);
   for (const n of notes) console.log(`    · ${n}`);
 }

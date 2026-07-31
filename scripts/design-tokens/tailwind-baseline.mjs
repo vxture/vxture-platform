@@ -48,6 +48,15 @@ export const NAMESPACES = [
   { ns: "aspect", file: "aspect-primitive.css", title: "宽高比", utility: "aspect-*" },
   { ns: "ease", file: "ease-primitive.css", title: "缓动曲线", utility: "ease-*" },
   { ns: "animate", file: "animate-primitive.css", title: "动画", utility: "animate-*" },
+  // 上游 theme.css 里没有这一族——v4 的 duration-* 是裸数值工具类。但它在文档与
+  // 实现里是一条**封闭的档位表**，T2 的 fast / base / slow 需要有 T1 可指，
+  // 否则语义名只能落裸值、破坏"T2 只引 T1"。故整族由 EXTENSIONS 提供。
+  {
+    ns: "transition-duration",
+    file: "transition-duration-primitive.css",
+    title: "过渡时长",
+    utility: "duration-*",
+  },
 ];
 
 /**

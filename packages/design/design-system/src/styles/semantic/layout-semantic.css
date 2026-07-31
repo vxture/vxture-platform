@@ -4,31 +4,33 @@
  * @layer Presentation
  * @category styles
  * @author AI-Generated
- * @date 2026-07-31
+ * @date 2026-08-01
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
- *   源：Figma-Token/vx-Layout/（过程文件，迁移完成后删除）
+ *   源：Figma-Token/vx-Layout/
  *
  * T2 定义见 docs/10-standards/060-design-system.md §1.1。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ *
+ * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。
  */
 
-:root {
+@theme {
   /* page */
-  --layout-page-xs: var(--vx-breakpoint-xs);
-  --layout-page-sm: var(--vx-breakpoint-sm);
-  --layout-page-md: var(--vx-breakpoint-md);
-  --layout-page-lg: var(--vx-breakpoint-lg);
-  --layout-page-xl: var(--vx-breakpoint-xl);
-  --layout-page-2xl: var(--vx-breakpoint-2xl);
-  --layout-page-3xl: var(--vx-breakpoint-3xl);
-  --layout-page-4xl: var(--vx-breakpoint-4xl);
-  --layout-page-5xl: var(--vx-breakpoint-5xl);
+  --container-page-xs: 23.4375rem;
+  --container-page-sm: 40rem;
+  --container-page-md: 48rem;
+  --container-page-lg: 64rem;
+  --container-page-xl: 80rem;
+  --container-page-2xl: 96rem;
+  --container-page-3xl: 120rem;
+  --container-page-4xl: 160rem;
+  --container-page-5xl: 240rem;
 
   /* content */
-  --layout-content-narrow-lg: var(--layout-page-lg);
-  --layout-content-base-xl: var(--layout-page-xl);
-  --layout-content-wide-2xl: var(--layout-page-2xl);
-  --layout-content-ultra-3xl: var(--layout-page-3xl);
+  --container-content-narrow-lg: 64rem;
+  --container-content-base-xl: 80rem;
+  --container-content-wide-2xl: 96rem;
+  --container-content-ultra-3xl: 120rem;
 }

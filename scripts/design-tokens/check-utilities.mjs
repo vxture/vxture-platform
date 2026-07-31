@@ -41,36 +41,58 @@ const STYLES = path.join(ROOT, "packages/design/design-system/src/styles");
  * 而 DS 自己的注册仍然正常——只测自家注册就看不见这种塌方。
  */
 const EXPECTED = [
-  // T2 语义
-  ["bg-primary", "语义色"],
-  ["text-foreground", "语义色"],
-  ["border-border", "语义色"],
-  ["dark:bg-card", "语义色 · 暗色变体"],
-  ["text-body-md", "排版角色"],
-  ["text-heading-1", "排版角色"],
-  ["max-w-page-lg", "页面宽度"],
-  ["max-w-content-base-xl", "内容宽度"],
+  // T2 语义 —— 每族至少一个样例。九族里有六族的命名空间名与直觉不同
+  // （`--transition-duration-*` 而非 `--duration-*`、`--z-index-*` 而非 `--z-*`、
+  // `--spacing-*` 而非 `--space-*`），写错则变量声明成功、工具类不产出且不报错。
+  ["bg-primary", "T2 色彩"],
+  ["text-foreground", "T2 色彩"],
+  ["border-border", "T2 色彩"],
+  ["dark:bg-card", "T2 色彩 · 暗色变体"],
+  ["text-body-md", "T2 排版角色"],
+  ["text-heading-1", "T2 排版角色"],
+  ["p-md", "T2 间距（密度轴）"],
+  ["gap-lg", "T2 间距"],
+  ["h-control-md", "T2 控件高度"],
+  ["h-row-lg", "T2 行高度"],
+  ["md:p-xl", "T2 间距 · 断点变体"],
+  ["size-icon-md", "T2 图标尺寸"],
+  ["size-media-lg", "T2 媒体尺寸"],
+  ["size-control-lg", "T2 控件尺寸（Button icon 变体）"],
+  ["rounded-md", "T2 圆角"],
+  ["shadow-raised", "T2 视觉高度"],
+  ["shadow-dialog", "T2 视觉高度"],
+  ["z-modal", "T2 叠放次序"],
+  ["z-tooltip", "T2 叠放次序"],
+  ["duration-fast", "T2 时长"],
+  ["duration-base", "T2 时长"],
+  ["ease-enter", "T2 缓动"],
+  ["ease-exit", "T2 缓动"],
+  ["opacity-disabled", "T2 透明度"],
+  ["border-thin", "T2 描边宽度"],
+  ["max-w-page-lg", "T2 页面宽度"],
+  ["max-w-content-base-xl", "T2 内容宽度"],
   // T1 偏离：扩展档与覆盖值
-  ["font-brand", "扩展 · 品牌字体族"],
-  ["font-cjk", "扩展 · 中文字体栈"],
-  ["text-2xs", "扩展 · 小字号"],
-  ["text-3xs", "扩展 · 小字号"],
-  ["3xl:p-4", "扩展 · 断点变体"],
-  ["font-sans", "覆盖 · 正文字体栈"],
-  ["font-mono", "覆盖 · 等宽字体栈"],
-  // 上游内置：退役各族后组件改用的就是这些
+  ["font-brand", "T1 扩展 · 品牌字体族"],
+  ["font-cjk", "T1 扩展 · 中文字体栈"],
+  ["text-2xs", "T1 扩展 · 小字号"],
+  ["text-3xs", "T1 扩展 · 小字号"],
+  ["3xl:p-4", "T1 扩展 · 断点变体"],
+  ["font-sans", "T1 覆盖 · 正文字体栈"],
+  ["font-mono", "T1 覆盖 · 等宽字体栈"],
+  // 上游内置：DS 注册不得挤掉它们。若哪天 import 链出错把上游 theme 清空，
+  // DS 自家注册仍然正常，只测自家就看不见这种塌方。
   ["p-4", "内置 · 间距"],
-  ["gap-6", "内置 · 间距"],
   ["size-4", "内置 · 尺寸"],
-  ["h-10", "内置 · 高度"],
-  ["rounded-lg", "内置 · 圆角"],
-  ["shadow-md", "内置 · 阴影"],
-  ["ease-out", "内置 · 缓动"],
   ["duration-150", "内置 · 时长"],
-  ["opacity-45", "内置 · 透明度"],
-  ["border-2", "内置 · 描边宽度"],
   ["z-50", "内置 · 层级"],
-  ["md:p-6", "内置 · 断点变体"],
+  ["opacity-45", "内置 · 透明度"],
+];
+
+/** 模式轴：三档必须都在，缺一档意味着该模式下整族回落到默认值且不报错。 */
+const MODE_BLOCKS = [
+  ["typography-semantic.css", ["html.vx-font-small", "html.vx-font-large"], "字号三档"],
+  ["spacing-semantic.css", [".density-compact", ".density-comfortable"], "密度三档"],
+  ["color-semantic.css", [".dark"], "暗色"],
 ];
 
 /** 排版角色须一次落齐四个属性，只出 font-size 等于注册没生效。 */
@@ -146,6 +168,19 @@ if (lacking.length > 0) {
   process.exit(1);
 }
 
+const missingModes = [];
+for (const [file, selectors, note] of MODE_BLOCKS) {
+  const css = await readFile(path.join(STYLES, "semantic", file), "utf8");
+  for (const sel of selectors) {
+    if (!css.includes(sel)) missingModes.push(`${file} 缺 ${sel}（${note}）`);
+  }
+}
+if (missingModes.length > 0) {
+  console.error("模式轴缺档——该模式下整族回落到默认值且不报错：\n");
+  for (const m of missingModes) console.error(`  ✗ ${m}`);
+  process.exit(1);
+}
+
 console.log(
-  `工具类实测通过（${EXPECTED.length} 个样例全部生成，排版角色四属性齐备）`,
+  `工具类实测通过（${EXPECTED.length} 个样例全部生成，排版角色四属性齐备，模式轴三族齐备）`,
 );

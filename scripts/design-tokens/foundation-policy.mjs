@@ -50,6 +50,18 @@ export const EXTENSIONS = {
     ["3xs", "0.5rem", "密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大"],
     ["2xs", "0.625rem", "同上，介于 3xs 与 xs 之间"],
   ],
+  // v4 的 duration-* 是裸数值工具类，theme.css 里没有这一族，T2 的 fast / base /
+  // slow 因此无 T1 可指。档位表本身是 Tailwind 文档给定的封闭集合，照录即可。
+  "transition-duration": [
+    ["75", "75ms", "Tailwind 时长档"],
+    ["100", "100ms", "Tailwind 时长档"],
+    ["150", "150ms", "Tailwind 时长档"],
+    ["200", "200ms", "Tailwind 时长档"],
+    ["300", "300ms", "Tailwind 时长档"],
+    ["500", "500ms", "Tailwind 时长档"],
+    ["700", "700ms", "Tailwind 时长档"],
+    ["1000", "1000ms", "Tailwind 时长档"],
+  ],
   breakpoint: [
     ["xs", "23.4375rem", "375px，主流手机竖屏宽；Tailwind 最小档 sm=640px 已属平板"],
     ["3xl", "120rem", "1920px，1080p 横屏"],

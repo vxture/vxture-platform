@@ -22,13 +22,11 @@ const BASELINE_PATH = path.join(
   "scripts/guardrails/design-system-baseline.json",
 );
 const DS_STYLE_HARDCODED_SCALE_BUDGET = 0;
-/** Tailwind v4 的时长档；判据说明见 hasOffLadderDuration。 */
-const TAILWIND_DURATIONS_MS = new Set([0, 75, 100, 150, 200, 300, 500, 700, 1000]);
 /**
- * DS 叠放阶梯。原为 `--z-*` 语义 token，随 T2 该族退役——v4 的 z-index 是裸数值
- * 工具类（`z-500`），没有具名 token 可引用。阶梯本身是真实的设计约束
- * （Radix portal 菜单须压过粘性表头、tooltip 必须最高…），故保留为**取值白名单**：
- * 阶梯语义与推导依据见 docs/10-standards/060-design-system.md §8。
+ * DS 叠放阶梯的取值。**首选仍是 `var(--z-index-*)` 语义名**；本表只是兜底，
+ * 容许内联 style 等确实拿不到类名的场合直写档位值，档外取值一律拦。
+ * 阶梯语义与推导依据见 scripts/design-tokens/semantic-policy.mjs 与
+ * docs/10-standards/060-design-system.md §8。
  */
 const Z_LADDER = new Set([100, 200, 300, 400, 500, 600, 700, 800, 900, 9999]);
 const BASELINED_RULE_IDS = new Set([
@@ -520,11 +518,11 @@ const rules = [
       const normalized = normalize(file);
       if (!DS_EFFECT_LOCKED_STYLE_PATHS.has(normalized)) return null;
       const text = stripLineComment(line);
-      if (hasOffLadderDuration(text) || hasLiteralEasing(text)) {
+      if (/\d+(?:\.\d+)?(?:ms|s)/.test(text) || hasLiteralEasing(text)) {
         return violation(
           file,
           lineNumber,
-          "时长须取 Tailwind 时长档，缓动须用 var(--vx-ease-*)，不能回流硬编码动效。",
+          "改用 T2 动效 token：var(--transition-duration-*) 与 var(--ease-*)。",
           line,
         );
       }
@@ -645,11 +643,11 @@ const rules = [
         return null;
       const text = stripLineComment(line);
 
-      if (hasOffLadderDuration(text)) {
+      if (/\d+(?:\.\d+)?(?:ms|s)/.test(text)) {
         return violation(
           file,
           lineNumber,
-          `DS 样式叶子的 motion 时长须取 Tailwind 时长档（${[...TAILWIND_DURATIONS_MS].join(" / ")} ms）。`,
+          "DS 样式叶子不能直接写 motion 时长；改用 var(--transition-duration-*)。",
           line,
         );
       }
@@ -2353,26 +2351,6 @@ function isDsTokenOwner(file) {
   );
 }
 
-/**
- * Tailwind v4 的时长档。
- *
- * ── 为什么规则从"必须是 token"改成"必须在档上" ──
- * 原规则要求所有时长写成 `var(--vx-*)`，前提是 DS 自持一套 `--duration-*` token。
- * T1 改为镜像 Tailwind 后那一族退役了：v4 的时长是**裸数值工具类**
- * （`duration-150`），根本不存在可引用的具名 token，原规则因此变得无法满足——
- * 不是被放宽，是失去了指称对象。
- *
- * 规则的真实目的是"动效值全系统一致，不许各处随手写"。在 v4 下等价的表述就是
- * 落在上游这套档上；偏离档位仍然报错。缓动另有 `--vx-ease-*` 可引用，故仍要求 var()。
- */
-function hasOffLadderDuration(text) {
-  for (const m of text.matchAll(/(?:^|[\s(,:])(\d+(?:\.\d+)?)(ms|s)\b/g)) {
-    const ms = m[2] === "s" ? Number(m[1]) * 1000 : Number(m[1]);
-    if (!TAILWIND_DURATIONS_MS.has(ms)) return true;
-  }
-  return false;
-}
-
 /** 裸缓动曲线：`--vx-ease-*` 是可引用的 token，没有理由写字面量。 */
 function hasLiteralEasing(text) {
   return /\b(?:cubic-bezier|steps)\s*\(/.test(text) || /\bease(?:-in|-out|-in-out)?\b(?!\s*\))/.test(text.replace(/var\([^)]*\)/g, ""));
@@ -2390,17 +2368,19 @@ function isTokenOrNoneShadowValue(value) {
 /**
  * motion 值是否只由 token 构成。
  *
- * 时长允许字面量，但必须落在 Tailwind 的时长档上——v4 的时长是裸数值工具类
- * （`duration-150`），没有具名 token 可引用，要求 var() 等于要求一个不存在的东西。
- * 缓动仍须 var(--vx-ease-*)：那一族在 T1 里有名字。判据说明见 hasOffLadderDuration。
+ * 判据是「除 var() 引用外不得出现字面时长或曲线」。
+ *
+ * 不要求 `--vx-` 前缀：T2 的时长与缓动刻意命名为 `--transition-duration-*` /
+ * `--ease-*`——那是 v4 的真实命名空间名，带前缀就不产出 duration-fast / ease-enter
+ * 工具类。前缀只属于 T1。
  */
 function isTokenOrNoneMotionValue(value) {
   const normalized = (value ?? "").trim();
   if (!normalized) return true;
   if (normalized === "none" || normalized.startsWith("none ")) return true;
 
-  // 曲线函数与偏离档位的时长：连 var() 的回退值里也不允许，故在剥离前先查。
-  if (hasOffLadderDuration(normalized)) return false;
+  // 字面时长与曲线函数：连 var() 的回退值里也不允许，故在剥离前先查。
+  if (/\d+(?:\.\d+)?m?s/.test(normalized)) return false;
   if (/cubic-bezier\(|steps\(/.test(normalized)) return false;
 
   const withoutVars = normalized.replace(/var\((?:[^()]|\([^()]*\))*\)/g, " ");

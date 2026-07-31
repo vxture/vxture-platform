@@ -1,0 +1,25 @@
+/**
+ * semantic/radius-semantic.css - T2 语义层 · 圆角（工具类族 rounded-*）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-08-01
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Shape/
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+@theme {
+  /* radius */
+  --radius-xs: var(--vx-radius-xs);
+  --radius-sm: var(--vx-radius-sm);
+  --radius-md: var(--vx-radius-md);
+  --radius-lg: var(--vx-radius-lg);
+  --radius-xl: var(--vx-radius-xl);
+  --radius-2xl: var(--vx-radius-2xl);
+}

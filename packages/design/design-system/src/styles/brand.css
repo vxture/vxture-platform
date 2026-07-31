@@ -20,14 +20,14 @@
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  gap: calc(var(--vx-spacing) * 2);
+  gap: var(--space-sm);
   color: var(--foreground);
   text-decoration: none;
 }
 
 .vx-brand-mark {
-  width: calc(var(--vx-spacing) * 6);
-  height: calc(var(--vx-spacing) * 6);
+  width: var(--space-xl);
+  height: var(--space-xl);
   flex: 0 0 auto;
   display: block;
   object-fit: contain;

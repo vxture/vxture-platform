@@ -38,21 +38,72 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 - **覆盖**（Tailwind 有、DS 判定要改）：`font-sans` / `font-mono` 的字体栈
 - **减法**：色板只留 neutral / red / amber / emerald / sky / purple 六个色相（完整色阶）加品牌色
 
-**T2 只剩三族**：色彩语义、24 档排版角色、页面与内容宽度。其余刻度
-（radius / shadow / ease / duration / opacity / border-width / z-index / spacing / size）
-已随 T1 镜像上游一并退役——给上游档位另起一个名字（把 `duration-150` 叫成 `duration-fast`）
-不产生语义，只多一处真值。直接用内置工具类：`rounded-lg`、`shadow-md`、`ease-out`、
-`duration-150`、`opacity-45`、`border-2`、`z-500`、`p-4`、`size-4`。
+**T2 覆盖全部刻度族**，每族都产出真工具类：
 
-**T3 已退役**。组件尺寸改由 cva variant 承担：CSS 变量表达不了"紧凑档整体下移一档"
-这类关系（实测密度三档之间是档位平移而非等比缩放，比值 1.0–1.5 不等），而这正是
-组件变体的本职。设计稿的组件尺寸留在 `Figma-Token/vx-Component/` 作记录。
+| 族              | T2 名 → 工具类                                                                | 命名空间                               | 模式轴       |
+| --------------- | ----------------------------------------------------------------------------- | -------------------------------------- | ------------ |
+| 色彩            | `--primary` → `bg-primary`                                                    | `--color-*`                            | 明暗         |
+| 排版角色        | `--body-md-*` → `text-body-md`                                                | `--text-*`                             | 字号三档     |
+| 间距 / 控件高度 | `--space-md` → `p-md`、`h-control-lg`                                         | `--spacing-*`                          | **密度三档** |
+| 图标 / 媒体尺寸 | `--spacing-icon-md` → `size-icon-md`                                          | `--spacing-*`                          | 无           |
+| 圆角            | `--radius-md` → `rounded-md`                                                  | `--radius-*`                           | 无           |
+| 视觉高度        | `--shadow-raised` → `shadow-raised`                                           | `--shadow-*`                           | 无           |
+| 叠放次序        | `--z-index-modal` → `z-modal`                                                 | `--z-index-*`                          | 无           |
+| 时长 / 缓动     | `--transition-duration-fast` → `duration-fast`、`--ease-enter` → `ease-enter` | `--transition-duration-*` / `--ease-*` | 无           |
+| 透明度          | `--opacity-disabled` → `opacity-disabled`                                     | `--opacity-*`                          | 无           |
+| 描边宽度        | `--border-width-thin` → `border-thin`                                         | `--border-width-*`                     | 无           |
+| 页面 / 内容宽度 | `--container-page-lg` → `max-w-page-lg`                                       | `--container-*`                        | 无           |
+
+**命名空间必须写对**。`--duration-*`、`--z-*`、`--space-*` 都不是 v4 的命名空间（正确的是
+`--transition-duration-*`、`--z-index-*`、`--spacing-*`）；写错则变量声明成功、工具类不产出、
+**且不报错**。`duration-fast` 曾因此哑火一整轮。`check-utilities.mjs` 逐族取样实测守这条。
+
+**零增益的族也走 T2**。radius 目前就是 T1 的恒等别名。保留它是为分层边界完整——
+边界要么处处成立、要么不成立，消费方不该需要记住"这族有语义名、那族没有"。
+
+**三族有模式轴**，在模式选择器下声明、由 `theme.css` 以 `@theme inline` 注册，故模式切换
+自动跟随：色彩（`.dark`）、排版角色（`html.vx-font-*`）、间距（`.density-*`）。其余各族在
+自己的 semantic 文件里 `@theme` 一处声明即完成注册。
+
+**三族没有 T1 可指**：z-index（叠放次序不是量纲，500 不是某个测量值的第 500 档）、opacity
+与 border-width（上游既无 theme 变量也无封闭档位表，接受任意取值）。它们在 T2 落字面量，
+这不是分层的例外，是那一维本就没有原子层。容器宽度同样落字面量，原因是**容器查询里
+var() 不参与求值**。
+
+**T3 已退役**。组件尺寸改由 cva variant 承担——见 §1.2 的三根轴。设计稿的组件尺寸留在
+`Figma-Token/vx-Component/` 作记录。
 
 **取值约束**：
 
-- 组件里一律用工具类，**禁止任意值语法**（`h-(--control-height-lg)`）。
-- 布局常量（侧边栏宽度等一次性视口决策）在产品层定，不入 DS。
+- 一律用 T2 语义名产出的工具类。裸数值（`p-4` / `h-9` / `z-500`）**不跟随密度与字号三档**，
+  用了就等于把该处排除在用户偏好之外；仅限一次性布局微调，且需知情。
+- **禁止任意值语法**（`h-(--control-height-lg)`）。
 - 暗色层级由 surface 明度递增与描边承担，不靠阴影递增。
+
+### 1.2 组件尺寸的三根轴
+
+组件的"大小"不是一个轴，是三个，它们**相乘**而非相加：
+
+| 轴                                                         | 谁决定 / 何时 | 作用域                | 载体                      |
+| ---------------------------------------------------------- | ------------- | --------------------- | ------------------------- |
+| **用户偏好**：字号三档、密度三档                           | 用户，运行时  | 全局，`html` 上一个类 | T2 模式块（变量重定向）   |
+| **上下文尺寸**：工具栏 sm、英雄区 lg                       | 设计，放置时  | 单个放置点            | cva `size` variant        |
+| **意图与状态**：primary/destructive、hover/active/disabled | 设计，放置时  | 单个实例              | T2 语义色 + cva `variant` |
+
+必须分开的理由很直接：用户把字号调大，不该让工具栏按钮变成 hero 按钮；设计师把某个按钮
+设成 lg，也不该波及别处。
+
+两者的相乘是自动的：cva 给出 `h-control-md`（上下文说"中号控件"），`.density-compact`
+把 `--space-control-md` 从 2rem 改成 1.75rem（用户说"紧凑"）。**组件不需要知道密度存在**。
+这也是密度不做成 cva compound variant 的原因：3 档 × 4 尺寸 = 每个组件 12 组要声明，
+而且页面里那些 `<div class="gap-md">` 根本跟不上。
+
+**一致性靠三道，只有第二道是真保证**：
+
+1. **cva 定义合法集合** —— `size` 只有 sm/default/lg，写别的 TS 报错。挡住"发明新尺寸"。
+2. **模式组件（L2）固定"哪个上下文用哪档"** —— `Toolbar` 自己渲染控件、或用 context 下发
+   `size="sm"`，页面代码没有选择余地。靠人记住"工具栏用 sm"必然漂移。
+3. **护栏** —— 禁任意值语法、禁应用层定义 `--vx-*`、禁裸设计值。挡住绕过前两道。
 
 ## 2. 合法使用方式
 
@@ -212,13 +263,17 @@ DS 已在 `@vxture/design-system/tokens` 暴露 `colors.semantic.ai*` 与 `gradi
 
 ## 6. Foundation 尺度、阴影与动效
 
-尺度、阴影与缓动**一律用 Tailwind 内置工具类**，DS 不再自持这几族刻度——T1 与上游同值，
-另起一套名字只会多一处真值。应用端不得在 CSS 中重新定义阴影、圆角、动效曲线或动画关键帧；
-需要新挡位时走 §9 的流程补进 `foundation-policy.mjs` 的扩展表，而不是就地写死。
+尺度、阴影与缓动一律消费 T2 语义名产出的工具类（`rounded-md` / `shadow-raised` /
+`duration-fast` / `ease-enter`），族清单见 §1.1。应用端不得在 CSS 中重新定义阴影、圆角、
+动效曲线或动画关键帧。
 
-事实来源只有三处：`packages/design/design-system/src/styles/foundation|semantic/*`（生成物）、
-`scripts/design-tokens/foundation-policy.mjs`（偏离登记）与本规范文档。生成物不得手工编辑，
-改动会被下一次生成静默覆盖。
+新挡位分两种情况：**T1 缺档**（上游没有的取值）走 §9 的流程补进 `foundation-policy.mjs`
+的扩展表；**T2 缺语义名**（取值有了但没有对应角色）补进 `semantic-policy.mjs`。两者都要
+写理由，生成时逐条打印。就地写死一律不接受。
+
+事实来源只有四处：`src/styles/foundation|semantic/*`（生成物）、`foundation-policy.mjs`
+（T1 相对上游的偏离）、`semantic-policy.mjs`（T2 里设计稿给不出的语义映射）与本规范文档。
+生成物不得手工编辑，改动会被下一次生成静默覆盖。
 
 ## 7. 品牌标识组合
 
@@ -228,12 +283,15 @@ DS 提供 `.vx-brand-lockup`、`.vx-brand-mark`、`.vx-brand-name`、`.vx-brand-
 
 ## 8. Motion / Z-index / Breakpoint
 
-**Motion**：时长取 Tailwind 时长档（`duration-75/100/150/200/300/500/700/1000`），缓动取
-`ease-in` / `ease-out` / `ease-in-out`。DS 曾用 Material 三条曲线覆盖这三个名字，已退回上游取值——
-覆盖上游同名挡位属"修改"不属"扩展"。业务层不得声明全局 keyframes；AI 生成态优先用 DS AI 组件内建 motion。
+**Motion**：用 T2 语义名——时长 `duration-instant/fast/base/slow/slower`，缓动
+`ease-enter`（入场减速）/ `ease-exit`（退场加速）/ `ease-standard`（位置与尺寸变化）。
+取值全部落在上游档上：DS 曾用 Material 三条曲线覆盖 `in`/`out`/`in-out`，已退回上游取值——
+覆盖上游同名挡位属"修改"不属"扩展"。业务层不得声明全局 keyframes 或字面时长；
+AI 生成态优先用 DS AI 组件内建 motion。
 
-**Z-index**：v4 的 z-index 是裸数值工具类，没有具名 token 可引用，但**叠放次序是真实的设计约束**，
-故保留为取值阶梯。`0–99` 归局部堆叠自由使用；超过 `99` 必须落在下表上（守卫 `ds/no-hardcoded-z-index` 按此白名单校验）：
+**Z-index**：用 `z-base` … `z-max` 语义名。`0–99` 归局部堆叠自由使用；超过 `99` 的一律取自
+下表（内联 style 等确实拿不到类名的场合可直写档位值，守卫 `ds/no-hardcoded-z-index`
+按此白名单兜底校验）：
 
 | 值   | 用途         | 依据                                                   |
 | ---- | ------------ | ------------------------------------------------------ |
@@ -248,8 +306,14 @@ DS 提供 `.vx-brand-lockup`、`.vx-brand-mark`、`.vx-brand-name`、`.vx-brand-
 | 900  | tooltip      | 必须最高，否则被它所描述的元素遮挡                     |
 | 9999 | max          | 逃生档，新增使用需在 PR 说明                           |
 
-阶梯依据 Bootstrap / MUI / Ant Design 三家共识。逐档互异是硬要求：同值时叠放次序取决于
-DOM 顺序而非设计意图，是静默的层级 bug。
+阶梯依据 Bootstrap / MUI / Ant Design 三家共识，权威表在 `scripts/design-tokens/semantic-policy.mjs`。
+逐档互异是硬要求：同值时叠放次序取决于 DOM 顺序而非设计意图，是静默的层级 bug。
+
+**视觉高度（elevation）另有一条阶梯**，`shadow-flat` / `raised` / `sticky` / `overlay` /
+`dialog` / `notification`。它与叠放次序**相关但不可互相推导**：tooltip 叠放最高，阴影却应当
+很轻——它小而短暂，重阴影只显笨重（Material 同样给 tooltip 极低 elevation）。两条阶梯的档数
+也不同：z-index 要求逐档互异，elevation 允许多角色共用一档，因为可辨识的视觉高度本就比
+叠放层级少。
 
 **断点**：用 Tailwind 变体（`sm:` … `2xl:`）与 DS 扩展档（`xs:` / `3xl:` / `4xl:` / `5xl:`）。
 业务 CSS 不得在 media query 中复制 `640px`、`768px`、`1024px`、`1280px`、`1536px`；

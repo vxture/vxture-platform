@@ -26,14 +26,14 @@
 .vx-fullscreen-active {
   position: fixed;
   inset: 0;
-  z-index: 1400;
+  z-index: var(--z-index-max);
   background: var(--background);
   overflow: hidden;
   /* 隐藏滚动条 */
   -ms-overflow-style: none;
   scrollbar-width: none;
   /* 进入/退出过渡 */
-  transition: opacity 200ms var(--vx-ease-in-out);
+  transition: opacity var(--transition-duration-base) var(--ease-standard);
 }
 
 .vx-fullscreen-active::-webkit-scrollbar {
