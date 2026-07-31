@@ -1,0 +1,24 @@
+/**
+ * foundation/font-weight-primitive.css - T1 原子层 · 排版（工具类族 font-*）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-primitives.mjs
+ *   源：Figma-Token/（过程文件，迁移完成后删除；届时本文件转为手工维护的真值源）
+ *
+ * T1 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* 字重。 */
+  --vx-font-weight-normal: 400;
+  --vx-font-weight-medium: 500;
+  --vx-font-weight-semibold: 600;
+  --vx-font-weight-bold: 700;
+  --vx-font-weight-extrabold: 800;
+}

@@ -67,7 +67,9 @@ export const SCALE_DEVIATIONS = {
  */
 export const SCALE_ADDITIONS = {
   "layout/content/ultra-3xl": {
-    value: 1920,
+    // 1920 恰是 breakpoint-3xl，故写成引用而非裸值——与其余 content/* 一致，
+    // 且断点若调整能自动跟随。
+    alias: "--layout-page-3xl",
     why: "2K/4K 下数据密集型页面的内容宽度上限；再宽则行长失控，应改用分栏",
   },
 };

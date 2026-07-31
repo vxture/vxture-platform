@@ -254,40 +254,49 @@ function buildSpacing() {
 /** 含空格的字族名必须加引号，否则直接用于 font-family 时解析有歧义。 */
 const quoteFamily = (v) => (/\s/.test(v) ? `"${v}"` : v);
 
+/**
+ * 排版原子按 Tailwind 命名空间拆成独立文件，与 T2 的分文件规则一致：
+ * 一个命名空间对应一族工具类。行高与字距沿用排版通用术语 leading / tracking
+ * （亦即 Tailwind 的 --leading-* / --tracking-*），不再挂 font- 前缀。
+ */
 const TYPE_GROUPS = [
-  ["family", "字族", quoteFamily],
-  ["stack", "完整字体栈（含 CJK 与系统回退）", (v) => v],
-  ["size", "字号", (v) => `${v}px`],
-  ["weight", "字重", (v) => String(v)],
-  ["lineHeight", "行高。导出为百分比×100，此处转为无单位倍数", (v) => String(trim(v / 100))],
+  ["family", "字族", quoteFamily, "font-family-primitive.css", "font-family", "font-*"],
+  ["stack", "完整字体栈（含 CJK 与系统回退）", (v) => v, "font-family-primitive.css", "font-stack", "font-*"],
+  ["size", "字号", (v) => `${v}px`, "font-size-primitive.css", "font-size", "text-*"],
+  ["weight", "字重", (v) => String(v), "font-weight-primitive.css", "font-weight", "font-*"],
+  ["lineHeight", "行高。导出为百分比×100，此处转为无单位倍数", (v) => String(trim(v / 100)), "leading-primitive.css", "leading", "leading-*"],
   // 字距用 em 而非 px：本系统有三档字号模式，px 字距不随字号缩放，大字号下会
   // 显得偏紧；em 自动跟随。设计稿只能存绝对值（Figma 字距字段限制），但按 16px
   // 基准换算后与 Tailwind 的 --tracking-* 逐档等值（-0.8px = -0.05em 等），
   // 说明设计意图本就是这套相对刻度。
-  ["letterSpacing", "字距（em，随字号缩放）", (v) => `${trim(v / 16)}em`],
+  ["letterSpacing", "字距（em，随字号缩放）", (v) => `${trim(v / 16)}em`, "tracking-primitive.css", "tracking", "tracking-*"],
 ];
 
 function buildTypography() {
   const all = flatten(loadCollection("vx-Typography-Primitive")).filter(([p]) =>
     p.startsWith("font/"),
   );
-  let count = 0;
 
-  const blocks = TYPE_GROUPS.map(([group, note, format]) => {
+  /** file → { title, family, blocks[], count } */
+  const files = new Map();
+  for (const [group, note, format, file, prefix, family] of TYPE_GROUPS) {
     const rows = all
       .filter(([p]) => p.startsWith(`font/${group}/`))
-      .map(([p, v]) => {
-        count += 1;
-        return `  --vx-font-${kebab(group)}-${p.split("/").pop()}: ${format(v)};`;
-      });
-    return rows.length ? `  /* ${note}。 */\n${rows.join("\n")}` : "";
-  }).filter(Boolean);
+      .map(([p, v]) => `  --vx-${prefix}-${p.split("/").pop()}: ${format(v)};`);
+    if (rows.length === 0) continue;
+    if (!files.has(file)) files.set(file, { family, blocks: [], count: 0 });
+    const entry = files.get(file);
+    entry.blocks.push(`  /* ${note}。 */\n${rows.join("\n")}`);
+    entry.count += rows.length;
+  }
 
-  const css =
-    header("foundation/typography-primitive.css - T1 原子层 · 排版。") +
-    `\n:root {\n${blocks.join("\n\n")}\n}\n`;
-
-  return { css, count };
+  const outputs = [...files].map(([file, entry]) => [
+    file,
+    header(`foundation/${file} - T1 原子层 · 排版（工具类族 ${entry.family}）。`) +
+      `\n:root {\n${entry.blocks.join("\n\n")}\n}\n`,
+    entry.count,
+  ]);
+  return { outputs, count: [...files.values()].reduce((s, e) => s + e.count, 0) };
 }
 
 /* ─────────────────────────── 输出 ─────────────────────────── */
@@ -299,7 +308,7 @@ const typography = buildTypography();
 const outputs = [
   ["color-primitive.css", color.css, color.count],
   ["spacing-primitive.css", spacing.css, spacing.count],
-  ["typography-primitive.css", typography.css, typography.count],
+  ...typography.outputs,
 ];
 
 if (CHECK) {

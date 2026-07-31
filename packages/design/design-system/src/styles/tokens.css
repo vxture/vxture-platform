@@ -8,8 +8,12 @@
  */
 
 @import "./foundation/color-primitive.css";
+@import "./foundation/font-family-primitive.css";
+@import "./foundation/font-size-primitive.css";
+@import "./foundation/font-weight-primitive.css";
+@import "./foundation/leading-primitive.css";
 @import "./foundation/spacing-primitive.css";
-@import "./foundation/typography-primitive.css";
+@import "./foundation/tracking-primitive.css";
 @import "./semantic/border-semantic.css";
 @import "./semantic/breakpoint-semantic.css";
 @import "./semantic/color-semantic.css";

@@ -49,5 +49,5 @@
   --layout-topbar-lg: 64px;
   --layout-docs-inset: var(--vx-spacing-8);
   --layout-docs-gap: var(--vx-spacing-8);
-  --layout-content-ultra-3xl: 1920px;
+  --layout-content-ultra-3xl: var(--layout-page-3xl);
 }

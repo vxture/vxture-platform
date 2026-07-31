@@ -150,14 +150,18 @@ function primitiveVar(target) {
   }
   if (target.startsWith("font/")) {
     const [, group, name] = target.split("/");
-    return `--vx-font-${kebab(group)}-${name}`;
+    // 排版原子已按命名空间拆分并改用通用术语：lineHeight→leading、letterSpacing→tracking。
+    const prefix = { lineHeight: "leading", letterSpacing: "tracking" }[group] ?? `font-${kebab(group)}`;
+    return `--vx-${prefix}-${name}`;
   }
   return null;
 }
 
+/** 扫描整个 foundation/ 目录而非写死文件名——T1 拆分后写死清单会漏。 */
 function loadT1Vars() {
   const vars = new Set();
-  for (const f of ["spacing-primitive.css", "typography-primitive.css", "color-primitive.css"]) {
+  for (const f of readdirSync(FOUNDATION)) {
+    if (!f.endsWith(".css")) continue;
     const css = readFileSync(path.join(FOUNDATION, f), "utf8");
     for (const m of css.matchAll(/^\s*(--vx-[\w-]+):/gm)) vars.add(m[1]);
   }
@@ -270,8 +274,9 @@ function buildRows(collection, file) {
       if (!rows.some(([, , p]) => p.startsWith(`${owner}/`))) continue;
     }
     if (rows.some(([, , p]) => p === tokenPath)) continue;
-    added.push(`${tokenPath} = ${add.value}（${add.why}）`);
-    rows.push([derivedName(tokenPath), literal(tokenPath, add.value), tokenPath, add.why]);
+    const value = add.alias ? `var(${add.alias})` : literal(tokenPath, add.value);
+    added.push(`${tokenPath} = ${value}（${add.why}）`);
+    rows.push([derivedName(tokenPath), value, tokenPath, add.why]);
   }
   return rows;
 }
@@ -283,6 +288,40 @@ function assertUnique(rows, label) {
     if (seen.has(name)) errors.push(`${label}: ${name} 在同一块内重复声明`);
     seen.add(name);
   }
+}
+
+/**
+ * 排版角色的行高改为**无单位比值**（行高 px / 字号 px）。
+ *
+ * 设计稿存的是绝对 px（Figma 行高字段限制）。常规使用下比值与 px 计算结果相同，
+ * 但比值能扛住浏览器缩放与 rem 覆写，且与 Tailwind 的 --text-*--line-height 同构
+ * （Tailwind 也是每字号自带比值，另有独立 --leading-* 供覆写）。
+ *
+ * 各角色比值并不相同（1.167 / 1.200 / 1.429…）——大字号收紧行距是排版惯例，
+ * 故**不可能**引用一条固定倍数刻度；T1 的 --vx-font-line-height-* 是给作者
+ * 直接覆写用的，与角色行高是两件事。
+ */
+function toLineHeightRatio(rows) {
+  const sizeOf = new Map();
+  for (const [, value, tokenPath] of rows) {
+    if (!tokenPath.endsWith("/fontSize")) continue;
+    const m = /var\(--vx-font-size-([\w-]+)\)/.exec(value);
+    if (m) sizeOf.set(tokenPath.replace(/\/fontSize$/, ""), m[1]);
+  }
+  const px = {};
+  for (const m of readFileSync(path.join(FOUNDATION, "font-size-primitive.css"), "utf8")
+    .matchAll(/--vx-font-size-([\w-]+):\s*(\d+)px/g)) {
+    px[m[1]] = Number(m[2]);
+  }
+
+  return rows.map((row) => {
+    const [name, value, tokenPath, why] = row;
+    if (!tokenPath.endsWith("/lineHeight")) return row;
+    const step = sizeOf.get(tokenPath.replace(/\/lineHeight$/, ""));
+    const lh = /^(\d+(?:\.\d+)?)px$/.exec(value);
+    if (!step || !px[step] || !lh) return row;
+    return [name, String(Number((+lh[1] / px[step]).toFixed(4))), tokenPath, why];
+  });
 }
 
 /**
@@ -348,12 +387,13 @@ for (const col of COLLECTIONS) {
       continue;
     }
     const rows = buildRows(col.name, file);
-    assertUnique(rows, mode ? `${col.name}/${mode}` : col.name);
-    assertZIndexDistinct(rows);
+    const rows2 = toLineHeightRatio(rows);
+    assertUnique(rows2, mode ? `${col.name}/${mode}` : col.name);
+    assertZIndexDistinct(rows2);
 
     // 按命名空间分流。一个集合可能横跨多个路由（vx-Shape → radius + border）。
     const grouped = new Map();
-    for (const row of rows) {
+    for (const row of rows2) {
       const route = routeOf(row[2], col.name);
       if (!grouped.has(route.file)) grouped.set(route.file, []);
       grouped.get(route.file).push(row);
