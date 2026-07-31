@@ -285,6 +285,21 @@ function assertUnique(rows, label) {
   }
 }
 
+/**
+ * z-index 必须逐档互异——同值时叠放次序取决于 DOM 顺序而非设计意图，
+ * 是静默的层级 bug。设计稿曾出现两组同值（drawer=modal、notification=toast）。
+ */
+function assertZIndexDistinct(rows) {
+  const byValue = new Map();
+  for (const [name, value, tokenPath] of rows) {
+    if (!tokenPath.startsWith("z/")) continue;
+    if (byValue.has(value)) {
+      errors.push(`z-index 同值：${byValue.get(value)} 与 ${name} 都是 ${value}——叠放次序未定义`);
+    }
+    byValue.set(value, name);
+  }
+}
+
 function render(rows, indent = "  ") {
   const groups = new Map();
   for (const [name, value, tokenPath] of rows) {
@@ -334,6 +349,7 @@ for (const col of COLLECTIONS) {
     }
     const rows = buildRows(col.name, file);
     assertUnique(rows, mode ? `${col.name}/${mode}` : col.name);
+    assertZIndexDistinct(rows);
 
     // 按命名空间分流。一个集合可能横跨多个路由（vx-Shape → radius + border）。
     const grouped = new Map();

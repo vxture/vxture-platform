@@ -24,8 +24,36 @@ export const DEVIATIONS = {
   },
 };
 
-/** 非色彩刻度的取值偏离（裸值覆盖）。当前无——container 已改为别名断点，不再需要覆盖。 */
-export const SCALE_DEVIATIONS = {};
+/**
+ * 非色彩刻度的取值偏离（裸值覆盖）。
+ *
+ * ── z-index 分层重排 ────────────────────────────────────────────
+ * 设计稿的梯度有三处问题：`drawer` 与 `modal` 同为 400、`notification` 与
+ * `toast` 同为 600——同值意味着叠放次序取决于 DOM 顺序而非设计意图；
+ * 且 `dropdown`(100) 低于 `sticky`(200)，而本系统组件基座是 Radix，
+ * 菜单默认经 portal 挂到 body，低于粘性表头会被裁切。
+ *
+ * 重排依据（Bootstrap / MUI / Ant Design 三家共识）：
+ * - tooltip 最高——否则会被它所描述的元素遮挡（三家一致）
+ * - toast / notification 高于 modal（MUI snackbar 1400 > modal 1300；Ant 同）
+ * - popover 高于 modal——气泡可用在模态内，如模态里的下拉与日期选择
+ *   （Bootstrap popover 1070 > modal 1050；Ant 同）
+ * - drawer 低于 modal——模态可从抽屉内唤起，如抽屉里点删除弹确认框
+ *   （MUI drawer 1200 < modal 1300；Bootstrap offcanvas 1045 < modal 1050）
+ * - dropdown 高于 sticky——portal 化菜单须压过粘性表头（Ant dropdown 1050）
+ * - notification 高于 toast——通知常驻更久、可堆叠，应压在轻提示之上
+ *
+ * 保持 100 步进与既有的 base/raised/max 三档不变。
+ */
+export const SCALE_DEVIATIONS = {
+  "z/sticky": { value: 100, why: "让位给 portal 化的 dropdown" },
+  "z/dropdown": { value: 200, why: "Radix portal 菜单须压过粘性表头，否则被裁切" },
+  "z/modal": { value: 500, why: "高于 drawer——模态可从抽屉内唤起" },
+  "z/popover": { value: 600, why: "高于 modal——气泡可用在模态内" },
+  "z/toast": { value: 700, why: "全局反馈，不应被浮层遮挡" },
+  "z/notification": { value: 800, why: "常驻更久且可堆叠，压在 toast 之上" },
+  "z/tooltip": { value: 900, why: "必须最高，否则被所描述的元素遮挡" },
+};
 
 /**
  * DS 增补的 token（设计稿中不存在）。需回报设计侧补进设计稿。

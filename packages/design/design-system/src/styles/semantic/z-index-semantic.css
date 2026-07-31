@@ -18,14 +18,14 @@
   /* z */
   --z-base: 0;
   --z-raised: 10;
-  --z-dropdown: 100;
-  --z-sticky: 200;
+  --z-dropdown: 200;
+  --z-sticky: 100;
   --z-overlay: 300;
-  --z-modal: 400;
-  --z-popover: 500;
-  --z-toast: 600;
-  --z-tooltip: 700;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-toast: 700;
+  --z-tooltip: 900;
   --z-max: 9999;
-  --z-notification: 600;
+  --z-notification: 800;
   --z-drawer: 400;
 }
