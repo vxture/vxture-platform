@@ -96,8 +96,13 @@ src/styles/foundation/*.css
 | `intent/*/muted`   | `<hue>/100`        | `<hue>/50`                       |
 | `content/disabled` | `neutral/400`      | `neutral-300`                    |
 | `stroke/control`   | `neutral/500`      | `neutral-400`                    |
+| `content/primary`  | `neutral/900`      | `neutral/600`（#525252）         |
 
 **生成器一律读 `aliasData` 与 `$value`，禁止解析 `$description`。** 描述错误应回报设计侧修正，但不阻塞生成。
+
+### 3.1.1 codeSyntax 漏写 `--` 前缀
+
+13 个 token 的 `codeSyntax.WEB` 写作 `var(elevation-1-color)` 而非 `var(--elevation-1-color)`（全部 `elevation/*/color` 与 `gradient/*/{from,to}`）。生成器规范化后继续，并在输出中逐条列出以便回报设计侧修正——**不得静默修正**。
 
 ### 3.2 命名映射
 
@@ -184,19 +189,19 @@ Figma MCP 的页面枚举会漏列页面，且 `search_design_system` 只返回�
 
 `Figma-Token/` 是过程文件，**全部集合迁入 `src/styles/` 后即可删除**。当前状态：
 
-| 集合                                      | 层  | 去向                        | 状态       |
-| ----------------------------------------- | --- | --------------------------- | ---------- |
-| `vx-Color-Primitive`                      | T1  | `color-primitive.css`       | **已迁入** |
-| `vx-Spacing-Primitive`                    | T1  | `spacing-primitive.css`     | **已迁入** |
-| `vx-Typography-Primitive`                 | T1  | `typography-primitive.css`  | **已迁入** |
-| `vx-Color`（Light / Dark）                | T2  | `semantic/color-*.css`      | 待迁       |
-| `vx-Shape`                                | T2  | `semantic/shape-*.css`      | 待迁       |
-| `vx-Depth`                                | T2  | `semantic/depth-*.css`      | 待迁       |
-| `vx-Space`（Compact/Default/Comfortable） | T2  | `semantic/space-*.css`      | 待迁       |
-| `vx-Typography`（Small/Default/Large）    | T2  | `semantic/typography-*.css` | 待迁       |
-| `vx-Element`                              | T2  | `semantic/element-*.css`    | 待迁       |
-| `vx-Layout`                               | T2  | `semantic/layout-*.css`     | 待迁       |
-| `vx-Motion`                               | T2  | `semantic/motion-*.css`     | 待迁       |
-| `vx-Component`                            | T3  | `components/*.css`          | 待迁       |
+| 集合                                      | 层  | 去向                          | 状态       |
+| ----------------------------------------- | --- | ----------------------------- | ---------- |
+| `vx-Color-Primitive`                      | T1  | `color-primitive.css`         | **已迁入** |
+| `vx-Spacing-Primitive`                    | T1  | `spacing-primitive.css`       | **已迁入** |
+| `vx-Typography-Primitive`                 | T1  | `typography-primitive.css`    | **已迁入** |
+| `vx-Color`（Light / Dark）                | T2  | `semantic/color-semantic.css` | **已迁入** |
+| `vx-Shape`                                | T2  | `semantic/shape-*.css`        | 待迁       |
+| `vx-Depth`                                | T2  | `semantic/depth-*.css`        | 待迁       |
+| `vx-Space`（Compact/Default/Comfortable） | T2  | `semantic/space-*.css`        | 待迁       |
+| `vx-Typography`（Small/Default/Large）    | T2  | `semantic/typography-*.css`   | 待迁       |
+| `vx-Element`                              | T2  | `semantic/element-*.css`      | 待迁       |
+| `vx-Layout`                               | T2  | `semantic/layout-*.css`       | 待迁       |
+| `vx-Motion`                               | T2  | `semantic/motion-*.css`       | 待迁       |
+| `vx-Component`                            | T3  | `components/*.css`            | 待迁       |
 
-**3 / 12 已迁。** 剩余 9 个集合迁完后，按 §1.1 的四步退役过程文件。
+**4 / 12 已迁。** 剩余 8 个集合迁完后，按 §1.1 的四步退役过程文件。

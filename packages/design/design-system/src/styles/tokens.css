@@ -10,6 +10,7 @@
 @import "./foundation/color-primitive.css";
 @import "./foundation/spacing-primitive.css";
 @import "./foundation/typography-primitive.css";
+@import "./semantic/color-semantic.css";
 @import "./tokens-theme.css";
 @import "./tokens-colors-primitives.css";
 @import "./tokens-gradients.css";
