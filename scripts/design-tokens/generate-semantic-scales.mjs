@@ -19,7 +19,8 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { RADIUS_TO_TAILWIND, RADIUS_DROPPED } from "./radius-map.mjs";
+import { RADIUS_TO_TAILWIND, RADIUS_DROPPED, radiusVarName } from "./radius-map.mjs";
+import { SCALE_DEVIATIONS, SCALE_ADDITIONS } from "./deviations.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
@@ -37,33 +38,90 @@ const MS = /^motion\/duration\//;
 
 // radius 向 Tailwind 刻度对齐的表与 T3 共用，理由见 radius-map.mjs。
 
-const COLLECTIONS = [
-  { name: "vx-Shape", out: "shape-semantic.css", title: "形状", modes: null },
-  { name: "vx-Depth", out: "depth-semantic.css", title: "深度", modes: null },
-  { name: "vx-Element", out: "element-semantic.css", title: "元素尺寸", modes: null },
-  { name: "vx-Motion", out: "motion-semantic.css", title: "动效", modes: null },
-  { name: "vx-Layout", out: "layout-semantic.css", title: "布局常量", modes: null },
-  {
-    name: "vx-Space",
-    out: "space-semantic.css",
-    title: "间距（密度三档）",
-    modes: [
-      ["Compact", ".density-compact"],
-      ["Default", ":root, .density-default"],
-      ["Comfortable", ".density-comfortable"],
-    ],
-  },
-  {
-    name: "vx-Typography",
-    out: "typography-semantic.css",
-    title: "排版（字号三档）",
-    modes: [
-      ["Small", "html.vx-font-small"],
-      ["Default", ":root, html.vx-font-default"],
-      ["Large", "html.vx-font-large"],
-    ],
-  },
+/**
+ * 命名空间对齐 Tailwind：一个命名空间对应一族工具类。
+ *
+ * - `motion/duration/*` → `--duration-*`（对应 duration-* 工具类）
+ * - `motion/easing/*`   → `--ease-*`（Tailwind 术语是 ease，且其内置只有
+ *                          in/out/in-out，与我方 standard/decelerate/… 不撞名）
+ * - `layout/container/*` → `--layout-page-*`：Tailwind 的 `--container-*` 是一套
+ *   **通用宽度刻度**（md=448px，供 max-w-md 用），我方是**页面最大宽度**
+ *   （md=768px）。同词不同义正是跨团队歧义的来源，故改名脱钩。
+ */
+const PATH_RENAMES = [
+  [/^motion\/duration\//, "--duration-"],
+  [/^motion\/easing\//, "--ease-"],
+  [/^layout\/container\//, "--layout-page-"],
 ];
+
+function renamedVar(tokenPath) {
+  for (const [pattern, prefix] of PATH_RENAMES) {
+    if (pattern.test(tokenPath)) {
+      return `${prefix}${tokenPath.replace(pattern, "").replace(/\//g, "-")}`;
+    }
+  }
+  return null;
+}
+
+/** DTCG 字符串别名 `{layout.container.lg}` → 对应 CSS 变量；非别名返回 null。 */
+function dtcgAlias(value) {
+  if (typeof value !== "string") return null;
+  const m = /^\{([\w.-]+)\}$/.exec(value);
+  if (!m) return null;
+  const targetPath = m[1].replace(/\./g, "/");
+  return renamedVar(targetPath) ?? radiusVarName(targetPath) ?? derivedName(targetPath);
+}
+
+const DENSITY_MODES = [
+  ["Compact", ".density-compact"],
+  ["Default", ":root, .density-default"],
+  ["Comfortable", ".density-comfortable"],
+];
+const FONT_SIZE_MODES = [
+  ["Small", "html.vx-font-small"],
+  ["Default", ":root, html.vx-font-default"],
+  ["Large", "html.vx-font-large"],
+];
+
+const COLLECTIONS = [
+  { name: "vx-Shape", modes: null },
+  { name: "vx-Depth", modes: null },
+  { name: "vx-Element", modes: null },
+  { name: "vx-Motion", modes: null },
+  { name: "vx-Layout", modes: null },
+  { name: "vx-Space", modes: DENSITY_MODES },
+  { name: "vx-Typography", modes: FONT_SIZE_MODES },
+];
+
+/**
+ * 文件划分：**一个命名空间对应一族工具类，一一对应**。
+ *
+ * 不再按 Figma 集合分文件——集合是设计侧的组织方式，会随设计稿调整而变动，
+ * 且一个集合常横跨多个工具类族（vx-Shape 同时含 radius 与 border-width，
+ * vx-Depth 同时含 shadow 几何、z-index 与 opacity）。按命名空间分则稳定，
+ * 且"改这个文件会影响哪族工具类"在文件名上就一目了然。
+ *
+ * 顺序即匹配优先级，前缀更长的规则须排在前面。
+ */
+const ROUTES = [
+  { file: "radius-semantic.css", title: "圆角", family: "rounded-*", test: (p) => p.startsWith("radius/") },
+  { file: "border-semantic.css", title: "描边宽度", family: "border-*", test: (p) => p.startsWith("border/") },
+  { file: "shadow-semantic.css", title: "阴影几何", family: "shadow-*", test: (p) => p.startsWith("elevation/") },
+  { file: "z-index-semantic.css", title: "层级", family: "z-*", test: (p) => p.startsWith("z/") },
+  { file: "opacity-semantic.css", title: "透明度", family: "opacity-*", test: (p) => p.startsWith("opacity/") },
+  { file: "size-semantic.css", title: "图标与媒体尺寸", family: "size-*", test: (p) => p.startsWith("icon/") || p.startsWith("media/") },
+  { file: "duration-semantic.css", title: "时长", family: "duration-*", test: (p) => p.startsWith("motion/duration/") },
+  { file: "ease-semantic.css", title: "缓动", family: "ease-*", test: (p) => p.startsWith("motion/easing/") },
+  { file: "breakpoint-semantic.css", title: "断点", family: "sm: / md: / …", test: (p) => p.startsWith("layout/breakpoint/") },
+  { file: "layout-semantic.css", title: "布局常量", family: "—（DS 特有）", test: (p) => p.startsWith("layout/") },
+  { file: "typography-semantic.css", title: "排版角色", family: "text-* / font-* / leading-* / tracking-*", test: () => false },
+  { file: "spacing-semantic.css", title: "间距", family: "gap-* / p-* / h-*", test: () => true },
+];
+
+function routeOf(tokenPath, collection) {
+  if (collection === "vx-Typography") return ROUTES.find((r) => r.file === "typography-semantic.css");
+  return ROUTES.find((r) => r.test(tokenPath));
+}
 
 /* ── 工具 ───────────────────────────────────────────────────── */
 
@@ -111,6 +169,9 @@ const derived = [];
 const overridden = [];
 const radiusRemapped = [];
 const radiusDropped = [];
+const renamedVars = [];
+const scaleDeviated = [];
+const added = [];
 const errors = [];
 
 /** 裸值 → CSS 值。 */
@@ -138,8 +199,10 @@ function buildRows(collection, file) {
     // 故变量名一律由 DS 按路径机械推导——唯一性由路径本身保证。
     // 详见 docs/10-standards/065-design-token-pipeline.md §3.2.1。
     const remapped = RADIUS_TO_TAILWIND[tokenPath];
-    const name = remapped ? `--radius-${remapped}` : derivedName(tokenPath);
+    const renamed = renamedVar(tokenPath);
+    const name = remapped ? `--radius-${remapped}` : (renamed ?? derivedName(tokenPath));
     if (remapped) radiusRemapped.push(`${tokenPath} → --radius-${remapped}`);
+    if (renamed) renamedVars.push(`${tokenPath} → ${renamed}`);
     const web = ext(token, "codeSyntax")?.WEB;
     if (typeof web === "string") {
       const m = web.match(/^var\(\s*(--)?([\w-]+)\s*\)$/);
@@ -174,13 +237,33 @@ function buildRows(collection, file) {
       }
       rows.push([name, `var(${ref})`, tokenPath]);
     } else {
-      const value = literal(tokenPath, token.$value);
+      // DTCG 字符串别名（`{layout.container.lg}`）没有 aliasData 扩展，
+      // 早先被当裸值原样输出，产出了无效 CSS。此处解析为 var() 引用。
+      const aliasVar = dtcgAlias(token.$value);
+      if (aliasVar) {
+        rows.push([name, `var(${aliasVar})`, tokenPath]);
+        continue;
+      }
+      const override = SCALE_DEVIATIONS[tokenPath];
+      if (override) scaleDeviated.push(`${tokenPath}: ${token.$value} → ${override.value}（${override.why}）`);
+      const value = literal(tokenPath, override ? override.value : token.$value);
       if (value === null) {
         errors.push(`${collection}/${tokenPath}: 无法表达的裸值 ${JSON.stringify(token.$value)}`);
         continue;
       }
-      rows.push([name, value, tokenPath]);
+      rows.push([name, value, tokenPath, override?.why]);
     }
+  }
+
+  // DS 增补：设计稿没有、但工程上必需的 token。逐条留痕并回报设计侧。
+  for (const [tokenPath, add] of Object.entries(SCALE_ADDITIONS)) {
+    if (!tokenPath.startsWith(`${collection.replace(/^vx-/, "").toLowerCase()}/`)) {
+      const owner = tokenPath.split("/")[0];
+      if (!rows.some(([, , p]) => p.startsWith(`${owner}/`))) continue;
+    }
+    if (rows.some(([, , p]) => p === tokenPath)) continue;
+    added.push(`${tokenPath} = ${add.value}（${add.why}）`);
+    rows.push([derivedName(tokenPath), literal(tokenPath, add.value), tokenPath, add.why]);
   }
   return rows;
 }
@@ -227,37 +310,57 @@ function header(title, source) {
 
 /* ── 生成 ───────────────────────────────────────────────────── */
 
-const outputs = [];
-const stats = [];
+/** route.file → [[selector, rows], …]，按命名空间归集，模式结构随来源集合。 */
+const byRoute = new Map();
+const sources = new Map();
 
 for (const col of COLLECTIONS) {
   const files = readdirSync(path.join(EXPORT_DIR, col.name)).filter((f) => f.endsWith(".json"));
-  let body;
-  let count = 0;
+  const modes = col.modes ?? [[null, ":root"]];
 
-  if (!col.modes) {
-    const rows = buildRows(col.name, files[0]);
-    assertUnique(rows, col.name);
-    count = rows.length;
-    body = `:root {\n${render(rows)}\n}\n`;
-  } else {
-    const blocks = [];
-    for (const [mode, selector] of col.modes) {
-      const file = files.find((f) => f.startsWith(`${mode}.`));
-      if (!file) {
-        errors.push(`${col.name}: 缺少模式文件 ${mode}.tokens.json`);
-        continue;
-      }
-      const rows = buildRows(col.name, file);
-      assertUnique(rows, `${col.name}/${mode}`);
-      count = rows.length;
-      blocks.push(`${selector} {\n${render(rows)}\n}`);
+  for (const [mode, selector] of modes) {
+    const file = mode ? files.find((f) => f.startsWith(`${mode}.`)) : files[0];
+    if (!file) {
+      errors.push(`${col.name}: 缺少模式文件 ${mode}.tokens.json`);
+      continue;
     }
-    body = `${blocks.join("\n\n")}\n`;
-  }
+    const rows = buildRows(col.name, file);
+    assertUnique(rows, mode ? `${col.name}/${mode}` : col.name);
 
-  outputs.push([col.out, header({ file: col.out, label: col.title }, col.name) + "\n" + body]);
-  stats.push(`${col.name} ${count}`);
+    // 按命名空间分流。一个集合可能横跨多个路由（vx-Shape → radius + border）。
+    const grouped = new Map();
+    for (const row of rows) {
+      const route = routeOf(row[2], col.name);
+      if (!grouped.has(route.file)) grouped.set(route.file, []);
+      grouped.get(route.file).push(row);
+    }
+    for (const [file_, group] of grouped) {
+      if (!byRoute.has(file_)) byRoute.set(file_, []);
+      byRoute.get(file_).push([selector, group]);
+      if (!sources.has(file_)) sources.set(file_, new Set());
+      sources.get(file_).add(col.name);
+    }
+  }
+}
+
+const outputs = [];
+const stats = [];
+
+for (const route of ROUTES) {
+  const blocks = byRoute.get(route.file);
+  if (!blocks) continue;
+  const body = blocks.map(([selector, rows]) => `${selector} {\n${render(rows)}\n}`).join("\n\n");
+  const count = blocks[0][1].length;
+  outputs.push([
+    route.file,
+    header(
+      { file: route.file, label: `${route.title}（工具类族 ${route.family}）` },
+      [...sources.get(route.file)].join(" / "),
+    ) +
+      "\n" +
+      `${body}\n`,
+  ]);
+  stats.push(`${route.file.replace("-semantic.css", "")} ${count}`);
 }
 
 if (errors.length > 0) {

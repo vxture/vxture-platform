@@ -1,5 +1,5 @@
 /**
- * semantic/depth-semantic.css - T2 语义层 · 深度。
+ * semantic/shadow-semantic.css - T2 语义层 · 阴影几何（工具类族 shadow-*）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -28,25 +28,4 @@
   --elevation-4-blur: var(--vx-spacing-4);
   --elevation-5-offset-y: var(--vx-spacing-4);
   --elevation-5-blur: var(--vx-spacing-8);
-
-  /* z */
-  --z-base: 0;
-  --z-raised: 10;
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-overlay: 300;
-  --z-modal: 400;
-  --z-popover: 500;
-  --z-toast: 600;
-  --z-tooltip: 700;
-  --z-max: 9999;
-  --z-notification: 600;
-  --z-drawer: 400;
-
-  /* opacity */
-  --opacity-disabled: 0.44999998807907104;
-  --opacity-subtle: 0.6000000238418579;
-  --opacity-muted: 0.75;
-  --opacity-overlay: 0.5;
-  --opacity-full: 1;
 }

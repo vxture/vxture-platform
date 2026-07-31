@@ -24,6 +24,39 @@ export const DEVIATIONS = {
   },
 };
 
+/**
+ * 非色彩刻度的取值偏离（裸值覆盖）。
+ *
+ * `layout/container/{3xl,4xl,5xl}` 在设计稿中同为 1920px——是"兼容 2K/4K"的
+ * 权宜写法，但三档同值等于没有档位，且破坏了 container 与 breakpoint 的一一对应
+ * （sm–2xl 本来是严格相等的）。
+ *
+ * 根因是把两个概念混在了一个刻度里：**视口容器**（应跟随断点）与**可读内容宽度**
+ * （应有上限）。故拆开处理——container 恢复与断点严格对齐，可读上限交给
+ * `layout/content/*`，后者另加 3xl 档承接 2K/4K 的数据密集型页面。
+ */
+export const SCALE_DEVIATIONS = {
+  "layout/container/4xl": { value: 2560, why: "与断点 4xl 对齐（QHD/2K）" },
+  "layout/container/5xl": { value: 3840, why: "与断点 5xl 对齐（UHD/4K）" },
+};
+
+/**
+ * DS 增补的 token（设计稿中不存在）。需回报设计侧补进设计稿。
+ *
+ * `layout/content/*` 是**可读内容宽度上限**，设计稿只给到 wide-2xl（1536px）。
+ * container 恢复与断点一一对应后，2K（2560）/ 4K（3840）视口下内容若仍卡在
+ * 1536px 会显著偏窄，而直接放开到视口宽度又会让行长失控。
+ *
+ * 行业实践的分档：正文类 640–768、应用内容 1280–1536、数据密集型面板至多 1920；
+ * 超过 1920 不再加宽内容，改为加大留白或增加分栏。故补 ultra-3xl = 1920px 收口。
+ */
+export const SCALE_ADDITIONS = {
+  "layout/content/ultra-3xl": {
+    value: 1920,
+    why: "2K/4K 下数据密集型页面的内容宽度上限；再宽则行长失控，应改用分栏",
+  },
+};
+
 /** 所有被偏离过的设计稿 token 路径（跨模式合并）。 */
 export const DEVIATED_PATHS = new Set(
   Object.values(DEVIATIONS).flatMap((byPath) => Object.keys(byPath)),

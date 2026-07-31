@@ -1,5 +1,5 @@
 /**
- * semantic/motion-semantic.css - T2 语义层 · 动效。
+ * semantic/ease-semantic.css - T2 语义层 · 缓动（工具类族 ease-*）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -16,14 +16,9 @@
 
 :root {
   /* motion */
-  --motion-duration-instant: 75ms;
-  --motion-duration-fast: 150ms;
-  --motion-duration-base: 200ms;
-  --motion-duration-slow: 300ms;
-  --motion-duration-slower: 500ms;
-  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
-  --motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
-  --motion-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
-  --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
-  --motion-easing-linear: linear;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+  --ease-linear: linear;
 }

@@ -59,6 +59,42 @@ src/styles/foundation/*.css
 - 不参与 DS 守卫扫描（`check-design-system.mjs` 的 `IGNORED_PARTS`），裸值正是它的本体。
 - 不随包发布：`package.json` 的 `files` 白名单未含该目录。
 
+### 2.2.1 T2 按命名空间分文件
+
+**一个命名空间对应一族工具类，一一对应。** 不按 Figma 集合分文件——集合是设计侧的组织方式，会随设计稿调整而变动，且一个集合常横跨多个工具类族（`vx-Shape` 同时含 radius 与 border-width，`vx-Depth` 同时含 shadow 几何、z-index 与 opacity）。按命名空间分则稳定，且"改这个文件会影响哪族工具类"在文件名上即可见。
+
+| 文件                      | 工具类族                                               | 数量 |
+| ------------------------- | ------------------------------------------------------ | ---- |
+| `color-semantic.css`      | `bg-*` `text-*` `border-*` `ring-*`                    | 117  |
+| `radius-semantic.css`     | `rounded-*`                                            | 8    |
+| `border-semantic.css`     | `border-*`（宽度）                                     | 4    |
+| `shadow-semantic.css`     | `shadow-*`                                             | 12   |
+| `z-index-semantic.css`    | `z-*`                                                  | 12   |
+| `opacity-semantic.css`    | `opacity-*`                                            | 5    |
+| `size-semantic.css`       | `size-*`                                               | 17   |
+| `duration-semantic.css`   | `duration-*`                                           | 5    |
+| `ease-semantic.css`       | `ease-*`                                               | 5    |
+| `breakpoint-semantic.css` | `sm:` `md:` …                                          | 9    |
+| `spacing-semantic.css`    | `gap-*` `p-*` `h-*`（密度三档）                        | 61   |
+| `typography-semantic.css` | `text-*` `font-*` `leading-*` `tracking-*`（字号三档） | 120  |
+| `layout-semantic.css`     | —（DS 特有：页宽/内容宽/侧栏/面板/字段）               | 34   |
+
+### 2.2.2 与 Tailwind 的刻度对齐
+
+设计系统严格对齐 Tailwind，设计稿按 DS 修正。逐项核对结果：
+
+| 命名空间                  | 状态                                                                                                                                      |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 字号 / 字重 / 行高 / 断点 | **完全一致**，零差异                                                                                                                      |
+| spacing                   | 等价（`--vx-spacing-4` = 16px = `p-4`）                                                                                                   |
+| radius                    | 已按取值对齐（见 §3.1.3）                                                                                                                 |
+| 字距                      | 已由 px 改 **em**——本系统有三档字号模式，px 不随字号缩放；换算后与 `--tracking-*` 逐档等值                                                |
+| duration / ease           | 已由 `--motion-duration-*` / `--motion-easing-*` 改为 `--duration-*` / `--ease-*`；Tailwind 内置仅 `ease-in/out/in-out`，与我方曲线名不撞 |
+| container                 | 已改名 `--layout-page-*`。Tailwind 的 `--container-*` 是**通用宽度刻度**（md=448px），我方是**页面最大宽度**（md=768px），同词不同义      |
+| elevation                 | 不可比且合理：我方拆 offset-y/blur/color 三件以便 Figma 阴影面板分字段绑定，Tailwind 是完整 shadow 字符串                                 |
+
+**页宽与内容宽分离**：`layout/container/{3xl,4xl,5xl}` 原本同为 1920px（"兼容 2K/4K"的权宜写法），三档同值等于没有档位，且破坏了 container 与 breakpoint 的一一对应。根因是把**视口容器**（应跟随断点）与**可读内容宽度**（应有上限）混在一个刻度里。现拆开：`--layout-page-*` 与断点严格对齐（…1920 / 2560 / 3840），可读上限归 `--layout-content-*`，并补 `ultra-3xl = 1920px` 承接 2K/4K 的数据密集型页面——再宽则行长失控，应改用分栏。
+
 ### 2.2 文件组织
 
 `src/styles/foundation/` 下按**主语在前、层级在后**命名，与 Figma 集合命名一致：

@@ -1,5 +1,5 @@
 /**
- * semantic/shape-semantic.css - T2 语义层 · 形状。
+ * semantic/border-semantic.css - T2 语义层 · 描边宽度（工具类族 border-*）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -15,16 +15,6 @@
  */
 
 :root {
-  /* radius */
-  --radius-none: var(--vx-spacing-0);
-  --radius-xs: var(--vx-spacing-0-5);
-  --radius-sm: var(--vx-spacing-1);
-  --radius-md: var(--vx-spacing-1-5);
-  --radius-lg: var(--vx-spacing-2);
-  --radius-xl: var(--vx-spacing-3);
-  --radius-2xl: var(--vx-spacing-4);
-  --radius-full: 9999px;
-
   /* border */
   --border-width-none: var(--vx-spacing-0);
   --border-width-thin: var(--vx-spacing-px);

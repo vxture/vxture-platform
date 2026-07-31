@@ -260,7 +260,11 @@ const TYPE_GROUPS = [
   ["size", "字号", (v) => `${v}px`],
   ["weight", "字重", (v) => String(v)],
   ["lineHeight", "行高。导出为百分比×100，此处转为无单位倍数", (v) => String(trim(v / 100))],
-  ["letterSpacing", "字距", (v) => `${trim(v)}px`],
+  // 字距用 em 而非 px：本系统有三档字号模式，px 字距不随字号缩放，大字号下会
+  // 显得偏紧；em 自动跟随。设计稿只能存绝对值（Figma 字距字段限制），但按 16px
+  // 基准换算后与 Tailwind 的 --tracking-* 逐档等值（-0.8px = -0.05em 等），
+  // 说明设计意图本就是这套相对刻度。
+  ["letterSpacing", "字距（em，随字号缩放）", (v) => `${trim(v / 16)}em`],
 ];
 
 function buildTypography() {

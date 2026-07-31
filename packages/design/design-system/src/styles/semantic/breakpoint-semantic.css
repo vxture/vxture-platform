@@ -1,0 +1,28 @@
+/**
+ * semantic/breakpoint-semantic.css - T2 语义层 · 断点（工具类族 sm: / md: / …）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Layout/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* layout */
+  --layout-breakpoint-xs: 375px;
+  --layout-breakpoint-sm: 640px;
+  --layout-breakpoint-md: 768px;
+  --layout-breakpoint-lg: 1024px;
+  --layout-breakpoint-xl: 1280px;
+  --layout-breakpoint-2xl: 1536px;
+  --layout-breakpoint-3xl: 1920px;
+  --layout-breakpoint-4xl: 2560px;
+  --layout-breakpoint-5xl: 3840px;
+}
