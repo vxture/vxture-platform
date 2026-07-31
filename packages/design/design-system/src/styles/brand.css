@@ -7,20 +7,27 @@
  * @date 2026-05-29
  *
  * 这些类只定义产品与子品牌标识的视觉基线，不限定内容结构或业务组合方式。
+ *
+ * 字标字距取 T1 的 `tracking-tight`（-0.025em），与原 `--vx-typography-logo-letter-spacing`
+ * 同值。原变量混在排版层里，会让人以为存在一档名为 logo 的文本角色——字标收紧
+ * 是这一枚标识的视觉修饰，不是可复用的排版角色。
+ *
+ * 原文本三级（primary / secondary / muted）在 T2 只有两级（foreground /
+ * muted-foreground），分隔符与次要名并入同一级。
  */
 
 .vx-brand-lockup {
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  gap: var(--vx-space-sm);
-  color: var(--vx-color-text-primary);
+  gap: var(--space-sm);
+  color: var(--foreground);
   text-decoration: none;
 }
 
 .vx-brand-mark {
-  width: var(--vx-space-xl);
-  height: var(--vx-space-xl);
+  width: var(--space-xl);
+  height: var(--space-xl);
   flex: 0 0 auto;
   display: block;
   object-fit: contain;
@@ -29,23 +36,19 @@
 .vx-brand-name {
   flex: 0 0 auto;
   font-family: var(--font-brand);
-  font-size: var(--vx-typography-heading-3-size);
+  font-size: var(--heading-3-font-size);
   font-weight: 700;
-  line-height: var(--vx-typography-metric-lg-line-height);
-  letter-spacing: var(--vx-typography-logo-letter-spacing);
-  color: var(--vx-color-text-primary);
+  line-height: 1;
+  letter-spacing: var(--vx-tracking-tight);
+  color: var(--foreground);
 }
 
 .vx-brand-local-name,
 .vx-brand-separator {
   flex: 0 0 auto;
   font-family: var(--font-sans);
-  font-size: var(--vx-typography-body-size);
+  font-size: var(--body-md-font-size);
   font-weight: 500;
-  line-height: var(--vx-typography-metric-lg-line-height);
-  color: var(--vx-color-text-secondary);
-}
-
-.vx-brand-separator {
-  color: var(--vx-color-text-muted);
+  line-height: 1;
+  color: var(--muted-foreground);
 }

@@ -1,6 +1,6 @@
 {
   "name": "@vxture/design-system",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Vxture platform — design tokens, UI components, theme, icons",
   "private": false,
   "type": "module",
@@ -38,7 +38,6 @@
     "./styles/shell-template.css": "./assets/shell-template.css",
     "./styles/shell-template-user-panel.css": "./assets/shell-template-user-panel.css",
     "./styles/tokens.css": "./src/styles/tokens.css",
-    "./styles/typography.css": "./src/styles/typography.css",
     "./styles/brands/vxture.css": "./src/styles/brands/vxture.css",
     "./styles/brands/ruyin.css": "./src/styles/brands/ruyin.css"
   },

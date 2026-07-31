@@ -47,7 +47,14 @@ const EXPECTED = [
   ["ease-standard", "缓动"],
   ["md:p-lg", "断点变体"],
   ["dark:bg-card", "暗色变体"],
+  ["text-body-md", "排版角色"],
+  ["text-heading-1", "排版角色"],
+  ["font-brand", "字体族"],
+  ["font-mono", "字体族"],
 ];
+
+/** 排版角色须一次落齐四个属性，只出 font-size 等于注册没生效。 */
+const TEXT_ROLE_PROPS = ["font-size", "line-height", "letter-spacing", "font-weight"];
 
 async function loadStylesheet(id, base) {
   if (id === "tailwindcss") {
@@ -80,4 +87,16 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log(`工具类实测通过（${EXPECTED.length} 个样例全部生成）`);
+// `--text-*` 的修饰子键写错时工具类仍会生成，只是少落几个属性——
+// 只断言类名存在会漏掉这种半哑火，故单独校验属性齐备。
+const roleCss = compiled.build(["text-body-md"]);
+const lacking = TEXT_ROLE_PROPS.filter((p) => !roleCss.includes(`${p}:`));
+if (lacking.length > 0) {
+  console.error(`text-body-md 只落了部分属性，缺：${lacking.join(" / ")}`);
+  console.error("检查 generate-theme.mjs 的 `--text-<role>--<modifier>` 子键拼写。");
+  process.exit(1);
+}
+
+console.log(
+  `工具类实测通过（${EXPECTED.length} 个样例全部生成，排版角色四属性齐备）`,
+);

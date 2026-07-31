@@ -657,7 +657,7 @@ const rules = [
         return violation(
           file,
           lineNumber,
-          "DS 样式叶子的 motion 属性必须使用 var(--vx-*) token 或 none。",
+          "DS 样式叶子的 motion 属性必须由 token 的 var() 引用构成，或为 none。",
           line,
         );
       }
@@ -2204,11 +2204,11 @@ function collectDsStyleExactScalePrefixViolations(sourceFiles, prefix) {
 }
 
 function isDsStyleScaleDebtFile(normalized) {
+  // typography.css 曾在此豁免（手写角色类里满是裸字号）。该文件已退役——24 档角色
+  // 改由 `@theme` 的 `--text-*` 注册产出工具类，不再有手写刻度可豁免。
   return (
     normalized.startsWith(`${DS_ROOT}/src/styles/`) &&
     normalized.endsWith(".css") &&
-    normalized !==
-      normalize("packages/design/design-system/src/styles/typography.css") &&
     !DS_RUNTIME_TOKEN_STYLE_PATTERN.test(normalized)
   );
 }
@@ -2355,18 +2355,28 @@ function isTokenOrNoneShadowValue(value) {
   return !/,\s*(?:-?\d|inset\b|calc\()/u.test(normalized);
 }
 
+/**
+ * motion 值是否只由 token 构成。
+ *
+ * 不再要求 `--vx-` 前缀：T2 的 duration / ease 刻意命名为 `--duration-*` /
+ * `--ease-*`，因为这两族在 `@theme` 里要自注册产出 duration-fast / ease-standard
+ * 工具类，带前缀就产不出。判据改为「除 var() 引用外不得出现字面时长或曲线」，
+ * 这才是规则真正要挡的东西。
+ */
 function isTokenOrNoneMotionValue(value) {
   const normalized = (value ?? "").trim();
   if (!normalized) return true;
-  const isNone = normalized === "none" || normalized.startsWith("none ");
-  if (isNone) return true;
-  if (
-    normalized.startsWith("var(") &&
-    !/,\s*(?:\d|[a-z-]+\s+\d|cubic-bezier\()/u.test(normalized)
-  )
-    return true;
-  if (/^[\w-]+\s+var\(--vx-[^)]+\)(?:\s+\w+)?$/.test(normalized)) return true;
-  return false;
+  if (normalized === "none" || normalized.startsWith("none ")) return true;
+
+  // 字面时长与曲线函数：连 var() 的回退值里也不允许，故在剥离前先查。
+  if (/\d+(?:\.\d+)?m?s\b/.test(normalized)) return false;
+  if (/cubic-bezier\(|steps\(/.test(normalized)) return false;
+
+  const withoutVars = normalized.replace(/var\((?:[^()]|\([^()]*\))*\)/g, " ");
+  // 剥掉 var() 后只应剩属性名、空白与分段逗号；缓动关键字属字面值。
+  if (/\b(?:ease|ease-in|ease-out|ease-in-out|linear|step-start|step-end)\b/.test(withoutVars))
+    return false;
+  return /^[\w\s,-]*$/.test(withoutVars);
 }
 
 function isGeneratedOrAsset(file) {

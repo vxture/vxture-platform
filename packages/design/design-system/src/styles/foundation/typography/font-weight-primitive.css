@@ -16,9 +16,13 @@
 
 :root {
   /* 字重。 */
+  --vx-font-weight-thin: 100;
+  --vx-font-weight-extralight: 200;
+  --vx-font-weight-light: 300;
   --vx-font-weight-normal: 400;
   --vx-font-weight-medium: 500;
   --vx-font-weight-semibold: 600;
   --vx-font-weight-bold: 700;
   --vx-font-weight-extrabold: 800;
+  --vx-font-weight-black: 900;
 }

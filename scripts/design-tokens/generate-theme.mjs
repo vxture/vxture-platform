@@ -53,6 +53,33 @@ const NAMESPACES = [
   { file: "breakpoint-semantic.css", ns: "--breakpoint-", note: "sm: / md: / …", strip: /^--layout-breakpoint-/ },
 ];
 
+/**
+ * 字体族：T1 的字体栈 → `--font-*`，产出 font-sans / font-brand / font-cjk / font-mono。
+ *
+ * 注册的是 `--vx-font-stack-*`（完整回退链）而非 `--vx-font-family-*`（单个族名），
+ * 工具类要能直接落到 font-family 上。
+ */
+const FONT_STACKS = ["sans", "brand", "cjk", "mono"];
+
+/**
+ * 排版角色：T2 的 24 档 → `--text-*`。
+ *
+ * v4 的 `--text-*` 支持 `--text-<name>--line-height` 这类修饰子键，一个 `text-body-md`
+ * 工具类即同时落 font-size / line-height / letter-spacing / font-weight，
+ * 这正是 v4 为排版角色准备的机制。
+ *
+ * 注册后即可删除手写的 `.text-heading-1` / `.font-brand` 之类类名——它们与生成的
+ * 同名工具类互相遮蔽，且手写版不跟随字号三档模式轴。
+ *
+ * font-family 不在 v4 的修饰子键之列（只有上述三个），故角色的字体族仍由
+ * 独立的 `font-*` 工具类承担。
+ */
+const TEXT_MODIFIERS = [
+  ["line-height", "line-height"],
+  ["letter-spacing", "letter-spacing"],
+  ["font-weight", "font-weight"],
+];
+
 /** 取某文件在首个规则块内声明的变量名（模式块重复声明，取一份即可）。 */
 function declaredVars(file) {
   const css = readFileSync(path.join(SEMANTIC, file), "utf8");
@@ -79,6 +106,30 @@ for (const entry of NAMESPACES) {
   blocks.push(`  /* ${entry.note} */\n${lines.join("\n")}`);
   stats.push(`${entry.file.replace("-semantic.css", "")} ${lines.length}`);
 }
+
+// 字体族
+const fontLines = FONT_STACKS.map((n) => `  --font-${n}: var(--vx-font-stack-${n});`);
+blocks.push(`  /* font-sans / font-brand / font-cjk / font-mono */\n${fontLines.join("\n")}`);
+stats.push(`font ${fontLines.length}`);
+
+// 排版角色：由 T2 声明的 `--<role>-font-size` 反推角色名，避免另立一份角色清单。
+const typoVars = declaredVars("typography-semantic.css");
+const roles = typoVars
+  .filter((n) => n.endsWith("-font-size"))
+  .map((n) => n.slice(2, -"-font-size".length));
+if (roles.length === 0) throw new Error("未从 T2 解析出任何排版角色，中止");
+
+const textLines = [];
+for (const role of roles) {
+  textLines.push(`  --text-${role}: var(--${role}-font-size);`);
+  for (const [suffix, prop] of TEXT_MODIFIERS) {
+    if (typoVars.includes(`--${role}-${prop}`)) {
+      textLines.push(`  --text-${role}--${suffix}: var(--${role}-${prop});`);
+    }
+  }
+}
+blocks.push(`  /* text-*（24 档角色，含行高 / 字距 / 字重修饰） */\n${textLines.join("\n")}`);
+stats.push(`text ${roles.length} 档`);
 
 const css = `/**
  * theme.css - T2 → Tailwind v4 @theme 注册。

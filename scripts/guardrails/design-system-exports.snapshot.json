@@ -27,7 +27,6 @@
       "./styles/shell-template-user-panel.css": "./assets/shell-template-user-panel.css",
       "./styles/shell-template.css": "./assets/shell-template.css",
       "./styles/tokens.css": "./src/styles/tokens.css",
-      "./styles/typography.css": "./src/styles/typography.css",
       "./tokens": {
         "import": "./dist/tokens.mjs",
         "require": "./dist/tokens.cjs",

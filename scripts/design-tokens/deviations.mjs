@@ -74,6 +74,21 @@ export const SCALE_ADDITIONS = {
   },
 };
 
+/**
+ * T1 原子层增补：设计稿导出缺档、但 DS 判定必须存在的原子值。
+ *
+ * 与 `SCALE_ADDITIONS`（T2）分开，因为 T1 是裸值、T2 是引用，两者形状不同。
+ *
+ * ⚠ 缺档**必须补在这里**，不能直接改 `foundation/` 下的文件——那些是生成物，
+ *   手改会被下一次生成静默覆盖。字重四档就是这么丢过一次的。
+ */
+export const PRIMITIVE_ADDITIONS = {
+  "font/weight/thin": { value: 100, why: "补齐 Tailwind 字重九档" },
+  "font/weight/extralight": { value: 200, why: "补齐 Tailwind 字重九档" },
+  "font/weight/light": { value: 300, why: "补齐 Tailwind 字重九档" },
+  "font/weight/black": { value: 900, why: "补齐 Tailwind 字重九档" },
+};
+
 /** 所有被偏离过的设计稿 token 路径（跨模式合并）。 */
 export const DEVIATED_PATHS = new Set(
   Object.values(DEVIATIONS).flatMap((byPath) => Object.keys(byPath)),

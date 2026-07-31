@@ -19,6 +19,8 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
+import { PRIMITIVE_ADDITIONS } from "./deviations.mjs";
+
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
@@ -272,17 +274,31 @@ const TYPE_GROUPS = [
   ["letterSpacing", "字距（em，随字号缩放）", (v) => `${trim(v / 16)}em`, "tracking-primitive.css", "tracking", "tracking-*"],
 ];
 
+const addedPaths = [];
+
 function buildTypography() {
   const all = flatten(loadCollection("vx-Typography-Primitive")).filter(([p]) =>
     p.startsWith("font/"),
   );
 
+  for (const [tokenPath, { value }] of Object.entries(PRIMITIVE_ADDITIONS)) {
+    if (all.some(([p]) => p === tokenPath)) continue; // 设计稿补上后自动让位
+    all.push([tokenPath, value]);
+    addedPaths.push(tokenPath);
+  }
+
   /** file → { title, family, blocks[], count } */
   const files = new Map();
   for (const [group, note, format, file, prefix, family] of TYPE_GROUPS) {
-    const rows = all
-      .filter(([p]) => p.startsWith(`font/${group}/`))
-      .map(([p, v]) => `  --vx-${prefix}-${p.split("/").pop()}: ${format(v)};`);
+    const picked = all.filter(([p]) => p.startsWith(`font/${group}/`));
+    // 数值族按值排序，使补录档位落在阶梯正确位置而非追加在末尾；
+    // 字族 / 字体栈是字符串，保持设计稿顺序。
+    if (picked.length > 0 && picked.every(([, v]) => typeof v === "number")) {
+      picked.sort((a, b) => a[1] - b[1]);
+    }
+    const rows = picked.map(
+      ([p, v]) => `  --vx-${prefix}-${p.split("/").pop()}: ${format(v)};`,
+    );
     if (rows.length === 0) continue;
     if (!files.has(file)) files.set(file, { family, blocks: [], count: 0 });
     const entry = files.get(file);
@@ -342,4 +358,9 @@ if (CHECK) {
   console.log(
     `断言通过：回收本体值 ${color.recoveredCount} 项（均有引用佐证）；被引用原子 ${color.referencedCount} 项全部覆盖。`,
   );
+  if (addedPaths.length > 0) {
+    console.log(
+      `⚠ 设计稿缺档，已由 DS 补齐（需回报设计侧补进设计稿）：${addedPaths.join(", ")}`,
+    );
+  }
 }
