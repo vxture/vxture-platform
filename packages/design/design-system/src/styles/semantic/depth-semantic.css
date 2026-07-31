@@ -1,0 +1,52 @@
+/**
+ * semantic/depth-semantic.css - T2 语义层 · 深度。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Depth/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* elevation */
+  --elevation-0-offset-y: var(--vx-spacing-0);
+  --elevation-0-blur: var(--vx-spacing-0);
+  --elevation-1-offset-y: var(--vx-spacing-px);
+  --elevation-1-blur: var(--vx-spacing-0-5);
+  --elevation-2-offset-y: var(--vx-spacing-0-5);
+  --elevation-2-blur: var(--vx-spacing-1);
+  --elevation-3-offset-y: var(--vx-spacing-1);
+  --elevation-3-blur: var(--vx-spacing-2);
+  --elevation-4-offset-y: var(--vx-spacing-2);
+  --elevation-4-blur: var(--vx-spacing-4);
+  --elevation-5-offset-y: var(--vx-spacing-4);
+  --elevation-5-blur: var(--vx-spacing-8);
+
+  /* z */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+  --z-max: 9999;
+  --z-notification: 600;
+  --z-drawer: 400;
+
+  /* opacity */
+  --opacity-disabled: 0.44999998807907104;
+  --opacity-subtle: 0.6000000238418579;
+  --opacity-muted: 0.75;
+  --opacity-overlay: 0.5;
+  --opacity-full: 1;
+}

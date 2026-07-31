@@ -1,0 +1,29 @@
+/**
+ * semantic/motion-semantic.css - T2 语义层 · 动效。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Motion/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* motion */
+  --motion-duration-instant: 75ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 200ms;
+  --motion-duration-slow: 300ms;
+  --motion-duration-slower: 500ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  --motion-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+  --motion-easing-linear: linear;
+}

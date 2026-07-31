@@ -11,6 +11,13 @@
 @import "./foundation/spacing-primitive.css";
 @import "./foundation/typography-primitive.css";
 @import "./semantic/color-semantic.css";
+@import "./semantic/shape-semantic.css";
+@import "./semantic/depth-semantic.css";
+@import "./semantic/element-semantic.css";
+@import "./semantic/motion-semantic.css";
+@import "./semantic/layout-semantic.css";
+@import "./semantic/space-semantic.css";
+@import "./semantic/typography-semantic.css";
 @import "./tokens-theme.css";
 @import "./tokens-colors-primitives.css";
 @import "./tokens-gradients.css";

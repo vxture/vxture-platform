@@ -1,17 +1,5 @@
-# Design Token 构建规范
-
-版本：1.0.0
-日期：2026-07-31
-范围：`@vxture/design-system` 的 T1–T3 token、Figma DTCG 导出、`scripts/design-tokens/*` 生成器
-
-本文定义 token 从设计到代码的**唯一构建路径**与权威边界。层级定义见 `060-design-system.md` §1.1，发布影响见 `050-design-system-release.md`。
-
-## 1. 权威边界
-
-**`@vxture/design-system` 的 token 产出即唯一真值源。** 其余一切都是应用方——**Figma 也是应用方**，它最终要应用本包的 token 来做产品设计。
-
-| 角色                                            | 定位                                     | 是否权威            |
-| ----------------------------------------------- | ---------------------------------------- | ------------------- |
+| `semantic/motion-semantic.css`                  | **已迁入**                               |                     | **已迁入** |     | **已迁入** |     | **已迁入** |     | **已迁入** |     | 角色 | 定位 | 是否权威 |
+| ----------------------------------------------- | ---------------------------------------- | ------------------- | ---------- | --- | ---------- | --- | ---------- | --- | ---------- | --- | ---- | ---- | -------- |
 | `src/styles/foundation\|semantic\|components/*` | **DS token 真值源**                      | **是**              |
 | `src/tokens/*.ts`                               | 真值源的 TS 投影                         | 否（由 CSS 层决定） |
 | Figma 文件                                      | **应用方**：用 DS token 做视觉推演与设计 | 否                  |
@@ -119,6 +107,14 @@ DS 是真值源，设计稿只是输入且已证实会出错，因此**必须允
 | `--card`       | neutral-50  | white       |
 | `--surface-3`  | neutral-100 | neutral-50  |
 
+### 3.2.1 非色彩集合的命名由 DS 定义
+
+`vx-Shape / vx-Depth / vx-Element / vx-Motion / vx-Layout / vx-Space / vx-Typography` 共 292 个 token，其 `codeSyntax` **38% 不可用**：50 个缺失，62 个分属 22 组撞名（如 `inset/2xl`–`inset/6xl` 五档全部声明为 `--inset-2xl`，`vx-Typography` 有 12 组）。该字段已不足以充当这些集合的命名权威。
+
+因此这些集合的变量名**一律由 DS 按 token 路径机械推导**（`control/height/md` → `--control-height-md`），唯一性由路径本身保证。`codeSyntax` 降为参考，生成时逐条列出与 DS 命名不符之处（当前 142 项）与缺失项（50 项），供回报设计侧修正。
+
+`vx-Color` 不适用本条——其 `codeSyntax` 除 §3.1.1 的前缀问题外无撞名，仍作命名权威。
+
 ### 3.2 命名映射
 
 Figma 路径 → CSS 变量名，规则确定且不可自由发挥：
@@ -204,19 +200,19 @@ Figma MCP 的页面枚举会漏列页面，且 `search_design_system` 只返回�
 
 `Figma-Token/` 是过程文件，**全部集合迁入 `src/styles/` 后即可删除**。当前状态：
 
-| 集合                                      | 层  | 去向                          | 状态       |
-| ----------------------------------------- | --- | ----------------------------- | ---------- |
-| `vx-Color-Primitive`                      | T1  | `color-primitive.css`         | **已迁入** |
-| `vx-Spacing-Primitive`                    | T1  | `spacing-primitive.css`       | **已迁入** |
-| `vx-Typography-Primitive`                 | T1  | `typography-primitive.css`    | **已迁入** |
-| `vx-Color`（Light / Dark）                | T2  | `semantic/color-semantic.css` | **已迁入** |
-| `vx-Shape`                                | T2  | `semantic/shape-*.css`        | 待迁       |
-| `vx-Depth`                                | T2  | `semantic/depth-*.css`        | 待迁       |
-| `vx-Space`（Compact/Default/Comfortable） | T2  | `semantic/space-*.css`        | 待迁       |
-| `vx-Typography`（Small/Default/Large）    | T2  | `semantic/typography-*.css`   | 待迁       |
-| `vx-Element`                              | T2  | `semantic/element-*.css`      | 待迁       |
-| `vx-Layout`                               | T2  | `semantic/layout-*.css`       | 待迁       |
-| `vx-Motion`                               | T2  | `semantic/motion-*.css`       | 待迁       |
-| `vx-Component`                            | T3  | `components/*.css`            | 待迁       |
+| 集合                                      | 层  | 去向                               | 状态       |
+| ----------------------------------------- | --- | ---------------------------------- | ---------- |
+| `vx-Color-Primitive`                      | T1  | `color-primitive.css`              | **已迁入** |
+| `vx-Spacing-Primitive`                    | T1  | `spacing-primitive.css`            | **已迁入** |
+| `vx-Typography-Primitive`                 | T1  | `typography-primitive.css`         | **已迁入** |
+| `vx-Color`（Light / Dark）                | T2  | `semantic/color-semantic.css`      | **已迁入** |
+| `vx-Shape`                                | T2  | `semantic/shape-semantic.css`      | **已迁入** |
+| `vx-Depth`                                | T2  | `semantic/depth-semantic.css`      | **已迁入** |
+| `vx-Space`（Compact/Default/Comfortable） | T2  | `semantic/space-semantic.css`      | **已迁入** |
+| `vx-Typography`（Small/Default/Large）    | T2  | `semantic/typography-semantic.css` | **已迁入** |
+| `vx-Element`                              | T2  | `semantic/element-semantic.css`    | **已迁入** |
+| `vx-Layout`                               | T2  | `semantic/layout-semantic.css`     | **已迁入** |
+| `vx-Motion`                               | T2  | `semantic/motion-semantic.css`     | **已迁入** |
+| `vx-Component`                            | T3  | `components/*.css`                 | 待迁       |
 
-**4 / 12 已迁。** 剩余 8 个集合迁完后，按 §1.1 的四步退役过程文件。
+**11 / 12 已迁。** 仅剩 `vx-Component`（T3，Phase 3）；迁完后按 §1.1 的四步退役过程文件。

@@ -1,0 +1,34 @@
+/**
+ * semantic/shape-semantic.css - T2 语义层 · 形状。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Shape/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  /* radius */
+  --radius-none: var(--vx-spacing-0);
+  --radius-2xs: var(--vx-spacing-0-5);
+  --radius-xs: var(--vx-spacing-1);
+  --radius-sm: var(--vx-spacing-1-5);
+  --radius-md: var(--vx-spacing-2);
+  --radius-lg: var(--vx-spacing-3);
+  --radius-xl: var(--vx-spacing-4);
+  --radius-2xl: var(--vx-spacing-5);
+  --radius-full: 9999px;
+
+  /* border */
+  --border-width-none: var(--vx-spacing-0);
+  --border-width-thin: var(--vx-spacing-px);
+  --border-width-medium: var(--vx-spacing-0-5);
+  --border-width-thick: var(--vx-spacing-1);
+}

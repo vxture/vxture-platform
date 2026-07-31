@@ -1,0 +1,240 @@
+/**
+ * semantic/space-semantic.css - T2 语义层 · 间距（密度三档）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Space/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+.density-compact {
+  /* inset */
+  --inset-none: var(--vx-spacing-0);
+  --inset-2xs: var(--vx-spacing-0-5);
+  --inset-xs: var(--vx-spacing-1);
+  --inset-sm: var(--vx-spacing-1-5);
+  --inset-md: var(--vx-spacing-2);
+  --inset-lg: var(--vx-spacing-3);
+  --inset-xl: var(--vx-spacing-4);
+  --inset-2xl: var(--vx-spacing-6);
+  --inset-3xl: var(--vx-spacing-8);
+  --inset-4xl: var(--vx-spacing-10);
+  --inset-5xl: var(--vx-spacing-12);
+  --inset-6xl: var(--vx-spacing-14);
+
+  /* gap */
+  --gap-2xs: var(--vx-spacing-0-5);
+  --gap-xs: var(--vx-spacing-1);
+  --gap-sm: var(--vx-spacing-1-5);
+  --gap-md: var(--vx-spacing-2);
+  --gap-lg: var(--vx-spacing-3);
+  --gap-xl: var(--vx-spacing-4);
+  --gap-2xl: var(--vx-spacing-6);
+  --gap-3xl: var(--vx-spacing-8);
+  --gap-4xl: var(--vx-spacing-12);
+  --gap-5xl: var(--vx-spacing-14);
+  --gap-6xl: var(--vx-spacing-16);
+
+  /* row */
+  --row-height-sm: var(--vx-spacing-8);
+  --row-height-md: var(--vx-spacing-10);
+  --row-height-lg: var(--vx-spacing-12);
+  --row-height-xl: var(--vx-spacing-14);
+  --row-height-2xl: var(--vx-spacing-16);
+  --row-height-3xl: var(--vx-spacing-20);
+  --row-height-4xl: var(--vx-spacing-24);
+
+  /* control */
+  --control-height-3xs: var(--vx-spacing-3);
+  --control-height-2xs: var(--vx-spacing-4);
+  --control-height-xs: var(--vx-spacing-5);
+  --control-height-sm: var(--vx-spacing-6);
+  --control-height-md: var(--vx-spacing-7);
+  --control-height-lg: var(--vx-spacing-8);
+  --control-height-xl: var(--vx-spacing-9);
+  --control-height-2xl: var(--vx-spacing-10);
+  --control-height-3xl: var(--vx-spacing-12);
+  --control-inset-x-xs: var(--vx-spacing-1);
+  --control-inset-x-sm: var(--vx-spacing-1-5);
+  --control-inset-x-md: var(--vx-spacing-2);
+  --control-inset-x-lg: var(--vx-spacing-3);
+  --control-inset-x-xl: var(--vx-spacing-4);
+  --control-inset-y-xs: var(--vx-spacing-0-5);
+  --control-inset-y-sm: var(--vx-spacing-1);
+  --control-inset-y-md: var(--vx-spacing-1-5);
+  --control-inset-y-lg: var(--vx-spacing-2);
+  --control-inset-y-xl: var(--vx-spacing-2-5);
+  --control-gap-xs: var(--vx-spacing-0-5);
+  --control-gap-sm: var(--vx-spacing-1);
+  --control-gap-md: var(--vx-spacing-1-5);
+  --control-gap-lg: var(--vx-spacing-2);
+  --control-gap-xl: var(--vx-spacing-2-5);
+
+  /* section */
+  --section-gap-sm: var(--vx-spacing-4);
+  --section-gap-md: var(--vx-spacing-6);
+  --section-gap-lg: var(--vx-spacing-8);
+  --section-gap-xl: var(--vx-spacing-12);
+
+  /* container */
+  --container-inset-sm: var(--vx-spacing-3);
+  --container-inset-md: var(--vx-spacing-4);
+  --container-inset-lg: var(--vx-spacing-6);
+}
+
+:root, .density-default {
+  /* inset */
+  --inset-none: var(--vx-spacing-0);
+  --inset-2xs: var(--vx-spacing-1);
+  --inset-xs: var(--vx-spacing-1-5);
+  --inset-sm: var(--vx-spacing-2);
+  --inset-md: var(--vx-spacing-3);
+  --inset-lg: var(--vx-spacing-4);
+  --inset-xl: var(--vx-spacing-6);
+  --inset-2xl: var(--vx-spacing-8);
+  --inset-3xl: var(--vx-spacing-10);
+  --inset-4xl: var(--vx-spacing-12);
+  --inset-5xl: var(--vx-spacing-14);
+  --inset-6xl: var(--vx-spacing-16);
+
+  /* gap */
+  --gap-2xs: var(--vx-spacing-0-5);
+  --gap-xs: var(--vx-spacing-1);
+  --gap-sm: var(--vx-spacing-2);
+  --gap-md: var(--vx-spacing-3);
+  --gap-lg: var(--vx-spacing-4);
+  --gap-xl: var(--vx-spacing-6);
+  --gap-2xl: var(--vx-spacing-8);
+  --gap-3xl: var(--vx-spacing-10);
+  --gap-4xl: var(--vx-spacing-14);
+  --gap-5xl: var(--vx-spacing-16);
+  --gap-6xl: var(--vx-spacing-20);
+
+  /* row */
+  --row-height-sm: var(--vx-spacing-10);
+  --row-height-md: var(--vx-spacing-12);
+  --row-height-lg: var(--vx-spacing-14);
+  --row-height-xl: var(--vx-spacing-16);
+  --row-height-2xl: var(--vx-spacing-20);
+  --row-height-3xl: var(--vx-spacing-24);
+  --row-height-4xl: var(--vx-spacing-28);
+
+  /* control */
+  --control-height-3xs: var(--vx-spacing-4);
+  --control-height-2xs: var(--vx-spacing-5);
+  --control-height-xs: var(--vx-spacing-6);
+  --control-height-sm: var(--vx-spacing-7);
+  --control-height-md: var(--vx-spacing-8);
+  --control-height-lg: var(--vx-spacing-9);
+  --control-height-xl: var(--vx-spacing-10);
+  --control-height-2xl: var(--vx-spacing-12);
+  --control-height-3xl: var(--vx-spacing-14);
+  --control-inset-x-xs: var(--vx-spacing-1-5);
+  --control-inset-x-sm: var(--vx-spacing-2);
+  --control-inset-x-md: var(--vx-spacing-3);
+  --control-inset-x-lg: var(--vx-spacing-4);
+  --control-inset-x-xl: var(--vx-spacing-5);
+  --control-inset-y-xs: var(--vx-spacing-1);
+  --control-inset-y-sm: var(--vx-spacing-1-5);
+  --control-inset-y-md: var(--vx-spacing-2);
+  --control-inset-y-lg: var(--vx-spacing-2-5);
+  --control-inset-y-xl: var(--vx-spacing-3);
+  --control-gap-xs: var(--vx-spacing-1);
+  --control-gap-sm: var(--vx-spacing-1-5);
+  --control-gap-md: var(--vx-spacing-2);
+  --control-gap-lg: var(--vx-spacing-2-5);
+  --control-gap-xl: var(--vx-spacing-3);
+
+  /* section */
+  --section-gap-sm: var(--vx-spacing-6);
+  --section-gap-md: var(--vx-spacing-8);
+  --section-gap-lg: var(--vx-spacing-12);
+  --section-gap-xl: var(--vx-spacing-16);
+
+  /* container */
+  --container-inset-sm: var(--vx-spacing-4);
+  --container-inset-md: var(--vx-spacing-6);
+  --container-inset-lg: var(--vx-spacing-8);
+}
+
+.density-comfortable {
+  /* inset */
+  --inset-none: var(--vx-spacing-0);
+  --inset-2xs: var(--vx-spacing-1);
+  --inset-xs: var(--vx-spacing-2);
+  --inset-sm: var(--vx-spacing-2-5);
+  --inset-md: var(--vx-spacing-4);
+  --inset-lg: var(--vx-spacing-6);
+  --inset-xl: var(--vx-spacing-8);
+  --inset-2xl: var(--vx-spacing-10);
+  --inset-3xl: var(--vx-spacing-12);
+  --inset-4xl: var(--vx-spacing-14);
+  --inset-5xl: var(--vx-spacing-16);
+  --inset-6xl: var(--vx-spacing-20);
+
+  /* gap */
+  --gap-2xs: var(--vx-spacing-1);
+  --gap-xs: var(--vx-spacing-1-5);
+  --gap-sm: var(--vx-spacing-2-5);
+  --gap-md: var(--vx-spacing-4);
+  --gap-lg: var(--vx-spacing-5);
+  --gap-xl: var(--vx-spacing-8);
+  --gap-2xl: var(--vx-spacing-10);
+  --gap-3xl: var(--vx-spacing-12);
+  --gap-4xl: var(--vx-spacing-16);
+  --gap-5xl: var(--vx-spacing-20);
+  --gap-6xl: var(--vx-spacing-24);
+
+  /* row */
+  --row-height-sm: var(--vx-spacing-12);
+  --row-height-md: var(--vx-spacing-14);
+  --row-height-lg: var(--vx-spacing-16);
+  --row-height-xl: var(--vx-spacing-20);
+  --row-height-2xl: var(--vx-spacing-24);
+  --row-height-3xl: var(--vx-spacing-28);
+  --row-height-4xl: var(--vx-spacing-32);
+
+  /* control */
+  --control-height-3xs: var(--vx-spacing-5);
+  --control-height-2xs: var(--vx-spacing-6);
+  --control-height-xs: var(--vx-spacing-7);
+  --control-height-sm: var(--vx-spacing-8);
+  --control-height-md: var(--vx-spacing-9);
+  --control-height-lg: var(--vx-spacing-10);
+  --control-height-xl: var(--vx-spacing-11);
+  --control-height-2xl: var(--vx-spacing-14);
+  --control-height-3xl: var(--vx-spacing-16);
+  --control-inset-x-xs: var(--vx-spacing-2);
+  --control-inset-x-sm: var(--vx-spacing-2-5);
+  --control-inset-x-md: var(--vx-spacing-3);
+  --control-inset-x-lg: var(--vx-spacing-4);
+  --control-inset-x-xl: var(--vx-spacing-6);
+  --control-inset-y-xs: var(--vx-spacing-1);
+  --control-inset-y-sm: var(--vx-spacing-2);
+  --control-inset-y-md: var(--vx-spacing-2-5);
+  --control-inset-y-lg: var(--vx-spacing-3);
+  --control-inset-y-xl: var(--vx-spacing-3-5);
+  --control-gap-xs: var(--vx-spacing-1-5);
+  --control-gap-sm: var(--vx-spacing-2);
+  --control-gap-md: var(--vx-spacing-2-5);
+  --control-gap-lg: var(--vx-spacing-3);
+  --control-gap-xl: var(--vx-spacing-3-5);
+
+  /* section */
+  --section-gap-sm: var(--vx-spacing-8);
+  --section-gap-md: var(--vx-spacing-12);
+  --section-gap-lg: var(--vx-spacing-16);
+  --section-gap-xl: var(--vx-spacing-20);
+
+  /* container */
+  --container-inset-sm: var(--vx-spacing-6);
+  --container-inset-md: var(--vx-spacing-8);
+  --container-inset-lg: var(--vx-spacing-12);
+}
