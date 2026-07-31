@@ -16,9 +16,9 @@
 
 :root {
   /* motion */
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
-  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
-  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
-  --ease-linear: linear;
+  --ease-standard: var(--vx-ease-standard);
+  --ease-decelerate: var(--vx-ease-decelerate);
+  --ease-accelerate: var(--vx-ease-accelerate);
+  --ease-emphasized: var(--vx-ease-emphasized);
+  --ease-linear: var(--vx-ease-linear);
 }

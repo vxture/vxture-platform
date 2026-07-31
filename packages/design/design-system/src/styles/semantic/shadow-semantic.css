@@ -16,16 +16,16 @@
 
 :root {
   /* elevation */
-  --elevation-0-offset-y: var(--vx-spacing-0);
-  --elevation-0-blur: var(--vx-spacing-0);
-  --elevation-1-offset-y: var(--vx-spacing-px);
-  --elevation-1-blur: var(--vx-spacing-0-5);
-  --elevation-2-offset-y: var(--vx-spacing-0-5);
-  --elevation-2-blur: var(--vx-spacing-1);
-  --elevation-3-offset-y: var(--vx-spacing-1);
-  --elevation-3-blur: var(--vx-spacing-2);
-  --elevation-4-offset-y: var(--vx-spacing-2);
-  --elevation-4-blur: var(--vx-spacing-4);
-  --elevation-5-offset-y: var(--vx-spacing-4);
-  --elevation-5-blur: var(--vx-spacing-8);
+  --elevation-0-offset-y: var(--vx-shadow-0-offset-y);
+  --elevation-0-blur: var(--vx-shadow-0-blur);
+  --elevation-1-offset-y: var(--vx-shadow-1-offset-y);
+  --elevation-1-blur: var(--vx-shadow-1-blur);
+  --elevation-2-offset-y: var(--vx-shadow-2-offset-y);
+  --elevation-2-blur: var(--vx-shadow-2-blur);
+  --elevation-3-offset-y: var(--vx-shadow-3-offset-y);
+  --elevation-3-blur: var(--vx-shadow-3-blur);
+  --elevation-4-offset-y: var(--vx-shadow-4-offset-y);
+  --elevation-4-blur: var(--vx-shadow-4-blur);
+  --elevation-5-offset-y: var(--vx-shadow-5-offset-y);
+  --elevation-5-blur: var(--vx-shadow-5-blur);
 }

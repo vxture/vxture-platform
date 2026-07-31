@@ -1,0 +1,30 @@
+/**
+ * semantic/shadow-primitive.css - T2 语义层 · 阴影几何（T1 原子刻度）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Depth/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  --vx-shadow-0-offset-y: var(--vx-spacing-0);
+  --vx-shadow-0-blur: var(--vx-spacing-0);
+  --vx-shadow-1-offset-y: var(--vx-spacing-px);
+  --vx-shadow-1-blur: var(--vx-spacing-0-5);
+  --vx-shadow-2-offset-y: var(--vx-spacing-0-5);
+  --vx-shadow-2-blur: var(--vx-spacing-1);
+  --vx-shadow-3-offset-y: var(--vx-spacing-1);
+  --vx-shadow-3-blur: var(--vx-spacing-2);
+  --vx-shadow-4-offset-y: var(--vx-spacing-2);
+  --vx-shadow-4-blur: var(--vx-spacing-4);
+  --vx-shadow-5-offset-y: var(--vx-spacing-4);
+  --vx-shadow-5-blur: var(--vx-spacing-8);
+}

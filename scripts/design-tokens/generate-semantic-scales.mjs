@@ -123,6 +123,52 @@ function routeOf(tokenPath, collection) {
   return ROUTES.find((r) => r.test(tokenPath));
 }
 
+/**
+ * 需要拆出 T1 原子刻度的命名空间。
+ *
+ * 这五组本质是**无意义的值刻度**（`--radius-md: 6px` 只是阶梯上的一格），
+ * 与 color / spacing / typography 同级，本就该在 T1；此前全挂在 T2，
+ * 导致 T1 只剩三类、而 T2 里刻度与语义混杂，分层边界不清。
+ *
+ * 拆分后：T1 持有取值，T2 只持有组件消费的名字并引用 T1。这样
+ * 「T3/T4 只接触 T2」的规则得以保持，且将来若要在某个命名空间上加语义
+ * 中间层（如 shadcn 的 --radius 总旋钮），有现成的位置。
+ */
+const PRIMITIVE_NAMESPACES = {
+  "radius-semantic.css": { file: "radius-primitive.css", prefix: "--vx-radius", title: "圆角" },
+  "border-semantic.css": {
+    file: "border-width-primitive.css",
+    prefix: "--vx-border-width",
+    title: "描边宽度",
+  },
+  "shadow-semantic.css": { file: "shadow-primitive.css", prefix: "--vx-shadow", title: "阴影几何" },
+  "opacity-semantic.css": { file: "opacity-primitive.css", prefix: "--vx-opacity", title: "透明度" },
+  "breakpoint-semantic.css": {
+    file: "breakpoint-primitive.css",
+    prefix: "--vx-breakpoint",
+    title: "断点",
+  },
+  // 以下三组不在最初拟定的清单里，但按同一判据（无意义的值刻度）同样属 T1。
+  // 若只拆前五组，T2 仍残留三条刻度，分层边界依旧是糊的。
+  "duration-semantic.css": { file: "duration-primitive.css", prefix: "--vx-duration", title: "时长" },
+  "ease-semantic.css": { file: "ease-primitive.css", prefix: "--vx-ease", title: "缓动曲线" },
+  "size-semantic.css": { file: "size-primitive.css", prefix: "--vx-size", title: "图标与媒体尺寸" },
+};
+
+/** T2 变量名 → T1 阶梯名。opacity 特殊：用数值作阶名，与 Tailwind 的 0~100 刻度同构。 */
+function primitiveStep(t2Name, value, prefix) {
+  if (prefix === "--vx-opacity") {
+    const n = Math.round(Number(value) * 100);
+    return `${prefix}-${n}`;
+  }
+  const stripped = t2Name
+    .replace(/^--(layout-)?/, "")
+    .replace(/^(radius|border-width|elevation|opacity|breakpoint|duration|ease|icon|media)-?/, "");
+  // icon 与 media 共用 --vx-size-* 刻度，需保留族名以免 icon-md 与 media-md 撞名。
+  const kind = /^--(icon|media)-/.exec(t2Name);
+  return kind ? `${prefix}-${kind[1]}-${stripped}` : `${prefix}-${stripped}`;
+}
+
 /* ── 工具 ───────────────────────────────────────────────────── */
 
 function flatten(node, prefix = "", out = []) {
@@ -413,6 +459,34 @@ const stats = [];
 for (const route of ROUTES) {
   const blocks = byRoute.get(route.file);
   if (!blocks) continue;
+
+  // 拆 T1：这些命名空间的取值移入原子层，T2 只留引用。
+  const primitive = PRIMITIVE_NAMESPACES[route.file];
+  if (primitive) {
+    const atoms = [];
+    const seenAtom = new Set();
+    for (const [, rows] of blocks) {
+      for (const row of rows) {
+        const [name, value] = row;
+        const atom = primitiveStep(name, value, primitive.prefix);
+        if (!seenAtom.has(atom)) {
+          seenAtom.add(atom);
+          atoms.push([atom, value, row[2]]);
+        }
+        row[1] = `var(${atom})`; // T2 改为引用 T1
+      }
+    }
+    outputs.push([
+      primitive.file,
+      header(
+        { file: primitive.file, label: `${primitive.title}（T1 原子刻度）` },
+        [...sources.get(route.file)].join(" / "),
+      ) + `\n:root {\n${atoms.map(([n, v]) => `  ${n}: ${v};`).join("\n")}\n}\n`,
+      atoms.length,
+    ]);
+    stats.push(`${primitive.file.replace("-primitive.css", "")}(T1) ${atoms.length}`);
+  }
+
   const body = blocks.map(([selector, rows]) => `${selector} {\n${render(rows)}\n}`).join("\n\n");
   const count = blocks[0][1].length;
   outputs.push([
@@ -435,10 +509,13 @@ if (errors.length > 0) {
 
 mkdirSync(OUT_DIR, { recursive: true });
 
+/** T1 原子刻度落 foundation/，T2 语义落 semantic/。 */
+const dirFor = (name) => (name.endsWith("-primitive.css") ? FOUNDATION : OUT_DIR);
+
 if (CHECK) {
   const stale = outputs.filter(([name, css]) => {
     try {
-      return readFileSync(path.join(OUT_DIR, name), "utf8") !== css;
+      return readFileSync(path.join(dirFor(name), name), "utf8") !== css;
     } catch {
       return true;
     }
@@ -452,7 +529,7 @@ if (CHECK) {
   }
   console.log(`T2 非色彩层一致（${stats.join(" · ")}）`);
 } else {
-  for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
+  for (const [name, css] of outputs) writeFileSync(path.join(dirFor(name), name), css, "utf8");
   console.log(`已生成 T2 非色彩层：${stats.join(" · ")}`);
   if (radiusRemapped.length > 0) {
     console.log(

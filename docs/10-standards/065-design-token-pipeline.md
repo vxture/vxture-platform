@@ -59,6 +59,40 @@ src/styles/foundation/*.css
 - 不参与 DS 守卫扫描（`check-design-system.mjs` 的 `IGNORED_PARTS`），裸值正是它的本体。
 - 不随包发布：`package.json` 的 `files` 白名单未含该目录。
 
+### 2.2.0 T1 / T2 的边界
+
+**T1 是无意义的值刻度，T2 是组件消费的名字。** 判据只有一条：这个 token 的名字本身是否携带含义。`--vx-radius-md: 6px` 只是阶梯上的一格 → T1；`--z-modal: 500`、`--opacity-disabled` 名字即含义 → T2。
+
+早先 T1 只有色彩、间距、排版三类，radius / shadow / border-width / opacity / breakpoint / duration / ease / size 这八条刻度全挂在 T2，导致 T2 里刻度与语义混杂，边界不清。现已全部下沉，T1 共 **15 个文件**：
+
+| T1 文件                      | 内容                       |
+| ---------------------------- | -------------------------- |
+| `color-primitive.css`        | 13 色相、alpha 变体（189） |
+| `spacing-primitive.css`      | 长度刻度（24）             |
+| `font-family-primitive.css`  | 字族 + 完整字体栈（8）     |
+| `font-size-primitive.css`    | 字号（12）                 |
+| `font-weight-primitive.css`  | 字重（5）                  |
+| `leading-primitive.css`      | 行高倍数（6）              |
+| `tracking-primitive.css`     | 字距，em（6）              |
+| `radius-primitive.css`       | 圆角（8）                  |
+| `border-width-primitive.css` | 描边宽度（4）              |
+| `shadow-primitive.css`       | 阴影几何（12）             |
+| `opacity-primitive.css`      | 透明度，数值阶（5）        |
+| `breakpoint-primitive.css`   | 断点（9）                  |
+| `duration-primitive.css`     | 时长（5）                  |
+| `ease-primitive.css`         | 缓动曲线（5）              |
+| `size-primitive.css`         | 图标与媒体尺寸（17）       |
+
+T1 内部允许互相引用（`--vx-radius-md: var(--vx-spacing-1-5)`——圆角与间距同为长度量纲，共用一条阶），这不破坏分层。
+
+**T2 中允许保留裸值的只有三类**，共 104 项，各有据：
+
+| 类别             | 数量 | 理由                                                                                              |
+| ---------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| 排版角色行高比值 | 72   | 各角色比值不同（1.167 / 1.200 / 1.429）——大字号收紧行距是排版惯例，**不可能**引用一条固定倍数刻度 |
+| 布局常量         | 20   | 侧栏/面板/字段/顶栏尺寸是一次性产品决策，收进原子层只会让长度阶膨胀                               |
+| z-index          | 12   | 语义梯度，名字即含义                                                                              |
+
 ### 2.2.1 T2 按命名空间分文件
 
 **一个命名空间对应一族工具类，一一对应。** 不按 Figma 集合分文件——集合是设计侧的组织方式，会随设计稿调整而变动，且一个集合常横跨多个工具类族（`vx-Shape` 同时含 radius 与 border-width，`vx-Depth` 同时含 shadow 几何、z-index 与 opacity）。按命名空间分则稳定，且"改这个文件会影响哪族工具类"在文件名上即可见。

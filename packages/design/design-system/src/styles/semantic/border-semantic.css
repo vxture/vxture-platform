@@ -16,8 +16,8 @@
 
 :root {
   /* border */
-  --border-width-none: var(--vx-spacing-0);
-  --border-width-thin: var(--vx-spacing-px);
-  --border-width-medium: var(--vx-spacing-0-5);
-  --border-width-thick: var(--vx-spacing-1);
+  --border-width-none: var(--vx-border-width-none);
+  --border-width-thin: var(--vx-border-width-thin);
+  --border-width-medium: var(--vx-border-width-medium);
+  --border-width-thick: var(--vx-border-width-thick);
 }

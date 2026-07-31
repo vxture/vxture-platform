@@ -1,0 +1,27 @@
+/**
+ * semantic/breakpoint-primitive.css - T2 语义层 · 断点（T1 原子刻度）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category styles
+ * @author AI-Generated
+ * @date 2026-07-31
+ *
+ * ⚠ 本文件由脚本生成，请勿手工编辑。
+ *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
+ *   源：Figma-Token/vx-Layout/（过程文件，迁移完成后删除）
+ *
+ * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
+ */
+
+:root {
+  --vx-breakpoint-xs: 375px;
+  --vx-breakpoint-sm: 640px;
+  --vx-breakpoint-md: 768px;
+  --vx-breakpoint-lg: 1024px;
+  --vx-breakpoint-xl: 1280px;
+  --vx-breakpoint-2xl: 1536px;
+  --vx-breakpoint-3xl: 1920px;
+  --vx-breakpoint-4xl: 2560px;
+  --vx-breakpoint-5xl: 3840px;
+}

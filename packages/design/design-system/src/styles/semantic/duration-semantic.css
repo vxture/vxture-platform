@@ -16,9 +16,9 @@
 
 :root {
   /* motion */
-  --duration-instant: 75ms;
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  --duration-slow: 300ms;
-  --duration-slower: 500ms;
+  --duration-instant: var(--vx-duration-instant);
+  --duration-fast: var(--vx-duration-fast);
+  --duration-base: var(--vx-duration-base);
+  --duration-slow: var(--vx-duration-slow);
+  --duration-slower: var(--vx-duration-slower);
 }

@@ -7,11 +7,19 @@
  * @date 2026-05-15
  */
 
+@import "./foundation/border-width-primitive.css";
+@import "./foundation/breakpoint-primitive.css";
 @import "./foundation/color-primitive.css";
+@import "./foundation/duration-primitive.css";
+@import "./foundation/ease-primitive.css";
 @import "./foundation/font-family-primitive.css";
 @import "./foundation/font-size-primitive.css";
 @import "./foundation/font-weight-primitive.css";
 @import "./foundation/leading-primitive.css";
+@import "./foundation/opacity-primitive.css";
+@import "./foundation/radius-primitive.css";
+@import "./foundation/shadow-primitive.css";
+@import "./foundation/size-primitive.css";
 @import "./foundation/spacing-primitive.css";
 @import "./foundation/tracking-primitive.css";
 @import "./semantic/border-semantic.css";

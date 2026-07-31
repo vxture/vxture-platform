@@ -1,5 +1,5 @@
 /**
- * semantic/opacity-semantic.css - T2 语义层 · 透明度（工具类族 opacity-*）。
+ * semantic/ease-primitive.css - T2 语义层 · 缓动曲线（T1 原子刻度）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -8,17 +8,16 @@
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
- *   源：Figma-Token/vx-Depth/（过程文件，迁移完成后删除）
+ *   源：Figma-Token/vx-Motion/（过程文件，迁移完成后删除）
  *
  * T2 定义见 docs/10-standards/060-design-system.md §1.1。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  */
 
 :root {
-  /* opacity */
-  --opacity-disabled: var(--vx-opacity-45);
-  --opacity-subtle: var(--vx-opacity-60);
-  --opacity-muted: var(--vx-opacity-75);
-  --opacity-overlay: var(--vx-opacity-50);
-  --opacity-full: var(--vx-opacity-100);
+  --vx-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --vx-ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --vx-ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --vx-ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+  --vx-ease-linear: linear;
 }

@@ -1,5 +1,5 @@
 /**
- * semantic/opacity-semantic.css - T2 语义层 · 透明度（工具类族 opacity-*）。
+ * semantic/opacity-primitive.css - T2 语义层 · 透明度（T1 原子刻度）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -15,10 +15,9 @@
  */
 
 :root {
-  /* opacity */
-  --opacity-disabled: var(--vx-opacity-45);
-  --opacity-subtle: var(--vx-opacity-60);
-  --opacity-muted: var(--vx-opacity-75);
-  --opacity-overlay: var(--vx-opacity-50);
-  --opacity-full: var(--vx-opacity-100);
+  --vx-opacity-45: 0.45;
+  --vx-opacity-60: 0.6;
+  --vx-opacity-75: 0.75;
+  --vx-opacity-50: 0.5;
+  --vx-opacity-100: 1;
 }
