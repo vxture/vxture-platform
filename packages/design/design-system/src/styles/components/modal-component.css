@@ -1,5 +1,5 @@
 /**
- * components/modal-component.css - T3 组件层 · modal（12 项）。
+ * components/modal-component.css - T3 组件层 · modal（2 项）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -16,16 +16,6 @@
  */
 
 :root {
-  --modal-bg: var(--popover);
-  --modal-scrim: var(--scrim);
-  --modal-text: var(--foreground);
-  --modal-divider: var(--border);
-  --modal-radius: var(--radius-lg);
-  --modal-shadow-offset-y: var(--elevation-4-offset-y);
-  --modal-shadow-blur: var(--elevation-4-blur);
-  --modal-shadow-color: var(--elevation-4-color);
-  --modal-inset: var(--inset-xl);
-  --modal-gap: var(--gap-md);
   --modal-max-width: 640px;
   --modal-min-width: 400px;
 }

@@ -35,6 +35,17 @@ const OUT_DIR = path.join(PKG, "src/styles/components");
 /** 设计稿治理规定「无需 T3、直接绑 T2」的组件；出现即需回报设计侧复核。 */
 const NO_T3_EXPECTED = ["button", "input", "card", "modal", "badge", "tabs", "dropdown"];
 
+/**
+ * 按治理门槛收敛回 T2 的组件族（设计侧 2026-07-31 确认）。
+ *
+ * 只收敛**纯别名** token——它们正是门槛禁止的冗余，消费方直接绑 T2 即可。
+ * 裸值 token 不在此列：门槛原文允许「T2 根本无从表达」时建 T3，裸值恰属此类，
+ * 排除它们会丢信息。生成器对此设断言，拒绝排除任何裸值。
+ */
+const CONVERGE_TO_T2 = {
+  modal: "治理白名单组件，纯别名收敛回 T2；仅保留 T2 无从表达的尺寸",
+};
+
 const UNITLESS = /^(z\/|opacity\/)/;
 const MS = /duration/;
 
@@ -93,6 +104,8 @@ const t2Names = buildT2NameMap();
 const t2Vars = loadT2Vars();
 const errors = [];
 const derived = [];
+const converged = [];
+const kept = [];
 
 function literal(tokenPath, value) {
   if (typeof value === "string") return value;
@@ -144,8 +157,27 @@ for (const [tokenPath, token] of tokens) {
     }
   }
 
+  // 治理收敛：纯别名丢弃，裸值必须保留。
+  if (CONVERGE_TO_T2[family]) {
+    if (target) {
+      converged.push(`${tokenPath} → ${value}`);
+      continue;
+    }
+    kept.push(`${tokenPath} = ${value}`);
+  }
+
   if (!families.has(family)) families.set(family, []);
   families.get(family).push([name, value, tokenPath]);
+}
+
+// 断言：被收敛的族若一个 token 都没剩下，说明它本就不该有 T3；
+// 若剩下的里混进了别名，说明收敛没生效。
+for (const family of Object.keys(CONVERGE_TO_T2)) {
+  const rows = families.get(family) ?? [];
+  const stillAliased = rows.filter(([, v]) => v.startsWith("var("));
+  if (stillAliased.length > 0) {
+    errors.push(`${family}: 收敛后仍残留别名 ${stillAliased.map(([n]) => n).join(", ")}`);
+  }
 }
 
 if (errors.length > 0) {
@@ -197,6 +229,8 @@ ${[...families].sort().map(([f]) => `@import "./${f}-component.css";`).join("\n"
 `;
 outputs.push(["index.css", indexCss]);
 
+const emittedCount = [...families.values()].reduce((sum, rows) => sum + rows.length, 0);
+
 mkdirSync(OUT_DIR, { recursive: true });
 
 if (CHECK) {
@@ -214,12 +248,19 @@ if (CHECK) {
     );
     process.exit(1);
   }
-  console.log(`T3 组件层一致（${families.size} 族 / ${seen.size} 项）`);
+  console.log(`T3 组件层一致（${families.size} 族 / ${emittedCount} 项）`);
 } else {
   for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
-  console.log(`已生成 T3 组件层：${families.size} 族 / ${seen.size} 项`);
-  const unexpected = [...families.keys()].filter((f) =>
-    NO_T3_EXPECTED.some((n) => f === n || f.startsWith(`${n}-`)),
+  console.log(`已生成 T3 组件层：${families.size} 族 / ${emittedCount} 项`);
+  if (converged.length > 0) {
+    console.log(
+      `已按治理门槛收敛回 T2 ${converged.length} 项（纯别名，消费方直接绑 T2）；` +
+        `保留 ${kept.length} 项 T2 无从表达的裸值：${kept.join(", ")}`,
+    );
+  }
+  // 已按治理收敛的族不再告警——它们已处理，仅余 T2 无从表达的裸值。
+  const unexpected = [...families.keys()].filter(
+    (f) => !CONVERGE_TO_T2[f] && NO_T3_EXPECTED.some((n) => f === n || f.startsWith(`${n}-`)),
   );
   if (unexpected.length > 0) {
     console.log(
