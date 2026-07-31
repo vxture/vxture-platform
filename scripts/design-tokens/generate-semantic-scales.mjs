@@ -148,25 +148,38 @@ const PRIMITIVE_NAMESPACES = {
     prefix: "--vx-breakpoint",
     title: "断点",
   },
-  // 以下三组不在最初拟定的清单里，但按同一判据（无意义的值刻度）同样属 T1。
-  // 若只拆前五组，T2 仍残留三条刻度，分层边界依旧是糊的。
+  // 这两组不在最初拟定的清单里，但按同一判据（名字是纯档位）同样属 T1。
   "duration-semantic.css": { file: "duration-primitive.css", prefix: "--vx-duration", title: "时长" },
   "ease-semantic.css": { file: "ease-primitive.css", prefix: "--vx-ease", title: "缓动曲线" },
-  "size-semantic.css": { file: "size-primitive.css", prefix: "--vx-size", title: "图标与媒体尺寸" },
+  // ⚠ size（icon/media）不在此列：`--icon-md` 里的 "icon" 携带含义，不是阶梯上的一格，
+  //   故不属 T1；也不属 T3——图标尺寸跨组件复用（Button / Alert / Table 都用），
+  //   放进组件层意味着每族各存一份。它是 T2 语义名，引用 T1 的长度刻度。
 };
+
+/**
+ * T1 一律裸值，**不得引用其他 T1**。
+ *
+ * 设计稿称"圆角与间距同为长度量纲，共用一条阶"，但量纲相同不等于因果相关：
+ * 若把间距基准从 4px 改为 8px，圆角与阴影模糊半径不应跟着翻倍——圆角是视觉风格，
+ * 间距是节奏，数值重合而已。Tailwind 与 shadcn 都把两者当互相独立的原子刻度。
+ * 且"原子引用原子"本身自相矛盾：原子的定义就是不依赖他物。
+ *
+ * 取值落在 4px 栅格上这件事由 assertOnGrid 保证，而非靠 var() 强行绑定。
+ */
+function resolveToLiteral(value, t1Literals) {
+  const m = /^var\((--[\w-]+)\)$/.exec(value);
+  return m && t1Literals.has(m[1]) ? t1Literals.get(m[1]) : value;
+}
 
 /** T2 变量名 → T1 阶梯名。opacity 特殊：用数值作阶名，与 Tailwind 的 0~100 刻度同构。 */
 function primitiveStep(t2Name, value, prefix) {
   if (prefix === "--vx-opacity") {
-    const n = Math.round(Number(value) * 100);
-    return `${prefix}-${n}`;
+    return `${prefix}-${Math.round(Number(value) * 100)}`;
   }
   const stripped = t2Name
     .replace(/^--(layout-)?/, "")
-    .replace(/^(radius|border-width|elevation|opacity|breakpoint|duration|ease|icon|media)-?/, "");
-  // icon 与 media 共用 --vx-size-* 刻度，需保留族名以免 icon-md 与 media-md 撞名。
-  const kind = /^--(icon|media)-/.exec(t2Name);
-  return kind ? `${prefix}-${kind[1]}-${stripped}` : `${prefix}-${stripped}`;
+    .replace(/^(radius|border-width|elevation|opacity|breakpoint|duration|ease)-?/, "");
+  return `${prefix}-${stripped}`;
 }
 
 /* ── 工具 ───────────────────────────────────────────────────── */
@@ -203,18 +216,27 @@ function primitiveVar(target) {
   return null;
 }
 
-/** 扫描整个 foundation/ 目录而非写死文件名——T1 拆分后写死清单会漏。 */
-function loadT1Vars() {
-  const vars = new Set();
-  for (const f of readdirSync(FOUNDATION)) {
-    if (!f.endsWith(".css")) continue;
-    const css = readFileSync(path.join(FOUNDATION, f), "utf8");
-    for (const m of css.matchAll(/^\s*(--vx-[\w-]+):/gm)) vars.add(m[1]);
-  }
-  return vars;
+/** 递归扫描 foundation/（含 typography/ 子目录）→ 变量名 → 字面值。 */
+function loadT1() {
+  const literals = new Map();
+  const walk = (dir) => {
+    for (const f of readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, f.name);
+      if (f.isDirectory()) {
+        walk(full);
+      } else if (f.name.endsWith(".css")) {
+        for (const m of readFileSync(full, "utf8").matchAll(/^\s*(--vx-[\w-]+):\s*([^;]+);/gm)) {
+          literals.set(m[1], m[2].trim());
+        }
+      }
+    }
+  };
+  walk(FOUNDATION);
+  return literals;
 }
 
-const t1Vars = loadT1Vars();
+const t1Literals = loadT1();
+const t1Vars = new Set(t1Literals.keys());
 const derived = [];
 const overridden = [];
 const radiusRemapped = [];
@@ -355,7 +377,7 @@ function toLineHeightRatio(rows) {
     if (m) sizeOf.set(tokenPath.replace(/\/fontSize$/, ""), m[1]);
   }
   const px = {};
-  for (const m of readFileSync(path.join(FOUNDATION, "font-size-primitive.css"), "utf8")
+  for (const m of readFileSync(path.join(FOUNDATION, "typography/font-size-primitive.css"), "utf8")
     .matchAll(/--vx-font-size-([\w-]+):\s*(\d+)px/g)) {
     px[m[1]] = Number(m[2]);
   }
@@ -471,7 +493,8 @@ for (const route of ROUTES) {
         const atom = primitiveStep(name, value, primitive.prefix);
         if (!seenAtom.has(atom)) {
           seenAtom.add(atom);
-          atoms.push([atom, value, row[2]]);
+          // T1 落裸值：把对其他 T1 的引用就地解开。
+          atoms.push([atom, resolveToLiteral(value, t1Literals), row[2]]);
         }
         row[1] = `var(${atom})`; // T2 改为引用 T1
       }

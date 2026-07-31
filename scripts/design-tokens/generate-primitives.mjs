@@ -15,7 +15,7 @@
  *   node scripts/design-tokens/generate-primitives.mjs --check   # 只校验不写入
  */
 
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -290,9 +290,11 @@ function buildTypography() {
     entry.count += rows.length;
   }
 
+  // 排版原子归入 foundation/typography/ 子目录——排版是一个大类，
+  // 内部再分 font-family / font-size / font-weight / leading / tracking 五个命名空间。
   const outputs = [...files].map(([file, entry]) => [
-    file,
-    header(`foundation/${file} - T1 原子层 · 排版（工具类族 ${entry.family}）。`) +
+    `typography/${file}`,
+    header(`foundation/typography/${file} - T1 原子层 · 排版（工具类族 ${entry.family}）。`) +
       `\n:root {\n${entry.blocks.join("\n\n")}\n}\n`,
     entry.count,
   ]);
@@ -330,7 +332,10 @@ if (CHECK) {
     `T1 原子层一致（color ${color.count} · spacing ${spacing.count} · typography ${typography.count}）`,
   );
 } else {
-  for (const [name, css] of outputs) writeFileSync(path.join(OUT_DIR, name), css, "utf8");
+  for (const [name, css] of outputs) {
+    mkdirSync(path.dirname(path.join(OUT_DIR, name)), { recursive: true });
+    writeFileSync(path.join(OUT_DIR, name), css, "utf8");
+  }
   console.log(
     `已生成 T1：color ${color.count} · spacing ${spacing.count} · typography ${typography.count}`,
   );

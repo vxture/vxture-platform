@@ -15,12 +15,12 @@
  */
 
 :root {
-  --vx-radius-none: var(--vx-spacing-0);
-  --vx-radius-xs: var(--vx-spacing-0-5);
-  --vx-radius-sm: var(--vx-spacing-1);
-  --vx-radius-md: var(--vx-spacing-1-5);
-  --vx-radius-lg: var(--vx-spacing-2);
-  --vx-radius-xl: var(--vx-spacing-3);
-  --vx-radius-2xl: var(--vx-spacing-4);
+  --vx-radius-none: 0px;
+  --vx-radius-xs: 2px;
+  --vx-radius-sm: 4px;
+  --vx-radius-md: 6px;
+  --vx-radius-lg: 8px;
+  --vx-radius-xl: 12px;
+  --vx-radius-2xl: 16px;
   --vx-radius-full: 9999px;
 }

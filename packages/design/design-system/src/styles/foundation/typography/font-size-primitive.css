@@ -1,5 +1,5 @@
 /**
- * foundation/leading-primitive.css - T1 原子层 · 排版（工具类族 leading-*）。
+ * foundation/typography/font-size-primitive.css - T1 原子层 · 排版（工具类族 text-*）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -15,11 +15,17 @@
  */
 
 :root {
-  /* 行高。导出为百分比×100，此处转为无单位倍数。 */
-  --vx-leading-none: 1;
-  --vx-leading-tight: 1.25;
-  --vx-leading-snug: 1.375;
-  --vx-leading-normal: 1.5;
-  --vx-leading-relaxed: 1.625;
-  --vx-leading-loose: 2;
+  /* 字号。 */
+  --vx-font-size-3xs: 8px;
+  --vx-font-size-2xs: 10px;
+  --vx-font-size-xs: 12px;
+  --vx-font-size-sm: 14px;
+  --vx-font-size-base: 16px;
+  --vx-font-size-lg: 18px;
+  --vx-font-size-xl: 20px;
+  --vx-font-size-2xl: 24px;
+  --vx-font-size-3xl: 30px;
+  --vx-font-size-4xl: 36px;
+  --vx-font-size-5xl: 48px;
+  --vx-font-size-6xl: 60px;
 }

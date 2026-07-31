@@ -15,16 +15,16 @@
  */
 
 :root {
-  --vx-shadow-0-offset-y: var(--vx-spacing-0);
-  --vx-shadow-0-blur: var(--vx-spacing-0);
-  --vx-shadow-1-offset-y: var(--vx-spacing-px);
-  --vx-shadow-1-blur: var(--vx-spacing-0-5);
-  --vx-shadow-2-offset-y: var(--vx-spacing-0-5);
-  --vx-shadow-2-blur: var(--vx-spacing-1);
-  --vx-shadow-3-offset-y: var(--vx-spacing-1);
-  --vx-shadow-3-blur: var(--vx-spacing-2);
-  --vx-shadow-4-offset-y: var(--vx-spacing-2);
-  --vx-shadow-4-blur: var(--vx-spacing-4);
-  --vx-shadow-5-offset-y: var(--vx-spacing-4);
-  --vx-shadow-5-blur: var(--vx-spacing-8);
+  --vx-shadow-0-offset-y: 0px;
+  --vx-shadow-0-blur: 0px;
+  --vx-shadow-1-offset-y: 1px;
+  --vx-shadow-1-blur: 2px;
+  --vx-shadow-2-offset-y: 2px;
+  --vx-shadow-2-blur: 4px;
+  --vx-shadow-3-offset-y: 4px;
+  --vx-shadow-3-blur: 8px;
+  --vx-shadow-4-offset-y: 8px;
+  --vx-shadow-4-blur: 16px;
+  --vx-shadow-5-offset-y: 16px;
+  --vx-shadow-5-blur: 32px;
 }
