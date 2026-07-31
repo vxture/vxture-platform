@@ -32,7 +32,6 @@
     },
     "./styles/auth.css": "./src/styles/auth.css",
     "./styles/brand.css": "./src/styles/brand.css",
-    "./styles/components.css": "./src/styles/components.css",
     "./styles/fullscreen.css": "./src/styles/fullscreen.css",
     "./styles/globals.css": "./src/styles/globals.css",
     "./styles/shell-template.css": "./assets/shell-template.css",

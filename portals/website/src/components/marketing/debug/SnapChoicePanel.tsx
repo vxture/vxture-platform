@@ -62,7 +62,7 @@ export interface SnapChoicePanelProps {
 const DEFAULT_POSITION = {
   top: "80px",
   left: "20px",
-  zIndex: "var(--vx-z-toast)",
+  zIndex: 700,
 };
 /** 默认可见性 */
 const DEFAULT_VISIBLE = true;

@@ -23,23 +23,36 @@ Design System 是平台 UI 的规则层、基准层和通用能力层。应用�
 
 L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层另用 **T1–T4**，两者正交，编号不可混用。
 
-| 层           | 定义                                         | 载体                                         | 公开契约     | 应用侧                        |
-| ------------ | -------------------------------------------- | -------------------------------------------- | ------------ | ----------------------------- |
-| T1 Primitive | 原子值：色阶、spacing 刻度、字号刻度；无语义 | `styles/foundation/`                         | 否           | 禁止引用                      |
-| T2 Semantic  | 意义绑定，引用 T1                            | `styles/semantic/` + `/tokens`               | 是（主契约） | 可引用                        |
-| T3 Component | 组件域 token，引用 T2                        | `styles/components/` + `tokens/component.ts` | 是（只读）   | 可 `var()` 引用，**禁止赋值** |
-| T4 Page      | 页面/实例样式                                | 各产品仓库，不在 DS 包内                     | 不适用       | —                             |
+| 层           | 定义                                             | 载体                     | 公开契约     | 应用侧   |
+| ------------ | ------------------------------------------------ | ------------------------ | ------------ | -------- |
+| T1 Primitive | 原子值，无语义；**Tailwind v4 theme 的完整镜像** | `styles/foundation/`     | 否           | 禁止引用 |
+| T2 Semantic  | 意义绑定，引用 T1                                | `styles/semantic/`       | 是（主契约） | 可引用   |
+| T3 Component | —（已退役，见下）                                | —                        | —            | —        |
+| T4 Page      | 页面/实例样式                                    | 各产品仓库，不在 DS 包内 | 不适用       | —        |
 
-**T3 建立门槛**：仅当某值可预见地偏离其 T2 来源、或 T2 无从表达时才建。Button / Input / Card / Modal / Badge / Tabs / Dropdown **不建 T3，直接绑 T2**。
+**T1 是镜像，不是差分**。命名空间、分组、挡位、名称、取值与 Tailwind v4 逐项一致，由
+`scripts/design-tokens/generate-foundation.mjs` 读上游 `theme.css` 生成，一致性由构造保证。
+全部偏离登记在 `scripts/design-tokens/foundation-policy.mjs`，逐条带理由，生成时打印：
+
+- **扩展**（Tailwind 没有的挡位）：`text-3xs/2xs`、`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`
+- **覆盖**（Tailwind 有、DS 判定要改）：`font-sans` / `font-mono` 的字体栈
+- **减法**：色板只留 neutral / red / amber / emerald / sky / purple 六个色相（完整色阶）加品牌色
+
+**T2 只剩三族**：色彩语义、24 档排版角色、页面与内容宽度。其余刻度
+（radius / shadow / ease / duration / opacity / border-width / z-index / spacing / size）
+已随 T1 镜像上游一并退役——给上游档位另起一个名字（把 `duration-150` 叫成 `duration-fast`）
+不产生语义，只多一处真值。直接用内置工具类：`rounded-lg`、`shadow-md`、`ease-out`、
+`duration-150`、`opacity-45`、`border-2`、`z-500`、`p-4`、`size-4`。
+
+**T3 已退役**。组件尺寸改由 cva variant 承担：CSS 变量表达不了"紧凑档整体下移一档"
+这类关系（实测密度三档之间是档位平移而非等比缩放，比值 1.0–1.5 不等），而这正是
+组件变体的本职。设计稿的组件尺寸留在 `Figma-Token/vx-Component/` 作记录。
 
 **取值约束**：
 
-- 长度量（圆角、描边宽度、阴影 blur）须别名 T1，不允许裸值。
-- 布局常量（侧边栏宽度等一次性视口决策）刻意不别名 T1。
-- 阴影几何与阴影颜色分离：几何归 Depth，颜色随主题走 Color。
+- 组件里一律用工具类，**禁止任意值语法**（`h-(--control-height-lg)`）。
+- 布局常量（侧边栏宽度等一次性视口决策）在产品层定，不入 DS。
 - 暗色层级由 surface 明度递增与描边承担，不靠阴影递增。
-
-T3 不允许覆写。特殊需求两条路径：①产品在 T4 引用 T3/T2 组合自有样式；②更新 DS 本体。
 
 ## 2. 合法使用方式
 
@@ -199,13 +212,13 @@ DS 已在 `@vxture/design-system/tokens` 暴露 `colors.semantic.ai*` 与 `gradi
 
 ## 6. Foundation 尺度、阴影与动效
 
-Foundation patch 已正式迁入 DS，临时 patch 文件不再保留为源码。`--vx-space-3xl/4xl`、`--vx-radius-xs/2xl/3xl`、`--vx-shadow-xs/xl/2xl/glow/focus-ring/focus-ring-ai`、`--vx-duration-*`、`--vx-ease-*`、`--vx-motion-*` 和 `--animate-vx-*` 由 `tokens-foundation-radius-space.css`、`tokens-foundation-shadow.css`、`tokens-foundation-motion.css` 与 `tokens-foundation-type-layout.css` 分层维护，并通过 `tokens-theme-foundation.css` 映射为 Tailwind `vx-*` 工具能力。
+尺度、阴影与缓动**一律用 Tailwind 内置工具类**，DS 不再自持这几族刻度——T1 与上游同值，
+另起一套名字只会多一处真值。应用端不得在 CSS 中重新定义阴影、圆角、动效曲线或动画关键帧；
+需要新挡位时走 §9 的流程补进 `foundation-policy.mjs` 的扩展表，而不是就地写死。
 
-应用端只能消费这些语义 token、Tailwind `vx-*` 映射或 DS 组件封装；不得在应用 CSS 中重新定义阴影、圆角、动效曲线、动画关键帧或发光基线。`--vx-shadow-glow`、`--vx-motion-ai-pop`、`--animate-vx-shimmer` 属于 AI / 生成态视觉语义，只能用于 AI 入口、生成中状态、模型徽章和 DS 授权的 AI 组件组装。
-
-Reduced motion 已在 DS Foundation 层处理，应用端不需要重复写全局 `prefers-reduced-motion` 基线；业务确需动态延迟、坐标或进度时，保留在 L5 Runtime Dynamic，不能借此承载固定设计值。
-
-`packages/design/*.css` 下的迁移 patch 文件只允许作为短期输入。迁入完成后必须删除，正式事实来源只允许是 `packages/design/design-system/src/styles/*`、`packages/design/design-system/src/tokens/*` 和本规范文档。
+事实来源只有三处：`packages/design/design-system/src/styles/foundation|semantic/*`（生成物）、
+`scripts/design-tokens/foundation-policy.mjs`（偏离登记）与本规范文档。生成物不得手工编辑，
+改动会被下一次生成静默覆盖。
 
 ## 7. 品牌标识组合
 
@@ -215,11 +228,32 @@ DS 提供 `.vx-brand-lockup`、`.vx-brand-mark`、`.vx-brand-name`、`.vx-brand-
 
 ## 8. Motion / Z-index / Breakpoint
 
-Motion 只能消费 DS Foundation token：`--vx-duration-*`、`--vx-ease-*`、`--vx-motion-*` 或 `--animate-vx-*`。业务层不得重新声明固定时长、缓动曲线或全局 keyframes；AI 生成态优先使用 DS AI 组件内建 motion。
+**Motion**：时长取 Tailwind 时长档（`duration-75/100/150/200/300/500/700/1000`），缓动取
+`ease-in` / `ease-out` / `ease-in-out`。DS 曾用 Material 三条曲线覆盖这三个名字，已退回上游取值——
+覆盖上游同名挡位属"修改"不属"扩展"。业务层不得声明全局 keyframes；AI 生成态优先用 DS AI 组件内建 motion。
 
-Z-index 只能使用 `--vx-z-*` 语义层级。业务层允许 `0-99` 内的局部堆叠值，超过 `99` 的 overlay、drawer、toast、popover、modal 必须使用 `--vx-z-dropdown`、`--vx-z-popover`、`--vx-z-tooltip`、`--vx-z-modal`、`--vx-z-drawer`、`--vx-z-toast` 等 token。
+**Z-index**：v4 的 z-index 是裸数值工具类，没有具名 token 可引用，但**叠放次序是真实的设计约束**，
+故保留为取值阶梯。`0–99` 归局部堆叠自由使用；超过 `99` 必须落在下表上（守卫 `ds/no-hardcoded-z-index` 按此白名单校验）：
 
-断点使用 Tailwind 语义类或 DS breakpoint token 体系。业务 CSS 不得在 media query 中复制 `640px`、`768px`、`1024px`、`1280px`、`1536px` 标准断点；容器宽度优先使用 `--vx-container-*`，页面栅格使用 `--vx-grid-*`。
+| 值   | 用途         | 依据                                                   |
+| ---- | ------------ | ------------------------------------------------------ |
+| 100  | sticky       | 让位给 portal 化的 dropdown                            |
+| 200  | dropdown     | Radix portal 菜单须压过粘性表头，否则被裁切            |
+| 300  | overlay      | 浮层遮罩                                               |
+| 400  | drawer       | 低于 modal——模态可从抽屉内唤起（抽屉里点删除弹确认框） |
+| 500  | modal        |                                                        |
+| 600  | popover      | 高于 modal——气泡可用在模态内（模态里的下拉与日期选择） |
+| 700  | toast        | 全局反馈，不应被浮层遮挡                               |
+| 800  | notification | 常驻更久且可堆叠，压在 toast 之上                      |
+| 900  | tooltip      | 必须最高，否则被它所描述的元素遮挡                     |
+| 9999 | max          | 逃生档，新增使用需在 PR 说明                           |
+
+阶梯依据 Bootstrap / MUI / Ant Design 三家共识。逐档互异是硬要求：同值时叠放次序取决于
+DOM 顺序而非设计意图，是静默的层级 bug。
+
+**断点**：用 Tailwind 变体（`sm:` … `2xl:`）与 DS 扩展档（`xs:` / `3xl:` / `4xl:` / `5xl:`）。
+业务 CSS 不得在 media query 中复制 `640px`、`768px`、`1024px`、`1280px`、`1536px`；
+页面与内容宽度用 `max-w-page-*` / `max-w-content-*`。
 
 暗色模式由 DS token 在 `.dark` / `:root.dark` 下重映射。业务源码不得定义新的 `.dark {}` 块，也不得为暗色主题复制颜色、阴影和边框值。
 

@@ -50,8 +50,19 @@ export const NAMESPACES = [
   { ns: "animate", file: "animate-primitive.css", title: "动画", utility: "animate-*" },
 ];
 
-/** `--default-*` 是 Tailwind 的全局旋钮（默认字体 / 默认过渡），单列一文件。 */
-export const DEFAULTS_FILE = "defaults-primitive.css";
+/**
+ * `--default-*` **不镜像**。
+ *
+ * 它们不是设计 token，而是 Tailwind 自己的内部旋钮：驱动 preflight 的默认字体、
+ * 以及 `transition` 工具类在未指定时长时的兜底值。加上 `--vx-` 前缀后 Tailwind
+ * 不会去读，变量就此失效；更糟的是其取值形如
+ * `--theme(--font-sans, initial)`——`--theme()` 只在 Tailwind 的 theme 处理阶段
+ * 有意义，落到普通 `:root` 里根本不解析。
+ *
+ * 要改这些默认值，正确做法是在消费方的 `@theme` 里直接写 `--default-*`，
+ * 而不是在 DS 里存一份镜像。故解析时识别、但不产出。
+ */
+export const DEFAULTS_MIRRORED = false;
 
 /**
  * 解析 theme.css → [{ ns, step, name, value }]。

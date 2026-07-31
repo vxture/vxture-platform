@@ -22,6 +22,15 @@ const BASELINE_PATH = path.join(
   "scripts/guardrails/design-system-baseline.json",
 );
 const DS_STYLE_HARDCODED_SCALE_BUDGET = 0;
+/** Tailwind v4 的时长档；判据说明见 hasOffLadderDuration。 */
+const TAILWIND_DURATIONS_MS = new Set([0, 75, 100, 150, 200, 300, 500, 700, 1000]);
+/**
+ * DS 叠放阶梯。原为 `--z-*` 语义 token，随 T2 该族退役——v4 的 z-index 是裸数值
+ * 工具类（`z-500`），没有具名 token 可引用。阶梯本身是真实的设计约束
+ * （Radix portal 菜单须压过粘性表头、tooltip 必须最高…），故保留为**取值白名单**：
+ * 阶梯语义与推导依据见 docs/10-standards/060-design-system.md §8。
+ */
+const Z_LADDER = new Set([100, 200, 300, 400, 500, 600, 700, 800, 900, 9999]);
 const BASELINED_RULE_IDS = new Set([
   "ds/no-inline-design-style",
   "ds/no-native-primitive",
@@ -64,8 +73,12 @@ const DS_TOKEN_PATHS = [
 // T1–T4 分层落地后 token 文件迁入这些子目录，同样属 DS token 层。
 // 允许 foundation/ semantic/ components/ 下任意深度——排版原子按子命名空间
 // 归入 foundation/typography/，只认一层会把它们判成裸值违规。
+// token owner = 分层 token 模块（T1 foundation / T2 semantic）、聚合入口 tokens.css，
+// 以及 @theme 注册 theme.css。theme.css 必须算 owner：断点与容器宽度进的是媒体查询
+// 与容器查询，那里 var() 不参与求值，只能落字面量——它是有依据的刻度真值源，
+// 不是"叶子里随手写死的数"。components/ 已随 T3 层退役。
 const DS_RUNTIME_TOKEN_STYLE_PATTERN =
-  /^packages\/design\/design-system\/src\/styles\/(?:tokens(?:-[\w-]+)?\.css|(?:foundation|semantic|components)\/(?:[\w-]+\/)*[\w-]+\.css)$/;
+  /^packages\/design\/design-system\/src\/styles\/(?:tokens\.css|theme\.css|(?:foundation|semantic)\/(?:[\w-]+\/)*[\w-]+\.css)$/;
 const DS_RUNTIME_SCALE_BRIDGE_VAR_PATTERN =
   /var\(--vx-(?:scale|platform-scale|auth-scale|console-scale|component-scale)-/;
 const DS_RUNTIME_COMPONENT_METRIC_VAR_PATTERN = /var\(--vx-component-metric-/;
@@ -125,10 +138,6 @@ const IMPORT_ONLY_STYLE_ENTRIES = new Map([
   [
     normalize("packages/design/design-system/src/styles/auth.css"),
     "DS auth.css",
-  ],
-  [
-    normalize("packages/design/design-system/src/styles/components.css"),
-    "DS components.css",
   ],
   [
     normalize("packages/design/design-system/src/styles/globals.css"),
@@ -404,7 +413,7 @@ const rules = [
   },
   {
     id: "ds/no-hardcoded-z-index",
-    description: "业务层 z-index 大于 99 必须使用 DS 语义层级 token。",
+    description: "业务层 z-index 大于 99 必须取自 DS 叠放阶梯。",
     checkLine(file, line, lineNumber) {
       if (!isFrontendSource(file) || isGeneratedOrAsset(file)) return null;
       const text = stripLineComment(line);
@@ -412,10 +421,11 @@ const rules = [
       const inlineMatch = text.match(/\bzIndex\s*:\s*(-?\d+)\b/);
       const value = Number(cssMatch?.[1] ?? inlineMatch?.[1] ?? NaN);
       if (!Number.isFinite(value) || value <= 99) return null;
+      if (Z_LADDER.has(value)) return null;
       return violation(
         file,
         lineNumber,
-        "改为使用 --vx-z-* 语义层级 token，例如 var(--vx-z-dropdown)、var(--vx-z-modal)。",
+        `z-index 须取 DS 叠放阶梯（${[...Z_LADDER].join(" / ")}），阶梯语义见 docs/10-standards/060-design-system.md §8。`,
         line,
       );
     },
@@ -510,14 +520,11 @@ const rules = [
       const normalized = normalize(file);
       if (!DS_EFFECT_LOCKED_STYLE_PATHS.has(normalized)) return null;
       const text = stripLineComment(line);
-      if (
-        /\b\d+(?:\.\d+)?(?:ms|s)\b/.test(text) &&
-        /\b(?:ease|linear|cubic-bezier)\b/.test(text)
-      ) {
+      if (hasOffLadderDuration(text) || hasLiteralEasing(text)) {
         return violation(
           file,
           lineNumber,
-          "使用 --vx-control-transition、--vx-motion-* 或组件 effect token，不能回流硬编码动效。",
+          "时长须取 Tailwind 时长档，缓动须用 var(--vx-ease-*)，不能回流硬编码动效。",
           line,
         );
       }
@@ -638,11 +645,11 @@ const rules = [
         return null;
       const text = stripLineComment(line);
 
-      if (/\b\d+(?:\.\d+)?(?:ms|s)\b/.test(text)) {
+      if (hasOffLadderDuration(text)) {
         return violation(
           file,
           lineNumber,
-          "DS 样式叶子不能直接写 motion 时长；请迁入 token owner 后通过 var(--vx-*) 消费。",
+          `DS 样式叶子的 motion 时长须取 Tailwind 时长档（${[...TAILWIND_DURATIONS_MS].join(" / ")} ms）。`,
           line,
         );
       }
@@ -2346,6 +2353,31 @@ function isDsTokenOwner(file) {
   );
 }
 
+/**
+ * Tailwind v4 的时长档。
+ *
+ * ── 为什么规则从"必须是 token"改成"必须在档上" ──
+ * 原规则要求所有时长写成 `var(--vx-*)`，前提是 DS 自持一套 `--duration-*` token。
+ * T1 改为镜像 Tailwind 后那一族退役了：v4 的时长是**裸数值工具类**
+ * （`duration-150`），根本不存在可引用的具名 token，原规则因此变得无法满足——
+ * 不是被放宽，是失去了指称对象。
+ *
+ * 规则的真实目的是"动效值全系统一致，不许各处随手写"。在 v4 下等价的表述就是
+ * 落在上游这套档上；偏离档位仍然报错。缓动另有 `--vx-ease-*` 可引用，故仍要求 var()。
+ */
+function hasOffLadderDuration(text) {
+  for (const m of text.matchAll(/(?:^|[\s(,:])(\d+(?:\.\d+)?)(ms|s)\b/g)) {
+    const ms = m[2] === "s" ? Number(m[1]) * 1000 : Number(m[1]);
+    if (!TAILWIND_DURATIONS_MS.has(ms)) return true;
+  }
+  return false;
+}
+
+/** 裸缓动曲线：`--vx-ease-*` 是可引用的 token，没有理由写字面量。 */
+function hasLiteralEasing(text) {
+  return /\b(?:cubic-bezier|steps)\s*\(/.test(text) || /\bease(?:-in|-out|-in-out)?\b(?!\s*\))/.test(text.replace(/var\([^)]*\)/g, ""));
+}
+
 function isTokenOrNoneShadowValue(value) {
   const normalized = (value ?? "").trim();
   if (!normalized) return false;
@@ -2358,25 +2390,24 @@ function isTokenOrNoneShadowValue(value) {
 /**
  * motion 值是否只由 token 构成。
  *
- * 不再要求 `--vx-` 前缀：T2 的 duration / ease 刻意命名为 `--duration-*` /
- * `--ease-*`，因为这两族在 `@theme` 里要自注册产出 duration-fast / ease-standard
- * 工具类，带前缀就产不出。判据改为「除 var() 引用外不得出现字面时长或曲线」，
- * 这才是规则真正要挡的东西。
+ * 时长允许字面量，但必须落在 Tailwind 的时长档上——v4 的时长是裸数值工具类
+ * （`duration-150`），没有具名 token 可引用，要求 var() 等于要求一个不存在的东西。
+ * 缓动仍须 var(--vx-ease-*)：那一族在 T1 里有名字。判据说明见 hasOffLadderDuration。
  */
 function isTokenOrNoneMotionValue(value) {
   const normalized = (value ?? "").trim();
   if (!normalized) return true;
   if (normalized === "none" || normalized.startsWith("none ")) return true;
 
-  // 字面时长与曲线函数：连 var() 的回退值里也不允许，故在剥离前先查。
-  if (/\d+(?:\.\d+)?m?s\b/.test(normalized)) return false;
+  // 曲线函数与偏离档位的时长：连 var() 的回退值里也不允许，故在剥离前先查。
+  if (hasOffLadderDuration(normalized)) return false;
   if (/cubic-bezier\(|steps\(/.test(normalized)) return false;
 
   const withoutVars = normalized.replace(/var\((?:[^()]|\([^()]*\))*\)/g, " ");
-  // 剥掉 var() 后只应剩属性名、空白与分段逗号；缓动关键字属字面值。
+  // 剥掉 var() 后只应剩属性名、时长字面量、空白与分段逗号；缓动关键字属字面值。
   if (/\b(?:ease|ease-in|ease-out|ease-in-out|linear|step-start|step-end)\b/.test(withoutVars))
     return false;
-  return /^[\w\s,-]*$/.test(withoutVars);
+  return /^[\w\s,.-]*$/.test(withoutVars);
 }
 
 function isGeneratedOrAsset(file) {

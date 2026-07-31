@@ -20,7 +20,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-import { NAMESPACES, DEFAULTS_FILE, readBaseline, readKeyframes } from "./tailwind-baseline.mjs";
+import { NAMESPACES, readBaseline, readKeyframes } from "./tailwind-baseline.mjs";
 import {
   KEEP_HUES,
   KEEP_COLOR_SINGLES,
@@ -60,7 +60,7 @@ function keepColor(step) {
   return KEEP_HUES.includes(hue);
 }
 
-const { rows, defaults } = readBaseline(ROOT);
+const { rows } = readBaseline(ROOT);
 const byNs = new Map();
 for (const r of rows) {
   if (r.ns === "color" && !keepColor(r.step)) continue;
@@ -140,23 +140,14 @@ for (const ns of NAMESPACES) {
   addBlock(ns.file, `  /* ${ns.title}。 */\n${lines.join("\n")}`);
 }
 
-// `--default-*`：Tailwind 的全局旋钮，镜像一并带上
-addBlock(
-  DEFAULTS_FILE,
-  `  /* Tailwind 全局默认（字体 / 过渡）。 */\n` +
-    defaults.map((d) => `  --vx-${d.name.slice(2)}: ${d.value};`).join("\n"),
-);
-
 /* ── 写出 ── */
 const files = new Map();
 for (const [file, blocks] of outputs) {
   const meta = NAMESPACES.find((n) => n.file === file);
   const title =
-    file === DEFAULTS_FILE
-      ? "foundation/defaults-primitive.css - T1 原子层 · 全局默认。"
-      : file === "color-brand-primitive.css"
-        ? "foundation/color-brand-primitive.css - T1 原子层 · 品牌与合成色。"
-        : `foundation/${file} - T1 原子层 · ${meta?.title ?? file}。`;
+    file === "color-brand-primitive.css"
+      ? "foundation/color-brand-primitive.css - T1 原子层 · 品牌与合成色。"
+      : `foundation/${file} - T1 原子层 · ${meta?.title ?? file}。`;
   files.set(
     file,
     header(title, meta?.utility ?? "—") + `\n:root {\n${blocks.join("\n\n")}\n}\n`,

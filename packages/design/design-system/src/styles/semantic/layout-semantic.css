@@ -1,5 +1,5 @@
 /**
- * semantic/layout-semantic.css - T2 语义层 · 布局常量（工具类族 —（DS 特有））。
+ * semantic/layout-semantic.css - T2 语义层 · 页面与内容宽度（工具类族 max-w-*）。
  * @package @vxture/design-system
  * @layer Presentation
  * @category styles
@@ -15,39 +15,20 @@
  */
 
 :root {
-  /* layout */
-  --layout-page-sm: var(--layout-breakpoint-sm);
-  --layout-page-md: var(--layout-breakpoint-md);
-  --layout-page-lg: var(--layout-breakpoint-lg);
-  --layout-page-xl: var(--layout-breakpoint-xl);
-  --layout-page-2xl: var(--layout-breakpoint-2xl);
-  --layout-page-3xl: var(--layout-breakpoint-3xl);
-  --layout-page-4xl: var(--layout-breakpoint-4xl);
-  --layout-page-5xl: var(--layout-breakpoint-5xl);
+  /* page */
+  --layout-page-xs: var(--vx-breakpoint-xs);
+  --layout-page-sm: var(--vx-breakpoint-sm);
+  --layout-page-md: var(--vx-breakpoint-md);
+  --layout-page-lg: var(--vx-breakpoint-lg);
+  --layout-page-xl: var(--vx-breakpoint-xl);
+  --layout-page-2xl: var(--vx-breakpoint-2xl);
+  --layout-page-3xl: var(--vx-breakpoint-3xl);
+  --layout-page-4xl: var(--vx-breakpoint-4xl);
+  --layout-page-5xl: var(--vx-breakpoint-5xl);
+
+  /* content */
   --layout-content-narrow-lg: var(--layout-page-lg);
   --layout-content-base-xl: var(--layout-page-xl);
   --layout-content-wide-2xl: var(--layout-page-2xl);
-  --layout-field-3xs: 120px;
-  --layout-field-2xs: 140px;
-  --layout-field-xs: 160px;
-  --layout-field-sm: 180px;
-  --layout-field-md: 200px;
-  --layout-field-lg: 240px;
-  --layout-field-xl: 280px;
-  --layout-field-2xl: 320px;
-  --layout-field-3xl: 360px;
-  --layout-panel-xs: 320px;
-  --layout-panel-sm: 400px;
-  --layout-panel-md: 480px;
-  --layout-panel-lg: 640px;
-  --layout-panel-xl: 800px;
-  --layout-sidebar-expanded: 256px;
-  --layout-sidebar-collapsed: 64px;
-  --layout-sidebar-mini: 48px;
-  --layout-topbar-sm: 48px;
-  --layout-topbar-md: 56px;
-  --layout-topbar-lg: 64px;
-  --layout-docs-inset: var(--vx-spacing-8);
-  --layout-docs-gap: var(--vx-spacing-8);
   --layout-content-ultra-3xl: var(--layout-page-3xl);
 }

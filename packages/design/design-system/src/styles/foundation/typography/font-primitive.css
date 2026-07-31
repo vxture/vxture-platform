@@ -15,7 +15,11 @@
 
 :root {
   /* 字体栈。 */
-  --vx-font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --vx-font-sans: Inter, 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --vx-font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --vx-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --vx-font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Noto Sans Mono CJK SC', 'Liberation Mono', 'Courier New', monospace;
+
+  /* DS 扩展（Tailwind 无此挡位）。 */
+  --vx-font-brand: 'Funnel Display', Inter, 'Noto Sans SC', sans-serif; /* 品牌标题字体；Tailwind 的 font 命名空间只有 sans / serif / mono 三族，无标题族 */
+  --vx-font-cjk: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif; /* 中文优先栈，用于需强制中文字形的场合（正文栈里中文是回退位） */
 }

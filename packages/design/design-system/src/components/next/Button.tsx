@@ -10,10 +10,10 @@
  * 1. **不建 T3。** 设计稿治理门槛规定 Button 直接绑 T2，故本组件不引用任何
  *    --button-* 组件层 token（既有 --vx-button-height / --vx-button-radius
  *    属伪 T3，本组件不消费）。
- * 2. **不用 Tailwind 原生刻度。** 颜色走 @theme 桥接的工具类
- *    （bg-primary / text-primary-foreground），尺寸直接引用 T2 变量
- *    （h-(--control-height-lg)）——因为 Tailwind 内置 spacing/radius 刻度与
- *    DS 取值不同，桥接会污染仓库既有工具类。
+ * 2. **尺度用 Tailwind 内置刻度。** 颜色走 @theme 注册的语义工具类
+ *    （bg-primary / text-primary-foreground），尺寸用内置工具类（h-9 / px-4 /
+ *    size-4）。原先"内置刻度与 DS 取值不同、桥接会污染工具类"的顾虑随 T1 镜像
+ *    上游一并消失：现在两者本就是同一套数。
  *
  * 与 components/ui/Button.tsx 并存：那个由 Tailwind 工具类与 .vx-btn 两套
  * 机制同时驱动，本组件以 cva 为唯一样式来源。旧组件不动（不做删除）。
@@ -27,14 +27,14 @@ import { cn } from "../../utils/cn";
 const buttonVariants = cva(
   cn(
     "inline-flex shrink-0 items-center justify-center whitespace-nowrap",
-    // radius 已按取值对齐 Tailwind 刻度（见 scripts/design-tokens/radius-map.mjs），
-    // 故可直接用标准工具类，与 shadcn 组件源码一致。
-    "gap-(--gap-xs) rounded-md",
+    // 尺度一律用 Tailwind 内置工具类：T1 镜像上游后 DS 不再自持 spacing / radius /
+    // size 刻度，任意值语法（gap-(--gap-xs)）指向的 T2 名已随该层退役。
+    "gap-2 rounded-md",
     "text-sm font-medium transition-colors outline-none",
     "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
     "disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
-    "[&_svg:not([class*='size-'])]:size-(--icon-sm)",
+    "[&_svg:not([class*='size-'])]:size-4",
   ),
   {
     variants: {
@@ -51,10 +51,10 @@ const buttonVariants = cva(
         link: "text-link underline-offset-4 hover:underline hover:text-link-hover",
       },
       size: {
-        sm: "h-(--control-height-md) px-(--control-inset-x-sm)",
-        default: "h-(--control-height-lg) px-(--control-inset-x-md)",
-        lg: "h-(--control-height-xl) px-(--control-inset-x-lg)",
-        icon: "size-(--control-height-lg) p-0",
+        sm: "h-8 px-3",
+        default: "h-9 px-4",
+        lg: "h-10 px-6",
+        icon: "size-9 p-0",
       },
     },
     defaultVariants: {

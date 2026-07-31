@@ -32,33 +32,45 @@ const { compile } = await import(
 );
 const STYLES = path.join(ROOT, "packages/design/design-system/src/styles");
 
-/** 每个已注册命名空间取一个代表，覆盖模式轴与变体。 */
+/**
+ * 样例覆盖三类：DS 注册的语义、DS 登记的偏离、以及**上游内置**。
+ *
+ * 第三类看似不该由 DS 测，但正是它守住了这轮重构的前提：T1 与上游同值的挡位
+ * 一律不再注册，全靠 Tailwind 自己产出。若哪天样式链 import 顺序出错、或
+ * `@theme` 写成了覆盖形式把上游整族清空，`p-4` / `rounded-lg` 这些会一起哑火，
+ * 而 DS 自己的注册仍然正常——只测自家注册就看不见这种塌方。
+ */
 const EXPECTED = [
-  ["p-md", "间距（密度轴）"],
-  ["gap-lg", "间距"],
-  ["h-control-md", "控件高度"],
-  ["h-row-lg", "行高度"],
-  ["size-icon-md", "图标尺寸"],
+  // T2 语义
   ["bg-primary", "语义色"],
   ["text-foreground", "语义色"],
   ["border-border", "语义色"],
-  ["rounded-md", "圆角"],
-  ["duration-fast", "时长"],
-  ["ease-standard", "缓动"],
-  ["md:p-lg", "断点变体"],
-  ["dark:bg-card", "暗色变体"],
+  ["dark:bg-card", "语义色 · 暗色变体"],
   ["text-body-md", "排版角色"],
   ["text-heading-1", "排版角色"],
-  ["font-brand", "字体族"],
-  ["font-mono", "字体族"],
-  // 以下各族曾整族哑火（无对应 theme 命名空间 / 漏注册 / 只有几何分量），
-  // 逐族留一个样例守住。
-  ["duration-fast", "自定义工具类"],
-  ["opacity-disabled", "自定义工具类"],
-  ["border-thin", "自定义工具类"],
-  ["z-modal", "自定义工具类"],
-  ["shadow-1", "合成阴影"],
-  ["max-w-page-lg", "内容宽度"],
+  ["max-w-page-lg", "页面宽度"],
+  ["max-w-content-base-xl", "内容宽度"],
+  // T1 偏离：扩展档与覆盖值
+  ["font-brand", "扩展 · 品牌字体族"],
+  ["font-cjk", "扩展 · 中文字体栈"],
+  ["text-2xs", "扩展 · 小字号"],
+  ["text-3xs", "扩展 · 小字号"],
+  ["3xl:p-4", "扩展 · 断点变体"],
+  ["font-sans", "覆盖 · 正文字体栈"],
+  ["font-mono", "覆盖 · 等宽字体栈"],
+  // 上游内置：退役各族后组件改用的就是这些
+  ["p-4", "内置 · 间距"],
+  ["gap-6", "内置 · 间距"],
+  ["size-4", "内置 · 尺寸"],
+  ["h-10", "内置 · 高度"],
+  ["rounded-lg", "内置 · 圆角"],
+  ["shadow-md", "内置 · 阴影"],
+  ["ease-out", "内置 · 缓动"],
+  ["duration-150", "内置 · 时长"],
+  ["opacity-45", "内置 · 透明度"],
+  ["border-2", "内置 · 描边宽度"],
+  ["z-50", "内置 · 层级"],
+  ["md:p-6", "内置 · 断点变体"],
 ];
 
 /** 排版角色须一次落齐四个属性，只出 font-size 等于注册没生效。 */
@@ -97,7 +109,21 @@ function generated(util) {
   const out = compiled.build([util]);
   const i = out.indexOf("@layer utilities {");
   if (i < 0) return false;
-  return out.slice(i).includes(`.${util.replace(/:/g, "\\:")} {`);
+  return out.slice(i).includes(`.${cssIdent(util)} {`);
+}
+
+/**
+ * 类名 → CSS 选择器里的转义写法。
+ *
+ * 首字符是数字时不能只转义冒号：CSS 标识符不允许数字开头，须写成十六进制码点
+ * 加一个空格（`3xl:p-4` → `\33 xl\:p-4`）。漏了这条会把 `3xl:` / `2xl:` 这些
+ * 断点变体一律误判为未生成。
+ */
+function cssIdent(name) {
+  const escaped = name.replace(/[:./]/g, (c) => `\\${c}`);
+  return /^\d/.test(escaped)
+    ? `\\3${escaped[0]} ${escaped.slice(1)}`
+    : escaped;
 }
 
 const missing = EXPECTED.filter(([u]) => !generated(u));

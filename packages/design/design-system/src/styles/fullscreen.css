@@ -33,7 +33,7 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
   /* 进入/退出过渡 */
-  transition: opacity var(--duration-base) var(--ease-standard);
+  transition: opacity 200ms var(--vx-ease-in-out);
 }
 
 .vx-fullscreen-active::-webkit-scrollbar {

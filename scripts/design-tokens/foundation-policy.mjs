@@ -34,6 +34,18 @@ export const KEEP_COLOR_SINGLES = ["black", "white"];
  * 每条都要能回答"为什么 Tailwind 的挡位不够用"，答不上来的不算扩展，算私货。
  */
 export const EXTENSIONS = {
+  font: [
+    [
+      "brand",
+      "'Funnel Display', Inter, 'Noto Sans SC', sans-serif",
+      "品牌标题字体；Tailwind 的 font 命名空间只有 sans / serif / mono 三族，无标题族",
+    ],
+    [
+      "cjk",
+      "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif",
+      "中文优先栈，用于需强制中文字形的场合（正文栈里中文是回退位）",
+    ],
+  ],
   text: [
     ["3xs", "0.5rem", "密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大"],
     ["2xs", "0.625rem", "同上，介于 3xs 与 xs 之间"],
@@ -49,11 +61,24 @@ export const EXTENSIONS = {
 /**
  * 覆盖：Tailwind 有该挡位、但 DS 认定取值不同。
  *
- * 目前为空——这是刻意的。ease 曾用 Material 曲线覆盖 in/out/in-out，已按
- * "扩展不是修改"的原则退回 Tailwind 取值；shadow 曾用自造的几何倍增阶梯，
- * 亦已退回。任何新增覆盖都是一次明确的设计决策，需在此写明理由。
+ * ease 曾用 Material 曲线覆盖 in/out/in-out，已按"扩展不是修改"的原则退回
+ * Tailwind 取值；shadow 曾用自造的几何倍增阶梯，亦已退回。仅剩的两条是字体栈：
+ * Tailwind 的 `--font-sans` / `--font-mono` 是**通用系统栈**，不含任何具体字体。
+ * 品牌指定了 Inter / Noto Sans SC / Geist Mono，不覆盖则这些字体永远不生效——
+ * 这不是"换个数"，而是该挡位按设计本就应由使用方填的内容。
  */
-export const OVERRIDES = {};
+export const OVERRIDES = {
+  "font/sans": {
+    value:
+      "Inter, 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+    why: "平台正文字体为 Inter + Noto Sans SC，其后接 Tailwind 原栈作回退",
+  },
+  "font/mono": {
+    value:
+      "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Noto Sans Mono CJK SC', 'Liberation Mono', 'Courier New', monospace",
+    why: "代码与数字等宽用 Geist Mono，其后接 Tailwind 原栈作回退",
+  },
+};
 
 /**
  * 品牌与合成色：Tailwind 不可能有，取自设计稿，属 DS 私有。

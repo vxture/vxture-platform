@@ -6,37 +6,41 @@
  * @author AI-Generated
  * @date 2026-05-15
  *
- * 层次固定为 T1 原子 → T2 语义 → T3 组件 → Tailwind `@theme` 注册，
- * 顺序即依赖方向，不得调换。各族文件由 scripts/design-tokens/ 下的生成器产出。
+ * 层次固定为 T1 原子 → T2 语义 → Tailwind `@theme` 注册，顺序即依赖方向，
+ * 不得调换。各族文件由 scripts/design-tokens/ 下的生成器产出。
+ *
+ * T1 是 Tailwind v4 theme 的完整镜像（偏离登记在 foundation-policy.mjs），
+ * 全族导入而非按需——`--vx-*` 是 DS 对外的完整词汇表，缺档会让"哪些能引用"
+ * 变成要逐个试出来的事。
+ *
+ * T2 只剩三族：色彩语义、24 档排版角色、页面与内容宽度。其余刻度
+ * （radius / shadow / ease / duration / opacity / border-width / z-index /
+ * spacing / size）已随 T1 镜像上游一并退役，直接用 Tailwind 内置工具类
+ * （`rounded-lg` / `shadow-md` / `ease-out` / `duration-150` / `opacity-45` /
+ * `border-2` / `z-50` / `p-4` / `size-4`）。
  */
 
-@import "./foundation/border-width-primitive.css";
+@import "./foundation/animate-primitive.css";
+@import "./foundation/aspect-primitive.css";
+@import "./foundation/blur-primitive.css";
 @import "./foundation/breakpoint-primitive.css";
 @import "./foundation/color-primitive.css";
-@import "./foundation/duration-primitive.css";
+@import "./foundation/color-brand-primitive.css";
+@import "./foundation/container-primitive.css";
+@import "./foundation/drop-shadow-primitive.css";
 @import "./foundation/ease-primitive.css";
-@import "./foundation/opacity-primitive.css";
+@import "./foundation/inset-shadow-primitive.css";
+@import "./foundation/perspective-primitive.css";
 @import "./foundation/radius-primitive.css";
 @import "./foundation/shadow-primitive.css";
 @import "./foundation/spacing-primitive.css";
+@import "./foundation/text-shadow-primitive.css";
 @import "./foundation/typography/font-primitive.css";
-@import "./foundation/typography/text-primitive.css";
-@import "./foundation/typography/weight-primitive.css";
 @import "./foundation/typography/leading-primitive.css";
+@import "./foundation/typography/text-primitive.css";
 @import "./foundation/typography/tracking-primitive.css";
-@import "./semantic/border-semantic.css";
-@import "./semantic/breakpoint-semantic.css";
+@import "./foundation/typography/weight-primitive.css";
 @import "./semantic/color-semantic.css";
-@import "./semantic/duration-semantic.css";
-@import "./semantic/ease-semantic.css";
 @import "./semantic/layout-semantic.css";
-@import "./semantic/opacity-semantic.css";
-@import "./semantic/radius-semantic.css";
-@import "./semantic/shadow-semantic.css";
-@import "./semantic/size-semantic.css";
-@import "./semantic/spacing-semantic.css";
 @import "./semantic/typography-semantic.css";
-@import "./semantic/z-index-semantic.css";
-@import "./components/index.css";
 @import "./theme.css";
-@import "./utilities.css";

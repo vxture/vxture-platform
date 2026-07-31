@@ -31,7 +31,10 @@ const CHECK = process.argv.includes("--check");
 const PKG = path.join(ROOT, "packages/design/design-system");
 const EXPORT_DIR = path.join(PKG, "Figma-Token");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
-const T1_COLOR = path.join(PKG, "src/styles/foundation/color-primitive.css");
+const T1_COLOR_FILES = [
+  path.join(PKG, "src/styles/foundation/color-primitive.css"),
+  path.join(PKG, "src/styles/foundation/color-brand-primitive.css"),
+];
 
 function flatten(node, prefix = "", out = []) {
   for (const key of Object.keys(node)) {
@@ -74,25 +77,54 @@ function cssVarName(token, tokenPath) {
   return `--${m[2]}`;
 }
 
-/** color/brand/main/600 → --vx-color-brand-600 ；color/neutral/600/alpha-08 → …-alpha-08 */
+/**
+ * color/brand/main/600 → --vx-color-brand-600 ；color/neutral/600/alpha-08 → …-alpha-08
+ *
+ * `color/base/white` → `--vx-color-white`：T1 镜像 Tailwind 后，黑白是色板里的
+ * 两个单值，不再挂在 `base/` 分组下。
+ */
 function primitiveVar(target) {
-  const body = target.replace(/^color\//, "").replace(/^brand\/main\//, "brand/");
+  const body = target
+    .replace(/^color\//, "")
+    .replace(/^brand\/main\//, "brand/")
+    .replace(/^base\//, "");
   return `--vx-color-${body.replace(/\//g, "-")}`;
 }
 
-/** T1 已生成的变量集合——用于断言 T2 不会引用不存在的原子。 */
+/**
+ * T1 已生成的色板变量——用于断言 T2 不会引用不存在的原子。
+ *
+ * 两个文件：镜像 Tailwind 的色阶，与设计稿提供的品牌 / 合成色。分开存放是为了
+ * 一眼能看出哪些是我们的；读的时候必须都读，否则品牌色会被误判为不存在。
+ */
 function loadT1Vars() {
-  const css = readFileSync(T1_COLOR, "utf8");
-  return new Set([...css.matchAll(/^\s*(--vx-color-[\w-]+):/gm)].map((m) => m[1]));
+  const names = new Set();
+  for (const file of T1_COLOR_FILES) {
+    const css = readFileSync(file, "utf8");
+    for (const m of css.matchAll(/^\s*(--vx-color-[\w-]+):/gm)) names.add(m[1]);
+  }
+  return names;
 }
 
 const t1Vars = loadT1Vars();
 const skipped = [];
 const errors = [];
 
+/**
+ * 不再产出的分组。
+ *
+ * `elevation/*` 是阴影的颜色分量，配套的几何分量（offset-y / blur）随 T2 阴影层
+ * 一并退役——阴影改用 Tailwind 内置的 `shadow-xs…2xl`（v4 已是双层合成值，
+ * 比我方原先的"偏移与模糊各翻一倍"阶梯更贴近真实光照）。留着颜色分量就是
+ * 一组没有消费者的变量。若日后要做随明暗切换的阴影色，v4 的做法是
+ * `shadow-md shadow-black/20`，即在使用处叠 `--tw-shadow-color`，仍不需要这一组。
+ */
+const DROPPED_GROUPS = [/^elevation\//];
+
 function buildMode(collection, mode) {
   const rows = [];
   for (const [tokenPath, token] of flatten(loadMode(collection, mode))) {
+    if (DROPPED_GROUPS.some((p) => p.test(tokenPath))) continue;
     const name = cssVarName(token, tokenPath);
     if (!name) {
       if (mode === "vx-Color-Light") skipped.push(tokenPath);
