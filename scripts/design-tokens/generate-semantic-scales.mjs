@@ -56,7 +56,6 @@ import {
   CAPS_TRACKING,
   CJK_SELECTOR,
   CJK_LEADING_ADD,
-  CJK_TRACKING_ADD,
 } from "./typography-policy.mjs";
 
 const ROOT = process.cwd();
@@ -146,8 +145,8 @@ function stepFor(role, shift) {
 /**
  * 一个角色在某个字号档下的五项属性。
  *
- * 行高与字距按规则取，不逐角色写死——规则见 typography-policy。行高默认引字号档
- * 自带的子键，故角色在三档之间自动跟随，无需为每档存一个数。
+ * 行高引字号档自带的子键，故角色在三档字号模式之间自动跟随；字距统一为零。
+ * 规则与两处例外（大字号标题收紧行高、全大写放开字距）见 typography-policy。
  */
 function buildRoles(modeIndex) {
   const rows = [];
@@ -171,13 +170,10 @@ function buildRoles(modeIndex) {
       } + var(--vx-cjk-leading-add))`,
       group,
     ]);
-    // 字距跟字号档，不跟角色；全大写是唯一与尺寸无关的例外。
+    // 字距统一为零，全大写除外。角色仍显式声明，避免继承自父级的字距漏进来。
     rows.push([
       `--${name}-letter-spacing`,
-      `calc(${t1(
-        CAPS_ROLES.has(name) ? CAPS_TRACKING : `--vx-text-${step}--letter-spacing`,
-        where,
-      )} + var(--vx-cjk-tracking-add))`,
+      t1(CAPS_ROLES.has(name) ? CAPS_TRACKING : "--vx-tracking-normal", where),
       group,
     ]);
   }
@@ -405,9 +401,8 @@ const outputs = [
       "\n\n" +
       // 中文修正轴：默认零，由 :lang(zh) 打开。写成加法故与字号三档正交，
       // 三个模式块无需各自复制一遍。
-      `:root {\n  --vx-cjk-leading-add: 0;\n  --vx-cjk-tracking-add: 0em;\n}\n\n` +
-      `${CJK_SELECTOR} {\n  --vx-cjk-leading-add: ${CJK_LEADING_ADD};\n` +
-      `  --vx-cjk-tracking-add: ${CJK_TRACKING_ADD};\n}\n`,
+      `:root {\n  --vx-cjk-leading-add: 0;\n}\n\n` +
+      `${CJK_SELECTOR} {\n  --vx-cjk-leading-add: ${CJK_LEADING_ADD};\n}\n`,
   ],
   [
     "spacing-semantic.css",
