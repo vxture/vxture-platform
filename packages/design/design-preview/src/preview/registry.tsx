@@ -92,22 +92,48 @@ import {
   TooltipTrigger,
   useToast,
 } from "@vxture/design-system";
-import { Row } from "./kit";
+import {
+  AuthLoginTemplate,
+  AuthPasswordLoginPanel,
+  ShellBrand,
+  ShellIconButton,
+  ShellLegalFooter,
+  ShellLocaleSwitcher,
+  ShellPreferencePanel,
+  ShellThemeToggle,
+  ShellUserMenu,
+} from "@vxture/design-system";
+import { PendingNote, Row } from "./kit";
 
 export type Provenance =
   | "shadcn"
   | "origin"
   | "vxture"
   | "component"
-  | "patterns";
+  | "patterns"
+  /** 尚未重写、且去向是删除或迁出的件。渲染无样式是预期结果。 */
+  | "pending";
+
+/**
+ * 粒度，决定进哪个大类页面。**显式标注，不从出处标签推**——标签说的是"谁做的"
+ * （上游 / 我们改的 / 我们建的），跟"它是不是原子件"是两回事：`NativeSelect` 是我们
+ * 建的，但它就是一个控件；`Card` 来自上游，却是一组部件。
+ *
+ * 判据：`atom` = 一个控件、一个交互单元、没有子件 API；`pattern` = 由多个部件或多个
+ * 控件拼成（含所有 `X.Part` 形态的件）；`pending` = 尚未重写。
+ */
+export type Layer = "atom" | "pattern" | "pending";
 
 export interface Entry {
   readonly name: string;
   readonly group: string;
+  readonly layer: Layer;
   /** 恰好两枚，见文件头的三类。 */
   readonly tags: readonly [Provenance, Provenance];
   /** 定制了什么。只有 vxture 类需要写。 */
   readonly deviation?: string;
+  /** 待删 / 待迁出，不计入统计卡的"已完成"。 */
+  readonly pending?: boolean;
   readonly render: () => React.ReactNode;
 }
 
@@ -120,12 +146,17 @@ const BUTTON_VARIANTS = [
   "link",
 ] as const;
 
+/**
+ * 组件页内部的分组顺序。大类见 `./sections`——那一层决定进哪个页面，这一层只决定
+ * 在页面里的先后。
+ */
 export const GROUPS = ["表单", "展示", "导航", "浮层", "反馈", "图案"] as const;
 
 export const ENTRIES: readonly Entry[] = [
   /* ── 表单 ───────────────────────────────────────────────── */
   {
     name: "Button",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -152,6 +183,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Input",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -166,6 +198,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Textarea",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -178,6 +211,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Label",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -193,6 +227,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Checkbox",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -214,6 +249,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Switch",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -235,6 +271,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Select",
+    layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -261,6 +298,7 @@ export const ENTRIES: readonly Entry[] = [
 
   {
     name: "NativeSelect",
+    layer: "atom",
     group: "表单",
     tags: ["vxture", "component"],
     deviation:
@@ -283,6 +321,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "SegmentedControl",
+    layer: "atom",
     group: "表单",
     tags: ["vxture", "patterns"],
     deviation:
@@ -293,6 +332,7 @@ export const ENTRIES: readonly Entry[] = [
   /* ── 展示 ───────────────────────────────────────────────── */
   {
     name: "Badge",
+    layer: "atom",
     group: "展示",
     tags: ["shadcn", "vxture"],
     deviation:
@@ -314,6 +354,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Card",
+    layer: "pattern",
     group: "展示",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -336,6 +377,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Avatar",
+    layer: "atom",
     group: "展示",
     tags: ["shadcn", "vxture"],
     deviation: "增 AvatarSilhouette 与 UserAvatar 两件（平台头像的兜底形态）",
@@ -352,6 +394,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Separator",
+    layer: "atom",
     group: "展示",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -367,6 +410,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Skeleton",
+    layer: "atom",
     group: "展示",
     tags: ["shadcn", "vxture"],
     deviation:
@@ -383,6 +427,7 @@ export const ENTRIES: readonly Entry[] = [
   /* ── 导航 ───────────────────────────────────────────────── */
   {
     name: "Tabs",
+    layer: "pattern",
     group: "导航",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -405,6 +450,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Breadcrumb",
+    layer: "pattern",
     group: "导航",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -427,6 +473,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Pagination",
+    layer: "pattern",
     group: "导航",
     tags: ["shadcn", "vxture"],
     deviation:
@@ -437,6 +484,7 @@ export const ENTRIES: readonly Entry[] = [
   /* ── 浮层 ───────────────────────────────────────────────── */
   {
     name: "Dialog",
+    layer: "pattern",
     group: "浮层",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -463,6 +511,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Drawer",
+    layer: "pattern",
     group: "浮层",
     tags: ["shadcn", "vxture"],
     deviation:
@@ -471,6 +520,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "DropdownMenu",
+    layer: "pattern",
     group: "浮层",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -492,6 +542,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Popover",
+    layer: "pattern",
     group: "浮层",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -511,6 +562,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "Tooltip",
+    layer: "atom",
     group: "浮层",
     tags: ["shadcn", "origin"],
     render: () => (
@@ -528,6 +580,7 @@ export const ENTRIES: readonly Entry[] = [
   /* ── 反馈 ───────────────────────────────────────────────── */
   {
     name: "Toast",
+    layer: "pattern",
     group: "反馈",
     tags: ["shadcn", "vxture"],
     deviation:
@@ -537,6 +590,7 @@ export const ENTRIES: readonly Entry[] = [
 
   {
     name: "Banner",
+    layer: "pattern",
     group: "反馈",
     tags: ["vxture", "patterns"],
     deviation:
@@ -547,6 +601,7 @@ export const ENTRIES: readonly Entry[] = [
   /* ── 图案（完全自建）─────────────────────────────────────── */
   {
     name: "ViewHeader",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -570,6 +625,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "StatusBadge",
+    layer: "atom",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -613,6 +669,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "EmptyState",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -632,6 +689,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "结构件族",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -670,6 +728,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "SplitViewLayout",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -697,6 +756,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "SectionNav",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -705,6 +765,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "FilterBar",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -735,6 +796,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "ActionMenu",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -760,6 +822,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "BulkActionBar",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -768,6 +831,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "DataTable",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -776,6 +840,7 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "MetricGrid / MetricCard",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
@@ -823,15 +888,138 @@ export const ENTRIES: readonly Entry[] = [
   },
   {
     name: "DialogForm",
+    layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
       "页脚由 props 描述而非 markup 槽，danger 一个开关覆盖常规/危险两种提交。字段区仍是 children——表单字段是业务形状",
     render: () => <DialogFormDemo />,
   },
+
+  /* ── 待删（尚未重写，渲染无样式是预期结果）──────────────── */
+  {
+    name: "ShellChrome",
+    layer: "pending",
+    group: "外壳与登录",
+    tags: ["vxture", "pending"],
+    pending: true,
+    deviation:
+      "856 行，website 的 Header 在用其中三件。整份仍挂 .vx-shell-* 遗留类名。八个导出件全部摆在这里，供判断有无值得并入 WorkbenchShell 的部分",
+    render: () => <ShellChromeDemo />,
+  },
+  {
+    name: "AuthLogin",
+    layer: "pending",
+    group: "外壳与登录",
+    tags: ["vxture", "pending"],
+    pending: true,
+    deviation:
+      "1,742 行，accounts 有 6 个文件在用。整份仍挂 .vx-auth-* 遗留类名。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
+    render: () => <AuthLoginDemo />,
+  },
 ];
 
 /* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
+
+function ShellChromeDemo() {
+  const [locale, setLocale] = React.useState<"zh-CN" | "en-US">("zh-CN");
+  const [theme, setTheme] = React.useState<"light" | "dark" | "system">(
+    "light",
+  );
+  return (
+    <div className="flex max-h-screen w-full flex-col gap-md overflow-auto">
+      <PendingNote />
+      <Row label="ShellBrand">
+        <ShellBrand label="Vxture" />
+      </Row>
+      <Row label="ShellIconButton（默认 / 激活 / 禁用）">
+        <ShellIconButton icon="bell" label="通知" />
+        <ShellIconButton icon="search" label="搜索" active />
+        <ShellIconButton icon="settings" label="设置" disabled />
+      </Row>
+      <Row label="ShellThemeToggle / ShellLocaleSwitcher">
+        <ShellThemeToggle
+          currentTheme={theme === "dark" ? "dark" : "light"}
+          onThemeChange={(next) => setTheme(next)}
+        />
+        <ShellLocaleSwitcher
+          currentLocale={locale}
+          onLocaleChange={(next) => setLocale(next as "zh-CN" | "en-US")}
+        />
+      </Row>
+      <Row label="ShellUserMenu" stack>
+        <ShellUserMenu
+          user={{
+            displayName: "郭衍浩",
+            uniqueLine: "@yanhao",
+            avatarFallback: "郭",
+            statusTag: { label: "已认证", verified: true },
+            badges: [{ key: "lv", label: "Lv.4" }],
+          }}
+          links={[{ key: "profile", label: "个人信息", href: "#profile" }]}
+          actions={[{ key: "logout", label: "退出登录", onClick: () => {} }]}
+        />
+      </Row>
+      <Row label="ShellPreferencePanel" stack>
+        <ShellPreferencePanel
+          locale={locale}
+          theme={theme}
+          density="default"
+          fontSize="default"
+          onLocaleChange={(next) => setLocale(next as "zh-CN" | "en-US")}
+          onThemeChange={(next) => setTheme(next)}
+        />
+      </Row>
+      <Row label="ShellLegalFooter" stack>
+        <ShellLegalFooter
+          copyright="© 2026 Vxture"
+          links={[
+            { href: "#terms", label: "服务条款" },
+            { href: "#privacy", label: "隐私政策" },
+          ]}
+        />
+      </Row>
+    </div>
+  );
+}
+
+function AuthLoginDemo() {
+  const [identifier, setIdentifier] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [agreed, setAgreed] = React.useState(false);
+  return (
+    <div className="flex w-full flex-col gap-md">
+      <PendingNote />
+      {/* 关进一个带自身滚动的框里。无样式的件会把装饰元素放大到几千像素——
+          AuthLogin 那把锁就把整页顶没了。框不掩盖坏，只是不让它波及别的条目。 */}
+      <div className="max-h-screen w-full overflow-auto rounded-lg border border-dashed border-border">
+        <AuthLoginTemplate
+          title="欢迎回来"
+          visual={{
+            title: "Vxture 平台",
+            description: "一个账号，贯通全部工作台。",
+            statusText: "服务正常",
+            stats: [
+              { value: "99.9%", label: "可用性" },
+              { value: "12ms", label: "中位时延" },
+            ],
+          }}
+        >
+          <AuthPasswordLoginPanel
+            identifier={identifier}
+            password={password}
+            agreementChecked={agreed}
+            loading={false}
+            onChangeIdentifier={setIdentifier}
+            onChangePassword={setPassword}
+            onAgreementChange={setAgreed}
+            onSubmit={(e) => e.preventDefault()}
+          />
+        </AuthLoginTemplate>
+      </div>
+    </div>
+  );
+}
 
 const TONES = [
   "neutral",

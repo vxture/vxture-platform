@@ -13,6 +13,7 @@ import {
   ToastProvider,
   TooltipProvider,
 } from "@vxture/design-system";
+import { Shell } from "@/preview/Shell";
 import "./globals.css";
 
 export const metadata = {
@@ -30,7 +31,9 @@ export default function RootLayout({
       <body className="bg-background text-foreground">
         <ThemeProvider>
           <ToastProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider>
+              <Shell>{children}</Shell>
+            </TooltipProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

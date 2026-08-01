@@ -190,6 +190,7 @@
       "cn",
       "densityClass",
       "fontSizeClass",
+      "iconDictionary",
       "themeBootstrapScript",
       "toneIcons",
       "toneSurfaceClasses",
