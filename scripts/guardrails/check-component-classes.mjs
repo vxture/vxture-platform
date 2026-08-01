@@ -154,13 +154,13 @@ async function walk(dir, out = []) {
  */
 const PENDING = new Set([
   "ActionButton.tsx", "ActionMenu.tsx",  "Banner.tsx", "BulkActionBar.tsx",
-   "DataTable.tsx", "DetailDrawer.tsx", "DetailPanel.tsx",
+   "DataTable.tsx", 
    "DialogForm.tsx",  
-  "EntityListPage.tsx", "EntityTableSection.tsx", "FilterBar.tsx", 
-  "MetricCard.tsx", "MetricGrid.tsx", "NativeSelect.tsx", "PageActions.tsx",
+     
+  "MetricCard.tsx", "MetricGrid.tsx", "NativeSelect.tsx", 
     "PageSizePicker.tsx", 
-   "SectionCard.tsx", "SectionNav.tsx", 
-     "TableToolbar.tsx",
+     
+     
     "ViewModeSwitch.tsx",
   "AuthLogin.tsx", "ShellChrome.tsx",
   "AIAssistantBubble.tsx", "GenerationStream.tsx", "ModelBadge.tsx",
