@@ -54,21 +54,17 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 | 描边宽度        | `--border-width-thin` → `border-thin`                                         | `--border-width-*`                     | 无           |
 | 页面 / 内容宽度 | `--container-page-lg` → `max-w-page-lg`                                       | `--container-*`                        | 无           |
 
-**命名空间必须写对**。`--duration-*`、`--z-*`、`--space-*` 都不是 v4 的命名空间（正确的是
-`--transition-duration-*`、`--z-index-*`、`--spacing-*`）；写错则变量声明成功、工具类不产出、
-**且不报错**。`duration-fast` 曾因此哑火一整轮。`check-utilities.mjs` 逐族取样实测守这条。
+**命名空间必须写对**：`--transition-duration-*`、`--z-index-*`、`--spacing-*`。写错则变量
+声明成功、工具类不产出且不报错。由 `check-utilities.mjs` 逐族取样实测。
 
-**零增益的族也走 T2**。radius 目前就是 T1 的恒等别名。保留它是为分层边界完整——
-边界要么处处成立、要么不成立，消费方不该需要记住"这族有语义名、那族没有"。
+**零增益的族也走 T2**。radius 目前是 T1 的恒等别名，仍保留，使分层边界处处成立。
 
 **三族有模式轴**，在模式选择器下声明、由 `theme.css` 以 `@theme inline` 注册，故模式切换
 自动跟随：色彩（`.dark`）、排版角色（`html.vx-font-*`）、间距（`.density-*`）。其余各族在
 自己的 semantic 文件里 `@theme` 一处声明即完成注册。
 
-**三族没有 T1 可指**：z-index（叠放次序不是量纲，500 不是某个测量值的第 500 档）、opacity
-与 border-width（上游既无 theme 变量也无封闭档位表，接受任意取值）。它们在 T2 落字面量，
-这不是分层的例外，是那一维本就没有原子层。容器宽度同样落字面量，原因是**容器查询里
-var() 不参与求值**。
+**四族在 T2 落字面量**：z-index、opacity、border-width 上游无原子层可指；容器宽度是因为
+容器查询里 `var()` 不参与求值。
 
 **T3 已退役**。组件尺寸改由 cva variant 承担——见 §1.2 的三根轴。
 
@@ -89,20 +85,15 @@ var() 不参与求值**。
 | **上下文尺寸**：工具栏 sm、英雄区 lg                       | 设计，放置时  | 单个放置点            | cva `size` variant        |
 | **意图与状态**：primary/destructive、hover/active/disabled | 设计，放置时  | 单个实例              | T2 语义色 + cva `variant` |
 
-必须分开的理由很直接：用户把字号调大，不该让工具栏按钮变成 hero 按钮；设计师把某个按钮
-设成 lg，也不该波及别处。
-
-两者的相乘是自动的：cva 给出 `h-control-md`（上下文说"中号控件"），`.density-compact`
-把 `--space-control-md` 从 2rem 改成 1.75rem（用户说"紧凑"）。**组件不需要知道密度存在**。
-这也是密度不做成 cva compound variant 的原因：3 档 × 4 尺寸 = 每个组件 12 组要声明，
-而且页面里那些 `<div class="gap-md">` 根本跟不上。
+相乘是自动的：cva 给出 `h-control-md`，`.density-compact` 改写 `--space-control-md` 的取值。
+**组件不需要知道密度存在**，故密度不做成 cva compound variant。
 
 **一致性靠三道，只有第二道是真保证**：
 
-1. **cva 定义合法集合** —— `size` 只有 sm/default/lg，写别的 TS 报错。挡住"发明新尺寸"。
-2. **模式组件（L2）固定"哪个上下文用哪档"** —— `Toolbar` 自己渲染控件、或用 context 下发
-   `size="sm"`，页面代码没有选择余地。靠人记住"工具栏用 sm"必然漂移。
-3. **护栏** —— 禁任意值语法、禁应用层定义 `--vx-*`、禁裸设计值。挡住绕过前两道。
+1. **cva 定义合法集合** —— `size` 只有 sm/default/lg，写别的 TS 报错。
+2. **图案件固定"哪个上下文用哪档"** —— 由图案件自己渲染控件或经 context 下发 `size`，
+   调用方没有选择余地。
+3. **护栏** —— 禁任意值语法、禁应用层定义 `--vx-*`、禁裸设计值。
 
 ### 1.3 组件目录归属
 
@@ -117,7 +108,7 @@ var() 不参与求值**。
 
 两条边界：
 
-- **`patterns/` 收录看实据不看设想**。"以后可能用到"正是造出零消费组件的来路。
+- **`patterns/` 收录看实据不看设想**：须已在多个产品中各自重写过。
 - **DS 零业务**。`StatusBadge` 有 tone，没有"订阅已逾期"。带业务归属的共享面板归
   本仓的 `@vxture/domain-ui`（private，不发布）。
 
@@ -331,8 +322,7 @@ DS 提供 `.vx-brand-lockup`、`.vx-brand-mark`、`.vx-brand-name`、`.vx-brand-
 
 **Motion**：用 T2 语义名——时长 `duration-instant/fast/base/slow/slower`，缓动
 `ease-enter`（入场减速）/ `ease-exit`（退场加速）/ `ease-standard`（位置与尺寸变化）。
-取值全部落在上游档上：DS 曾用 Material 三条曲线覆盖 `in`/`out`/`in-out`，已退回上游取值——
-覆盖上游同名挡位属"修改"不属"扩展"。业务层不得声明全局 keyframes 或字面时长；
+取值全部落在上游档上，不覆盖上游同名挡位。业务层不得声明全局 keyframes 或字面时长；
 AI 生成态优先用 DS AI 组件内建 motion。
 
 **Z-index**：用 `z-base` … `z-max` 语义名。`0–99` 归局部堆叠自由使用；超过 `99` 的一律取自
