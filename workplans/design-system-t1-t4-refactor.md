@@ -96,17 +96,85 @@ T1/T2/T3 的引用数为 **0**，两层完全不相交，没有可迁移的等�
 三个 barrel 留空壳使 portal 仍可构建；顺带清掉三处重复（shadcn 桥接、
 两个品牌色阶副本）。DS 样式层的悬空引用已清零。
 
-### C2. 通用工作台图案（新增）
+### C2. 通用工作台图案
 
-admin 在 portal 里另起了 148 文件 / 12.8k 行的私有栈，console 则一直吃 DS 的
-`platform-*`。**重复发生在 admin ↔ DS 之间，不是 console ↔ admin。**
+#### 产品扫描结论（2026-08-01）
 
-admin 那 148 个文件按**页面**切分（`management` 50、`overview` 17…），不是按图案，
-所以原样抬进 DS 等于把页面级重复升格成包级重复。改为提炼约 12–15 个复现图案，
-以 T1–T3 + 工具类重写为 cva 组件：数据表格、工具栏、页头、面板、表单行、
-状态胶囊、分页、空态、详情抽屉、step-up 弹窗、标签页。
+对 console / admin / opera 三个产品自有 `.tsx` 全量扫描，推翻了先前"重复在
+admin ↔ DS 之间"的判断。
 
-命名遵循 D16：`DataTable` / `Toolbar` / `PageHeader`，不带任何产品前缀。
+规模：console 62 文件 11,871 行；admin 121 文件 41,552 行；opera 5 文件 439 行。
+opera 近乎空白，是**验收样本**——图案抽对了，opera 应当几乎全靠它拼出来。
+
+**名字在 ≥2 个产品各自实现的 9 组：**
+
+| 组件                | console | admin | opera |
+| ------------------- | ------: | ----: | ----: |
+| `TemplateHeader`    |     787 |   483 |       |
+| `AppShell`          |     466 |   331 |       |
+| `TemplateSidebar`   |     179 |   181 |       |
+| `TemplateDrawer`    |     146 |   146 |       |
+| `TemplateAssistant` |      46 |    47 |       |
+| `Shell`             |     110 |       |   218 |
+| `SessionProvider`   |     286 |   102 |   103 |
+| `BillingPage`       |     220 |  1177 |       |
+| `RolesPage`         |     890 |  1885 |       |
+
+`TemplateDrawer` 146 vs 146、`TemplateSidebar` 179 vs 181——不是相似，是拷贝。
+外壳一族在 console + admin 之间重复约 **1,600 行**，而 DS 里一个都没有（856 行的
+`ShellChrome` 零消费方）。
+
+**结构特征出现的文件数：**
+
+| 特征     | console | admin | opera | 合计 | DS 现状                            |
+| -------- | ------: | ----: | ----: | ---: | ---------------------------------- |
+| 页头     |      21 |    49 |     2 |   72 | `PageHeader`                       |
+| 状态标   |      11 |    39 |       |   50 | `StatusBadge`                      |
+| 空态     |       4 |    44 |       |   48 | `EmptyState`                       |
+| 筛选栏   |       2 |    30 |       |   32 | `FilterBar`                        |
+| 弹窗表单 |       3 |    20 |       |   23 | `DialogForm`                       |
+| 批量操作 |       3 |    17 |       |   20 | `BulkActionBar`                    |
+| 设置分栏 |       4 |    14 |       |   18 | `SettingsSplitPage` / `SectionNav` |
+| 详情抽屉 |       3 |     4 |       |    7 | `DetailDrawer`                     |
+| 表格     |       4 |     1 |       |    5 | `DataTable`                        |
+| 指标卡   |       2 |     2 |       |    4 | `MetricCard` / `MetricGrid`        |
+
+**DS 现有图案件选型正确**：前七名全部已有对应件。它们不是投机建设，而是**建对了
+但没接上**——样式层退役后集体哑火，产品于是各写各的。C2 的性质因此从"提炼新图案"
+改为"把既有图案件重新上样式并接回产品"。
+
+#### 执行清单
+
+第一梯队（≥18 次，按频次排）：`PageHeader`、`StatusBadge`、`EmptyState`、
+`FilterBar`、`DialogForm`、`BulkActionBar`、`SettingsSplitPage` + `SectionNav`。
+
+第二梯队（<10 次）：`DetailDrawer`、`DataTable`、`MetricCard` / `MetricGrid`。
+
+其余自有件：命中上表的留；≤1 消费方的回产品；零消费的删。`ai/` 五件归 agent-studio。
+
+命名遵循 D16：不带任何产品前缀。
+
+### C3. 外壳族 `WorkbenchShell`（延后）
+
+DS 唯一完全缺失、且重复最重（~1,600 行）的一块。`TemplateHeader` 787 vs 483 的差异
+说明 console / admin 已经开始分叉，拖越久越贵。
+
+前置：读 `TemplateHeader` 两份做差异分析，判定哪些是通用骨架、哪些是 console 专属，
+据此定 `NavItem` 之外的数据字段。设计为**数据驱动**（`nav={NavItem[]}`，
+`icon: IconName`、`label: string`），不开 slot，产品无法写 markup。
+
+同批删除零消费方的 `ShellChrome`（856 行）与 `AuthLogin`（1,742 行）——accounts 有自己的
+`login/` 路由，console 有自己 109 行的 `ConsoleShell.tsx`。
+
+### C4. 业务属性面板（延后，不进 DS）
+
+`UserPanel` / `TenantPanel` 一类带业务归属的共享面板，不进设计系统、不发独立包，
+落在本仓 `@vxture/domain-ui`（`packages/domain/ui`，`private: true`），供三个产品共用。
+边界由 depcruise 规则守：需要 `@vxture/shared` 的进 domain-ui，不需要的进 design-ui。
+
+### C5. 产品侧遗留类名清理（延后）
+
+产品侧约 990 个引用已退役 BEM 类名的死类，需在图案件接回后统一清。
 
 ### D. 发布体系改造
 

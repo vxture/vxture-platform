@@ -26,7 +26,8 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
         ref={ref}
         className={cn(
           "peer size-icon-md shrink-0 rounded-sm border border-foreground",
-          "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          // 焦点环与 Button / Input / Switch 统一，不用上游旧版的 ring-offset 写法
+          "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
           "disabled:cursor-not-allowed disabled:opacity-disabled",
           "data-[state=checked]:bg-primary data-[state=checked]:text-content-on-fill",
           className,

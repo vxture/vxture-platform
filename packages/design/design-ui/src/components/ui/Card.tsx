@@ -1,10 +1,16 @@
 /**
- * card.tsx - Card 组件
+ * Card.tsx - 卡片（shadcn 惯例）。
  * @package @vxture/design-ui
- *
- * @copyright Vxture Team
  * @layer Presentation
  * @category Components - Display
+ *
+ * 结构承 shadcn 官方 Card 的六件套。相对上游的定制：
+ * - 卡片自身用 `shadow-flat` 而非上游的 `shadow-sm`——视觉高度是 T2 的语义阶梯，
+ *   卡片是"贴地"那一档，抬高由使用方按场景加 `shadow-raised`。
+ * - 内边距走 `p-lg`、标题层次走 `text-heading-5`，跟随密度与字号三档；
+ *   上游的 p-6 / text-2xl 是裸数值，不跟随。
+ *
+ * 原实现在每一件上都挂了 .vx-card__*，随遗留样式层一并退役。
  */
 
 import * as React from "react";
@@ -18,8 +24,7 @@ const Card = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "rounded-xl border border-border bg-card text-foreground shadow-sm",
-        "vx-card",
+        "flex flex-col rounded-lg border border-border bg-card text-foreground shadow-flat",
         className,
       )}
       {...props}
@@ -34,30 +39,18 @@ const CardHeader = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn(
-        "flex flex-col space-y-1.5 p-6",
-        "vx-card__header",
-        className,
-      )}
+      className={cn("flex flex-col gap-2xs p-lg", className)}
       {...props}
     />
   );
 });
 
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
+  HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(function CardTitle({ className, ...props }, ref) {
   return (
-    <h3
-      ref={ref}
-      className={cn(
-        "text-2xl font-semibold leading-none tracking-tight",
-        "vx-card__title",
-        className,
-      )}
-      {...props}
-    />
+    <h3 ref={ref} className={cn("text-heading-5", className)} {...props} />
   );
 });
 
@@ -68,11 +61,7 @@ const CardDescription = React.forwardRef<
   return (
     <p
       ref={ref}
-      className={cn(
-        "text-sm text-muted-foreground",
-        "vx-card__description",
-        className,
-      )}
+      className={cn("text-body-sm text-muted-foreground", className)}
       {...props}
     />
   );
@@ -82,13 +71,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(function CardContent({ className, ...props }, ref) {
-  return (
-    <div
-      ref={ref}
-      className={cn("p-6 pt-0", "vx-card__content", className)}
-      {...props}
-    />
-  );
+  return <div ref={ref} className={cn("p-lg pt-none", className)} {...props} />;
 });
 
 const CardFooter = React.forwardRef<
@@ -98,7 +81,7 @@ const CardFooter = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("flex items-center p-6 pt-0", className)}
+      className={cn("flex items-center gap-sm p-lg pt-none", className)}
       {...props}
     />
   );

@@ -153,15 +153,15 @@ async function walk(dir, out = []) {
  * 每重写完一个就从 PENDING 移走，清空即可删掉这份名单。
  */
 const PENDING = new Set([
-  "ActionButton.tsx", "ActionMenu.tsx", "Badge.tsx", "Banner.tsx", "BulkActionBar.tsx",
-  "Card.tsx", "DataTable.tsx", "DetailDrawer.tsx", "DetailPanel.tsx",
+  "ActionButton.tsx", "ActionMenu.tsx",  "Banner.tsx", "BulkActionBar.tsx",
+   "DataTable.tsx", "DetailDrawer.tsx", "DetailPanel.tsx",
   "DetailSectionHeading.tsx", "DialogForm.tsx", "Drawer.tsx", "EmptyState.tsx",
-  "EntityListPage.tsx", "EntityTableSection.tsx", "FilterBar.tsx", "Input.tsx",
+  "EntityListPage.tsx", "EntityTableSection.tsx", "FilterBar.tsx", 
   "MetricCard.tsx", "MetricGrid.tsx", "NativeSelect.tsx", "PageActions.tsx",
   "PageHeader.tsx", "PageSection.tsx", "PageSizePicker.tsx", "PageStack.tsx",
   "Pagination.tsx", "SectionCard.tsx", "SectionNav.tsx", "SettingsSplitPage.tsx",
-  "Skeleton.tsx", "StatusBadge.tsx", "Switch.tsx", "TableToolbar.tsx",
-  "Textarea.tsx", "Toast.tsx", "ViewModeSwitch.tsx",
+   "StatusBadge.tsx",  "TableToolbar.tsx",
+   "Toast.tsx", "ViewModeSwitch.tsx",
   "AuthLogin.tsx", "ShellChrome.tsx",
   "AIAssistantBubble.tsx", "GenerationStream.tsx", "ModelBadge.tsx",
   "PromptInput.tsx", "TokenCounter.tsx",

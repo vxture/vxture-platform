@@ -1,62 +1,52 @@
 /**
- * switch.tsx - Switch 组件
+ * Switch.tsx - 开关（shadcn 惯例）。
  * @package @vxture/design-ui
- *
- * @copyright Vxture Team
  * @layer Presentation
  * @category Components - Form
+ *
+ * 结构照 shadcn 官方 Switch，取值换成 T2 语义类，不加上游没有的变体。
+ *
+ * 原实现是 label + 原生 checkbox + .vx-switch__track 的手写件——`@radix-ui/react-switch`
+ * 一直在依赖里却没被用上。改回 Radix 拿到无障碍语义（role=switch、aria-checked、
+ * 键盘操作），代价是 `onChange` 换成 Radix 的 `onCheckedChange`（本仓无消费方）。
+ *
+ * 尺寸取图标刻度而非密度刻度：开关是定尺的图形控件，密度收紧应体现在它周围的
+ * 留白上，把图形本身压小只会先丢掉可点击面积。Checkbox 同理。
  */
 
 import * as React from "react";
+import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { cn } from "../../utils/cn";
 
-export interface SwitchProps extends Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "type"
-> {
-  readonly onCheckedChange?: (checked: boolean) => void;
-}
+export type SwitchProps = React.ComponentPropsWithoutRef<
+  typeof SwitchPrimitive.Root
+>;
 
-export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
-  function Switch(
-    {
-      className,
-      checked,
-      defaultChecked,
-      disabled,
-      onChange,
-      onCheckedChange,
-      ...props
-    },
-    ref,
-  ) {
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(event);
-      onCheckedChange?.(event.target.checked);
-    };
-
+export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
+  function Switch({ className, ...props }, ref) {
     return (
-      <label
+      <SwitchPrimitive.Root
+        ref={ref}
         className={cn(
-          "vx-switch",
-          disabled && "cursor-not-allowed opacity-60",
+          "peer inline-flex h-icon-lg w-icon-2xl shrink-0 items-center rounded-full border border-transparent",
+          "transition-colors duration-fast ease-standard outline-none",
+          "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
+          "disabled:cursor-not-allowed disabled:opacity-disabled",
+          "data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
           className,
         )}
+        {...props}
       >
-        <input
-          ref={ref}
-          type="checkbox"
-          className="vx-switch__input"
-          checked={checked}
-          defaultChecked={defaultChecked}
-          disabled={disabled}
-          onChange={handleChange}
-          {...props}
+        <SwitchPrimitive.Thumb
+          className={cn(
+            "pointer-events-none block size-icon-md rounded-full bg-background shadow-raised ring-0",
+            "transition-transform duration-fast ease-standard",
+            "data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-[2px]",
+          )}
         />
-        <span className="vx-switch__track" aria-hidden="true" />
-      </label>
+      </SwitchPrimitive.Root>
     );
   },
 );
 
-Switch.displayName = "Switch";
+Switch.displayName = SwitchPrimitive.Root.displayName;
