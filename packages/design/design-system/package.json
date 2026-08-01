@@ -51,8 +51,8 @@
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",
-    "@vxture/design-tokens": "workspace:^",
-    "@vxture/design-ui": "workspace:^",
+    "@vxture/design-tokens": "workspace:*",
+    "@vxture/design-ui": "workspace:*",
     "@vxture/shared": "workspace:^"
   },
   "peerDependencies": {
