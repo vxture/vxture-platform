@@ -1,31 +1,49 @@
 "use client";
 
 /**
- * drawer.tsx - 侧滑抽屉组件
+ * Drawer.tsx - 侧滑抽屉（shadcn Sheet 结构 + Radix Dialog）。
  * @package @vxture/design-ui
  * @layer Presentation
- * @category Components - UI
- * @description
- *   提供带 scrim、Esc 关闭和 body scroll lock 的通用侧滑面板。
+ * @category Components - Overlay
  *
- * @author AI-Generated
- * @date 2026-05-16
+ * 对应 shadcn 的 **Sheet**（侧滑面板），不是 shadcn 的 Drawer——后者走 vaul，
+ * 面向移动端的下拉抽屉，本仓没有那个场景，也不为此引一个新依赖。
+ *
+ * 两处相对上游的定制：
+ * 1. **保留受控便捷式 API**（open / onClose / title / footer），不改成上游的
+ *    Sheet + SheetTrigger + SheetContent 组合式。抽屉的页眉页脚结构是固定的，
+ *    开成组合式等于让每个产品各写一遍 header/footer 的 markup，正是要防的分叉。
+ *    组合能力仍在——`children` 就是内容区。
+ * 2. side 只开左右两侧。上下侧滑在工作台里没有出现过，等有实据再加。
+ *
+ * 原实现是手写的 div + scrim button，自己 addEventListener 处理 Esc、自己改
+ * document.body.style.overflow，且无焦点陷阱。换到 Radix Dialog 后这些全部由
+ * primitive 承担：Portal、焦点陷阱与归还、滚动锁、aria-modal、Esc 与点击遮罩关闭。
  */
 
-import type { CSSProperties, ReactNode } from "react";
-import { useEffect } from "react";
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "../../utils/cn";
+import { Icon } from "../../icons";
 
 export interface DrawerProps {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly side?: "right" | "left";
+  /** 面板宽度。运行时数据，不属于设计刻度，故走内联样式。 */
   readonly width?: number | string;
-  readonly title?: ReactNode;
-  readonly footer?: ReactNode;
-  readonly children: ReactNode;
+  readonly title?: React.ReactNode;
+  readonly description?: React.ReactNode;
+  readonly footer?: React.ReactNode;
+  readonly children: React.ReactNode;
   readonly className?: string;
 }
+
+const SIDE_CLASS = {
+  right:
+    "inset-y-0 right-0 border-l data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right",
+  left: "inset-y-0 left-0 border-r data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left",
+} as const;
 
 export function Drawer({
   open,
@@ -33,67 +51,78 @@ export function Drawer({
   side = "right",
   width,
   title,
+  description,
   footer,
   children,
   className,
 }: DrawerProps) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, open]);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [open]);
-
-  if (!open) return null;
-
   const widthValue = typeof width === "number" ? `${width}px` : width;
-  const panelStyle = widthValue
-    ? ({ "--vx-drawer-width": widthValue } as CSSProperties)
-    : undefined;
 
   return (
-    <div className={cn("vx-drawer-root", `vx-drawer-root--${side}`, className)}>
-      <button
-        type="button"
-        className="vx-drawer__scrim"
-        onClick={onClose}
-        aria-label="Close drawer"
-      />
-      <div
-        className="vx-drawer__panel"
-        role="dialog"
-        aria-modal="true"
-        style={panelStyle}
-      >
-        {title ? (
-          <div className="vx-drawer__header">
-            <div className="vx-drawer__title">{title}</div>
-            <button
-              type="button"
-              className="vx-drawer__close"
-              onClick={onClose}
-              aria-label="Close drawer"
-            >
-              Close
-            </button>
-          </div>
-        ) : null}
-        <div className="vx-drawer__body">{children}</div>
-        {footer ? <div className="vx-drawer__footer">{footer}</div> : null}
-      </div>
-    </div>
+    <DialogPrimitive.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          className={cn(
+            "fixed inset-0 z-drawer bg-scrim",
+            "data-[state=open]:animate-in data-[state=open]:fade-in",
+            "data-[state=closed]:animate-out data-[state=closed]:fade-out",
+          )}
+        />
+        <DialogPrimitive.Content
+          style={widthValue ? { width: widthValue } : undefined}
+          className={cn(
+            "fixed z-drawer flex h-full w-full flex-col border-border bg-background shadow-overlay",
+            "max-w-content-narrow-lg outline-none",
+            "duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out",
+            SIDE_CLASS[side],
+            className,
+          )}
+        >
+          {/* Radix 要求 Content 内必须有可访问名。无标题时给一个隐藏的兜底。 */}
+          {title ? (
+            <div className="flex items-start justify-between gap-md border-b border-border p-lg">
+              <div className="flex flex-col gap-2xs">
+                <DialogPrimitive.Title className="text-heading-5">
+                  {title}
+                </DialogPrimitive.Title>
+                {description ? (
+                  <DialogPrimitive.Description className="text-body-sm text-muted-foreground">
+                    {description}
+                  </DialogPrimitive.Description>
+                ) : null}
+              </div>
+              <DialogPrimitive.Close
+                className={cn(
+                  "inline-flex size-control-md shrink-0 items-center justify-center rounded-md",
+                  "text-muted-foreground transition-colors duration-fast ease-standard",
+                  "hover:bg-accent hover:text-foreground",
+                  "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                )}
+                aria-label="关闭"
+              >
+                <Icon name="x" size={16} />
+              </DialogPrimitive.Close>
+            </div>
+          ) : (
+            <DialogPrimitive.Title className="sr-only">
+              抽屉
+            </DialogPrimitive.Title>
+          )}
+
+          <div className="flex-1 overflow-y-auto p-lg">{children}</div>
+
+          {footer ? (
+            <div className="flex items-center justify-end gap-sm border-t border-border p-lg">
+              {footer}
+            </div>
+          ) : null}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 }
