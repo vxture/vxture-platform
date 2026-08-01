@@ -19,6 +19,7 @@
 
 import * as React from "react";
 import {
+  ActionMenu,
   Avatar,
   AvatarFallback,
   Badge,
@@ -38,9 +39,13 @@ import {
   Checkbox,
   Dialog,
   Drawer,
+  BulkActionBar,
+  DialogForm,
   EmptyState,
+  FilterBar,
   Section,
   SectionHeader,
+  SectionNav,
   SplitViewLayout,
   ViewLayout,
   ViewHeader,
@@ -645,9 +650,191 @@ export const ENTRIES: readonly Entry[] = [
       />
     ),
   },
+  {
+    name: "SectionNav",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "SplitViewLayout 的左栏。条目是左对齐两行块，不复用 Button——后者是单行居中控件，套上去要一串 className 把布局全覆盖掉",
+    render: () => <SectionNavDemo />,
+  },
+  {
+    name: "FilterBar",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "只管筛选控件与右侧动作。删了 title / description——板块标题只由 SectionHeader 一处产出",
+    render: () => (
+      <FilterBar
+        className="w-full"
+        actions={
+          <>
+            <Button variant="outline">导出</Button>
+            <Button>新建</Button>
+          </>
+        }
+      >
+        <Input className="w-56" placeholder="搜索名称…" />
+        <Select defaultValue="all">
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">全部状态</SelectItem>
+            <SelectItem value="active">运行中</SelectItem>
+            <SelectItem value="paused">已暂停</SelectItem>
+          </SelectContent>
+        </Select>
+      </FilterBar>
+    ),
+  },
+  {
+    name: "ActionMenu",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "数据驱动，只收 items。icon 收为 IconName 而非 ReactNode——传 node 等于把图标尺寸与颜色的决定权交回调用方",
+    render: () => (
+      <Row label="触发器形态、危险项配色、分隔位置都由本件固定">
+        <ActionMenu
+          items={[
+            { id: "edit", label: "编辑", icon: "edit" },
+            { id: "copy", label: "复制", icon: "copy" },
+            { id: "lock", label: "已锁定", icon: "key", disabled: true },
+            {
+              id: "delete",
+              label: "删除",
+              icon: "trash",
+              danger: true,
+              separatorBefore: true,
+            },
+          ]}
+        />
+      </Row>
+    ),
+  },
+  {
+    name: "BulkActionBar",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "count 为 0 时返回 null——它只在有选中项时存在。删了 primaryActions：无选中时也显示的动作属于 FilterBar",
+    render: () => <BulkActionBarDemo />,
+  },
+  {
+    name: "DialogForm",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "页脚由 props 描述而非 markup 槽，danger 一个开关覆盖常规/危险两种提交。字段区仍是 children——表单字段是业务形状",
+    render: () => <DialogFormDemo />,
+  },
 ];
 
-/* 需要局部状态的三件单独成组件——registry 本身保持成数据。 */
+/* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
+
+function SectionNavDemo() {
+  const [active, setActive] = React.useState("profile");
+  return (
+    <SectionNav
+      className="w-full max-w-content-narrow-lg"
+      activeKey={active}
+      onSelect={setActive}
+      items={[
+        {
+          key: "profile",
+          label: "基本信息",
+          description: "名称、头像与联系方式",
+        },
+        {
+          key: "security",
+          label: "安全",
+          description: "登录方式与二次验证",
+          meta: <StatusBadge tone="warning">待完善</StatusBadge>,
+        },
+        { key: "billing", label: "账单", meta: <Badge>3</Badge> },
+        { key: "audit", label: "审计日志", disabled: true },
+      ]}
+    />
+  );
+}
+
+function BulkActionBarDemo() {
+  const [count, setCount] = React.useState(3);
+  return (
+    <div className="flex w-full flex-col gap-sm">
+      <Row label="count 归零后整条消失">
+        <Button variant="outline" size="sm" onClick={() => setCount(3)}>
+          选中 3 项
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setCount(0)}>
+          清空选中
+        </Button>
+      </Row>
+      <BulkActionBar
+        count={count}
+        onClear={() => setCount(0)}
+        actions={[
+          { id: "export", label: "导出", icon: "arrow-down" },
+          { id: "disable", label: "停用", icon: "stop" },
+          { id: "delete", label: "删除", icon: "trash", danger: true },
+        ]}
+      />
+    </div>
+  );
+}
+
+function DialogFormDemo() {
+  const [open, setOpen] = React.useState(false);
+  const [danger, setDanger] = React.useState(false);
+  return (
+    <Row label="两种提交语气；提交中两侧按钮同时禁用">
+      <Button
+        variant="outline"
+        onClick={() => {
+          setDanger(false);
+          setOpen(true);
+        }}
+      >
+        常规提交
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => {
+          setDanger(true);
+          setOpen(true);
+        }}
+      >
+        危险提交
+      </Button>
+      <DialogForm
+        open={open}
+        onOpenChange={setOpen}
+        danger={danger}
+        title={danger ? "删除模型接入" : "新建模型接入"}
+        description={
+          danger
+            ? "删除后调用凭据立即失效，且不可恢复。"
+            : "填写供给方与配额，保存后立即生效。"
+        }
+        submitLabel={danger ? "确认删除" : "保存"}
+        onSubmit={(e) => {
+          e.preventDefault();
+          setOpen(false);
+        }}
+      >
+        <div className="flex flex-col gap-2xs">
+          <Label htmlFor="preview-df-name">名称</Label>
+          <Input id="preview-df-name" placeholder="例如：主力推理通道" />
+        </div>
+        <div className="flex flex-col gap-2xs">
+          <Label htmlFor="preview-df-note">备注</Label>
+          <Textarea id="preview-df-note" rows={3} />
+        </div>
+      </DialogForm>
+    </Row>
+  );
+}
 
 function PaginationDemo() {
   const [page, setPage] = React.useState(3);

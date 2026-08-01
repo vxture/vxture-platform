@@ -145,10 +145,13 @@ opera 近乎空白，是**验收样本**——图案抽对了，opera 应当几�
 
 #### 执行清单
 
-第一梯队（≥18 次，按频次排）：`PageHeader`、`StatusBadge`、`EmptyState`、
-`FilterBar`、`DialogForm`、`BulkActionBar`、`SettingsSplitPage` + `SectionNav`。
+第一梯队（≥18 次）✅ 全部完成：`PageHeader`→`ViewHeader`、`StatusBadge`、
+`EmptyState`、`FilterBar`、`DialogForm`、`BulkActionBar`、
+`SettingsSplitPage`→`SplitViewLayout`、`SectionNav`。
 
-第二梯队（<10 次）：`DetailDrawer`、`DataTable`、`MetricCard` / `MetricGrid`。
+第二梯队（<10 次）：`DataTable`、`MetricCard` / `MetricGrid`、`Banner`、
+`NativeSelect`、`PageSizePicker`、`ViewModeSwitch`。`DetailDrawer` 已并入
+`Drawer`。
 
 其余自有件：命中上表的留；≤1 消费方的回产品；零消费的删。`ai/` 五件归 agent-studio。
 
@@ -191,6 +194,7 @@ DS 唯一完全缺失、且重复最重（~1,600 行）的一块。`TemplateHead
 | `layout-semantic` 拆分                               | `field-*`/`panel-*` 是宽度刻度，`sidebar-*`/`topbar-*` 是组件尺寸          |
 | T1 栅格断言                                          | T1 改裸值后失去"自动落在 4px 栅格"的保证，需补断言                         |
 | `radius/2xl`（20px）                                 | Tailwind 刻度无对应，未发出，待设计侧确认                                  |
+| 图标字典缺 `download` / `lock` / `pause`             | 三个通用动作图标无对应项，preview 里暂借 arrow-down / key / stop           |
 
 ## 不做事项
 

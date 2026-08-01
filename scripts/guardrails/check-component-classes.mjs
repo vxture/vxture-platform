@@ -153,15 +153,13 @@ async function walk(dir, out = []) {
  * 每重写完一个就从 PENDING 移走，清空即可删掉这份名单。
  */
 const PENDING = new Set([
-     "Banner.tsx", "BulkActionBar.tsx",
-   "DataTable.tsx", 
-   "DialogForm.tsx",  
-     
-  "MetricCard.tsx", "MetricGrid.tsx", "NativeSelect.tsx", 
-    "PageSizePicker.tsx", 
-     
-     
-    "ViewModeSwitch.tsx",
+  "Banner.tsx",
+  "DataTable.tsx",
+  "MetricCard.tsx",
+  "MetricGrid.tsx",
+  "NativeSelect.tsx",
+  "PageSizePicker.tsx",
+  "ViewModeSwitch.tsx",
   "AuthLogin.tsx", "ShellChrome.tsx",
   "AIAssistantBubble.tsx", "GenerationStream.tsx", "ModelBadge.tsx",
   "PromptInput.tsx", "TokenCounter.tsx",

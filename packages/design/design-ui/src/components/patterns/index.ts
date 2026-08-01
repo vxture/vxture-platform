@@ -18,6 +18,8 @@
  */
 
 export * from "./ActionMenu";
+export * from "./BulkActionBar";
+export * from "./DialogForm";
 export * from "./EmptyState";
 export * from "./FilterBar";
 export * from "./Section";

@@ -17,9 +17,7 @@
  */
 
 export * from "./patterns/Banner";
-export * from "./patterns/BulkActionBar";
 export * from "./patterns/DataTable";
-export * from "./patterns/DialogForm";
 export * from "./patterns/MetricCard";
 export * from "./patterns/MetricGrid";
 export * from "./patterns/NativeSelect";
