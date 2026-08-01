@@ -17,6 +17,7 @@
  * 尚未重写的图案暂存 `../_pending/patterns`，逐件重写后迁入本目录。
  */
 
+export * from "./ActionMenu";
 export * from "./EmptyState";
 export * from "./FilterBar";
 export * from "./Section";

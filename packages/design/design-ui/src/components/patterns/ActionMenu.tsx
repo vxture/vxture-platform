@@ -1,33 +1,37 @@
 /**
- * action-menu.tsx - ActionMenu 组件
+ * ActionMenu.tsx - 行操作菜单（表格行尾的"⋮"）。
  * @package @vxture/design-ui
- *
- * 功能：跨应用行操作菜单，统一触发器、禁用态与危险操作样式。
- *
- * @copyright Vxture Team
  * @layer Presentation
- * @category Components - Navigation
+ * @category Components - Pattern
+ *
+ * 数据驱动：调用方给 `items`，不给 markup。触发器形态、危险项配色、分隔位置都由
+ * 本件固定，各处不会长得不一样。
+ *
+ * 相对原实现：`icon` 从 `ReactNode` 收为 `IconName`——传 node 等于把图标尺寸和
+ * 颜色的决定权交回调用方，行内菜单最容易在这里长歪；删 `triggerClassName` /
+ * `contentClassName` / `triggerProps` 三个逃生口。
  */
 
 import * as React from "react";
-import { cn } from "../../../utils/cn";
-import { Icon } from "../../../icons";
-import { Button, type ButtonProps } from "../../ui/Button";
+import { cn } from "../../utils/cn";
+import { Icon, type IconName } from "../../icons";
+import { Button } from "../ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../ui/DropdownMenu";
+} from "../ui/DropdownMenu";
 
 export interface ActionMenuItem {
   readonly id: string;
   readonly label: React.ReactNode;
-  readonly icon?: React.ReactNode;
-  readonly title?: string | undefined;
+  readonly icon?: IconName;
   readonly disabled?: boolean;
+  /** 危险动作，用 destructive 语义色。 */
   readonly danger?: boolean;
+  /** 在本项之前插一条分隔线，用于把危险动作与常规动作分开。 */
   readonly separatorBefore?: boolean;
   readonly onSelect?: () => void;
 }
@@ -36,40 +40,21 @@ export interface ActionMenuProps {
   readonly items: readonly ActionMenuItem[];
   readonly label?: string;
   readonly align?: "start" | "center" | "end";
-  readonly triggerClassName?: string;
-  readonly contentClassName?: string;
-  readonly triggerProps?: Omit<ButtonProps, "children" | "asChild">;
 }
 
 function ActionMenu({
   items,
   label = "打开操作菜单",
   align = "end",
-  triggerClassName,
-  contentClassName,
-  triggerProps,
 }: ActionMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={label}
-          {...triggerProps}
-          className={cn(
-            "vx-action-menu__trigger",
-            triggerClassName,
-            triggerProps?.className,
-          )}
-        >
-          <Icon name="more-vertical" size={18} aria-hidden="true" />
+        <Button variant="ghost" size="icon" aria-label={label}>
+          <Icon name="more-vertical" size={16} aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align={align}
-        className={cn("vx-action-menu__content", contentClassName)}
-      >
+      <DropdownMenuContent align={align}>
         {items.map((item) => (
           <React.Fragment key={item.id}>
             {item.separatorBefore ? <DropdownMenuSeparator /> : null}
@@ -77,16 +62,17 @@ function ActionMenu({
               {...(item.disabled !== undefined
                 ? { disabled: item.disabled }
                 : {})}
-              {...(item.title !== undefined ? { title: item.title } : {})}
               {...(item.onSelect !== undefined
                 ? { onSelect: item.onSelect }
                 : {})}
               className={cn(
-                "vx-action-menu__item gap-2",
+                "gap-xs",
                 item.danger && "text-destructive focus:text-destructive",
               )}
             >
-              {item.icon ? <span className="shrink-0">{item.icon}</span> : null}
+              {item.icon ? (
+                <Icon name={item.icon} size={16} aria-hidden="true" />
+              ) : null}
               <span className="min-w-0 truncate">{item.label}</span>
             </DropdownMenuItem>
           </React.Fragment>

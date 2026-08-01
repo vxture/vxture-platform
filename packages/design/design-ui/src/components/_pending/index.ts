@@ -16,8 +16,6 @@
  * 里摘掉一行——那份清单是本目录清空进度的唯一计数。
  */
 
-export * from "./patterns/ActionButton";
-export * from "./patterns/ActionMenu";
 export * from "./patterns/Banner";
 export * from "./patterns/BulkActionBar";
 export * from "./patterns/DataTable";

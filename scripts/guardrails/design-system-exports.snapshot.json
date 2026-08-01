@@ -45,7 +45,6 @@
   "runtime": {
     ".": [
       "AIAssistantBubble",
-      "ActionButton",
       "ActionMenu",
       "AuthChromeFooter",
       "AuthChromeHeader",
