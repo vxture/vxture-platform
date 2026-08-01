@@ -10,16 +10,16 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Icon } from "../../icons";
-import { Button, type ButtonProps } from "./Button";
+import { cn } from "../../../utils/cn";
+import { Icon } from "../../../icons";
+import { Button, type ButtonProps } from "../../ui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./DropdownMenu";
+} from "../../ui/DropdownMenu";
 
 export interface ActionMenuItem {
   readonly id: string;

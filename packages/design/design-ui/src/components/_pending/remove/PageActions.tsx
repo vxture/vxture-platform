@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 export interface PageActionsProps extends React.HTMLAttributes<HTMLDivElement> {
   readonly children: React.ReactNode;

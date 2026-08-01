@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Badge, type BadgeProps } from "./Badge";
+import { cn } from "../../../utils/cn";
+import { Badge, type BadgeProps } from "../../ui/Badge";
 
 export type StatusBadgeTone =
   | "neutral"

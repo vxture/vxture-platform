@@ -23,16 +23,16 @@
 // entry (client.ts) stays the home for all interactive components.
 // ---------------------------------------------------------------------------
 export * from "./components/ui/Badge";
-export * from "./components/ui/StatusBadge";
+export * from "./components/_pending/patterns/StatusBadge";
 export * from "./components/ui/Card";
-export * from "./components/ui/SectionCard";
-export * from "./components/ui/MetricCard";
-export * from "./components/ui/EmptyState";
-export * from "./components/ui/Banner";
-export * from "./components/ui/PageSection";
-export * from "./components/ui/PageStack";
-export * from "./components/ui/PageActions";
-export * from "./components/ui/EntityListPage";
+export * from "./components/_pending/remove/SectionCard";
+export * from "./components/_pending/patterns/MetricCard";
+export * from "./components/_pending/patterns/EmptyState";
+export * from "./components/_pending/patterns/Banner";
+export * from "./components/_pending/patterns/PageSection";
+export * from "./components/_pending/patterns/PageStack";
+export * from "./components/_pending/remove/PageActions";
+export * from "./components/_pending/remove/EntityListPage";
 export * from "./components/layout/container";
 export * from "./components/layout/stack";
 export * from "./components/layout/grid";

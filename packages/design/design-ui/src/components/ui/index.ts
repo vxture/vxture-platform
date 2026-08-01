@@ -1,60 +1,35 @@
 /**
- * components/ui/index.ts - UI 组件导出入口
+ * components/ui/index.ts - 基础组件层导出入口。
  * @package @vxture/design-ui
- *
- * 功能：导出所有基础 UI 组件与平台组合组件，统一管理组件集合
- *
- * @copyright Vxture Team
  * @layer Presentation
  * @category Index
+ *
+ * 本目录只放 **shadcn 上游有对应件** 的组件：结构照上游，取值绑 T2 语义层，
+ * 需要定制的就地定制并在文件头注明偏离及理由。上游没有的组合件归 `../patterns`，
+ * 带业务属性的一律不进本包（见 `docs/10-standards/060-design-system.md`）。
+ *
+ * Drawer 对应上游的 **Sheet**；上游那个基于 vaul 的 Drawer 本仓无对应场景。
  */
 
+export * from "./Avatar";
+export * from "./Badge";
+export * from "./Breadcrumb";
 export * from "./Button";
 export type * from "./Button.types";
-export * from "./Badge";
-export * from "./Banner";
-export * from "./StatusBadge";
-export * from "./Avatar";
 export * from "./Card";
-export * from "./MetricCard";
-export * from "./Separator";
-export * from "./Input";
-export * from "./NativeSelect";
-export * from "./Textarea";
-export * from "./Label";
 export * from "./Checkbox";
-export * from "./Select";
-export * from "./Tooltip";
-export * from "./Popover";
 export * from "./Dialog";
-export * from "./Tabs";
-export * from "./DropdownMenu";
-export * from "./ActionMenu";
-export * from "./DataTable";
-export * from "./DialogForm";
-export * from "./FilterBar";
-export * from "./ActionButton";
-export * from "./PageHeader";
-export * from "./PageSection";
-export * from "./PageStack";
-export * from "./PageActions";
-export * from "./BulkActionBar";
-export * from "./EntityListPage";
-export * from "./SettingsSplitPage";
-export * from "./PageSizePicker";
-export * from "./DetailSectionHeading";
-export * from "./TableToolbar";
-export * from "./EntityTableSection";
-export * from "./DetailPanel";
-export * from "./DetailDrawer";
-export * from "./EmptyState";
-export * from "./SectionCard";
-export * from "./SectionNav";
-export * from "./MetricGrid";
-export * from "./ViewModeSwitch";
-export * from "./Pagination";
-export * from "./Breadcrumb";
-export * from "./Switch";
-export * from "./Toast";
 export * from "./Drawer";
+export * from "./DropdownMenu";
+export * from "./Input";
+export * from "./Label";
+export * from "./Pagination";
+export * from "./Popover";
+export * from "./Select";
+export * from "./Separator";
 export * from "./Skeleton";
+export * from "./Switch";
+export * from "./Tabs";
+export * from "./Textarea";
+export * from "./Toast";
+export * from "./Tooltip";

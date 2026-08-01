@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 export interface BulkActionBarProps extends React.HTMLAttributes<HTMLDivElement> {
   readonly selectedLabel?: React.ReactNode;

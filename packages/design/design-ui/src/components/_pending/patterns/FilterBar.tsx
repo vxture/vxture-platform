@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 export interface FilterBarProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,

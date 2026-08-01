@@ -8,10 +8,10 @@
  */
 
 import * as React from "react";
-import { EmptyState } from "./EmptyState";
-import { PageSection } from "./PageSection";
-import type { PageSectionProps } from "./PageSection";
-import { TableToolbar } from "./TableToolbar";
+import { EmptyState } from "../patterns/EmptyState";
+import { PageSection } from "../patterns/PageSection";
+import type { PageSectionProps } from "../patterns/PageSection";
+import { TableToolbar } from "../patterns/TableToolbar";
 
 export interface EntityTableSectionProps extends Omit<
   PageSectionProps,

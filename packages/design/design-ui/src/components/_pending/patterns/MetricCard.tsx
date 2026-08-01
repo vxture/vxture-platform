@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Card, CardContent } from "./Card";
+import { cn } from "../../../utils/cn";
+import { Card, CardContent } from "../../ui/Card";
 import { StatusBadge, type StatusBadgeTone } from "./StatusBadge";
 
 export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {

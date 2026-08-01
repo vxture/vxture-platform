@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { PageStack } from "./PageStack";
+import { PageStack } from "../patterns/PageStack";
 
 export interface EntityListPageProps {
   readonly header: React.ReactNode;

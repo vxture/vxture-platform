@@ -6,7 +6,7 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 export interface NativeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
 

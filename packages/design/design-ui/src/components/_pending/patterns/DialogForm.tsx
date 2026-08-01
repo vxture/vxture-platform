@@ -10,8 +10,8 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Button } from "./Button";
+import { cn } from "../../../utils/cn";
+import { Button } from "../../ui/Button";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./Dialog";
-import type { ButtonVariant } from "./Button.types";
+} from "../../ui/Dialog";
+import type { ButtonVariant } from "../../ui/Button.types";
 
 export interface DialogFormProps extends Omit<
   React.ComponentPropsWithoutRef<typeof Dialog>,

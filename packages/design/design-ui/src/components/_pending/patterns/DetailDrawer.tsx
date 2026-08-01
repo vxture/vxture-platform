@@ -8,11 +8,11 @@
  */
 
 import * as React from "react";
-import { Icon } from "../../icons";
-import { cn } from "../../utils/cn";
-import { Button } from "./Button";
-import { DetailPanel } from "./DetailPanel";
-import type { DetailField, DetailPanelProps } from "./DetailPanel";
+import { Icon } from "../../../icons";
+import { cn } from "../../../utils/cn";
+import { Button } from "../../ui/Button";
+import { DetailPanel } from "../remove/DetailPanel";
+import type { DetailField, DetailPanelProps } from "../remove/DetailPanel";
 
 export interface DetailDrawerProps extends Omit<
   React.HTMLAttributes<HTMLDivElement>,

@@ -8,8 +8,8 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Button } from "./Button";
+import { cn } from "../../../utils/cn";
+import { Button } from "../../ui/Button";
 
 export interface SectionNavItem {
   readonly key: string;

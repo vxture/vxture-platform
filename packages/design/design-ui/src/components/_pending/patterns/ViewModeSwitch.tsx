@@ -8,8 +8,8 @@
  */
 
 import * as React from "react";
-import { Icon } from "../../icons";
-import { Button } from "./Button";
+import { Icon } from "../../../icons";
+import { Button } from "../../ui/Button";
 
 export type ViewModeSwitchValue = "list" | "cards";
 

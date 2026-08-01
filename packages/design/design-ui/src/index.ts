@@ -18,6 +18,9 @@
  */
 
 export * from "./components/ui";
+export * from "./components/patterns";
+// 临时目录，随 C2 重写逐件清空后删除。公开入口不因此改变。
+export * from "./components/_pending";
 export * from "./components/layout";
 export * from "./components/ai";
 export * from "./icons";

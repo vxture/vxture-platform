@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import { Icon } from "../../icons";
-import type { IconName, IconSize } from "../../icons";
-import { cn } from "../../utils/cn";
+import { Icon } from "../../../icons";
+import type { IconName, IconSize } from "../../../icons";
+import { cn } from "../../../utils/cn";
 
 export type DetailSectionHeadingLevel = 2 | 3 | 4;
 

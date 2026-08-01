@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 export type BannerTone = "success" | "error" | "warning" | "info" | "ai";
 

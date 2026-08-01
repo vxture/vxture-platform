@@ -14,7 +14,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./Card";
+} from "../../ui/Card";
 
 export interface SectionCardProps {
   readonly title: React.ReactNode;

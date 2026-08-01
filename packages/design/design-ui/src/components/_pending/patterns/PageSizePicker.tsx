@@ -8,9 +8,9 @@
  */
 
 import * as React from "react";
-import { cn } from "../../utils/cn";
-import { Button } from "./Button";
-import type { ButtonVariant } from "./Button.types";
+import { cn } from "../../../utils/cn";
+import { Button } from "../../ui/Button";
+import type { ButtonVariant } from "../../ui/Button.types";
 
 export interface PageSizePickerProps<
   TValue extends number | string = number,

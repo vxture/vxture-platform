@@ -8,10 +8,10 @@
  */
 
 import * as React from "react";
-import { Icon } from "../../icons";
-import type { IconName, IconSize } from "../../icons";
-import { Button } from "./Button";
-import type { ButtonProps } from "./Button";
+import { Icon } from "../../../icons";
+import type { IconName, IconSize } from "../../../icons";
+import { Button } from "../../ui/Button";
+import type { ButtonProps } from "../../ui/Button";
 
 export interface ActionButtonProps extends Omit<ButtonProps, "children"> {
   readonly children: React.ReactNode;
