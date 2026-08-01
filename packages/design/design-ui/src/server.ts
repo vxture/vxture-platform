@@ -16,7 +16,7 @@
 //     (Button, ActionButton, Select, Tabs, Dialog, DropdownMenu, DataTable, …),
 //   - anything importing ../../icons (Icon → iconRegistry → @phosphor-icons/react
 //     CSR build calls createContext at module load → breaks in RSC; so
-//     PageHeader / DetailSectionHeading are deliberately EXCLUDED here),
+//     ViewHeader / SectionHeader are deliberately EXCLUDED here),
 //   - anything carrying React context (theme/density providers).
 // Adding any of the above pulls "use client"/hooks/createContext into the
 // server graph and can crash server render. The bare "@vxture/design-ui"
@@ -29,8 +29,8 @@ export * from "./components/_pending/remove/SectionCard";
 export * from "./components/_pending/patterns/MetricCard";
 export * from "./components/patterns/EmptyState";
 export * from "./components/_pending/patterns/Banner";
-export * from "./components/_pending/patterns/PageSection";
-export * from "./components/_pending/patterns/PageStack";
+export * from "./components/_pending/patterns/Section";
+export * from "./components/_pending/patterns/ViewLayout";
 export * from "./components/_pending/remove/PageActions";
 export * from "./components/_pending/remove/EntityListPage";
 export * from "./components/layout/container";

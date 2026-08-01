@@ -9,8 +9,8 @@
 
 import * as React from "react";
 import { EmptyState } from "../../patterns/EmptyState";
-import { PageSection } from "../patterns/PageSection";
-import type { PageSectionProps } from "../patterns/PageSection";
+import { Section } from "../patterns/Section";
+import type { PageSectionProps } from "../patterns/Section";
 import { TableToolbar } from "../patterns/TableToolbar";
 
 export interface EntityTableSectionProps extends Omit<
@@ -51,7 +51,7 @@ const EntityTableSection = React.forwardRef<
   ref,
 ) {
   return (
-    <PageSection ref={ref} title={title} description={description} {...props}>
+    <Section ref={ref} title={title} description={description} {...props}>
       <div className="vx-table-stack">
         {toolbarTitle || toolbarHint || toolbarAction ? (
           <TableToolbar
@@ -73,7 +73,7 @@ const EntityTableSection = React.forwardRef<
           />
         )}
       </div>
-    </PageSection>
+    </Section>
   );
 });
 

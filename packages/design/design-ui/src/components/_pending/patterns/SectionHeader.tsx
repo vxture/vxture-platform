@@ -33,7 +33,7 @@ const headingTagByLevel = {
   4: "h4",
 } as const;
 
-function DetailSectionHeading({
+function SectionHeader({
   className,
   icon,
   title,
@@ -61,4 +61,4 @@ function DetailSectionHeading({
   );
 }
 
-export { DetailSectionHeading };
+export { SectionHeader };

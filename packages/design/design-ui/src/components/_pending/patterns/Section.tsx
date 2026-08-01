@@ -25,8 +25,8 @@ export interface PageSectionProps extends Omit<
   readonly bodyClassName?: string;
 }
 
-const PageSection = React.forwardRef<HTMLElement, PageSectionProps>(
-  function PageSection(
+const Section = React.forwardRef<HTMLElement, PageSectionProps>(
+  function Section(
     {
       className,
       title,
@@ -69,6 +69,6 @@ const PageSection = React.forwardRef<HTMLElement, PageSectionProps>(
   },
 );
 
-PageSection.displayName = "PageSection";
+Section.displayName = "Section";
 
-export { PageSection };
+export { Section };

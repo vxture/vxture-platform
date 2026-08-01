@@ -14,8 +14,8 @@ export interface PageStackProps extends React.HTMLAttributes<HTMLDivElement> {
   readonly children: React.ReactNode;
 }
 
-const PageStack = React.forwardRef<HTMLDivElement, PageStackProps>(
-  function PageStack({ className, children, ...props }, ref) {
+const ViewLayout = React.forwardRef<HTMLDivElement, PageStackProps>(
+  function ViewLayout({ className, children, ...props }, ref) {
     return (
       <div ref={ref} className={cn("vx-page-stack", className)} {...props}>
         {children}
@@ -24,6 +24,6 @@ const PageStack = React.forwardRef<HTMLDivElement, PageStackProps>(
   },
 );
 
-PageStack.displayName = "PageStack";
+ViewLayout.displayName = "ViewLayout";
 
-export { PageStack };
+export { ViewLayout };

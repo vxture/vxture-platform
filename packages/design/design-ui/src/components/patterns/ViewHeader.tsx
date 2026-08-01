@@ -1,5 +1,5 @@
 /**
- * PageHeader.tsx - 页头。
+ * ViewHeader.tsx - 页头。
  * @package @vxture/design-ui
  * @layer Presentation
  * @category Components - Pattern
@@ -38,8 +38,8 @@ export interface PageHeaderProps extends Omit<
   readonly secondary?: React.ReactNode;
 }
 
-const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
-  function PageHeader(
+const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
+  function ViewHeader(
     {
       className,
       eyebrow,
@@ -95,6 +95,6 @@ const PageHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   },
 );
 
-PageHeader.displayName = "PageHeader";
+ViewHeader.displayName = "ViewHeader";
 
-export { PageHeader };
+export { ViewHeader };

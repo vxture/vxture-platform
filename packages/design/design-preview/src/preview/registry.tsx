@@ -11,7 +11,7 @@
  *   {vxture}{component|patterns} 完全自建——上游没有这个件；第二枚说明它落在哪一层。
  *
  * 两枚一起看才说得清来历。Button 是纯上游；Toast 占的是上游的通知位，但 API
- * 整套是我们的（上游现行方案是 sonner，换过去要动产品侧 16 处）；PageHeader
+ * 整套是我们的（上游现行方案是 sonner，换过去要动产品侧 16 处）；ViewHeader
  * 则上游根本没有，是从产品重复里提炼出来的图案。
  *
  * 这份清单同时是统计卡的数据源——数字不手写，从这里算。
@@ -39,7 +39,7 @@ import {
   Dialog,
   Drawer,
   EmptyState,
-  PageHeader,
+  ViewHeader,
   StatusBadge,
   DialogContent,
   DialogDescription,
@@ -492,13 +492,13 @@ export const ENTRIES: readonly Entry[] = [
 
   /* ── 图案（完全自建）─────────────────────────────────────── */
   {
-    name: "PageHeader",
+    name: "ViewHeader",
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
       "产品扫描出现频次第一（72 处文件）。删了 5 个 *ClassName 逃生口与 actions 别名——逃生口会把页头内部 DOM 变成公开契约",
     render: () => (
-      <PageHeader
+      <ViewHeader
         className="w-full"
         icon="squares-four"
         eyebrow="ATLAS"

@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { PageStack } from "../patterns/PageStack";
+import { ViewLayout } from "../patterns/ViewLayout";
 
 export interface EntityListPageProps {
   readonly header: React.ReactNode;
@@ -26,12 +26,12 @@ export function EntityListPage({
   drawer,
 }: EntityListPageProps) {
   return (
-    <PageStack>
+    <ViewLayout>
       {header}
       {summary}
-      {insights ? <PageStack>{insights}</PageStack> : null}
+      {insights ? <ViewLayout>{insights}</ViewLayout> : null}
       {list}
       {drawer}
-    </PageStack>
+    </ViewLayout>
   );
 }

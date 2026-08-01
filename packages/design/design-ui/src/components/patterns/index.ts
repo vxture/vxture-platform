@@ -18,5 +18,5 @@
  */
 
 export * from "./EmptyState";
-export * from "./PageHeader";
+export * from "./ViewHeader";
 export * from "./StatusBadge";

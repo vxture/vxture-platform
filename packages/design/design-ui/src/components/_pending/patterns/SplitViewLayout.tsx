@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { PageStack } from "./PageStack";
+import { ViewLayout } from "./ViewLayout";
 
 export interface SettingsSplitPageProps {
   readonly header: React.ReactNode;
@@ -16,18 +16,18 @@ export interface SettingsSplitPageProps {
   readonly content: React.ReactNode;
 }
 
-export function SettingsSplitPage({
+export function SplitViewLayout({
   header,
   navigation,
   content,
 }: SettingsSplitPageProps) {
   return (
-    <PageStack>
+    <ViewLayout>
       {header}
       <div className="vx-settings-split-page">
         <aside className="vx-settings-split-page__nav">{navigation}</aside>
         <div className="vx-settings-split-page__content">{content}</div>
       </div>
-    </PageStack>
+    </ViewLayout>
   );
 }
