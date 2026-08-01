@@ -190,8 +190,9 @@
       "cn",
       "densityClass",
       "fontSizeClass",
-      "statusBadgeToneClasses",
       "themeBootstrapScript",
+      "toneIcons",
+      "toneSurfaceClasses",
       "useAuthVerificationCountdown",
       "useBreakpoint",
       "useControllableState",
@@ -225,8 +226,7 @@
       "Z_INDEX",
       "badgeVariants",
       "densityClass",
-      "fontSizeClass",
-      "statusBadgeToneClasses"
+      "fontSizeClass"
     ],
     "./tokens": [
       "DENSITIES",

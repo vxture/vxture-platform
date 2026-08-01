@@ -149,12 +149,15 @@ opera 近乎空白，是**验收样本**——图案抽对了，opera 应当几�
 `EmptyState`、`FilterBar`、`DialogForm`、`BulkActionBar`、
 `SettingsSplitPage`→`SplitViewLayout`、`SectionNav`。
 
-第二梯队：`MetricCard` / `MetricGrid` ✅、`NativeSelect` ✅、
-`PageSizePicker` + `ViewModeSwitch` → 合并为 `SegmentedControl` ✅。
-剩 `DataTable`、`Banner`。`DetailDrawer` 已并入 `Drawer`。
+第二梯队 ✅ 全部完成：`MetricCard` / `MetricGrid`、`NativeSelect`、
+`DataTable`、`Banner`、`PageSizePicker` + `ViewModeSwitch` → 合并为
+`SegmentedControl`。`DetailDrawer` 已并入 `Drawer`。
 
 合并依据：两件形状完全相同（一串按钮、一个选中），只是一个装数字一个装图标；且
 两者的选中态都靠调用方挂 `.is-active`，该类随遗留样式层删除后**选中态已不可见**。
+
+**`_pending` 已清空并删除**，图案层 18 件全部落位。余下 7 件在
+`scripts/guardrails/pending-components.mjs`：5 件归 agent-studio、2 件 C3 删除。
 
 其余自有件：命中上表的留；≤1 消费方的回产品；零消费的删。`ai/` 五件归 agent-studio。
 
@@ -190,14 +193,14 @@ DS 唯一完全缺失、且重复最重（~1,600 行）的一块。`TemplateHead
 
 ## 未决
 
-| 项                                                   | 说明                                                                       |
-| ---------------------------------------------------- | -------------------------------------------------------------------------- |
-| gap / inset / control-inset-x 三条刻度五档中三档同值 | 是否合并为一条？影响 `@theme` 能否干净注册（`--spacing-*` 是单一命名空间） |
-| 排版角色行高吸附刻度（方案 A）                       | 24 角色、最大偏移 4px、平均 1.1px；已确认采纳，待执行                      |
-| `layout-semantic` 拆分                               | `field-*`/`panel-*` 是宽度刻度，`sidebar-*`/`topbar-*` 是组件尺寸          |
-| T1 栅格断言                                          | T1 改裸值后失去"自动落在 4px 栅格"的保证，需补断言                         |
-| `radius/2xl`（20px）                                 | Tailwind 刻度无对应，未发出，待设计侧确认                                  |
-| 图标字典缺 `download` / `lock` / `pause`             | 三个通用动作图标无对应项，preview 里暂借 arrow-down / key / stop           |
+| 项                                                   | 说明                                                                             |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- |
+| gap / inset / control-inset-x 三条刻度五档中三档同值 | 是否合并为一条？影响 `@theme` 能否干净注册（`--spacing-*` 是单一命名空间）       |
+| 排版角色行高吸附刻度（方案 A）                       | 24 角色、最大偏移 4px、平均 1.1px；已确认采纳，待执行                            |
+| `layout-semantic` 拆分                               | `field-*`/`panel-*` 是宽度刻度，`sidebar-*`/`topbar-*` 是组件尺寸                |
+| T1 栅格断言                                          | T1 改裸值后失去"自动落在 4px 栅格"的保证，需补断言                               |
+| `radius/2xl`（20px）                                 | Tailwind 刻度无对应，未发出，待设计侧确认                                        |
+| 图标字典缺 `download` / `lock` / `pause`             | 三个通用动作图标无对应项，preview 里暂借 arrow-down / key / stop（`minus` 已补） |
 
 ## 不做事项
 

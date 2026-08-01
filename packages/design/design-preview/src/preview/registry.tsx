@@ -23,6 +23,7 @@ import {
   Avatar,
   AvatarFallback,
   Badge,
+  Banner,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -40,6 +41,7 @@ import {
   Dialog,
   Drawer,
   BulkActionBar,
+  DataTable,
   DialogForm,
   EmptyState,
   FilterBar,
@@ -533,6 +535,15 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <ToastDemo />,
   },
 
+  {
+    name: "Banner",
+    group: "反馈",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "与 Toast 分工：Toast 说刚才那一下成了没有，说完就走；Banner 说这个页面现在处于什么状态，状态还在就一直在。tone 改用共用的六档语气（原为含 ai 的自有五值），图标由语气决定",
+    render: () => <BannerDemo />,
+  },
+
   /* ── 图案（完全自建）─────────────────────────────────────── */
   {
     name: "ViewHeader",
@@ -756,6 +767,14 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <BulkActionBarDemo />,
   },
   {
+    name: "DataTable",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "三态一次定齐：加载出骨架行（撑住高度不让页面跳）、空态出 EmptyState、有数据出行。选择态受控于 selectedKeys，与 BulkActionBar 对接；表头半选走 indeterminate。删了三个列级 *ClassName 与 getRowClassName",
+    render: () => <DataTableDemo />,
+  },
+  {
     name: "MetricGrid / MetricCard",
     group: "图案",
     tags: ["vxture", "patterns"],
@@ -813,6 +832,170 @@ export const ENTRIES: readonly Entry[] = [
 ];
 
 /* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
+
+const TONES = [
+  "neutral",
+  "brand",
+  "info",
+  "success",
+  "warning",
+  "danger",
+] as const;
+
+function BannerDemo() {
+  const [dismissed, setDismissed] = React.useState(false);
+  return (
+    <div className="flex w-full flex-col gap-sm">
+      {TONES.map((tone) => (
+        <Banner
+          key={tone}
+          tone={tone}
+          title={`${tone} 语气的常驻提示`}
+          description="图标由语气决定，调用方不传——同一语气在各处配不同的图就散了。"
+        />
+      ))}
+      <Banner
+        tone="warning"
+        title="带动作与关闭"
+        description="onDismiss 给了才出现关闭按钮：不是所有状态都允许用户自行消掉。"
+        action={<Button variant="outline">去处理</Button>}
+        {...(dismissed ? {} : { onDismiss: () => setDismissed(true) })}
+      />
+      {dismissed ? (
+        <Button variant="ghost" size="sm" onClick={() => setDismissed(false)}>
+          恢复关闭按钮
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+interface DemoRow {
+  readonly id: string;
+  readonly name: string;
+  readonly owner: string;
+  readonly calls: number;
+  readonly tone: (typeof TONES)[number];
+  readonly status: string;
+}
+
+const DEMO_ROWS: readonly DemoRow[] = [
+  {
+    id: "r1",
+    name: "主力推理通道",
+    owner: "平台运维",
+    calls: 128493,
+    tone: "success",
+    status: "运行中",
+  },
+  {
+    id: "r2",
+    name: "批处理通道",
+    owner: "数据组",
+    calls: 20418,
+    tone: "warning",
+    status: "配额将满",
+  },
+  {
+    id: "r3",
+    name: "灰度通道",
+    owner: "模型组",
+    calls: 912,
+    tone: "neutral",
+    status: "已暂停",
+  },
+];
+
+function DataTableDemo() {
+  const [sort, setSort] = React.useState({
+    columnId: "calls",
+    direction: "desc" as "asc" | "desc",
+  });
+  const [selected, setSelected] = React.useState<readonly string[]>(["r1"]);
+  const [state, setState] = React.useState<"data" | "loading" | "empty">(
+    "data",
+  );
+
+  const rows =
+    state === "data"
+      ? [...DEMO_ROWS].sort((a, b) =>
+          sort.direction === "asc" ? a.calls - b.calls : b.calls - a.calls,
+        )
+      : [];
+
+  return (
+    <div className="flex w-full flex-col gap-sm">
+      <SegmentedControl
+        size="sm"
+        ariaLabel="表格状态"
+        value={state}
+        onChange={setState}
+        items={[
+          { value: "data", label: "有数据" },
+          { value: "loading", label: "加载中" },
+          { value: "empty", label: "空态" },
+        ]}
+      />
+      <BulkActionBar
+        count={selected.length}
+        onClear={() => setSelected([])}
+        actions={[
+          { id: "export", label: "导出", icon: "arrow-down" },
+          { id: "delete", label: "删除", icon: "trash", danger: true },
+        ]}
+      />
+      <DataTable<DemoRow>
+        rows={rows}
+        rowKey={(row) => row.id}
+        loading={state === "loading"}
+        emptyTitle="还没有任何通道"
+        emptyDescription="创建第一条通道后，这里会显示它的调用量与状态。"
+        emptyAction={<Button>新建通道</Button>}
+        sort={sort}
+        onSortChange={setSort}
+        selectedKeys={selected}
+        onSelectionChange={setSelected}
+        columns={[
+          { id: "name", header: "名称", cell: (row) => row.name },
+          { id: "owner", header: "归属", cell: (row) => row.owner },
+          {
+            id: "calls",
+            header: "调用量",
+            align: "right",
+            sortable: true,
+            cell: (row) => row.calls.toLocaleString("zh-CN"),
+          },
+          {
+            id: "status",
+            header: "状态",
+            cell: (row) => (
+              <StatusBadge tone={row.tone}>{row.status}</StatusBadge>
+            ),
+          },
+          {
+            id: "actions",
+            header: "",
+            align: "right",
+            cell: () => (
+              <ActionMenu
+                items={[
+                  { id: "edit", label: "编辑", icon: "edit" },
+                  {
+                    id: "delete",
+                    label: "删除",
+                    icon: "trash",
+                    danger: true,
+                    separatorBefore: true,
+                  },
+                ]}
+              />
+            ),
+          },
+        ]}
+      />
+    </div>
+  );
+}
 
 function SegmentedControlDemo() {
   const [size, setSize] = React.useState(20);

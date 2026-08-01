@@ -43,6 +43,7 @@ export const iconDictionary = [
   "key",
   "trash", // 删除（原 delete 已合并）
   "plus", // 新增（原 add 已合并）
+  "minus", // 减少；复选框半选态的指示符
   "x",
   "check",
   "copy",

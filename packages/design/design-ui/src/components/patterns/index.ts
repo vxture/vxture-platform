@@ -14,12 +14,12 @@
  *    "订阅已逾期"；`DataTable` 有列定义，没有"租户列表"。带业务归属的面板
  *    （UserPanel / TenantPanel 一类）不进本包，归 `@vxture/domain-ui`。
  * 2. **不带产品专名**（D16）。没有 console-* / admin-* / platform-* 前缀。
- *
- * 尚未重写的图案暂存 `../_pending/patterns`，逐件重写后迁入本目录。
  */
 
 export * from "./ActionMenu";
+export * from "./Banner";
 export * from "./BulkActionBar";
+export * from "./DataTable";
 export * from "./DialogForm";
 export * from "./EmptyState";
 export * from "./FilterBar";
@@ -34,3 +34,4 @@ export * from "./SplitViewLayout";
 export * from "./ViewHeader";
 export * from "./ViewLayout";
 export * from "./StatusBadge";
+export * from "./tone";

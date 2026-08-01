@@ -29,9 +29,14 @@ import {
   type Entry,
   type Provenance,
 } from "@/preview/registry";
+// 仓根守卫的清单。走相对路径引，是为了让"同一份"这件事在编译期成立。
+import { PENDING_COMPONENTS } from "../../../../../scripts/guardrails/pending-components.mjs";
 
-/** 待重写件数取自守卫的 PENDING 清单，与那份清单同源，不另记一份。 */
-const PENDING_COUNT = 31;
+/**
+ * 待重写件数与守卫**读同一份清单**。这里原先抄的是个手写数字，清单减了它没跟着减，
+ * 卡片上挂着一个早已不成立的数——统计数字一律取自源头，不另记一份。
+ */
+const PENDING_COUNT = PENDING_COMPONENTS.length;
 
 export default function PreviewPage() {
   const { theme, setTheme } = useTheme();

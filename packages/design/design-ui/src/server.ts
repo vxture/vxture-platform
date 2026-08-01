@@ -28,7 +28,7 @@ export * from "./components/ui/Card";
 export * from "./components/patterns/MetricCard";
 export * from "./components/patterns/MetricGrid";
 export * from "./components/patterns/EmptyState";
-export * from "./components/_pending/patterns/Banner";
+export * from "./components/patterns/Banner";
 export * from "./components/patterns/Section";
 export * from "./components/patterns/ViewLayout";
 export * from "./components/layout/container";

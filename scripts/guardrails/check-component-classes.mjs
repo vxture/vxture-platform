@@ -20,6 +20,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { PENDING_COMPONENTS } from "./pending-components.mjs";
 
 const ROOT = process.cwd();
 const PNPM = path.join(ROOT, "node_modules/.pnpm");
@@ -152,13 +153,7 @@ async function walk(dir, out = []) {
  * 几百条，把真实回归淹掉。它们的去向是 C2（以工具类重写为 cva 组件）；
  * 每重写完一个就从 PENDING 移走，清空即可删掉这份名单。
  */
-const PENDING = new Set([
-  "Banner.tsx",
-  "DataTable.tsx",
-  "AuthLogin.tsx", "ShellChrome.tsx",
-  "AIAssistantBubble.tsx", "GenerationStream.tsx", "ModelBadge.tsx",
-  "PromptInput.tsx", "TokenCounter.tsx",
-]);
+const PENDING = new Set(PENDING_COMPONENTS);
 
 const discovered = [];
 for (const root of COMPONENT_ROOTS) discovered.push(...(await walk(root)));
