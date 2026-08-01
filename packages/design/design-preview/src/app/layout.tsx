@@ -8,7 +8,11 @@
  */
 
 import type { ReactNode } from "react";
-import { ThemeProvider, ToastProvider } from "@vxture/design-system";
+import {
+  ThemeProvider,
+  ToastProvider,
+  TooltipProvider,
+} from "@vxture/design-system";
 import "./globals.css";
 
 export const metadata = {
@@ -25,7 +29,9 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="bg-background text-foreground">
         <ThemeProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
