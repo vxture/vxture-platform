@@ -26,18 +26,15 @@ export * from "./patterns/DataTable";
 export * from "./patterns/DetailDrawer";
 export * from "./patterns/DetailSectionHeading";
 export * from "./patterns/DialogForm";
-export * from "./patterns/EmptyState";
 export * from "./patterns/FilterBar";
 export * from "./patterns/MetricCard";
 export * from "./patterns/MetricGrid";
 export * from "./patterns/NativeSelect";
-export * from "./patterns/PageHeader";
 export * from "./patterns/PageSection";
 export * from "./patterns/PageSizePicker";
 export * from "./patterns/PageStack";
 export * from "./patterns/SectionNav";
 export * from "./patterns/SettingsSplitPage";
-export * from "./patterns/StatusBadge";
 export * from "./patterns/TableToolbar";
 export * from "./patterns/ViewModeSwitch";
 

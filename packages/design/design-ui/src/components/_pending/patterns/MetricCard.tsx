@@ -12,7 +12,7 @@
 import * as React from "react";
 import { cn } from "../../../utils/cn";
 import { Card, CardContent } from "../../ui/Card";
-import { StatusBadge, type StatusBadgeTone } from "./StatusBadge";
+import { StatusBadge, type StatusBadgeTone } from "../../patterns/StatusBadge";
 
 export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   readonly label: React.ReactNode;

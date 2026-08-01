@@ -10,7 +10,7 @@
 import * as React from "react";
 import { cn } from "../../../utils/cn";
 import { MetricCard } from "./MetricCard";
-import type { StatusBadgeTone } from "./StatusBadge";
+import type { StatusBadgeTone } from "../../patterns/StatusBadge";
 
 export type MetricGridTone = StatusBadgeTone | "default" | "positive";
 

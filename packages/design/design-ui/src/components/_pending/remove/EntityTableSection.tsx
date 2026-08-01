@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { EmptyState } from "../patterns/EmptyState";
+import { EmptyState } from "../../patterns/EmptyState";
 import { PageSection } from "../patterns/PageSection";
 import type { PageSectionProps } from "../patterns/PageSection";
 import { TableToolbar } from "../patterns/TableToolbar";
