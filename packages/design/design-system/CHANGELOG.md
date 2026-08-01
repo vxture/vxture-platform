@@ -1,7 +1,48 @@
 # @vxture/design-system — 更新日志
 
 发布走 `publish-design-system.yml`（GitHub Packages `npm.pkg.github.com`）。版本规则见
-`docs/10-standards/design-system-release.md`：新增公开入口为 minor，删除/改名入口为 major。
+`docs/10-standards/050-design-system-release.md` §2。
+
+---
+
+## 4.0.0 — 2026-08-01
+
+设计系统重构收口。`3.0.0` 是本次重构分支内的中间态，从未发布，其变更并入本条。
+
+### 💥 Breaking
+
+- **拆为三包。** 本包成为**伞包 + 运行时接线**：只持有主题 / 密度 / 字号 provider、
+  shell 与 auth，其余转发 `@vxture/design-tokens`（token 两层 CSS）与
+  `@vxture/design-ui`（无状态组件层）。**消费方仍只依赖本包**，入口不变，拆包不可见。
+  对另两包用精确版本——本包把它们的类型原样 re-export，caret 会在转发边界上产生
+  类型不匹配。
+- **移除公开入口** `./next`（cva 组件的过渡入口，迁移已完成）、`./styles/tokens.css`
+  （迁至 `@vxture/design-tokens/styles/tokens.css`）、`./styles/components.css`。
+- **移除 11 张 TS token 表**（`colors` / `spacing` / `typography` / `radius` / `shadow` /
+  `gradients` / `motion` / `easing` / `duration` / `animation` / `motionPresets`）。
+  它们的 `var()` 目标多数早已不存在，且零消费者。取值的出口是工具类，不是 JS 字符串。
+- **色板换为 Tailwind v4 的 oklch / P3**，并收窄到六个色相加品牌色。原先停在 v3 的
+  hex，且多出 5 个只为图表各取一档的色相；`chart-2..6` 已改用保留色相，
+  **图表配色可辨识度下降**。
+- **遗留样式层退役**（155 个文件、约 12.3k 行）。43 个组件仍依赖其中的 BEM 类名，
+  **当前渲染无样式**，重写进度见 `check-component-classes.mjs` 的 PENDING 清单。
+- **排版规则化。** 行高改取字号档自带的值（display 与品牌标题收紧到 `leading-tight`）；
+  字距统一为零，仅 `overline` 因全大写保留放开。原先逐角色写死的 72 个行高里
+  有七组同字号不同值，规则化后这类分歧在结构上不可能存在。
+- Button 合并：cva 版本取代原实现，`.vx-btn` 随遗留层消失。
+
+### ✨ Added
+
+- `DENSITIES` / `FONT_SIZES` / `densityClass` / `fontSizeClass`，由与 CSS 同一份策略生成。
+- 中文排版轴：`:lang(zh)` 自动加大行高，作用于任何角色。
+- T1 扩展档：`text-3xs/2xs`、`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`。
+
+### 🛠 Internal
+
+- T1 改为直接读 Tailwind `theme.css` 生成，一致性由构造保证；全部偏离登记在
+  `foundation-policy.mjs`，逐条带理由。
+- token 输入全部迁入 DS 自有的 `*-policy.mjs`，设计导出文件退役。
+- 新增守卫 `lint:design-classes`（组件类名必须真能产出）与两条包依赖方向规则。
 
 ---
 
