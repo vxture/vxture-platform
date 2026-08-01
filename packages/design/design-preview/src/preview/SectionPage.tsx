@@ -74,8 +74,8 @@ function ColorPage() {
   return (
     <>
       <Stats>
+        <Stat value={ramps.size} label="原子色阶" note="T1 · 不参与明暗" />
         <Stat value={semantic.length} label="语义角色" note="T2 · 跟随主题" />
-        <Stat value={ramps.size} label="原色阶" note="T1 · 不参与明暗" />
         <Stat value={2} label="主题" note="明 / 暗" />
       </Stats>
       <Section id="c-ramps" title="原子色阶（T1）">

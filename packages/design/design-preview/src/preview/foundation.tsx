@@ -344,7 +344,7 @@ function groupByFamily(tokens: readonly ColorToken[]) {
  * 色块高度**全页一个值**。T1 与 T2 各用各的高度时，两段之间没有可比性——色块大小
  * 会被读成重要程度，而它只是当初随手写的。
  */
-const SWATCH_H = "h-media-lg";
+const SWATCH_H = "h-media-sm";
 
 /**
  * 一行装一组。列宽用 `flex-1 basis-0` 均分，组里几件就几列——11 阶的色阶和 4 个
@@ -594,7 +594,7 @@ function GradientPairs({ items }: { readonly items: readonly ColorToken[] }) {
             {/* 渐变样张比色块高得多（media-3xl = 128px）：48 高的条子里，从左上到右下
                 的对角过渡被压得几乎是横向的，看不出方向，也看不出中段的混色。 */}
             <div
-              className="h-media-3xl w-full overflow-hidden rounded-md border border-border"
+              className="h-media-2xl w-full overflow-hidden rounded-md border border-border"
               style={CHECKER}
             >
               <div

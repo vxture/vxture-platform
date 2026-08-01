@@ -31,7 +31,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
     <AvatarPrimitive.Root
       ref={ref}
       className={cn(
-        "relative flex size-media-md shrink-0 overflow-hidden rounded-full",
+        "relative flex size-media-xs shrink-0 overflow-hidden rounded-full",
         className,
       )}
       {...props}

@@ -219,7 +219,7 @@ export const ENTRIES: readonly Entry[] = [
         <Label htmlFor="r-label">字段名</Label>
         <Input
           id="r-label"
-          className="max-w-media-3xl"
+          className="max-w-media-2xl"
           placeholder="关联控件"
         />
       </Row>
@@ -277,7 +277,7 @@ export const ENTRIES: readonly Entry[] = [
     render: () => (
       <Row>
         <Select>
-          <SelectTrigger className="w-media-3xl">
+          <SelectTrigger className="w-media-2xl">
             <SelectValue placeholder="请选择" />
           </SelectTrigger>
           <SelectContent>
@@ -287,7 +287,7 @@ export const ENTRIES: readonly Entry[] = [
           </SelectContent>
         </Select>
         <Select disabled>
-          <SelectTrigger className="w-media-3xl">
+          <SelectTrigger className="w-media-2xl">
             <SelectValue placeholder="禁用" />
           </SelectTrigger>
           <SelectContent />
@@ -400,7 +400,7 @@ export const ENTRIES: readonly Entry[] = [
     render: () => (
       <div className="flex w-full max-w-content-base-xl flex-col gap-md">
         <Separator />
-        <div className="flex h-media-md items-center gap-md">
+        <div className="flex h-media-xs items-center gap-md">
           <span className="text-body-sm">左</span>
           <Separator orientation="vertical" />
           <span className="text-body-sm">右</span>

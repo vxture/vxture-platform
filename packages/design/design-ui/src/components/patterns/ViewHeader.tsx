@@ -66,7 +66,7 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
         <div className="flex min-w-0 items-start gap-md">
           {icon ? (
             <span
-              className="flex size-media-sm shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-muted-foreground"
+              className="flex size-media-xs shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-muted-foreground"
               aria-hidden="true"
             >
               <Icon name={icon} size={iconSize} fallback={iconFallback} />

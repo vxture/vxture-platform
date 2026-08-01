@@ -27,11 +27,11 @@
   --spacing-icon-2xl: calc(var(--vx-spacing) * 12);
 
   /* media */
-  --spacing-media-xs: calc(var(--vx-spacing) * 6);
-  --spacing-media-sm: calc(var(--vx-spacing) * 8);
-  --spacing-media-md: calc(var(--vx-spacing) * 10);
-  --spacing-media-lg: calc(var(--vx-spacing) * 12);
-  --spacing-media-xl: calc(var(--vx-spacing) * 16);
-  --spacing-media-2xl: calc(var(--vx-spacing) * 24);
-  --spacing-media-3xl: calc(var(--vx-spacing) * 32);
+  --spacing-media-xs: calc(var(--vx-spacing) * 8);
+  --spacing-media-sm: calc(var(--vx-spacing) * 12);
+  --spacing-media-md: calc(var(--vx-spacing) * 16);
+  --spacing-media-lg: calc(var(--vx-spacing) * 20);
+  --spacing-media-xl: calc(var(--vx-spacing) * 24);
+  --spacing-media-2xl: calc(var(--vx-spacing) * 32);
+  --spacing-media-3xl: calc(var(--vx-spacing) * 48);
 }

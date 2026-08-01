@@ -28,7 +28,7 @@ export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 const VARIANT_CLASS: Record<NonNullable<SkeletonProps["variant"]>, string> = {
   line: "h-row-sm w-full rounded-sm",
   rect: "w-full rounded-md",
-  circle: "size-media-sm rounded-full",
+  circle: "size-media-xs rounded-full",
 };
 
 function toCssLength(value: number | string | undefined): string | undefined {
