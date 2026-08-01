@@ -140,7 +140,7 @@
   --gradient-brand-to: var(--vx-color-brand-800);
   --gradient-ai-from: var(--vx-color-purple-600);
   --gradient-ai-to: var(--vx-color-purple-800);
-  --gradient-surface-from: var(--vx-color-neutral-50);
+  --gradient-surface-from: var(--vx-color-neutral-200);
   --gradient-surface-to: var(--vx-color-white);
   --gradient-glow-from: var(--vx-color-brand-600-alpha-22);
   --gradient-glow-to: var(--vx-color-brand-600-alpha-08);
@@ -264,7 +264,7 @@
 
   /* gradient */
   --gradient-brand-from: var(--vx-color-brand-500);
-  --gradient-brand-to: var(--vx-color-brand-700);
+  --gradient-brand-to: var(--vx-color-brand-800);
   --gradient-ai-from: var(--vx-color-purple-500);
   --gradient-ai-to: var(--vx-color-purple-700);
   --gradient-surface-from: var(--vx-color-neutral-800);

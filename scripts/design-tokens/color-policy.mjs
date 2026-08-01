@@ -74,18 +74,11 @@ export const INTENT_SLOT_ORDER = [
 /**
  * 非意图族：表面 / 内容 / 描边 / 图表 / 渐变。三列为 [语义名, 明色 T1 档, 暗色 T1 档]。
  *
- * 这些族没有可提取的规律——`background` 与 `card` 的明暗映射是**互相独立的**版面
- * 决策，不是同一条阶梯上的两点。硬套进"阶型"只会编造出不存在的关系。
- *
- * 几处值得知道的：
- * - 明色表面阶梯是中性的，不带品牌调：品牌浅蓝拉出的层次在暗色下完全塌缩，
- *   两种主题各有一套层次逻辑不如一套中性阶梯稳
- * - `scrim` 与 `gradient-glow-*` 明暗同值：它们是 alpha 合成色，本就该在两种主题下
- *   叠出相同的压暗 / 发光强度
- * - `chart-2..6` 用保留色相。色板只留六个色相，可辨识度因此有限；若数据可视化
- *   确有需要，应把 teal / orange 作为明确扩展加回 foundation-policy 的 KEEP_HUES
- * - `chart-seq-*` 与 `chart-div-*` 的明暗是**逐档反序**的（100↔900），这是连续色阶
- *   在深浅背景上保持同等区分度的标准做法，不是笔误
+ * 这些族没有可提取的规律，逐条列举。判据：
+ * - 表面阶梯用中性档，不带品牌调
+ * - `scrim` 与 `gradient-glow-*` 明暗同值（alpha 合成色）
+ * - `chart-seq-*` / `chart-div-*` 明暗逐档反序（100↔900）
+ * - 渐变端点按感知亮度差定：强调渐变（brand / ai）ΔL* 12–17，底纹（surface / glow）5–9
  */
 export const STANDALONE_COLORS = [
   /* surface */
@@ -138,10 +131,10 @@ export const STANDALONE_COLORS = [
   ["chart-div-5", "red-700", "red-300"],
   /* gradient */
   ["gradient-brand-from", "brand-600", "brand-500"],
-  ["gradient-brand-to", "brand-800", "brand-700"],
+  ["gradient-brand-to", "brand-800", "brand-800"],
   ["gradient-ai-from", "purple-600", "purple-500"],
   ["gradient-ai-to", "purple-800", "purple-700"],
-  ["gradient-surface-from", "neutral-50", "neutral-800"],
+  ["gradient-surface-from", "neutral-200", "neutral-800"],
   ["gradient-surface-to", "white", "neutral-900"],
   ["gradient-glow-from", "brand-600-alpha-22", "brand-600-alpha-22"],
   ["gradient-glow-to", "brand-600-alpha-08", "brand-600-alpha-08"],
