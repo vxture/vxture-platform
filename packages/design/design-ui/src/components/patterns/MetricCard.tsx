@@ -8,7 +8,7 @@
  * 一个 `<div>` 上。排版角色与元素绑定的规矩见 `SectionHeader`。
  *
  * 相对原实现：`icon` 从 `ReactNode` 收为 `IconName`；裸值换成刻度
- * （`text-sm`/`text-2xl`/`h-10 w-10`/`gap-4` → T2 角色与 `size-icon-2xl`）。
+ * （`text-sm`/`text-2xl`/`h-10 w-10`/`gap-4` → T2 角色与 `size-icon-xl`）。
  */
 
 import * as React from "react";
@@ -51,7 +51,7 @@ function MetricCard({
             <span className="text-display-xs text-foreground">{value}</span>
           </div>
           {icon ? (
-            <span className="inline-flex size-icon-2xl shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-text">
+            <span className="inline-flex size-icon-xl shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-text">
               <Icon name={icon} size={16} aria-hidden="true" />
             </span>
           ) : null}

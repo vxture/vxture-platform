@@ -20,12 +20,14 @@ import type { IconProps, IconSize } from "./icon.types";
 /**
  * 语义化尺寸到像素值的映射表
  */
+/** 与 T2 的 `--spacing-icon-*` 逐档同值，两处改一处必须改另一处。 */
 const sizeMap: Record<IconSize, number> = {
   xs: 12,
   sm: 16,
   md: 20,
   lg: 24,
   xl: 32,
+  "2xl": 48,
 };
 
 /**

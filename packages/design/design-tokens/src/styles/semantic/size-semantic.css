@@ -19,16 +19,12 @@
 
 @theme {
   /* icon */
-  --spacing-icon-2xs: calc(var(--vx-spacing) * 2.5);
   --spacing-icon-xs: calc(var(--vx-spacing) * 3);
-  --spacing-icon-sm: calc(var(--vx-spacing) * 3.5);
-  --spacing-icon-md: calc(var(--vx-spacing) * 4);
-  --spacing-icon-lg: calc(var(--vx-spacing) * 5);
-  --spacing-icon-xl: calc(var(--vx-spacing) * 6);
-  --spacing-icon-2xl: calc(var(--vx-spacing) * 8);
-  --spacing-icon-3xl: calc(var(--vx-spacing) * 12);
-  --spacing-icon-4xl: calc(var(--vx-spacing) * 14);
-  --spacing-icon-5xl: calc(var(--vx-spacing) * 16);
+  --spacing-icon-sm: calc(var(--vx-spacing) * 4);
+  --spacing-icon-md: calc(var(--vx-spacing) * 5);
+  --spacing-icon-lg: calc(var(--vx-spacing) * 6);
+  --spacing-icon-xl: calc(var(--vx-spacing) * 8);
+  --spacing-icon-2xl: calc(var(--vx-spacing) * 12);
 
   /* media */
   --spacing-media-xs: calc(var(--vx-spacing) * 6);

@@ -38,17 +38,20 @@ export type IconWeight =
 // ============================================================================
 
 /**
- * 语义化尺寸规格，对应 px 值见 Icon.tsx 的 sizeMap
+ * 语义化尺寸规格，与 T2 的 `--spacing-icon-*` 逐档同值。
  *
- * xs → 12px  用于 badge、tag 内嵌图标
- * sm → 16px  用于按钮内图标、辅助说明
- * md → 20px  默认，通用场景
- * lg → 24px  卡片标题、侧边栏导航
- * xl → 32px  空状态插图、Feature 展示区
+ * xs  → 12px  badge、tag 内嵌图标
+ * sm  → 16px  按钮、菜单项、面包屑内的图标
+ * md  → 20px  通用场景
+ * lg  → 24px  卡片标题、侧边栏导航
+ * xl  → 32px  强调位
+ * 2xl → 48px  空状态主图
+ *
+ * 48 以上不是图标是图形，用 `--spacing-media-*`。
  *
  * 也接受 number 直接传像素值，用于特殊场景
  */
-export type IconSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type IconSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 
 // ============================================================================
 // 组件 Props

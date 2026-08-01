@@ -29,7 +29,7 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       <CheckboxPrimitive.Root
         ref={ref}
         className={cn(
-          "peer group size-icon-md shrink-0 rounded-sm border border-foreground",
+          "peer group size-icon-sm shrink-0 rounded-sm border border-foreground",
           // 焦点环与 Button / Input / Switch 统一，不用上游旧版的 ring-offset 写法
           "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
           "disabled:cursor-not-allowed disabled:opacity-disabled",

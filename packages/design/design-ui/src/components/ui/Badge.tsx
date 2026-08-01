@@ -27,7 +27,7 @@ const badgeVariants = cva(
     "transition-colors duration-fast ease-standard",
     "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
-    "[&_svg:not([class*='size-'])]:size-icon-2xs",
+    "[&_svg:not([class*='size-'])]:size-icon-xs",
   ),
   {
     variants: {
