@@ -75,6 +75,20 @@ notes.push(`色板保留 ${KEEP_HUES.length} 色相，弃用 ${droppedHues.lengt
 /* ── 品牌与合成色：Tailwind 不可能有，取自既有产物 ── */
 /* 这一族没有上游对应物，只能自持。生成时从上一版产物读回，故它既是输入也是输出——
    要改品牌色请直接改 color-brand-primitive.css，它是本族唯一的真值源。 */
+/**
+ * 合成色跟着色相走：色相被 KEEP_HUES 砍掉，它的 alpha 衍生值就没有本体可衍生了。
+ *
+ * 这一族是从上一版产物读回来的，等于自我复制——所以过滤必须在读回这一步做，否则
+ * 被弃色相的合成值会一代代传下去。cyan / fuchsia / lime / orange / teal 的 20 个
+ * `-600-alpha-*` 就是这么留到今天的：色相早在减色时删了，衍生值没跟着删，语义层
+ * 一个都没取用。
+ */
+const keepBrandRow = (step) => {
+  if (step.startsWith("brand-")) return true;
+  const hue = step.replace(/-\d+(-alpha-\d+)?$/, "");
+  return KEEP_HUES.includes(hue) || KEEP_COLOR_SINGLES.includes(hue);
+};
+
 const brandRows = [];
 try {
   const prev = readFileSync(path.join(OUT_DIR, "color-brand-primitive.css"), "utf8");
@@ -94,8 +108,15 @@ try {
     /* 无既有色板，品牌色留空 */
   }
 }
-if (brandRows.length === 0) throw new Error("未取得品牌 / 合成色，中止（避免生成残缺色板）");
-notes.push(`品牌与合成色 ${brandRows.length} 项（DS 自有，上游无对应）`);
+const orphanRows = brandRows.filter((r) => !keepBrandRow(r.step));
+if (orphanRows.length > 0) {
+  const hues = [...new Set(orphanRows.map((r) => r.step.replace(/-\d+(-alpha-\d+)?$/, "")))];
+  notes.push(`剔除无本体合成色 ${orphanRows.length} 项：${hues.join(" ")}（色相已在减色时删除）`);
+}
+const keptBrandRows = brandRows.filter((r) => keepBrandRow(r.step));
+
+if (keptBrandRows.length === 0) throw new Error("未取得品牌 / 合成色，中止（避免生成残缺色板）");
+notes.push(`品牌与合成色 ${keptBrandRows.length} 项（DS 自有，上游无对应）`);
 
 /* ── 组装各命名空间文件 ── */
 const outputs = new Map();
@@ -119,12 +140,12 @@ for (const ns of NAMESPACES) {
     return `  --vx-${r.name.slice(2)}: ${r.value};`;
   });
 
-  if (ns.ns === "color" && brandRows.length > 0) {
+  if (ns.ns === "color" && keptBrandRows.length > 0) {
     // 品牌色单独成文件，避免与镜像混在一起看不出哪些是我们的
     addBlock(
       "color-brand-primitive.css",
       `  /* 品牌与合成色。DS 自有，非 Tailwind 镜像。 */\n` +
-        brandRows.map((r) => `  --vx-color-${r.step}: ${r.value};`).join("\n"),
+        keptBrandRows.map((r) => `  --vx-color-${r.step}: ${r.value};`).join("\n"),
     );
   }
 
@@ -164,7 +185,7 @@ if (byNs.has("animate") && keyframes.length > 0) {
   notes.push(`@keyframes ${keyframes.length} 组随 animate 一并镜像`);
 }
 
-const total = [...byNs.values()].reduce((s, l) => s + l.length, 0) + brandRows.length + extCount;
+const total = [...byNs.values()].reduce((s, l) => s + l.length, 0) + keptBrandRows.length + extCount;
 
 if (CHECK) {
   const stale = [];

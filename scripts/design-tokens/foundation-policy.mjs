@@ -108,5 +108,8 @@ export const OVERRIDES = {
 /**
  * 品牌与合成色：上游没有对应物，属 DS 私有。前缀在此登记，生成器据此把这部分
  * 从色板里分出来单独成文件。
+ *
+ * alpha 衍生值按用途配基色：≤22% 是叠加着色，用 `-600`；45% 是遮罩，用 `-950`。
+ * 不要两个基色各铺一遍刻度。
  */
 export const BRAND_COLOR_PATTERNS = [/^brand-/, /-alpha-\d+$/];
