@@ -18,8 +18,3 @@
 
 export * from "./patterns/Banner";
 export * from "./patterns/DataTable";
-export * from "./patterns/MetricCard";
-export * from "./patterns/MetricGrid";
-export * from "./patterns/NativeSelect";
-export * from "./patterns/PageSizePicker";
-export * from "./patterns/ViewModeSwitch";

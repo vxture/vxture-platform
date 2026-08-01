@@ -43,9 +43,12 @@ import {
   DialogForm,
   EmptyState,
   FilterBar,
+  MetricGrid,
+  NativeSelect,
   Section,
   SectionHeader,
   SectionNav,
+  SegmentedControl,
   SplitViewLayout,
   ViewLayout,
   ViewHeader,
@@ -252,6 +255,37 @@ export const ENTRIES: readonly Entry[] = [
         </Select>
       </Row>
     ),
+  },
+
+  {
+    name: "NativeSelect",
+    group: "表单",
+    tags: ["vxture", "component"],
+    deviation:
+      "与 Radix 的 Select 并存：那件把列表渲染进 portal，拿不到移动端系统选择器与表单原生提交。尺度与焦点表现对齐 Input，箭头自绘（原生箭头不跟随主题）",
+    render: () => (
+      <div className="flex w-full max-w-content-base-xl flex-col gap-md">
+        <NativeSelect defaultValue="b">
+          <option value="a">选项 A</option>
+          <option value="b">选项 B</option>
+          <option value="c">选项 C</option>
+        </NativeSelect>
+        <NativeSelect aria-invalid defaultValue="a">
+          <option value="a">失效态</option>
+        </NativeSelect>
+        <NativeSelect disabled defaultValue="a">
+          <option value="a">禁用</option>
+        </NativeSelect>
+      </div>
+    ),
+  },
+  {
+    name: "SegmentedControl",
+    group: "表单",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "取代 PageSizePicker 与 ViewModeSwitch——两者形状相同，只是一个装数字一个装图标。语义用 radiogroup；选中态由本件画，不再靠调用方挂 .is-active",
+    render: () => <SegmentedControlDemo />,
   },
 
   /* ── 展示 ───────────────────────────────────────────────── */
@@ -722,6 +756,53 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <BulkActionBarDemo />,
   },
   {
+    name: "MetricGrid / MetricCard",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "读数用 display-xs 而非 heading-2：同一字号，但指标值不是标题。删了 tone 的 default / positive 两个别名——同一语气两个名字迟早对不上",
+    render: () => (
+      <MetricGrid
+        className="w-full"
+        items={[
+          {
+            id: "calls",
+            label: "调用总数",
+            value: "1,284,930",
+            icon: "graph",
+            description: "近 30 天",
+            trend: "+12.4%",
+            trendTone: "success",
+          },
+          {
+            id: "tokens",
+            label: "消耗 token",
+            value: "8.42 亿",
+            icon: "database",
+            trend: "+3.1%",
+            trendTone: "neutral",
+          },
+          {
+            id: "latency",
+            label: "P95 时延",
+            value: "412 ms",
+            icon: "clock",
+            trend: "+86 ms",
+            trendTone: "warning",
+          },
+          {
+            id: "errors",
+            label: "错误率",
+            value: "0.37%",
+            icon: "error",
+            trend: "超出阈值",
+            trendTone: "danger",
+          },
+        ]}
+      />
+    ),
+  },
+  {
     name: "DialogForm",
     group: "图案",
     tags: ["vxture", "patterns"],
@@ -732,6 +813,51 @@ export const ENTRIES: readonly Entry[] = [
 ];
 
 /* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
+
+function SegmentedControlDemo() {
+  const [size, setSize] = React.useState(20);
+  const [mode, setMode] = React.useState<"list" | "cards">("list");
+  const [view, setView] = React.useState<"list" | "cards" | "table">("cards");
+  return (
+    <>
+      <Row label="每页条数（原 PageSizePicker）">
+        <SegmentedControl
+          size="sm"
+          ariaLabel="每页条数"
+          value={size}
+          onChange={setSize}
+          items={[10, 20, 50, 100].map((n) => ({
+            value: n,
+            label: String(n),
+            ariaLabel: `每页 ${n} 条`,
+          }))}
+        />
+      </Row>
+      <Row label="展示方式（原 ViewModeSwitch）——只有图标时必须给 ariaLabel">
+        <SegmentedControl
+          ariaLabel="展示方式"
+          value={mode}
+          onChange={setMode}
+          items={[
+            { value: "list", icon: "list", ariaLabel: "列表" },
+            { value: "cards", icon: "squares-four", ariaLabel: "卡片" },
+          ]}
+        />
+      </Row>
+      <Row label="图标 + 文字，含禁用项">
+        <SegmentedControl
+          value={view}
+          onChange={setView}
+          items={[
+            { value: "list", icon: "list", label: "列表" },
+            { value: "cards", icon: "squares-four", label: "卡片" },
+            { value: "table", icon: "table", label: "表格", disabled: true },
+          ]}
+        />
+      </Row>
+    </>
+  );
+}
 
 function SectionNavDemo() {
   const [active, setActive] = React.useState("profile");

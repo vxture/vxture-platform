@@ -149,9 +149,12 @@ opera 近乎空白，是**验收样本**——图案抽对了，opera 应当几�
 `EmptyState`、`FilterBar`、`DialogForm`、`BulkActionBar`、
 `SettingsSplitPage`→`SplitViewLayout`、`SectionNav`。
 
-第二梯队（<10 次）：`DataTable`、`MetricCard` / `MetricGrid`、`Banner`、
-`NativeSelect`、`PageSizePicker`、`ViewModeSwitch`。`DetailDrawer` 已并入
-`Drawer`。
+第二梯队：`MetricCard` / `MetricGrid` ✅、`NativeSelect` ✅、
+`PageSizePicker` + `ViewModeSwitch` → 合并为 `SegmentedControl` ✅。
+剩 `DataTable`、`Banner`。`DetailDrawer` 已并入 `Drawer`。
+
+合并依据：两件形状完全相同（一串按钮、一个选中），只是一个装数字一个装图标；且
+两者的选中态都靠调用方挂 `.is-active`，该类随遗留样式层删除后**选中态已不可见**。
 
 其余自有件：命中上表的留；≤1 消费方的回产品；零消费的删。`ai/` 五件归 agent-studio。
 

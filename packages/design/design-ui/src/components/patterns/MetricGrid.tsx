@@ -1,0 +1,73 @@
+/**
+ * MetricGrid.tsx - 一排指标卡。
+ * @package @vxture/design-ui
+ * @layer Presentation
+ * @category Components - Pattern
+ *
+ * 数据驱动：调用方给 `items`，不给 markup。窄屏单列、中屏两列，`columns` 只决定
+ * 宽屏那一档——断点由本件固定，各处不会长得不一样。
+ *
+ * 相对原实现：删 `MetricGridTone` 的 `default` / `positive` 两个别名，直接用
+ * `StatusBadgeTone`——同一个语气在两处有两个名字，迟早对不上；`id` 由可选改为必填，
+ * 原来回落到 `String(label)` 做 key，label 是 ReactNode 时会撞。
+ */
+
+import * as React from "react";
+import { cn } from "../../utils/cn";
+import { MetricCard } from "./MetricCard";
+import type { StatusBadgeTone } from "./StatusBadge";
+import type { IconName } from "../../icons";
+
+export type MetricGridColumns = 2 | 3 | 4;
+
+const BY_COLUMNS: Record<MetricGridColumns, string> = {
+  2: "lg:grid-cols-2",
+  3: "lg:grid-cols-3",
+  4: "lg:grid-cols-4",
+};
+
+export interface MetricGridItem {
+  readonly id: string;
+  readonly label: React.ReactNode;
+  readonly value: React.ReactNode;
+  readonly description?: React.ReactNode;
+  readonly icon?: IconName;
+  readonly trend?: React.ReactNode;
+  readonly trendTone?: StatusBadgeTone;
+}
+
+export interface MetricGridProps {
+  readonly items: readonly MetricGridItem[];
+  readonly columns?: MetricGridColumns;
+  readonly className?: string;
+}
+
+function MetricGrid({ items, columns = 4, className }: MetricGridProps) {
+  return (
+    <div
+      className={cn(
+        "grid gap-md sm:grid-cols-2",
+        BY_COLUMNS[columns],
+        className,
+      )}
+    >
+      {items.map((item) => (
+        <MetricCard
+          key={item.id}
+          label={item.label}
+          value={item.value}
+          {...(item.description !== undefined
+            ? { description: item.description }
+            : {})}
+          {...(item.icon !== undefined ? { icon: item.icon } : {})}
+          {...(item.trend !== undefined ? { trend: item.trend } : {})}
+          {...(item.trendTone !== undefined
+            ? { trendTone: item.trendTone }
+            : {})}
+        />
+      ))}
+    </div>
+  );
+}
+
+export { MetricGrid };

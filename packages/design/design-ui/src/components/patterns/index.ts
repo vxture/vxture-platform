@@ -4,7 +4,8 @@
  * @layer Presentation
  * @category Index
  *
- * 本目录放 **shadcn 上游没有** 的组合件。收录门槛是产品实据，不是设想：一个图案
+ * 本目录放 **shadcn 上游没有** 的件，绝大多数是组合件（`NativeSelect` 是唯一的基础
+ * 控件——`ui/` 只收上游有对应件的组件）。收录门槛是产品实据，不是设想：一个图案
  * 要进来，得先在 console / admin / opera 里被各自重写过（扫描结论见
  * `workplans/design-system-t1-t4-refactor.md` C2）。
  *
@@ -22,9 +23,13 @@ export * from "./BulkActionBar";
 export * from "./DialogForm";
 export * from "./EmptyState";
 export * from "./FilterBar";
+export * from "./MetricCard";
+export * from "./MetricGrid";
+export * from "./NativeSelect";
 export * from "./Section";
 export * from "./SectionHeader";
 export * from "./SectionNav";
+export * from "./SegmentedControl";
 export * from "./SplitViewLayout";
 export * from "./ViewHeader";
 export * from "./ViewLayout";
