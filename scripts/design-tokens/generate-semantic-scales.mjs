@@ -112,9 +112,12 @@ function resolve(name, where) {
 
 /* ── 排版角色（字号三档）───────────────────────────────────── */
 
+/* 默认块排最前，理由同 DENSITY_MODES。本族当前靠 `html.vx-font-*` 的
+ * (0,1,1) 压过 `:root` 的 (0,1,0) 侥幸没出事，但那是特异性在兜底而非顺序正确；
+ * 谁把选择器改成裸类名就会立刻复现 compact 那个故障。两族保持同一形态。 */
 const FONT_SIZE_MODES = [
-  [0, "html.vx-font-small"],
   [1, ":root, html.vx-font-default"],
+  [0, "html.vx-font-small"],
   [2, "html.vx-font-large"],
 ];
 
@@ -182,9 +185,17 @@ function buildRoles(modeIndex) {
 
 /* ── 间距（密度三档）───────────────────────────────────────── */
 
+/**
+ * **顺序即正确性**：`:root` 与 `.density-compact` 特异性同为 (0,1,0)，而 `:root`
+ * 也匹配 `<html>`——默认块排在后面就会把 compact 整档覆盖掉，且不报错。
+ * 实测症状是 compact 完全等于 default，comfortable（排在默认块之后）正常。
+ *
+ * 故默认块必须**排在最前**。不用 `html.density-*` 抬特异性来绕，是为了保留把
+ * 密度类挂在子树上的可能——密度是"这一片紧凑些"的合法诉求，不必须全局。
+ */
 const DENSITY_MODES = [
-  [0, ".density-compact"],
   [1, ":root, .density-default"],
+  [0, ".density-compact"],
   [2, ".density-comfortable"],
 ];
 
