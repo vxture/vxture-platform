@@ -1,5 +1,5 @@
 /**
- * typography-policy.mjs — 24 个排版角色的定义。
+ * typography-policy.mjs — 排版角色的定义。
  *
  * 一个角色回答的是"这段文字在版面里是什么身份"，四项属性随之确定：字体族、
  * 字重、字号档、以及行高与字距该怎么取。
@@ -14,13 +14,14 @@
  *         foundation-policy。需要时在使用处用 `tracking-*` 显式声明。
  *
  * 逐角色写死过一版，结果是同一字号在不同角色上出现七组互不相同的行高
- * （heading-5 在 12px 上是 2.0，而 body-sm 同样 12px 是 1.33），且没有任何依据
+ * （同一 12px 上出现 2.0 与 1.33 两种行高），且没有任何依据
  * 能解释差异。规则化之后这类分歧在结构上不可能存在。
  */
 
 /** T1 字号阶梯，字号三档沿此表平移。 */
 export const TEXT_LADDER = [
-  "3xs", "2xs", "xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl",
+  "2xs", "xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl",
+  "7xl", "8xl", "9xl",
 ];
 
 /** 字号三档 = 默认档在阶梯上 −1 / 0 / +1。两处例外由角色自己声明。 */
@@ -31,7 +32,7 @@ export const SIZE_MODE_SHIFT = [-1, 0, 1];
  *
  * 字号档自带的行高是按正文阅读定的；标题通常只有一到两行，且大字的行间空白在
  * 视觉上被放大，沿用正文行高会显得散。收紧只作用于 display 全族与两级品牌标题
- * ——heading-3 及以下用的是正文字体与正文字号区间，按正文规则处理才对。
+ * ——title 及以下用的是正文字体与正文字号区间，按正文规则处理才对。
  *
  * ⚠ 这里**不再管字距**：字距已随字号档自动收紧，角色再插一手就会出现
  *   "同一字号在不同角色上字距不同"，正是要消除的那类分歧。
@@ -76,22 +77,29 @@ export const CJK_LEADING_ADD = 0.15;
  * 排版角色。列依次为：角色名, 字体族, 字重, 默认字号档, 例外标记。
  *
  * 例外标记（字号三档的边界）：
- *   noGrow    大号档不再放大。display-xl 默认已是 60px，再大是挤压版面而非改善阅读。
+ *   noGrow    大号档不再放大。当前无角色使用；越界由阶梯两端夹取兜底，不靠此标记。
  *   noShrink  小号档不再缩小。代码与元信息低于 12px 失去可读性；字号偏好是无障碍
  *             设置，不该把这类文字推到读不了。
  */
 export const TYPE_ROLES = [
-  ["display-xl", "brand", "bold", "6xl", "noGrow"],
-  ["display-lg", "brand", "bold", "5xl"],
-  ["display-md", "brand", "bold", "4xl"],
-  ["display-sm", "brand", "bold", "3xl"],
-  ["display-xs", "brand", "bold", "2xl"],
+  /* 顶档留一格余量（默认 8xl，大号档用掉 9xl），五档才都跟随字号轴。曾经 display-xl
+     压在 6xl 这个当时的末档上并靠 noGrow 止步，结果大号档下它与 display-lg 撞成同一
+     个 60px——顶上两档变一档。 */
+  ["display-xl", "brand", "bold", "8xl"],
+  ["display-lg", "brand", "bold", "7xl"],
+  ["display-md", "brand", "bold", "6xl"],
+  ["display-sm", "brand", "bold", "5xl"],
+  ["display-xs", "brand", "bold", "4xl"],
 
+  /* heading 与 title 是两族不是一族的大小档。原先五档 heading 在 2→3 之间同时换了
+     字号与字体（brand 24 → sans 16），一条坡从中间断开而名字上看不出来。Material 的
+     Headline / Title、Fluent 的 Title / Subtitle 都是分开命名的，断点该有名字。 */
   ["heading-1", "brand", "semibold", "3xl"],
   ["heading-2", "brand", "semibold", "2xl"],
-  ["heading-3", "sans", "semibold", "base"],
-  ["heading-4", "sans", "semibold", "sm"],
-  ["heading-5", "sans", "semibold", "xs"],
+
+  ["title-1", "sans", "semibold", "xl"],
+  ["title-2", "sans", "semibold", "base"],
+  ["title-3", "sans", "semibold", "sm"],
 
   ["body-xl", "sans", "normal", "lg"],
   ["body-lg", "sans", "normal", "base"],
@@ -108,11 +116,10 @@ export const TYPE_ROLES = [
   ["code-md", "mono", "normal", "sm"],
   ["code-sm", "mono", "normal", "xs", "noShrink"],
 
-  ["caption", "sans", "normal", "xs", "noShrink"],
   ["overline", "sans", "semibold", "xs", "noShrink"],
 ];
 
 /** 产物里的分组顺序，与角色名前缀一致。 */
 export const TYPE_GROUP_ORDER = [
-  "display", "heading", "body", "label", "code", "caption", "overline",
+  "display", "heading", "title", "body", "label", "code", "overline",
 ];

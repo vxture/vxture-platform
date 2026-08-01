@@ -43,8 +43,6 @@
   --vx-text-9xl--line-height: 1;
 
   /* DS 扩展（Tailwind 无此挡位）。 */
-  --vx-text-3xs: 0.5rem; /* 密集表格与角标；Tailwind 最小档 xs=0.75rem 仍偏大 */
-  --vx-text-3xs--line-height: 1.5; /* 12px 行盒 / 8px 字号 */
-  --vx-text-2xs: 0.625rem; /* 同上，介于 3xs 与 xs 之间 */
+  --vx-text-2xs: 0.625rem; /* 10px；正文五档以 body-md=14 为中心，往下需要 12 与 10 两格 */
   --vx-text-2xs--line-height: 1.6; /* 16px 行盒 / 10px 字号 */
 }

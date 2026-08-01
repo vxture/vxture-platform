@@ -961,7 +961,15 @@ function readTypeRoles(): TypeRole[] {
 }
 
 /** 族的排列顺序。没列到的排在其后，不会因为漏改这份数组而消失。 */
-const ROLE_FAMILIES = ["display", "heading", "body", "label", "code"];
+const ROLE_FAMILIES = [
+  "display",
+  "heading",
+  "title",
+  "body",
+  "label",
+  "code",
+  "overline",
+];
 
 /** 族内按大小降序。一份清单同时覆盖 heading-1..5 与 display-xl..xs 两种命名。 */
 const ROLE_STEPS = ["1", "2", "3", "4", "5", "xl", "lg", "md", "sm", "xs"];
@@ -993,6 +1001,51 @@ export function useTypeRoles(): TypeRole[] {
   return roles;
 }
 
+/** 族的中文名与用途。没列到的族直接用族名，不会因为漏改这份表而没有标题。 */
+const FAMILY_NOTE: Record<string, readonly [string, string]> = {
+  display: ["展示", "营销页与大标题，非界面文本"],
+  heading: ["主标题", "页面主标题，品牌展示体"],
+  title: ["区块标题", "卡片头、区块名，正文体"],
+  body: ["正文", "段落、描述、说明"],
+  label: ["标签", "控件文字、字段名、元信息"],
+  code: ["代码", "等宽，代码与标识符"],
+  overline: ["眉标", "小字全大写，压在标题上方"],
+};
+
+/**
+ * 一个角色的样张：中文与英文各占一栏，同一行左右并排。
+ *
+ * 两种文字要一起看：同一个字号下汉字比拉丁字母显得大、行高需求也不同，只给一种
+ * 就看不出这一档在混排里到底合不合适。
+ *
+ * 样张用 `grid` 而不是 `flex`：flex 行里这一栏靠 `flex-1` 才有宽度，漏掉就被压成
+ * 0 宽——文字在 DOM 里、一个字也看不见，且不报错。这个坑在这一页踩过两次，改成
+ * 栅格后列宽由轨道给定，不存在压成 0 的路径。
+ */
+function TypeSample({ role }: { readonly role: string }) {
+  const style: React.CSSProperties = {
+    fontSize: `var(--${role}-font-size)`,
+    lineHeight: `var(--${role}-line-height)`,
+    letterSpacing: `var(--${role}-letter-spacing)`,
+    fontWeight: `var(--${role}-font-weight)`,
+    fontFamily: `var(--${role}-font-family)`,
+  };
+  return (
+    <div className="grid grid-cols-1 gap-md md:grid-cols-2">
+      <div className="min-w-0 overflow-hidden">
+        <div className="truncate text-foreground" style={style}>
+          永和九年岁在癸丑暮春之初
+        </div>
+      </div>
+      <div className="min-w-0 overflow-hidden md:border-l md:border-border md:pl-md">
+        <div className="truncate text-foreground" style={style}>
+          The quick brown fox 0123
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TypographyScale() {
   const roles = useTypeRoles();
   const sorted = [...roles].sort((a, b) => {
@@ -1002,41 +1055,52 @@ export function TypographyScale() {
     return t !== 0 ? t : a.role.localeCompare(b.role);
   });
 
+  const families = [...new Set(sorted.map((r) => r.role.split("-")[0] ?? ""))];
+
   return (
-    <div className="flex w-full flex-col gap-lg">
+    <div className="flex w-full flex-col gap-2xl">
       <p className="text-body-sm text-muted-foreground">
-        共 {sorted.length} 个角色，运行时从 <code>:root</code>{" "}
-        读出。切换右上角的字号，取值与样张一起变。
+        共 {sorted.length} 个角色，{families.length} 族，运行时从{" "}
+        <code>:root</code> 读出。切换右上角的字号，取值与样张一起变。
       </p>
-      <div className="flex flex-col divide-y divide-border">
-        {sorted.map((r) => (
-          <div
-            key={r.role}
-            className="flex flex-col gap-2xs py-md md:flex-row md:items-baseline md:gap-lg"
-          >
-            <div className="flex w-full shrink-0 flex-col gap-2xs md:w-content-narrow-md">
-              <span className="text-label-sm text-foreground">{r.role}</span>
+      {families.map((family) => {
+        // 按首段精确相等，不用 startsWith——那会让 `code` 顺手吃掉 `code-…` 之外的族。
+        const mine = sorted.filter((r) => r.role.split("-")[0] === family);
+        const [label, note] = FAMILY_NOTE[family] ?? [family, ""];
+        return (
+          <div key={family} className="flex flex-col gap-md">
+            <div className="flex items-baseline gap-sm border-b border-border pb-xs">
+              <span className="text-label-lg text-foreground">{label}</span>
+              <code className="text-body-sm text-muted-foreground">
+                {family}
+              </code>
+              {note ? (
+                <span className="text-body-sm text-muted-foreground">
+                  {note}
+                </span>
+              ) : null}
               <span className="text-body-xs text-muted-foreground">
-                {r.size} / {r.lineHeight} / {r.letterSpacing} / {r.weight}
+                {mine.length}
               </span>
             </div>
-            {/* flex-1 不能省：没有它这一栏在 flex 行里被压成 0 宽，
-                文字在 DOM 里、一个字也显示不出来。 */}
-            <span
-              className="min-w-0 flex-1 truncate text-foreground"
-              style={{
-                fontSize: `var(--${r.role}-font-size)`,
-                lineHeight: `var(--${r.role}-line-height)`,
-                letterSpacing: `var(--${r.role}-letter-spacing)`,
-                fontWeight: `var(--${r.role}-font-weight)`,
-                fontFamily: `var(--${r.role}-font-family)`,
-              }}
-            >
-              永和九年岁在癸丑 The quick brown fox 0123
-            </span>
+            <div className="flex flex-col divide-y divide-border">
+              {mine.map((r) => (
+                <div key={r.role} className="flex flex-col gap-xs py-md">
+                  <div className="flex flex-wrap items-baseline gap-sm">
+                    <span className="text-label-sm text-foreground">
+                      {r.role}
+                    </span>
+                    <code className="text-body-xs text-muted-foreground">
+                      {r.size} / {r.lineHeight} / {r.letterSpacing} / {r.weight}
+                    </code>
+                  </div>
+                  <TypeSample role={r.role} />
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

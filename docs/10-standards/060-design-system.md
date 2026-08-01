@@ -34,7 +34,7 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 `scripts/design-tokens/generate-foundation.mjs` 读上游 `theme.css` 生成，一致性由构造保证。
 全部偏离登记在 `scripts/design-tokens/foundation-policy.mjs`，逐条带理由，生成时打印：
 
-- **扩展**（Tailwind 没有的挡位）：`text-3xs/2xs`、`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`
+- **扩展**（Tailwind 没有的挡位）：`text-2xs`、`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`
 - **覆盖**（Tailwind 有、DS 判定要改）：`font-sans` / `font-mono` 的字体栈
 - **减法**：色板只留 neutral / red / amber / emerald / sky / purple 六个色相（完整色阶）加品牌色
 
@@ -57,19 +57,24 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 **命名空间必须写对**：`--transition-duration-*`、`--z-index-*`、`--spacing-*`。写错则变量
 声明成功、工具类不产出且不报错。由 `check-utilities.mjs` 逐族取样实测。
 
+**排版七族**：`display` / `heading` / `title` / `body` / `label` / `code` / `overline`。
+`display` 与 `heading` 用品牌展示体，其余用正文体——**一族一种字体**，族的边界就是换字体
+的地方。24px 是展示体与正文体的分界（`heading-2` 24 是展示体最小档，`title-1` 20 起用
+正文体），这也是 Material 与 Fluent 的切换点。
+
 **图标尺寸六档**：12 / 16 / 20 / 24 / 32 / 48（`xs`…`2xl`），取值对齐 Material / Carbon /
 Fluent / shadcn 的公共集。48 以上不是图标是图形，用 `--spacing-media-*`。`Icon` 组件的
 `size` 与本刻度逐档同值，改一处必须改另一处。
 
 **DS 组件内的图标按所配文字选档**，不凭观感：
 
-| 组件内文字                           | 字号 | 图标    |
-| ------------------------------------ | ---- | ------- |
-| `label-sm` / `body-sm`               | 12   | `xs` 12 |
-| `label-md` / `body-md`（控件默认）   | 14   | `sm` 16 |
-| `label-lg` / `body-lg` / `heading-3` | 16   | `sm` 16 |
-| `body-xl`                            | 18   | `lg` 24 |
-| `heading-2`                          | 24   | `xl` 32 |
+| 组件内文字                         | 字号 | 图标    |
+| ---------------------------------- | ---- | ------- |
+| `label-sm` / `body-sm`             | 12   | `xs` 12 |
+| `label-md` / `body-md`（控件默认） | 14   | `sm` 16 |
+| `label-lg` / `body-lg` / `title-2` | 16   | `sm` 16 |
+| `body-xl`                          | 18   | `lg` 24 |
+| `heading-2`                        | 24   | `xl` 32 |
 
 判据：图标与其相邻文字同属一个视觉单元，尺寸由文字定。本表只约束 DS 内部，产品侧自行
 决定。
@@ -144,10 +149,10 @@ Fluent / shadcn 的公共集。48 以上不是图标是图形，用 `--spacing-m
 
 `SectionHeader` 的 `level` 同时决定语义元素与排版角色：
 
-| level | 1           | 2           | 3           | 4           |
-| ----- | ----------- | ----------- | ----------- | ----------- |
-| 元素  | `h1`        | `h2`        | `h3`        | `h4`        |
-| 排版  | `heading-2` | `heading-3` | `heading-4` | `heading-5` |
+| level | 1           | 2         | 3         | 4         |
+| ----- | ----------- | --------- | --------- | --------- |
+| 元素  | `h1`        | `h2`      | `h3`      | `h4`      |
+| 排版  | `heading-2` | `title-1` | `title-2` | `title-3` |
 
 四档全开。DS 只定每档长什么样；放几个、放在哪属于信息结构，不在本规范内。
 

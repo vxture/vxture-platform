@@ -41,7 +41,7 @@ export function Section({ id, title, note, children }: SectionProps) {
   return (
     <section id={id} className="flex scroll-mt-xl flex-col gap-md">
       <div className="flex flex-col gap-2xs border-b border-border pb-sm">
-        <h2 className="text-heading-4 text-foreground">{title}</h2>
+        <h2 className="text-title-3 text-foreground">{title}</h2>
         {note ? (
           <p className="text-body-sm text-muted-foreground">{note}</p>
         ) : null}

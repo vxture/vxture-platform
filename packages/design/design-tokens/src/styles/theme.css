@@ -132,7 +132,7 @@
   --color-gradient-glow-from: var(--gradient-glow-from);
   --color-gradient-glow-to: var(--gradient-glow-to);
 
-  /* text-*（24 档角色，含行高 / 字距 / 字重修饰） */
+  /* text-*（23 档角色，含行高 / 字距 / 字重修饰） */
   --text-display-xl: var(--display-xl-font-size);
   --text-display-xl--line-height: var(--display-xl-line-height);
   --text-display-xl--letter-spacing: var(--display-xl-letter-spacing);
@@ -161,18 +161,18 @@
   --text-heading-2--line-height: var(--heading-2-line-height);
   --text-heading-2--letter-spacing: var(--heading-2-letter-spacing);
   --text-heading-2--font-weight: var(--heading-2-font-weight);
-  --text-heading-3: var(--heading-3-font-size);
-  --text-heading-3--line-height: var(--heading-3-line-height);
-  --text-heading-3--letter-spacing: var(--heading-3-letter-spacing);
-  --text-heading-3--font-weight: var(--heading-3-font-weight);
-  --text-heading-4: var(--heading-4-font-size);
-  --text-heading-4--line-height: var(--heading-4-line-height);
-  --text-heading-4--letter-spacing: var(--heading-4-letter-spacing);
-  --text-heading-4--font-weight: var(--heading-4-font-weight);
-  --text-heading-5: var(--heading-5-font-size);
-  --text-heading-5--line-height: var(--heading-5-line-height);
-  --text-heading-5--letter-spacing: var(--heading-5-letter-spacing);
-  --text-heading-5--font-weight: var(--heading-5-font-weight);
+  --text-title-1: var(--title-1-font-size);
+  --text-title-1--line-height: var(--title-1-line-height);
+  --text-title-1--letter-spacing: var(--title-1-letter-spacing);
+  --text-title-1--font-weight: var(--title-1-font-weight);
+  --text-title-2: var(--title-2-font-size);
+  --text-title-2--line-height: var(--title-2-line-height);
+  --text-title-2--letter-spacing: var(--title-2-letter-spacing);
+  --text-title-2--font-weight: var(--title-2-font-weight);
+  --text-title-3: var(--title-3-font-size);
+  --text-title-3--line-height: var(--title-3-line-height);
+  --text-title-3--letter-spacing: var(--title-3-letter-spacing);
+  --text-title-3--font-weight: var(--title-3-font-weight);
   --text-body-xl: var(--body-xl-font-size);
   --text-body-xl--line-height: var(--body-xl-line-height);
   --text-body-xl--letter-spacing: var(--body-xl-letter-spacing);
@@ -221,10 +221,6 @@
   --text-code-sm--line-height: var(--code-sm-line-height);
   --text-code-sm--letter-spacing: var(--code-sm-letter-spacing);
   --text-code-sm--font-weight: var(--code-sm-font-weight);
-  --text-caption: var(--caption-font-size);
-  --text-caption--line-height: var(--caption-line-height);
-  --text-caption--letter-spacing: var(--caption-letter-spacing);
-  --text-caption--font-weight: var(--caption-font-weight);
   --text-overline: var(--overline-font-size);
   --text-overline--line-height: var(--overline-line-height);
   --text-overline--letter-spacing: var(--overline-letter-spacing);
@@ -274,6 +270,4 @@
   --font-sans: var(--vx-font-sans);
   --text-2xs: var(--vx-text-2xs);
   --text-2xs--line-height: var(--vx-text-2xs--line-height);
-  --text-3xs: var(--vx-text-3xs);
-  --text-3xs--line-height: var(--vx-text-3xs--line-height);
 }

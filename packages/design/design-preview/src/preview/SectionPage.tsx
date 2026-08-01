@@ -193,7 +193,7 @@ function ComponentPage({ layer }: { readonly layer: Layer }) {
 
       {all.map(({ group, items }) => (
         <div key={group} className="flex flex-col gap-xl">
-          <h2 className="text-heading-3 text-foreground">{group}</h2>
+          <h2 className="text-title-2 text-foreground">{group}</h2>
           {items.map((e) => (
             <EntrySection key={e.name} entry={e} />
           ))}
