@@ -9,12 +9,12 @@
 
 import * as React from "react";
 import { EmptyState } from "../../patterns/EmptyState";
-import { Section } from "../patterns/Section";
-import type { PageSectionProps } from "../patterns/Section";
+import { Section } from "../../patterns/Section";
+import type { SectionProps } from "../../patterns/Section";
 import { TableToolbar } from "../patterns/TableToolbar";
 
 export interface EntityTableSectionProps extends Omit<
-  PageSectionProps,
+  SectionProps,
   "title" | "description" | "action" | "children"
 > {
   readonly title: React.ReactNode;

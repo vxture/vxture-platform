@@ -39,6 +39,10 @@ import {
   Dialog,
   Drawer,
   EmptyState,
+  Section,
+  SectionHeader,
+  SplitViewLayout,
+  ViewLayout,
   ViewHeader,
   StatusBadge,
   DialogContent,
@@ -574,6 +578,71 @@ export const ENTRIES: readonly Entry[] = [
         />
         <EmptyState className="w-full" title="无图标形态" />
       </>
+    ),
+  },
+  {
+    name: "结构件族",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "ViewHeader / SectionHeader(level 1–4) / Section / ViewLayout / SplitViewLayout 是一族，层级与间距节奏一次定齐",
+    render: () => (
+      <ViewLayout className="w-full rounded-lg border border-dashed border-border p-lg">
+        <SectionHeader level={1} title="一级标题（h1 · heading-2）" />
+        <SectionHeader
+          level={2}
+          icon="database"
+          title="二级标题（h2 · heading-3）"
+          description="板块标题区，可带板块级动作。"
+          action={<Button variant="outline">板块动作</Button>}
+        />
+        <Section
+          title="Section · default"
+          description="不托起，靠留白与标题分层。绝大多数板块用这个。"
+        >
+          <p className="text-body-sm text-muted-foreground">板块内容。</p>
+        </Section>
+        <Section
+          tone="raised"
+          level={3}
+          title="Section · raised（h3 · heading-4）"
+          description="描边 + 卡片底色，用于需要与周围明确切开的块。"
+          action={<Button variant="destructive">危险操作</Button>}
+        >
+          <p className="text-body-sm text-muted-foreground">
+            raised 对应视觉高度阶梯那一档，不叫
+            muted——后者在色彩语义里已表示弱化。
+          </p>
+        </Section>
+        <SectionHeader level={4} title="四级标题（h4 · heading-5）" />
+      </ViewLayout>
+    ),
+  },
+  {
+    name: "SplitViewLayout",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "原名 SettingsSplitPage。Settings 是场景，这件表达的是形状；窄屏塌成单列",
+    render: () => (
+      <SplitViewLayout
+        className="w-full rounded-lg border border-dashed border-border p-lg"
+        navigation={
+          <div className="flex flex-col gap-2xs rounded-md border border-border p-sm">
+            <span className="text-label-sm text-foreground">导航项一</span>
+            <span className="text-body-sm text-muted-foreground">导航项二</span>
+            <span className="text-body-sm text-muted-foreground">导航项三</span>
+          </div>
+        }
+        content={
+          <Section
+            title="右侧内容"
+            description="min-w-0 flex-1，不被导航挤压。"
+          >
+            <p className="text-body-sm text-muted-foreground">内容区。</p>
+          </Section>
+        }
+      />
     ),
   },
 ];

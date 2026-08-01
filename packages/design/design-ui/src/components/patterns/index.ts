@@ -18,5 +18,9 @@
  */
 
 export * from "./EmptyState";
+export * from "./Section";
+export * from "./SectionHeader";
+export * from "./SplitViewLayout";
 export * from "./ViewHeader";
+export * from "./ViewLayout";
 export * from "./StatusBadge";

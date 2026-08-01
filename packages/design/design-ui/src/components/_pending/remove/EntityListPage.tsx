@@ -8,7 +8,7 @@
  */
 
 import * as React from "react";
-import { ViewLayout } from "../patterns/ViewLayout";
+import { ViewLayout } from "../../patterns/ViewLayout";
 
 export interface EntityListPageProps {
   readonly header: React.ReactNode;

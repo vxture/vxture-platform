@@ -24,17 +24,13 @@ export * from "./patterns/Banner";
 export * from "./patterns/BulkActionBar";
 export * from "./patterns/DataTable";
 export * from "./patterns/DetailDrawer";
-export * from "./patterns/SectionHeader";
 export * from "./patterns/DialogForm";
 export * from "./patterns/FilterBar";
 export * from "./patterns/MetricCard";
 export * from "./patterns/MetricGrid";
 export * from "./patterns/NativeSelect";
-export * from "./patterns/Section";
 export * from "./patterns/PageSizePicker";
-export * from "./patterns/ViewLayout";
 export * from "./patterns/SectionNav";
-export * from "./patterns/SplitViewLayout";
 export * from "./patterns/TableToolbar";
 export * from "./patterns/ViewModeSwitch";
 
