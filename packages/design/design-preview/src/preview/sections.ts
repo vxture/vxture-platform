@@ -41,7 +41,7 @@ export const SECTIONS: readonly Section[] = [
     realm: "基础",
     kind: "icon",
     summary:
-      "全量图标与五档尺寸。名字来自 iconDictionary，同时是 IconName 的类型来源。",
+      "全量图标，按用途分组。名字来自 iconDictionary，同时是 IconName 的类型来源。",
   },
   {
     slug: "type",

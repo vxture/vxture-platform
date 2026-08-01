@@ -16,6 +16,7 @@
 import * as React from "react";
 import {
   Icon,
+  ICON_GROUPS,
   iconDictionary,
   Input,
   type IconName,
@@ -845,61 +846,80 @@ export function PrimitiveRamps() {
 
 /* ── 图标 ─────────────────────────────────────────────────── */
 
-const ICON_SIZES = ["xs", "sm", "md", "lg", "xl"] as const;
+/** 组件 `IconSize` 的全部档位，由小到大。 */
+export const ICON_SIZES = ["xs", "sm", "md", "lg", "xl", "2xl"] as const;
 
-/** 全量图标。名字来自 `iconDictionary`，那份数组同时是 IconName 的类型来源。 */
+/**
+ * 全量图标，按 `ICON_GROUPS` 分组。
+ *
+ * 八十多个名字平铺成一片，找图标只能靠肉眼一个个扫——分组是这一页能不能用的分界。
+ * 组来自 `@vxture/design-ui`，跟名字同一个来源；搜索时组照旧保留，空组不渲染。
+ */
 export function IconGallery() {
   const [query, setQuery] = React.useState("");
-  const names = iconDictionary as readonly IconName[];
-  const matched = query
-    ? names.filter((n) => n.includes(query.trim().toLowerCase()))
-    : names;
+  const q = query.trim().toLowerCase();
+
+  const groups = ICON_GROUPS.map((g) => ({
+    label: g.label,
+    icons: (g.icons as readonly IconName[]).filter((n) => !q || n.includes(q)),
+  })).filter((g) => g.icons.length > 0);
+  const matched = groups.reduce((n, g) => n + g.icons.length, 0);
 
   return (
-    <div className="flex w-full flex-col gap-lg">
-      <div className="flex flex-wrap items-end gap-lg">
-        <div className="flex flex-col gap-2xs">
-          <span className="text-label-sm text-muted-foreground">五档尺寸</span>
-          <div className="flex items-end gap-md">
-            {ICON_SIZES.map((size) => (
-              <span key={size} className="flex flex-col items-center gap-2xs">
-                <Icon name="sparkles" size={size} />
-                <span className="text-body-xs text-muted-foreground">
-                  {size}
-                </span>
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-2xs">
-          <span className="text-label-sm text-muted-foreground">
-            共 {names.length} 个，按名字筛选
-          </span>
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="例如 arrow / user / chart"
-            className="max-w-content-narrow-lg"
-          />
+    <div className="flex w-full flex-col gap-xl">
+      <div className="flex flex-col gap-sm">
+        <span className="text-label-sm text-muted-foreground">
+          {ICON_SIZES.length} 档尺寸
+        </span>
+        <div className="flex flex-wrap items-end gap-lg">
+          {ICON_SIZES.map((size) => (
+            <span key={size} className="flex flex-col items-center gap-2xs">
+              <Icon name="sparkles" size={size} />
+              <span className="text-body-xs text-muted-foreground">{size}</span>
+            </span>
+          ))}
         </div>
       </div>
 
-      {matched.length === 0 ? (
+      <div className="flex flex-col gap-2xs">
+        <span className="text-label-sm text-muted-foreground">
+          共 {iconDictionary.length} 个，{ICON_GROUPS.length} 组
+          {q ? `，命中 ${matched} 个` : "，按名字筛选"}
+        </span>
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="例如 arrow / user / chart"
+          className="max-w-content-narrow-lg"
+        />
+      </div>
+
+      {groups.length === 0 ? (
         <p className="text-body-sm text-muted-foreground">没有匹配的图标。</p>
       ) : (
-        <div className="grid grid-cols-3 gap-sm sm:grid-cols-6 lg:grid-cols-10">
-          {matched.map((name) => (
-            <div
-              key={name}
-              className="flex flex-col items-center gap-2xs rounded-md border border-border p-sm"
-            >
-              <Icon name={name} size="lg" />
-              <span className="w-full truncate text-center text-body-xs text-muted-foreground">
-                {name}
+        groups.map((g) => (
+          <div key={g.label} className="flex flex-col gap-md">
+            <div className="flex items-baseline gap-sm border-b border-border pb-xs">
+              <span className="text-label-lg text-foreground">{g.label}</span>
+              <span className="text-body-xs text-muted-foreground">
+                {g.icons.length}
               </span>
             </div>
-          ))}
-        </div>
+            <div className="grid grid-cols-2 gap-sm sm:grid-cols-4 lg:grid-cols-6">
+              {g.icons.map((name) => (
+                <div
+                  key={name}
+                  className="flex flex-col items-center gap-xs rounded-md border border-border p-md"
+                >
+                  <Icon name={name} size="2xl" />
+                  <span className="w-full truncate text-center text-body-sm text-foreground">
+                    {name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

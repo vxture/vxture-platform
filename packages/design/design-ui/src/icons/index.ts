@@ -18,4 +18,4 @@ export type {
 } from "./icon.types";
 export type { IconName } from "./iconDictionary";
 // 名字全集也导出：图标选择器、图标总览这类界面需要遍历它，否则只能各自抄一份。
-export { iconDictionary } from "./iconDictionary";
+export { iconDictionary, ICON_GROUPS } from "./iconDictionary";

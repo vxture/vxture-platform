@@ -12,7 +12,11 @@
  */
 
 import * as React from "react";
-import { iconDictionary, StatusBadge } from "@vxture/design-system";
+import {
+  ICON_GROUPS,
+  iconDictionary,
+  StatusBadge,
+} from "@vxture/design-system";
 import { Section } from "./kit";
 import {
   ENTRIES,
@@ -23,6 +27,7 @@ import {
 } from "./registry";
 import { sectionBySlug } from "./sections";
 import {
+  ICON_SIZES,
   IconGallery,
   PrimitiveRamps,
   SemanticColors,
@@ -92,7 +97,12 @@ function IconPage() {
           label="图标"
           note="iconDictionary"
         />
-        <Stat value={5} label="尺寸档位" note="xs / sm / md / lg / xl" />
+        <Stat value={ICON_GROUPS.length} label="分组" note="按用途" />
+        <Stat
+          value={ICON_SIZES.length}
+          label="尺寸档位"
+          note={`${ICON_SIZES[0]} … ${ICON_SIZES[ICON_SIZES.length - 1]}`}
+        />
       </Stats>
       <Section id="c-icons" title="图标全集">
         <IconGallery />
