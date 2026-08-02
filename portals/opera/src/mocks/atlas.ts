@@ -547,6 +547,38 @@ export const logs: LogRow[] = [
     message: "model qwen-max version 3.5 published",
     trace: "tr_8ec02",
   },
+  {
+    id: "l-7",
+    time: "14:24:18",
+    level: "error",
+    source: "gateway",
+    message: "key vxk_ext_55a rejected: key disabled",
+    trace: "tr_8eb80",
+  },
+  {
+    id: "l-8",
+    time: "14:22:59",
+    level: "info",
+    source: "router",
+    message: "embedding/default single route resolved: text-embedding-4",
+    trace: "tr_8ea44",
+  },
+  {
+    id: "l-9",
+    time: "14:21:07",
+    level: "warn",
+    source: "metering",
+    message: "cost lookup missed for model gemini-3, fell back to list price",
+    trace: "tr_8e912",
+  },
+  {
+    id: "l-10",
+    time: "14:19:33",
+    level: "info",
+    source: "health",
+    message: "probe cycle complete: 23/24 providers healthy",
+    trace: "tr_8e7f1",
+  },
 ];
 
 export interface AuditRow {
@@ -601,11 +633,22 @@ export const auditTrail: AuditRow[] = [
   },
 ];
 
+/** Opera 六域，opera-top-level-design.md §2.1。授权域是它们的子集。 */
+export const OPERA_DOMAINS = [
+  "Resource",
+  "Runtime",
+  "Metering",
+  "Delivery",
+  "Observability",
+  "Security",
+] as const;
+
+export type OperaDomain = (typeof OPERA_DOMAINS)[number];
+
 export interface RoleRow {
   id: string;
   role: string;
-  scope: string;
-  members: number;
+  domains: OperaDomain[];
   permissions: string;
 }
 
@@ -613,29 +656,43 @@ export const roles: RoleRow[] = [
   {
     id: "r-1",
     role: "Platform Admin",
-    scope: "全部域",
-    members: 2,
+    domains: [...OPERA_DOMAINS],
     permissions: "读写 + 授权管理",
   },
   {
     id: "r-2",
     role: "Operator",
-    scope: "Resource / Runtime / Security",
-    members: 5,
+    domains: ["Resource", "Runtime", "Security"],
     permissions: "读写",
   },
   {
     id: "r-3",
     role: "Developer",
-    scope: "Resource / Observability",
-    members: 11,
+    domains: ["Resource", "Observability"],
     permissions: "读 + 受限写",
   },
   {
     id: "r-4",
     role: "Viewer",
-    scope: "全部域",
-    members: 23,
+    domains: [...OPERA_DOMAINS],
     permissions: "只读",
   },
+];
+
+export interface MemberRow {
+  id: string;
+  name: string;
+  handle: string;
+  roleId: string;
+}
+
+export const members: MemberRow[] = [
+  { id: "u-1", name: "陈平", handle: "op-chen", roleId: "r-1" },
+  { id: "u-2", name: "刘岸", handle: "op-liu", roleId: "r-1" },
+  { id: "u-3", name: "赵岐", handle: "op-zhao", roleId: "r-2" },
+  { id: "u-4", name: "孙珂", handle: "op-sun", roleId: "r-2" },
+  { id: "u-5", name: "周砚", handle: "dev-zhou", roleId: "r-3" },
+  { id: "u-6", name: "吴桐", handle: "dev-wu", roleId: "r-3" },
+  { id: "u-7", name: "郑霖", handle: "dev-zheng", roleId: "r-3" },
+  { id: "u-8", name: "钱菲", handle: "view-qian", roleId: "r-4" },
 ];

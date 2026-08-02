@@ -3,6 +3,7 @@
 /* Audit — opera-top-level-design.md §8：谁 / 什么时间 / 修改什么；
  * Provider / Model / Endpoint / Router / Key 变更全量留痕。 */
 
+import { useMemo, useState } from "react";
 import {
   DataTable,
   FilterBar,
@@ -10,10 +11,39 @@ import {
   ListPageTemplate,
   NativeSelect,
   ViewHeader,
+  type DataTableSort,
 } from "@vxture/design-system";
 import { auditTrail } from "@/mocks/atlas";
 
+/** 动作档取自现有留痕，避免筛选项与数据脱节。 */
+const ACTIONS = Array.from(new Set(auditTrail.map((r) => r.action)));
+
 export default function AuditPage() {
+  const [keyword, setKeyword] = useState("");
+  const [action, setAction] = useState("all");
+  const [sort, setSort] = useState<DataTableSort>({
+    columnId: "time",
+    direction: "desc",
+  });
+
+  const visible = useMemo(() => {
+    const kw = keyword.trim().toLowerCase();
+    const rows = auditTrail.filter(
+      (r) =>
+        (action === "all" || r.action === action) &&
+        (kw === "" ||
+          r.target.toLowerCase().includes(kw) ||
+          r.actor.toLowerCase().includes(kw)),
+    );
+    return [...rows].sort((a, b) =>
+      sort.direction === "asc"
+        ? a.time.localeCompare(b.time)
+        : b.time.localeCompare(a.time),
+    );
+  }, [keyword, action, sort]);
+
+  const filtered = keyword !== "" || action !== "all";
+
   return (
     <ListPageTemplate
       header={
@@ -25,24 +55,31 @@ export default function AuditPage() {
       }
       filters={
         <FilterBar>
-          <Input placeholder="搜索对象 / 操作者…" className="max-w-panel-sm" />
+          <Input
+            placeholder="搜索对象 / 操作者…"
+            className="max-w-panel-sm"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
           <NativeSelect
             wrapperClassName="w-fit"
-            defaultValue="all"
+            value={action}
+            onChange={(e) => setAction(e.target.value)}
             aria-label="动作筛选"
           >
             <option value="all">全部动作</option>
-            <option>Router 变更</option>
-            <option>Key 轮换</option>
-            <option>Provider 禁用</option>
-            <option>Model 注册</option>
+            {ACTIONS.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
           </NativeSelect>
         </FilterBar>
       }
       table={
         <DataTable
           columns={[
-            { id: "time", header: "时间", cell: (r) => r.time },
+            { id: "time", header: "时间", cell: (r) => r.time, sortable: true },
             { id: "actor", header: "操作者", cell: (r) => r.actor },
             { id: "action", header: "动作", cell: (r) => r.action },
             {
@@ -64,8 +101,16 @@ export default function AuditPage() {
               ),
             },
           ]}
-          rows={auditTrail}
+          rows={visible}
           rowKey={(r) => r.id}
+          sort={sort}
+          onSortChange={setSort}
+          emptyTitle={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
+          emptyDescription={
+            filtered
+              ? "换个动作或关键词再看。"
+              : "配置尚未发生过变更。审计只记录写操作，读操作不留痕。"
+          }
         />
       }
     />

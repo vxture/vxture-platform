@@ -3,7 +3,14 @@
 /* Metrics — opera-top-level-design.md §7：Gateway / Provider / Endpoint
  * 三层服务指标。图表组件按 DS 判据归 domain-ui 排期，本期以指标卡呈现。 */
 
-import { Banner, MetricGrid, Section, ViewHeader } from "@vxture/design-system";
+import {
+  Banner,
+  DataTable,
+  MetricGrid,
+  Section,
+  ViewHeader,
+} from "@vxture/design-system";
+import { meteringByEndpoint } from "@/mocks/atlas";
 
 const gateway = [
   {
@@ -72,6 +79,36 @@ export default function MetricsPage() {
 
       <Section title="Provider" icon="plugs-connected" level={2}>
         <MetricGrid items={[...providerMetrics]} columns={4} />
+      </Section>
+
+      {/* §11 的第三层：Endpoint 只看请求数与 Token 数——延迟与成本归 Metering，
+          同一个事实不在两个页面各给一份。 */}
+      <Section title="Endpoint" icon="plug" level={2}>
+        <DataTable
+          columns={[
+            { id: "code", header: "Endpoint", cell: (r) => r.dimension },
+            {
+              id: "req",
+              header: "请求数",
+              align: "right",
+              cell: (r) => r.requests,
+            },
+            {
+              id: "in",
+              header: "Input Token",
+              align: "right",
+              cell: (r) => r.inputTokens,
+            },
+            {
+              id: "out",
+              header: "Output Token",
+              align: "right",
+              cell: (r) => r.outputTokens,
+            },
+          ]}
+          rows={meteringByEndpoint}
+          rowKey={(r) => r.id}
+        />
       </Section>
     </div>
   );
