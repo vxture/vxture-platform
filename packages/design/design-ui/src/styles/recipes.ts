@@ -101,6 +101,59 @@ export const panel = {
 } as const;
 
 /**
+ * 发丝线：品牌微染的分隔描边，线型语义分工为**实线开区块，虚线分行 / 分字段**
+ * （workplan §1 V4）。
+ *
+ * 颜色不新增 token：`primary/10` 即 brand-600 @10%，对齐 admin 的
+ * `--vx-color-auth-border`（brand 12% alpha）。暗色抬到 /20——同一浓度在
+ * 暗底上远不如亮底可见。
+ *
+ * 只给"颜色 + 线型"，边落在哪一侧由调用方补（`border-b` / `border-t`）——
+ * 同一条规则在表头是下边、在 footer 是上边。
+ */
+export const hairline = {
+  /** 区块起始：表格顶边、工具栏与内容的分界。 */
+  block: "border-primary/10 dark:border-primary/20",
+  /** 行 / 字段 / footer 分隔。 */
+  field: "border-dashed border-primary/10 dark:border-primary/20",
+} as const;
+
+/**
+ * 叠层容器（透明模式）：页面只有一层实色底，容器以半透明表面叠在其上。
+ *
+ * 三档共用同一副骨架（发丝线描边 + 8px 圆角），只差表面透明度——层级差异
+ * 用透明度而非亮度表达（workplan §1 V1）。三档取值来自 admin 内容区实测
+ * （58 / 68 / 72）。
+ *
+ * 表面不新增 token：`card/58` 的透明度修饰符作用在现有 `--card` 上，
+ * 明色下是白 58%、暗色下自动是 neutral-800 58%——正是叠层要的双主题行为。
+ *
+ * 语义色永不填充叠层的底；要表达状态用 `toneEdgeClasses`（顶缘色条，见 tone.ts）。
+ */
+export const veil = {
+  /** 最透（58%）：大面积实体卡、列表卡。 */
+  soft: `rounded-md border ${hairline.block} bg-card/58`,
+  /** 默认（68%）：面板、统计卡。 */
+  base: `rounded-md border ${hairline.block} bg-card/68`,
+  /** 最实（72%）：入口卡、重点卡。 */
+  strong: `rounded-md border ${hairline.block} bg-card/72`,
+} as const;
+
+/**
+ * 次要操作随父容器 hover / focus 渐显（workplan §1 V9）。
+ *
+ * 挂 `group` 在父容器上。`pointer-events` 跟着 opacity 走：看不见时也点不中，
+ * 否则隐形按钮会截胡本该落在下层的点击。focus-within 同样显形——键盘用户
+ * 没有 hover，tab 进来必须看得见自己落在了哪。
+ */
+export const revealOnHover = [
+  "opacity-0 pointer-events-none",
+  "transition-opacity duration-fast ease-standard",
+  "group-hover:opacity-100 group-hover:pointer-events-auto",
+  "group-focus-within:opacity-100 group-focus-within:pointer-events-auto",
+].join(" ");
+
+/**
  * 进出场动效。**必须用 `data-[state=*]`**：上游 radix 模板写的是 `data-open:` /
  * `data-closed:`，但 Radix 发的属性是 `data-state="open"`——那些类编译得出来、
  * 永远匹配不上，结果是整个叠层族没有任何动效，且不报错。

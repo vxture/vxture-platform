@@ -84,9 +84,13 @@ notes.push(`色板保留 ${KEEP_HUES.length} 色相，弃用 ${droppedHues.lengt
  * `-600-alpha-*` 就是这么留到今天的：色相早在减色时删了，衍生值没跟着删，语义层
  * 一个都没取用。
  */
+/* 单值色（white / black）没有数字档，本体提取要先剥 alpha 再剥档位，
+   否则 `white-alpha-58` 会被解析成色相 `white-alpha` 而误剔。 */
+const hueOf = (step) => step.replace(/-alpha-\d+$/, "").replace(/-\d+$/, "");
+
 const keepBrandRow = (step) => {
   if (step.startsWith("brand-")) return true;
-  const hue = step.replace(/-\d+(-alpha-\d+)?$/, "");
+  const hue = hueOf(step);
   return KEEP_HUES.includes(hue) || KEEP_COLOR_SINGLES.includes(hue);
 };
 
@@ -116,7 +120,7 @@ for (const [step, value] of EXTRA_BRAND_ROWS) {
 
 const orphanRows = brandRows.filter((r) => !keepBrandRow(r.step));
 if (orphanRows.length > 0) {
-  const hues = [...new Set(orphanRows.map((r) => r.step.replace(/-\d+(-alpha-\d+)?$/, "")))];
+  const hues = [...new Set(orphanRows.map((r) => hueOf(r.step)))];
   notes.push(`剔除无本体合成色 ${orphanRows.length} 项：${hues.join(" ")}（色相已在减色时删除）`);
 }
 const keptBrandRows = brandRows.filter((r) => keepBrandRow(r.step));
