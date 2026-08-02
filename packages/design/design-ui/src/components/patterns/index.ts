@@ -23,6 +23,7 @@ export * from "./DataTable";
 export * from "./DialogForm";
 export * from "./EmptyState";
 export * from "./FilterBar";
+export * from "./EntryCard";
 export * from "./MetricCard";
 export * from "./MetricGrid";
 export * from "./NativeSelect";

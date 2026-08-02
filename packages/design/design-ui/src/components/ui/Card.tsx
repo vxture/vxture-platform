@@ -5,31 +5,36 @@
  * @category Components - Display
  *
  * 结构承 shadcn 官方 Card 的六件套。相对上游的定制：
- * - 卡片自身用 `shadow-flat` 而非上游的 `shadow-sm`——视觉高度是 T2 的语义阶梯，
- *   卡片是"贴地"那一档，抬高由使用方按场景加 `shadow-raised`。
- * - 内边距走 `p-lg`、标题层次走 `text-title-sm`，跟随密度与字号三档；
+ * - **透明模式**（workplan §1 V1）：卡片不铺实色，走 veil 叠层——页面只有一层
+ *   实色底，卡片是叠在其上的半透明表面。`surface` 三档对应叠层透明度，
+ *   层级越"实体化"越透（入口卡最实、大面积实体卡最透）。
+ * - 无阴影：透明模式的层次由描边 + 透明度表达，阴影会把"贴在同一张纸上"的
+ *   错觉打破。要浮起的是浮层（popover/dialog），不是卡片。
+ * - 内边距走刻度、标题层次走 `text-title-sm`，跟随密度与字号三档；
  *   上游的 p-6 / text-2xl 是裸数值，不跟随。
  *
  * 原实现在每一件上都挂了 .vx-card__*，随遗留样式层一并退役。
  */
 
 import * as React from "react";
+import { hairline, veil } from "../../styles/recipes";
 import { cn } from "../../utils/cn";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(function Card({ className, ...props }, ref) {
+export type CardSurface = keyof typeof veil;
+
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** 叠层档位：soft(58%) 大面积实体卡 / base(68%) 默认 / strong(72%) 入口卡。 */
+  readonly surface?: CardSurface;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
+  { className, surface = "base", ...props },
+  ref,
+) {
   return (
     <div
       ref={ref}
-      className={cn(
-        // 卡片不是叠层：它躺在页面上，故用 card 底色而非 popover，
-        // 但边缘同样走 ring —— 页面上并排的卡片与浮起的面板边缘要一致。
-        "flex flex-col rounded-xl bg-card text-foreground",
-        "shadow-raised ring-1 ring-foreground/10",
-        className,
-      )}
+      className={cn("flex flex-col text-foreground", veil[surface], className)}
       {...props}
     />
   );
@@ -42,7 +47,7 @@ const CardHeader = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("flex flex-col gap-2xs p-lg", className)}
+      className={cn("flex flex-col gap-2xs p-xl", className)}
       {...props}
     />
   );
@@ -72,7 +77,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(function CardContent({ className, ...props }, ref) {
-  return <div ref={ref} className={cn("p-lg pt-none", className)} {...props} />;
+  return <div ref={ref} className={cn("p-xl pt-none", className)} {...props} />;
 });
 
 const CardFooter = React.forwardRef<
@@ -82,7 +87,12 @@ const CardFooter = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("flex items-center gap-sm p-lg pt-none", className)}
+      className={cn(
+        // footer 与正文的界是"字段级"分隔，走虚线（workplan §1 V4）。
+        "mx-xl mt-auto flex items-center gap-sm border-t py-md",
+        hairline.field,
+        className,
+      )}
       {...props}
     />
   );

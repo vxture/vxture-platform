@@ -4,11 +4,13 @@
  * @layer Presentation
  * @category Components - Pattern
  *
- * 读数用 `display-xs` 而不是 `heading-2`——两者字号相同，但指标值不是标题，它落在
- * 一个 `<div>` 上。排版角色与元素绑定的规矩见 `SectionHeader`。
+ * 读数 20px（title-xl）而非展示体大字——admin KPI 卡的密度（workplan §1）：
+ * 指标卡成排出现，36px 的读数会让四张卡各自都在喊。读数不是标题，落在 `<span>` 上。
  *
- * 相对原实现：`icon` 从 `ReactNode` 收为 `IconName`；裸值换成刻度
- * （`text-sm`/`text-2xl`/`h-10 w-10`/`gap-4` → T2 角色与 `size-icon-xl`）。
+ * 顶缘色条 2px（border-t-medium）——V3 的原文即"语义色只走顶部 2px 描边"；
+ * 4px 那一档是侧栏指示条这类结构件的宽度，放在卡顶像贴了胶带。
+ *
+ * 相对原实现：`icon` 从 `ReactNode` 收为 `IconName`；裸值换成刻度。
  */
 
 import * as React from "react";
@@ -50,15 +52,15 @@ function MetricCard({
   const hasFooter = Boolean(description || action);
 
   return (
-    <Card className={cn("border-t-thick", toneEdgeClasses[tone], className)}>
-      <CardContent className="flex flex-col gap-md p-lg">
+    <Card className={cn("border-t-medium", toneEdgeClasses[tone], className)}>
+      <CardContent className="flex flex-col gap-md p-xl">
         <div className="flex items-start gap-md">
           {/* 图标在左、不套填充块：右侧的填充图标块会和读数抢视觉重心，
               而一排卡片并列时，左侧对齐的图标本身就是分组线索。 */}
           {icon ? (
             <Icon
               name={icon}
-              size={32}
+              size="lg"
               aria-hidden="true"
               className="shrink-0"
             />
@@ -68,7 +70,7 @@ function MetricCard({
               {label}
             </span>
             <div className="flex flex-wrap items-center gap-sm">
-              <span className="text-heading-1 text-foreground">{value}</span>
+              <span className="text-title-xl text-foreground">{value}</span>
               {trend ? (
                 <StatusBadge tone={trendTone}>{trend}</StatusBadge>
               ) : null}

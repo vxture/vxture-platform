@@ -56,6 +56,7 @@ import {
   DataTable,
   DialogForm,
   EmptyState,
+  EntryCard,
   FilterBar,
   MetricGrid,
   type MetricGridItem,
@@ -392,23 +393,44 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "展示",
     tags: ["shadcn", "origin"],
+    deviation:
+      "透明模式：veil 叠层三档（surface prop）取代实色底与阴影，footer 虚线分隔",
+    axes: [{ name: "surface", values: ["soft", "base", "strong"] }],
     render: () => (
-      <Card className="w-full max-w-content-base-xl">
-        <CardHeader>
-          <CardTitle>卡片标题</CardTitle>
-          <CardDescription>描述文字，用 body-sm 与弱化前景色。</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-body-sm text-muted-foreground">
-            卡片边缘用 ring 而非 border：ring
-            不占布局，且叠在阴影之上不与它相争。
-          </p>
-        </CardContent>
-        <CardFooter>
-          <Button variant="outline">取消</Button>
-          <Button>确定</Button>
-        </CardFooter>
-      </Card>
+      <div className="flex w-full flex-col gap-md">
+        <Card className="w-full max-w-content-base-xl">
+          <CardHeader>
+            <CardTitle>卡片标题（surface=base 68%）</CardTitle>
+            <CardDescription>
+              描述文字，用 body-sm 与弱化前景色。
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-body-sm text-muted-foreground">
+              透明模式：卡片是叠在页面唯一实色底上的半透明表面，层次由发丝线
+              描边与透明度表达，无阴影。
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline">取消</Button>
+            <Button>确定</Button>
+          </CardFooter>
+        </Card>
+        <div className="grid w-full gap-md sm:grid-cols-2">
+          <Card surface="soft">
+            <CardHeader>
+              <CardTitle>surface=soft（58%）</CardTitle>
+              <CardDescription>大面积实体卡、列表卡。</CardDescription>
+            </CardHeader>
+          </Card>
+          <Card surface="strong">
+            <CardHeader>
+              <CardTitle>surface=strong（72%）</CardTitle>
+              <CardDescription>入口卡、重点卡。</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
     ),
   },
   {
@@ -635,6 +657,32 @@ export const ENTRIES: readonly Entry[] = [
   },
 
   /* ── 图案（完全自建）─────────────────────────────────────── */
+  {
+    name: "EntryCard",
+    layer: "pattern",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "提炼自 admin 入口卡。与 MetricCard 分工：MetricCard 报数、EntryCard 引路；唯一图标带色块底的卡（门牌比路标醒目）",
+    axes: [{ name: "meta", values: ["with", "without"] }],
+    render: () => (
+      <div className="grid w-full gap-md sm:grid-cols-2">
+        <EntryCard
+          href="#entry-card-demo"
+          icon="database"
+          title="模型接入"
+          meta="12 个供给方"
+          description="管理供给方、配额与调用审计。"
+        />
+        <EntryCard
+          href="#entry-card-demo"
+          icon="users"
+          title="成员与权限"
+          description="邀请成员、分配角色、审计授权变更。"
+        />
+      </div>
+    ),
+  },
   {
     name: "ViewHeader",
     layer: "pattern",
