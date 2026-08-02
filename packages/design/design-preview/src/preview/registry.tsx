@@ -97,6 +97,7 @@ import {
   TokenCounter,
   AvatarFallback,
   Badge,
+  BADGE_VARIANTS,
   Banner,
   Breadcrumb,
   BreadcrumbItem,
@@ -164,7 +165,9 @@ import {
   TabsList,
   TabsTrigger,
   Textarea,
+  TONES,
   Tooltip,
+  TOOLTIP_VARIANTS,
   TooltipContent,
   TooltipTrigger,
   useToast,
@@ -425,6 +428,7 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["vxture", "patterns"],
     deviation:
       "取代 PageSizePicker 与 ViewModeSwitch——两者形状相同，只是一个装数字一个装图标。语义用 radiogroup；选中态由本件画，不再靠调用方挂 .is-active",
+    axes: [{ name: "size", values: ["sm", "md"] }],
     render: () => <SegmentedControlDemo />,
   },
   {
@@ -505,7 +509,10 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "表单",
     tags: ["shadcn", "origin"],
-    axes: [{ name: "variant", values: [...TOGGLE_VARIANTS] }],
+    axes: [
+      { name: "variant", values: [...TOGGLE_VARIANTS] },
+      { name: "size", values: [...TOGGLE_SIZES] },
+    ],
     render: () => (
       <>
         <Row label="multiple · variant=default">
@@ -527,6 +534,20 @@ export const ENTRIES: readonly Entry[] = [
             <ToggleGroupItem value="week">周</ToggleGroupItem>
             <ToggleGroupItem value="month">月</ToggleGroupItem>
           </ToggleGroup>
+        </Row>
+        <Row label="size 三档（同样定在 Root）">
+          {TOGGLE_SIZES.map((size) => (
+            <ToggleGroup
+              key={size}
+              type="single"
+              variant="outline"
+              size={size}
+              defaultValue="a"
+            >
+              <ToggleGroupItem value="a">{size}</ToggleGroupItem>
+              <ToggleGroupItem value="b">对照</ToggleGroupItem>
+            </ToggleGroup>
+          ))}
         </Row>
       </>
     ),
@@ -558,15 +579,14 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["shadcn", "vxture"],
     deviation:
       "增 asChild（可渲染为 <a>）；保留 forwardRef，上游面向 React 19 已去掉",
+    axes: [{ name: "variant", values: [...BADGE_VARIANTS] }],
     render: () => (
       <Row>
-        {(["default", "secondary", "destructive", "outline"] as const).map(
-          (v) => (
-            <Badge key={v} variant={v}>
-              {v}
-            </Badge>
-          ),
-        )}
+        {BADGE_VARIANTS.map((v) => (
+          <Badge key={v} variant={v}>
+            {v}
+          </Badge>
+        ))}
         <Badge asChild>
           <a href="#badge">asChild 链接</a>
         </Badge>
@@ -658,11 +678,18 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["shadcn", "vxture"],
     deviation:
       "增 variant（line / rect / circle）与 lines——多行文本占位是列表页最常见形态",
+    axes: [{ name: "variant", values: ["line", "rect", "circle"] }],
     render: () => (
       <div className="flex w-full max-w-content-base-xl flex-col gap-md">
-        <Skeleton lines={3} />
-        <Skeleton variant="rect" height={80} />
-        <Skeleton variant="circle" />
+        <Row label="variant=line（lines=3）" stack>
+          <Skeleton lines={3} />
+        </Row>
+        <Row label="variant=rect" stack>
+          <Skeleton variant="rect" height={80} />
+        </Row>
+        <Row label="variant=circle" stack>
+          <Skeleton variant="circle" />
+        </Row>
       </div>
     ),
   },
@@ -894,6 +921,7 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["shadcn", "vxture"],
     deviation:
       "对应上游 Sheet（非其 vaul 版 Drawer）；受控便捷式 API 而非组合式——页眉页脚结构固定",
+    axes: [{ name: "side", values: ["right", "left"] }],
     render: () => <DrawerDemo />,
   },
   {
@@ -943,14 +971,17 @@ export const ENTRIES: readonly Entry[] = [
     layer: "atom",
     group: "浮层",
     tags: ["shadcn", "origin"],
+    axes: [{ name: "variant", values: [...TOOLTIP_VARIANTS] }],
     render: () => (
       <Row>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline">悬停看提示</Button>
-          </TooltipTrigger>
-          <TooltipContent>提示文本</TooltipContent>
-        </Tooltip>
+        {TOOLTIP_VARIANTS.map((v) => (
+          <Tooltip key={v}>
+            <TooltipTrigger asChild>
+              <Button variant="outline">悬停看提示（{v}）</Button>
+            </TooltipTrigger>
+            <TooltipContent variant={v}>variant={v} 的提示文本</TooltipContent>
+          </Tooltip>
+        ))}
       </Row>
     ),
   },
@@ -1065,6 +1096,9 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["shadcn", "vxture"],
     deviation:
       "整套 API 自有：上游现行方案是 sonner，迁移要动产品侧 16 处 useToast，需单独立项",
+    axes: [
+      { name: "tone", values: ["success", "error", "warning", "info", "ai"] },
+    ],
     render: () => <ToastDemo />,
   },
 
@@ -1075,6 +1109,7 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["vxture", "patterns"],
     deviation:
       "与 Toast 分工：Toast 说刚才那一下成了没有，说完就走；Banner 说这个页面现在处于什么状态，状态还在就一直在。tone 改用共用的六档语气（原为含 ai 的自有五值），图标由语气决定",
+    axes: [{ name: "tone", values: [...TONES] }],
     render: () => <BannerDemo />,
   },
   {
@@ -1154,35 +1189,18 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["vxture", "patterns"],
     deviation:
       "在 Badge 之上加语气与圆点。tone 只表达严重度，没有 overdue / suspended 这类业务值",
+    axes: [{ name: "tone", values: [...TONES] }],
     render: () => (
       <>
         <Row label="六种语气">
-          {(
-            [
-              "neutral",
-              "brand",
-              "info",
-              "success",
-              "warning",
-              "danger",
-            ] as const
-          ).map((t) => (
+          {TONES.map((t) => (
             <StatusBadge key={t} tone={t}>
               {t}
             </StatusBadge>
           ))}
         </Row>
         <Row label="带圆点（密集列表里不靠颜色也能分辨）">
-          {(
-            [
-              "neutral",
-              "brand",
-              "info",
-              "success",
-              "warning",
-              "danger",
-            ] as const
-          ).map((t) => (
+          {TONES.map((t) => (
             <StatusBadge key={t} tone={t} dot>
               {t}
             </StatusBadge>
@@ -1221,6 +1239,7 @@ export const ENTRIES: readonly Entry[] = [
     axes: [
       { name: "level", values: ["1", "2", "3", "4"] },
       { name: "divider", values: ["default(level2)", "off"] },
+      { name: "tone", values: ["default", "raised"] },
     ],
     render: () => (
       <ViewLayout className="w-full rounded-lg border border-dashed border-border p-lg">
@@ -1377,7 +1396,11 @@ export const ENTRIES: readonly Entry[] = [
     group: "图案",
     tags: ["vxture", "patterns"],
     covers: ["MetricCard"],
-    axes: [{ name: "columns", values: ["2", "3", "4", "5", "6"] }],
+    axes: [
+      { name: "columns", values: ["2", "3", "4", "5", "6"] },
+      // MetricCard 的 tone——六张示例卡各占一档，columns=6 那排一次看全。
+      { name: "tone", values: [...TONES] },
+    ],
     deviation:
       "卡片按语气染顶缘色条不染底：一排卡片靠色条分组，整块染色会盖过读数本身。趋势徽章挨着数字，它修饰的是数字不是卡片",
     render: () => <MetricGridDemo />,
@@ -1389,6 +1412,7 @@ export const ENTRIES: readonly Entry[] = [
     tags: ["vxture", "patterns"],
     deviation:
       "页脚由 props 描述而非 markup 槽，danger 一个开关覆盖常规/危险两种提交。字段区仍是 children——表单字段是业务形状",
+    axes: [{ name: "size", values: ["sm", "md", "lg"] }],
     render: () => <DialogFormDemo />,
   },
 
@@ -1401,7 +1425,8 @@ export const ENTRIES: readonly Entry[] = [
     axes: [
       { name: "gap", values: ["xs", "sm", "md", "lg"] },
       { name: "align", values: ["start", "center", "end", "stretch"] },
-      { name: "columns", values: ["2", "3", "4"] },
+      // Grid 的 columns 是自由数值（columns?: number，1–12 类表 + 缺省回落 3），
+      // 不是枚举变体，不登记为轴；样例仍摆 2/3/4 三档示意。
       { name: "size", values: ["sm", "md", "lg", "xl", "full"] },
     ],
     deviation:
@@ -1465,7 +1490,7 @@ export const ENTRIES: readonly Entry[] = [
       "全屏开关。必须包在 FullscreenProvider 里才有上下文，故此处连同 provider 一起摆",
     render: () => (
       <FullscreenProvider>
-        <Row label="mode=pseudo">
+        <Row label="mode=pseudo（工作区全屏）">
           <div
             id="preview-fullscreen-target"
             className="flex w-full items-center justify-between rounded-md border border-dashed border-border p-sm"
@@ -1474,6 +1499,20 @@ export const ENTRIES: readonly Entry[] = [
               可全屏区域
             </span>
             <FullscreenToggle targetId="preview-fullscreen-target" />
+          </div>
+        </Row>
+        <Row label="mode=native（显示器全屏，Esc 退出）">
+          <div
+            id="preview-fullscreen-native-target"
+            className="flex w-full items-center justify-between rounded-md border border-dashed border-border p-sm"
+          >
+            <span className="text-body-md text-muted-foreground">
+              可全屏区域
+            </span>
+            <FullscreenToggle
+              targetId="preview-fullscreen-native-target"
+              mode="native"
+            />
           </div>
         </Row>
       </FullscreenProvider>
@@ -1566,7 +1605,7 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "AI",
     tags: ["vxture", "patterns"],
-    axes: [{ name: "streaming", values: ["true", "false"] }],
+    // streaming 是布尔状态不是变体轴，不登记；两种状态的样例仍都摆。
     deviation:
       "ai 语气只在生成态出现，完成后退回普通表面——继续亮着会让人以为还在跑。文本 whitespace-pre-wrap：模型输出的换行是内容的一部分",
     render: () => (
@@ -1595,7 +1634,7 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "AI",
     tags: ["vxture", "patterns"],
-    axes: [{ name: "busy", values: ["false", "true"] }],
+    // busy 是布尔状态不是变体轴，不登记；两种状态的样例仍都摆。
     deviation:
       "输入区与提交键复用 Textarea / Button，不再自造——焦点环、禁用态、移动端 16px 防缩放都在那两件里。chip 用 Button 的 xs 档而非 Badge：它们可点可切换，是控件不是标签",
     render: () => <PromptInputDemo />,
@@ -1868,15 +1907,6 @@ function AuthLoginDemo() {
   );
 }
 
-const TONES = [
-  "neutral",
-  "brand",
-  "info",
-  "success",
-  "warning",
-  "danger",
-] as const;
-
 function BannerDemo() {
   const [dismissed, setDismissed] = React.useState(false);
   return (
@@ -2046,7 +2076,7 @@ function SegmentedControlDemo() {
   const [view, setView] = React.useState<"list" | "cards" | "table">("cards");
   return (
     <>
-      <Row label="每页条数（原 PageSizePicker）">
+      <Row label="size=sm · 每页条数（原 PageSizePicker）">
         <SegmentedControl
           size="sm"
           ariaLabel="每页条数"
@@ -2059,7 +2089,7 @@ function SegmentedControlDemo() {
           }))}
         />
       </Row>
-      <Row label="展示方式（原 ViewModeSwitch）——只有图标时必须给 ariaLabel">
+      <Row label="size=md（默认）· 展示方式（原 ViewModeSwitch）——只有图标时必须给 ariaLabel">
         <SegmentedControl
           ariaLabel="展示方式"
           value={mode}
@@ -2139,30 +2169,27 @@ function BulkActionBarDemo() {
 function DialogFormDemo() {
   const [open, setOpen] = React.useState(false);
   const [danger, setDanger] = React.useState(false);
+  const [size, setSize] = React.useState<"sm" | "md" | "lg">("md");
+  const openWith = (nextSize: "sm" | "md" | "lg", nextDanger: boolean) => {
+    setSize(nextSize);
+    setDanger(nextDanger);
+    setOpen(true);
+  };
   return (
-    <Row label="两种提交语气；提交中两侧按钮同时禁用">
-      <Button
-        variant="outline"
-        onClick={() => {
-          setDanger(false);
-          setOpen(true);
-        }}
-      >
-        常规提交
-      </Button>
-      <Button
-        variant="outline"
-        onClick={() => {
-          setDanger(true);
-          setOpen(true);
-        }}
-      >
+    <Row label="三档宽度 × 两种提交语气；提交中两侧按钮同时禁用">
+      {(["sm", "md", "lg"] as const).map((s) => (
+        <Button key={s} variant="outline" onClick={() => openWith(s, false)}>
+          size={s}
+        </Button>
+      ))}
+      <Button variant="outline" onClick={() => openWith("md", true)}>
         危险提交
       </Button>
       <DialogForm
         open={open}
         onOpenChange={setOpen}
         danger={danger}
+        size={size}
         title={danger ? "删除模型接入" : "新建模型接入"}
         description={
           danger
@@ -2203,17 +2230,24 @@ function PaginationDemo() {
 }
 
 function DrawerDemo() {
-  const [open, setOpen] = React.useState(false);
+  const [side, setSide] = React.useState<"right" | "left" | null>(null);
+  const open = side !== null;
+  const setOpen = (next: boolean) => {
+    if (!next) setSide(null);
+  };
   return (
     <Row>
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        打开 Drawer
-      </Button>
+      {(["right", "left"] as const).map((s) => (
+        <Button key={s} variant="outline" onClick={() => setSide(s)}>
+          打开 Drawer（side={s}）
+        </Button>
+      ))}
       <Drawer
         open={open}
+        side={side ?? "right"}
         onClose={() => setOpen(false)}
         title="模型详情"
-        description="右侧滑出，Esc 或点击遮罩关闭。"
+        description={`${side === "left" ? "左" : "右"}侧滑出，Esc 或点击遮罩关闭。`}
         footer={
           <>
             <Button variant="outline" onClick={() => setOpen(false)}>

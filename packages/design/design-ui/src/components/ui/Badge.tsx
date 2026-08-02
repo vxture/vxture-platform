@@ -57,8 +57,31 @@ const badgeVariants = cva(
   },
 );
 
-export type BadgeVariant = NonNullable<
-  VariantProps<typeof badgeVariants>["variant"]
+/**
+ * 变体的**运行时数组**，类型由它推导（同 Button.types 的写法）。
+ * 预览面要遍历全部档位时引这里，不再手抄。
+ */
+export const BADGE_VARIANTS = [
+  "default",
+  "secondary",
+  "destructive",
+  "outline",
+] as const;
+
+export type BadgeVariant = (typeof BADGE_VARIANTS)[number];
+
+/** cva 的变体键必须与数组一致——两处各写一份必然漂移，此处编译期对账。 */
+type Equal<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false;
+type Expect<T extends true> = T;
+
+export type _BadgeVariantKeysMatch = Expect<
+  Equal<
+    NonNullable<VariantProps<typeof badgeVariants>["variant"]>,
+    BadgeVariant
+  >
 >;
 
 export interface BadgeProps

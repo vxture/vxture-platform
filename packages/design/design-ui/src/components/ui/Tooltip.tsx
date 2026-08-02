@@ -53,8 +53,26 @@ const tooltipVariants = cva(
   },
 );
 
-export type TooltipContentVariant = NonNullable<
-  VariantProps<typeof tooltipVariants>["variant"]
+/**
+ * 变体的**运行时数组**，类型由它推导（同 Button.types 的写法）。
+ * 预览面要遍历全部档位时引这里，不再手抄。
+ */
+export const TOOLTIP_VARIANTS = ["default", "surface", "soft"] as const;
+
+export type TooltipContentVariant = (typeof TOOLTIP_VARIANTS)[number];
+
+/** cva 的变体键必须与数组一致——两处各写一份必然漂移，此处编译期对账。 */
+type Equal<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false;
+type Expect<T extends true> = T;
+
+export type _TooltipVariantKeysMatch = Expect<
+  Equal<
+    NonNullable<VariantProps<typeof tooltipVariants>["variant"]>,
+    TooltipContentVariant
+  >
 >;
 
 export interface TooltipContentProps

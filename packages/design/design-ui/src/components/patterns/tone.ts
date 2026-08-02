@@ -14,13 +14,21 @@
 
 import type { IconName } from "../../icons";
 
-export type Tone =
-  | "neutral"
-  | "brand"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+/**
+ * 六档语气的**运行时数组**，类型由它推导。预览面、图案件要遍历全部档位时引这里，
+ * 不再各自手抄一份——手抄的清单加了档位不会跟着加，且不报错。
+ * 下方三个 Record<Tone, …> 以此类型为键，档位漂移在编译期即报。
+ */
+export const TONES = [
+  "neutral",
+  "brand",
+  "info",
+  "success",
+  "warning",
+  "danger",
+] as const;
+
+export type Tone = (typeof TONES)[number];
 
 /** 描边 + 弱化底 + 同色前景，用于标与提示条这类需要托底的件。 */
 export const toneSurfaceClasses: Record<Tone, string> = {
