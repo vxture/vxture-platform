@@ -61,8 +61,9 @@ export const EXTENSIONS = {
     ["700", "700ms", "Tailwind 时长档"],
     ["1000", "1000ms", "Tailwind 时长档"],
   ],
+  /* 不设 sm 以下的档：mobile-first 里基线样式就是手机样式，断点只向上加——
+     曾有 xs=375px 一档，全仓零使用且答不上"上游为何不够"，2026-08-02 删。 */
   breakpoint: [
-    ["xs", "23.4375rem", "375px，主流手机竖屏宽；Tailwind 最小档 sm=640px 已属平板"],
     ["3xl", "120rem", "1920px，1080p 横屏"],
     ["4xl", "160rem", "2560px，2K"],
     ["5xl", "240rem", "3840px，4K"],
