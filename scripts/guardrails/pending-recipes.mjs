@@ -14,17 +14,8 @@
 
 export const PENDING_RECIPES = [
   // 批 B｜表单控件
-  "Button.tsx",
-  "Checkbox.tsx",
-  "Input.tsx",
-  "Label.tsx",
-  "NativeSelect.tsx",
-  "Select.tsx",
-  "Switch.tsx",
-  "Textarea.tsx",
   // 批 C｜容器叠层
   "Drawer.tsx",
-  "DropdownMenu.tsx",
   "Toast.tsx",
   // 批 D｜导航状态
   "Badge.tsx",

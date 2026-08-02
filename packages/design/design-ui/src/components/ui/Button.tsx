@@ -22,39 +22,66 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
+import {
+  expandable,
+  iconInset,
+  inlineIcon,
+  interactive,
+  invalid,
+  pressable,
+  radiusClamp,
+} from "../../styles/recipes";
 import type { ButtonVariant, ButtonSize } from "./Button.types";
 
 const buttonVariants = cva(
   cn(
-    "inline-flex shrink-0 items-center justify-center whitespace-nowrap",
+    "inline-flex shrink-0 items-center justify-center whitespace-nowrap select-none",
     // 尺度一律走 T2 语义名产出的工具类，不用裸数值：p-lg 之类不跟随密度三档，
     // 而 gap-xs / h-control-md 会。任意值语法（gap-(--gap-xs)）仍然禁止。
-    "gap-xs rounded-md",
-    "text-label-md transition-colors duration-fast ease-standard outline-none",
-    "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-    "disabled:pointer-events-none disabled:opacity-disabled",
-    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
-    "[&_svg:not([class*='size-'])]:size-icon-sm",
+    "gap-xs rounded-md border border-transparent bg-clip-padding",
+    "text-label-md",
+    interactive,
+    pressable,
+    invalid,
+    inlineIcon,
+    iconInset,
   ),
   {
     variants: {
       variant: {
         default:
           "bg-primary text-primary-foreground hover:bg-primary-hover active:bg-primary-active",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive-hover active:bg-destructive-active",
-        outline:
-          "border border-border bg-background text-foreground hover:bg-accent",
-        secondary:
+        // 危险动作用淡底不用实心：一屏里若有多个删除入口，实心红会把视觉重量
+        // 全吸过去。真正的拦截交给二次确认，不靠按钮颜色吓人。
+        // 用实色 muted 阶而非上游的 `/10` alpha——alpha 叠在未知底色上结果不定，
+        // 且不自适应暗色（上游为此要补写一行 dark:）。
+        destructive: cn(
+          "bg-destructive-muted text-destructive-muted-foreground",
+          "hover:bg-destructive-muted-hover active:bg-destructive-muted-active",
+          "focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
+        ),
+        outline: cn(
+          "border-border bg-background text-foreground",
+          "hover:bg-accent hover:text-foreground",
+          expandable,
+        ),
+        secondary: cn(
           "bg-primary-muted text-primary-muted-foreground hover:bg-primary-muted-hover",
-        ghost: "text-foreground hover:bg-accent",
+          expandable,
+        ),
+        ghost: cn("text-foreground hover:bg-accent", expandable),
         link: "text-link underline-offset-4 hover:underline hover:text-link-hover",
       },
       size: {
-        sm: "h-control-md px-sm",
+        // 小档另行封顶圆角：`rounded-md` 在基数调大后会让 24/32px 的按钮发胖。
+        xs: cn("h-control-xs px-xs text-label-sm", radiusClamp),
+        sm: cn("h-control-md px-sm", radiusClamp),
         default: "h-control-lg px-md",
         lg: "h-control-xl px-lg",
+        "icon-xs": cn("size-control-xs p-0", radiusClamp),
+        "icon-sm": cn("size-control-md p-0", radiusClamp),
         icon: "size-control-lg p-0",
+        "icon-lg": "size-control-xl p-0",
       },
     },
     defaultVariants: {

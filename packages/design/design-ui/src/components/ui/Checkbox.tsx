@@ -18,6 +18,7 @@ import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { cn } from "../../utils/cn";
 import { Icon } from "../../icons";
+import { interactive, invalid } from "../../styles/recipes";
 
 export interface CheckboxProps extends React.ComponentPropsWithoutRef<
   typeof CheckboxPrimitive.Root
@@ -29,12 +30,19 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
       <CheckboxPrimitive.Root
         ref={ref}
         className={cn(
-          "peer group size-icon-sm shrink-0 rounded-sm border border-foreground",
-          // 焦点环与 Button / Input / Switch 统一，不用上游旧版的 ring-offset 写法
-          "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-          "disabled:cursor-not-allowed disabled:opacity-disabled",
-          "data-[state=checked]:bg-primary data-[state=checked]:text-content-on-fill",
-          "data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-content-on-fill",
+          "peer group relative flex size-icon-sm shrink-0 items-center justify-center",
+          "rounded-sm border border-input bg-transparent shadow-raised dark:bg-input/30",
+          // 命中区外扩到 40×32，但不占布局（绝对定位的伪元素）。16px 的方框
+          // 达不到任何平台的最小点击目标，而把方框本身放大会破坏与文字的比例。
+          "after:absolute after:-inset-x-lg after:-inset-y-sm",
+          interactive,
+          invalid,
+          "disabled:cursor-not-allowed",
+          // ⚠ 用 `data-[state=checked]` 而非上游 radix 模板里的 `data-checked`：
+          //   Radix 实际发的属性是 `data-state="checked"`，`data-checked` 编译得出
+          //   类名但永远匹配不上——勾选后没有填充色，且不报错。
+          "data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+          "data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
           className,
         )}
         {...props}

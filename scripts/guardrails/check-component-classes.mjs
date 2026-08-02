@@ -219,7 +219,16 @@ for (const file of files) {
   const body = (await readFile(file, "utf8"))
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/.*$/gm, "");
-  const hits = RECIPE_PATTERNS.filter(([pattern]) => body.includes(pattern));
+  // 判据是"有没有 import 配方"，不是"文本里有没有这个串"。
+  // 逐变体覆盖（destructive 换环色）是合法定制，按串匹配会把它误判成手写。
+  const adopted = /from\s+"[^"]*styles\/recipes"/.test(body);
+  if (adopted) continue;
+
+  // `(?<![\w-])` 挡住 `peer-disabled:opacity` / `group-data-[disabled=…]` 这类
+  // **反应别人状态**的写法——它们不是配方能替的：配方管的是元素自己的状态。
+  const hits = RECIPE_PATTERNS.filter(([pattern]) =>
+    new RegExp(`(?<![\\w-])${pattern.replace(/[[\]]/g, "\\$&")}`).test(body),
+  );
   if (hits.length === 0) continue;
   stillHandWritten.add(base);
   if (PENDING_RECIPES_SET.has(base)) continue;

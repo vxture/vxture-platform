@@ -17,6 +17,7 @@
 import * as React from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 import { cn } from "../../utils/cn";
+import { interactive, invalid } from "../../styles/recipes";
 
 export type SwitchProps = React.ComponentPropsWithoutRef<
   typeof SwitchPrimitive.Root
@@ -28,11 +29,15 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       <SwitchPrimitive.Root
         ref={ref}
         className={cn(
-          "peer inline-flex h-icon-md w-icon-xl shrink-0 items-center rounded-full border border-transparent",
-          "transition-colors duration-fast ease-standard outline-none",
-          "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-          "disabled:cursor-not-allowed disabled:opacity-disabled",
+          "peer group relative inline-flex h-icon-md w-icon-xl shrink-0 items-center",
+          "rounded-full border border-transparent shadow-raised",
+          // 同 Checkbox：外扩命中区，不占布局。
+          "after:absolute after:-inset-x-lg after:-inset-y-sm",
+          interactive,
+          invalid,
+          "disabled:cursor-not-allowed",
           "data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+          "dark:data-[state=unchecked]:bg-input/80",
           className,
         )}
         {...props}

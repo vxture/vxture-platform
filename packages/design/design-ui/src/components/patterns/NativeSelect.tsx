@@ -18,6 +18,7 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { Icon } from "../../icons";
+import { interactive, invalid } from "../../styles/recipes";
 
 export type NativeSelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
 
@@ -31,12 +32,12 @@ export const NativeSelect = React.forwardRef<
         ref={ref}
         data-slot="native-select"
         className={cn(
-          "flex h-control-lg w-full min-w-0 appearance-none rounded-md border border-input bg-card pl-sm pr-xl py-2xs",
-          "text-body-sm text-foreground",
-          "transition-[color,box-shadow] duration-fast ease-standard outline-none",
-          "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-          "aria-invalid:border-destructive aria-invalid:ring-destructive/20",
-          "disabled:cursor-not-allowed disabled:opacity-disabled",
+          "flex h-control-lg w-full min-w-0 appearance-none rounded-md border border-input pl-sm pr-xl py-2xs",
+          "bg-transparent shadow-raised dark:bg-input/30",
+          "text-body-lg md:text-body-md text-foreground",
+          interactive,
+          invalid,
+          "disabled:cursor-not-allowed",
           className,
         )}
         {...props}

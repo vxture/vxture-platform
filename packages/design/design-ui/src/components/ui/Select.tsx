@@ -11,6 +11,7 @@ import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "../../utils/cn";
 import { Icon } from "../../icons";
+import { expandable, interactive, invalid } from "../../styles/recipes";
 
 export interface SelectProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Root
@@ -54,7 +55,16 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
       <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-          "flex h-control-xl w-full items-center justify-between rounded-md border border-border bg-card px-md py-sm text-body-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-disabled [&>span]:line-clamp-1",
+          // 高度与 Input 对齐到 control-lg：同一表单行里 40 配 36 是肉眼可见的不齐。
+          "flex h-control-lg w-full items-center justify-between gap-xs",
+          "rounded-md border border-input px-sm py-2xs",
+          "bg-transparent shadow-raised dark:bg-input/30",
+          "text-body-lg md:text-body-md placeholder:text-muted-foreground",
+          interactive,
+          invalid,
+          expandable,
+          "disabled:cursor-not-allowed",
+          "[&>span]:line-clamp-1",
           className,
         )}
         {...props}

@@ -4,14 +4,14 @@
  * @layer Presentation
  * @category Components - Form
  *
- * 结构承 shadcn 官方 Textarea，与 Input 共用同一套边框、焦点环与失效态，
- * 差别只在最小高度与 `field-sizing-content`（随内容增高，上游新版行为）。
- *
- * 原实现挂了 .vx-textarea，并引用不存在的 ring-offset-vx-surface，一并清除。
+ * 视觉规格取 shadcn vega。与 Input 共用同一套边框、底色与配方，差别只在最小高度与
+ * `field-sizing-content`（随内容增高）。两者必须看起来是一家的——同一表单里
+ * 单行和多行长得不一样是最容易被察觉的不一致。
  */
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive, invalid } from "../../styles/recipes";
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
 
@@ -22,12 +22,12 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         ref={ref}
         data-slot="textarea"
         className={cn(
-          "flex field-sizing-content min-h-row-4xl w-full rounded-md border border-input bg-card px-sm py-xs",
-          "text-body-sm text-foreground placeholder:text-muted-foreground",
-          "transition-[color,box-shadow] duration-fast ease-standard outline-none",
-          "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
-          "aria-invalid:border-destructive aria-invalid:ring-destructive/20",
-          "disabled:cursor-not-allowed disabled:opacity-disabled",
+          "flex field-sizing-content min-h-row-4xl w-full rounded-md border border-input px-sm py-xs",
+          "bg-transparent shadow-raised dark:bg-input/30",
+          "text-body-lg md:text-body-md text-foreground placeholder:text-muted-foreground",
+          interactive,
+          invalid,
+          "disabled:cursor-not-allowed",
           className,
         )}
         {...props}
