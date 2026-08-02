@@ -44,7 +44,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
           align={align}
           sideOffset={sideOffset}
           className={cn(
-            // w-72 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 060 §1.2，
+            // w-72 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 design-system/docs/01-usage.md §3，
             // 组件尺寸归 cva / 组件自身，不进 T2。
             "z-popover w-72 p-lg outline-none",
             panel.base,

@@ -15,7 +15,7 @@
  * ⚠ 这里只放**跨组件恒定**的片段。只有一个组件用到的写在它自己的 cva 里——
  *   放进来会让"配方"退化成公共类名垃圾桶，那就白抽了。
  *
- * 取值依据见 docs/10-standards/060-design-system.md §视觉规格，规格来源为 shadcn vega。
+ * 取值依据见 packages/design/design-system/docs/02-visual-spec.md，规格来源为 shadcn vega。
  */
 
 /**

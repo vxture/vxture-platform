@@ -26,7 +26,7 @@ const DS_STYLE_HARDCODED_SCALE_BUDGET = 0;
  * DS 叠放阶梯的取值。**首选仍是 `var(--z-index-*)` 语义名**；本表只是兜底，
  * 容许内联 style 等确实拿不到类名的场合直写档位值，档外取值一律拦。
  * 阶梯语义与推导依据见 scripts/design-tokens/semantic-policy.mjs 与
- * docs/10-standards/060-design-system.md §8。
+ * packages/design/design-system/docs/04-tokens-contract.md §8。
  */
 const Z_LADDER = new Set([100, 200, 300, 400, 500, 600, 700, 800, 900, 9999]);
 const BASELINED_RULE_IDS = new Set([
@@ -428,7 +428,7 @@ const rules = [
       return violation(
         file,
         lineNumber,
-        `z-index 须取 DS 叠放阶梯（${[...Z_LADDER].join(" / ")}），阶梯语义见 docs/10-standards/060-design-system.md §8。`,
+        `z-index 须取 DS 叠放阶梯（${[...Z_LADDER].join(" / ")}），阶梯语义见 packages/design/design-system/docs/04-tokens-contract.md §8。`,
         line,
       );
     },

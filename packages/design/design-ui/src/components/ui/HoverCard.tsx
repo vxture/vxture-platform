@@ -46,7 +46,7 @@ const HoverCardContent = React.forwardRef<
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          // w-64 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 060 §1.2，
+          // w-64 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 design-system/docs/01-usage.md §3，
           // 组件尺寸归组件自身，不进 T2。
           "z-popover w-64 p-lg outline-none",
           panel.base,

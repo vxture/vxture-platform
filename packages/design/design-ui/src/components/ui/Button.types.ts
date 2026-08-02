@@ -11,7 +11,7 @@ export const BUTTON_VARIANTS = [
   "secondary",
   "outline",
   "ghost",
-  /** 入口用：行内删除、菜单危险项。淡底，见 060 §1.2.1 危险两档。 */
+  /** 入口用：行内删除、菜单危险项。淡底，见 design-system/docs/03-patterns-guide.md §3 危险两档。 */
   "destructive",
   /** 落锤用：确认对话框的提交。实心。 */
   "destructive-strong",

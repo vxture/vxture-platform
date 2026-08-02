@@ -10,7 +10,7 @@
  *   生成：node scripts/design-tokens/generate-semantic.mjs
  *   输入：scripts/design-tokens/color-policy.mjs
  *
- * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * T2 契约见 packages/design/design-system/docs/04-tokens-contract.md。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  *
  * 命名沿用 shadcn 约定（--background / --foreground / --primary / --border …），

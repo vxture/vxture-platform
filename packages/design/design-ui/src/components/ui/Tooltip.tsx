@@ -31,7 +31,7 @@ export interface TooltipProviderProps extends React.ComponentPropsWithoutRef<
 /**
  * 视觉高度取 `shadow-overlay` 而非更高档：tooltip 叠放最高（`z-tooltip`），
  * 但阴影应当轻——它小而短暂，重阴影只显笨重。两条阶梯不可互相推导，
- * 见 060 §8。
+ * 见 packages/design/design-system/docs/04-tokens-contract.md §7–8。
  */
 const tooltipVariants = cva(
   cn(

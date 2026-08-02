@@ -194,7 +194,8 @@ GitHub Packages 版本发布后不可覆盖。出现问题时按补丁版本处�
 
 ## 10. 关联文档
 
-- `docs/10-standards/060-design-system.md` —— 分层、token 族与组件约定
+- `packages/design/design-system/docs/` —— 对外使用规范（随包发布）
+- `docs/10-standards/060-design-system.md` —— DS 内部工程规范
 - `docs/10-standards/065-design-token-pipeline.md` —— token 生成与守卫
 - `docs/10-standards/040-design-system-package-convergence.md` —— 包结构
 - `.github/workflows/publish-design-system.yml` —— 实现

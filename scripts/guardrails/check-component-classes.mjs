@@ -235,7 +235,7 @@ if (dead.length > 0) {
   console.error("组件用到未生成的类名——这些元素会静默无样式：\n");
   for (const d of dead) console.error(`  ✗ ${d.file}:${d.line}  ${d.cls}`);
   console.error(
-    "\n改用 T2 语义名产出的工具类；族清单见 docs/10-standards/060-design-system.md §1.1。",
+    "\n改用 T2 语义名产出的工具类；族清单见 packages/design/design-system/docs/04-tokens-contract.md。",
   );
   process.exit(1);
 }

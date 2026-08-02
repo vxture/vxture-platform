@@ -398,7 +398,7 @@ function header(file, label, source, extra = "") {
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
  *   输入：${source}
  *
- * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * T2 契约见 packages/design/design-system/docs/04-tokens-contract.md。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。${extra}
  */
 `;

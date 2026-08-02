@@ -10,7 +10,7 @@
  *   生成：node scripts/design-tokens/generate-semantic-scales.mjs
  *   输入：scripts/design-tokens/semantic-policy.mjs
  *
- * T2 定义见 docs/10-standards/060-design-system.md §1.1。
+ * T2 契约见 packages/design/design-system/docs/04-tokens-contract.md。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  *
  * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。

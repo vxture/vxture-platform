@@ -6,7 +6,7 @@
  *
  * 本目录只放 **shadcn 上游有对应件** 的组件：结构照上游，取值绑 T2 语义层，
  * 需要定制的就地定制并在文件头注明偏离及理由。上游没有的组合件归 `../patterns`，
- * 带业务属性的一律不进本包（见 `docs/10-standards/060-design-system.md`）。
+ * 带业务属性的一律不进本包（见 `packages/design/design-system/docs/03-patterns-guide.md` §8）。
  *
  * Drawer 对应上游的 **Sheet**；上游那个基于 vaul 的 Drawer 本仓无对应场景。
  */

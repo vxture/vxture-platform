@@ -10,7 +10,7 @@
  *   aria-expanded 高亮都在配方层里），浮层走 `Popover`（外点关闭 / Escape / portal /
  *   进出场动效由 Radix + overlayMotion 提供，替代原先手写的事件监听），下拉走
  *   `NativeSelect`，互斥选项走 `SegmentedControl`，认证标走 `StatusBadge`。
- * - 透明模式（060 §1.2.1）：外壳部件与底同色，hover 用 `bg-accent`（brand 微染），
+ * - 透明模式（design-system/docs/02-visual-spec.md §3）：外壳部件与底同色，hover 用 `bg-accent`（brand 微染），
  *   不动 border / 阴影 / 位置；分隔用发丝线（实线开区块、虚线分行）。
  * - 品牌标识用 §7 的 .vx-brand-* 组合类——那是仍然在册的品牌基线，不是遗留类。
  * - **公开 API 冻结**：导出名与 props 形状与重写前逐项一致，消费方零改动。
@@ -252,7 +252,7 @@ const FONT_SIZE_OPTIONS: readonly ShellFontSizePreference[] = [
   "large",
 ];
 
-/** 用户菜单内的字段级分隔：发丝线，虚线分行（060 §1.2.1）。 */
+/** 用户菜单内的字段级分隔：发丝线，虚线分行（02-visual-spec.md §3）。 */
 const HAIRLINE_FIELD = "border-t border-dashed border-primary/10";
 const HAIRLINE_FIELD_DARK = "dark:border-primary/20";
 
@@ -755,7 +755,7 @@ export function ShellLegalFooter({
   return (
     <footer
       className={cn(
-        // 区块级分隔用实线发丝线（060 §1.2.1）。
+        // 区块级分隔用实线发丝线（02-visual-spec.md §3）。
         "border-t border-primary/10 dark:border-primary/20",
         "px-lg py-md text-body-sm text-muted-foreground",
         className,

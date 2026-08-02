@@ -9,7 +9,7 @@
  * - **能组合 design-ui 现成组件的不自造**：输入走 `Input`/`Label`（焦点环 / 失效态 /
  *   移动端 16px 防缩放都在那里），勾选走 `Checkbox`，tab 走 Radix `Tabs`，按钮走
  *   `Button`，分隔走 `Separator`，字段图标走 `Icon`。
- * - 透明模式（060 §1.2.1）：登录卡走 `Card` 的 veil 叠层（strong 档）+ 发丝线，
+ * - 透明模式（design-system/docs/02-visual-spec.md §3）：登录卡走 `Card` 的 veil 叠层（strong 档）+ 发丝线，
  *   无阴影；页面唯一实色底在 `UnifiedAuthPage` 的 section 上。
  * - 视觉面板不再依赖已退役的 auth 专属 token：底色用语义色 primary 渐变，
  *   NodeGraph 画布颜色从自身 computed color 读取（text-primary-foreground）。
@@ -459,7 +459,7 @@ export function UnifiedAuthPage({
       {overlay}
       {header}
       <main className="flex flex-1 items-center justify-center px-md py-xl">
-        {/* 登录卡：veil 叠层（strong 档）+ 发丝线，无阴影（060 §1.2.1）。 */}
+        {/* 登录卡：veil 叠层（strong 档）+ 发丝线，无阴影（02-visual-spec.md §3）。 */}
         <Card
           surface="strong"
           aria-label={ariaLabel}
