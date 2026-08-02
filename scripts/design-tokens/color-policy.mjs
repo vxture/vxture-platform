@@ -87,7 +87,9 @@ export const STANDALONE_COLORS = [
   ["card", "white", "neutral-800"],
   ["surface-3", "neutral-50", "neutral-700"],
   ["popover", "white", "neutral-800"],
-  ["scrim", "neutral-950-alpha-45", "neutral-950-alpha-45"],
+  // 遮罩与背景虚化配套使用。虚化本身已经说明"下面那层不可操作"，
+  // 遮罩不必再压暗一次——45% 那种浓度是没有虚化时才需要的。
+  ["scrim", "neutral-950-alpha-10", "neutral-950-alpha-10"],
   ["accent", "neutral-600-alpha-08", "neutral-600-alpha-10"],
   ["surface-active", "neutral-600-alpha-15", "neutral-600-alpha-22"],
   ["surface-selected", "brand-600-alpha-10", "brand-600-alpha-15"],

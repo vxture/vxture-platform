@@ -27,6 +27,7 @@ import {
   EXTENSIONS,
   OVERRIDES,
   BRAND_COLOR_PATTERNS,
+  EXTRA_BRAND_ROWS,
 } from "./foundation-policy.mjs";
 
 const ROOT = process.cwd();
@@ -108,6 +109,11 @@ try {
     /* 无既有色板，品牌色留空 */
   }
 }
+// 登记的新增行并入读回结果；已经在产出里的不重复添加。
+for (const [step, value] of EXTRA_BRAND_ROWS) {
+  if (!brandRows.some((r) => r.step === step)) brandRows.push({ step, value });
+}
+
 const orphanRows = brandRows.filter((r) => !keepBrandRow(r.step));
 if (orphanRows.length > 0) {
   const hues = [...new Set(orphanRows.map((r) => r.step.replace(/-\d+(-alpha-\d+)?$/, "")))];
