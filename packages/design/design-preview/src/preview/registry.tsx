@@ -21,6 +21,7 @@ import * as React from "react";
 import {
   ActionMenu,
   Avatar,
+  BUTTON_VARIANTS,
   AvatarFallback,
   Badge,
   Banner,
@@ -137,15 +138,6 @@ export interface Entry {
   readonly render: () => React.ReactNode;
 }
 
-const BUTTON_VARIANTS = [
-  "default",
-  "secondary",
-  "outline",
-  "ghost",
-  "destructive",
-  "link",
-] as const;
-
 /**
  * 组件页内部的分组顺序。大类见 `./sections`——那一层决定进哪个页面，这一层只决定
  * 在页面里的先后。
@@ -163,6 +155,9 @@ export const ENTRIES: readonly Entry[] = [
       <>
         {BUTTON_VARIANTS.map((v) => (
           <Row key={v} label={v}>
+            <Button variant={v} size="xs">
+              最小
+            </Button>
             <Button variant={v} size="sm">
               小
             </Button>
@@ -365,7 +360,8 @@ export const ENTRIES: readonly Entry[] = [
         </CardHeader>
         <CardContent>
           <p className="text-body-sm text-muted-foreground">
-            卡片自身用 shadow-flat，抬高由使用方按场景加 shadow-raised。
+            卡片边缘用 ring 而非 border：ring
+            不占布局，且叠在阴影之上不与它相争。
           </p>
         </CardContent>
         <CardFooter>

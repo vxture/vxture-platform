@@ -15,7 +15,9 @@ export * from "./Avatar";
 export * from "./Badge";
 export * from "./Breadcrumb";
 export * from "./Button";
-export type * from "./Button.types";
+// 值与类型都要导出：BUTTON_VARIANTS / BUTTON_SIZES 是运行时数组，
+// 预览面与图案件遍历全部挡位时引它，避免各自手抄。
+export * from "./Button.types";
 export * from "./Card";
 export * from "./Checkbox";
 export * from "./Dialog";
