@@ -46,6 +46,16 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
   const [fontSize, setFontSize] = React.useState<FontSize>("default");
   const [collapsed, setCollapsed] = React.useState(false);
 
+  /**
+   * 当前主题只有客户端知道——它存在 localStorage 里，服务端渲染时无从得知，于是
+   * SSR 把 light 标成选中、hydration 时发现应该是 dark，React 报 hydration mismatch。
+   * 密度与字号没这个问题：它们是本组件的 state，两端都从 default 起步。
+   *
+   * 挂载前不标任何一档，挂载后再显示——这是 next-themes 官方给的做法。
+   */
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
+
   // 换页即恢复展开——收起只对当前这一眼有效。
   React.useEffect(() => setCollapsed(false), [active]);
 
@@ -114,7 +124,7 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
         <div className="sticky bottom-none mt-auto flex flex-col gap-sm border-t border-border bg-surface-1 pb-sm pt-lg">
           <Axis
             label="主题"
-            value={theme}
+            value={mounted ? (theme ?? "") : ""}
             options={["light", "dark", "system"]}
             onChange={(v) => setTheme(v as typeof theme)}
           />
