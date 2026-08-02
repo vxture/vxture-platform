@@ -1,5 +1,5 @@
 /**
- * foundation-policy.mjs — T1 相对 Tailwind 基线的**全部偏离**，逐条写明理由。
+ * primitive-policy.mjs — T1 相对 Tailwind 基线的**全部偏离**，逐条写明理由。
  *
  * T1 是 Tailwind theme 的完整镜像。凡与基线不同之处只有三种，且必须登记在此：
  *
@@ -7,7 +7,7 @@
  *   EXTENSIONS  Tailwind 没有的挡位（扩展）
  *   OVERRIDES   Tailwind 有、但 DS 判定要改的取值（修改）
  *
- * 没登记就是没有偏离——生成器直接照搬基线。**不允许手工改 foundation/ 下的文件**，
+ * 没登记就是没有偏离——生成器直接照搬基线。**不允许手工改 primitive/ 下的文件**，
  * 那是生成物，改动会被下一次生成静默覆盖。
  */
 

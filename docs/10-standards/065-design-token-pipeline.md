@@ -10,13 +10,13 @@
 
 **`@vxture/design-system` 的 token 产出即唯一真值源。** 其余一切都是应用方——**Figma 也是应用方**，它最终要应用本包的 token 来做产品设计。
 
-| 角色                                            | 定位                                     | 是否权威            |
-| ----------------------------------------------- | ---------------------------------------- | ------------------- |
-| `src/styles/foundation\|semantic\|components/*` | **DS token 真值源**                      | **是**              |
-| `src/tokens/*.ts`                               | 真值源的 TS 投影                         | 否（由 CSS 层决定） |
-| Figma 文件                                      | **应用方**：用 DS token 做视觉推演与设计 | 否                  |
-| `Figma-Token/`（DTCG 导出）                     | **过程文件**：首次播种用，迁移完成后删除 | 否（临时）          |
-| 手写非生成态 token                              | 迁移完成后即为常态                       | **是**              |
+| 角色                                           | 定位                                     | 是否权威            |
+| ---------------------------------------------- | ---------------------------------------- | ------------------- |
+| `src/styles/primitive\|semantic\|components/*` | **DS token 真值源**                      | **是**              |
+| `src/tokens/*.ts`                              | 真值源的 TS 投影                         | 否（由 CSS 层决定） |
+| Figma 文件                                     | **应用方**：用 DS token 做视觉推演与设计 | 否                  |
+| `Figma-Token/`（DTCG 导出）                    | **过程文件**：首次播种用，迁移完成后删除 | 否（临时）          |
+| 手写非生成态 token                             | 迁移完成后即为常态                       | **是**              |
 
 方向：**DS → Figma / 产品**。不是 Figma → DS。
 
@@ -38,7 +38,7 @@
 **目标态**：
 
 ```
-packages/design/design-system/src/styles/foundation|semantic|components/*.css   ← 真值源
+packages/design/design-system/src/styles/primitive|semantic|components/*.css   ← 真值源
   ↓ tokens.css 聚合            ↓ 导出 DTCG
 消费方（产品仓库 / T4）        Figma（导入后用于设计）
 ```
@@ -48,7 +48,7 @@ packages/design/design-system/src/styles/foundation|semantic|components/*.css   
 ```
 Figma-Token/<collection>/*.tokens.json   ← 过程文件
   ↓ scripts/design-tokens/*.mjs
-src/styles/foundation/*.css
+src/styles/primitive/*.css
 ```
 
 ### 2.1 过程文件约定（迁移期有效）
@@ -131,7 +131,7 @@ T1 内部允许互相引用（`--vx-radius-md: var(--vx-spacing-1-5)`——圆�
 
 ### 2.2 文件组织
 
-`src/styles/foundation/` 下按**主语在前、层级在后**命名，与 Figma 集合命名一致：
+`src/styles/primitive/` 下按**主语在前、层级在后**命名，与 Figma 集合命名一致：
 
 | 文件                       | 内容                                      | 数量 |
 | -------------------------- | ----------------------------------------- | ---- |

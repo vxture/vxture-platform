@@ -67,7 +67,7 @@ const CHECK = process.argv.includes("--check");
 
 const PKG = path.join(ROOT, "packages/design/design-tokens");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
-const FOUNDATION = path.join(PKG, "src/styles/foundation");
+const PRIMITIVE = path.join(PKG, "src/styles/primitive");
 
 const errors = [];
 const notes = [];
@@ -87,7 +87,7 @@ function loadT1() {
       }
     }
   };
-  walk(FOUNDATION);
+  walk(PRIMITIVE);
   return literals;
 }
 

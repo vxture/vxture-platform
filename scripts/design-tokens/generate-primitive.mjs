@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * generate-foundation.mjs — 生成 T1 原子层：Tailwind theme 的完整镜像 + DS 偏离。
+ * generate-primitive.mjs — 生成 T1 原子层：Tailwind theme 的完整镜像 + DS 偏离。
  *
  * T1 直接读上游的 theme.css 生成，一致性由构造保证。靠人工核对维持"取值等于
  * Tailwind"是不行的——实测漂成过两套（色板停在 v3 的 hex，而 v4 早已改用 oklch；
  * shadow 与 ease 各自另起一套）。
  *
- * 偏离全部集中在 foundation-policy.mjs，逐条带理由，生成时打印。
+ * 偏离全部集中在 primitive-policy.mjs，逐条带理由，生成时打印。
  *
- * 出：src/styles/foundation/**.css
+ * 出：src/styles/primitive/**.css
  *
  * 用法：
- *   node scripts/design-tokens/generate-foundation.mjs
- *   node scripts/design-tokens/generate-foundation.mjs --check
+ *   node scripts/design-tokens/generate-primitive.mjs
+ *   node scripts/design-tokens/generate-primitive.mjs --check
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -28,11 +28,11 @@ import {
   OVERRIDES,
   BRAND_COLOR_PATTERNS,
   EXTRA_BRAND_ROWS,
-} from "./foundation-policy.mjs";
+} from "./primitive-policy.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
-const OUT_DIR = path.join(ROOT, "packages/design/design-tokens/src/styles/foundation");
+const OUT_DIR = path.join(ROOT, "packages/design/design-tokens/src/styles/primitive");
 
 const notes = [];
 
@@ -46,10 +46,10 @@ function header(title, utility) {
  * @date 2026-07-31
  *
  * ⚠ 本文件由脚本生成，请勿手工编辑。
- *   生成：node scripts/design-tokens/generate-foundation.mjs
+ *   生成：node scripts/design-tokens/generate-primitive.mjs
  *
  * T1 是 Tailwind v4 theme 的镜像，取值与之逐项一致；偏离登记在
- * scripts/design-tokens/foundation-policy.mjs。工具类族：${utility}
+ * scripts/design-tokens/primitive-policy.mjs。工具类族：${utility}
  */
 `;
 }
@@ -179,8 +179,8 @@ for (const [file, blocks] of outputs) {
   const meta = NAMESPACES.find((n) => n.file === file);
   const title =
     file === "color-brand-primitive.css"
-      ? "foundation/color-brand-primitive.css - T1 原子层 · 品牌与合成色。"
-      : `foundation/${file} - T1 原子层 · ${meta?.title ?? file}。`;
+      ? "primitive/color-brand-primitive.css - T1 原子层 · 品牌与合成色。"
+      : `primitive/${file} - T1 原子层 · ${meta?.title ?? file}。`;
   files.set(
     file,
     header(title, meta?.utility ?? "—") + `\n:root {\n${blocks.join("\n\n")}\n}\n`,
@@ -210,7 +210,7 @@ if (CHECK) {
   }
   if (stale.length > 0) {
     console.error(`T1 与 Tailwind 基线不同步：${stale.join(", ")}`);
-    console.error("运行：node scripts/design-tokens/generate-foundation.mjs");
+    console.error("运行：node scripts/design-tokens/generate-primitive.mjs");
     process.exit(1);
   }
   console.log(`T1 镜像一致（${files.size} 文件 / ${total} 项 · 扩展 ${extCount} · 覆盖 ${overCount}）`);

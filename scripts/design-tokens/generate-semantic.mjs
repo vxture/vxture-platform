@@ -31,8 +31,8 @@ const CHECK = process.argv.includes("--check");
 const PKG = path.join(ROOT, "packages/design/design-tokens");
 const OUT_DIR = path.join(PKG, "src/styles/semantic");
 const T1_COLOR_FILES = [
-  path.join(PKG, "src/styles/foundation/color-primitive.css"),
-  path.join(PKG, "src/styles/foundation/color-brand-primitive.css"),
+  path.join(PKG, "src/styles/primitive/color-primitive.css"),
+  path.join(PKG, "src/styles/primitive/color-brand-primitive.css"),
 ];
 
 const errors = [];

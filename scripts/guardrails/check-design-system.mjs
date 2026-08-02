@@ -72,17 +72,17 @@ const DS_TOKEN_PATHS = [
   normalize("packages/design/design-system/src/tokens"),
   normalize("packages/design/design-tokens/src/styles/tokens.css"),
 ];
-// 顶层 tokens*.css 是历史平铺形态；foundation/ semantic/ components/ 是
+// 顶层 tokens*.css 是历史平铺形态；primitive/ semantic/ components/ 是
 // docs/10-standards/040-design-system-package-convergence.md §3 的目标结构，
 // T1–T4 分层落地后 token 文件迁入这些子目录，同样属 DS token 层。
-// 允许 foundation/ semantic/ components/ 下任意深度——排版原子按子命名空间
-// 归入 foundation/typography/，只认一层会把它们判成裸值违规。
-// token owner = 分层 token 模块（T1 foundation / T2 semantic）、聚合入口 tokens.css，
+// 允许 primitive/ semantic/ components/ 下任意深度——排版原子按子命名空间
+// 归入 primitive/typography/，只认一层会把它们判成裸值违规。
+// token owner = 分层 token 模块（T1 primitive / T2 semantic）、聚合入口 tokens.css，
 // 以及 @theme 注册 theme.css。theme.css 必须算 owner：断点与容器宽度进的是媒体查询
 // 与容器查询，那里 var() 不参与求值，只能落字面量——它是有依据的刻度真值源，
 // 不是"叶子里随手写死的数"。components/ 已随 T3 层退役。
 const DS_RUNTIME_TOKEN_STYLE_PATTERN =
-  /^packages\/design\/design-tokens\/src\/styles\/(?:tokens\.css|tailwind\.css|theme\.css|(?:foundation|semantic)\/(?:[\w-]+\/)*[\w-]+\.css)$/;
+  /^packages\/design\/design-tokens\/src\/styles\/(?:tokens\.css|tailwind\.css|theme\.css|(?:primitive|semantic)\/(?:[\w-]+\/)*[\w-]+\.css)$/;
 const DS_RUNTIME_SCALE_BRIDGE_VAR_PATTERN =
   /var\(--vx-(?:scale|platform-scale|auth-scale|console-scale|component-scale)-/;
 const DS_RUNTIME_COMPONENT_METRIC_VAR_PATTERN = /var\(--vx-component-metric-/;
@@ -1031,7 +1031,7 @@ const rules = [
         violation(
           file,
           1,
-          "DS tokens-* 模块超过 8KB；请按 theme、colors、foundation、component、platform、admin、console、website 等语义域继续拆分。",
+          "DS tokens-* 模块超过 8KB；请按 theme、colors、primitive、component、platform、admin、console、website 等语义域继续拆分。",
         ),
       ];
     },

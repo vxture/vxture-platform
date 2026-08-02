@@ -12,7 +12,7 @@ L0–L5 组件归属与 T1–T4 token 分层的对外定义见包内 `docs/01-us
 
 ### 1.1 T1 镜像与偏离登记
 
-**T1 是镜像，不是差分**。命名空间、分组、挡位、名称、取值与 Tailwind v4 逐项一致，由 `scripts/design-tokens/generate-foundation.mjs` 读上游 `theme.css` 生成，一致性由构造保证。全部偏离登记在 `scripts/design-tokens/foundation-policy.mjs`，逐条带理由，生成时打印：
+**T1 是镜像，不是差分**。命名空间、分组、挡位、名称、取值与 Tailwind v4 逐项一致，由 `scripts/design-tokens/generate-primitive.mjs` 读上游 `theme.css` 生成，一致性由构造保证。全部偏离登记在 `scripts/design-tokens/primitive-policy.mjs`，逐条带理由，生成时打印：
 
 - **扩展**（Tailwind 没有的挡位）：`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`（字号档无扩展，最小档即上游的 `xs`=12px）
 - **覆盖**（Tailwind 有、DS 判定要改）：`font-sans` / `font-mono` 的字体栈
@@ -94,9 +94,9 @@ T2 装得下"值"，装不下"规则"。跨组件恒定的类名片段抽到 `de
 
 ## 6. 新挡位流程
 
-新挡位分两种情况：**T1 缺档**（上游没有的取值）走 §9 的流程补进 `foundation-policy.mjs` 的扩展表；**T2 缺语义名**（取值有了但没有对应角色）补进 `semantic-policy.mjs`。两者都要写理由，生成时逐条打印。就地写死一律不接受。
+新挡位分两种情况：**T1 缺档**（上游没有的取值）走 §9 的流程补进 `primitive-policy.mjs` 的扩展表；**T2 缺语义名**（取值有了但没有对应角色）补进 `semantic-policy.mjs`。两者都要写理由，生成时逐条打印。就地写死一律不接受。
 
-事实来源只有四处：`src/styles/foundation|semantic/*`（生成物）、`foundation-policy.mjs`（T1 相对上游的偏离）、`semantic-policy.mjs` / `color-policy.mjs` / `typography-policy.mjs`（T2 的全部输入）与规范文档。生成物不得手工编辑，改动会被下一次生成静默覆盖。
+事实来源只有四处：`src/styles/primitive|semantic/*`（生成物）、`primitive-policy.mjs`（T1 相对上游的偏离）、`semantic-policy.mjs` / `color-policy.mjs` / `typography-policy.mjs`（T2 的全部输入）与规范文档。生成物不得手工编辑，改动会被下一次生成静默覆盖。
 
 ## 7. 品牌标识组合
 

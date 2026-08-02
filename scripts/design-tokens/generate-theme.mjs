@@ -9,7 +9,7 @@
  * `duration-150`、`p-4`、`z-50`…），DS 再注册一遍只会得到一份逐字重复的真值。
  *
  * 因此需要注册的恰好是两类，且都是"上游没有"的：
- *   1. T1 相对基线的**偏离**——扩展档与覆盖值，清单在 foundation-policy.mjs
+ *   1. T1 相对基线的**偏离**——扩展档与覆盖值，清单在 primitive-policy.mjs
  *   2. T2 的**语义**——色彩角色、24 档排版角色、页面与内容宽度
  *
  * 出：src/styles/theme.css
@@ -27,14 +27,14 @@ import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-import { EXTENSIONS, OVERRIDES } from "./foundation-policy.mjs";
+import { EXTENSIONS, OVERRIDES } from "./primitive-policy.mjs";
 
 const ROOT = process.cwd();
 const CHECK = process.argv.includes("--check");
 
 const PKG = path.join(ROOT, "packages/design/design-tokens");
 const SEMANTIC = path.join(PKG, "src/styles/semantic");
-const FOUNDATION = path.join(PKG, "src/styles/foundation");
+const FOUNDATION = path.join(PKG, "src/styles/primitive");
 const TARGET = path.join(PKG, "src/styles/theme.css");
 
 /**
