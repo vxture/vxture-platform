@@ -15,6 +15,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon, type IconName } from "../../icons";
 
 export type SegmentedControlSize = "sm" | "md";
@@ -55,7 +56,7 @@ function SegmentedControl<TValue extends string | number>({
       role="radiogroup"
       {...(ariaLabel ? { "aria-label": ariaLabel } : {})}
       className={cn(
-        "inline-flex items-center gap-2xs rounded-md border border-border bg-accent p-2xs",
+        "inline-flex items-center gap-2xs rounded-lg bg-accent p-2xs",
         className,
       )}
     >
@@ -71,10 +72,9 @@ function SegmentedControl<TValue extends string | number>({
             disabled={item.disabled}
             onClick={() => onChange(item.value)}
             className={cn(
-              "inline-flex items-center justify-center gap-2xs rounded-sm",
-              "transition-colors duration-fast ease-standard outline-none",
-              "focus-visible:ring-[3px] focus-visible:ring-ring/50",
-              "disabled:pointer-events-none disabled:opacity-disabled",
+              "inline-flex items-center justify-center gap-2xs rounded-md",
+              "border border-transparent",
+              interactive,
               BY_SIZE[size],
               active
                 ? "bg-card text-foreground shadow-flat"

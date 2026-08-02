@@ -18,26 +18,37 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
+import { iconInset, interactive, invalid } from "../../styles/recipes";
 
 const badgeVariants = cva(
   cn(
-    "inline-flex w-fit shrink-0 items-center justify-center gap-2xs",
-    "rounded-full border border-transparent px-sm py-2xs",
+    // 定高：徽章常成簇出现（状态列里"正常 + 未认证"并排），高度不定就对不齐。
+    "inline-flex h-control-2xs w-fit shrink-0 items-center justify-center gap-2xs",
+    "overflow-hidden rounded-4xl border border-transparent px-sm py-2xs",
     "text-label-sm whitespace-nowrap",
-    "transition-colors duration-fast ease-standard",
-    "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring",
+    interactive,
+    invalid,
+    iconInset,
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
     "[&_svg:not([class*='size-'])]:size-icon-xs",
   ),
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary-hover",
-        secondary:
-          "bg-primary-muted text-primary-muted-foreground hover:bg-primary-muted-hover",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive-hover",
-        outline: "border-border text-foreground hover:bg-accent",
+        // hover 只在徽章本身是链接时才给——不可点的徽章有悬停反馈是在说谎。
+        default:
+          "bg-primary text-primary-foreground [a&]:hover:bg-primary-hover",
+        secondary: cn(
+          "bg-primary-muted text-primary-muted-foreground",
+          "[a&]:hover:bg-primary-muted-hover",
+        ),
+        // 与 Button 同一判断：危险用淡底。徽章更需要如此——它常成片出现，
+        // 满屏实心红会把整页的视觉重心压到异常状态上。
+        destructive: cn(
+          "bg-destructive-muted text-destructive-muted-foreground",
+          "[a&]:hover:bg-destructive-muted-hover",
+        ),
+        outline: "border-border text-foreground [a&]:hover:bg-accent",
       },
     },
     defaultVariants: {

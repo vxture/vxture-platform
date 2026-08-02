@@ -10,6 +10,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
 
 export interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {}
@@ -67,7 +68,12 @@ const BreadcrumbLink = React.forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
     return (
       <Comp
         ref={ref}
-        className={cn("transition-colors hover:text-foreground", className)}
+        className={cn(
+          "rounded-sm transition-colors duration-fast ease-standard",
+          "hover:text-foreground",
+          interactive,
+          className,
+        )}
         {...props}
       />
     );

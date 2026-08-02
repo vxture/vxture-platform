@@ -10,6 +10,7 @@
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "../../utils/cn";
+import { iconInset, interactive } from "../../styles/recipes";
 
 export interface TabsProps extends React.ComponentPropsWithoutRef<
   typeof TabsPrimitive.Root
@@ -35,7 +36,7 @@ const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
       <TabsPrimitive.List
         ref={ref}
         className={cn(
-          "inline-flex h-control-xl items-center justify-center rounded-md bg-accent p-2xs text-muted-foreground",
+          "inline-flex h-control-lg items-center justify-center rounded-lg bg-accent p-2xs text-muted-foreground",
           className,
         )}
         {...props}
@@ -51,10 +52,13 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         ref={ref}
         className={cn(
           cn(
-            "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-md py-xs text-label-md",
-            "transition-all duration-fast ease-standard",
-            "ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-            "disabled:pointer-events-none disabled:opacity-disabled",
+            "relative inline-flex flex-1 items-center justify-center gap-xs whitespace-nowrap",
+            "rounded-md border border-transparent px-sm py-2xs text-label-md",
+            interactive,
+            iconInset,
+            // 未选中的标签压到 60% 而不是换成 muted-foreground：同一组标签里
+            // 选中与未选中应当是同一种颜色的深浅，换个色号会读成两类东西。
+            "text-foreground/60 hover:text-foreground",
             "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-raised",
           ),
           className,

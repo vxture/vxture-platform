@@ -13,6 +13,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 
 export interface SectionNavItem {
   readonly key: string;
@@ -62,9 +63,8 @@ const SectionNav = React.forwardRef<HTMLElement, SectionNavProps>(
               onClick={() => onSelect?.(item.key)}
               className={cn(
                 "flex w-full items-start justify-between gap-sm rounded-md px-sm py-xs text-left",
-                "transition-colors duration-fast ease-standard outline-none",
-                "focus-visible:ring-[3px] focus-visible:ring-ring/50",
-                "disabled:pointer-events-none disabled:opacity-disabled",
+                "border border-transparent",
+                interactive,
                 active
                   ? "bg-surface-selected text-foreground"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",
