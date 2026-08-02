@@ -69,7 +69,7 @@ export function ButtonGroupText({
       data-slot="button-group-text"
       className={cn(
         "flex items-center gap-2xs rounded-md border border-input",
-        "bg-accent px-sm text-label-md text-muted-foreground",
+        "bg-muted px-sm text-label-md text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-icon-sm",
         className,
       )}

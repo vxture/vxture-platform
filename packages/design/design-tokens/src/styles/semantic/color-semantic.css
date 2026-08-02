@@ -136,6 +136,7 @@
   --chart-div-5: var(--vx-color-red-700);
 
   /* gradient */
+  --muted: var(--vx-color-neutral-200);
   --gradient-brand-from: var(--vx-color-brand-600);
   --gradient-brand-to: var(--vx-color-brand-800);
   --gradient-ai-from: var(--vx-color-purple-600);
@@ -263,6 +264,7 @@
   --chart-div-5: var(--vx-color-red-300);
 
   /* gradient */
+  --muted: var(--vx-color-neutral-800);
   --gradient-brand-from: var(--vx-color-brand-500);
   --gradient-brand-to: var(--vx-color-brand-800);
   --gradient-ai-from: var(--vx-color-purple-500);

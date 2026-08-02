@@ -133,13 +133,20 @@ function generated(cls) {
  * "多数 token 能被编译器认出"：`"flex items-center gap-md"` 全中；`"react"`、
  * `"horizontal"` 一个都不中，直接跳过。半数以上命中才逐个报缺失的那几个。
  */
-function classListOf(text) {
+/**
+ * strict：配方层专用。多数票启发式在组件文件里是必要的（要把 import 路径、普通
+ * 文案排除掉），但它放走过 `"aria-expanded:bg-muted aria-expanded:text-foreground"`
+ * ——两 token 恰好一半失效，整串被判为"不是类名列表"（2026-08-03 实测：
+ * expandable 配方的展开高亮因 bg-muted 缺 token 静默失效，所有菜单触发器中招）。
+ * recipes.ts 按定义只装类名片段：命中一个生成类就整串实测，不再多数票。
+ */
+function classListOf(text, strict = false) {
   const tokens = text.split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return null;
   if (tokens.some((t) => /[<>{}"`;]|^\.{1,2}\//.test(t))) return null;
   const hits = tokens.filter((t) => generated(t));
   if (hits.length === 0) return null;
-  if (hits.length * 2 <= tokens.length) return null;
+  if (!strict && hits.length * 2 <= tokens.length) return null;
   return tokens.filter((t) => !generated(t));
 }
 
@@ -204,10 +211,11 @@ let scanned = 0;
 for (const file of files) {
   const src = await readFile(file, "utf8");
   const body = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const strict = path.basename(file) === "recipes.ts";
   const lines = body.split("\n");
   lines.forEach((line, i) => {
     for (const m of line.matchAll(/"([^"\n]{2,})"/g)) {
-      const missing = classListOf(m[1]);
+      const missing = classListOf(m[1], strict);
       if (missing === null) continue;
       scanned++;
       for (const cls of missing) {

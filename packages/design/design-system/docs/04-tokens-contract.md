@@ -24,14 +24,14 @@ T2 是唯一公开 token 契约（T1 禁引，见 [`01-usage.md`](./01-usage.md)
 
 六个意图族由"色相 × 阶型"派生，阶型按对比度定档（A=600 填充配白字；B=700 填充配白字，给 emerald/sky；C=400 填充配深字，给 amber）。
 
-| 组       | 成员                                                                                                                                                                                        |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 表面     | `background` `surface-1` `card` `surface-3` `popover` `scrim` `accent` `surface-active` `surface-selected` `surface-selected-hover` `surface-inverse`                                       |
-| 内容     | `foreground` `muted-foreground` `content-tertiary` `content-disabled` `content-on-fill` `content-on-inverse` `link` `link-hover`                                                            |
-| 描边     | `border` `input` `stroke-emphasis` `stroke-disabled` `ring`                                                                                                                                 |
-| 意图六族 | `primary` / `destructive` / `ai` / `success` / `info` / `warning`，每族十槽：`-hover` `-active` `-foreground` `-muted` `-muted-hover` `-muted-active` `-muted-foreground` `-border` `-text` |
-| 图表     | 基线 `chart-other` `chart-grid` `chart-axis` `chart-tooltip-bg`；分类 `chart-1`…`chart-6`；顺序 `chart-seq-1`…`5`；发散 `chart-div-1`…`5`                                                   |
-| 渐变     | `gradient-brand-from/to` `gradient-ai-from/to` `gradient-surface-from/to` `gradient-glow-from/to`                                                                                           |
+| 组       | 成员                                                                                                                                                                                                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 表面     | `background` `surface-1` `card` `surface-3` `popover` `scrim` `accent` `surface-active` `surface-selected` `surface-selected-hover` `muted` `surface-inverse`；`accent` 是品牌微染的交互反馈（hover/展开），`muted` 是静态中性弱底（占位、键位、非交互成员）——分工不混用 |
+| 内容     | `foreground` `muted-foreground` `content-tertiary` `content-disabled` `content-on-fill` `content-on-inverse` `link` `link-hover`                                                                                                                                         |
+| 描边     | `border` `input` `stroke-emphasis` `stroke-disabled` `ring`                                                                                                                                                                                                              |
+| 意图六族 | `primary` / `destructive` / `ai` / `success` / `info` / `warning`，每族十槽：`-hover` `-active` `-foreground` `-muted` `-muted-hover` `-muted-active` `-muted-foreground` `-border` `-text`                                                                              |
+| 图表     | 基线 `chart-other` `chart-grid` `chart-axis` `chart-tooltip-bg`；分类 `chart-1`…`chart-6`；顺序 `chart-seq-1`…`5`；发散 `chart-div-1`…`5`                                                                                                                                |
+| 渐变     | `gradient-brand-from/to` `gradient-ai-from/to` `gradient-surface-from/to` `gradient-glow-from/to`                                                                                                                                                                        |
 
 ### AI 色彩语义
 

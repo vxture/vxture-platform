@@ -24,7 +24,7 @@ export function Kbd({ className, ...props }: KbdProps) {
       className={cn(
         "inline-flex h-control-3xs w-fit min-w-control-3xs select-none",
         "items-center justify-center gap-2xs rounded-sm px-2xs",
-        "bg-accent text-code-sm text-muted-foreground",
+        "bg-muted text-code-sm text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-icon-xs",
         className,
       )}

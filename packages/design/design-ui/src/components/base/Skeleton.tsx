@@ -55,7 +55,7 @@ export function Skeleton({
   style,
   ...props
 }: SkeletonProps) {
-  const base = cn("animate-pulse bg-accent", VARIANT_CLASS[variant], className);
+  const base = cn("animate-pulse bg-muted", VARIANT_CLASS[variant], className);
   const inline = { ...sizeStyle(width, height), ...style };
 
   if (variant === "line" && lines && lines > 1) {

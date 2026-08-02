@@ -97,6 +97,11 @@ export const STANDALONE_COLORS = [
   ["surface-active", "brand-600-alpha-15", "brand-600-alpha-22"],
   ["surface-selected", "brand-600-alpha-10", "brand-600-alpha-15"],
   ["surface-selected-hover", "brand-600-alpha-15", "brand-600-alpha-22"],
+  // 中性弱化填充（owner 拍板 2026-08-03）：占位、键位标示、组内非交互成员。
+  // 与 accent 的分工：accent 是品牌微染的交互反馈（hover/展开），muted 是静态
+  // 中性底——上游 muted/muted-foreground 本是一对，此前只建了后者，
+  // expandable 配方引用 bg-muted 静默失效即此缺口。
+  ["muted", "neutral-200", "neutral-800"],
   ["surface-inverse", "neutral-900", "neutral-100"],
   /* content */
   ["foreground", "neutral-600", "neutral-50"],
