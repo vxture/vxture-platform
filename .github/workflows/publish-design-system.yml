@@ -122,15 +122,24 @@ jobs:
               continue
             fi
 
+            # dist-tag 从版本号自己推出来。publish 不带 --tag 一律打 latest，
+            # **预发布版也不例外**——那会让 `pnpm add @vxture/design-system` 装到
+            # alpha，且没有任何提示。预发布走自己的通道，标识符即通道名
+            # （2.0.0-alpha.0 → alpha，2.0.0-rc.1 → rc）。
+            case "${version}" in
+              *-*) id="${version#*-}"; tag="${id%%.*}" ;;
+              *)   tag="latest" ;;
+            esac
+
             if [ "${DRY_RUN}" = "true" ]; then
-              echo "· ${name}@${version} 待发布（dry run，未推送）"
-              summary="${summary}- ${name}@${version} — **待发布**"$'\n'
+              echo "· ${name}@${version} 待发布（dry run，未推送）dist-tag=${tag}"
+              summary="${summary}- ${name}@${version} — **待发布**（dist-tag \`${tag}\`）"$'\n'
               continue
             fi
 
-            echo "· 发布 ${name}@${version}"
-            ( cd "${dir}" && pnpm publish --no-git-checks )
-            summary="${summary}- ${name}@${version} — 已发布"$'\n'
+            echo "· 发布 ${name}@${version} dist-tag=${tag}"
+            ( cd "${dir}" && pnpm publish --no-git-checks --tag "${tag}" )
+            summary="${summary}- ${name}@${version} — 已发布（dist-tag \`${tag}\`）"$'\n'
           done <<< "$RELEASE_ORDER"
 
           {

@@ -1,7 +1,7 @@
 # Design System 版本发布规范
 
-版本：2.0.0
-日期：2026-08-01
+版本：2.1.0
+日期：2026-08-02
 范围：`@vxture/design-tokens`、`@vxture/design-ui`、`@vxture/design-system`、`@vxture/shared`、`publish-design-system.yml`
 
 本文定义设计包的版本判断、发布准备、dry run、真实发布与发布后验证。发布必须走 PR、CI、merge、workflow，禁止从本地直接 `pnpm publish` 到 GitHub Packages。实现文件为 `.github/workflows/publish-design-system.yml`。
@@ -43,6 +43,14 @@
 **下层的 major 会向上传导**：tokens 删一个 token 名，ui 的组件可能哑火，伞包的公开行为随之改变——所以下层 major 时上层同样按 major 处理，除非能证明变更未穿透。伞包用精确版本，这一点无法靠版本范围回避。
 
 token 层的破坏性判据与 CSS 不同于代码：**删掉一个 CSS 变量不会报错，只会静默失效**。故 token 的删改一律按 major，不做"应该没人用"的推定。
+
+### 2.1 预发布
+
+破坏性变更分批落地、消费端尚未迁移时，走预发布版：`<next-major>.0.0-<id>.<n>`，标识符按成熟度取 `alpha` / `beta` / `rc`。同一批次内继续迭代只递增末位（`-alpha.0` → `-alpha.1`），major 号在整批收口前不重复决策。
+
+预发布的**通道即标识符**：`2.0.0-alpha.0` 发到 dist-tag `alpha`，不发到 `latest`。这条由流水线从版本号自动推出，不需要手填——`npm publish` / `pnpm publish` 不带 `--tag` 时一律打 `latest`，**预发布版也不例外**，漏了这一步就等于把未完成的 major 推给了所有按默认范围安装的消费方。
+
+预发布期间消费方须显式钉版本（`"@vxture/design-system": "5.0.0-alpha.0"`），不用 caret：caret 在预发布区间的匹配规则容易误判，且这个阶段本就不该自动跟进。整批收口后发正式 major，正式版才回到 `latest`。
 
 ## 3. 发布顺序
 
@@ -182,6 +190,7 @@ GitHub Packages 版本发布后不可覆盖。出现问题时按补丁版本处�
   发出一个装不上的版本，而流水线自己是绿的。
 - 禁止应用直接依赖 `@vxture/design-ui` 或 `@vxture/design-tokens`：它们是伞包的
   实现细节，绕过去就拿不到运行时接线，且版本约束不再由伞包保证。
+- 禁止把预发布版发到 `latest` dist-tag（见 2.1）。
 
 ## 10. 关联文档
 
