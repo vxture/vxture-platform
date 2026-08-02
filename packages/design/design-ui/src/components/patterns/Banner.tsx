@@ -15,6 +15,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
 import { toneIcons, toneSurfaceClasses, type Tone } from "./tone";
 
@@ -42,7 +43,7 @@ function Banner({
     <div
       role="status"
       className={cn(
-        "flex items-start gap-sm rounded-lg border p-md",
+        "flex items-start gap-sm rounded-xl border p-md",
         toneSurfaceClasses[tone],
         className,
       )}
@@ -68,7 +69,8 @@ function Banner({
           className={cn(
             "-mr-2xs -mt-2xs shrink-0 rounded-sm p-2xs opacity-muted",
             "transition-opacity duration-fast ease-standard outline-none",
-            "hover:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "hover:opacity-100",
+            interactive,
           )}
         >
           <Icon name="x" size={16} aria-hidden="true" />

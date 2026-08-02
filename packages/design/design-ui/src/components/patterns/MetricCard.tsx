@@ -13,8 +13,10 @@
 
 import * as React from "react";
 import { Icon, type IconName } from "../../icons";
+import { cn } from "../../utils/cn";
 import { Card, CardContent } from "../ui/Card";
 import { StatusBadge, type StatusBadgeTone } from "./StatusBadge";
+import { toneEdgeClasses } from "./tone";
 
 export interface MetricCardProps {
   readonly label: React.ReactNode;
@@ -25,6 +27,11 @@ export interface MetricCardProps {
   readonly trend?: React.ReactNode;
   readonly trendTone?: StatusBadgeTone;
   readonly action?: React.ReactNode;
+  /**
+   * 整块的语气：染顶缘色条与图标，不染底。
+   * 一排指标卡靠色条区分归属——底色染满会盖过读数本身。
+   */
+  readonly tone?: StatusBadgeTone;
   readonly className?: string;
 }
 
@@ -36,38 +43,45 @@ function MetricCard({
   trend,
   trendTone = "neutral",
   action,
+  tone = "neutral",
   className,
 }: MetricCardProps) {
-  const hasFooter = Boolean(description || trend || action);
+  // trend 已经挪到读数旁边，不再算进页脚。
+  const hasFooter = Boolean(description || action);
 
   return (
-    <Card className={className}>
+    <Card className={cn("border-t-thick", toneEdgeClasses[tone], className)}>
       <CardContent className="flex flex-col gap-md p-lg">
-        <div className="flex items-start justify-between gap-sm">
+        <div className="flex items-start gap-md">
+          {/* 图标在左、不套填充块：右侧的填充图标块会和读数抢视觉重心，
+              而一排卡片并列时，左侧对齐的图标本身就是分组线索。 */}
+          {icon ? (
+            <Icon
+              name={icon}
+              size={32}
+              aria-hidden="true"
+              className="shrink-0"
+            />
+          ) : null}
           <div className="flex min-w-0 flex-col gap-xs">
             <span className="truncate text-label-md text-muted-foreground">
               {label}
             </span>
-            <span className="text-heading-1 text-foreground">{value}</span>
-          </div>
-          {icon ? (
-            <span className="inline-flex size-icon-xl shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-text">
-              <Icon name={icon} size={16} aria-hidden="true" />
-            </span>
-          ) : null}
-        </div>
-        {hasFooter ? (
-          <div className="flex items-end justify-between gap-sm">
-            <div className="flex min-w-0 flex-col items-start gap-xs">
-              {description ? (
-                <span className="text-body-sm text-muted-foreground">
-                  {description}
-                </span>
-              ) : null}
+            <div className="flex flex-wrap items-center gap-sm">
+              <span className="text-heading-1 text-foreground">{value}</span>
               {trend ? (
                 <StatusBadge tone={trendTone}>{trend}</StatusBadge>
               ) : null}
             </div>
+          </div>
+        </div>
+        {hasFooter ? (
+          <div className="flex items-end justify-between gap-sm">
+            {description ? (
+              <span className="min-w-0 text-body-sm text-muted-foreground">
+                {description}
+              </span>
+            ) : null}
             {action ? <div className="shrink-0">{action}</div> : null}
           </div>
         ) : null}

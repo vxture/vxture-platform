@@ -21,9 +21,13 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { PENDING_COMPONENTS } from "./pending-components.mjs";
-import { PENDING_RECIPES, RECIPE_PATTERNS } from "./pending-recipes.mjs";
+import { RECIPE_PATTERNS } from "./pending-recipes.mjs";
 
-const PENDING_RECIPES_SET = new Set(PENDING_RECIPES);
+/**
+ * 曾有一份"尚未改用配方层"的豁免清单，批 B–E 逐个清空后删除。
+ * 现在没有豁免：任何组件手写这些片段都是错。
+ */
+const PENDING_RECIPES_SET = new Set();
 
 const ROOT = process.cwd();
 const PNPM = path.join(ROOT, "node_modules/.pnpm");
@@ -271,6 +275,5 @@ if (recipeViolations.length > 0 || staleLedger.length > 0) {
 console.log(
   `组件类名实测通过（${files.length} 个已重写组件 / ${scanned} 处类名列表，全部生成；` +
     `${PENDING.size} 个待 C2 重写的组件暂不纳入）\n` +
-    `配方层检查通过（${files.length - PENDING_RECIPES_SET.size} 个组件已无手写视觉片段；` +
-    `${PENDING_RECIPES_SET.size} 个待批 B–E 改造）`,
+    `配方层检查通过（${files.length} 个组件全部无手写视觉片段，无豁免）`,
 );

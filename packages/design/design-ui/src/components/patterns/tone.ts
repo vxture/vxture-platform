@@ -33,6 +33,21 @@ export const toneSurfaceClasses: Record<Tone, string> = {
     "border-destructive-border bg-destructive-muted text-destructive-text",
 };
 
+/**
+ * 顶缘色条 + 同色前景，用于指标卡这类"整块归属某个语气"的件。
+ *
+ * 与 `toneSurfaceClasses` 的分工：那一套给整块上弱化底色，适合标与提示条——
+ * 它们本身就小。指标卡占一整块，整块染色会盖过读数本身，所以只染一条边。
+ */
+export const toneEdgeClasses: Record<Tone, string> = {
+  neutral: "border-t-border text-muted-foreground",
+  brand: "border-t-primary text-primary-text",
+  info: "border-t-info-border text-info-text",
+  success: "border-t-success-border text-success-text",
+  warning: "border-t-warning-border text-warning-text",
+  danger: "border-t-destructive-border text-destructive-text",
+};
+
 /** 语气对应的图标。调用方不传图标名，避免同一语气在各处配不同的图。 */
 export const toneIcons: Record<Tone, IconName> = {
   neutral: "info",

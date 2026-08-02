@@ -20,6 +20,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
 import { Checkbox } from "../ui/Checkbox";
 import { Skeleton } from "../ui/Skeleton";
@@ -117,13 +118,13 @@ function DataTable<TRow>({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg border border-border bg-card",
+        "overflow-hidden rounded-xl bg-card shadow-raised ring-1 ring-foreground/10",
         className,
       )}
     >
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-body-sm">
-          <thead className="border-b border-border bg-accent text-muted-foreground">
+          <thead className="border-b border-border text-muted-foreground">
             <tr>
               {selectable ? (
                 <th scope="col" className="w-px px-md py-sm">
@@ -163,9 +164,8 @@ function DataTable<TRow>({
                           })
                         }
                         className={cn(
-                          "inline-flex items-center gap-2xs rounded-sm outline-none",
-                          "transition-colors duration-fast ease-standard",
-                          "focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                          "inline-flex items-center gap-2xs rounded-sm",
+                          interactive,
                           active ? "text-foreground" : "hover:text-foreground",
                         )}
                       >
@@ -227,6 +227,7 @@ function DataTable<TRow>({
                       onRowClick ? () => onRowClick(row, rowIndex) : undefined
                     }
                     className={cn(
+                      "border-b border-border last:border-b-0",
                       "transition-colors duration-fast ease-standard",
                       isSelected ? "bg-surface-selected" : "hover:bg-accent",
                       onRowClick && "cursor-pointer",
@@ -248,7 +249,7 @@ function DataTable<TRow>({
                       <td
                         key={column.id}
                         className={cn(
-                          "px-md py-sm align-middle text-foreground",
+                          "px-md py-md align-middle text-foreground",
                           ALIGN[column.align ?? "left"],
                         )}
                       >
