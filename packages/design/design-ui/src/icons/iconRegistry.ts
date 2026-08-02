@@ -27,6 +27,12 @@ import {
   CaretDownIcon,
   CaretDoubleUpIcon,
   CaretDoubleDownIcon,
+  CaretDoubleLeftIcon,
+  CaretDoubleRightIcon,
+  CaretUpDownIcon,
+  ArrowsDownUpIcon,
+  ArrowBendUpLeftIcon,
+  ArrowBendUpRightIcon,
   SquaresFourIcon,
   ArrowSquareOutIcon,
   LinkIcon,
@@ -73,6 +79,11 @@ import {
   PowerIcon,
   SignInIcon,
   QrCodeIcon,
+  FloppyDiskIcon,
+  TextTIcon,
+  ListChecksIcon,
+  TargetIcon,
+  PercentIcon,
 
   // ==========================================================================
   // 通用交互 - 状态
@@ -91,18 +102,26 @@ import {
   // ==========================================================================
   RobotIcon,
   TimerIcon,
+  FlowArrowIcon,
+  PlayCircleIcon,
   DatabaseIcon,
   CloudIcon,
   PlugIcon,
   EraserIcon,
   CubeIcon,
   BuildingIcon,
+  BankIcon,
   CpuIcon,
   HardDrivesIcon,
   RocketLaunchIcon,
   TerminalWindowIcon,
   PlugsConnectedIcon,
   PuzzlePieceIcon,
+  BrainIcon,
+  MagicWandIcon,
+  LightningIcon,
+  FadersIcon,
+  PackageIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 数据
@@ -115,6 +134,12 @@ import {
   LightbulbIcon,
   SparkleIcon,
   ShieldCheckIcon,
+  ChartLineUpIcon,
+  ChartPieSliceIcon,
+  TreeStructureIcon,
+  GitBranchIcon,
+  StackIcon,
+  KanbanIcon,
 
   // ==========================================================================
   // 文件与文档
@@ -126,6 +151,7 @@ import {
   ClipboardTextIcon,
   BookOpenIcon,
   NewspaperIcon,
+  GraduationCapIcon,
 
   // ==========================================================================
   // 商业与账务
@@ -181,6 +207,9 @@ import {
   MicrophoneIcon,
   PaperclipIcon,
   ImageIcon,
+  ChatCircleDotsIcon,
+  WaveformIcon,
+  TranslateIcon,
 
   // ==========================================================================
   // 时间/日历
@@ -258,6 +287,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   "chevron-down": CaretDownIcon,
   "caret-double-up": CaretDoubleUpIcon,
   "caret-double-down": CaretDoubleDownIcon,
+  "caret-double-left": CaretDoubleLeftIcon,
+  "caret-double-right": CaretDoubleRightIcon,
+  "caret-up-down": CaretUpDownIcon,
+  "arrows-down-up": ArrowsDownUpIcon,
+  "arrow-bend-up-left": ArrowBendUpLeftIcon,
+  "arrow-bend-up-right": ArrowBendUpRightIcon,
   "squares-four": SquaresFourIcon,
   "external-link": ArrowSquareOutIcon,
   link: LinkIcon,
@@ -305,6 +340,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   power: PowerIcon,
   "sign-in": SignInIcon,
   "qr-code": QrCodeIcon,
+  save: FloppyDiskIcon,
+  "text-t": TextTIcon,
+  "list-checks": ListChecksIcon,
+  target: TargetIcon,
+  timer: TimerIcon,
+  percent: PercentIcon,
 
   // ==========================================================================
   // 通用交互 - 状态
@@ -322,20 +363,28 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   // 云服务/智能体 - 平台
   // ==========================================================================
   agent: RobotIcon,
-  workflow: TimerIcon,
-  trigger: TimerIcon,
+  // 曾与 timer 三语义共挂 TimerIcon（遗留错配），2026-08-02 各归其形。
+  workflow: FlowArrowIcon,
+  // 触发＝启动一段流程；与 play（媒体播放）分形。
+  trigger: PlayCircleIcon,
   database: DatabaseIcon,
   cloud: CloudIcon,
   plug: PlugIcon,
   server: EraserIcon,
   cube: CubeIcon,
-  "building-library": BuildingIcon,
+  // 柱廊建筑＝馆藏/机构，与 building（单体楼宇）分形。
+  "building-library": BankIcon,
   cpu: CpuIcon,
   "hard-drive": HardDrivesIcon,
   rocket: RocketLaunchIcon,
   terminal: TerminalWindowIcon,
   "plugs-connected": PlugsConnectedIcon,
   puzzle: PuzzlePieceIcon,
+  brain: BrainIcon,
+  "magic-wand": MagicWandIcon,
+  lightning: LightningIcon,
+  faders: FadersIcon,
+  package: PackageIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 数据
@@ -348,6 +397,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   lightbulb: LightbulbIcon,
   sparkles: SparkleIcon,
   "shield-check": ShieldCheckIcon,
+  "chart-line-up": ChartLineUpIcon,
+  "chart-pie-slice": ChartPieSliceIcon,
+  "tree-structure": TreeStructureIcon,
+  "git-branch": GitBranchIcon,
+  stack: StackIcon,
+  kanban: KanbanIcon,
 
   // ==========================================================================
   // 文件与文档
@@ -359,6 +414,7 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   clipboard: ClipboardTextIcon,
   "book-open": BookOpenIcon,
   newspaper: NewspaperIcon,
+  "graduation-cap": GraduationCapIcon,
 
   // ==========================================================================
   // 商业与账务
@@ -398,6 +454,7 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   star: StarIcon,
   "user-plus": UserPlusIcon,
   "user-circle": UserCircleIcon,
+  building: BuildingIcon,
 
   // ==========================================================================
   // 通讯/联系
@@ -415,6 +472,9 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   microphone: MicrophoneIcon,
   paperclip: PaperclipIcon,
   image: ImageIcon,
+  "chat-dots": ChatCircleDotsIcon,
+  waveform: WaveformIcon,
+  translate: TranslateIcon,
 
   // ==========================================================================
   // 时间/日历

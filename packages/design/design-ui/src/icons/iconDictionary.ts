@@ -31,6 +31,12 @@ export const ICON_GROUPS = [
       "chevron-down",
       "caret-double-up",
       "caret-double-down",
+      "caret-double-left",
+      "caret-double-right",
+      "caret-up-down", // 表头/选择器排序指示
+      "arrows-down-up", // 纵向交换/排序
+      "arrow-bend-up-left", // 回复/返回上级
+      "arrow-bend-up-right", // 转发
       "caret-left-bold",
       "caret-right-bold",
       "squares-four",
@@ -82,6 +88,12 @@ export const ICON_GROUPS = [
       "power",
       "sign-in",
       "qr-code",
+      "save",
+      "text-t", // 文本/排版
+      "list-checks", // 核对清单
+      "target", // 目标/OKR
+      "timer", // 时限/超时
+      "percent", // 折扣/费率
     ],
   },
   {
@@ -115,6 +127,11 @@ export const ICON_GROUPS = [
       "terminal",
       "plugs-connected", // 集成已连
       "puzzle", // 插件/扩展
+      "brain", // 模型能力/推理
+      "magic-wand", // 一键生成/优化
+      "lightning", // 快捷指令/加速
+      "faders", // 参数调节/模型设置
+      "package", // 交付物/制品
     ],
   },
   {
@@ -128,6 +145,12 @@ export const ICON_GROUPS = [
       "lightbulb",
       "sparkles",
       "shield-check",
+      "chart-line-up", // 上升趋势图表（trend-up 是行内趋势符号，本 key 是图表语义）
+      "chart-pie-slice", // 单一份额强调（chart-pie=整盘构成、chart-pie-slice=单一份额）
+      "tree-structure", // 组织树/流程图
+      "git-branch", // 版本/分支
+      "stack", // 层叠/环境
+      "kanban", // 看板
     ],
   },
   {
@@ -140,6 +163,7 @@ export const ICON_GROUPS = [
       "clipboard",
       "book-open",
       "newspaper",
+      "graduation-cap", // 教程/学习中心
     ],
   },
   {
@@ -182,6 +206,7 @@ export const ICON_GROUPS = [
       "star",
       "user-plus", // 邀请/添加成员
       "user-circle",
+      "building", // 单一场所（buildings=企业/多主体，building=单一建筑）
     ],
   },
   {
@@ -200,6 +225,9 @@ export const ICON_GROUPS = [
       "microphone",
       "paperclip", // 附件
       "image",
+      "chat-dots", // 会话进行中
+      "waveform", // 语音波形
+      "translate", // 翻译
     ],
   },
   {
