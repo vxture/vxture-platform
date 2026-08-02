@@ -66,8 +66,8 @@
 
 ### 批 L — 清单补齐·纯 Radix（装分包即可）
 
-alert, alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, toggle-group, scroll-area, table 原语, hover-card, context-menu, aspect-ratio
-（menubar / navigation-menu 缓：控制台形态用 sidebar 导航，无消费场景）
+alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, toggle-group, scroll-area, table 原语, hover-card, context-menu, aspect-ratio（13 件）
+（menubar / navigation-menu 缓：控制台形态用 sidebar 导航，无消费场景；**alert 不引**：Banner 已以六档 tone 占 inline callout 位，再引=同一严重度两套名字）
 
 ### 批 M — 清单补齐·重依赖（收窄）
 
