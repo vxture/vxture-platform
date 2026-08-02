@@ -30,7 +30,9 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
         )}
         {...props}
       >
-        <div className="flex min-w-0 flex-wrap items-center gap-sm">
+        {/* flex-1：左组必须占满剩余宽，否则容器被内容反推，w-full 的搜索框
+            会把相邻筛选件挤下行（2026-08-03 opera 实测）。 */}
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-sm">
           {children}
         </div>
         {actions ? (

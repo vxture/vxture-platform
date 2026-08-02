@@ -20,14 +20,28 @@ import { cn } from "../../../utils/cn";
 import { Icon } from "../../../icons";
 import { interactive, invalid } from "../../../styles/recipes";
 
-export type NativeSelectProps = React.SelectHTMLAttributes<HTMLSelectElement>;
+export interface NativeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  /**
+   * 包裹层（相对定位容器）的类。宽度必须落在这里而不是 select 上——
+   * 箭头图标锚定包裹层右缘，只收窄 select 会让箭头脱位（2026-08-03 opera 实测）。
+   */
+  readonly wrapperClassName?: string;
+}
 
 export const NativeSelect = React.forwardRef<
   HTMLSelectElement,
   NativeSelectProps
->(function NativeSelect({ className, children, ...props }, ref) {
+>(function NativeSelect(
+  { className, wrapperClassName, children, ...props },
+  ref,
+) {
   return (
-    <span className="relative inline-flex w-full items-center">
+    <span
+      className={cn(
+        "relative inline-flex w-full items-center",
+        wrapperClassName,
+      )}
+    >
       <select
         ref={ref}
         data-slot="native-select"
