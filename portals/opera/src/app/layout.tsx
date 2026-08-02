@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Funnel_Display, Geist_Mono, Inter } from "next/font/google";
-import { themeBootstrapScript } from "@vxture/design-system";
+import { ThemeProvider, themeBootstrapScript } from "@vxture/design-system";
 import "./globals.css";
 
 const fontBrand = Funnel_Display({
@@ -36,24 +36,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
-        {/* Phosphor icon font — shell templates use `ph ph-*` classes. */}
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css"
-        />
+        {/* Icons are DS React components (@phosphor-icons/react via iconRegistry);
+            the legacy icon webfont links are gone with shell-template. */}
       </head>
       <body
         className={`${fontBrand.variable} ${inter.variable} ${geistMono.variable}`}
       >
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

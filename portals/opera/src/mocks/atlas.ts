@@ -1,0 +1,515 @@
+/**
+ * atlas.ts — Atlas 域演示数据。
+ *
+ * 界面先行、功能排期（owner 2026-08-03）：页面全部以本文件的静态数据渲染，
+ * 后续接 BFF 时替换取数层即可，页面结构不动。数据形状照抄
+ * docs/opera-atlas-design.md 的接口定义。
+ */
+
+import type { KeyStatus, LogLevel, ResourceStatus } from "@/lib/status";
+
+export interface ProviderRow {
+  id: string;
+  code: string;
+  name: string;
+  status: ResourceStatus;
+  region: string;
+  proxy: string;
+  models: number;
+  latencyMs: number;
+  successRate: string;
+}
+
+export const providers: ProviderRow[] = [
+  {
+    id: "p-openai",
+    code: "openai",
+    name: "OpenAI",
+    status: "active",
+    region: "us",
+    proxy: "egress-us-1",
+    models: 6,
+    latencyMs: 420,
+    successRate: "99.6%",
+  },
+  {
+    id: "p-anthropic",
+    code: "anthropic",
+    name: "Anthropic",
+    status: "active",
+    region: "us",
+    proxy: "egress-us-1",
+    models: 4,
+    latencyMs: 380,
+    successRate: "99.8%",
+  },
+  {
+    id: "p-google",
+    code: "google",
+    name: "Google",
+    status: "degraded",
+    region: "us",
+    proxy: "egress-us-2",
+    models: 3,
+    latencyMs: 940,
+    successRate: "97.1%",
+  },
+  {
+    id: "p-deepseek",
+    code: "deepseek",
+    name: "DeepSeek",
+    status: "active",
+    region: "cn",
+    proxy: "direct",
+    models: 2,
+    latencyMs: 210,
+    successRate: "99.9%",
+  },
+  {
+    id: "p-qwen",
+    code: "qwen",
+    name: "Qwen",
+    status: "active",
+    region: "cn",
+    proxy: "direct",
+    models: 5,
+    latencyMs: 180,
+    successRate: "99.7%",
+  },
+  {
+    id: "p-glm",
+    code: "glm",
+    name: "GLM",
+    status: "disabled",
+    region: "cn",
+    proxy: "direct",
+    models: 0,
+    latencyMs: 0,
+    successRate: "—",
+  },
+];
+
+export interface ModelRow {
+  id: string;
+  code: string;
+  name: string;
+  provider: string;
+  version: string;
+  contextWindow: string;
+  capabilities: string[];
+  status: ResourceStatus;
+}
+
+export const models: ModelRow[] = [
+  {
+    id: "m-1",
+    code: "gpt-5",
+    name: "GPT-5",
+    provider: "OpenAI",
+    version: "2026-05",
+    contextWindow: "400K",
+    capabilities: ["Chat", "Reasoning", "Vision", "Tool Calling"],
+    status: "active",
+  },
+  {
+    id: "m-2",
+    code: "gpt-5-mini",
+    name: "GPT-5 Mini",
+    provider: "OpenAI",
+    version: "2026-05",
+    contextWindow: "200K",
+    capabilities: ["Chat", "Tool Calling"],
+    status: "active",
+  },
+  {
+    id: "m-3",
+    code: "claude-opus",
+    name: "Claude Opus",
+    provider: "Anthropic",
+    version: "4.6",
+    contextWindow: "500K",
+    capabilities: ["Chat", "Reasoning", "Vision", "Tool Calling"],
+    status: "active",
+  },
+  {
+    id: "m-4",
+    code: "claude-sonnet",
+    name: "Claude Sonnet",
+    provider: "Anthropic",
+    version: "4.6",
+    contextWindow: "500K",
+    capabilities: ["Chat", "Reasoning", "Tool Calling"],
+    status: "active",
+  },
+  {
+    id: "m-5",
+    code: "gemini-3",
+    name: "Gemini 3",
+    provider: "Google",
+    version: "3.0",
+    contextWindow: "1M",
+    capabilities: ["Chat", "Vision", "Audio", "Video"],
+    status: "degraded",
+  },
+  {
+    id: "m-6",
+    code: "deepseek-r1",
+    name: "DeepSeek R1",
+    provider: "DeepSeek",
+    version: "r1",
+    contextWindow: "128K",
+    capabilities: ["Chat", "Reasoning"],
+    status: "active",
+  },
+  {
+    id: "m-7",
+    code: "qwen-max",
+    name: "Qwen Max",
+    provider: "Qwen",
+    version: "3.5",
+    contextWindow: "256K",
+    capabilities: ["Chat", "Reasoning", "Embedding"],
+    status: "active",
+  },
+  {
+    id: "m-8",
+    code: "text-embedding-4",
+    name: "Text Embedding 4",
+    provider: "OpenAI",
+    version: "4",
+    contextWindow: "8K",
+    capabilities: ["Embedding"],
+    status: "active",
+  },
+];
+
+export interface EndpointRow {
+  id: string;
+  code: string;
+  category: string;
+  primaryModel: string;
+  fallbackModel: string | null;
+  enabled: boolean;
+  qps: number;
+}
+
+export const endpoints: EndpointRow[] = [
+  {
+    id: "e-1",
+    code: "chat/default",
+    category: "Chat",
+    primaryModel: "gpt-5",
+    fallbackModel: "claude-opus",
+    enabled: true,
+    qps: 42,
+  },
+  {
+    id: "e-2",
+    code: "reasoning/default",
+    category: "Reasoning",
+    primaryModel: "claude-opus",
+    fallbackModel: "deepseek-r1",
+    enabled: true,
+    qps: 11,
+  },
+  {
+    id: "e-3",
+    code: "embedding/default",
+    category: "Embedding",
+    primaryModel: "text-embedding-4",
+    fallbackModel: null,
+    enabled: true,
+    qps: 87,
+  },
+  {
+    id: "e-4",
+    code: "vision/default",
+    category: "Vision",
+    primaryModel: "gemini-3",
+    fallbackModel: "gpt-5",
+    enabled: true,
+    qps: 6,
+  },
+  {
+    id: "e-5",
+    code: "audio/default",
+    category: "Audio",
+    primaryModel: "gemini-3",
+    fallbackModel: null,
+    enabled: false,
+    qps: 0,
+  },
+];
+
+export interface ApiKeyRow {
+  id: string;
+  name: string;
+  kind: "internal" | "external";
+  owner: string;
+  prefix: string;
+  status: KeyStatus;
+  lastUsed: string;
+  createdAt: string;
+}
+
+export const apiKeys: ApiKeyRow[] = [
+  {
+    id: "k-1",
+    name: "runa-engine",
+    kind: "internal",
+    owner: "Runa",
+    prefix: "vxk_int_9f2…",
+    status: "active",
+    lastUsed: "2 分钟前",
+    createdAt: "2026-06-01",
+  },
+  {
+    id: "k-2",
+    name: "arda-service",
+    kind: "internal",
+    owner: "Arda",
+    prefix: "vxk_int_b41…",
+    status: "active",
+    lastUsed: "8 分钟前",
+    createdAt: "2026-06-01",
+  },
+  {
+    id: "k-3",
+    name: "varda-assistant",
+    kind: "internal",
+    owner: "Varda",
+    prefix: "vxk_int_c07…",
+    status: "active",
+    lastUsed: "1 小时前",
+    createdAt: "2026-06-14",
+  },
+  {
+    id: "k-4",
+    name: "partner-lab",
+    kind: "external",
+    owner: "外部合作方",
+    prefix: "vxk_ext_55a…",
+    status: "disabled",
+    lastUsed: "3 天前",
+    createdAt: "2026-07-02",
+  },
+  {
+    id: "k-5",
+    name: "legacy-probe",
+    kind: "external",
+    owner: "已下线探针",
+    prefix: "vxk_ext_d19…",
+    status: "revoked",
+    lastUsed: "30 天前",
+    createdAt: "2026-05-11",
+  },
+];
+
+export interface MeteringRow {
+  id: string;
+  dimension: string;
+  requests: string;
+  inputTokens: string;
+  outputTokens: string;
+  avgTtftMs: number;
+  rawCost: string;
+}
+
+export const meteringByProvider: MeteringRow[] = [
+  {
+    id: "mt-1",
+    dimension: "OpenAI",
+    requests: "1,284,003",
+    inputTokens: "2.41B",
+    outputTokens: "812M",
+    avgTtftMs: 310,
+    rawCost: "$12,406",
+  },
+  {
+    id: "mt-2",
+    dimension: "Anthropic",
+    requests: "934,110",
+    inputTokens: "1.87B",
+    outputTokens: "690M",
+    avgTtftMs: 280,
+    rawCost: "$10,982",
+  },
+  {
+    id: "mt-3",
+    dimension: "Google",
+    requests: "201,554",
+    inputTokens: "410M",
+    outputTokens: "98M",
+    avgTtftMs: 720,
+    rawCost: "$1,204",
+  },
+  {
+    id: "mt-4",
+    dimension: "DeepSeek",
+    requests: "1,772,900",
+    inputTokens: "3.02B",
+    outputTokens: "1.21B",
+    avgTtftMs: 190,
+    rawCost: "$3,377",
+  },
+  {
+    id: "mt-5",
+    dimension: "Qwen",
+    requests: "655,320",
+    inputTokens: "1.11B",
+    outputTokens: "402M",
+    avgTtftMs: 170,
+    rawCost: "$1,911",
+  },
+];
+
+export interface LogRow {
+  id: string;
+  time: string;
+  level: LogLevel;
+  source: string;
+  message: string;
+  trace: string;
+}
+
+export const logs: LogRow[] = [
+  {
+    id: "l-1",
+    time: "14:32:07",
+    level: "error",
+    source: "gateway",
+    message: "provider google timeout after 30s (endpoint vision/default)",
+    trace: "tr_8f21c",
+  },
+  {
+    id: "l-2",
+    time: "14:31:52",
+    level: "warn",
+    source: "router",
+    message: "chat/default failover engaged: gpt-5 → claude-opus",
+    trace: "tr_8f1e0",
+  },
+  {
+    id: "l-3",
+    time: "14:30:11",
+    level: "info",
+    source: "gateway",
+    message: "key vxk_int_9f2 rate normalized (2.1k rpm)",
+    trace: "tr_8ef99",
+  },
+  {
+    id: "l-4",
+    time: "14:28:45",
+    level: "info",
+    source: "metering",
+    message: "hourly rollup complete: 214,006 requests aggregated",
+    trace: "tr_8ee71",
+  },
+  {
+    id: "l-5",
+    time: "14:27:03",
+    level: "warn",
+    source: "health",
+    message: "provider google latency p95 940ms (threshold 800ms)",
+    trace: "tr_8ed15",
+  },
+  {
+    id: "l-6",
+    time: "14:25:40",
+    level: "info",
+    source: "registry",
+    message: "model qwen-max version 3.5 published",
+    trace: "tr_8ec02",
+  },
+];
+
+export interface AuditRow {
+  id: string;
+  time: string;
+  actor: string;
+  action: string;
+  target: string;
+  detail: string;
+}
+
+export const auditTrail: AuditRow[] = [
+  {
+    id: "a-1",
+    time: "2026-08-03 13:58",
+    actor: "op-chen",
+    action: "Router 变更",
+    target: "chat/default",
+    detail: "fallback claude-sonnet → claude-opus",
+  },
+  {
+    id: "a-2",
+    time: "2026-08-03 11:24",
+    actor: "op-chen",
+    action: "Key 轮换",
+    target: "runa-engine",
+    detail: "internal key rotated (vxk_int_8d1 → 9f2)",
+  },
+  {
+    id: "a-3",
+    time: "2026-08-02 19:41",
+    actor: "op-liu",
+    action: "Provider 禁用",
+    target: "GLM",
+    detail: "quota exhausted, disabled until renewal",
+  },
+  {
+    id: "a-4",
+    time: "2026-08-02 16:03",
+    actor: "op-liu",
+    action: "Model 注册",
+    target: "qwen-max",
+    detail: "version 3.5, capabilities +Embedding",
+  },
+  {
+    id: "a-5",
+    time: "2026-08-01 10:12",
+    actor: "op-chen",
+    action: "Endpoint 停用",
+    target: "audio/default",
+    detail: "no consumer, disabled",
+  },
+];
+
+export interface RoleRow {
+  id: string;
+  role: string;
+  scope: string;
+  members: number;
+  permissions: string;
+}
+
+export const roles: RoleRow[] = [
+  {
+    id: "r-1",
+    role: "Platform Admin",
+    scope: "全部域",
+    members: 2,
+    permissions: "读写 + 授权管理",
+  },
+  {
+    id: "r-2",
+    role: "Operator",
+    scope: "Resource / Runtime / Security",
+    members: 5,
+    permissions: "读写",
+  },
+  {
+    id: "r-3",
+    role: "Developer",
+    scope: "Resource / Observability",
+    members: 11,
+    permissions: "读 + 受限写",
+  },
+  {
+    id: "r-4",
+    role: "Viewer",
+    scope: "全部域",
+    members: 23,
+    permissions: "只读",
+  },
+];

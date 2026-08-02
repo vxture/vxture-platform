@@ -1,8 +1,5 @@
 @import "@vxture/design-system/styles/globals.css";
 @import "@vxture/design-system/styles/brands/vxture.css";
-/* Shared portal shell visual system — single source of truth in the design
- * system, identical to console/admin. Loaded after the DS packs so the
- * template's .app/.vxh/.sidebar chrome wins. The Phosphor icon font is loaded
- * via <link> in app/layout.tsx. No portal-local CSS on purpose: the shell is
- * chrome-only; provider modules ship their own styling. */
-@import "@vxture/design-system/styles/shell-template.css";
+/* DS-only wiring, same as design-preview: the portal ships zero local CSS.
+ * shell-template.css is retired here — the Opera shell is rebuilt on DS
+ * components + T2 utilities (transparent mode), no legacy chrome classes. */

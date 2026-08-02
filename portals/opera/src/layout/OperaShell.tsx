@@ -1,215 +1,210 @@
 "use client";
 
-/* Capability Console shell frame — deliberately thin re-use of the shared
- * shell-template chrome (.app/.vxh/.sidebar), stripped of the admin extras
- * (workspace launcher, Varda assistant, drawers): header + sidebar + content.
- * Provider modules render OUTSIDE this shell (edge-proxied full pages); the
- * shell only hosts chrome and the overview. */
+/**
+ * OperaShell — Opera 外壳（DS 透明模式重建）。
+ *
+ * 页面与侧栏同底（单一实底 bg-background），分界全部走品牌微染发丝线；
+ * 外壳零件取 DS（ShellBrand / ShellIconButton / ShellThemeToggle /
+ * ShellUserMenu），布局尺度绑 T2（h-header-md 48 / w-sidebar-{expanded,
+ * collapsed} 256/64）。不引 shell-template.css，不写本地 CSS。
+ *
+ * 会话：生产由边缘网关兜底；开发环境无网关时用占位 operator 渲染（界面
+ * 先行、功能排期），占位在用户菜单里明确标注。
+ */
 
 import { useEffect, useState, type ReactNode } from "react";
-import Image from "next/image";
-import { capNavSections } from "@/config/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Icon,
+  ShellBrand,
+  ShellIconButton,
+  ShellThemeToggle,
+  ShellUserMenu,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  cn,
+  useTheme,
+} from "@vxture/design-system";
+import { operaNavSections } from "@/config/navigation";
 import { useOperatorSession } from "@/features/session/SessionProvider";
 
 const LS_NAV = "vx-opera-nav-collapsed";
-const BRAND_NAME = "Vxture Capability Console";
 
-function SkeletonFrame() {
+/** 实线开区块（工具栏与内容、头与身），透明模式发丝线。 */
+const HAIRLINE = "border-primary/10 dark:border-primary/20";
+
+const DEV_OPERATOR = { displayName: "Dev Operator", role: "platform-admin" };
+
+function NavItem({
+  href,
+  label,
+  icon,
+  collapsed,
+  active,
+}: {
+  href: string;
+  label: string;
+  icon: Parameters<typeof Icon>[0]["name"];
+  collapsed: boolean;
+  active: boolean;
+}) {
+  const link = (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex h-control-md items-center gap-sm rounded-md px-sm",
+        "text-label-md outline-none transition-colors duration-fast ease-standard",
+        "focus-visible:ring-3 focus-visible:ring-ring/50",
+        active
+          ? "bg-surface-selected text-primary-text"
+          : "text-muted-foreground hover:bg-accent hover:text-foreground",
+        collapsed && "justify-center px-none",
+      )}
+    >
+      <Icon name={icon} size="sm" />
+      {collapsed ? null : <span className="truncate">{label}</span>}
+    </Link>
+  );
+
+  if (!collapsed) return link;
   return (
-    <div className="app">
-      <div className="vxh vxh--skeleton" aria-hidden="true">
-        <div className="vxh-left">
-          <div className="vxh-skeleton-block vxh-skeleton-block--icon" />
-          <div className="vxh-skeleton-block vxh-skeleton-block--brand" />
-        </div>
-        <div className="vxh-actions">
-          <div className="vxh-skeleton-block vxh-skeleton-block--circle" />
-        </div>
-      </div>
-      <div className="app-body">
-        <div className="sidebar">
-          <div className="vxh-skeleton-nav">
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="vxh-skeleton-block vxh-skeleton-block--nav"
-              />
-            ))}
-          </div>
-        </div>
-        <main className="content-scroll">
-          <div className="content-inner vxh-skeleton-content">
-            <div className="vxh-skeleton-block vxh-skeleton-block--title" />
-            <div className="vxh-skeleton-block vxh-skeleton-block--card" />
-          </div>
-        </main>
-      </div>
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>{link}</TooltipTrigger>
+      <TooltipContent side="right">{label}</TooltipContent>
+    </Tooltip>
   );
 }
 
 export function OperaShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const { operator, status, signOut } = useOperatorSession();
-  const [navCollapsed, setNavCollapsed] = useState(false);
-  const [userPanel, setUserPanel] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     try {
-      setNavCollapsed(window.localStorage.getItem(LS_NAV) === "true");
+      setCollapsed(window.localStorage.getItem(LS_NAV) === "true");
     } catch {
       /* ignore */
     }
   }, []);
 
   const toggleNav = () =>
-    setNavCollapsed((c) => {
-      const n = !c;
+    setCollapsed((c) => {
+      const next = !c;
       try {
-        window.localStorage.setItem(LS_NAV, String(n));
+        window.localStorage.setItem(LS_NAV, String(next));
       } catch {
         /* ignore */
       }
-      return n;
+      return next;
     });
 
-  if (status === "loading") return <SkeletonFrame />;
-  if (status === "anonymous" || !operator) {
-    // The production edge gate never lets an unauthenticated navigation get
-    // here; render nothing while the client-side redirect (dev/expiry) runs.
-    return null;
-  }
+  const isDev = process.env.NODE_ENV === "development";
+  const effectiveOperator =
+    operator ?? (isDev && status !== "loading" ? DEV_OPERATOR : null);
 
-  const navigate = (href: string, external: boolean) => {
-    if (external) {
-      window.location.href = href;
-      return;
-    }
-    window.location.assign(href);
-  };
+  if (status === "loading") {
+    return (
+      <div className="flex h-dvh items-center justify-center bg-background">
+        <Icon
+          name="spinner"
+          size="lg"
+          className="animate-spin text-muted-foreground"
+        />
+      </div>
+    );
+  }
+  if (!effectiveOperator) return null;
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <div className={"app" + (navCollapsed ? " nav-collapsed" : "")}>
-      <header className="vxh">
-        <div className="vxh-left">
-          <button
-            type="button"
-            className="vxh-brand"
-            aria-label={BRAND_NAME}
-            onClick={() => navigate("/", false)}
-          >
-            <Image
-              className="vxh-logo"
-              src="/brand/vxture-logo-white.png"
-              alt=""
-              aria-hidden="true"
-              width={24}
-              height={24}
-              priority
-            />
-            <strong className="vxh-brand-name">{BRAND_NAME}</strong>
-          </button>
-          <span className="vxh-divider" aria-hidden="true"></span>
-          <span className="vxh-active-menu">
-            <span>能力控制台</span>
+    <div className="flex h-dvh flex-col bg-background text-foreground">
+      <header
+        className={cn(
+          "flex h-header-md shrink-0 items-center justify-between gap-md border-b px-md",
+          HAIRLINE,
+        )}
+      >
+        <div className="flex min-w-0 items-center gap-sm">
+          <ShellIconButton
+            icon="sidebar"
+            label={collapsed ? "展开导航" : "收起导航"}
+            onClick={toggleNav}
+          />
+          <ShellBrand href="/" label="Opera" />
+          <span className="hidden text-body-sm text-muted-foreground md:inline">
+            基础设施控制平面
           </span>
         </div>
-
-        <div className="vxh-actions">
-          <div className="vxh-pop-anchor">
-            <button
-              className="vxh-user"
-              title="用户菜单"
-              aria-label="用户菜单"
-              onClick={() => setUserPanel((v) => !v)}
-            >
-              <span className="vxh-avatar" aria-hidden="true">
-                <i className="ph ph-user"></i>
-              </span>
-              <span className="vxh-user-status"></span>
-            </button>
-            {userPanel && (
-              <div className="vxh-panel vxh-user-panel">
-                <div className="vxh-user-head">
-                  <div className="vxh-user-meta">
-                    <div className="vxh-user-name">{operator.displayName}</div>
-                    <div className="vxh-user-contacts">
-                      <span className="vxh-user-contact">
-                        {operator.role || "operator"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="vxh-acct-div"></div>
-                <div className="vxh-user-actions">
-                  <button
-                    className="vxh-menu-item danger"
-                    onClick={() => {
-                      setUserPanel(false);
-                      void signOut();
-                    }}
-                  >
-                    <i className="ph ph-sign-out"></i>
-                    退出登录
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="flex items-center gap-2xs">
+          <ShellThemeToggle
+            currentTheme={theme === "dark" ? "dark" : "light"}
+            onThemeChange={setTheme}
+          />
+          <ShellUserMenu
+            user={{
+              displayName: effectiveOperator.displayName,
+              uniqueLine: effectiveOperator.role || "operator",
+              ...(operator ? {} : { meta: "开发占位会话（无边缘网关）" }),
+            }}
+            actions={[
+              {
+                key: "sign-out",
+                label: "退出登录",
+                icon: "sign-out",
+                onClick: () => void signOut(),
+              },
+            ]}
+          />
         </div>
-
-        {userPanel && (
-          <div
-            className="vxh-backdrop"
-            onClick={() => setUserPanel(false)}
-          ></div>
-        )}
       </header>
 
-      <div className="app-body">
-        <aside className={"sidebar" + (navCollapsed ? " is-collapsed" : "")}>
-          <div className="side-rail">
-            <button
-              className="rail-toggle"
-              onClick={toggleNav}
-              title={navCollapsed ? "展开导航" : "收起导航"}
-              aria-label={navCollapsed ? "展开导航" : "收起导航"}
+      <div className="flex min-h-0 flex-1">
+        <aside
+          className={cn(
+            "flex shrink-0 flex-col gap-lg overflow-y-auto border-r py-md",
+            HAIRLINE,
+            collapsed
+              ? "w-sidebar-collapsed px-2xs"
+              : "w-sidebar-expanded px-sm",
+            "transition-all duration-base ease-standard",
+          )}
+        >
+          {operaNavSections.map((section) => (
+            <nav
+              key={section.title}
+              aria-label={section.title}
+              className="flex flex-col gap-2xs"
             >
-              <i
-                className={
-                  "ph " + (navCollapsed ? "ph-text-indent" : "ph-text-outdent")
-                }
-              ></i>
-            </button>
-            {!navCollapsed && <span className="side-domain">能力控制台</span>}
-          </div>
-
-          <nav className="side-nav">
-            {capNavSections.map((section) => (
-              <section key={section.title} className="nav-section">
-                <button className="nav-section-trigger" aria-expanded>
-                  <span className="nav-section-title">{section.title}</span>
-                </button>
-                <div className="nav-items">
-                  {section.items.map((it) => (
-                    <button
-                      key={it.href}
-                      className="nav-item"
-                      onClick={() => navigate(it.href, it.external)}
-                      title={it.description ?? it.label}
-                      aria-label={it.label}
-                    >
-                      <i className={"ph " + it.icon}></i>
-                      <span className="nav-item-label">{it.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </nav>
+              {collapsed ? null : (
+                <p className="px-sm text-overline text-muted-foreground">
+                  {section.title}
+                </p>
+              )}
+              {section.items.map((item) => (
+                <NavItem
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  collapsed={collapsed}
+                  active={isActive(item.href)}
+                />
+              ))}
+            </nav>
+          ))}
         </aside>
 
-        <main className="content-scroll">
-          <div className="content-inner">{children}</div>
+        <main className="min-w-0 flex-1 overflow-y-auto">
+          <div className="mx-auto flex max-w-content-wide-2xl flex-col p-xl">
+            {children}
+          </div>
         </main>
       </div>
     </div>
