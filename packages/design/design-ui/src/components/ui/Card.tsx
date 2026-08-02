@@ -7,7 +7,7 @@
  * 结构承 shadcn 官方 Card 的六件套。相对上游的定制：
  * - 卡片自身用 `shadow-flat` 而非上游的 `shadow-sm`——视觉高度是 T2 的语义阶梯，
  *   卡片是"贴地"那一档，抬高由使用方按场景加 `shadow-raised`。
- * - 内边距走 `p-lg`、标题层次走 `text-title-3`，跟随密度与字号三档；
+ * - 内边距走 `p-lg`、标题层次走 `text-title-sm`，跟随密度与字号三档；
  *   上游的 p-6 / text-2xl 是裸数值，不跟随。
  *
  * 原实现在每一件上都挂了 .vx-card__*，随遗留样式层一并退役。
@@ -49,7 +49,7 @@ const CardTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(function CardTitle({ className, ...props }, ref) {
-  return <h3 ref={ref} className={cn("text-title-3", className)} {...props} />;
+  return <h3 ref={ref} className={cn("text-title-sm", className)} {...props} />;
 });
 
 const CardDescription = React.forwardRef<

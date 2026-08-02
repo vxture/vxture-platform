@@ -132,7 +132,7 @@
   --color-gradient-glow-from: var(--gradient-glow-from);
   --color-gradient-glow-to: var(--gradient-glow-to);
 
-  /* text-*（20 档角色，含行高 / 字距 / 字重修饰） */
+  /* text-*（21 档角色，含行高 / 字距 / 字重修饰） */
   --text-display-lg: var(--display-lg-font-size);
   --text-display-lg--line-height: var(--display-lg-line-height);
   --text-display-lg--letter-spacing: var(--display-lg-letter-spacing);
@@ -157,18 +157,22 @@
   --text-heading-3--line-height: var(--heading-3-line-height);
   --text-heading-3--letter-spacing: var(--heading-3-letter-spacing);
   --text-heading-3--font-weight: var(--heading-3-font-weight);
-  --text-title-1: var(--title-1-font-size);
-  --text-title-1--line-height: var(--title-1-line-height);
-  --text-title-1--letter-spacing: var(--title-1-letter-spacing);
-  --text-title-1--font-weight: var(--title-1-font-weight);
-  --text-title-2: var(--title-2-font-size);
-  --text-title-2--line-height: var(--title-2-line-height);
-  --text-title-2--letter-spacing: var(--title-2-letter-spacing);
-  --text-title-2--font-weight: var(--title-2-font-weight);
-  --text-title-3: var(--title-3-font-size);
-  --text-title-3--line-height: var(--title-3-line-height);
-  --text-title-3--letter-spacing: var(--title-3-letter-spacing);
-  --text-title-3--font-weight: var(--title-3-font-weight);
+  --text-title-xl: var(--title-xl-font-size);
+  --text-title-xl--line-height: var(--title-xl-line-height);
+  --text-title-xl--letter-spacing: var(--title-xl-letter-spacing);
+  --text-title-xl--font-weight: var(--title-xl-font-weight);
+  --text-title-lg: var(--title-lg-font-size);
+  --text-title-lg--line-height: var(--title-lg-line-height);
+  --text-title-lg--letter-spacing: var(--title-lg-letter-spacing);
+  --text-title-lg--font-weight: var(--title-lg-font-weight);
+  --text-title-md: var(--title-md-font-size);
+  --text-title-md--line-height: var(--title-md-line-height);
+  --text-title-md--letter-spacing: var(--title-md-letter-spacing);
+  --text-title-md--font-weight: var(--title-md-font-weight);
+  --text-title-sm: var(--title-sm-font-size);
+  --text-title-sm--line-height: var(--title-sm-line-height);
+  --text-title-sm--letter-spacing: var(--title-sm-letter-spacing);
+  --text-title-sm--font-weight: var(--title-sm-font-weight);
   --text-body-xl: var(--body-xl-font-size);
   --text-body-xl--line-height: var(--body-xl-line-height);
   --text-body-xl--letter-spacing: var(--body-xl-letter-spacing);

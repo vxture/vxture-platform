@@ -50,9 +50,9 @@ export interface SectionHeaderProps extends Omit<
 
 const BY_LEVEL = {
   1: { tag: "h1", type: "text-heading-2" },
-  2: { tag: "h2", type: "text-title-1" },
-  3: { tag: "h3", type: "text-title-2" },
-  4: { tag: "h4", type: "text-title-3" },
+  2: { tag: "h2", type: "text-title-lg" },
+  3: { tag: "h3", type: "text-title-md" },
+  4: { tag: "h4", type: "text-title-sm" },
 } as const;
 
 function SectionHeader({

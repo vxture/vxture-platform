@@ -50,7 +50,7 @@ const EXPECTED = [
   ["dark:bg-card", "T2 色彩 · 暗色变体"],
   ["text-body-md", "T2 排版角色"],
   ["text-heading-1", "T2 排版角色"],
-  ["text-title-2", "T2 排版角色"],
+  ["text-title-md", "T2 排版角色"],
   ["p-md", "T2 间距（密度轴）"],
   ["gap-lg", "T2 间距"],
   ["h-control-md", "T2 控件高度"],

@@ -193,7 +193,7 @@ function ComponentPage({ layer }: { readonly layer: Layer }) {
 
       {all.map(({ group, items }) => (
         <div key={group} className="flex flex-col gap-xl">
-          <h2 className="text-title-2 text-foreground">{group}</h2>
+          <h2 className="text-title-md text-foreground">{group}</h2>
           {items.map((e) => (
             <EntrySection key={e.name} entry={e} />
           ))}
@@ -273,8 +273,8 @@ function Stat({
       <span
         className={
           tone === "warning"
-            ? "text-display-sm text-warning-text"
-            : "text-display-sm text-foreground"
+            ? "text-heading-1 text-warning-text"
+            : "text-heading-1 text-foreground"
         }
       >
         {value}

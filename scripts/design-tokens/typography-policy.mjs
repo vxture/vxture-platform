@@ -84,20 +84,26 @@ export const CJK_LEADING_ADD = 0.15;
 export const TYPE_ROLES = [
   /* 顶档留一格余量（默认 6xl，大号档用掉 7xl），三档才都跟随字号轴。曾经 display 的
      顶档压在当时的末档上并靠 noGrow 止步，结果大号档下顶上两档撞成同一个字号。 */
-  ["display-lg", "brand", "bold", "6xl"],
-  ["display-md", "brand", "bold", "5xl"],
-  ["display-sm", "brand", "bold", "4xl"],
+  ["display-lg", "brand", "bold", "7xl"],
+  ["display-md", "brand", "bold", "6xl"],
+  ["display-sm", "brand", "bold", "5xl"],
 
   /* heading 与 title 是两族不是一族的大小档。原先五档 heading 在中间同时换了字号与
      字体（brand → sans），一条坡从中间断开而名字上看不出来。Material 的 Headline /
-     Title、Fluent 的 Title / Subtitle 都是分开命名的，断点该有名字。 */
-  ["heading-1", "brand", "semibold", "3xl"],
-  ["heading-2", "brand", "semibold", "2xl"],
-  ["heading-3", "brand", "semibold", "xl"],
+     Title、Fluent 的 Title / Subtitle 都是分开命名的，断点该有名字。
 
-  ["title-1", "sans", "semibold", "lg"],
-  ["title-2", "sans", "semibold", "base"],
-  ["title-3", "sans", "semibold", "sm"],
+     heading 最小档 24px 是展示体的下限：再小 Funnel Display 的字形细节就糊了，
+     而 24 也正是 Material 与 Fluent 切到正文体的那一档。 */
+  ["heading-1", "brand", "semibold", "4xl"],
+  ["heading-2", "brand", "semibold", "3xl"],
+  ["heading-3", "brand", "semibold", "2xl"],
+
+  /* title 与 body / label 同为四档、同用 t-shirt 档名——三者在 14–20 这一段并排，
+     档名对得上才能一眼看出「同字号、不同字重」的那三层。 */
+  ["title-xl", "sans", "semibold", "xl"],
+  ["title-lg", "sans", "semibold", "lg"],
+  ["title-md", "sans", "semibold", "base"],
+  ["title-sm", "sans", "semibold", "sm"],
 
   ["body-xl", "sans", "normal", "lg"],
   ["body-lg", "sans", "normal", "base"],

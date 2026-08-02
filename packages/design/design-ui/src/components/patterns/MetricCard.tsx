@@ -48,7 +48,7 @@ function MetricCard({
             <span className="truncate text-label-md text-muted-foreground">
               {label}
             </span>
-            <span className="text-display-sm text-foreground">{value}</span>
+            <span className="text-heading-1 text-foreground">{value}</span>
           </div>
           {icon ? (
             <span className="inline-flex size-icon-xl shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-text">

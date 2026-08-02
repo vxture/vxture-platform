@@ -87,7 +87,7 @@ export function Drawer({
           {title ? (
             <div className="flex items-start justify-between gap-md border-b border-border p-lg">
               <div className="flex flex-col gap-2xs">
-                <DialogPrimitive.Title className="text-title-3">
+                <DialogPrimitive.Title className="text-title-sm">
                   {title}
                 </DialogPrimitive.Title>
                 {description ? (
