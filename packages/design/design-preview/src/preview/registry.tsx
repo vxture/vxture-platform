@@ -188,6 +188,32 @@ import {
   ShellThemeToggle,
   ShellUserMenu,
 } from "@vxture/design-system";
+import {
+  BUTTON_GROUP_ORIENTATIONS,
+  ButtonGroup,
+  ButtonGroupText,
+  Field,
+  FIELD_ORIENTATIONS,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  INPUT_GROUP_ALIGNS,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+  Kbd,
+  KbdGroup,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  Spinner,
+  SPINNER_SIZES,
+} from "@vxture/design-system";
 import { Row } from "./kit";
 
 export type Provenance =
@@ -1907,6 +1933,211 @@ export const ENTRIES: readonly Entry[] = [
     deviation:
       "批 O 重写：字段复用 Input/Label/Checkbox（移动端 16px 防缩放、失效态在原子件里），tab 走 Radix Tabs，主按钮/三方登录复用 Button，分隔走 Separator + 发丝线；登录卡走 Card 的 veil 叠层（strong 档）无阴影；视觉面板底色改语义色 primary 渐变，NodeGraph 画布颜色从自身 computed color 读取，不再依赖已退役的 auth 专属 token。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
     render: () => <AuthLoginDemo />,
+  },
+  /* ── 批 S：上游目录补齐 ─────────────────────────────────── */
+  {
+    name: "Spinner",
+    layer: "atom",
+    group: "反馈",
+    tags: ["shadcn", "vxture"],
+    deviation:
+      "与 Skeleton 分工：Skeleton 占位、Spinner 等待。图标取本仓单一来源 Phosphor 的 spinner（CircleNotch），不引上游的 lucide Loader2；尺寸档与图标刻度逐档同值",
+    axes: [{ name: "size", values: SPINNER_SIZES }],
+    render: () => (
+      <div className="flex flex-col gap-md">
+        <Row label="全部尺寸档">
+          {SPINNER_SIZES.map((size) => (
+            <Spinner key={size} size={size} />
+          ))}
+        </Row>
+        <Row label="带播报文案（sr-only）">
+          <Spinner size="sm" label="正在提交" />
+          <span className="text-body-sm text-muted-foreground">
+            role=status，读屏播报“正在提交”
+          </span>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "Kbd",
+    layer: "atom",
+    group: "展示",
+    tags: ["shadcn", "vxture"],
+    covers: ["KbdGroup"],
+    deviation:
+      "上游的 text-[0.7rem] / px-1.5 裸数值不跟随，改绑 T2（text-code-sm / px-2xs），走 code 族等宽字体",
+    render: () => (
+      <div className="flex flex-col gap-md">
+        <Row label="单键">
+          <Kbd>Esc</Kbd>
+          <Kbd>Enter</Kbd>
+          <Kbd>Tab</Kbd>
+        </Row>
+        <Row label="组合键（KbdGroup）">
+          <KbdGroup>
+            <Kbd>Ctrl</Kbd>
+            <span className="text-body-sm text-muted-foreground">+</span>
+            <Kbd>K</Kbd>
+          </KbdGroup>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "ButtonGroup",
+    layer: "pattern",
+    group: "表单",
+    tags: ["shadcn", "vxture"],
+    covers: ["ButtonGroupText"],
+    deviation:
+      "与 SegmentedControl 分工：SegmentedControl 是单选语义，ButtonGroup 是动作并排。接缝清圆角 + -ml-px 叠边 + 聚焦 z-10 抬起承上游",
+    axes: [{ name: "orientation", values: BUTTON_GROUP_ORIENTATIONS }],
+    render: () => (
+      <div className="flex flex-col gap-md">
+        <Row label="horizontal（分裂按钮）">
+          <ButtonGroup>
+            <Button variant="outline">保存</Button>
+            <Button variant="outline" size="icon">
+              <Icon name="chevron-down" size="sm" />
+            </Button>
+          </ButtonGroup>
+        </Row>
+        <Row label="带非按钮成员（ButtonGroupText）">
+          <ButtonGroup>
+            <ButtonGroupText>共 128 条</ButtonGroupText>
+            <Button variant="outline">上一页</Button>
+            <Button variant="outline">下一页</Button>
+          </ButtonGroup>
+        </Row>
+        <Row label="vertical">
+          <ButtonGroup orientation="vertical">
+            <Button variant="outline">置顶</Button>
+            <Button variant="outline">上移</Button>
+            <Button variant="outline">下移</Button>
+          </ButtonGroup>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "InputGroup",
+    layer: "pattern",
+    group: "表单",
+    tags: ["shadcn", "vxture"],
+    covers: ["InputGroupAddon", "InputGroupInput"],
+    deviation:
+      "框身（描边/圆角/焦点环/失效态）整体上移到容器，经 has-[] 从内部控件上浮，焦点环包住整组；与 ButtonGroup 分工：一个输入带附属物 vs 多个动作并排",
+    axes: [{ name: "align", values: INPUT_GROUP_ALIGNS }],
+    render: () => (
+      <div className="flex w-full max-w-panel-md flex-col gap-md">
+        <Row label="前缀图标" stack>
+          <InputGroup>
+            <InputGroupAddon>
+              <Icon name="search" size="sm" />
+            </InputGroupAddon>
+            <InputGroupInput placeholder="搜索…" />
+          </InputGroup>
+        </Row>
+        <Row label="前后缀（单位）" stack>
+          <InputGroup>
+            <InputGroupAddon>￥</InputGroupAddon>
+            <InputGroupInput placeholder="0.00" />
+            <InputGroupAddon align="end">CNY</InputGroupAddon>
+          </InputGroup>
+        </Row>
+        <Row label="失效态（aria-invalid 上浮到框身）" stack>
+          <InputGroup>
+            <InputGroupAddon>
+              <Icon name="mail" size="sm" />
+            </InputGroupAddon>
+            <InputGroupInput aria-invalid defaultValue="not-an-email" />
+          </InputGroup>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "Field",
+    layer: "pattern",
+    group: "表单",
+    tags: ["shadcn", "vxture"],
+    covers: ["FieldGroup", "FieldLabel", "FieldDescription", "FieldError"],
+    deviation:
+      "取上游核心子集（Set/Legend/responsive 等无实据未收）；刻意不引 react-hook-form——UI 层零表单框架绑定，错误经 FieldError 或 aria-invalid 进来",
+    axes: [{ name: "orientation", values: FIELD_ORIENTATIONS }],
+    render: () => (
+      <FieldGroup className="max-w-panel-md">
+        <Field>
+          <FieldLabel htmlFor="fld-name">显示名</FieldLabel>
+          <Input id="fld-name" placeholder="输入显示名" />
+          <FieldDescription>对外展示的名称，可随时修改。</FieldDescription>
+        </Field>
+        <Field data-invalid>
+          <FieldLabel htmlFor="fld-email">邮箱</FieldLabel>
+          <Input id="fld-email" aria-invalid defaultValue="not-an-email" />
+          <FieldError>邮箱格式不正确</FieldError>
+        </Field>
+        <Field orientation="horizontal">
+          <Switch id="fld-notify" />
+          <FieldLabel htmlFor="fld-notify">接收通知</FieldLabel>
+        </Field>
+      </FieldGroup>
+    ),
+  },
+  {
+    name: "InputOTP",
+    layer: "pattern",
+    group: "表单",
+    tags: ["shadcn", "vxture"],
+    covers: ["InputOTPGroup", "InputOTPSlot", "InputOTPSeparator"],
+    deviation:
+      "槽位绑控件刻度（h-control-md/w-control-md）随密度三档；假光标用 animate-pulse——不为单组件开全局 keyframes；激活槽高亮与 interactive 同款 ring",
+    render: () => (
+      <div className="flex flex-col gap-md">
+        <Row label="6 位，3+3 分组" stack>
+          <InputOTP maxLength={6}>
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+            </InputOTPGroup>
+            <InputOTPSeparator />
+            <InputOTPGroup>
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "Resizable",
+    layer: "pattern",
+    group: "展示",
+    tags: ["shadcn", "vxture"],
+    covers: ["ResizablePanelGroup", "ResizablePanel", "ResizableHandle"],
+    deviation:
+      "底层 react-resizable-panels v4（Group/Panel/Separator，与 shadcn 文档的 v2 不同代，类名按 v4 钩子重写）；分隔线走发丝线语义；与 SplitViewLayout 分工：定宽双栏归 layout，可拖分栏是控件",
+    render: () => (
+      <div className="h-row-4xl w-full max-w-content-narrow-lg">
+        <ResizablePanelGroup>
+          <ResizablePanel defaultSize="40%" minSize="20%">
+            <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
+              导航栏
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel>
+            <div className="flex h-full items-center justify-center text-body-sm text-muted-foreground">
+              内容区
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+    ),
   },
 ];
 
