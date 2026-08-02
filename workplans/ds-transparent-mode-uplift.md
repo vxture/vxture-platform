@@ -81,11 +81,11 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
 
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 
-| 决策                              | 取向                                                                                                     |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 透明叠层落点                      | 零新增：现有 token + 透明度修饰符（`card/58`、`primary/10`）                                             |
-| hover/pressed 换 brand 微染（V8） | **待 owner 拍板**：需改 T2 `accent` / `surface-active` 取值（neutral→brand alpha）；未批前维持中性 hover |
-| 焦点环                            | 保留（X5）                                                                                               |
-| 重依赖范围                        | 仅 cmdk + react-day-picker，其余缓                                                                       |
-| menubar/navigation-menu           | 缓，无消费场景                                                                                           |
-| Toast/Drawer/DataTable 自研件     | 保留自研，不换 sonner/vaul/tanstack                                                                      |
+| 决策                              | 取向                                                                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 透明叠层落点                      | 零新增：现有 token + 透明度修饰符（`card/58`、`primary/10`）                                                       |
+| hover/pressed 换 brand 微染（V8） | **已批（2026-08-02 "accent 改"）**：`accent`=brand-600-alpha-08/15、`surface-active`=15/22，与 selected 成连续刻度 |
+| 焦点环                            | 保留（X5）                                                                                                         |
+| 重依赖范围                        | 仅 cmdk + react-day-picker，其余缓                                                                                 |
+| menubar/navigation-menu           | 缓，无消费场景                                                                                                     |
+| Toast/Drawer/DataTable 自研件     | 保留自研，不换 sonner/vaul/tanstack                                                                                |
