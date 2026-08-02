@@ -19,9 +19,71 @@
 
 import * as React from "react";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   ActionMenu,
   AIAssistantBubble,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AspectRatio,
   Avatar,
+  buttonVariants,
+  Calendar,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Combobox,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+  Progress,
+  RadioGroup,
+  RadioGroupItem,
+  ScrollArea,
+  Slider,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Toggle,
+  TOGGLE_SIZES,
+  TOGGLE_VARIANTS,
+  ToggleGroup,
+  ToggleGroupItem,
   BUTTON_SIZES,
   BUTTON_VARIANTS,
   Container,
@@ -75,6 +137,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DatePicker,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -364,6 +427,128 @@ export const ENTRIES: readonly Entry[] = [
       "取代 PageSizePicker 与 ViewModeSwitch——两者形状相同，只是一个装数字一个装图标。语义用 radiogroup；选中态由本件画，不再靠调用方挂 .is-active",
     render: () => <SegmentedControlDemo />,
   },
+  {
+    name: "RadioGroup",
+    layer: "atom",
+    group: "表单",
+    tags: ["shadcn", "origin"],
+    deviation:
+      "指示点用 rounded-full 的 span 而非上游的 Circle 图标——本仓图标字典没有 circle，纯色圆点也不值得为此扩字典",
+    render: () => (
+      <RadioGroup defaultValue="b" className="w-full max-w-content-base-xl">
+        <span className="flex items-center gap-xs">
+          <RadioGroupItem value="a" id="r-rg1" />
+          <Label htmlFor="r-rg1">按量计费</Label>
+        </span>
+        <span className="flex items-center gap-xs">
+          <RadioGroupItem value="b" id="r-rg2" />
+          <Label htmlFor="r-rg2">包月订阅（默认选中）</Label>
+        </span>
+        <span className="flex items-center gap-xs">
+          <RadioGroupItem value="c" id="r-rg3" disabled />
+          <Label htmlFor="r-rg3">企业专属（禁用）</Label>
+        </span>
+      </RadioGroup>
+    ),
+  },
+  {
+    name: "Slider",
+    layer: "atom",
+    group: "表单",
+    tags: ["shadcn", "origin"],
+    render: () => (
+      <div className="flex w-full max-w-content-base-xl flex-col gap-lg">
+        <Row label="单值" stack>
+          <Slider defaultValue={[40]} max={100} step={1} />
+        </Row>
+        <Row label="禁用" stack>
+          <Slider defaultValue={[65]} max={100} step={1} disabled />
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "Toggle",
+    layer: "atom",
+    group: "表单",
+    tags: ["shadcn", "origin"],
+    axes: [
+      { name: "variant", values: [...TOGGLE_VARIANTS] },
+      { name: "size", values: [...TOGGLE_SIZES] },
+    ],
+    render: () => (
+      <>
+        {TOGGLE_VARIANTS.map((variant) => (
+          <Row key={variant} label={variant}>
+            {TOGGLE_SIZES.map((size) => (
+              <Toggle
+                key={size}
+                variant={variant}
+                size={size}
+                defaultPressed={size === "default"}
+                title={size}
+              >
+                <Icon name="star" />
+                {size}
+              </Toggle>
+            ))}
+            <Toggle variant={variant} disabled title="disabled">
+              禁用
+            </Toggle>
+          </Row>
+        ))}
+      </>
+    ),
+  },
+  {
+    name: "ToggleGroup",
+    layer: "pattern",
+    group: "表单",
+    tags: ["shadcn", "origin"],
+    axes: [{ name: "variant", values: [...TOGGLE_VARIANTS] }],
+    render: () => (
+      <>
+        <Row label="multiple · variant=default">
+          <ToggleGroup type="multiple" defaultValue={["bold"]}>
+            <ToggleGroupItem value="bold" aria-label="加粗">
+              加粗
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="斜体">
+              斜体
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="下划线" disabled>
+              下划线
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </Row>
+        <Row label="single · variant=outline（variant / size 定在 Root，经 context 下发）">
+          <ToggleGroup type="single" variant="outline" defaultValue="week">
+            <ToggleGroupItem value="day">日</ToggleGroupItem>
+            <ToggleGroupItem value="week">周</ToggleGroupItem>
+            <ToggleGroupItem value="month">月</ToggleGroupItem>
+          </ToggleGroup>
+        </Row>
+      </>
+    ),
+  },
+  {
+    name: "Combobox",
+    layer: "pattern",
+    group: "表单",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "上游只给组合示例（Button + Popover + Command），这里落成 pattern：items 零业务（value/label/disabled），value/onValueChange 受控，浮层宽度经 --radix-popover-trigger-width 跟触发器对齐",
+    render: () => <ComboboxDemo />,
+  },
+  {
+    name: "DatePicker",
+    layer: "pattern",
+    group: "表单",
+    tags: ["vxture", "patterns"],
+    deviation:
+      '上游只给组合示例（Button + Popover + Calendar），这里落成 pattern。展示格式用 Intl.DateTimeFormat("zh-CN")，不引 date-fns；再点选中日 = 清空（onValueChange 收 undefined）',
+    render: () => <DatePickerDemo />,
+  },
 
   /* ── 展示 ───────────────────────────────────────────────── */
   {
@@ -480,6 +665,141 @@ export const ENTRIES: readonly Entry[] = [
         <Skeleton variant="circle" />
       </div>
     ),
+  },
+  {
+    name: "Accordion",
+    layer: "pattern",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    deviation:
+      "条目分隔走虚线发丝线（分行语义）；上游的展开高度动画依赖本仓未注册的 accordion keyframes，刻意省略，箭头旋转保留",
+    render: () => (
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue="a"
+        className="w-full max-w-content-base-xl"
+      >
+        <AccordionItem value="a">
+          <AccordionTrigger>配额是怎么计算的？</AccordionTrigger>
+          <AccordionContent>
+            按订阅档位内含量 + 弹性池叠加计算，月底出账。
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="b">
+          <AccordionTrigger>可以中途升级套餐吗？</AccordionTrigger>
+          <AccordionContent>可以，差价按剩余天数折算。</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="c">
+          <AccordionTrigger>发票何时开具？</AccordionTrigger>
+          <AccordionContent>出账后三个工作日内开具并送达。</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    ),
+  },
+  {
+    name: "Collapsible",
+    layer: "atom",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    render: () => <CollapsibleDemo />,
+  },
+  {
+    name: "ScrollArea",
+    layer: "atom",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    deviation:
+      "Viewport 不挂上游的 rounded-[inherit]（任意值语法被禁），圆角裁切由 Root 的 overflow-hidden 承担",
+    render: () => (
+      <ScrollArea className="h-media-2xl w-media-3xl rounded-md border border-border">
+        <div className="flex flex-col gap-xs p-sm">
+          {Array.from({ length: 20 }, (_, i) => (
+            <span key={i} className="text-body-sm text-muted-foreground">
+              审计记录 #{String(i + 1).padStart(2, "0")}
+            </span>
+          ))}
+        </div>
+      </ScrollArea>
+    ),
+  },
+  {
+    name: "AspectRatio",
+    layer: "atom",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    render: () => (
+      <div className="w-full max-w-content-base-xl">
+        <AspectRatio
+          ratio={16 / 9}
+          className="flex items-center justify-center rounded-md bg-accent"
+        >
+          <span className="text-body-sm text-muted-foreground">16 : 9</span>
+        </AspectRatio>
+      </div>
+    ),
+  },
+  {
+    name: "Table",
+    layer: "pattern",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    covers: [
+      "TableHeader",
+      "TableBody",
+      "TableFooter",
+      "TableHead",
+      "TableRow",
+      "TableCell",
+      "TableCaption",
+    ],
+    deviation:
+      "视觉语法对齐 DataTable 的透明模式：无容器卡、表头下实线、行间虚线、首末列内边距归零；footer 用虚线上边框替换上游的 bg-muted/50。与 DataTable 分工：那件管三态/排序/选择，本族只管 markup",
+    render: () => (
+      <Table className="max-w-content-base-xl">
+        <TableCaption>近期发票（data-state=selected 行为选中态）</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>发票号</TableHead>
+            <TableHead>状态</TableHead>
+            <TableHead className="text-right">金额</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>INV-0301</TableCell>
+            <TableCell>已支付</TableCell>
+            <TableCell className="text-right">¥ 2,500</TableCell>
+          </TableRow>
+          <TableRow data-state="selected">
+            <TableCell>INV-0302</TableCell>
+            <TableCell>已支付</TableCell>
+            <TableCell className="text-right">¥ 1,800</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>INV-0303</TableCell>
+            <TableCell>待支付</TableCell>
+            <TableCell className="text-right">¥ 950</TableCell>
+          </TableRow>
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={2}>合计</TableCell>
+            <TableCell className="text-right">¥ 5,250</TableCell>
+          </TableRow>
+        </TableFooter>
+      </Table>
+    ),
+  },
+  {
+    name: "Calendar",
+    layer: "pattern",
+    group: "展示",
+    tags: ["shadcn", "origin"],
+    axes: [{ name: "mode", values: ["single", "range"] }],
+    deviation:
+      "classNames key 逐个对过 react-day-picker v10 枚举；选中态不走 selected/range_* 的 classNames（同格双 key 会赌 CSS 顺序），改自定义 DayButton 读 modifiers 按条件拼类；箭头换本仓 Icon",
+    render: () => <CalendarDemo />,
   },
 
   /* ── 导航 ───────────────────────────────────────────────── */
@@ -634,6 +954,108 @@ export const ENTRIES: readonly Entry[] = [
       </Row>
     ),
   },
+  {
+    name: "AlertDialog",
+    layer: "pattern",
+    group: "浮层",
+    tags: ["shadcn", "origin"],
+    render: () => (
+      <Row>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">删除工作空间</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>确定要删除吗？</AlertDialogTitle>
+              <AlertDialogDescription>
+                工作空间及其全部成员授权将立即失效，且不可恢复。没有 X
+                关闭钮：必须在两个按钮之间表态。
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>取消</AlertDialogCancel>
+              {/* 不可撤销的落锤动作换到实心红档，样式函数与 Button 共用。 */}
+              <AlertDialogAction
+                className={buttonVariants({ variant: "destructive-strong" })}
+              >
+                确认删除
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Row>
+    ),
+  },
+  {
+    name: "HoverCard",
+    layer: "pattern",
+    group: "浮层",
+    tags: ["shadcn", "origin"],
+    render: () => (
+      <Row>
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            <Button variant="link">@vxture</Button>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <div className="flex flex-col gap-2xs">
+              <span className="text-label-md">Vxture 平台</span>
+              <span className="text-body-sm text-muted-foreground">
+                悬停出预览面。只对指针设备生效，关键信息不能只放这里。
+              </span>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+      </Row>
+    ),
+  },
+  {
+    name: "ContextMenu",
+    layer: "pattern",
+    group: "浮层",
+    tags: ["shadcn", "origin"],
+    render: () => (
+      <ContextMenu>
+        <ContextMenuTrigger className="flex h-media-lg w-full max-w-content-base-xl items-center justify-center rounded-md border border-dashed border-border text-body-sm text-muted-foreground">
+          在这块区域里右键
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-56">
+          <ContextMenuLabel>操作</ContextMenuLabel>
+          <ContextMenuSeparator />
+          <ContextMenuItem>
+            重命名
+            <ContextMenuShortcut>F2</ContextMenuShortcut>
+          </ContextMenuItem>
+          <ContextMenuItem disabled>移动（禁用）</ContextMenuItem>
+          <ContextMenuCheckboxItem checked>显示已归档</ContextMenuCheckboxItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>排序方式</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuRadioGroup value="name">
+                <ContextMenuRadioItem value="name">按名称</ContextMenuRadioItem>
+                <ContextMenuRadioItem value="time">按时间</ContextMenuRadioItem>
+              </ContextMenuRadioGroup>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+          <ContextMenuSeparator />
+          <ContextMenuItem className="text-destructive-muted-foreground">
+            删除
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    ),
+  },
+  {
+    name: "Command",
+    layer: "pattern",
+    group: "浮层",
+    tags: ["shadcn", "origin"],
+    covers: ["CommandDialog"],
+    deviation:
+      "CommandDialog 复用本仓 Dialog（遮罩/动效/Esc 不重写）；条目状态属性是 cmdk 的 data-selected/data-disabled 带值形态，非 Radix 的 data-state",
+    render: () => <CommandDemo />,
+  },
 
   /* ── 反馈 ───────────────────────────────────────────────── */
   {
@@ -654,6 +1076,23 @@ export const ENTRIES: readonly Entry[] = [
     deviation:
       "与 Toast 分工：Toast 说刚才那一下成了没有，说完就走；Banner 说这个页面现在处于什么状态，状态还在就一直在。tone 改用共用的六档语气（原为含 ai 的自有五值），图标由语气决定",
     render: () => <BannerDemo />,
+  },
+  {
+    name: "Progress",
+    layer: "atom",
+    group: "反馈",
+    tags: ["shadcn", "origin"],
+    deviation:
+      "轨道语法对齐 TokenCounter（bg-accent 轨道 + rounded-4xl），不用上游的 bg-primary/20——同一形状在 DS 内只有一套画法",
+    render: () => (
+      <div className="flex w-full max-w-content-base-xl flex-col gap-lg">
+        {[13, 66, 88].map((value) => (
+          <Row key={value} label={`value=${value}`} stack>
+            <Progress value={value} />
+          </Row>
+        ))}
+      </div>
+    ),
   },
 
   /* ── 图案（完全自建）─────────────────────────────────────── */
@@ -1015,7 +1454,9 @@ export const ENTRIES: readonly Entry[] = [
     ),
   },
   {
-    name: "Toggle",
+    // 原条目名 "Toggle" 让位给 ui 层新增的双态按钮——这里摆的本来就是
+    // FullscreenToggle 这个导出名，条目名改成一致。
+    name: "FullscreenToggle",
     layer: "atom",
     group: "布局",
     tags: ["vxture", "component"],
@@ -1183,6 +1624,149 @@ export const ENTRIES: readonly Entry[] = [
 ];
 
 /* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
+
+function CollapsibleDemo() {
+  const [open, setOpen] = React.useState(true);
+  return (
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="flex w-full max-w-content-base-xl flex-col gap-xs"
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-label-md">已挂载能力（3）</span>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="icon-sm" aria-label="展开或收起">
+            <Icon name={open ? "chevron-up" : "chevron-down"} />
+          </Button>
+        </CollapsibleTrigger>
+      </div>
+      <CollapsibleContent className="flex flex-col gap-xs">
+        {["模型接入", "调用审计", "配额管理"].map((item) => (
+          <span
+            key={item}
+            className="rounded-md border border-border px-sm py-xs text-body-sm"
+          >
+            {item}
+          </span>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+function CommandDemo() {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <Row label="⌘K 式命令面板；输入过滤、键盘巡航由 cmdk 承担">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        打开命令面板
+      </Button>
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="输入命令或搜索…" />
+        <CommandList>
+          <CommandEmpty>没有匹配的命令</CommandEmpty>
+          <CommandGroup heading="导航">
+            <CommandItem onSelect={() => setOpen(false)}>
+              <Icon name="home" />
+              回到工作台
+              <CommandShortcut>G H</CommandShortcut>
+            </CommandItem>
+            <CommandItem onSelect={() => setOpen(false)}>
+              <Icon name="database" />
+              模型接入
+            </CommandItem>
+            <CommandItem disabled>
+              <Icon name="settings" />
+              系统设置（禁用）
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="操作">
+            <CommandItem onSelect={() => setOpen(false)}>
+              <Icon name="plus" />
+              新建通道
+              <CommandShortcut>⌘ N</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </Row>
+  );
+}
+
+function ComboboxDemo() {
+  const [value, setValue] = React.useState("beta");
+  return (
+    <Row label="可搜索单选；触发器宽度由调用方给">
+      <Combobox
+        className="w-media-3xl"
+        value={value}
+        onValueChange={setValue}
+        placeholder="选择发布通道"
+        searchPlaceholder="搜索通道…"
+        items={[
+          { value: "stable", label: "稳定通道" },
+          { value: "beta", label: "灰度通道" },
+          { value: "canary", label: "金丝雀通道" },
+          { value: "legacy", label: "遗留通道", disabled: true },
+        ]}
+      />
+    </Row>
+  );
+}
+
+function CalendarDemo() {
+  const [date, setDate] = React.useState<Date | undefined>(
+    new Date(2026, 7, 12),
+  );
+  const [range, setRange] = React.useState<
+    { from: Date | undefined; to?: Date | undefined } | undefined
+  >({
+    from: new Date(2026, 7, 5),
+    to: new Date(2026, 7, 14),
+  });
+  return (
+    <div className="flex w-full flex-wrap items-start gap-lg">
+      <Row label="mode=single" stack>
+        <div className="rounded-md border border-border">
+          <Calendar
+            mode="single"
+            defaultMonth={new Date(2026, 7, 1)}
+            {...(date !== undefined ? { selected: date } : {})}
+            onSelect={setDate}
+          />
+        </div>
+      </Row>
+      <Row label="mode=range" stack>
+        <div className="rounded-md border border-border">
+          <Calendar
+            mode="range"
+            defaultMonth={new Date(2026, 7, 1)}
+            {...(range !== undefined ? { selected: range } : {})}
+            onSelect={setRange}
+          />
+        </div>
+      </Row>
+    </div>
+  );
+}
+
+function DatePickerDemo() {
+  const [date, setDate] = React.useState<Date | undefined>(
+    new Date(2026, 7, 12),
+  );
+  return (
+    <Row label="再点选中日即清空">
+      <DatePicker
+        className="w-media-3xl"
+        {...(date !== undefined ? { value: date } : {})}
+        onValueChange={setDate}
+        placeholder="选择生效日期"
+      />
+    </Row>
+  );
+}
 
 function ShellChromeDemo() {
   const [locale, setLocale] = React.useState<"zh-CN" | "en-US">("zh-CN");
