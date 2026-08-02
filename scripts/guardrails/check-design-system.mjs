@@ -1081,6 +1081,10 @@ const rules = [
           return;
         }
         if (/^@import\s+["'][^"']+["'];$/.test(text)) return;
+        // `@source` 和 @import 一样是构建指令，不是样式规则：它告诉 Tailwind 去哪
+        // 扫类名。路径相对声明它的文件，挪进分层模块只会让这条极易失效的声明更难
+        // 维护——而它一旦失效，DS 组件的工具类全部不产出且不报错。
+        if (/^@source\s+["'][^"']+["'];$/.test(text)) return;
         items.push(
           violation(
             file,
@@ -2085,7 +2089,11 @@ function collectDsStyleHardcodedScaleCount(sourceFiles) {
   for (const file of sourceFiles) {
     const normalized = normalize(path.relative(ROOT, file));
     if (!isDsStyleScaleDebtFile(normalized)) continue;
-    const lines = readFileSync(file, "utf8").split(/\r?\n/);
+    // 先整体剥掉块注释再逐行看。`stripLineComment` 认的是 `//`，那不是 CSS 的
+    // 注释语法——注释里写一句"16px"就会被记成一处硬编码尺度，把预算顶穿。
+    const lines = stripCssBlockComments(readFileSync(file, "utf8")).split(
+      /\r?\n/,
+    );
     for (const line of lines) {
       if (hasDsStyleHardcodedScale(line)) count += 1;
     }
@@ -2220,6 +2228,13 @@ function isDsStyleScaleDebtFile(normalized) {
     normalized.startsWith(`${DS_ROOT}/src/styles/`) &&
     normalized.endsWith(".css") &&
     !DS_RUNTIME_TOKEN_STYLE_PATTERN.test(normalized)
+  );
+}
+
+/** 抹掉 CSS 块注释，保留行数（换行不动），行号才对得上。 */
+function stripCssBlockComments(content) {
+  return content.replace(/\/\*[\s\S]*?\*\//g, (m) =>
+    m.replace(/[^\n]/g, " "),
   );
 }
 
