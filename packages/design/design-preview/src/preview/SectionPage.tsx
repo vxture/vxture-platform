@@ -131,6 +131,15 @@ function TypePage() {
 
 function ComponentPage({ layer }: { readonly layer: Layer }) {
   const mine = ENTRIES.filter((e) => e.layer === layer);
+  /**
+   * 件数按**实际展示到的组件**算，不是条目数——一族并在一条里看是对的，
+   * 但不能因此少算。此前统计卡给的是条目数，比真实件数少 15 件且看不出来。
+   */
+  const shown = mine.reduce((n, e) => n + 1 + (e.covers?.length ?? 0), 0);
+  const axisTotal = mine.reduce(
+    (n, e) => n + (e.axes?.reduce((m, a) => m + a.values.length, 0) ?? 0),
+    0,
+  );
   const of = (a: Provenance, b: Provenance) =>
     mine.filter((e) => e.tags[0] === a && e.tags[1] === b).length;
 
@@ -155,10 +164,10 @@ function ComponentPage({ layer }: { readonly layer: Layer }) {
   return (
     <>
       <Stats>
-        <Stat value={mine.length} label="件数" note="本类合计" />
+        <Stat value={shown} label="件数" note="含并列展示的" />
         {layer === "pending" ? (
           <Stat
-            value={mine.length}
+            value={shown}
             label="待重写"
             note="仍挂遗留类名"
             tone="warning"
@@ -175,6 +184,7 @@ function ComponentPage({ layer }: { readonly layer: Layer }) {
               label="部分定制"
               note={<Tags tags={["shadcn", "vxture"]} />}
             />
+            <Stat value={axisTotal} label="变体挡位" note="全部轴合计" />
             <Stat
               value={mine.filter((e) => e.tags[0] === "vxture").length}
               label="完全自建"
@@ -213,6 +223,16 @@ function EntrySection({ entry }: { readonly entry: Entry }) {
       note={
         <span className="flex flex-wrap items-center gap-sm">
           <Tags tags={entry.tags} />
+          {entry.axes?.map((axis) => (
+            <span
+              key={axis.name}
+              className="inline-flex items-center gap-2xs rounded-4xl bg-accent px-sm py-2xs text-label-sm text-muted-foreground"
+              title={axis.values.join(" / ")}
+            >
+              {axis.name}
+              <span className="text-foreground">{axis.values.length}</span>
+            </span>
+          ))}
           {entry.deviation ? (
             <span className="text-body-sm text-muted-foreground">
               {entry.deviation}
@@ -228,7 +248,7 @@ function EntrySection({ entry }: { readonly entry: Entry }) {
 
 function Stats({ children }: { readonly children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-2 gap-md lg:grid-cols-4">{children}</div>
+    <div className="grid grid-cols-2 gap-md lg:grid-cols-5">{children}</div>
   );
 }
 

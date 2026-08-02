@@ -21,7 +21,13 @@ import * as React from "react";
 import {
   ActionMenu,
   Avatar,
+  BUTTON_SIZES,
   BUTTON_VARIANTS,
+  Container,
+  FullscreenProvider,
+  FullscreenToggle,
+  Grid,
+  Stack,
   AvatarFallback,
   Badge,
   Banner,
@@ -135,6 +141,25 @@ export interface Entry {
   readonly deviation?: string;
   /** 待删 / 待迁出，不计入统计卡的"已完成"。 */
   readonly pending?: boolean;
+  /**
+   * 变体轴：轴名 → 全部取值。用于在页面上标出"这件到底有几个变体"，
+   * 以及统计卡里的合计——不写就没法验证摆出来的样例是不是全的。
+   *
+   * 能从组件导出的运行时数组取就取（如 Button 的 BUTTON_VARIANTS），
+   * 那样加一个变体不必回来改这里。
+   */
+  readonly axes?: readonly {
+    readonly name: string;
+    readonly values: readonly string[];
+  }[];
+  /**
+   * 本条同时展示了哪些别的组件。
+   *
+   * 一族东西（ViewLayout / Section / SectionHeader）拆成三条各摆一次，读者反而
+   * 看不出它们的层级关系——族就该一起看。但件数不能因此少算，也不能让覆盖检查
+   * 以为它们没露过面，故在此声明。
+   */
+  readonly covers?: readonly string[];
   readonly render: () => React.ReactNode;
 }
 
@@ -151,6 +176,10 @@ export const ENTRIES: readonly Entry[] = [
     layer: "atom",
     group: "表单",
     tags: ["shadcn", "origin"],
+    axes: [
+      { name: "variant", values: [...BUTTON_VARIANTS] },
+      { name: "size", values: [...BUTTON_SIZES] },
+    ],
     render: () => (
       <>
         {BUTTON_VARIANTS.map((v) => (
@@ -600,6 +629,7 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
+    covers: ["ViewLayout", "SplitViewLayout", "Section", "SectionHeader"],
     deviation:
       "产品扫描出现频次第一（72 处文件）。删了 5 个 *ClassName 逃生口与 actions 别名——逃生口会把页头内部 DOM 变成公开契约",
     render: () => (
@@ -835,12 +865,14 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <DataTableDemo />,
   },
   {
-    name: "MetricGrid / MetricCard",
+    name: "MetricGrid",
     layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
+    covers: ["MetricCard"],
+    axes: [{ name: "columns", values: ["2", "3", "4", "5", "6"] }],
     deviation:
-      "读数用 display-xs 而非 heading-2：同一字号，但指标值不是标题。删了 tone 的 default / positive 两个别名——同一语气两个名字迟早对不上",
+      "卡片按语气染顶缘色条不染底：一排卡片靠色条分组，整块染色会盖过读数本身。趋势徽章挨着数字，它修饰的是数字不是卡片",
     render: () => (
       <MetricGrid
         className="w-full"
@@ -892,6 +924,68 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <DialogFormDemo />,
   },
 
+  {
+    name: "Stack",
+    layer: "atom",
+    group: "布局",
+    tags: ["vxture", "component"],
+    covers: ["Grid", "Container"],
+    axes: [
+      { name: "gap", values: ["xs", "sm", "md", "lg"] },
+      { name: "align", values: ["start", "center", "end", "stretch"] },
+    ],
+    deviation:
+      "⚠ 三件都还写着裸值（gap-2 / grid-cols-3 / max-w-screen-*），不跟随密度三档，违反 060 的取值约束。批 A–F 没覆盖到布局族",
+    render: () => (
+      <div className="flex w-full flex-col gap-lg">
+        <Row label="Stack gap=sm">
+          <Stack gap="sm" className="w-full">
+            <div className="rounded-md bg-accent p-sm text-body-md">一</div>
+            <div className="rounded-md bg-accent p-sm text-body-md">二</div>
+          </Stack>
+        </Row>
+        <Row label="Grid columns=3">
+          <Grid columns={3} gap="sm" className="w-full">
+            <div className="rounded-md bg-accent p-sm text-body-md">1</div>
+            <div className="rounded-md bg-accent p-sm text-body-md">2</div>
+            <div className="rounded-md bg-accent p-sm text-body-md">3</div>
+          </Grid>
+        </Row>
+        <Row label="Container size=md">
+          <Container
+            size="md"
+            className="w-full rounded-md border border-dashed border-border p-sm text-body-md"
+          >
+            受限宽度容器
+          </Container>
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "Toggle",
+    layer: "atom",
+    group: "布局",
+    tags: ["vxture", "component"],
+    axes: [{ name: "mode", values: ["pseudo", "native"] }],
+    deviation:
+      "全屏开关。必须包在 FullscreenProvider 里才有上下文，故此处连同 provider 一起摆",
+    render: () => (
+      <FullscreenProvider>
+        <Row label="mode=pseudo">
+          <div
+            id="preview-fullscreen-target"
+            className="flex w-full items-center justify-between rounded-md border border-dashed border-border p-sm"
+          >
+            <span className="text-body-md text-muted-foreground">
+              可全屏区域
+            </span>
+            <FullscreenToggle targetId="preview-fullscreen-target" />
+          </div>
+        </Row>
+      </FullscreenProvider>
+    ),
+  },
   /* ── 待删（尚未重写，渲染无样式是预期结果）──────────────── */
   {
     name: "ShellChrome",
@@ -912,6 +1006,17 @@ export const ENTRIES: readonly Entry[] = [
     deviation:
       "1,742 行，accounts 有 6 个文件在用。整份仍挂 .vx-auth-* 遗留类名。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
     render: () => <AuthLoginDemo />,
+  },
+  {
+    name: "AIAssistantBubble",
+    layer: "pending",
+    group: "AI",
+    tags: ["vxture", "pending"],
+    pending: true,
+    covers: ["GenerationStream", "ModelBadge", "PromptInput", "TokenCounter"],
+    deviation:
+      "五件 AI 组件的去向是迁往 agent-studio（批 G），不在本轮视觉精修范围内。列在这里是为了它们别从册子上消失",
+    render: () => <PendingNote />,
   },
 ];
 

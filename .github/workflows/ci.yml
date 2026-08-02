@@ -156,6 +156,12 @@ jobs:
         if: steps.changes.outputs.docs_only != 'true'
         run: pnpm lint:design-classes
 
+      # 预览面是这套系统唯一的验收面。组件没有条目就等于改了也没人看得见，
+      # 而统计卡照样给出一个自洽但偏小的数字。
+      - name: Design preview covers every component
+        if: steps.changes.outputs.docs_only != 'true'
+        run: pnpm lint:design-preview
+
       - name: Env audit (deploy bundle + runtime template contract)
         if: steps.changes.outputs.docs_only != 'true'
         run: |
