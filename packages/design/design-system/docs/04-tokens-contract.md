@@ -35,17 +35,22 @@ T2 是唯一公开 token 契约（T1 禁引，见 [`01-usage.md`](./01-usage.md)
 
 ### AI 色彩语义
 
-AI primitive 色阶只属于 DS 内部，应用只能消费语义 token：
+**定位（owner 拍板 2026-08-02）：`ai` 是 AI 板块的局部强化品牌色——性质相当于
+"brand-2"，不是反馈语气**。它不在 tone 六档里：Toast / Banner / StatusBadge 无 ai
+档；AI 语气由 AI 组件族（ModelBadge / GenerationStream / PromptInput 等）自身承载。
 
-| token                  | 用途                                                                        |
-| ---------------------- | --------------------------------------------------------------------------- |
-| `--vx-color-primary`   | 产品主色：CTA、链接、焦点环、激活导航和品牌 chrome                          |
-| `--vx-color-ai`        | AI 专属 UI：模型徽章、助手 chrome、AI 生成标识、AI 导航入口                 |
-| `--vx-color-ai-cyan`   | 仅与 `--vx-color-ai` 成对使用（渐变层次、图谱线条、内发光），不得单独作主色 |
-| `--vx-color-spark`     | 仅用于生成中、完成闪烁等短暂动画瞬间，禁用于静态表面                        |
-| `--vx-gradient-aurora` | 品牌级重点视觉（登录视觉面板、营销 hero），单屏最多一个                     |
+槽位与六个意图族同构（`ai` / `-hover` / `-active` / `-foreground` / `-muted` 系列 /
+`-border` / `-text`），另有渐变端点 `--gradient-ai-from/to`：
 
-禁止把 `--vx-color-ai` 用作通用 CTA；工具类只允许语义映射（`bg-vx-ai` / `bg-vx-ai-soft` / `text-vx-ai-foreground` 等），`bg-vx-ai-500` / `from-vx-ai-cyan-500` 一类 primitive utility 禁止。
+| 用途                                 | token                                     |
+| ------------------------------------ | ----------------------------------------- |
+| AI 专属 UI 填充：助手 chrome、AI CTA | `bg-ai` + `text-ai-foreground`            |
+| AI 板块弱化底 / 生成中面板           | `bg-ai-muted`                             |
+| AI 描边 / 文字着色                   | `border-ai-border` / `text-ai-text`       |
+| AI 重点视觉渐变                      | `from-gradient-ai-from to-gradient-ai-to` |
+
+判据：`ai` 只用于"这里是 AI 能力"的标识与氛围，**不作通用 CTA**（那是 `primary`
+的位置）；生成态短暂动效用 `animate-pulse` + ai 着色表达，无独立动效色。
 
 ## 3. 排版角色
 

@@ -1112,10 +1112,8 @@ export const ENTRIES: readonly Entry[] = [
     group: "反馈",
     tags: ["shadcn", "vxture"],
     deviation:
-      "整套 API 自有：上游现行方案是 sonner，迁移要动产品侧 16 处 useToast，需单独立项",
-    axes: [
-      { name: "tone", values: ["success", "error", "warning", "info", "ai"] },
-    ],
+      "整套 API 自有：上游现行方案是 sonner，迁移要动产品侧 16 处 useToast，需单独立项。tone 已收敛到共用六档（error→danger，ai 档移除，AI 语气由 AI 组件族自身承载）",
+    axes: [{ name: "tone", values: [...TONES] }],
     render: () => <ToastDemo />,
   },
 
@@ -2578,8 +2576,8 @@ function DrawerDemo() {
 function ToastDemo() {
   const { toast } = useToast();
   return (
-    <Row label="五种语气；error 用 assertive 播报，其余 polite">
-      {(["success", "error", "warning", "info", "ai"] as const).map((tone) => (
+    <Row label="六档语气；danger 用 assertive 播报，其余 polite">
+      {TONES.map((tone) => (
         <Button
           key={tone}
           variant="outline"

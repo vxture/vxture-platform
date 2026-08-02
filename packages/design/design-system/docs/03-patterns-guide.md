@@ -19,6 +19,8 @@
 
 判据：**Toast 说"刚才那一下成了没有"，说完就走；Banner 说"这个页面现在处于什么状态"，状态还在就一直看得见**。Banner 不自动消失，`onDismiss` 只在状态可由用户主动接受时才给。
 
+两者 tone 均为共用六档（见 04 §2）；`danger` 档的 Toast 以 `aria-live="assertive"` 播报，其余 polite。
+
 ## 3. 危险两档：destructive vs destructive-strong
 
 判据是**数量**：

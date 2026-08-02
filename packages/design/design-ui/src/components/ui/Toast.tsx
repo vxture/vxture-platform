@@ -13,19 +13,22 @@
  *
  * 相对原实现的修正：
  * - 去掉整套 .vx-toast* 类（随遗留样式层退役后本组件完全无样式）。
- * - tone 图标原先渲染的是 "Success" / "Error" 这类英文文本当图标，且 aria-hidden；
- *   改为真图标，语义色绑 T2 的四个语义族。
  * - 关闭按钮原先是 "Close" 文本，改为图标 + aria-label。
  * - `role="alert"` 改为 `role="status"` + `aria-live`：alert 会打断屏幕阅读器，
- *   只有 error 需要这种强度。
+ *   只有 danger 需要这种强度。
+ * - **tone 收敛到共用六档**（owner 拍板 2026-08-02，Banner 先例）：原自有五值
+ *   （success/error/warning/info/ai）改为 tone.ts 的 `Tone`——同一严重度在 DS 内
+ *   只有一个名字，`error` 即 `danger`；`ai` 档随收敛移除，AI 语气由 AI 组件族
+ *   自身承载，不经全局通知表达。图标改由 `toneIcons` 给出，一语气一图标。
  */
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { interactive } from "../../styles/recipes";
-import { Icon, type IconName } from "../../icons";
+import { Icon } from "../../icons";
+import { toneIcons, type Tone } from "../patterns/tone";
 
-export type ToastTone = "success" | "error" | "warning" | "info" | "ai";
+export type ToastTone = Tone;
 
 export interface ToastInput {
   readonly id?: string;
@@ -51,21 +54,15 @@ interface ToastContextValue {
 
 const ToastContext = React.createContext<ToastContextValue | null>(null);
 
-const TONE: Record<
-  ToastTone,
-  { readonly icon: IconName; readonly cls: string }
-> = {
-  success: { icon: "check", cls: "border-success-border text-success-text" },
-  error: {
-    icon: "error",
-    cls: "border-destructive-border text-destructive-text",
-  },
-  warning: {
-    icon: "warning",
-    cls: "border-warning-border text-warning-text",
-  },
-  info: { icon: "info", cls: "border-info-border text-info-text" },
-  ai: { icon: "sparkles", cls: "border-ai-border text-ai-text" },
+/* 只染描边与图标、不染底——通知浮在任意内容之上，底保持近实色 popover 才可读。
+   这与 toneSurfaceClasses（描边+弱化底）分工不同，故本件自持映射。 */
+const TONE_CLS: Record<ToastTone, string> = {
+  neutral: "border-border text-muted-foreground",
+  brand: "border-primary-border text-primary-text",
+  info: "border-info-border text-info-text",
+  success: "border-success-border text-success-text",
+  warning: "border-warning-border text-warning-text",
+  danger: "border-destructive-border text-destructive-text",
 };
 
 export function ToastProvider({
@@ -118,16 +115,18 @@ export function ToastProvider({
           <div
             key={item.id}
             role="status"
-            aria-live={item.tone === "error" ? "assertive" : "polite"}
+            aria-live={item.tone === "danger" ? "assertive" : "polite"}
             className={cn(
-              "pointer-events-auto flex w-full max-w-content-narrow-lg items-start gap-sm",
+              // panel-sm 而非 content 宽度族：通知条是浮层面板，1024px 的行宽
+              // 会让一条提示横贯整屏（content 族是页面级行宽，见 Dialog 塌宽案）。
+              "pointer-events-auto flex w-full max-w-panel-sm items-start gap-sm",
               "rounded-lg border bg-popover p-md shadow-notification",
               "animate-in slide-in-from-bottom fade-in duration-base ease-enter",
-              TONE[item.tone].cls,
+              TONE_CLS[item.tone],
             )}
           >
             <Icon
-              name={TONE[item.tone].icon}
+              name={toneIcons[item.tone]}
               size={16}
               className="mt-2xs shrink-0"
               aria-hidden
