@@ -1,24 +1,47 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+/**
+ * ShellChrome.tsx - 门户外壳部件族（品牌、工具按钮、语言/主题/全屏、偏好、用户菜单、法务页脚）。
+ * @package @vxture/design-system
+ * @layer Presentation
+ * @category Components - Shell
+ *
+ * T2 重写（批 O）：原实现整份挂 .vx-shell-* 遗留类名，随 155 个遗留样式文件退役后
+ * 完全无样式。重写原则：
+ * - **能组合 design-ui 现成组件的不自造**：图标按钮走 `Button`（焦点环 / 禁用态 /
+ *   aria-expanded 高亮都在配方层里），浮层走 `Popover`（外点关闭 / Escape / portal /
+ *   进出场动效由 Radix + overlayMotion 提供，替代原先手写的事件监听），下拉走
+ *   `NativeSelect`，互斥选项走 `SegmentedControl`，认证标走 `StatusBadge`。
+ * - 透明模式（060 §1.2.1）：外壳部件与底同色，hover 用 `bg-accent`（brand 微染），
+ *   不动 border / 阴影 / 位置；分隔用发丝线（实线开区块、虚线分行）。
+ * - 品牌标识用 §7 的 .vx-brand-* 组合类——那是仍然在册的品牌基线，不是遗留类。
+ * - **公开 API 冻结**：导出名与 props 形状与重写前逐项一致，消费方零改动。
+ *   默认 label 用中性占位 "Brand"，真实品牌名由调用方传入（真名不入仓）。
+ */
+
+import { useState, type ReactNode } from "react";
+import * as React from "react";
 import {
   LOCALE_CONFIGS,
   SUPPORTED_LOCALES,
   type Locale,
   type Theme,
 } from "@vxture/shared";
-import { Icon } from "@vxture/design-ui";
-import type { IconName } from "@vxture/design-ui";
-import { cn } from "@vxture/design-ui";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
   AvatarSilhouette,
+  Button,
+  Icon,
+  NativeSelect,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  SegmentedControl,
+  StatusBadge,
+  cn,
+  useFullscreen,
 } from "@vxture/design-ui";
-import { useFullscreen } from "@vxture/design-ui";
-import type { FullscreenMode } from "@vxture/design-ui";
+import type { FullscreenMode, IconName } from "@vxture/design-ui";
 import type { Density } from "../../density";
 
 export type ShellFontSizePreference = "small" | "default" | "large";
@@ -229,45 +252,45 @@ const FONT_SIZE_OPTIONS: readonly ShellFontSizePreference[] = [
   "large",
 ];
 
+/** 用户菜单内的字段级分隔：发丝线，虚线分行（060 §1.2.1）。 */
+const HAIRLINE_FIELD = "border-t border-dashed border-primary/10";
+const HAIRLINE_FIELD_DARK = "dark:border-primary/20";
+
 export function LocaleSelectPanel({
   activeLocale,
   options = DEFAULT_LOCALE_OPTIONS,
   onSelect,
 }: LocaleSelectPanelProps) {
   return (
-    <div className="vx-locale-panel" role="menu">
+    <div className="flex flex-col gap-2xs" role="menu">
       {options.map((option) => {
         const active = option.locale === activeLocale;
         return (
-          <button
+          <Button
             key={option.locale}
-            type="button"
+            variant={active ? "secondary" : "ghost"}
             role="menuitemradio"
             aria-checked={active}
-            className={`vx-locale-option${active ? " vx-locale-option--active" : ""}`}
+            className="h-auto w-full justify-start gap-sm px-sm py-xs text-left"
             onClick={() => onSelect(option.locale)}
           >
             {option.flag ? (
-              <span className="vx-locale-option__flag" aria-hidden="true">
+              <span className="shrink-0 text-body-lg" aria-hidden="true">
                 {option.flag}
               </span>
             ) : null}
-            <span className="vx-locale-option__text">
-              <strong>
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-none">
+              <span className="text-label-md">
                 {option.nativeName ?? option.label ?? option.locale}
-              </strong>
+              </span>
               {option.label && option.label !== option.nativeName ? (
-                <small>{option.label}</small>
+                <span className="text-body-sm text-muted-foreground">
+                  {option.label}
+                </span>
               ) : null}
             </span>
-            {active ? (
-              <Icon
-                name="check"
-                size="sm"
-                className="vx-locale-option__check"
-              />
-            ) : null}
-          </button>
+            {active ? <Icon name="check" size="sm" /> : null}
+          </Button>
         );
       })}
     </div>
@@ -278,7 +301,8 @@ export function ShellBrand({
   href = "/",
   logoSrc,
   logoAlt = "",
-  label = "vxture.ai",
+  // 中性占位。真实品牌名由调用方传入——真名不入仓。
+  label = "Brand",
   className,
   logoClassName,
   labelClassName,
@@ -286,7 +310,8 @@ export function ShellBrand({
   return (
     <a
       href={href}
-      className={cn("vx-shell-brand", className)}
+      // §7 品牌标识组合类：仍在册的 DS 基线（brand.css），非遗留类。
+      className={cn("vx-brand-lockup", className)}
       aria-label={typeof label === "string" ? label : undefined}
     >
       {logoSrc ? (
@@ -296,47 +321,63 @@ export function ShellBrand({
           aria-hidden={logoAlt ? undefined : true}
           width={24}
           height={24}
-          className={cn("vx-shell-brand__logo", logoClassName)}
+          className={cn("vx-brand-mark", logoClassName)}
           draggable={false}
         />
       ) : null}
-      <span className={cn("vx-shell-brand__label", labelClassName)}>
+      <span className={cn("vx-brand-name", "text-title-lg", labelClassName)}>
         {label}
       </span>
     </a>
   );
 }
 
-export function ShellIconButton({
-  icon,
-  label,
-  active = false,
-  disabled = false,
-  className,
-  activeClassName,
-  iconClassName,
-  children,
-  onClick,
-}: ShellIconButtonProps) {
+/**
+ * forwardRef 是给 Radix Trigger（asChild）用的；同理把未知 props 透传给
+ * Button，否则 Popover 注入的 onClick / aria 属性会被丢掉，面板永远打不开。
+ */
+export const ShellIconButton = React.forwardRef<
+  HTMLButtonElement,
+  ShellIconButtonProps
+>(function ShellIconButton(
+  {
+    icon,
+    label,
+    active = false,
+    disabled = false,
+    className,
+    activeClassName,
+    iconClassName,
+    children,
+    onClick,
+    ...rest
+  },
+  ref,
+) {
   return (
-    <button
-      type="button"
+    <Button
+      ref={ref}
+      variant="ghost"
+      size="icon-sm"
       title={label}
       aria-label={label}
       aria-pressed={active || undefined}
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "vx-shell-tool-button",
-        active && "vx-shell-tool-button--active",
+        "text-muted-foreground hover:text-foreground",
+        active && "bg-accent text-foreground",
         active && activeClassName,
         className,
       )}
+      {...rest}
     >
       {children ?? <Icon name={icon} size="sm" className={iconClassName} />}
-    </button>
+    </Button>
   );
-}
+});
+
+ShellIconButton.displayName = "ShellIconButton";
 
 export function ShellLocaleSwitcher({
   currentLocale,
@@ -351,50 +392,24 @@ export function ShellLocaleSwitcher({
   onLocaleChange,
 }: ShellLocaleSwitcherProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!ref.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open]);
 
   return (
-    <div ref={ref} className={cn("vx-shell-locale-switcher", className)}>
-      <ShellIconButton
-        icon="globe"
-        label={buttonLabel}
-        active={open}
-        className={buttonClassName}
-        activeClassName={activeButtonClassName}
-        onClick={() => setOpen((value) => !value)}
-      />
-      {open ? (
-        <div
-          className={cn(
-            "vx-shell-locale-popover",
-            `vx-shell-locale-popover--${align}`,
-            popoverClassName,
-          )}
+    <div className={cn("inline-flex", className)}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <ShellIconButton
+            icon="globe"
+            label={buttonLabel}
+            active={open}
+            className={buttonClassName}
+            activeClassName={activeButtonClassName}
+          />
+        </PopoverTrigger>
+        <PopoverContent
+          align={align}
+          sideOffset={8}
           aria-label={panelLabel}
+          className={cn("w-auto min-w-media-2xl p-xs", popoverClassName)}
         >
           <LocaleSelectPanel
             activeLocale={currentLocale}
@@ -404,8 +419,8 @@ export function ShellLocaleSwitcher({
               onLocaleChange(locale);
             }}
           />
-        </div>
-      ) : null}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
@@ -496,69 +511,68 @@ export function ShellPreferencePanel({
   onFontSizeChange,
 }: ShellPreferencePanelProps) {
   return (
-    <div className={cn("vx-shell-preferences", className)}>
+    <div className={cn("flex w-full flex-col gap-sm", className)}>
       {labels?.title ? (
-        <p className="vx-shell-preferences__title">{labels.title}</p>
+        <p className="text-label-sm text-muted-foreground">{labels.title}</p>
       ) : null}
       <ShellPreferenceRow icon="globe" label={labels?.locale}>
-        <div className="vx-shell-preferences__select-wrap">
-          <select
-            className="vx-shell-preferences__select"
-            value={locale}
-            onChange={(event) => onLocaleChange(event.target.value as Locale)}
-          >
-            {localeOptions.map((option) => (
-              <option key={option.locale} value={option.locale}>
-                {option.nativeName ?? option.label ?? option.locale}
-              </option>
-            ))}
-          </select>
-          <Icon
-            name="chevron-down"
-            className="vx-shell-preferences__select-icon"
-          />
-        </div>
+        <NativeSelect
+          className="h-control-md text-body-md md:text-body-sm"
+          value={locale}
+          onChange={(event) => onLocaleChange(event.target.value as Locale)}
+        >
+          {localeOptions.map((option) => (
+            <option key={option.locale} value={option.locale}>
+              {option.nativeName ?? option.label ?? option.locale}
+            </option>
+          ))}
+        </NativeSelect>
       </ShellPreferenceRow>
 
       <ShellPreferenceRow icon="sun" label={labels?.theme}>
-        <ShellSegmentedOptions
+        <SegmentedControl
+          size="sm"
           value={theme}
-          options={THEME_OPTIONS}
-          labels={{
-            system: labels?.themeOptions?.system ?? "跟随系统",
-            light: labels?.themeOptions?.light ?? "浅色",
-            dark: labels?.themeOptions?.dark ?? "深色",
-          }}
           onChange={onThemeChange}
+          items={THEME_OPTIONS.map((option) => ({
+            value: option,
+            label:
+              labels?.themeOptions?.[option] ??
+              { system: "跟随系统", light: "浅色", dark: "深色" }[option],
+          }))}
         />
       </ShellPreferenceRow>
 
       {showDensity ? (
         <ShellPreferenceRow icon="rows" label={labels?.density}>
-          <ShellSegmentedOptions
+          <SegmentedControl
+            size="sm"
             value={density}
-            options={DENSITY_OPTIONS}
-            labels={{
-              compact: labels?.densityOptions?.compact ?? "紧凑",
-              default: labels?.densityOptions?.default ?? "默认",
-              comfortable: labels?.densityOptions?.comfortable ?? "宽松",
-            }}
             onChange={(value) => onDensityChange?.(value)}
+            items={DENSITY_OPTIONS.map((option) => ({
+              value: option,
+              label:
+                labels?.densityOptions?.[option] ??
+                { compact: "紧凑", default: "默认", comfortable: "宽松" }[
+                  option
+                ],
+            }))}
           />
         </ShellPreferenceRow>
       ) : null}
 
       {showFontSize ? (
         <ShellPreferenceRow icon="settings" label={labels?.fontSize}>
-          <ShellSegmentedOptions
+          <SegmentedControl
+            size="sm"
             value={fontSize}
-            options={FONT_SIZE_OPTIONS}
-            labels={{
-              small: labels?.fontSizeOptions?.small ?? "小",
-              default: labels?.fontSizeOptions?.default ?? "默认",
-              large: labels?.fontSizeOptions?.large ?? "大",
-            }}
             onChange={(value) => onFontSizeChange?.(value)}
+            items={FONT_SIZE_OPTIONS.map((option) => ({
+              value: option,
+              label:
+                labels?.fontSizeOptions?.[option] ??
+                { small: "小", default: "默认", large: "大" }[option],
+            }))}
           />
         </ShellPreferenceRow>
       ) : null}
@@ -585,156 +599,145 @@ export function ShellUserMenu({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
-          type="button"
-          className={cn("vx-shell-user-trigger", triggerClassName)}
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label={openLabel}
           title={openLabel}
+          className={cn("relative rounded-full", triggerClassName)}
         >
           <ShellUserAvatar user={user} />
           {online ? (
             <span
-              className={cn("vx-shell-user-trigger__status", statusClassName)}
+              aria-hidden="true"
+              className={cn(
+                "absolute right-none bottom-none size-2xs rounded-full",
+                "bg-success ring-2 ring-background",
+                statusClassName,
+              )}
             />
           ) : null}
-        </button>
+        </Button>
       </PopoverTrigger>
 
       <PopoverContent
         align={align}
         sideOffset={sideOffset}
-        className={cn("vx-shell-user-menu", contentClassName)}
+        className={cn("flex w-media-3xl flex-col gap-sm", contentClassName)}
       >
-        <div className="vx-shell-user-menu__profile">
+        <div className="flex items-start gap-sm">
           <ShellUserAvatar user={user} size="lg" />
-          <div className="vx-shell-user-menu__identity">
-            <div className="vx-shell-user-menu__name-row">
-              <p className="vx-shell-user-menu__name">{user.displayName}</p>
+          <div className="flex min-w-0 flex-1 flex-col gap-2xs">
+            <div className="flex items-center justify-between gap-sm">
+              <p className="truncate text-label-lg text-foreground">
+                {user.displayName}
+              </p>
               {user.statusTag ? (
-                <span
-                  className={cn(
-                    "vx-shell-user-status-tag",
-                    user.statusTag.verified &&
-                      "vx-shell-user-status-tag--verified",
-                  )}
+                <StatusBadge
+                  tone={user.statusTag.verified ? "success" : "neutral"}
                 >
-                  {user.statusTag.verified ? (
-                    <Icon
-                      name="check"
-                      className="vx-shell-user-status-tag__icon"
-                    />
-                  ) : null}
+                  {user.statusTag.verified ? <Icon name="check" /> : null}
                   {user.statusTag.label}
-                </span>
+                </StatusBadge>
               ) : null}
             </div>
             {user.uniqueLine ? (
-              <p className="vx-shell-user-menu__line">{user.uniqueLine}</p>
+              <p className="truncate text-body-sm text-muted-foreground">
+                {user.uniqueLine}
+              </p>
             ) : null}
             {user.meta ? (
-              <p className="vx-shell-user-menu__meta">{user.meta}</p>
+              <p className="text-body-sm text-muted-foreground">{user.meta}</p>
             ) : null}
           </div>
         </div>
 
         {user.badges && user.badges.length > 0 ? (
-          <div className="vx-shell-user-menu__badges">
+          <div className="flex flex-wrap items-center gap-2xs">
             {user.badges.map((badge) => (
-              <span key={badge.key} className="vx-shell-user-badge">
+              <StatusBadge key={badge.key} tone="brand">
                 {badge.label}
-              </span>
+              </StatusBadge>
             ))}
           </div>
         ) : null}
 
         {portalReturn ? (
-          <>
-            <div className="vx-shell-user-menu__separator" />
-            <div className="vx-shell-user-menu__section vx-shell-user-menu__return">
-              <button
-                type="button"
-                className="vx-shell-user-menu__action vx-shell-user-menu__action--return"
+          <ShellUserMenuSection>
+            <div className="flex items-center gap-2xs">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-1 justify-start gap-sm"
                 onClick={() => {
                   setOpen(false);
                   portalReturn.onReturn();
                 }}
               >
-                <span className="vx-shell-user-menu__action-icon">
-                  <Icon name="arrow-left" size="sm" />
-                </span>
+                <Icon name="arrow-left" size="sm" />
                 <span>{portalReturn.label}</span>
-              </button>
+              </Button>
               {portalReturn.onDismiss ? (
-                <button
-                  type="button"
-                  className="vx-shell-user-menu__dismiss"
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
                   aria-label={portalReturn.dismissLabel ?? "关闭"}
                   onClick={portalReturn.onDismiss}
                 >
                   <Icon name="x" size="xs" />
-                </button>
+                </Button>
               ) : null}
             </div>
-          </>
+          </ShellUserMenuSection>
         ) : null}
 
         {links.length > 0 ? (
-          <>
-            <div className="vx-shell-user-menu__separator" />
-            <div className="vx-shell-user-menu__section">
-              {links.map((link) => (
+          <ShellUserMenuSection>
+            {links.map((link) => (
+              <Button
+                key={link.key}
+                asChild
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-sm"
+              >
                 <a
-                  key={link.key}
-                  className="vx-shell-user-menu__action"
                   href={link.href}
                   target={link.newTab ? "_blank" : undefined}
                   rel={link.newTab ? "noreferrer noopener" : undefined}
                   onClick={() => setOpen(false)}
                 >
-                  {link.icon ? (
-                    <span className="vx-shell-user-menu__action-icon">
-                      <Icon name={link.icon} size="sm" />
-                    </span>
-                  ) : null}
+                  {link.icon ? <Icon name={link.icon} size="sm" /> : null}
                   {link.label}
                 </a>
-              ))}
-            </div>
-          </>
+              </Button>
+            ))}
+          </ShellUserMenuSection>
         ) : null}
 
         {settings ? (
-          <>
-            <div className="vx-shell-user-menu__separator" />
-            <div className="vx-shell-user-menu__section">{settings}</div>
-          </>
+          <ShellUserMenuSection>{settings}</ShellUserMenuSection>
         ) : null}
 
         {actions.length > 0 ? (
-          <>
-            <div className="vx-shell-user-menu__separator" />
-            <div className="vx-shell-user-menu__section">
-              {actions.map((action) => (
-                <button
-                  key={action.key}
-                  type="button"
-                  className="vx-shell-user-menu__action"
-                  disabled={action.disabled}
-                  onClick={async () => {
-                    setOpen(false);
-                    await action.onClick();
-                  }}
-                >
-                  {action.icon ? (
-                    <span className="vx-shell-user-menu__action-icon">
-                      <Icon name={action.icon} size="sm" />
-                    </span>
-                  ) : null}
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          </>
+          <ShellUserMenuSection>
+            {actions.map((action) => (
+              <Button
+                key={action.key}
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-sm"
+                disabled={action.disabled}
+                onClick={async () => {
+                  setOpen(false);
+                  await action.onClick();
+                }}
+              >
+                {action.icon ? <Icon name={action.icon} size="sm" /> : null}
+                {action.label}
+              </Button>
+            ))}
+          </ShellUserMenuSection>
         ) : null}
       </PopoverContent>
     </Popover>
@@ -742,7 +745,7 @@ export function ShellUserMenu({
 }
 
 export function ShellLegalFooter({
-  copyright = "© 2026 vxture.ai. All rights reserved.",
+  copyright = "© 2026 Brand. All rights reserved.",
   links = DEFAULT_LEGAL_LINKS,
   legalLabel = "Legal links",
   className,
@@ -750,21 +753,52 @@ export function ShellLegalFooter({
   linksClassName,
 }: ShellLegalFooterProps) {
   return (
-    <footer className={cn("vx-shell-legal-footer", className)}>
-      <div className={cn("vx-shell-legal-footer__inner", innerClassName)}>
+    <footer
+      className={cn(
+        // 区块级分隔用实线发丝线（060 §1.2.1）。
+        "border-t border-primary/10 dark:border-primary/20",
+        "px-lg py-md text-body-sm text-muted-foreground",
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-page-xl flex-wrap items-center justify-between gap-sm",
+          innerClassName,
+        )}
+      >
         <span>{copyright}</span>
         <nav
-          className={cn("vx-shell-legal-footer__links", linksClassName)}
+          className={cn("flex flex-wrap items-center gap-md", linksClassName)}
           aria-label={legalLabel}
         >
           {links.map((link) => (
-            <a key={link.href} href={link.href}>
+            <a
+              key={link.href}
+              href={link.href}
+              className="transition-colors duration-fast hover:text-foreground hover:underline"
+            >
               {link.label}
             </a>
           ))}
         </nav>
       </div>
     </footer>
+  );
+}
+
+/** 用户菜单的分段：上缘一条虚线发丝线，段内纵排。 */
+function ShellUserMenuSection({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-2xs pt-sm",
+        HAIRLINE_FIELD,
+        HAIRLINE_FIELD_DARK,
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -781,24 +815,26 @@ function ShellUserAvatar({
     <Avatar
       key={user.avatarSrc ?? "__default__"}
       className={cn(
-        "vx-shell-user-avatar",
         "text-muted-foreground",
-        size === "lg" && "vx-shell-user-avatar--lg",
+        size === "md" && "size-icon-xl",
+        size === "lg" && "size-media-sm",
       )}
     >
       {user.avatarSrc ? (
         <AvatarImage
-          className="vx-shell-user-avatar__image"
           src={user.avatarSrc}
           alt={user.avatarAlt ?? user.displayName}
         />
       ) : null}
       <AvatarFallback
         delayMs={0}
-        className="vx-shell-user-avatar__fallback"
         aria-label={user.avatarAlt ?? user.displayName}
       >
-        <AvatarSilhouette />
+        {/* 显式档位：触发器套在 Button 里，inlineIcon 配方会把不带 size-*
+            的 svg 压到 16px，剪影必须自带尺寸类才不被截胖改瘦。 */}
+        <AvatarSilhouette
+          className={size === "lg" ? "size-icon-xl" : "size-icon-md"}
+        />
       </AvatarFallback>
     </Avatar>
   );
@@ -814,42 +850,15 @@ function ShellPreferenceRow({
   children: ReactNode;
 }) {
   return (
-    <div className="vx-shell-preferences__row">
+    <div className="flex items-center gap-sm">
       <span
-        className="vx-shell-preferences__icon"
+        className="flex size-icon-lg shrink-0 items-center justify-center text-muted-foreground"
         title={typeof label === "string" ? label : undefined}
         aria-hidden={label ? undefined : true}
       >
         <Icon name={icon} size="sm" />
       </span>
-      <div className="vx-shell-preferences__control">{children}</div>
-    </div>
-  );
-}
-
-function ShellSegmentedOptions<T extends string>({
-  value,
-  options,
-  labels,
-  onChange,
-}: {
-  value: T;
-  options: readonly T[];
-  labels: Record<T, ReactNode>;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div className="vx-shell-segmented" role="group">
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          className={`vx-shell-segmented__item${value === option ? " vx-shell-segmented__item--active" : ""}`}
-          onClick={() => onChange(option)}
-        >
-          {labels[option]}
-        </button>
-      ))}
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
 }

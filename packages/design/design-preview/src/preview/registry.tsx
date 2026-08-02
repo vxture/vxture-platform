@@ -183,7 +183,7 @@ import {
   ShellThemeToggle,
   ShellUserMenu,
 } from "@vxture/design-system";
-import { PendingNote, Row } from "./kit";
+import { Row } from "./kit";
 
 export type Provenance =
   | "shadcn"
@@ -1639,25 +1639,23 @@ export const ENTRIES: readonly Entry[] = [
       "输入区与提交键复用 Textarea / Button，不再自造——焦点环、禁用态、移动端 16px 防缩放都在那两件里。chip 用 Button 的 xs 档而非 Badge：它们可点可切换，是控件不是标签",
     render: () => <PromptInputDemo />,
   },
-  /* ── 待删（尚未重写，渲染无样式是预期结果）──────────────── */
+  /* ── 外壳与登录（伞包自持的两个组合族）───────────────────── */
   {
     name: "ShellChrome",
-    layer: "pending",
+    layer: "pattern",
     group: "外壳与登录",
-    tags: ["vxture", "pending"],
-    pending: true,
+    tags: ["vxture", "patterns"],
     deviation:
-      "856 行，website 的 Header 在用其中三件。整份仍挂 .vx-shell-* 遗留类名。八个导出件全部摆在这里，供判断有无值得并入 WorkbenchShell 的部分",
+      "批 O 重写：图标按钮复用 Button（ghost/icon-sm，焦点环与 aria-expanded 高亮在配方层），语言面板与用户菜单改走 Popover（外点/Escape/动效由 Radix 提供，替代手写监听），偏好面板的下拉与互斥选项复用 NativeSelect / SegmentedControl，认证标与徽章复用 StatusBadge；品牌标识走 §7 的 .vx-brand-* 基线，默认 label 为中性占位 Brand（真名不入仓）",
     render: () => <ShellChromeDemo />,
   },
   {
     name: "AuthLogin",
-    layer: "pending",
+    layer: "pattern",
     group: "外壳与登录",
-    tags: ["vxture", "pending"],
-    pending: true,
+    tags: ["vxture", "patterns"],
     deviation:
-      "1,742 行，accounts 有 6 个文件在用。整份仍挂 .vx-auth-* 遗留类名。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
+      "批 O 重写：字段复用 Input/Label/Checkbox（移动端 16px 防缩放、失效态在原子件里），tab 走 Radix Tabs，主按钮/三方登录复用 Button，分隔走 Separator + 发丝线；登录卡走 Card 的 veil 叠层（strong 档）无阴影；视觉面板底色改语义色 primary 渐变，NodeGraph 画布颜色从自身 computed color 读取，不再依赖已退役的 auth 专属 token。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
     render: () => <AuthLoginDemo />,
   },
 ];
@@ -1813,8 +1811,7 @@ function ShellChromeDemo() {
     "light",
   );
   return (
-    <div className="flex max-h-screen w-full flex-col gap-md overflow-auto">
-      <PendingNote />
+    <div className="flex w-full flex-col gap-md">
       <Row label="ShellBrand">
         <ShellBrand label="Vxture" />
       </Row>
@@ -1875,10 +1872,8 @@ function AuthLoginDemo() {
   const [agreed, setAgreed] = React.useState(false);
   return (
     <div className="flex w-full flex-col gap-md">
-      <PendingNote />
-      {/* 关进一个带自身滚动的框里。无样式的件会把装饰元素放大到几千像素——
-          AuthLogin 那把锁就把整页顶没了。框不掩盖坏，只是不让它波及别的条目。 */}
-      <div className="max-h-screen w-full overflow-auto rounded-lg border border-dashed border-border">
+      {/* 登录卡在窄容器里也要完整可见，给一个自适应外框即可。 */}
+      <div className="w-full">
         <AuthLoginTemplate
           title="欢迎回来"
           visual={{

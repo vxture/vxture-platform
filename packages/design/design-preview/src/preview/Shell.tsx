@@ -74,7 +74,10 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
         </div>
 
         <nav className="flex flex-col gap-2xs">
-          {SECTIONS.map((s) => {
+          {/* 临时组件分区随 pending 清零而隐藏；登记机制保留，再欠债时它自己回来。 */}
+          {SECTIONS.filter(
+            (s) => s.slug !== "pending" || entriesOf(s.slug).length > 0,
+          ).map((s) => {
             const here = s.slug === active;
             const open = here && !collapsed;
             const hasChildren = entriesOf(s.slug).length > 0;

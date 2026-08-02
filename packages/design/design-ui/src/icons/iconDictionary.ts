@@ -47,6 +47,9 @@ export const ICON_GROUPS = [
       "more-vertical",
       "edit",
       "key",
+      "lock", // 密码/机密字段
+      "eye", // 明文可见（密码可见性切换）
+      "eye-slash", // 明文隐藏（密码可见性切换）
       "trash", // 删除（原 delete 已合并）
       "plus", // 新增（原 add 已合并）
       "minus", // 减少；复选框半选态的指示符
