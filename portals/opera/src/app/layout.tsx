@@ -26,9 +26,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vxture Capability Console",
+  title: "Opera · Vxture 基础设施控制平面",
   description:
-    "OSS-side operator console hosting L1 provider admin modules (product_250 M-4).",
+    "平台技术资源、运行、计量、发布、可观测与安全管理。不承担商业运营职责。",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

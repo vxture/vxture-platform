@@ -21,8 +21,10 @@ import {
   ShellIconButton,
   ShellThemeToggle,
   ShellUserMenu,
+  ToastProvider,
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
   cn,
   useTheme,
@@ -124,89 +126,96 @@ export function OperaShell({ children }: { children: ReactNode }) {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <div className="flex h-dvh flex-col bg-background text-foreground">
-      <header
-        className={cn(
-          "flex h-header-md shrink-0 items-center justify-between gap-md border-b px-md",
-          HAIRLINE,
-        )}
-      >
-        <div className="flex min-w-0 items-center gap-sm">
-          <ShellIconButton
-            icon="sidebar"
-            label={collapsed ? "展开导航" : "收起导航"}
-            onClick={toggleNav}
-          />
-          <ShellBrand href="/" label="Opera" />
-          <span className="hidden text-body-sm text-muted-foreground md:inline">
-            基础设施控制平面
-          </span>
-        </div>
-        <div className="flex items-center gap-2xs">
-          <ShellThemeToggle
-            currentTheme={theme === "dark" ? "dark" : "light"}
-            onThemeChange={setTheme}
-          />
-          <ShellUserMenu
-            user={{
-              displayName: effectiveOperator.displayName,
-              uniqueLine: effectiveOperator.role || "operator",
-              ...(operator ? {} : { meta: "开发占位会话（无边缘网关）" }),
-            }}
-            actions={[
-              {
-                key: "sign-out",
-                label: "退出登录",
-                icon: "sign-out",
-                onClick: () => void signOut(),
-              },
-            ]}
-          />
-        </div>
-      </header>
+    /* Tooltip 与 Toast 都是**必须有 Provider 才能用**的：Radix 的 Tooltip.Root
+     * 在没有 Provider 时直接抛错（收起导航的图标提示会整页崩），useToast 同理。
+     * 挂在外壳上，全部页面共用一套延迟与一个 toast 队列。 */
+    <TooltipProvider delayDuration={300}>
+      <ToastProvider>
+        <div className="flex h-dvh flex-col bg-background text-foreground">
+          <header
+            className={cn(
+              "flex h-header-md shrink-0 items-center justify-between gap-md border-b px-md",
+              HAIRLINE,
+            )}
+          >
+            <div className="flex min-w-0 items-center gap-sm">
+              <ShellIconButton
+                icon="sidebar"
+                label={collapsed ? "展开导航" : "收起导航"}
+                onClick={toggleNav}
+              />
+              <ShellBrand href="/" label="Opera" />
+              <span className="hidden text-body-sm text-muted-foreground md:inline">
+                基础设施控制平面
+              </span>
+            </div>
+            <div className="flex items-center gap-2xs">
+              <ShellThemeToggle
+                currentTheme={theme === "dark" ? "dark" : "light"}
+                onThemeChange={setTheme}
+              />
+              <ShellUserMenu
+                user={{
+                  displayName: effectiveOperator.displayName,
+                  uniqueLine: effectiveOperator.role || "operator",
+                  ...(operator ? {} : { meta: "开发占位会话（无边缘网关）" }),
+                }}
+                actions={[
+                  {
+                    key: "sign-out",
+                    label: "退出登录",
+                    icon: "sign-out",
+                    onClick: () => void signOut(),
+                  },
+                ]}
+              />
+            </div>
+          </header>
 
-      <div className="flex min-h-0 flex-1">
-        <aside
-          className={cn(
-            "flex shrink-0 flex-col gap-lg overflow-y-auto border-r py-md",
-            HAIRLINE,
-            collapsed
-              ? "w-sidebar-collapsed px-2xs"
-              : "w-sidebar-expanded px-sm",
-            "transition-all duration-base ease-standard",
-          )}
-        >
-          {operaNavSections.map((section) => (
-            <nav
-              key={section.title}
-              aria-label={section.title}
-              className="flex flex-col gap-2xs"
-            >
-              {collapsed ? null : (
-                <p className="px-sm text-overline text-muted-foreground">
-                  {section.title}
-                </p>
+          <div className="flex min-h-0 flex-1">
+            <aside
+              className={cn(
+                "flex shrink-0 flex-col gap-lg overflow-y-auto border-r py-md",
+                HAIRLINE,
+                collapsed
+                  ? "w-sidebar-collapsed px-2xs"
+                  : "w-sidebar-expanded px-sm",
+                "transition-all duration-base ease-standard",
               )}
-              {section.items.map((item) => (
-                <NavItem
-                  key={item.href}
-                  href={item.href}
-                  label={item.label}
-                  icon={item.icon}
-                  collapsed={collapsed}
-                  active={isActive(item.href)}
-                />
+            >
+              {operaNavSections.map((section) => (
+                <nav
+                  key={section.title}
+                  aria-label={section.title}
+                  className="flex flex-col gap-2xs"
+                >
+                  {collapsed ? null : (
+                    <p className="px-sm text-overline text-muted-foreground">
+                      {section.title}
+                    </p>
+                  )}
+                  {section.items.map((item) => (
+                    <NavItem
+                      key={item.href}
+                      href={item.href}
+                      label={item.label}
+                      icon={item.icon}
+                      collapsed={collapsed}
+                      active={isActive(item.href)}
+                    />
+                  ))}
+                </nav>
               ))}
-            </nav>
-          ))}
-        </aside>
+            </aside>
 
-        <main className="min-w-0 flex-1 overflow-y-auto">
-          <div className="mx-auto flex max-w-content-wide-2xl flex-col p-xl">
-            {children}
+            <main className="min-w-0 flex-1 overflow-y-auto">
+              <div className="mx-auto flex max-w-content-wide-2xl flex-col p-xl">
+                {children}
+              </div>
+            </main>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </ToastProvider>
+    </TooltipProvider>
   );
 }
