@@ -16,11 +16,17 @@
  * 相对原实现：删 `className` / `headerClassName` / `cellClassName` 三个列级逃生口
  * （列的对齐由 `align` 表达，其余交给单元格内容）与 `getRowClassName`——按行改样式
  * 等于把行的视觉状态交回调用方，行选中与行禁用本件自己画。
+ *
+ * 透明模式（workplan §1 V5）：表格不套容器卡。它直接浮在页面底色上，结构由
+ * 三条线定义——顶边实线开区块，表头下实线，行间虚线。首末列内边距归零，
+ * 让表格文字与上下文的左右缘对齐（admin 的表格就是靠这个嵌进页面的）。
+ * 表头与数据行共用同一个 `align` 轴——admin 表头居中、行左对齐的轴冲突（X1）
+ * 在这里从结构上不可能发生。
  */
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
-import { interactive } from "../../styles/recipes";
+import { hairline, interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
 import { Checkbox } from "../ui/Checkbox";
 import { Skeleton } from "../ui/Skeleton";
@@ -66,6 +72,8 @@ export interface DataTableProps<TRow> {
   readonly selectedKeys?: readonly string[];
   readonly onSelectionChange?: (keys: readonly string[]) => void;
   readonly onRowClick?: (row: TRow, rowIndex: number) => void;
+  /** 表尾：分页、总数一类。渲染在虚线上边框之下，左右两端由调用方内容自摆。 */
+  readonly footer?: React.ReactNode;
   readonly className?: string;
 }
 
@@ -92,6 +100,7 @@ function DataTable<TRow>({
   selectedKeys,
   onSelectionChange,
   onRowClick,
+  footer,
   className,
 }: DataTableProps<TRow>) {
   const selectable = selectedKeys !== undefined;
@@ -116,18 +125,18 @@ function DataTable<TRow>({
   };
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl bg-card shadow-raised ring-1 ring-foreground/10",
-        className,
-      )}
-    >
+    <div className={cn("border-t", hairline.block, className)}>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-body-sm">
-          <thead className="border-b border-border text-muted-foreground">
+          <thead
+            className={cn("border-b", hairline.block, "text-muted-foreground")}
+          >
             <tr>
               {selectable ? (
-                <th scope="col" className="w-px px-md py-sm">
+                <th
+                  scope="col"
+                  className="w-px px-md py-sm first:pl-none last:pr-none"
+                >
                   <Checkbox
                     checked={allSelected || (someSelected && "indeterminate")}
                     onCheckedChange={toggleAll}
@@ -151,6 +160,7 @@ function DataTable<TRow>({
                     }
                     className={cn(
                       "whitespace-nowrap px-md py-sm text-label-sm",
+                      "first:pl-none last:pr-none",
                       ALIGN[align],
                     )}
                   >
@@ -189,12 +199,15 @@ function DataTable<TRow>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody>
             {loading ? (
               Array.from({ length: loadingRows }, (_, i) => (
                 <tr key={`skeleton-${i}`} aria-hidden="true">
                   {Array.from({ length: colSpan }, (_, c) => (
-                    <td key={c} className="px-md py-sm">
+                    <td
+                      key={c}
+                      className="px-md py-sm first:pl-none last:pr-none"
+                    >
                       <Skeleton className="h-control-xs w-full" />
                     </td>
                   ))}
@@ -227,7 +240,8 @@ function DataTable<TRow>({
                       onRowClick ? () => onRowClick(row, rowIndex) : undefined
                     }
                     className={cn(
-                      "border-b border-border last:border-b-0",
+                      "border-b last:border-b-0",
+                      hairline.field,
                       "transition-colors duration-fast ease-standard",
                       isSelected ? "bg-surface-selected" : "hover:bg-accent",
                       onRowClick && "cursor-pointer",
@@ -235,7 +249,7 @@ function DataTable<TRow>({
                   >
                     {selectable ? (
                       <td
-                        className="w-px px-md py-sm"
+                        className="w-px px-md py-sm first:pl-none last:pr-none"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Checkbox
@@ -250,6 +264,7 @@ function DataTable<TRow>({
                         key={column.id}
                         className={cn(
                           "px-md py-md align-middle text-foreground",
+                          "first:pl-none last:pr-none",
                           ALIGN[column.align ?? "left"],
                         )}
                       >
@@ -263,6 +278,16 @@ function DataTable<TRow>({
           </tbody>
         </table>
       </div>
+      {footer ? (
+        <div
+          className={cn(
+            "flex flex-wrap items-center justify-between gap-sm border-t py-md",
+            hairline.field,
+          )}
+        >
+          {footer}
+        </div>
+      ) : null}
     </div>
   );
 }

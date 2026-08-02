@@ -929,7 +929,7 @@ export const ENTRIES: readonly Entry[] = [
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
-      "三态一次定齐：加载出骨架行（撑住高度不让页面跳）、空态出 EmptyState、有数据出行。选择态受控于 selectedKeys，与 BulkActionBar 对接；表头半选走 indeterminate。删了三个列级 *ClassName 与 getRowClassName",
+      "三态一次定齐：加载出骨架行（撑住高度不让页面跳）、空态出 EmptyState、有数据出行。选择态受控于 selectedKeys，与 BulkActionBar 对接；表头半选走 indeterminate。透明模式：无容器卡，顶边实线/表头实线/行间虚线，首末列内边距归零与上下文对齐；footer 槽位承分页。行操作列标准 = align:right 列 + ActionMenu",
     render: () => <DataTableDemo />,
   },
   {
@@ -1406,6 +1406,14 @@ function DataTableDemo() {
         onSortChange={setSort}
         selectedKeys={selected}
         onSelectionChange={setSelected}
+        footer={
+          <>
+            <span className="text-body-sm text-muted-foreground">
+              共 {rows.length} 条记录
+            </span>
+            <Pagination page={1} pageCount={3} onPageChange={() => undefined} />
+          </>
+        }
         columns={[
           { id: "name", header: "名称", cell: (row) => row.name },
           { id: "owner", header: "归属", cell: (row) => row.owner },
