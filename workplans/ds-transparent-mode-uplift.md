@@ -74,10 +74,19 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
 - 引入：command/combobox（cmdk）、calendar/date-picker（react-day-picker）——控制台筛选/日期区间刚需
 - 缓：carousel / chart / resizable / input-otp / form(react-hook-form)——当前无消费场景，按需再引
 
-### 批 N — 预览面 + 全量验证
+### 批 N — 预览面 + 全量验证（已完成）
 
-- 预览背景切到透明模式底色；新组件全部入 registry（axes 齐全）
-- 守卫全绿 + 浏览器实测计算值
+- 预览外壳本身改为 V2 活演示（sidebar 透明零分隔）；axes 全量补齐（63 条目，派生优先）
+- 实测抓出并修复三个"生成≠正确"缺陷：border-t-medium 被 tw-merge 误分类挤掉（cn 补 border-width 组）、
+  **max-w-lg 命中同名 spacing 档致 Dialog 塌宽 24px**（新增 panel 宽度族 448/512/672 + 守卫拦裸容器档）、
+  Checkbox 16px 字形溢出 16px 盒（图标降 12）
+- 新增 T2：`--spacing-sidebar-{expanded,collapsed,rail}`（owner 拍板 256/64/48）、`--container-panel-{sm,md,lg}`
+
+### 批 O — 最后两件 pending 重写（进行中）
+
+- AuthLogin（1741 行 / 88 处遗留类）+ ShellChrome（855 行 / 59 处）：T2 + 配方重写，公开 API 冻结
+  （accounts 6 文件 / website Header 消费中），ShellBrand 默认 label 去真实域名
+- 完成判据：守卫 72 组件全绿、消费方 type-check 零新增错误、PENDING_COMPONENTS 清空
 
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 
