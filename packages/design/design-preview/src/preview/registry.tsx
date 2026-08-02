@@ -730,16 +730,25 @@ export const ENTRIES: readonly Entry[] = [
     group: "图案",
     tags: ["vxture", "patterns"],
     deviation:
-      "ViewHeader / SectionHeader(level 1–4) / Section / ViewLayout / SplitViewLayout 是一族，层级与间距节奏一次定齐",
+      "ViewHeader / SectionHeader(level 1–4) / Section / ViewLayout / SplitViewLayout 是一族，层级与间距节奏一次定齐；字级对齐 admin 密度（20/16/14），level 2 默认带虚线下边框",
+    axes: [
+      { name: "level", values: ["1", "2", "3", "4"] },
+      { name: "divider", values: ["default(level2)", "off"] },
+    ],
     render: () => (
       <ViewLayout className="w-full rounded-lg border border-dashed border-border p-lg">
-        <SectionHeader level={1} title="一级标题（h1 · heading-2）" />
+        <SectionHeader level={1} title="一级标题（h1 · title-xl 20px）" />
         <SectionHeader
           level={2}
           icon="database"
-          title="二级标题（h2 · heading-3）"
+          title="二级标题（h2 · title-md 16px · 虚线下边框）"
           description="板块标题区，可带板块级动作。"
           action={<Button variant="outline">板块动作</Button>}
+        />
+        <SectionHeader
+          level={2}
+          divider={false}
+          title="二级标题（divider=false）"
         />
         <Section
           title="Section · default"
@@ -750,7 +759,7 @@ export const ENTRIES: readonly Entry[] = [
         <Section
           tone="raised"
           level={3}
-          title="Section · raised（h3 · heading-4）"
+          title="Section · raised（h3 · title-sm）"
           description="描边 + 卡片底色，用于需要与周围明确切开的块。"
           action={<Button variant="destructive">危险操作</Button>}
         >
@@ -759,7 +768,7 @@ export const ENTRIES: readonly Entry[] = [
             muted——后者在色彩语义里已表示弱化。
           </p>
         </Section>
-        <SectionHeader level={4} title="四级标题（h4 · heading-5）" />
+        <SectionHeader level={4} title="四级标题（h4 · label-md）" />
       </ViewLayout>
     ),
   },

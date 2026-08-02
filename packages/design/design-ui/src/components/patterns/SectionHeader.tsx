@@ -6,10 +6,15 @@
  *
  * 层级由 `level` 给出，同时决定语义元素与排版角色，两者不会各说各话：
  *
- *   level 1 → <h1> + heading-2   一级
- *   level 2 → <h2> + heading-3   板块标题
- *   level 3 → <h3> + heading-4   板块内的分组
- *   level 4 → <h4> + heading-5   分组内的小节
+ *   level 1 → <h1> + title-xl (20px)   一级
+ *   level 2 → <h2> + title-md (16px)   板块标题，默认带虚线下边框
+ *   level 3 → <h3> + title-sm (14px)   板块内的分组
+ *   level 4 → <h4> + label-md (14px medium)   分组内的小节
+ *
+ * 字级对齐 admin 的密度（20/16/14，workplan §1 V6）：展示体 heading 族退出
+ * 工作界面的标题阶——它是营销页的字体，控制台里 30px 的板块标题只会吃掉内容。
+ * 板块标题（level 2）默认带虚线下边框，这是 admin 的板块开始记号（V4：虚线分
+ * 字段、实线开区块——标题属于"字段级"分隔，界的是标题与正文，不是区块与区块）。
  *
  * **四档全开，包括 level 1。** 本件的职责到"每一档长什么样"为止——排版角色、语义
  * 元素、两者的对应关系。放几个、放在哪属于信息结构，不在这里的题目里。
@@ -29,6 +34,7 @@
 import * as React from "react";
 import { Icon } from "../../icons";
 import type { IconName, IconSize } from "../../icons";
+import { hairline } from "../../styles/recipes";
 import { cn } from "../../utils/cn";
 
 export type SectionHeaderLevel = 1 | 2 | 3 | 4;
@@ -46,13 +52,16 @@ export interface SectionHeaderProps extends Omit<
   readonly icon?: IconName;
   readonly iconSize?: IconSize | number;
   readonly iconFallback?: IconName;
+  /** 虚线下边框。缺省时 level 2 有、其余没有——板块开始的记号只属于板块标题。 */
+  readonly divider?: boolean;
 }
 
+/* icon 档随层级走：一级 32 / 二级 24 / 以下 20，保持与字级同向的阶差。 */
 const BY_LEVEL = {
-  1: { tag: "h1", type: "text-heading-2" },
-  2: { tag: "h2", type: "text-title-lg" },
-  3: { tag: "h3", type: "text-title-md" },
-  4: { tag: "h4", type: "text-title-sm" },
+  1: { tag: "h1", type: "text-title-xl", iconSize: "xl" },
+  2: { tag: "h2", type: "text-title-md", iconSize: "lg" },
+  3: { tag: "h3", type: "text-title-sm", iconSize: "md" },
+  4: { tag: "h4", type: "text-label-md", iconSize: "md" },
 } as const;
 
 function SectionHeader({
@@ -62,32 +71,37 @@ function SectionHeader({
   description,
   action,
   icon,
-  iconSize = "md",
+  iconSize,
   iconFallback = "placeholder",
+  divider,
   ...props
 }: SectionHeaderProps) {
-  const { tag: Tag, type } = BY_LEVEL[level];
+  const { tag: Tag, type, iconSize: levelIconSize } = BY_LEVEL[level];
+  const withDivider = divider ?? level === 2;
 
   return (
     <div
-      className={cn("flex items-start justify-between gap-md", className)}
+      className={cn(
+        "flex items-start gap-lg",
+        withDivider && ["border-b pb-md", hairline.field],
+        className,
+      )}
       {...props}
     >
-      <div className="flex min-w-0 items-start gap-sm">
-        {icon ? (
-          <span
-            className="mt-2xs shrink-0 text-muted-foreground"
-            aria-hidden="true"
-          >
-            <Icon name={icon} size={iconSize} fallback={iconFallback} />
-          </span>
+      {icon ? (
+        <span className="mt-2xs shrink-0 text-primary-text" aria-hidden="true">
+          <Icon
+            name={icon}
+            size={iconSize ?? levelIconSize}
+            fallback={iconFallback}
+          />
+        </span>
+      ) : null}
+      <div className="flex min-w-0 flex-1 flex-col gap-2xs">
+        <Tag className={cn(type, "text-foreground")}>{title}</Tag>
+        {description ? (
+          <p className="text-body-sm text-muted-foreground">{description}</p>
         ) : null}
-        <div className="flex min-w-0 flex-col gap-2xs">
-          <Tag className={cn(type, "text-foreground")}>{title}</Tag>
-          {description ? (
-            <p className="text-body-sm text-muted-foreground">{description}</p>
-          ) : null}
-        </div>
       </div>
       {action ? (
         <div className="flex shrink-0 items-center gap-sm">{action}</div>
