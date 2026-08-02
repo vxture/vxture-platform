@@ -64,10 +64,8 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      {/* w-72 是裸值：T2 目前**没有侧栏宽度刻度**——container-* 是页面与正文宽度，
-          拿来当侧栏会宽到半屏。记在 workplans 未决表（sidebar-* / topbar-* 归属）。 */}
       {/* 透明模式 V2：侧栏与内容同底、零分隔——预览外壳自己就是这条规则的活演示。 */}
-      <aside className="sticky top-none hidden h-screen w-72 shrink-0 flex-col gap-lg overflow-y-auto p-lg lg:flex">
+      <aside className="sticky top-none hidden h-screen w-sidebar-expanded shrink-0 flex-col gap-lg overflow-y-auto p-lg lg:flex">
         <div className="flex flex-col gap-2xs">
           <span className="text-label-lg text-foreground">Design Preview</span>
           <span className="text-body-sm text-muted-foreground">

@@ -34,4 +34,9 @@
   --spacing-media-xl: calc(var(--vx-spacing) * 24);
   --spacing-media-2xl: calc(var(--vx-spacing) * 32);
   --spacing-media-3xl: calc(var(--vx-spacing) * 48);
+
+  /* sidebar */
+  --spacing-sidebar-expanded: calc(var(--vx-spacing) * 64);
+  --spacing-sidebar-collapsed: calc(var(--vx-spacing) * 16);
+  --spacing-sidebar-rail: calc(var(--vx-spacing) * 12);
 }

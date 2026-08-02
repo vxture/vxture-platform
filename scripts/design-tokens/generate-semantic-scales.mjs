@@ -42,6 +42,7 @@ import {
   OPACITIES,
   ICON_SIZES,
   MEDIA_SIZES,
+  SIDEBAR_WIDTHS,
   CONTENT_WIDTHS,
   SPACING_SCALE,
   SPACING_KINDS,
@@ -320,6 +321,7 @@ function buildSize() {
   for (const [kind, list] of [
     ["icon", ICON_SIZES],
     ["media", MEDIA_SIZES],
+    ["sidebar", SIDEBAR_WIDTHS],
   ]) {
     for (const [step, mult] of list) {
       rows.push([
