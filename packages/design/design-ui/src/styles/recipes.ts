@@ -81,8 +81,34 @@ export const iconInset = [
  */
 export const radiusClamp = "rounded-[min(var(--radius-md),8px)]";
 
-/** 叠层（弹层 / 对话框 / 抽屉）的公共外观：面板圆角、描边、投影一致。 */
-export const elevation = {
-  popover: "rounded-md border border-border bg-popover shadow-raised",
-  dialog: "rounded-xl border border-border bg-card shadow-dialog",
+/**
+ * 叠层面板的公共外观。
+ *
+ * 边缘用 `ring-1` 不用 `border`：ring 不占布局（换边框宽度不会让内容位移 1px），
+ * 且它叠在阴影**之上**而不是和阴影抢同一圈像素——border + shadow 并用时，
+ * 描边会在投影最浓的地方被压住，面板边缘看起来是断续的。
+ *
+ * 用 `foreground/10` 而非 `border-border`：叠层浮在不确定的底色上，需要一条
+ * 跟随明暗自动反相的边——实色描边在暗色下要么看不见要么过重。
+ * 这属于"描边用 alpha"那一条判据。
+ */
+export const panel = {
+  base: "bg-popover text-foreground ring-1 ring-foreground/10",
+  /** 悬浮小面板：下拉、气泡、选择器。 */
+  popover: "rounded-md shadow-overlay",
+  /** 模态面板：对话框。 */
+  dialog: "rounded-xl shadow-dialog",
 } as const;
+
+/**
+ * 进出场动效。**必须用 `data-[state=*]`**：上游 radix 模板写的是 `data-open:` /
+ * `data-closed:`，但 Radix 发的属性是 `data-state="open"`——那些类编译得出来、
+ * 永远匹配不上，结果是整个叠层族没有任何动效，且不报错。
+ */
+export const overlayMotion = [
+  "duration-fast ease-standard",
+  "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+  "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+  "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
+  "data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2",
+].join(" ");

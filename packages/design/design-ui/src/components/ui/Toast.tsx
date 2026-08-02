@@ -22,6 +22,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon, type IconName } from "../../icons";
 
 export type ToastTone = "success" | "error" | "warning" | "info" | "ai";
@@ -145,12 +146,11 @@ export function ToastProvider({
               aria-label="关闭通知"
               className={cn(
                 "inline-flex size-control-2xs shrink-0 items-center justify-center rounded-sm",
-                "text-muted-foreground transition-colors duration-fast ease-standard",
-                "hover:bg-accent hover:text-foreground",
-                "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                "text-muted-foreground hover:bg-accent hover:text-foreground",
+                interactive,
               )}
             >
-              <Icon name="x" size={14} />
+              <Icon name="x" size={16} />
             </button>
           </div>
         ))}

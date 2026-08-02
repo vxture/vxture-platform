@@ -15,8 +15,6 @@
 export const PENDING_RECIPES = [
   // 批 B｜表单控件
   // 批 C｜容器叠层
-  "Drawer.tsx",
-  "Toast.tsx",
   // 批 D｜导航状态
   "Badge.tsx",
   "SectionNav.tsx",

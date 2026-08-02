@@ -24,6 +24,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
 
 export interface DrawerProps {
@@ -69,6 +70,7 @@ export function Drawer({
         <DialogPrimitive.Overlay
           className={cn(
             "fixed inset-0 z-drawer bg-scrim",
+            "supports-backdrop-filter:backdrop-blur-xs",
             "data-[state=open]:animate-in data-[state=open]:fade-in",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out",
           )}
@@ -76,7 +78,9 @@ export function Drawer({
         <DialogPrimitive.Content
           style={widthValue ? { width: widthValue } : undefined}
           className={cn(
-            "fixed z-drawer flex h-full w-full flex-col border-border bg-background shadow-overlay",
+            // 抽屉贴着视口边缘，只有朝内的一侧需要边——故留 border 不改 ring，
+            // 由 SIDE_CLASS 决定是 border-l 还是 border-r。
+            "fixed z-drawer flex h-full w-full flex-col border-border bg-popover text-foreground shadow-dialog",
             "max-w-content-narrow-lg outline-none",
             "duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out",
             SIDE_CLASS[side],
@@ -99,9 +103,8 @@ export function Drawer({
               <DialogPrimitive.Close
                 className={cn(
                   "inline-flex size-control-md shrink-0 items-center justify-center rounded-md",
-                  "text-muted-foreground transition-colors duration-fast ease-standard",
-                  "hover:bg-accent hover:text-foreground",
-                  "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  interactive,
                 )}
                 aria-label="关闭"
               >

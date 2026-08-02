@@ -14,6 +14,7 @@ import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
+import { overlayMotion, panel } from "../../styles/recipes";
 
 export interface TooltipProps extends React.ComponentPropsWithoutRef<
   typeof TooltipPrimitive.Root
@@ -34,19 +35,18 @@ export interface TooltipProviderProps extends React.ComponentPropsWithoutRef<
  */
 const tooltipVariants = cva(
   cn(
-    "z-tooltip overflow-hidden rounded-md border px-md py-xs text-body-sm shadow-overlay",
-    "duration-fast ease-enter animate-in fade-in-0 zoom-in-95",
-    "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
-    "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-    "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+    "z-tooltip w-fit max-w-content-narrow-lg overflow-hidden rounded-md px-sm py-2xs text-body-sm",
+    overlayMotion,
   ),
   {
     variants: {
       variant: {
-        default: "border-border bg-popover text-foreground",
-        soft: "border-border bg-popover/90 text-muted-foreground backdrop-blur-md",
-        inverse:
-          "border-stroke-emphasis bg-surface-inverse text-content-on-inverse",
+        // 默认反相：提示是转瞬即逝的旁注，不是一块内容表面。反相把它和页面
+        // 明确分开，也省掉一圈描边。Material / Fluent / Carbon 同此。
+        default: "bg-surface-inverse text-content-on-inverse",
+        // 需要贴合页面表面时用（例如提示里还嵌了可读内容）。
+        surface: cn("shadow-overlay", panel.base, panel.popover),
+        soft: "bg-popover/90 text-muted-foreground shadow-overlay backdrop-blur-md",
       },
     },
     defaultVariants: { variant: "default" },

@@ -24,7 +24,10 @@ const Card = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "flex flex-col rounded-lg border border-border bg-card text-foreground shadow-flat",
+        // 卡片不是叠层：它躺在页面上，故用 card 底色而非 popover，
+        // 但边缘同样走 ring —— 页面上并排的卡片与浮起的面板边缘要一致。
+        "flex flex-col rounded-xl bg-card text-foreground",
+        "shadow-raised ring-1 ring-foreground/10",
         className,
       )}
       {...props}

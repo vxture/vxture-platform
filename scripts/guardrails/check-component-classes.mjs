@@ -160,6 +160,17 @@ const PENDING = new Set(PENDING_COMPONENTS);
 
 const discovered = [];
 for (const root of COMPONENT_ROOTS) discovered.push(...(await walk(root)));
+/**
+ * 配方层也要扫。
+ *
+ * 它不在 components/ 下，第一版因此漏检——`panel.base` 里写了个不存在的
+ * `text-popover-foreground`，被它引用的四个叠层组件全部逃过检查，
+ * 而组件自己写同样的类会立刻报错。**共享的东西比各写各的更需要检查**，
+ * 因为一处错会静默扩散到所有引用方。
+ */
+discovered.push(
+  path.join(ROOT, "packages/design/design-ui/src/styles/recipes.ts"),
+);
 const files = discovered.filter((f) => !PENDING.has(path.basename(f)));
 
 /**
@@ -219,6 +230,9 @@ for (const file of files) {
   const body = (await readFile(file, "utf8"))
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/\/\/.*$/gm, "");
+  // 配方层自己当然要写这些片段——它就是定义处。
+  if (base === "recipes.ts") continue;
+
   // 判据是"有没有 import 配方"，不是"文本里有没有这个串"。
   // 逐变体覆盖（destructive 换环色）是合法定制，按串匹配会把它误判成手写。
   const adopted = /from\s+"[^"]*styles\/recipes"/.test(body);
