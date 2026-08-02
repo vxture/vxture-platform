@@ -19,6 +19,7 @@
 
 export * from "./components/ui";
 export * from "./components/patterns";
+export * from "./components/templates";
 export * from "./components/layout";
 export * from "./components/ai";
 export * from "./icons";

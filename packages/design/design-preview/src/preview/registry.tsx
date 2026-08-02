@@ -116,8 +116,13 @@ import {
   Dialog,
   Drawer,
   BulkActionBar,
+  DashboardTemplate,
   DataTable,
+  DetailPageTemplate,
   DialogForm,
+  FormPageTemplate,
+  ListPageTemplate,
+  ResultPageTemplate,
   EmptyState,
   EntryCard,
   FilterBar,
@@ -240,7 +245,15 @@ export interface Entry {
  * 组件页内部的分组顺序。大类见 `./sections`——那一层决定进哪个页面，这一层只决定
  * 在页面里的先后。
  */
-export const GROUPS = ["表单", "展示", "导航", "浮层", "反馈", "图案"] as const;
+export const GROUPS = [
+  "表单",
+  "展示",
+  "导航",
+  "浮层",
+  "反馈",
+  "图案",
+  "模板",
+] as const;
 
 export const ENTRIES: readonly Entry[] = [
   /* ── 表单 ───────────────────────────────────────────────── */
@@ -1424,6 +1437,237 @@ export const ENTRIES: readonly Entry[] = [
     render: () => <DialogFormDemo />,
   },
 
+  /* ── 模板（页面级骨架，只定结构与区块占位）───────────────── */
+  {
+    name: "ListPageTemplate",
+    layer: "pattern",
+    group: "模板",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "只定结构：页头 / 筛选行 / 批量条 / 表格四槽自上而下，页头与列表区 gap-xl、列表区三段 gap-sm；样例数据为演示填充",
+    render: () => (
+      <ListPageTemplate
+        className="w-full rounded-lg border border-dashed border-border p-lg"
+        header={
+          <ViewHeader
+            icon="list"
+            title="对象列表"
+            description="header 槽放 ViewHeader，filters / bulkBar / table 各占一槽。"
+            action={<Button>新建</Button>}
+          />
+        }
+        filters={
+          <FilterBar actions={<Button variant="outline">导出</Button>}>
+            <Input className="w-56" placeholder="搜索记录…" />
+            <Select defaultValue="all">
+              <SelectTrigger className="w-40" aria-label="类型">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部类型</SelectItem>
+                <SelectItem value="a">类型甲</SelectItem>
+                <SelectItem value="b">类型乙</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterBar>
+        }
+        bulkBar={
+          <BulkActionBar
+            count={2}
+            onClear={() => undefined}
+            actions={[
+              { id: "export", label: "导出", icon: "arrow-down" },
+              { id: "delete", label: "删除", icon: "trash", danger: true },
+            ]}
+          />
+        }
+        table={<TemplateTableDemo />}
+      />
+    ),
+  },
+  {
+    name: "DetailPageTemplate",
+    layer: "pattern",
+    group: "模板",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "只定结构：页头 + 主列（Section 阶梯自组）+ 可选右栏摘要（max-w-panel-sm）；窄屏 aside 塌到主列之下——摘要是主体字段的快照，塌上会把主体挤出首屏；样例数据为演示填充",
+    render: () => (
+      <DetailPageTemplate
+        className="w-full rounded-lg border border-dashed border-border p-lg"
+        header={
+          <ViewHeader
+            icon="cube"
+            title="对象详情"
+            secondary={<StatusBadge tone="success">正常</StatusBadge>}
+            description="header 槽 + children（板块阶梯）+ aside 槽。"
+            action={<Button variant="outline">编辑</Button>}
+          />
+        }
+        aside={
+          <Section tone="raised" level={3} title="摘要">
+            <div className="flex flex-col gap-xs text-body-sm">
+              <div className="flex justify-between gap-sm">
+                <span className="text-muted-foreground">编号</span>
+                <span className="text-foreground">A-0001</span>
+              </div>
+              <div className="flex justify-between gap-sm">
+                <span className="text-muted-foreground">创建时间</span>
+                <span className="text-foreground">2026-08-01</span>
+              </div>
+              <div className="flex justify-between gap-sm">
+                <span className="text-muted-foreground">负责人</span>
+                <span className="text-foreground">示例成员</span>
+              </div>
+            </div>
+          </Section>
+        }
+      >
+        <Section title="基本信息" description="主列由 Section 阶梯自组。">
+          <p className="text-body-sm text-muted-foreground">
+            这里是对象的基本属性区。
+          </p>
+        </Section>
+        <Section title="变更历史">
+          <p className="text-body-sm text-muted-foreground">
+            这里是对象的历史记录区。
+          </p>
+        </Section>
+      </DetailPageTemplate>
+    ),
+  },
+  {
+    name: "FormPageTemplate",
+    layer: "pattern",
+    group: "模板",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "只定结构：表单区限宽 max-w-content-narrow-lg 保证行长可读，动作条虚线上边框（hairline.field），sticky 打开时粘底并垫回页面底色；样例数据为演示填充",
+    render: () => (
+      <FormPageTemplate
+        className="w-full rounded-lg border border-dashed border-border p-lg"
+        header={
+          <ViewHeader
+            icon="edit"
+            title="编辑对象"
+            description="header 槽 + 表单区 children（建议每组 Section）+ footer 动作条。"
+          />
+        }
+        footer={
+          <>
+            <Button variant="outline">取消</Button>
+            <Button>保存</Button>
+          </>
+        }
+      >
+        <Section title="基本信息">
+          <div className="flex flex-col gap-2xs">
+            <Label htmlFor="tpl-form-name">名称</Label>
+            <Input id="tpl-form-name" placeholder="示例名称" />
+          </div>
+          <div className="flex flex-col gap-2xs">
+            <Label htmlFor="tpl-form-note">备注</Label>
+            <Textarea id="tpl-form-note" rows={3} />
+          </div>
+        </Section>
+      </FormPageTemplate>
+    ),
+  },
+  {
+    name: "DashboardTemplate",
+    layer: "pattern",
+    group: "模板",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "只定结构与阅读顺序：指标区 → 入口区 → 其余板块；指标降列由 MetricGrid 自带，入口栅格由调用方声明；样例数据为演示填充",
+    render: () => (
+      <DashboardTemplate
+        className="w-full rounded-lg border border-dashed border-border p-lg"
+        header={
+          <ViewHeader
+            icon="squares-four"
+            title="工作台"
+            description="metrics 槽放 MetricGrid，entries 槽放入口卡栅格，其余板块走 children。"
+          />
+        }
+        metrics={
+          <MetricGrid
+            columns={3}
+            items={[
+              { id: "total", label: "对象总数", value: "1,284" },
+              {
+                id: "active",
+                label: "活跃记录",
+                value: "312",
+                tone: "success",
+              },
+              {
+                id: "pending",
+                label: "待处理",
+                value: "6",
+                tone: "warning",
+              },
+            ]}
+          />
+        }
+        entries={
+          <div className="grid gap-md sm:grid-cols-2">
+            <EntryCard
+              href="#dashboard-template-demo"
+              icon="cube"
+              title="对象管理"
+              meta="1,284 条记录"
+              description="查看与维护全部对象。"
+            />
+            <EntryCard
+              href="#dashboard-template-demo"
+              icon="users"
+              title="成员管理"
+              description="邀请成员、分配角色。"
+            />
+          </div>
+        }
+      >
+        <Section title="最近动态">
+          <p className="text-body-sm text-muted-foreground">
+            其余板块经 children 排在入口区之后。
+          </p>
+        </Section>
+      </DashboardTemplate>
+    ),
+  },
+  {
+    name: "ResultPageTemplate",
+    layer: "pattern",
+    group: "模板",
+    tags: ["vxture", "patterns"],
+    axes: [{ name: "tone", values: [...TONES] }],
+    deviation:
+      "只定结构：EmptyState 的整页形态，直接组合不重写；tone 走 tone.ts 六档，语义色只走顶缘色条；样例数据为演示填充",
+    render: () => (
+      <div className="grid w-full gap-md lg:grid-cols-2">
+        {TONES.map((tone) => (
+          <div
+            key={tone}
+            className="rounded-lg border border-dashed border-border"
+          >
+            <ResultPageTemplate
+              tone={tone}
+              title={`${tone} 语气的结果页`}
+              description="图标缺省随语气，动作区放返回 / 重试一类按钮。"
+              actions={
+                <>
+                  <Button variant="outline">返回</Button>
+                  <Button>继续</Button>
+                </>
+              }
+            />
+          </div>
+        ))}
+      </div>
+    ),
+  },
+
   {
     name: "Stack",
     layer: "atom",
@@ -2070,6 +2314,69 @@ function DataTableDemo() {
         ]}
       />
     </div>
+  );
+}
+
+/** 模板样例里的表格：中性假数据，只为把 table 槽填上。 */
+interface TemplateRow {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: string;
+  readonly updated: string;
+  readonly tone: (typeof TONES)[number];
+  readonly status: string;
+}
+
+const TEMPLATE_ROWS: readonly TemplateRow[] = [
+  {
+    id: "t1",
+    name: "对象甲",
+    kind: "类型甲",
+    updated: "2026-08-01",
+    tone: "success",
+    status: "正常",
+  },
+  {
+    id: "t2",
+    name: "对象乙",
+    kind: "类型乙",
+    updated: "2026-07-28",
+    tone: "warning",
+    status: "待处理",
+  },
+  {
+    id: "t3",
+    name: "对象丙",
+    kind: "类型甲",
+    updated: "2026-07-12",
+    tone: "neutral",
+    status: "已归档",
+  },
+];
+
+function TemplateTableDemo() {
+  return (
+    <DataTable<TemplateRow>
+      rows={TEMPLATE_ROWS}
+      rowKey={(row) => row.id}
+      columns={[
+        { id: "name", header: "名称", cell: (row) => row.name },
+        { id: "kind", header: "类型", cell: (row) => row.kind },
+        {
+          id: "updated",
+          header: "更新时间",
+          align: "right",
+          cell: (row) => row.updated,
+        },
+        {
+          id: "status",
+          header: "状态",
+          cell: (row) => (
+            <StatusBadge tone={row.tone}>{row.status}</StatusBadge>
+          ),
+        },
+      ]}
+    />
   );
 }
 
