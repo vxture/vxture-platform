@@ -85,7 +85,10 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
         <DialogPrimitive.Content
           ref={ref}
           className={cn(
-            "fixed left-[50%] top-[50%] z-modal grid w-full max-w-lg",
+            // ⚠ 不能写上游的 `max-w-lg`：本仓 spacing 命名空间有同名 `--spacing-lg`，
+            //   v4 宽度工具类优先吃 spacing 档——类名照常生成，对话框塌成 24px 宽。
+            //   浮层面板宽走 panel 族（md = 512px，即上游 max-w-lg 的意图值）。
+            "fixed left-[50%] top-[50%] z-modal grid w-full max-w-panel-md",
             "translate-x-[-50%] translate-y-[-50%] gap-lg p-xl outline-none",
             panel.base,
             panel.dialog,

@@ -44,6 +44,7 @@ import {
   MEDIA_SIZES,
   SIDEBAR_WIDTHS,
   CONTENT_WIDTHS,
+  PANEL_WIDTHS,
   SPACING_SCALE,
   SPACING_KINDS,
   assertElevationOrdered,
@@ -363,6 +364,10 @@ function buildLayout() {
       "content",
       why,
     ]);
+  }
+  /* 浮层面板宽：上游 container 刻度的三档字面量，理由见 semantic-policy。 */
+  for (const [name, value, why] of PANEL_WIDTHS) {
+    rows.push([`--container-panel-${name}`, value, "panel", why]);
   }
   return rows;
 }

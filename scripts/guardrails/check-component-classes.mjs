@@ -191,7 +191,15 @@ if (files.length === 0) {
   process.exit(1);
 }
 
+/**
+ * 生成了 ≠ 用对了：`max-w-lg` 在上游是 512px 容器宽，在本仓却命中同名的
+ * `--spacing-lg`——类名照常生成，Dialog 塌成 24px 宽（2026-08-02 实测事故）。
+ * 容器意图必须走 content / page 宽度族；这里把裸容器档的 max-w / min-w 一律拦下。
+ */
+const MISRESOLVED = /^(?:max|min)-w-(?:3xs|2xs|xs|sm|md|lg|xl|[2-7]xl)$/;
+
 const dead = [];
+const misresolved = [];
 let scanned = 0;
 for (const file of files) {
   const src = await readFile(file, "utf8");
@@ -205,8 +213,22 @@ for (const file of files) {
       for (const cls of missing) {
         dead.push({ file: path.relative(ROOT, file), line: i + 1, cls });
       }
+      for (const cls of m[1].split(/\s+/)) {
+        if (MISRESOLVED.test(cls.replace(/^.*:/, ""))) {
+          misresolved.push({ file: path.relative(ROOT, file), line: i + 1, cls });
+        }
+      }
     }
   });
+}
+
+if (misresolved.length > 0) {
+  console.error(
+    "裸容器档的宽度类会命中同名 spacing 档（生成但值错，如 max-w-lg → 24px）：\n",
+  );
+  for (const d of misresolved) console.error(`  ✗ ${d.file}:${d.line}  ${d.cls}`);
+  console.error("\n容器意图改用 max-w-content-* / max-w-page-* 宽度族。");
+  process.exit(1);
 }
 
 if (dead.length > 0) {

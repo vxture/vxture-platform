@@ -27,10 +27,12 @@ import {
 
 export type DialogFormSize = "sm" | "md" | "lg";
 
+/* 浮层面板宽走 panel 族（448 / 512 / 672）——裸 `max-w-md/lg` 会命中
+   同名 spacing 档（见 Dialog 的塌宽事故注释）。 */
 const BY_SIZE: Record<DialogFormSize, string> = {
-  sm: "max-w-md",
-  md: "max-w-lg",
-  lg: "max-w-2xl",
+  sm: "max-w-panel-sm",
+  md: "max-w-panel-md",
+  lg: "max-w-panel-lg",
 };
 
 export interface DialogFormProps extends Omit<

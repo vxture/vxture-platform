@@ -98,7 +98,8 @@ const AlertDialogContent = React.forwardRef<
       <AlertDialogPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed left-[50%] top-[50%] z-modal grid w-full max-w-lg",
+          // 同 Dialog：`max-w-lg` 会命中 --spacing-lg 而非面板宽，必须走 panel 族。
+          "fixed left-[50%] top-[50%] z-modal grid w-full max-w-panel-md",
           "translate-x-[-50%] translate-y-[-50%] gap-lg p-xl outline-none",
           panel.base,
           panel.dialog,

@@ -245,6 +245,21 @@ export const CONTENT_WIDTHS = [
 ];
 
 /**
+ * 浮层面板宽度：对话框、抽屉、command palette 这类模态面板的 max-width。
+ *
+ * 独立成族的理由是**没有族可指**：content 族是页面级行宽（1024 起步），
+ * media 族封顶 192——448–672 这一段是空的。上游 shadcn 的对话框写
+ * `max-w-lg`（512）取的是它的 container 刻度，而本仓 spacing 命名空间有
+ * 同名 `--spacing-lg`，裸档名会命中 24px 级别的间距值（2026-08-02 Dialog
+ * 塌宽事故）。取值即上游 container 的 md / lg / 2xl 三档。
+ */
+export const PANEL_WIDTHS = [
+  ["sm", "28rem", "紧凑对话框：确认框、单字段表单"],
+  ["md", "32rem", "默认对话框（= 上游 max-w-lg 的意图值）"],
+  ["lg", "42rem", "宽对话框：多列表单、预览面板"],
+];
+
+/**
  * ── 间距刻度（密度三档）──
  *
  * 三列是 `--vx-spacing` 的**倍数**（compact / default / comfortable），与 v4 的

@@ -50,14 +50,16 @@ export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
         <CheckboxPrimitive.Indicator
           className={cn("flex items-center justify-center text-current")}
         >
+          {/* 12（icon-xs）：方框 16px 含边框内容区只有 14px，16px 的字形
+              会溢出圆角糊成一团——图标必须比容器小一档。 */}
           <Icon
             name="check"
-            size={16}
+            size={12}
             className="group-data-[state=indeterminate]:hidden"
           />
           <Icon
             name="minus"
-            size={16}
+            size={12}
             className="hidden group-data-[state=indeterminate]:block"
           />
         </CheckboxPrimitive.Indicator>

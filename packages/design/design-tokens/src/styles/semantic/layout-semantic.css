@@ -33,4 +33,9 @@
   --container-content-base-xl: 80rem;  /* 应用内容：列表与详情 */
   --container-content-wide-2xl: 96rem;  /* 数据密集型面板 */
   --container-content-ultra-3xl: 120rem;  /* 2K / 4K 上限；再宽应改分栏而非加宽 */
+
+  /* panel */
+  --container-panel-sm: 28rem;  /* 紧凑对话框：确认框、单字段表单 */
+  --container-panel-md: 32rem;  /* 默认对话框（= 上游 max-w-lg 的意图值） */
+  --container-panel-lg: 42rem;  /* 宽对话框：多列表单、预览面板 */
 }

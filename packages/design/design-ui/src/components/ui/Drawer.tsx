@@ -81,7 +81,8 @@ export function Drawer({
             // 抽屉贴着视口边缘，只有朝内的一侧需要边——故留 border 不改 ring，
             // 由 SIDE_CLASS 决定是 border-l 还是 border-r。
             "fixed z-drawer flex h-full w-full flex-col border-border bg-popover text-foreground shadow-dialog",
-            "max-w-content-narrow-lg outline-none",
+            // 抽屉是浮层面板不是页面正文：content 族的 1024 会让它占掉大半屏。
+            "max-w-panel-lg outline-none",
             "duration-base ease-standard data-[state=open]:animate-in data-[state=closed]:animate-out",
             SIDE_CLASS[side],
             className,
