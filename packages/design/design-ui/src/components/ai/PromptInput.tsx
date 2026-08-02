@@ -8,12 +8,19 @@
  * @description
  *   提供 AI 专用输入、mention chip、工具栏和快捷提交能力。
  *
+ * 输入区与提交键复用 `Textarea` / `Button`，不自己再实现一遍：焦点环、禁用态、
+ * 移动端 16px 防缩放这些都在那两件里，重写一份必然漏掉其中几条。
+ *
+ * chip 用 `Button` 的 xs 档而不是 Badge：它们可点、可切换，是控件不是标签。
+ *
  * @author AI-Generated
  * @date 2026-05-16
  */
 
 import type { KeyboardEvent } from "react";
 import { cn } from "../../utils/cn";
+import { Button } from "../ui/Button";
+import { Textarea } from "../ui/Textarea";
 
 export interface PromptInputChip {
   readonly label: string;
@@ -57,47 +64,48 @@ export function PromptInput({
   return (
     <div
       className={cn(
-        "vx-prompt-input",
-        busy ? "vx-prompt-input--busy" : undefined,
+        "flex w-full flex-col gap-sm rounded-xl border border-border bg-card p-md",
+        // 生成中整块压暗并锁交互：此时再改 prompt 也不会影响已经在跑的那次。
+        busy && "pointer-events-none opacity-muted",
         className,
       )}
     >
       {chips && chips.length > 0 ? (
-        <div className="vx-prompt-input__toolbar">
+        <div className="flex flex-wrap items-center gap-xs">
           {chips.map((chip) => (
-            <button
+            <Button
               key={chip.label}
               type="button"
-              className={cn(
-                "vx-prompt-input__chip",
-                chip.active ? "vx-prompt-input__chip--active" : undefined,
-              )}
+              size="xs"
+              variant={chip.active ? "secondary" : "ghost"}
+              aria-pressed={chip.active ?? false}
               onClick={chip.onClick}
             >
               {chip.label}
-            </button>
+            </Button>
           ))}
         </div>
       ) : null}
-      <textarea
-        className="vx-prompt-input__textarea"
+
+      <Textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
         rows={3}
+        className="border-none bg-transparent shadow-none dark:bg-transparent"
       />
-      <div className="vx-prompt-input__footer">
-        <span className="vx-prompt-input__hint">{hint}</span>
-        <button
+
+      <div className="flex flex-wrap items-center justify-between gap-sm">
+        <span className="text-body-sm text-muted-foreground">{hint}</span>
+        <Button
           type="button"
-          className="vx-prompt-input__send"
           disabled={busy || !value.trim()}
           onClick={() => onSubmit?.(value)}
         >
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );

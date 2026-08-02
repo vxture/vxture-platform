@@ -20,14 +20,19 @@
 import * as React from "react";
 import {
   ActionMenu,
+  AIAssistantBubble,
   Avatar,
   BUTTON_SIZES,
   BUTTON_VARIANTS,
   Container,
   FullscreenProvider,
   FullscreenToggle,
+  GenerationStream,
   Grid,
+  ModelBadge,
+  PromptInput,
   Stack,
+  TokenCounter,
   AvatarFallback,
   Badge,
   Banner,
@@ -976,6 +981,127 @@ export const ENTRIES: readonly Entry[] = [
       </FullscreenProvider>
     ),
   },
+  {
+    name: "ModelBadge",
+    layer: "atom",
+    group: "AI",
+    tags: ["vxture", "component"],
+    axes: [
+      { name: "variant", values: ["default", "flagship"] },
+      { name: "status", values: ["active", "idle", "deploying", "error"] },
+    ],
+    deviation:
+      "部署状态映射到通用语气刻度，不自造一套色：deploying 是进行中不是异常，落 info。只染圆点与状态字——徽章成排出现时，四种满色底会糊成一片",
+    render: () => (
+      <div className="flex w-full flex-col gap-lg">
+        {(["default", "flagship"] as const).map((variant) => (
+          <Row key={variant} label={`variant=${variant}`}>
+            {(["active", "idle", "deploying", "error"] as const).map(
+              (status) => (
+                <ModelBadge
+                  key={status}
+                  modelId="gpt-5-turbo"
+                  variant={variant}
+                  status={status}
+                />
+              ),
+            )}
+          </Row>
+        ))}
+        <Row label="可点击 / 禁用">
+          <ModelBadge modelId="claude-opus-5" onClick={() => undefined} />
+          <ModelBadge
+            modelId="claude-opus-5"
+            onClick={() => undefined}
+            disabled
+          />
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "TokenCounter",
+    layer: "atom",
+    group: "AI",
+    tags: ["vxture", "component"],
+    axes: [{ name: "tone", values: ["success", "warning", "danger"] }],
+    deviation:
+      "三段阈值 60% / 85% 不变，但中段语气从只此一件才有的 spark 改成通用的 warning——同一严重度在 DS 内不能有两个名字",
+    render: () => (
+      <div className="flex w-full flex-col gap-lg">
+        <Row label="< 60%（success）" stack>
+          <TokenCounter used={18_400} total={100_000} />
+        </Row>
+        <Row label="60–85%（warning）" stack>
+          <TokenCounter used={72_500} total={100_000} />
+        </Row>
+        <Row label="≥ 85%（danger）" stack>
+          <TokenCounter used={93_100} total={100_000} />
+        </Row>
+        <Row label="showNumbers=false" stack>
+          <TokenCounter used={40_000} total={100_000} showNumbers={false} />
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "AIAssistantBubble",
+    layer: "pattern",
+    group: "AI",
+    tags: ["vxture", "patterns"],
+    axes: [{ name: "role", values: ["user", "ai"] }],
+    deviation:
+      "头像复用 Avatar。两侧用不同语气而非左右镜像同一种色——窄屏折行后单靠位置分不出谁在说话",
+    render: () => (
+      <div className="flex w-full flex-col gap-md">
+        <AIAssistantBubble role="user" timestamp="14:32">
+          帮我把这张表按订阅状态分组统计。
+        </AIAssistantBubble>
+        <AIAssistantBubble role="ai" timestamp="14:32">
+          已按状态分成四组：正常 128、试用 24、逾期 6、已停 3。
+        </AIAssistantBubble>
+      </div>
+    ),
+  },
+  {
+    name: "GenerationStream",
+    layer: "pattern",
+    group: "AI",
+    tags: ["vxture", "patterns"],
+    axes: [{ name: "streaming", values: ["true", "false"] }],
+    deviation:
+      "ai 语气只在生成态出现，完成后退回普通表面——继续亮着会让人以为还在跑。文本 whitespace-pre-wrap：模型输出的换行是内容的一部分",
+    render: () => (
+      <div className="flex w-full flex-col gap-lg">
+        <Row label="streaming" stack>
+          <GenerationStream
+            text="正在按订阅状态聚合……"
+            modelId="claude-opus-5"
+            tokensProduced={128}
+            tokensPerSecond={42}
+          />
+        </Row>
+        <Row label="complete" stack>
+          <GenerationStream
+            text={"已完成。\n正常 128 / 试用 24 / 逾期 6 / 已停 3。"}
+            streaming={false}
+            modelId="claude-opus-5"
+            tokensProduced={860}
+          />
+        </Row>
+      </div>
+    ),
+  },
+  {
+    name: "PromptInput",
+    layer: "pattern",
+    group: "AI",
+    tags: ["vxture", "patterns"],
+    axes: [{ name: "busy", values: ["false", "true"] }],
+    deviation:
+      "输入区与提交键复用 Textarea / Button，不再自造——焦点环、禁用态、移动端 16px 防缩放都在那两件里。chip 用 Button 的 xs 档而非 Badge：它们可点可切换，是控件不是标签",
+    render: () => <PromptInputDemo />,
+  },
   /* ── 待删（尚未重写，渲染无样式是预期结果）──────────────── */
   {
     name: "ShellChrome",
@@ -996,17 +1122,6 @@ export const ENTRIES: readonly Entry[] = [
     deviation:
       "1,742 行，accounts 有 6 个文件在用。整份仍挂 .vx-auth-* 遗留类名。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
     render: () => <AuthLoginDemo />,
-  },
-  {
-    name: "AIAssistantBubble",
-    layer: "pending",
-    group: "AI",
-    tags: ["vxture", "pending"],
-    pending: true,
-    covers: ["GenerationStream", "ModelBadge", "PromptInput", "TokenCounter"],
-    deviation:
-      "五件 AI 组件的去向是迁往 agent-studio（批 G），不在本轮视觉精修范围内。列在这里是为了它们别从册子上消失",
-    render: () => <PendingNote />,
   },
 ];
 
@@ -1551,6 +1666,36 @@ function MetricGridDemo() {
           />
         </Row>
       ))}
+    </div>
+  );
+}
+
+/** Prompt 输入需要受控值，单独成组件。 */
+function PromptInputDemo() {
+  const [value, setValue] = React.useState("按订阅状态分组统计租户");
+  const [busy, setBusy] = React.useState(false);
+  return (
+    <div className="flex w-full flex-col gap-lg">
+      <Row label="常态" stack>
+        <PromptInput
+          value={value}
+          onChange={setValue}
+          onSubmit={() => setBusy(true)}
+          chips={[
+            { label: "@租户", active: true },
+            { label: "@订阅" },
+            { label: "@工单" },
+          ]}
+        />
+      </Row>
+      <Row label="busy" stack>
+        <PromptInput value={value} onChange={setValue} busy />
+      </Row>
+      <Row label="—">
+        <Button size="sm" variant="outline" onClick={() => setBusy(!busy)}>
+          切换 busy（当前 {String(busy)}）
+        </Button>
+      </Row>
     </div>
   );
 }

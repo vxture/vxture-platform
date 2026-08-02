@@ -8,13 +8,8 @@
  */
 
 export const PENDING_COMPONENTS = [
-  // 零消费方，C3 直接删除
+  // 仍挂 .vx-* 遗留类名，去向待定（两件都有真实消费方：accounts 6 个文件用
+  // AuthLogin，website 的 Header 用 ShellChrome 的三件，不能直接删）
   "AuthLogin.tsx",
   "ShellChrome.tsx",
-  // 迁往 agent-studio
-  "AIAssistantBubble.tsx",
-  "GenerationStream.tsx",
-  "ModelBadge.tsx",
-  "PromptInput.tsx",
-  "TokenCounter.tsx",
 ];

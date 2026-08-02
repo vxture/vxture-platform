@@ -8,12 +8,17 @@
  * @description
  *   用于模型选择、部署状态和 AI Header，不作为通用 Badge 的替代。
  *
+ * 部署状态映射到语气刻度而非自造一套色：`deploying` 是进行中不是异常，落 info；
+ * `idle` 不是故障，落中性。DS 内同一语气在各处必须是同一个颜色。
+ *
  * @author AI-Generated
  * @date 2026-05-16
  */
 
 import type { KeyboardEvent } from "react";
 import { cn } from "../../utils/cn";
+import { interactive } from "../../styles/recipes";
+import type { Tone } from "../patterns/tone";
 
 export type ModelBadgeStatus = "active" | "idle" | "deploying" | "error";
 
@@ -33,6 +38,32 @@ const STATUS_LABEL: Record<ModelBadgeStatus, string> = {
   error: "ERROR",
 };
 
+const STATUS_TONE: Record<ModelBadgeStatus, Tone> = {
+  active: "success",
+  idle: "neutral",
+  deploying: "info",
+  error: "danger",
+};
+
+/** 只染圆点与状态字，不染整块——徽章成排出现时，四种满色底会糊成一片。 */
+const TONE_DOT: Record<Tone, string> = {
+  neutral: "bg-muted-foreground",
+  brand: "bg-primary",
+  info: "bg-info-border",
+  success: "bg-success-border",
+  warning: "bg-warning-border",
+  danger: "bg-destructive-border",
+};
+
+const TONE_TEXT: Record<Tone, string> = {
+  neutral: "text-muted-foreground",
+  brand: "text-primary-text",
+  info: "text-info-text",
+  success: "text-success-text",
+  warning: "text-warning-text",
+  danger: "text-destructive-text",
+};
+
 export function ModelBadge({
   modelId,
   variant = "default",
@@ -42,6 +73,7 @@ export function ModelBadge({
   className,
 }: ModelBadgeProps) {
   const isInteractive = !!onClick && !disabled;
+  const tone = STATUS_TONE[status];
 
   const handleKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
     if (!isInteractive) return;
@@ -61,11 +93,16 @@ export function ModelBadge({
   return (
     <span
       className={cn(
-        "vx-model-badge",
-        `vx-model-badge--${variant}`,
-        `vx-model-badge--${status}`,
-        isInteractive ? "vx-model-badge--interactive" : undefined,
-        disabled ? "vx-model-badge--disabled" : undefined,
+        "inline-flex h-control-2xs w-fit shrink-0 items-center gap-xs",
+        "rounded-4xl border border-border px-sm text-label-sm whitespace-nowrap",
+        // 旗舰款用 ai 语气托底：它说的是"这台是主力"，属身份不属状态，
+        // 所以染底；状态只染圆点和那三个字母。
+        variant === "flagship"
+          ? "border-ai-border bg-ai-muted"
+          : "bg-transparent",
+        interactive,
+        isInteractive && "cursor-pointer hover:bg-accent",
+        disabled && "pointer-events-none opacity-disabled",
         className,
       )}
       onClick={isInteractive ? onClick : undefined}
@@ -75,9 +112,14 @@ export function ModelBadge({
       tabIndex={isInteractive ? 0 : undefined}
       aria-disabled={disabled || undefined}
     >
-      <span className="vx-model-badge__dot" aria-hidden />
-      <span className="vx-model-badge__id">{modelId}</span>
-      <span className="vx-model-badge__status">{STATUS_LABEL[status]}</span>
+      <span
+        className={cn("size-2xs shrink-0 rounded-full", TONE_DOT[tone])}
+        aria-hidden
+      />
+      <span className="truncate text-foreground">{modelId}</span>
+      <span className={cn("font-mono", TONE_TEXT[tone])}>
+        {STATUS_LABEL[status]}
+      </span>
     </span>
   );
 }
