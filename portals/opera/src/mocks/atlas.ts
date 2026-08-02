@@ -363,6 +363,132 @@ export const meteringByProvider: MeteringRow[] = [
   },
 ];
 
+export const meteringByModel: MeteringRow[] = [
+  {
+    id: "mt-m1",
+    dimension: "gpt-5",
+    requests: "902,441",
+    inputTokens: "1.82B",
+    outputTokens: "604M",
+    avgTtftMs: 330,
+    rawCost: "$9,880",
+  },
+  {
+    id: "mt-m2",
+    dimension: "claude-opus",
+    requests: "611,207",
+    inputTokens: "1.31B",
+    outputTokens: "498M",
+    avgTtftMs: 290,
+    rawCost: "$8,204",
+  },
+  {
+    id: "mt-m3",
+    dimension: "deepseek-r1",
+    requests: "1,772,900",
+    inputTokens: "3.02B",
+    outputTokens: "1.21B",
+    avgTtftMs: 190,
+    rawCost: "$3,377",
+  },
+  {
+    id: "mt-m4",
+    dimension: "qwen-max",
+    requests: "655,320",
+    inputTokens: "1.11B",
+    outputTokens: "402M",
+    avgTtftMs: 170,
+    rawCost: "$1,911",
+  },
+  {
+    id: "mt-m5",
+    dimension: "text-embedding-4",
+    requests: "1,204,880",
+    inputTokens: "1.44B",
+    outputTokens: "0",
+    avgTtftMs: 40,
+    rawCost: "$412",
+  },
+];
+
+export const meteringByEndpoint: MeteringRow[] = [
+  {
+    id: "mt-e1",
+    dimension: "chat/default",
+    requests: "2,410,663",
+    inputTokens: "4.92B",
+    outputTokens: "1.88B",
+    avgTtftMs: 280,
+    rawCost: "$18,220",
+  },
+  {
+    id: "mt-e2",
+    dimension: "reasoning/default",
+    requests: "588,102",
+    inputTokens: "1.71B",
+    outputTokens: "902M",
+    avgTtftMs: 610,
+    rawCost: "$9,104",
+  },
+  {
+    id: "mt-e3",
+    dimension: "embedding/default",
+    requests: "1,204,880",
+    inputTokens: "1.44B",
+    outputTokens: "0",
+    avgTtftMs: 40,
+    rawCost: "$412",
+  },
+  {
+    id: "mt-e4",
+    dimension: "vision/default",
+    requests: "201,554",
+    inputTokens: "410M",
+    outputTokens: "98M",
+    avgTtftMs: 720,
+    rawCost: "$1,204",
+  },
+];
+
+export const meteringByTenant: MeteringRow[] = [
+  {
+    id: "mt-t1",
+    dimension: "Arda",
+    requests: "1,908,220",
+    inputTokens: "3.71B",
+    outputTokens: "1.42B",
+    avgTtftMs: 260,
+    rawCost: "$13,902",
+  },
+  {
+    id: "mt-t2",
+    dimension: "Runa",
+    requests: "1,402,551",
+    inputTokens: "2.88B",
+    outputTokens: "1.01B",
+    avgTtftMs: 310,
+    rawCost: "$10,118",
+  },
+  {
+    id: "mt-t3",
+    dimension: "Varda",
+    requests: "994,003",
+    inputTokens: "1.62B",
+    outputTokens: "588M",
+    avgTtftMs: 240,
+    rawCost: "$4,806",
+  },
+  {
+    id: "mt-t4",
+    dimension: "外部合作方",
+    requests: "540,110",
+    inputTokens: "600M",
+    outputTokens: "192M",
+    avgTtftMs: 350,
+    rawCost: "$1,054",
+  },
+];
+
 export interface LogRow {
   id: string;
   time: string;

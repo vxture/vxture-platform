@@ -1,17 +1,27 @@
 "use client";
 
 /* Metering — opera-atlas-design.md §10：事实计量（Request / Token / TTFT /
- * Raw Cost），聚合维度 Provider（Model / Endpoint / Tenant 维度排期）。 */
+ * Raw Cost），四个聚合维度 Provider / Model / Endpoint / Tenant。
+ *
+ * 维度切换用 SegmentedControl 而不是下拉：四档全部可见、一次点击到位，
+ * 而下拉要"点开—找—再点"。时间窗口反过来——它是次要旋钮，收进下拉。 */
 
+import { useState } from "react";
 import {
   DataTable,
-  FilterBar,
   MetricGrid,
   NativeSelect,
   Section,
+  SegmentedControl,
   ViewHeader,
 } from "@vxture/design-system";
-import { meteringByProvider } from "@/mocks/atlas";
+import {
+  meteringByEndpoint,
+  meteringByModel,
+  meteringByProvider,
+  meteringByTenant,
+  type MeteringRow,
+} from "@/mocks/atlas";
 
 const summary = [
   { id: "req", label: "总请求", value: "4.85M", icon: "gauge" },
@@ -26,7 +36,41 @@ const summary = [
   },
 ] as const;
 
+type Dimension = "provider" | "model" | "endpoint" | "tenant";
+
+/** 每档自带表头名与图标——第一列的含义随维度变，不能写死成"维度"。 */
+const DIMENSIONS: ReadonlyArray<{
+  value: Dimension;
+  label: string;
+  icon: "plugs-connected" | "brain" | "plug" | "building";
+  rows: MeteringRow[];
+}> = [
+  {
+    value: "provider",
+    label: "Provider",
+    icon: "plugs-connected",
+    rows: meteringByProvider,
+  },
+  { value: "model", label: "Model", icon: "brain", rows: meteringByModel },
+  {
+    value: "endpoint",
+    label: "Endpoint",
+    icon: "plug",
+    rows: meteringByEndpoint,
+  },
+  {
+    value: "tenant",
+    label: "Tenant",
+    icon: "building",
+    rows: meteringByTenant,
+  },
+];
+
 export default function MeteringPage() {
+  const [dimension, setDimension] = useState<Dimension>("provider");
+  const active =
+    DIMENSIONS.find((d) => d.value === dimension) ?? DIMENSIONS[0]!;
+
   return (
     <div className="flex flex-col gap-xl">
       <ViewHeader
@@ -38,26 +82,37 @@ export default function MeteringPage() {
       <MetricGrid items={[...summary]} columns={4} />
 
       <Section
-        title="按 Provider 聚合"
-        icon="plugs-connected"
+        title={`按 ${active.label} 聚合`}
+        icon={active.icon}
         level={2}
         action={
-          <FilterBar className="p-none">
-            <NativeSelect
-              wrapperClassName="w-fit"
-              defaultValue="30d"
-              aria-label="时间窗口"
-            >
-              <option value="24h">近 24 小时</option>
-              <option value="7d">近 7 天</option>
-              <option value="30d">近 30 天</option>
-            </NativeSelect>
-          </FilterBar>
+          <NativeSelect
+            wrapperClassName="w-fit"
+            defaultValue="30d"
+            aria-label="时间窗口"
+          >
+            <option value="24h">近 24 小时</option>
+            <option value="7d">近 7 天</option>
+            <option value="30d">近 30 天</option>
+          </NativeSelect>
         }
       >
+        <SegmentedControl
+          items={DIMENSIONS.map((d) => ({
+            value: d.value,
+            label: d.label,
+            icon: d.icon,
+          }))}
+          value={dimension}
+          onChange={setDimension}
+          ariaLabel="聚合维度"
+          /* 默认铺满容器宽，四档挤在左边、右侧拖一条空轨道。收成内容宽。 */
+          className="w-fit"
+        />
+
         <DataTable
           columns={[
-            { id: "dim", header: "Provider", cell: (r) => r.dimension },
+            { id: "dim", header: active.label, cell: (r) => r.dimension },
             {
               id: "req",
               header: "请求数",
@@ -89,7 +144,7 @@ export default function MeteringPage() {
               cell: (r) => r.rawCost,
             },
           ]}
-          rows={meteringByProvider}
+          rows={active.rows}
           rowKey={(r) => r.id}
         />
       </Section>
