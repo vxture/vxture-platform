@@ -21,7 +21,7 @@
 import * as React from "react";
 import type { IconName } from "../../icons";
 import { cn } from "../../utils/cn";
-import { EmptyState } from "../base/EmptyState";
+import { EmptyState } from "../base/display/EmptyState";
 import { toneEdgeClasses, toneIcons, type Tone } from "../tone";
 
 export interface ResultPageTemplateProps {

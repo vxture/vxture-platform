@@ -16,17 +16,17 @@
  * 2. **不带产品专名**（D16）。没有 console-* / admin-* / platform-* 前缀。
  */
 
-export * from "./ActionMenu";
-export * from "./BulkActionBar";
-export * from "./Combobox";
-export * from "./DataTable";
-export * from "./DatePicker";
-export * from "./DialogForm";
-export * from "./FilterBar";
-export * from "./EntryCard";
-export * from "./MetricCard";
-export * from "./MetricGrid";
-export * from "./Section";
-export * from "./SectionHeader";
-export * from "./SectionNav";
-export * from "./ViewHeader";
+export * from "./data/ActionMenu";
+export * from "./data/BulkActionBar";
+export * from "./form/Combobox";
+export * from "./data/DataTable";
+export * from "./form/DatePicker";
+export * from "./form/DialogForm";
+export * from "./data/FilterBar";
+export * from "./data/EntryCard";
+export * from "./data/MetricCard";
+export * from "./data/MetricGrid";
+export * from "./structure/Section";
+export * from "./structure/SectionHeader";
+export * from "./structure/SectionNav";
+export * from "./structure/ViewHeader";
