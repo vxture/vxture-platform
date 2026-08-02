@@ -16,7 +16,7 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { Icon, type IconName } from "../../icons";
-import { Button } from "../ui/Button";
+import { Button } from "../base/Button";
 
 export interface BulkActionBarItem {
   readonly id: string;

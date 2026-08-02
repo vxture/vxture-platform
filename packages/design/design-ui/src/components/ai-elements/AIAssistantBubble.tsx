@@ -20,7 +20,7 @@
 
 import type { ReactNode } from "react";
 import { cn } from "../../utils/cn";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/Avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../base/Avatar";
 
 export interface AIAssistantBubbleProps {
   readonly role: "user" | "ai";

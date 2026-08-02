@@ -21,8 +21,8 @@
 import * as React from "react";
 import type { IconName } from "../../icons";
 import { cn } from "../../utils/cn";
-import { EmptyState } from "../patterns/EmptyState";
-import { toneEdgeClasses, toneIcons, type Tone } from "../patterns/tone";
+import { EmptyState } from "../base/EmptyState";
+import { toneEdgeClasses, toneIcons, type Tone } from "../tone";
 
 export interface ResultPageTemplateProps {
   /** 结果的语气：成功 success、出错 danger、提示 info…… */

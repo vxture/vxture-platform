@@ -19,8 +19,8 @@
 
 import type { KeyboardEvent } from "react";
 import { cn } from "../../utils/cn";
-import { Button } from "../ui/Button";
-import { Textarea } from "../ui/Textarea";
+import { Button } from "../base/Button";
+import { Textarea } from "../base/Textarea";
 
 export interface PromptInputChip {
   readonly label: string;

@@ -17,7 +17,7 @@ import * as React from "react";
 import { cn } from "../../utils/cn";
 import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
-import { toneIcons, toneSurfaceClasses, type Tone } from "./tone";
+import { toneIcons, toneSurfaceClasses, type Tone } from "../tone";
 
 export type BannerTone = Tone;
 

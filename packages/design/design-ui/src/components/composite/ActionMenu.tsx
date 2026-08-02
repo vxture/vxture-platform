@@ -15,14 +15,14 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { Icon, type IconName } from "../../icons";
-import { Button } from "../ui/Button";
+import { Button } from "../base/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/DropdownMenu";
+} from "../base/DropdownMenu";
 
 export interface ActionMenuItem {
   readonly id: string;

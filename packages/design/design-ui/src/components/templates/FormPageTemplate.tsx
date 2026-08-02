@@ -25,7 +25,7 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { hairline } from "../../styles/recipes";
-import { ViewLayout } from "../patterns/ViewLayout";
+import { ViewLayout } from "../layout/ViewLayout";
 
 export interface FormPageTemplateProps {
   /** 页头槽，通常是 ViewHeader。 */

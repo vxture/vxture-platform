@@ -26,7 +26,7 @@ import * as React from "react";
 import { cn } from "../../utils/cn";
 import { interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
-import { toneIcons, type Tone } from "../patterns/tone";
+import { toneIcons, type Tone } from "../tone";
 
 export type ToastTone = Tone;
 

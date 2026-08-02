@@ -15,7 +15,7 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
-import { Button } from "../ui/Button";
+import { Button } from "../base/Button";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/Dialog";
+} from "../base/Dialog";
 
 export type DialogFormSize = "sm" | "md" | "lg";
 

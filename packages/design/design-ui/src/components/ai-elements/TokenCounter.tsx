@@ -17,7 +17,7 @@
  */
 
 import { cn } from "../../utils/cn";
-import type { Tone } from "../patterns/tone";
+import type { Tone } from "../tone";
 
 export interface TokenCounterProps {
   readonly used: number;

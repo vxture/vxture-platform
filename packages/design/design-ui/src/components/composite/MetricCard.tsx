@@ -16,9 +16,9 @@
 import * as React from "react";
 import { Icon, type IconName } from "../../icons";
 import { cn } from "../../utils/cn";
-import { Card, CardContent } from "../ui/Card";
-import { StatusBadge, type StatusBadgeTone } from "./StatusBadge";
-import { toneEdgeClasses } from "./tone";
+import { Card, CardContent } from "../base/Card";
+import { StatusBadge, type StatusBadgeTone } from "../base/StatusBadge";
+import { toneEdgeClasses } from "../tone";
 
 export interface MetricCardProps {
   readonly label: React.ReactNode;

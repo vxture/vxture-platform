@@ -18,7 +18,7 @@
 import type { KeyboardEvent } from "react";
 import { cn } from "../../utils/cn";
 import { interactive } from "../../styles/recipes";
-import type { Tone } from "../patterns/tone";
+import type { Tone } from "../tone";
 
 export type ModelBadgeStatus = "active" | "idle" | "deploying" | "error";
 

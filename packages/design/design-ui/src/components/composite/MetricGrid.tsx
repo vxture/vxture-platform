@@ -15,7 +15,7 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { MetricCard } from "./MetricCard";
-import type { StatusBadgeTone } from "./StatusBadge";
+import type { StatusBadgeTone } from "../base/StatusBadge";
 import type { IconName } from "../../icons";
 
 export type MetricGridColumns = 2 | 3 | 4 | 5 | 6;

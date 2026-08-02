@@ -28,9 +28,9 @@ import * as React from "react";
 import { cn } from "../../utils/cn";
 import { hairline, interactive } from "../../styles/recipes";
 import { Icon } from "../../icons";
-import { Checkbox } from "../ui/Checkbox";
-import { Skeleton } from "../ui/Skeleton";
-import { EmptyState } from "./EmptyState";
+import { Checkbox } from "../base/Checkbox";
+import { Skeleton } from "../base/Skeleton";
+import { EmptyState } from "../base/EmptyState";
 
 export type DataTableAlign = "left" | "center" | "right";
 

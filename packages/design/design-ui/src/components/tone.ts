@@ -1,18 +1,18 @@
 /**
- * tone.ts - 语气刻度，图案层共用。
+ * tone.ts - 语气刻度，base / composite / ai-elements 跨层共用。
  * @package @vxture/design-ui
  * @layer Presentation
- * @category Components - Pattern
+ * @category Components
  *
  * 六档语气只表达**严重度**，不表达业务状态。这里没有 `overdue` / `suspended`
  * 之类的值——把"订阅逾期"映射成 `warning` 是产品的判断，不同产品对同一状态的严重度
  * 本就可以不同；DS 一旦收下这个映射就等于把业务语义焊了进来。
  *
  * 单独成文件而不是挂在某一件上：`StatusBadge` 与 `Banner` 说的是同一件事，同一个
- * 语气在两处有两个名字迟早对不上。新的图案要表达语气，一律引这里。
+ * 语气在两处有两个名字迟早对不上。新的组件要表达语气，一律引这里。
  */
 
-import type { IconName } from "../../icons";
+import type { IconName } from "../icons";
 
 /**
  * 六档语气的**运行时数组**，类型由它推导。预览面、图案件要遍历全部档位时引这里，

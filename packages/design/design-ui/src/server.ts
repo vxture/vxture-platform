@@ -22,15 +22,15 @@
 // server graph and can crash server render. The bare "@vxture/design-ui"
 // entry (client.ts) stays the home for all interactive components.
 // ---------------------------------------------------------------------------
-export * from "./components/ui/Badge";
-export * from "./components/patterns/StatusBadge";
-export * from "./components/ui/Card";
-export * from "./components/patterns/MetricCard";
-export * from "./components/patterns/MetricGrid";
-export * from "./components/patterns/EmptyState";
-export * from "./components/patterns/Banner";
-export * from "./components/patterns/Section";
-export * from "./components/patterns/ViewLayout";
+export * from "./components/base/Badge";
+export * from "./components/base/StatusBadge";
+export * from "./components/base/Card";
+export * from "./components/composite/MetricCard";
+export * from "./components/composite/MetricGrid";
+export * from "./components/base/EmptyState";
+export * from "./components/base/Banner";
+export * from "./components/composite/Section";
+export * from "./components/layout/ViewLayout";
 export * from "./components/layout/container";
 export * from "./components/layout/stack";
 export * from "./components/layout/grid";

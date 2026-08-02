@@ -14,8 +14,8 @@
 
 import * as React from "react";
 import { cn } from "../../utils/cn";
-import { Badge, type BadgeProps } from "../ui/Badge";
-import { toneSurfaceClasses, type Tone } from "./tone";
+import { Badge, type BadgeProps } from "./Badge";
+import { toneSurfaceClasses, type Tone } from "../tone";
 
 export type StatusBadgeTone = Tone;
 

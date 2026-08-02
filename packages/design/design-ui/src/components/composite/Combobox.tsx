@@ -17,8 +17,8 @@
 import * as React from "react";
 import { cn } from "../../utils/cn";
 import { Icon } from "../../icons";
-import { Button } from "../ui/Button";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
+import { Button } from "../base/Button";
+import { Popover, PopoverContent, PopoverTrigger } from "../base/Popover";
 import {
   Command,
   CommandEmpty,
@@ -26,7 +26,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/Command";
+} from "../base/Command";
 
 export interface ComboboxItem {
   readonly value: string;

@@ -10,7 +10,7 @@
  */
 
 import { useRef } from "react";
-import { Button } from "../../ui/Button";
+import { Button } from "../../base/Button";
 import { Icon } from "../../../icons/Icon";
 import { FullscreenToggleProps } from "../../../types/fullscreen";
 import { useFullscreenContext } from "./Provider";

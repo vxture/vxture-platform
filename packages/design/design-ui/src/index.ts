@@ -17,11 +17,12 @@
  * 由 lint:boundaries 硬门守。反过来才对：shell 与 auth 消费 ui。
  */
 
-export * from "./components/ui";
-export * from "./components/patterns";
+export * from "./components/base";
+export * from "./components/composite";
 export * from "./components/templates";
 export * from "./components/layout";
-export * from "./components/ai";
+export * from "./components/tone";
+export * from "./components/ai-elements";
 export * from "./icons";
 export * from "./hooks";
 export * from "./utils";

@@ -18,7 +18,7 @@
  */
 
 import * as React from "react";
-import { ViewLayout } from "../patterns/ViewLayout";
+import { ViewLayout } from "../layout/ViewLayout";
 
 export interface DetailPageTemplateProps {
   /** 页头槽，通常是 ViewHeader。 */

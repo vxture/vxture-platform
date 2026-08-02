@@ -172,7 +172,7 @@ Foundation 层统一维护 spacing、radius、shadow、motion 和 animation keyf
 
 ```tsx
 // 禁止：内部路径
-import { Button } from "@vxture/design-system/src/components/ui/button";
+import { Button } from "@vxture/design-ui/src/components/base/Button";
 
 // 禁止：应用直接使用底层图标库
 import { User } from "@phosphor-icons/react";
