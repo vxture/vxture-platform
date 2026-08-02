@@ -11,6 +11,7 @@
  */
 
 import { iconRegistry } from "./iconRegistry";
+import { cn } from "../utils/cn";
 import type { IconProps, IconSize } from "./icon.types";
 
 // ============================================================================
@@ -91,7 +92,10 @@ export const Icon = ({
     <Component
       weight={weight}
       size={resolvedSize}
-      className={`inline-flex shrink-0 ${className}`}
+      // cn 而非模板串拼接：`hidden` 与基类 `inline-flex` 同属 display 组，
+      // 字符串拼接时两个都留下、由生成 CSS 的源顺序裁决——Checkbox 的 ✓ 与 −
+      // 因此同时显形（调用方写了 hidden 却不生效）。合并必须走 tailwind-merge。
+      className={cn("inline-flex shrink-0", className)}
       aria-hidden
       {...(color !== undefined ? { color } : {})}
       {...rest}

@@ -343,6 +343,10 @@ export const ENTRIES: readonly Entry[] = [
           <Label htmlFor="r-cb2">未选中</Label>
         </span>
         <span className="flex items-center gap-xs">
+          <Checkbox id="r-cb4" checked="indeterminate" />
+          <Label htmlFor="r-cb4">半选</Label>
+        </span>
+        <span className="flex items-center gap-xs">
           <Checkbox id="r-cb3" disabled defaultChecked />
           <Label htmlFor="r-cb3">禁用</Label>
         </span>
