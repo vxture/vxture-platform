@@ -409,7 +409,7 @@ function Swatch({
       <span className="truncate text-label-sm text-foreground" title={label}>
         {label}
       </span>
-      <code className="truncate text-body-xs text-muted-foreground">
+      <code className="truncate text-body-sm text-muted-foreground">
         {toHex(value)}
       </code>
     </div>
@@ -485,7 +485,7 @@ export function SemanticColors() {
           <div className="flex items-baseline gap-sm border-b border-border pb-xs">
             <span className="text-label-lg text-foreground">{g.label}</span>
             <span className="text-body-sm text-muted-foreground">{g.note}</span>
-            <span className="text-body-xs text-muted-foreground">
+            <span className="text-body-sm text-muted-foreground">
               {g.families.length}
             </span>
           </div>
@@ -515,8 +515,8 @@ function FamilyPanel({
         <span className="text-label-md text-foreground">
           {FAMILY_LABEL[family] ?? family}
         </span>
-        <code className="text-body-xs text-muted-foreground">{family}</code>
-        <span className="text-body-xs text-muted-foreground">
+        <code className="text-body-sm text-muted-foreground">{family}</code>
+        <span className="text-body-sm text-muted-foreground">
           {items.length}
         </span>
       </div>
@@ -767,7 +767,7 @@ export function PrimitiveRamps() {
           <div className="flex items-baseline gap-sm border-b border-border pb-xs">
             <span className="text-label-lg text-foreground">{g.label}</span>
             <span className="text-body-sm text-muted-foreground">{g.note}</span>
-            <span className="text-body-xs text-muted-foreground">
+            <span className="text-body-sm text-muted-foreground">
               {g.items.length}
             </span>
           </div>
@@ -777,11 +777,11 @@ export function PrimitiveRamps() {
                 <span className="text-label-md text-foreground">
                   {ramp.name}
                 </span>
-                <span className="text-body-xs text-muted-foreground">
+                <span className="text-body-sm text-muted-foreground">
                   {ramp.steps.length} 阶
                 </span>
                 {ramp.consumers.length > 0 ? (
-                  <span className="text-body-xs text-muted-foreground">
+                  <span className="text-body-sm text-muted-foreground">
                     → {ramp.consumers.join(" / ")}
                   </span>
                 ) : null}
@@ -822,7 +822,7 @@ export function PrimitiveRamps() {
             <div className="flex flex-col gap-sm">
               <div className="flex items-baseline gap-sm">
                 <span className="text-label-md text-foreground">基础色</span>
-                <span className="text-body-xs text-muted-foreground">
+                <span className="text-body-sm text-muted-foreground">
                   无色阶，纯黑纯白本身就是一档
                 </span>
               </div>
@@ -875,7 +875,7 @@ export function IconGallery() {
           {ICON_SIZES.map((size) => (
             <span key={size} className="flex flex-col items-center gap-2xs">
               <Icon name="sparkles" size={size} />
-              <span className="text-body-xs text-muted-foreground">{size}</span>
+              <span className="text-body-sm text-muted-foreground">{size}</span>
             </span>
           ))}
         </div>
@@ -901,7 +901,7 @@ export function IconGallery() {
           <div key={g.label} className="flex flex-col gap-md">
             <div className="flex items-baseline gap-sm border-b border-border pb-xs">
               <span className="text-label-lg text-foreground">{g.label}</span>
-              <span className="text-body-xs text-muted-foreground">
+              <span className="text-body-sm text-muted-foreground">
                 {g.icons.length}
               </span>
             </div>
@@ -972,7 +972,7 @@ const ROLE_FAMILIES = [
 ];
 
 /** 族内按大小降序。一份清单同时覆盖 heading-1..5 与 display-xl..xs 两种命名。 */
-const ROLE_STEPS = ["1", "2", "3", "4", "5", "xl", "lg", "md", "sm", "xs"];
+const ROLE_STEPS = ["1", "2", "3", "xl", "lg", "md", "sm"];
 
 function roleRank(role: string): number {
   const i = ROLE_FAMILIES.findIndex((f) => role.startsWith(f));
@@ -1079,7 +1079,7 @@ export function TypographyScale() {
                   {note}
                 </span>
               ) : null}
-              <span className="text-body-xs text-muted-foreground">
+              <span className="text-body-sm text-muted-foreground">
                 {mine.length}
               </span>
             </div>
@@ -1090,7 +1090,7 @@ export function TypographyScale() {
                     <span className="text-label-sm text-foreground">
                       {r.role}
                     </span>
-                    <code className="text-body-xs text-muted-foreground">
+                    <code className="text-body-sm text-muted-foreground">
                       {r.size} / {r.lineHeight} / {r.letterSpacing} / {r.weight}
                     </code>
                   </div>

@@ -20,7 +20,7 @@
 
 /** T1 字号阶梯，字号三档沿此表平移。 */
 export const TEXT_LADDER = [
-  "2xs", "xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl",
+  "xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl", "6xl",
   "7xl", "8xl", "9xl",
 ];
 
@@ -82,22 +82,20 @@ export const CJK_LEADING_ADD = 0.15;
  *             设置，不该把这类文字推到读不了。
  */
 export const TYPE_ROLES = [
-  /* 顶档留一格余量（默认 8xl，大号档用掉 9xl），五档才都跟随字号轴。曾经 display-xl
-     压在 6xl 这个当时的末档上并靠 noGrow 止步，结果大号档下它与 display-lg 撞成同一
-     个 60px——顶上两档变一档。 */
-  ["display-xl", "brand", "bold", "8xl"],
-  ["display-lg", "brand", "bold", "7xl"],
-  ["display-md", "brand", "bold", "6xl"],
-  ["display-sm", "brand", "bold", "5xl"],
-  ["display-xs", "brand", "bold", "4xl"],
+  /* 顶档留一格余量（默认 6xl，大号档用掉 7xl），三档才都跟随字号轴。曾经 display 的
+     顶档压在当时的末档上并靠 noGrow 止步，结果大号档下顶上两档撞成同一个字号。 */
+  ["display-lg", "brand", "bold", "6xl"],
+  ["display-md", "brand", "bold", "5xl"],
+  ["display-sm", "brand", "bold", "4xl"],
 
-  /* heading 与 title 是两族不是一族的大小档。原先五档 heading 在 2→3 之间同时换了
-     字号与字体（brand 24 → sans 16），一条坡从中间断开而名字上看不出来。Material 的
-     Headline / Title、Fluent 的 Title / Subtitle 都是分开命名的，断点该有名字。 */
+  /* heading 与 title 是两族不是一族的大小档。原先五档 heading 在中间同时换了字号与
+     字体（brand → sans），一条坡从中间断开而名字上看不出来。Material 的 Headline /
+     Title、Fluent 的 Title / Subtitle 都是分开命名的，断点该有名字。 */
   ["heading-1", "brand", "semibold", "3xl"],
   ["heading-2", "brand", "semibold", "2xl"],
+  ["heading-3", "brand", "semibold", "xl"],
 
-  ["title-1", "sans", "semibold", "xl"],
+  ["title-1", "sans", "semibold", "lg"],
   ["title-2", "sans", "semibold", "base"],
   ["title-3", "sans", "semibold", "sm"],
 
@@ -105,13 +103,11 @@ export const TYPE_ROLES = [
   ["body-lg", "sans", "normal", "base"],
   ["body-md", "sans", "normal", "sm"],
   ["body-sm", "sans", "normal", "xs"],
-  ["body-xs", "sans", "normal", "2xs"],
 
   ["label-xl", "sans", "medium", "lg"],
   ["label-lg", "sans", "medium", "base"],
   ["label-md", "sans", "medium", "sm"],
   ["label-sm", "sans", "medium", "xs"],
-  ["label-xs", "sans", "medium", "2xs"],
 
   ["code-md", "mono", "normal", "sm"],
   ["code-sm", "mono", "normal", "xs", "noShrink"],

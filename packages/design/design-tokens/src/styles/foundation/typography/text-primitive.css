@@ -41,8 +41,4 @@
   --vx-text-8xl--line-height: 1;
   --vx-text-9xl: 8rem;
   --vx-text-9xl--line-height: 1;
-
-  /* DS 扩展（Tailwind 无此挡位）。 */
-  --vx-text-2xs: 0.625rem; /* 10px；正文五档以 body-md=14 为中心，往下需要 12 与 10 两格 */
-  --vx-text-2xs--line-height: 1.6; /* 16px 行盒 / 10px 字号 */
 }

@@ -75,7 +75,7 @@ const EXPECTED = [
   // T1 偏离：扩展档与覆盖值
   ["font-brand", "T1 扩展 · 品牌字体族"],
   ["font-cjk", "T1 扩展 · 中文字体栈"],
-  ["text-2xs", "T1 扩展 · 小字号"],
+  
   ["3xl:p-4", "T1 扩展 · 断点变体"],
   ["font-sans", "T1 覆盖 · 正文字体栈"],
   ["font-mono", "T1 覆盖 · 等宽字体栈"],

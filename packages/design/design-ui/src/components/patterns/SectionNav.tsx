@@ -73,7 +73,7 @@ const SectionNav = React.forwardRef<HTMLElement, SectionNavProps>(
               <span className="flex min-w-0 flex-col gap-2xs">
                 <span className="text-label-md">{item.label}</span>
                 {item.description ? (
-                  <span className="text-body-xs text-muted-foreground">
+                  <span className="text-body-sm text-muted-foreground">
                     {item.description}
                   </span>
                 ) : null}

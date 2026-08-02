@@ -273,15 +273,15 @@ function Stat({
       <span
         className={
           tone === "warning"
-            ? "text-display-xs text-warning-text"
-            : "text-display-xs text-foreground"
+            ? "text-display-sm text-warning-text"
+            : "text-display-sm text-foreground"
         }
       >
         {value}
       </span>
       <span className="text-label-md text-foreground">{label}</span>
       {note ? (
-        <span className="flex flex-wrap items-center gap-2xs text-body-xs text-muted-foreground">
+        <span className="flex flex-wrap items-center gap-2xs text-body-sm text-muted-foreground">
           {note}
         </span>
       ) : null}

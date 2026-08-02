@@ -34,7 +34,7 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 `scripts/design-tokens/generate-foundation.mjs` 读上游 `theme.css` 生成，一致性由构造保证。
 全部偏离登记在 `scripts/design-tokens/foundation-policy.mjs`，逐条带理由，生成时打印：
 
-- **扩展**（Tailwind 没有的挡位）：`text-2xs`、`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`
+- **扩展**（Tailwind 没有的挡位）：`breakpoint-xs/3xl/4xl/5xl`、`font-brand/cjk`（字号档无扩展，最小档即上游的 `xs`=12px）
 - **覆盖**（Tailwind 有、DS 判定要改）：`font-sans` / `font-mono` 的字体栈
 - **减法**：色板只留 neutral / red / amber / emerald / sky / purple 六个色相（完整色阶）加品牌色
 
@@ -59,8 +59,13 @@ L0–L5 是**组件归属**分层（谁拥有这段 UI）。Token 取值分层�
 
 **排版七族**：`display` / `heading` / `title` / `body` / `label` / `code` / `overline`。
 `display` 与 `heading` 用品牌展示体，其余用正文体——**一族一种字体**，族的边界就是换字体
-的地方。24px 是展示体与正文体的分界（`heading-2` 24 是展示体最小档，`title-1` 20 起用
-正文体），这也是 Material 与 Fluent 的切换点。
+的地方。20px 是展示体与正文体的分界：`heading-3` 20 是展示体最小档，`title-1` 18 起用
+正文体。
+
+**每族档数按实际用量定，不求形状整齐**：display 3 档（36/48/60）、heading 3 档
+（20/24/30）、title 3 档（14/16/18）、body 与 label 各 4 档（12/14/16/18）、code 2 档、
+overline 1 档。**全刻度最小 12px**——10px 以下的汉字读不了，而字号三档是无障碍设置，
+任何档下都不该把文字推到读不了。
 
 **图标尺寸六档**：12 / 16 / 20 / 24 / 32 / 48（`xs`…`2xl`），取值对齐 Material / Carbon /
 Fluent / shadcn 的公共集。48 以上不是图标是图形，用 `--spacing-media-*`。`Icon` 组件的

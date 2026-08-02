@@ -59,7 +59,7 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
       <aside className="sticky top-none hidden h-screen w-72 shrink-0 flex-col gap-lg overflow-y-auto border-r border-border bg-surface-1 p-lg lg:flex">
         <div className="flex flex-col gap-2xs">
           <span className="text-label-lg text-foreground">Design Preview</span>
-          <span className="text-body-xs text-muted-foreground">
+          <span className="text-body-sm text-muted-foreground">
             仅开发用，不发布不部署
           </span>
         </div>
@@ -88,7 +88,7 @@ export function Shell({ children }: { readonly children: React.ReactNode }) {
                   }
                 >
                   <span className="flex min-w-0 items-baseline gap-xs">
-                    <span className="text-body-xs text-muted-foreground">
+                    <span className="text-body-sm text-muted-foreground">
                       {s.realm}
                     </span>
                     <span className="truncate">{s.label}</span>
@@ -191,7 +191,7 @@ function Axis({
 }) {
   return (
     <div className="flex flex-col gap-2xs">
-      <span className="text-body-xs text-muted-foreground">{label}</span>
+      <span className="text-body-sm text-muted-foreground">{label}</span>
       <div className="flex items-center gap-2xs">
         {options.map((o) => (
           <button

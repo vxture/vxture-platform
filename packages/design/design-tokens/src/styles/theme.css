@@ -132,11 +132,7 @@
   --color-gradient-glow-from: var(--gradient-glow-from);
   --color-gradient-glow-to: var(--gradient-glow-to);
 
-  /* text-*（23 档角色，含行高 / 字距 / 字重修饰） */
-  --text-display-xl: var(--display-xl-font-size);
-  --text-display-xl--line-height: var(--display-xl-line-height);
-  --text-display-xl--letter-spacing: var(--display-xl-letter-spacing);
-  --text-display-xl--font-weight: var(--display-xl-font-weight);
+  /* text-*（20 档角色，含行高 / 字距 / 字重修饰） */
   --text-display-lg: var(--display-lg-font-size);
   --text-display-lg--line-height: var(--display-lg-line-height);
   --text-display-lg--letter-spacing: var(--display-lg-letter-spacing);
@@ -149,10 +145,6 @@
   --text-display-sm--line-height: var(--display-sm-line-height);
   --text-display-sm--letter-spacing: var(--display-sm-letter-spacing);
   --text-display-sm--font-weight: var(--display-sm-font-weight);
-  --text-display-xs: var(--display-xs-font-size);
-  --text-display-xs--line-height: var(--display-xs-line-height);
-  --text-display-xs--letter-spacing: var(--display-xs-letter-spacing);
-  --text-display-xs--font-weight: var(--display-xs-font-weight);
   --text-heading-1: var(--heading-1-font-size);
   --text-heading-1--line-height: var(--heading-1-line-height);
   --text-heading-1--letter-spacing: var(--heading-1-letter-spacing);
@@ -161,6 +153,10 @@
   --text-heading-2--line-height: var(--heading-2-line-height);
   --text-heading-2--letter-spacing: var(--heading-2-letter-spacing);
   --text-heading-2--font-weight: var(--heading-2-font-weight);
+  --text-heading-3: var(--heading-3-font-size);
+  --text-heading-3--line-height: var(--heading-3-line-height);
+  --text-heading-3--letter-spacing: var(--heading-3-letter-spacing);
+  --text-heading-3--font-weight: var(--heading-3-font-weight);
   --text-title-1: var(--title-1-font-size);
   --text-title-1--line-height: var(--title-1-line-height);
   --text-title-1--letter-spacing: var(--title-1-letter-spacing);
@@ -189,10 +185,6 @@
   --text-body-sm--line-height: var(--body-sm-line-height);
   --text-body-sm--letter-spacing: var(--body-sm-letter-spacing);
   --text-body-sm--font-weight: var(--body-sm-font-weight);
-  --text-body-xs: var(--body-xs-font-size);
-  --text-body-xs--line-height: var(--body-xs-line-height);
-  --text-body-xs--letter-spacing: var(--body-xs-letter-spacing);
-  --text-body-xs--font-weight: var(--body-xs-font-weight);
   --text-label-xl: var(--label-xl-font-size);
   --text-label-xl--line-height: var(--label-xl-line-height);
   --text-label-xl--letter-spacing: var(--label-xl-letter-spacing);
@@ -209,10 +201,6 @@
   --text-label-sm--line-height: var(--label-sm-line-height);
   --text-label-sm--letter-spacing: var(--label-sm-letter-spacing);
   --text-label-sm--font-weight: var(--label-sm-font-weight);
-  --text-label-xs: var(--label-xs-font-size);
-  --text-label-xs--line-height: var(--label-xs-line-height);
-  --text-label-xs--letter-spacing: var(--label-xs-letter-spacing);
-  --text-label-xs--font-weight: var(--label-xs-font-weight);
   --text-code-md: var(--code-md-font-size);
   --text-code-md--line-height: var(--code-md-line-height);
   --text-code-md--letter-spacing: var(--code-md-letter-spacing);
@@ -268,6 +256,4 @@
   --font-cjk: var(--vx-font-cjk);
   --font-mono: var(--vx-font-mono);
   --font-sans: var(--vx-font-sans);
-  --text-2xs: var(--vx-text-2xs);
-  --text-2xs--line-height: var(--vx-text-2xs--line-height);
 }
