@@ -58,7 +58,7 @@ const Section = React.forwardRef<HTMLElement, SectionProps>(function Section(
       className={cn(
         "flex flex-col gap-md",
         tone === "raised" &&
-          "rounded-lg border border-border bg-card p-lg shadow-flat",
+          "rounded-xl bg-card p-lg shadow-raised ring-1 ring-foreground/10",
         className,
       )}
       {...props}

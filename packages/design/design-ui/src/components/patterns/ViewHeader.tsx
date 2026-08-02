@@ -45,7 +45,7 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
       eyebrow,
       icon,
       iconFallback = "placeholder",
-      iconSize = "lg",
+      iconSize = "xl",
       title,
       description,
       action,
@@ -66,7 +66,7 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
         <div className="flex min-w-0 items-start gap-md">
           {icon ? (
             <span
-              className="flex size-media-xs shrink-0 items-center justify-center rounded-lg bg-primary-muted text-primary-muted-foreground"
+              className="flex size-media-sm shrink-0 items-center justify-center rounded-xl bg-primary-muted text-primary-text"
               aria-hidden="true"
             >
               <Icon name={icon} size={iconSize} fallback={iconFallback} />
@@ -81,7 +81,7 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
               {secondary}
             </div>
             {description ? (
-              <p className="text-body-sm text-muted-foreground">
+              <p className="text-body-md text-muted-foreground">
                 {description}
               </p>
             ) : null}

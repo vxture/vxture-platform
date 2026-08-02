@@ -52,7 +52,7 @@ function BulkActionBar({
       aria-label="批量操作"
       className={cn(
         "flex flex-wrap items-center justify-between gap-md",
-        "rounded-lg border border-border bg-card px-lg py-sm shadow-flat",
+        "rounded-xl bg-card px-lg py-sm shadow-raised ring-1 ring-foreground/10",
         className,
       )}
     >

@@ -91,7 +91,7 @@ function DialogForm({
             </Button>
             <Button
               type="submit"
-              variant={danger ? "destructive" : "default"}
+              variant={danger ? "destructive-strong" : "default"}
               disabled={submitDisabled || submitting}
             >
               {submitting ? "处理中…" : submitLabel}

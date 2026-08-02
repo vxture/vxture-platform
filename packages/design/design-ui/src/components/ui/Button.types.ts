@@ -5,6 +5,7 @@
 export type ButtonVariant =
   | "default"
   | "destructive"
+  | "destructive-strong"
   | "outline"
   | "secondary"
   | "ghost"

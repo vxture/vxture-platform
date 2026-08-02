@@ -60,6 +60,14 @@ const buttonVariants = cva(
           "hover:bg-destructive-muted-hover active:bg-destructive-muted-active",
           "focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         ),
+        // 实心红只留给"落锤"的那一下：确认对话框里的提交。
+        // 判据是数量——入口按钮一屏可能有十个，淡底避免它们抢走全部注意力；
+        // 而确认按钮一屏只有一个，且按下去不可撤销，弱化它是在帮倒忙。
+        "destructive-strong": cn(
+          "bg-destructive text-destructive-foreground",
+          "hover:bg-destructive-hover active:bg-destructive-active",
+          "focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
+        ),
         outline: cn(
           "border-border bg-background text-foreground",
           "hover:bg-accent hover:text-foreground",

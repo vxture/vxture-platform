@@ -67,7 +67,10 @@ function ActionMenu({
                 : {})}
               className={cn(
                 "gap-xs",
-                item.danger && "text-destructive focus:text-destructive",
+                // 悬停时给一层淡底而不是把整条变实心红——菜单里危险项常和常规项
+                // 挨着，实心底会让整个菜单看起来在报警。与 Button / Badge 同一判断。
+                item.danger &&
+                  "text-destructive-text focus:bg-destructive-muted focus:text-destructive-muted-foreground",
               )}
             >
               {item.icon ? (
