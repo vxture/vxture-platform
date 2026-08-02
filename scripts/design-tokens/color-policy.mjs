@@ -90,8 +90,11 @@ export const STANDALONE_COLORS = [
   // 遮罩与背景虚化配套使用。虚化本身已经说明"下面那层不可操作"，
   // 遮罩不必再压暗一次——45% 那种浓度是没有虚化时才需要的。
   ["scrim", "neutral-950-alpha-10", "neutral-950-alpha-10"],
-  ["accent", "neutral-600-alpha-08", "neutral-600-alpha-10"],
-  ["surface-active", "neutral-600-alpha-15", "neutral-600-alpha-22"],
+  // hover / pressed 用品牌微染而非中性灰（owner 拍板 2026-08-02，透明模式 V8）：
+  // 交互反馈是"染上品牌色"，与 surface-selected 同色相、不同浓度，构成连续刻度
+  // hover(08) < selected(10) = pressed(15) < selected-hover(15)。
+  ["accent", "brand-600-alpha-08", "brand-600-alpha-15"],
+  ["surface-active", "brand-600-alpha-15", "brand-600-alpha-22"],
   ["surface-selected", "brand-600-alpha-10", "brand-600-alpha-15"],
   ["surface-selected-hover", "brand-600-alpha-15", "brand-600-alpha-22"],
   ["surface-inverse", "neutral-900", "neutral-100"],

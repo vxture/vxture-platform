@@ -28,8 +28,8 @@
   --surface-3: var(--vx-color-neutral-50);
   --popover: var(--vx-color-white);
   --scrim: var(--vx-color-neutral-950-alpha-10);
-  --accent: var(--vx-color-neutral-600-alpha-08);
-  --surface-active: var(--vx-color-neutral-600-alpha-15);
+  --accent: var(--vx-color-brand-600-alpha-08);
+  --surface-active: var(--vx-color-brand-600-alpha-15);
   --surface-selected: var(--vx-color-brand-600-alpha-10);
   --surface-selected-hover: var(--vx-color-brand-600-alpha-15);
   --surface-inverse: var(--vx-color-neutral-900);
@@ -155,8 +155,8 @@
   --surface-3: var(--vx-color-neutral-700);
   --popover: var(--vx-color-neutral-800);
   --scrim: var(--vx-color-neutral-950-alpha-10);
-  --accent: var(--vx-color-neutral-600-alpha-10);
-  --surface-active: var(--vx-color-neutral-600-alpha-22);
+  --accent: var(--vx-color-brand-600-alpha-15);
+  --surface-active: var(--vx-color-brand-600-alpha-22);
   --surface-selected: var(--vx-color-brand-600-alpha-15);
   --surface-selected-hover: var(--vx-color-brand-600-alpha-22);
   --surface-inverse: var(--vx-color-neutral-100);
