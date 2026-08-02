@@ -38,6 +38,29 @@ const TYPE_FAMILIES = [
 /** 角色档位不做穷举：新增一档不必回来改这里。 */
 const anyStep = () => true;
 
+/**
+ * T2 描边宽度档。`border-t-medium` 是宽度不是颜色——tailwind-merge 不认识
+ * `medium` 这个档，会把它判进 border-**color** 组，于是 `border-t-medium` 与
+ * `border-t-info-border` 互相顶替，后写的把前写的从 DOM 上挤掉。
+ * 实测症状：MetricCard 顶缘色条 2px 静默变 1px（浏览器实测抓到，同 vx-type 一案）。
+ */
+const BORDER_WIDTH_STEPS = ["thin", "medium", "thick"] as const;
+
+/** 逐侧登记进内置的 border-w* 组，让宽度档只和宽度互斥、不再碰颜色组。 */
+const borderWidthGroups = Object.fromEntries(
+  (
+    [
+      ["border-w", "border"],
+      ["border-w-t", "border-t"],
+      ["border-w-r", "border-r"],
+      ["border-w-b", "border-b"],
+      ["border-w-l", "border-l"],
+      ["border-w-x", "border-x"],
+      ["border-w-y", "border-y"],
+    ] as const
+  ).map(([group, prefix]) => [group, [{ [prefix]: [...BORDER_WIDTH_STEPS] }]]),
+);
+
 const twMergeConfigured = extendTailwindMerge<"vx-type">({
   extend: {
     classGroups: {
@@ -52,6 +75,7 @@ const twMergeConfigured = extendTailwindMerge<"vx-type">({
           ],
         },
       ],
+      ...borderWidthGroups,
     },
     // 与内置字号组互斥：`text-sm` 和 `text-label-lg` 说的是同一件事，
     // 两条都留下等于让 CSS 顺序决定，那不叫合并。
