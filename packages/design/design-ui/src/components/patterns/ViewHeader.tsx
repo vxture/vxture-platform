@@ -16,11 +16,13 @@
  *
  * `secondary` 保留：它放的是标题旁的状态标一类，位置在标题行内，不是右侧动作区。
  *
- * 视觉语法对齐 admin 页头（workplan §1 V6）：
- * - icon 裸色无底块——页头图标是"这一页是什么"的记号，不是入口卡的按钮化色块；
- *   32px 取 DS 图标刻度（admin 的 40 不在刻度上，X3）。
- * - 标题 20px（title-xl）而非展示体 heading——控制台页头是工作界面的路标，
- *   30px 展示体是营销页的排场，放在这里只会把首屏内容往下顶。
+ * 视觉语法对齐 admin 页头（workplan §1 V6），2026-08-02 owner 定稿：
+ * - icon 裸色无底块、48px（2xl；admin 的 40 不在刻度上，取上档）——顶部与标题
+ *   光学对齐（mt-2xs 抵消标题行高的上半距），下部随内容自然。
+ * - 标题 20px（title-xl）而非展示体 heading——控制台页头是工作界面的路标。
+ * - 无 eyebrow：页头只有标题与描述两行（原 eyebrow 行随定稿删除）。
+ * - 右侧操作区底沿与描述行对齐（self-end），不与标题顶平——按钮属于"接下来做
+ *   什么"，挂在页头的收束线上。
  */
 
 import * as React from "react";
@@ -32,7 +34,6 @@ export interface PageHeaderProps extends Omit<
   React.HTMLAttributes<HTMLElement>,
   "title"
 > {
-  readonly eyebrow?: React.ReactNode;
   readonly icon?: IconName;
   readonly iconFallback?: IconName;
   readonly iconSize?: IconSize | number;
@@ -48,10 +49,9 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
   function ViewHeader(
     {
       className,
-      eyebrow,
       icon,
       iconFallback = "placeholder",
-      iconSize = "xl",
+      iconSize = "2xl",
       title,
       description,
       action,
@@ -67,14 +67,14 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
         {...props}
       >
         {icon ? (
-          <span className="shrink-0 text-primary-text" aria-hidden="true">
+          <span
+            className="mt-2xs shrink-0 text-primary-text"
+            aria-hidden="true"
+          >
             <Icon name={icon} size={iconSize} fallback={iconFallback} />
           </span>
         ) : null}
         <div className="flex min-w-0 flex-1 flex-col gap-sm">
-          {eyebrow ? (
-            <p className="text-overline text-muted-foreground">{eyebrow}</p>
-          ) : null}
           <div className="flex flex-wrap items-center gap-sm">
             <h1 className="text-title-xl text-foreground">{title}</h1>
             {secondary}
@@ -84,7 +84,9 @@ const ViewHeader = React.forwardRef<HTMLElement, PageHeaderProps>(
           ) : null}
         </div>
         {action ? (
-          <div className="flex shrink-0 items-center gap-sm">{action}</div>
+          <div className="flex shrink-0 items-center gap-sm self-end">
+            {action}
+          </div>
         ) : null}
       </section>
     );

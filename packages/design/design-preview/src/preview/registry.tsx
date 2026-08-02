@@ -1173,7 +1173,6 @@ export const ENTRIES: readonly Entry[] = [
       <ViewHeader
         className="w-full"
         icon="squares-four"
-        eyebrow="ATLAS"
         title="模型接入"
         description="管理供给方、配额与调用审计。"
         secondary={<StatusBadge tone="success">运行中</StatusBadge>}
@@ -1247,7 +1246,12 @@ export const ENTRIES: readonly Entry[] = [
     ],
     render: () => (
       <ViewLayout className="w-full rounded-lg border border-dashed border-border p-lg">
-        <SectionHeader level={1} title="一级标题（h1 · title-xl 20px）" />
+        <SectionHeader
+          level={1}
+          icon="squares-four"
+          title="大板块标题（h1 · title-lg 18px · icon 32）"
+          description="页头之下的一级板块，icon 与字级自页头逐级递减。"
+        />
         <SectionHeader
           level={2}
           icon="database"

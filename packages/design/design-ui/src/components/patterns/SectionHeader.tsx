@@ -4,15 +4,16 @@
  * @layer Presentation
  * @category Components - Pattern
  *
- * 层级由 `level` 给出，同时决定语义元素与排版角色，两者不会各说各话：
+ * 层级由 `level` 给出，同时决定语义元素与排版角色，两者不会各说各话。
+ * 整页的标题阶梯（owner 定稿 2026-08-02）：ViewHeader 是页头（20px / icon 48），
+ * 其后的板块层级由本件承担，icon 与字级逐级递减、语法同构（icon+标题+描述+可选操作）：
  *
- *   level 1 → <h1> + title-xl (20px)   一级
- *   level 2 → <h2> + title-md (16px)   板块标题，默认带虚线下边框
- *   level 3 → <h3> + title-sm (14px)   板块内的分组
- *   level 4 → <h4> + label-md (14px medium)   分组内的小节
+ *   level 1 → <h1> + title-lg (18px) + icon 32   大板块
+ *   level 2 → <h2> + title-md (16px) + icon 24   二级板块，默认带虚线下边框
+ *   level 3 → <h3> + title-sm (14px) + icon 20   板块内的分组
+ *   level 4 → <h4> + label-md (14px medium) + icon 16   分组内的小节
  *
- * 字级对齐 admin 的密度（20/16/14，workplan §1 V6）：展示体 heading 族退出
- * 工作界面的标题阶——它是营销页的字体，控制台里 30px 的板块标题只会吃掉内容。
+ * 展示体 heading 族退出工作界面的标题阶——它是营销页的字体。
  * 板块标题（level 2）默认带虚线下边框，这是 admin 的板块开始记号（V4：虚线分
  * 字段、实线开区块——标题属于"字段级"分隔，界的是标题与正文，不是区块与区块）。
  *
@@ -56,12 +57,12 @@ export interface SectionHeaderProps extends Omit<
   readonly divider?: boolean;
 }
 
-/* icon 档随层级走：一级 32 / 二级 24 / 以下 20，保持与字级同向的阶差。 */
+/* icon 档随层级走（32/24/20/16），与字级同向递减；20px/48 那一档属 ViewHeader。 */
 const BY_LEVEL = {
-  1: { tag: "h1", type: "text-title-xl", iconSize: "xl" },
+  1: { tag: "h1", type: "text-title-lg", iconSize: "xl" },
   2: { tag: "h2", type: "text-title-md", iconSize: "lg" },
   3: { tag: "h3", type: "text-title-sm", iconSize: "md" },
-  4: { tag: "h4", type: "text-label-md", iconSize: "md" },
+  4: { tag: "h4", type: "text-label-md", iconSize: "sm" },
 } as const;
 
 function SectionHeader({
