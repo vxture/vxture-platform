@@ -1,5 +1,5 @@
 /**
- * semantic/layout-semantic.css - T2 语义层 · 页面与内容宽度（工具类族 max-w-*）。
+ * semantic/layout-semantic.css - T2 语义层 · 版面宽度：页面 / 内容 / 面板（max-w-*）与侧栏（w-sidebar-*）。
  * @package @vxture/design-tokens
  * @layer Presentation
  * @category styles
@@ -13,7 +13,8 @@
  * T2 契约见 packages/design/design-system/docs/04-tokens-contract.md。
  * 构建规范见 docs/10-standards/065-design-token-pipeline.md。
  *
- * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。
+ * ⚠ container 族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。
+ *   sidebar 族例外地留在 spacing 命名空间——w-* 工具类只从 --spacing-* 派生。
  */
 
 @theme {
@@ -38,4 +39,15 @@
   --container-panel-sm: 28rem;  /* 紧凑对话框：确认框、单字段表单 */
   --container-panel-md: 32rem;  /* 默认对话框（= 上游 max-w-lg 的意图值） */
   --container-panel-lg: 42rem;  /* 宽对话框：多列表单、预览面板 */
+
+  /* sidebar */
+  --spacing-sidebar-expanded: calc(var(--vx-spacing) * 64);
+  --spacing-sidebar-collapsed: calc(var(--vx-spacing) * 16);
+  --spacing-sidebar-rail: calc(var(--vx-spacing) * 12);
+
+  /* header */
+  --spacing-header-xl: calc(var(--vx-spacing) * 16);
+  --spacing-header-lg: calc(var(--vx-spacing) * 14);
+  --spacing-header-md: calc(var(--vx-spacing) * 12);
+  --spacing-header-sm: calc(var(--vx-spacing) * 10);
 }

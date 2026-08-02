@@ -200,20 +200,6 @@ export const ICON_SIZES = [
   ["2xl", 12],
 ];
 
-/**
- * 侧栏宽度三态（owner 拍板 2026-08-02：展开 256 / 收起 64 / 最小 48）。
- *
- * 此前散落在 shell-template 资产 CSS 里且 off-scale（252px），T2 无档可指——
- * 预览外壳只能写裸值 w-72。三态都在 4px 基的整数倍上：64 / 16 / 12。
- *
- * 不随密度变化：侧栏宽度是版面结构，收紧密度收的是内容留白，不是把导航挤窄。
- */
-export const SIDEBAR_WIDTHS = [
-  ["expanded", 64],
-  ["collapsed", 16],
-  ["rail", 12],
-];
-
 /*
  * 32 / 48 / 64 / 80 / 96 / 128 / 192。低段等距（+16）便于头像与缩略图挑档，高段翻倍
  * 供插画与空状态主图。整条刻度从 24 起提到 32 起——24–40 那一段是图标容器不是媒体框，
@@ -257,6 +243,34 @@ export const PANEL_WIDTHS = [
   ["sm", "28rem", "紧凑对话框：确认框、单字段表单"],
   ["md", "32rem", "默认对话框（= 上游 max-w-lg 的意图值）"],
   ["lg", "42rem", "宽对话框：多列表单、预览面板"],
+];
+
+/**
+ * 侧栏宽度三态（owner 拍板 2026-08-02：展开 256 / 收起 64 / 最小 48）。
+ *
+ * 归 layout 族（版面结构，与 content / panel 同类），但**命名空间留 spacing**：
+ * `w-*` 工具类只从 `--spacing-*` 派生，`--container-*` 只喂 `max-w-*` 与容器查询——
+ * 挪空间会让 `w-sidebar-expanded` 静默停产。三态都在 4px 基的整数倍上：64 / 16 / 12。
+ *
+ * 不随密度变化：侧栏宽度是版面结构，收紧密度收的是内容留白，不是把导航挤窄。
+ */
+export const SIDEBAR_WIDTHS = [
+  ["expanded", 64],
+  ["collapsed", 16],
+  ["rail", 12],
+];
+
+/**
+ * 整页 header 高度四档（owner 拍板 2026-08-02：64 / 56 / 48 / 40）。
+ *
+ * 与 sidebar 同类同级：版面结构、spacing 命名空间（`h-*` 只从 `--spacing-*` 派生）、
+ * 不随密度轴变化。shell-template 现行 64px 即 `xl` 档。
+ */
+export const HEADER_HEIGHTS = [
+  ["xl", 16],
+  ["lg", 14],
+  ["md", 12],
+  ["sm", 10],
 ];
 
 /**

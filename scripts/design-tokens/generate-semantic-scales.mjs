@@ -43,6 +43,7 @@ import {
   ICON_SIZES,
   MEDIA_SIZES,
   SIDEBAR_WIDTHS,
+  HEADER_HEIGHTS,
   CONTENT_WIDTHS,
   PANEL_WIDTHS,
   SPACING_SCALE,
@@ -322,7 +323,6 @@ function buildSize() {
   for (const [kind, list] of [
     ["icon", ICON_SIZES],
     ["media", MEDIA_SIZES],
-    ["sidebar", SIDEBAR_WIDTHS],
   ]) {
     for (const [step, mult] of list) {
       rows.push([
@@ -368,6 +368,20 @@ function buildLayout() {
   /* 浮层面板宽：上游 container 刻度的三档字面量，理由见 semantic-policy。 */
   for (const [name, value, why] of PANEL_WIDTHS) {
     rows.push([`--container-panel-${name}`, value, "panel", why]);
+  }
+  /* 侧栏宽 / header 高：版面结构归本族，但命名空间留 spacing——
+     w-* / h-* 只从 --spacing-* 派生。 */
+  for (const [kind, list] of [
+    ["sidebar", SIDEBAR_WIDTHS],
+    ["header", HEADER_HEIGHTS],
+  ]) {
+    for (const [name, mult] of list) {
+      rows.push([
+        `--spacing-${kind}-${name}`,
+        `calc(${t1("--vx-spacing", `${kind}/${name}`)} * ${mult})`,
+        kind,
+      ]);
+    }
   }
   return rows;
 }
@@ -462,12 +476,13 @@ const outputs = [
   ],
   staticFile(
     "layout-semantic.css",
-    "页面与内容宽度（工具类族 max-w-*）",
+    "版面宽度：页面 / 内容 / 面板（max-w-*）与侧栏（w-sidebar-*）",
     "scripts/design-tokens/semantic-policy.mjs",
     buildLayout(),
     `
  *
- * ⚠ 本族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。`,
+ * ⚠ container 族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。
+ *   sidebar 族例外地留在 spacing 命名空间——w-* 工具类只从 --spacing-* 派生。`,
   ),
   staticFile("radius-semantic.css", "圆角（工具类族 rounded-*）", "scripts/design-tokens/semantic-policy.mjs", buildRadius()),
   staticFile(
