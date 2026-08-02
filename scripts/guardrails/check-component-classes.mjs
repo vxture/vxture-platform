@@ -21,6 +21,9 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { PENDING_COMPONENTS } from "./pending-components.mjs";
+import { PENDING_RECIPES, RECIPE_PATTERNS } from "./pending-recipes.mjs";
+
+const PENDING_RECIPES_SET = new Set(PENDING_RECIPES);
 
 const ROOT = process.cwd();
 const PNPM = path.join(ROOT, "node_modules/.pnpm");
@@ -200,7 +203,51 @@ if (dead.length > 0) {
   process.exit(1);
 }
 
+/* ── 配方层采用情况 ───────────────────────────────────────────
+ *
+ * 上面查的是"类名存不存在"，这里查的是"该不该由组件自己写"。
+ * 焦点环 / 禁用态 / 校验态在每个组件里都该长一个样，手写就会漂移——而漂移不报错，
+ * 只是那个组件从此和别人不一样。
+ *
+ * 双向校验：清单外的组件手写会报错（挡新增漂移），清单内的组件已经不写了也报错
+ * （挡清单腐烂）。后者是关键——没有它，清单会变成一份永远只增不减的豁免名单。
+ */
+const stillHandWritten = new Set();
+const recipeViolations = [];
+for (const file of files) {
+  const base = path.basename(file);
+  const body = (await readFile(file, "utf8"))
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/.*$/gm, "");
+  const hits = RECIPE_PATTERNS.filter(([pattern]) => body.includes(pattern));
+  if (hits.length === 0) continue;
+  stillHandWritten.add(base);
+  if (PENDING_RECIPES_SET.has(base)) continue;
+  for (const [pattern, recipe] of hits) {
+    recipeViolations.push({ file: path.relative(ROOT, file), pattern, recipe });
+  }
+}
+
+const staleLedger = [...PENDING_RECIPES_SET].filter((b) => !stillHandWritten.has(b));
+
+if (recipeViolations.length > 0 || staleLedger.length > 0) {
+  if (recipeViolations.length > 0) {
+    console.error("组件手写了本该由配方层提供的片段——改基调时一定会漏掉：\n");
+    for (const v of recipeViolations) {
+      console.error(`  ✗ ${v.file}  写了 ${v.pattern}，应引用配方 \`${v.recipe}\``);
+    }
+    console.error("\n配方在 packages/design/design-ui/src/styles/recipes.ts。");
+  }
+  if (staleLedger.length > 0) {
+    console.error("\n以下组件已不再手写这些片段，请从 pending-recipes.mjs 删掉：\n");
+    for (const b of staleLedger) console.error(`  ✗ ${b}`);
+  }
+  process.exit(1);
+}
+
 console.log(
   `组件类名实测通过（${files.length} 个已重写组件 / ${scanned} 处类名列表，全部生成；` +
-    `${PENDING.size} 个待 C2 重写的组件暂不纳入）`,
+    `${PENDING.size} 个待 C2 重写的组件暂不纳入）\n` +
+    `配方层检查通过（${files.length - PENDING_RECIPES_SET.size} 个组件已无手写视觉片段；` +
+    `${PENDING_RECIPES_SET.size} 个待批 B–E 改造）`,
 );

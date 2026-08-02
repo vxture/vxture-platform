@@ -123,15 +123,31 @@ export function assertElevationOrdered(errors) {
 }
 
 /**
- * 圆角挡位，按 Tailwind 标签列。
+ * 圆角基数。整条梯子由它按比例派生，**产品要改基调只改这一个数**。
  *
- * 取值来自 T1（即上游），故本族目前是恒等别名；保留它是为分层边界完整，
- * 见 060 §1.1，将来引入角色名（rounded-control / rounded-card）时长出内容。
+ * 上游 shadcn 的 radius=medium 即此值。它不是 T1 的某一档——T1 镜像的是
+ * Tailwind 的固定阶梯（2/4/6/8/12/16），那条阶梯没有基数概念，逐档改才能换基调。
+ */
+export const RADIUS_BASE = "0.625rem";
+
+/**
+ * 圆角挡位：`[标签, 相对基数的倍率]`。倍率取自 shadcn 的派生式。
+ *
+ * 本族**不指向 T1**：T1 是 Tailwind 固定阶梯的镜像，而这里要的是"一个基数换基调"。
+ * 这是 T2 对上游值域的一次有意偏离，登记在 060 §1.1。
  *
  * 未列 `none` 与 `full`：v4 把 `rounded-none` / `rounded-full` 实现为**静态工具类**，
  * 不读主题变量，注册了也不会被用到。
  */
-export const RADIUS_STEPS = ["xs", "sm", "md", "lg", "xl", "2xl"];
+export const RADIUS_STEPS = [
+  ["sm", 0.6],
+  ["md", 0.8],
+  ["lg", 1],
+  ["xl", 1.4],
+  ["2xl", 1.8],
+  ["3xl", 2.2],
+  ["4xl", 2.6],
+];
 
 /**
  * 描边宽度。

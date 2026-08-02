@@ -36,6 +36,7 @@ import {
   ELEVATION,
   EASE_ROLES,
   DURATION_ROLES,
+  RADIUS_BASE,
   RADIUS_STEPS,
   BORDER_WIDTHS,
   OPACITIES,
@@ -193,10 +194,22 @@ function buildRoles(modeIndex) {
  * 故默认块必须**排在最前**。不用 `html.density-*` 抬特异性来绕，是为了保留把
  * 密度类挂在子树上的可能——密度是"这一片紧凑些"的合法诉求，不必须全局。
  */
+/**
+ * 每档取 `SPACING_SCALE` 的哪一列，**按族分开**。
+ *
+ * 默认档的留白与行高取最宽那一列（原 comfortable 的取值），但 `control` 族**不跟**：
+ * 密度是"一屏放多少信息"，由留白和行高决定；控件高度是人机工程（点击目标、
+ * 文字可读性），不该因为页面变宽松就把按钮撑胖。
+ *
+ * 这不是我们的发明——实测 shadcn 的 maia（generous）与 vega 的控件高度完全相同，
+ * 都是 24/32/36/40。上游改密度从不改控件高度。
+ *
+ * 于是 `control` 的第三列在默认档下闲置，只有显式 `.density-comfortable` 才用到。
+ */
 const DENSITY_MODES = [
-  [1, ":root, .density-default"],
-  [0, ".density-compact"],
-  [2, ".density-comfortable"],
+  [{ inset: 2, row: 2, control: 1 }, ":root, .density-default"],
+  [{ inset: 0, row: 0, control: 0 }, ".density-compact"],
+  [{ inset: 2, row: 2, control: 2 }, ".density-comfortable"],
 ];
 
 /**
@@ -204,10 +217,10 @@ const DENSITY_MODES = [
  * 自己的注册（`--spacing-md: var(--spacing-md)`），CSS 判定为循环、整族失效且不报错。
  * 注册由 generate-theme.mjs 改名完成。
  */
-function buildSpacing(modeIndex) {
+function buildSpacing(columnOf) {
   return SPACING_SCALE.map(([step, ...mults]) => {
     const kind = SPACING_KINDS.find((k) => step.startsWith(`${k}-`)) ?? "inset";
-    const n = mults[modeIndex];
+    const n = mults[columnOf(kind)];
     const value =
       n === 0 ? "0px" : `calc(${t1("--vx-spacing", `spacing/${step}`)} * ${n})`;
     return [`--space-${step}`, value, kind];
@@ -235,11 +248,15 @@ function assertSpacingMonotonic() {
 /* ── 无模式轴的各族 ─────────────────────────────────────────── */
 
 function buildRadius() {
-  return RADIUS_STEPS.map((step) => [
-    `--radius-${step}`,
-    t1(`--vx-radius-${step}`, `radius/${step}`),
-    "radius",
-  ]);
+  // 基数先落，各档 calc 引它——产品覆写 `--radius` 一处，整条梯子等比跟随。
+  return [
+    ["--radius", RADIUS_BASE, "radius", "圆角基数：改基调只改这一个数"],
+    ...RADIUS_STEPS.map(([step, ratio]) => [
+      `--radius-${step}`,
+      ratio === 1 ? "var(--radius)" : `calc(var(--radius) * ${ratio})`,
+      "radius",
+    ]),
+  ];
 }
 
 function buildBorder() {
@@ -391,7 +408,10 @@ const t1Literals = loadT1();
 
 assertSpacingMonotonic();
 const typoBlocks = FONT_SIZE_MODES.map(([i, sel]) => [sel, buildRoles(i)]);
-const spaceBlocks = DENSITY_MODES.map(([i, sel]) => [sel, buildSpacing(i)]);
+const spaceBlocks = DENSITY_MODES.map(([cols, sel]) => [
+  sel,
+  buildSpacing((kind) => cols[kind]),
+]);
 const roleCount = TYPE_ROLES.length;
 
 const outputs = [
