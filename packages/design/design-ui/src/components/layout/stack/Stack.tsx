@@ -20,11 +20,17 @@ export interface StackProps extends HTMLAttributes<HTMLDivElement> {
   align?: "start" | "center" | "end" | "stretch";
 }
 
+/**
+ * 间距走 T2 语义名，不用裸值。
+ *
+ * `gap-2` / `gap-4` 这类裸值**不跟随密度三档**——用户把密度切到紧凑，页面上别的
+ * 东西都收了，只有布局原语排出来的间距纹丝不动。取值按像素对齐迁移，观感不变。
+ */
 const gapClasses = {
-  xs: "gap-2",
-  sm: "gap-4",
-  md: "gap-6",
-  lg: "gap-8",
+  xs: "gap-xs",
+  sm: "gap-md",
+  md: "gap-lg",
+  lg: "gap-xl",
 };
 
 const alignClasses = {

@@ -18,11 +18,18 @@ export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
+/**
+ * 宽度走 T2 的页面宽度族。
+ *
+ * `max-w-screen-*` 读的是断点值——断点是"从这个宽度起换布局"，不是"内容该多宽"，
+ * 两者恰好同值纯属巧合。改指 `--container-page-*` 后，调整页面宽度不会连带
+ * 改变响应式断点。取值逐档相同（640 / 768 / 1024 / 1280），观感不变。
+ */
 const sizeClasses = {
-  sm: "max-w-screen-sm",
-  md: "max-w-screen-md",
-  lg: "max-w-screen-lg",
-  xl: "max-w-screen-xl",
+  sm: "max-w-page-sm",
+  md: "max-w-page-md",
+  lg: "max-w-page-lg",
+  xl: "max-w-page-xl",
   full: "max-w-full",
 };
 

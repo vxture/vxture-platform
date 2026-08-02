@@ -53,6 +53,7 @@ import {
   EmptyState,
   FilterBar,
   MetricGrid,
+  type MetricGridItem,
   NativeSelect,
   Section,
   SectionHeader,
@@ -184,21 +185,26 @@ export const ENTRIES: readonly Entry[] = [
       <>
         {BUTTON_VARIANTS.map((v) => (
           <Row key={v} label={v}>
-            <Button variant={v} size="xs">
-              最小
-            </Button>
-            <Button variant={v} size="sm">
-              小
-            </Button>
-            <Button variant={v}>默认</Button>
-            <Button variant={v} size="lg">
-              大
-            </Button>
-            <Button variant={v} disabled>
+            {/* 档位由数组驱动：声明了几档就摆几个，样例数不会再和轴对不上。 */}
+            {BUTTON_SIZES.map((size) =>
+              size.startsWith("icon") ? (
+                <Button
+                  key={size}
+                  variant={v}
+                  size={size}
+                  aria-label={size}
+                  title={size}
+                >
+                  <Icon name="plus" />
+                </Button>
+              ) : (
+                <Button key={size} variant={v} size={size} title={size}>
+                  {size}
+                </Button>
+              ),
+            )}
+            <Button variant={v} disabled title="disabled">
               禁用
-            </Button>
-            <Button variant={v} size="icon" aria-label="图标">
-              <Icon name="plus" size={16} />
             </Button>
           </Row>
         ))}
@@ -873,46 +879,7 @@ export const ENTRIES: readonly Entry[] = [
     axes: [{ name: "columns", values: ["2", "3", "4", "5", "6"] }],
     deviation:
       "卡片按语气染顶缘色条不染底：一排卡片靠色条分组，整块染色会盖过读数本身。趋势徽章挨着数字，它修饰的是数字不是卡片",
-    render: () => (
-      <MetricGrid
-        className="w-full"
-        items={[
-          {
-            id: "calls",
-            label: "调用总数",
-            value: "1,284,930",
-            icon: "graph",
-            description: "近 30 天",
-            trend: "+12.4%",
-            trendTone: "success",
-          },
-          {
-            id: "tokens",
-            label: "消耗 token",
-            value: "8.42 亿",
-            icon: "database",
-            trend: "+3.1%",
-            trendTone: "neutral",
-          },
-          {
-            id: "latency",
-            label: "P95 时延",
-            value: "412 ms",
-            icon: "clock",
-            trend: "+86 ms",
-            trendTone: "warning",
-          },
-          {
-            id: "errors",
-            label: "错误率",
-            value: "0.37%",
-            icon: "error",
-            trend: "超出阈值",
-            trendTone: "danger",
-          },
-        ]}
-      />
-    ),
+    render: () => <MetricGridDemo />,
   },
   {
     name: "DialogForm",
@@ -933,32 +900,55 @@ export const ENTRIES: readonly Entry[] = [
     axes: [
       { name: "gap", values: ["xs", "sm", "md", "lg"] },
       { name: "align", values: ["start", "center", "end", "stretch"] },
+      { name: "columns", values: ["2", "3", "4"] },
+      { name: "size", values: ["sm", "md", "lg", "xl", "full"] },
     ],
     deviation:
-      "⚠ 三件都还写着裸值（gap-2 / grid-cols-3 / max-w-screen-*），不跟随密度三档，违反 060 的取值约束。批 A–F 没覆盖到布局族",
+      "间距与宽度已迁到 T2（gap-xs…xl / max-w-page-*），取值逐档不变但从此跟随密度轴。Container 原先读的是断点值，断点是'从这宽度换布局'不是'内容该多宽'，同值纯属巧合",
     render: () => (
       <div className="flex w-full flex-col gap-lg">
-        <Row label="Stack gap=sm">
-          <Stack gap="sm" className="w-full">
-            <div className="rounded-md bg-accent p-sm text-body-md">一</div>
-            <div className="rounded-md bg-accent p-sm text-body-md">二</div>
-          </Stack>
-        </Row>
-        <Row label="Grid columns=3">
-          <Grid columns={3} gap="sm" className="w-full">
-            <div className="rounded-md bg-accent p-sm text-body-md">1</div>
-            <div className="rounded-md bg-accent p-sm text-body-md">2</div>
-            <div className="rounded-md bg-accent p-sm text-body-md">3</div>
-          </Grid>
-        </Row>
-        <Row label="Container size=md">
-          <Container
-            size="md"
-            className="w-full rounded-md border border-dashed border-border p-sm text-body-md"
-          >
-            受限宽度容器
-          </Container>
-        </Row>
+        {(["xs", "sm", "md", "lg"] as const).map((gap) => (
+          <Row key={gap} label={`Stack gap=${gap}`}>
+            <Stack gap={gap} className="w-full">
+              <div className="rounded-md bg-accent p-sm text-body-md">一</div>
+              <div className="rounded-md bg-accent p-sm text-body-md">二</div>
+            </Stack>
+          </Row>
+        ))}
+        {(["start", "center", "end", "stretch"] as const).map((align) => (
+          <Row key={align} label={`Stack align=${align}`}>
+            <Stack
+              align={align}
+              gap="sm"
+              className="h-media-sm w-full rounded-md border border-dashed border-border p-sm"
+            >
+              <div className="rounded-md bg-accent px-sm py-2xs text-body-md">
+                {align}
+              </div>
+            </Stack>
+          </Row>
+        ))}
+        {([2, 3, 4] as const).map((columns) => (
+          <Row key={columns} label={`Grid columns=${columns}`}>
+            <Grid columns={columns} gap="sm" className="w-full">
+              {Array.from({ length: columns }, (_, i) => (
+                <div key={i} className="rounded-md bg-accent p-sm text-body-md">
+                  {i + 1}
+                </div>
+              ))}
+            </Grid>
+          </Row>
+        ))}
+        {(["sm", "md", "lg", "xl", "full"] as const).map((size) => (
+          <Row key={size} label={`Container size=${size}`}>
+            <Container
+              size={size}
+              className="w-full rounded-md border border-dashed border-border p-sm text-body-md"
+            >
+              {size}
+            </Container>
+          </Row>
+        ))}
       </div>
     ),
   },
@@ -1493,5 +1483,74 @@ function ToastDemo() {
         </Button>
       ))}
     </Row>
+  );
+}
+
+/** 五档列数各摆一次：轴上写了几档，页面就得能数出几档。 */
+function MetricGridDemo() {
+  const items: MetricGridItem[] = [
+    {
+      id: "calls",
+      label: "调用总数",
+      value: "1,284,930",
+      icon: "graph" as const,
+      trend: "+12.4%",
+      trendTone: "success" as const,
+      tone: "info" as const,
+    },
+    {
+      id: "tokens",
+      label: "消耗 token",
+      value: "8.42 亿",
+      icon: "database" as const,
+      trend: "+3.1%",
+      trendTone: "neutral" as const,
+      tone: "brand" as const,
+    },
+    {
+      id: "latency",
+      label: "P95 时延",
+      value: "412 ms",
+      icon: "clock" as const,
+      trend: "+86 ms",
+      trendTone: "warning" as const,
+      tone: "warning" as const,
+    },
+    {
+      id: "errors",
+      label: "错误率",
+      value: "0.42%",
+      icon: "warning" as const,
+      trend: "-0.1%",
+      trendTone: "success" as const,
+      tone: "success" as const,
+    },
+    {
+      id: "cost",
+      label: "本月费用",
+      value: "¥12,480",
+      icon: "chart-bar" as const,
+      tone: "neutral" as const,
+    },
+    {
+      id: "quota",
+      label: "配额余量",
+      value: "63%",
+      icon: "chart-bar" as const,
+      tone: "danger" as const,
+    },
+  ];
+  return (
+    <div className="flex w-full flex-col gap-lg">
+      {([2, 3, 4, 5, 6] as const).map((columns) => (
+        <Row key={columns} label={`columns=${columns}`} stack>
+          <MetricGrid
+            className="w-full"
+            columns={columns}
+            items={items.slice(0, columns)}
+          />
+        </Row>
+      ))}
+    </div>
   );
 }

@@ -36,6 +36,8 @@ export interface MetricGridItem {
   readonly icon?: IconName;
   readonly trend?: React.ReactNode;
   readonly trendTone?: StatusBadgeTone;
+  /** 整块语气，染顶缘色条。批 E 给 MetricCard 加的，item 类型没跟上就传不进去。 */
+  readonly tone?: StatusBadgeTone;
 }
 
 export interface MetricGridProps {
@@ -66,6 +68,7 @@ function MetricGrid({ items, columns = 4, className }: MetricGridProps) {
           {...(item.trendTone !== undefined
             ? { trendTone: item.trendTone }
             : {})}
+          {...(item.tone !== undefined ? { tone: item.tone } : {})}
         />
       ))}
     </div>
