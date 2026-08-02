@@ -28,6 +28,12 @@ import {
   CaretDoubleUpIcon,
   CaretDoubleDownIcon,
   SquaresFourIcon,
+  ArrowSquareOutIcon,
+  LinkIcon,
+  SortAscendingIcon,
+  SortDescendingIcon,
+  PushPinIcon,
+  SidebarSimpleIcon,
 
   // ==========================================================================
   // 通用交互 - 操作
@@ -52,6 +58,21 @@ import {
   StopIcon,
   TextIndentIcon,
   TextOutdentIcon,
+  DownloadSimpleIcon,
+  UploadSimpleIcon,
+  ArrowsClockwiseIcon,
+  ArrowCounterClockwiseIcon,
+  FunnelIcon,
+  ShareNetworkIcon,
+  ArchiveIcon,
+  ProhibitIcon,
+  PauseIcon,
+  DotsThreeIcon,
+  DotsSixVerticalIcon,
+  PrinterIcon,
+  PowerIcon,
+  SignInIcon,
+  QrCodeIcon,
 
   // ==========================================================================
   // 通用交互 - 状态
@@ -60,6 +81,10 @@ import {
   XCircleIcon,
   WarningCircleIcon,
   InfoIcon,
+  CircleNotchIcon,
+  CircleDashedIcon,
+  FlagIcon,
+  SealCheckIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 平台
@@ -72,6 +97,12 @@ import {
   EraserIcon,
   CubeIcon,
   BuildingIcon,
+  CpuIcon,
+  HardDrivesIcon,
+  RocketLaunchIcon,
+  TerminalWindowIcon,
+  PlugsConnectedIcon,
+  PuzzlePieceIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 数据
@@ -86,6 +117,43 @@ import {
   ShieldCheckIcon,
 
   // ==========================================================================
+  // 文件与文档
+  // ==========================================================================
+  FileIcon,
+  FileTextIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  ClipboardTextIcon,
+  BookOpenIcon,
+  NewspaperIcon,
+
+  // ==========================================================================
+  // 商业与账务
+  // ==========================================================================
+  CreditCardIcon,
+  ReceiptIcon,
+  WalletIcon,
+  CoinsIcon,
+  CurrencyCnyIcon,
+  TicketIcon,
+  GiftIcon,
+  ScalesIcon,
+  GaugeIcon,
+  TrendUpIcon,
+  TrendDownIcon,
+  ChartLineIcon,
+  ChartPieIcon,
+
+  // ==========================================================================
+  // 安全与凭证
+  // ==========================================================================
+  ShieldIcon,
+  ShieldWarningIcon,
+  FingerprintIcon,
+  CertificateIcon,
+  LockOpenIcon,
+
+  // ==========================================================================
   // 用户/组织
   // ==========================================================================
   UserIcon,
@@ -94,6 +162,8 @@ import {
   UsersIcon,
   MedalIcon,
   StarIcon,
+  UserPlusIcon,
+  UserCircleIcon,
 
   // ==========================================================================
   // 通讯/联系
@@ -105,6 +175,12 @@ import {
   LinkedinLogoIcon,
   ChatCircleIcon,
   PaperPlaneTiltIcon,
+  MegaphoneIcon,
+  HeadsetIcon,
+  VideoCameraIcon,
+  MicrophoneIcon,
+  PaperclipIcon,
+  ImageIcon,
 
   // ==========================================================================
   // 时间/日历
@@ -131,6 +207,14 @@ import {
   ListIcon,
   RowsIcon,
   SignOutIcon,
+  DeviceMobileIcon,
+  DesktopIcon,
+
+  // ==========================================================================
+  // 反馈与互动
+  // ==========================================================================
+  ThumbsUpIcon,
+  ThumbsDownIcon,
 
   // ==========================================================================
   // 其他
@@ -175,6 +259,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   "caret-double-up": CaretDoubleUpIcon,
   "caret-double-down": CaretDoubleDownIcon,
   "squares-four": SquaresFourIcon,
+  "external-link": ArrowSquareOutIcon,
+  link: LinkIcon,
+  "sort-ascending": SortAscendingIcon,
+  "sort-descending": SortDescendingIcon,
+  "push-pin": PushPinIcon,
+  sidebar: SidebarSimpleIcon,
 
   // ==========================================================================
   // 通用交互 - 操作
@@ -200,6 +290,21 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   stop: StopIcon,
   "text-indent": TextIndentIcon,
   "text-outdent": TextOutdentIcon,
+  download: DownloadSimpleIcon,
+  upload: UploadSimpleIcon,
+  refresh: ArrowsClockwiseIcon,
+  undo: ArrowCounterClockwiseIcon,
+  filter: FunnelIcon,
+  share: ShareNetworkIcon,
+  archive: ArchiveIcon,
+  prohibit: ProhibitIcon,
+  pause: PauseIcon,
+  "dots-three": DotsThreeIcon,
+  drag: DotsSixVerticalIcon,
+  printer: PrinterIcon,
+  power: PowerIcon,
+  "sign-in": SignInIcon,
+  "qr-code": QrCodeIcon,
 
   // ==========================================================================
   // 通用交互 - 状态
@@ -208,6 +313,10 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   error: XCircleIcon,
   warning: WarningCircleIcon,
   info: InfoIcon,
+  spinner: CircleNotchIcon,
+  "circle-dashed": CircleDashedIcon,
+  flag: FlagIcon,
+  "seal-check": SealCheckIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 平台
@@ -221,6 +330,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   server: EraserIcon,
   cube: CubeIcon,
   "building-library": BuildingIcon,
+  cpu: CpuIcon,
+  "hard-drive": HardDrivesIcon,
+  rocket: RocketLaunchIcon,
+  terminal: TerminalWindowIcon,
+  "plugs-connected": PlugsConnectedIcon,
+  puzzle: PuzzlePieceIcon,
 
   // ==========================================================================
   // 云服务/智能体 - 数据
@@ -235,6 +350,43 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   "shield-check": ShieldCheckIcon,
 
   // ==========================================================================
+  // 文件与文档
+  // ==========================================================================
+  file: FileIcon,
+  "file-text": FileTextIcon,
+  folder: FolderIcon,
+  "folder-open": FolderOpenIcon,
+  clipboard: ClipboardTextIcon,
+  "book-open": BookOpenIcon,
+  newspaper: NewspaperIcon,
+
+  // ==========================================================================
+  // 商业与账务
+  // ==========================================================================
+  "credit-card": CreditCardIcon,
+  receipt: ReceiptIcon,
+  wallet: WalletIcon,
+  coins: CoinsIcon,
+  "currency-cny": CurrencyCnyIcon,
+  ticket: TicketIcon,
+  gift: GiftIcon,
+  scales: ScalesIcon,
+  gauge: GaugeIcon,
+  "trend-up": TrendUpIcon,
+  "trend-down": TrendDownIcon,
+  "chart-line": ChartLineIcon,
+  "chart-pie": ChartPieIcon,
+
+  // ==========================================================================
+  // 安全与凭证
+  // ==========================================================================
+  shield: ShieldIcon,
+  "shield-warning": ShieldWarningIcon,
+  fingerprint: FingerprintIcon,
+  certificate: CertificateIcon,
+  "lock-open": LockOpenIcon,
+
+  // ==========================================================================
   // 用户/组织
   // ==========================================================================
   user: UserIcon,
@@ -244,6 +396,8 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   users: UsersIcon,
   medal: MedalIcon,
   star: StarIcon,
+  "user-plus": UserPlusIcon,
+  "user-circle": UserCircleIcon,
 
   // ==========================================================================
   // 通讯/联系
@@ -255,6 +409,12 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   linkedin: LinkedinLogoIcon,
   "chat-circle": ChatCircleIcon,
   "paperplane-tilt": PaperPlaneTiltIcon,
+  megaphone: MegaphoneIcon,
+  headset: HeadsetIcon,
+  "video-camera": VideoCameraIcon,
+  microphone: MicrophoneIcon,
+  paperclip: PaperclipIcon,
+  image: ImageIcon,
 
   // ==========================================================================
   // 时间/日历
@@ -281,6 +441,14 @@ export const iconRegistry: Record<IconName, PhosphorIcon> = {
   list: ListIcon,
   rows: RowsIcon,
   "sign-out": SignOutIcon,
+  "device-mobile": DeviceMobileIcon,
+  desktop: DesktopIcon,
+
+  // ==========================================================================
+  // 反馈与互动
+  // ==========================================================================
+  "thumbs-up": ThumbsUpIcon,
+  "thumbs-down": ThumbsDownIcon,
 
   // ==========================================================================
   // 其他

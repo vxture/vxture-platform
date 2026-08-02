@@ -34,6 +34,12 @@ export const ICON_GROUPS = [
       "caret-left-bold",
       "caret-right-bold",
       "squares-four",
+      "external-link", // 站外/新窗口打开
+      "link",
+      "sort-ascending",
+      "sort-descending",
+      "push-pin", // 置顶/固定
+      "sidebar", // 侧栏收放
     ],
   },
   {
@@ -61,11 +67,35 @@ export const ICON_GROUPS = [
       "text-indent",
       "text-outdent",
       "sign-out",
+      "download",
+      "upload",
+      "refresh",
+      "undo",
+      "filter",
+      "share",
+      "archive",
+      "prohibit", // 禁用/封禁
+      "pause",
+      "dots-three", // 水平省略号（更多操作）
+      "drag", // 拖拽手柄
+      "printer",
+      "power",
+      "sign-in",
+      "qr-code",
     ],
   },
   {
     label: "状态",
-    icons: ["success", "error", "warning", "info"],
+    icons: [
+      "success",
+      "error",
+      "warning",
+      "info",
+      "spinner", // 加载中
+      "circle-dashed", // 待定/排队态
+      "flag",
+      "seal-check", // 已认证/官方
+    ],
   },
   {
     label: "云服务与智能体",
@@ -79,6 +109,12 @@ export const ICON_GROUPS = [
       "server",
       "cube",
       "building-library",
+      "cpu",
+      "hard-drive",
+      "rocket", // 发布/上线
+      "terminal",
+      "plugs-connected", // 集成已连
+      "puzzle", // 插件/扩展
     ],
   },
   {
@@ -95,6 +131,46 @@ export const ICON_GROUPS = [
     ],
   },
   {
+    label: "文件与文档",
+    icons: [
+      "file",
+      "file-text",
+      "folder",
+      "folder-open",
+      "clipboard",
+      "book-open",
+      "newspaper",
+    ],
+  },
+  {
+    label: "商业与账务",
+    icons: [
+      "credit-card",
+      "receipt",
+      "wallet",
+      "coins",
+      "currency-cny",
+      "ticket", // 券/工单
+      "gift",
+      "scales", // 结算/对账
+      "gauge", // 用量/配额仪表
+      "trend-up",
+      "trend-down",
+      "chart-line",
+      "chart-pie",
+    ],
+  },
+  {
+    label: "安全与凭证",
+    icons: [
+      "shield",
+      "shield-warning",
+      "fingerprint",
+      "certificate",
+      "lock-open",
+    ],
+  },
+  {
     label: "用户与组织",
     icons: [
       "user",
@@ -104,6 +180,8 @@ export const ICON_GROUPS = [
       "users", // 用户组（原 user-group 已合并）
       "medal",
       "star",
+      "user-plus", // 邀请/添加成员
+      "user-circle",
     ],
   },
   {
@@ -116,6 +194,12 @@ export const ICON_GROUPS = [
       "linkedin",
       "chat-circle",
       "paperplane-tilt",
+      "megaphone", // 公告
+      "headset", // 客服/支持
+      "video-camera",
+      "microphone",
+      "paperclip", // 附件
+      "image",
     ],
   },
   {
@@ -139,7 +223,13 @@ export const ICON_GROUPS = [
       "minimize", // 原生全屏收起（ArrowsInSimple）
       "list", // 列表视图
       "rows", // 密度切换
+      "device-mobile",
+      "desktop",
     ],
+  },
+  {
+    label: "反馈与互动",
+    icons: ["thumbs-up", "thumbs-down"],
   },
   {
     label: "系统保留",
