@@ -26,6 +26,9 @@ import {
   type FilterBarView,
   Icon,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   ListCard,
   ListCardGrid,
   ListPageTemplate,
@@ -279,15 +282,20 @@ export default function ProvidersPage() {
               </Button>
             }
           >
-            <Input
-              placeholder="搜索 Provider…"
-              className="grow basis-media-3xl max-w-panel-sm"
-              value={keyword}
-              onChange={(e) => {
-                setKeyword(e.target.value);
-                pager.resetPage();
-              }}
-            />
+            <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+              <InputGroupAddon>
+                <Icon name="search" size="sm" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="搜索 Provider…"
+                aria-label="搜索 Provider"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  pager.resetPage();
+                }}
+              />
+            </InputGroup>
             <NativeSelect
               wrapperClassName="w-fit"
               value={statusFilter}

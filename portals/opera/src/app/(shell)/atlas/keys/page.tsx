@@ -24,6 +24,9 @@ import {
   type FilterBarView,
   Icon,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Kbd,
   ListCard,
   ListCardGrid,
@@ -258,15 +261,20 @@ export default function KeysPage() {
                 : `${filtered.length} / ${rows.length}`
             }
           >
-            <Input
-              placeholder="搜索名称 / 前缀…"
-              className="grow basis-media-3xl max-w-panel-sm"
-              value={keyword}
-              onChange={(e) => {
-                setKeyword(e.target.value);
-                pager.resetPage();
-              }}
-            />
+            <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+              <InputGroupAddon>
+                <Icon name="search" size="sm" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="搜索名称 / 前缀…"
+                aria-label="搜索 Key"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  pager.resetPage();
+                }}
+              />
+            </InputGroup>
             <NativeSelect
               wrapperClassName="w-fit"
               value={kindFilter}

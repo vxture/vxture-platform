@@ -23,6 +23,9 @@ import {
   type FilterBarView,
   Icon,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Label,
   ListCard,
   ListCardGrid,
@@ -273,15 +276,20 @@ export default function ModelsPage() {
                 : `${filtered.length} / ${rows.length}`
             }
           >
-            <Input
-              placeholder="搜索模型编码…"
-              className="grow basis-media-3xl max-w-panel-sm"
-              value={keyword}
-              onChange={(e) => {
-                setKeyword(e.target.value);
-                pager.resetPage();
-              }}
-            />
+            <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+              <InputGroupAddon>
+                <Icon name="search" size="sm" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="搜索模型编码…"
+                aria-label="搜索模型"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  pager.resetPage();
+                }}
+              />
+            </InputGroup>
             <NativeSelect
               wrapperClassName="w-fit"
               value={capability}

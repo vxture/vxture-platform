@@ -11,7 +11,10 @@ import {
   DataTable,
   FilterBar,
   type FilterBarView,
-  Input,
+  Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Kbd,
   ListCard,
   ListCardGrid,
@@ -91,15 +94,20 @@ export default function LogsPage() {
               : `${visible.length} / ${logs.length}`
           }
         >
-          <Input
-            placeholder="搜索日志内容 / Trace…"
-            className="grow basis-media-3xl max-w-panel-sm"
-            value={keyword}
-            onChange={(e) => {
-              setKeyword(e.target.value);
-              pager.resetPage();
-            }}
-          />
+          <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+            <InputGroupAddon>
+              <Icon name="search" size="sm" aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="搜索日志内容 / Trace…"
+              aria-label="搜索日志"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
+            />
+          </InputGroup>
           <NativeSelect
             wrapperClassName="w-fit"
             value={level}

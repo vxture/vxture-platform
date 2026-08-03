@@ -9,7 +9,10 @@ import {
   DataTable,
   FilterBar,
   type FilterBarView,
-  Input,
+  Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   ListCard,
   ListCardGrid,
   ListPageTemplate,
@@ -84,15 +87,20 @@ export default function AuditPage() {
               : `${visible.length} / ${auditTrail.length}`
           }
         >
-          <Input
-            placeholder="搜索对象 / 操作者…"
-            className="grow basis-media-3xl max-w-panel-sm"
-            value={keyword}
-            onChange={(e) => {
-              setKeyword(e.target.value);
-              pager.resetPage();
-            }}
-          />
+          <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+            <InputGroupAddon>
+              <Icon name="search" size="sm" aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="搜索对象 / 操作者…"
+              aria-label="搜索留痕"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
+            />
+          </InputGroup>
           <NativeSelect
             wrapperClassName="w-fit"
             value={action}
