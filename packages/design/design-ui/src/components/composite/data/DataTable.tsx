@@ -22,6 +22,11 @@
  * 让表格文字与上下文的左右缘对齐（admin 的表格就是靠这个嵌进页面的）。
  * 表头与数据行共用同一个 `align` 轴——admin 表头居中、行左对齐的轴冲突（X1）
  * 在这里从结构上不可能发生。
+ *
+ * 选择列 / 序号列固定宽（`w-control-3xl`，约 64px）、内容居中，且**不**参与
+ * 首末列零边距——`first:` 选择器认的是 DOM 里真实的第一个 `<td>`，选择列一旦
+ * 存在就是它，零边距会把复选框顶到容器边界外观（2026-08-03 owner 实测抓到）。
+ * 零边距的意图仍在：没有选择/序号列时，业务首列照常贴边对齐上下文。
  */
 
 import * as React from "react";
@@ -41,6 +46,9 @@ const ALIGN: Record<DataTableAlign, string> = {
   center: "text-center",
   right: "text-right",
 };
+
+/** 选择列 / 序号列共用：固定宽、居中，不吃首列零边距。 */
+const EDGE_COL = "w-control-3xl px-md text-center";
 
 export interface DataTableColumn<TRow> {
   readonly id: string;
@@ -152,21 +160,23 @@ function DataTable<TRow>({
           >
             <tr>
               {selectable ? (
-                <th
-                  scope="col"
-                  className="w-px px-md py-sm first:pl-none last:pr-none"
-                >
-                  <Checkbox
-                    checked={allSelected || (someSelected && "indeterminate")}
-                    onCheckedChange={toggleAll}
-                    aria-label={allSelected ? "取消全选" : "全选本页"}
-                  />
+                <th scope="col" className={cn(EDGE_COL, "py-sm")}>
+                  <div className="flex items-center justify-center">
+                    <Checkbox
+                      checked={allSelected || (someSelected && "indeterminate")}
+                      onCheckedChange={toggleAll}
+                      aria-label={allSelected ? "取消全选" : "全选本页"}
+                    />
+                  </div>
                 </th>
               ) : null}
               {indexed ? (
                 <th
                   scope="col"
-                  className="w-px whitespace-nowrap px-md py-sm text-left text-label-sm first:pl-none"
+                  className={cn(
+                    EDGE_COL,
+                    "py-sm whitespace-nowrap text-label-sm",
+                  )}
                 >
                   序号
                 </th>
@@ -227,7 +237,7 @@ function DataTable<TRow>({
               {rowActions ? (
                 <th
                   scope="col"
-                  className="sticky right-0 w-px whitespace-nowrap bg-background px-md py-sm text-right text-label-sm last:pr-none"
+                  className="sticky right-0 w-px whitespace-nowrap bg-background px-md py-sm text-center text-label-sm"
                 >
                   {rowActionsHeader}
                 </th>
@@ -284,18 +294,25 @@ function DataTable<TRow>({
                   >
                     {selectable ? (
                       <td
-                        className="w-px px-md py-sm first:pl-none last:pr-none"
+                        className={cn(EDGE_COL, "py-md align-middle")}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleRow(key)}
-                          aria-label="选择本行"
-                        />
+                        <div className="flex items-center justify-center">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleRow(key)}
+                            aria-label="选择本行"
+                          />
+                        </div>
                       </td>
                     ) : null}
                     {indexed ? (
-                      <td className="w-px whitespace-nowrap px-md py-md align-middle text-body-sm text-muted-foreground first:pl-none">
+                      <td
+                        className={cn(
+                          EDGE_COL,
+                          "py-md align-middle whitespace-nowrap text-body-sm text-muted-foreground",
+                        )}
+                      >
                         {indexStart + rowIndex}
                       </td>
                     ) : null}
@@ -314,14 +331,17 @@ function DataTable<TRow>({
                     {rowActions ? (
                       /* 锁定列自己铺底：横向滚动时业务列从其下方经过，
                          bg-background 垫底、行 hover/选中态在其上再铺一层，
-                         与行的视觉状态保持同步。 */
+                         与行的视觉状态保持同步。h-full：内层 div 默认只随内容
+                         撑高，行内别的单元格更高（如两行主列）时它会矮一截，
+                         hover/选中背景上下留白（2026-08-03 owner 实测抓到）——
+                         撑满单元格高度才能让背景条与整行同高。 */
                       <td
-                        className="sticky right-0 w-px whitespace-nowrap bg-background p-none align-middle last:pr-none"
+                        className="sticky right-0 w-px whitespace-nowrap bg-background p-none align-middle"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div
                           className={cn(
-                            "flex items-center justify-end px-md py-md",
+                            "flex h-full items-center justify-end px-md",
                             "transition-colors duration-fast ease-standard",
                             isSelected
                               ? "bg-surface-selected"
