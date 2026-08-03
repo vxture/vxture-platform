@@ -84,28 +84,23 @@ function Pagination({
             }`
           : `第 ${safePage} / ${safePageCount} 页`}
       </div>
-      <div className="flex flex-wrap items-center gap-sm">
+      {/* 每页条数与翻页条之间留大距（gap-2xl）：两组都是数字按钮，贴近了
+          会读成同一排页码。 */}
+      <div className="flex flex-wrap items-center gap-2xl">
         {onPageSizeChange && typeof pageSize === "number" ? (
           /* 按钮化的每页条数（承旧 PageSizePicker，载体为 SegmentedControl）：
-             档位全部可见、一次点击到位，不走"点开—找—再点"的下拉。 */
-          <span className="flex items-center gap-xs">
-            <span className="whitespace-nowrap text-body-sm text-muted-foreground">
-              每页
-            </span>
-            <SegmentedControl
-              size="sm"
-              ariaLabel="每页条数"
-              value={pageSize}
-              onChange={onPageSizeChange}
-              items={pageSizeOptions.map((option) => ({
-                value: option,
-                label: option,
-              }))}
-            />
-            <span className="whitespace-nowrap text-body-sm text-muted-foreground">
-              条
-            </span>
-          </span>
+             纯数字、不带标签文字——档位一眼即懂；语义留给 aria-label。 */
+          <SegmentedControl
+            size="sm"
+            ariaLabel="每页条数"
+            value={pageSize}
+            onChange={onPageSizeChange}
+            items={pageSizeOptions.map((option) => ({
+              value: option,
+              label: option,
+              ariaLabel: `每页 ${option} 条`,
+            }))}
+          />
         ) : null}
         <div className="flex items-center gap-2xs">
           <Button
