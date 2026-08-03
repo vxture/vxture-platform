@@ -71,6 +71,17 @@ export interface DataTableProps<TRow> {
   /** 给了才出复选框列。 */
   readonly selectedKeys?: readonly string[];
   readonly onSelectionChange?: (keys: readonly string[]) => void;
+  /**
+   * 给了才出序号列（复选框之后、首业务列之前），值为本页首行的序号——
+   * 翻页时由调用方递进（`(page-1)*pageSize+1`），本件不认分页。
+   */
+  readonly indexStart?: number;
+  /**
+   * 给了才出行操作列：钉在最右、横向滚动时锁定不动（admin 列锁定惯例）。
+   * 单元格点击不冒泡到 `onRowClick`——行点击是选择/进详情，操作是操作。
+   */
+  readonly rowActions?: (row: TRow, rowIndex: number) => React.ReactNode;
+  readonly rowActionsHeader?: React.ReactNode;
   readonly onRowClick?: (row: TRow, rowIndex: number) => void;
   /** 表尾：分页、总数一类。渲染在虚线上边框之下，左右两端由调用方内容自摆。 */
   readonly footer?: React.ReactNode;
@@ -99,11 +110,15 @@ function DataTable<TRow>({
   onSortChange,
   selectedKeys,
   onSelectionChange,
+  indexStart,
+  rowActions,
+  rowActionsHeader = "操作",
   onRowClick,
   footer,
   className,
 }: DataTableProps<TRow>) {
   const selectable = selectedKeys !== undefined;
+  const indexed = indexStart !== undefined;
   const selected = React.useMemo(
     () => new Set(selectedKeys ?? []),
     [selectedKeys],
@@ -111,7 +126,11 @@ function DataTable<TRow>({
   const keys = rows.map((row, i) => rowKey(row, i));
   const allSelected = keys.length > 0 && keys.every((k) => selected.has(k));
   const someSelected = !allSelected && keys.some((k) => selected.has(k));
-  const colSpan = columns.length + (selectable ? 1 : 0);
+  const colSpan =
+    columns.length +
+    (selectable ? 1 : 0) +
+    (indexed ? 1 : 0) +
+    (rowActions ? 1 : 0);
 
   const toggleAll = () => {
     onSelectionChange?.(allSelected ? [] : keys);
@@ -142,6 +161,14 @@ function DataTable<TRow>({
                     onCheckedChange={toggleAll}
                     aria-label={allSelected ? "取消全选" : "全选本页"}
                   />
+                </th>
+              ) : null}
+              {indexed ? (
+                <th
+                  scope="col"
+                  className="w-px whitespace-nowrap px-md py-sm text-left text-label-sm first:pl-none"
+                >
+                  序号
                 </th>
               ) : null}
               {columns.map((column) => {
@@ -197,6 +224,14 @@ function DataTable<TRow>({
                   </th>
                 );
               })}
+              {rowActions ? (
+                <th
+                  scope="col"
+                  className="sticky right-0 w-px whitespace-nowrap bg-background px-md py-sm text-right text-label-sm last:pr-none"
+                >
+                  {rowActionsHeader}
+                </th>
+              ) : null}
             </tr>
           </thead>
           <tbody>
@@ -240,7 +275,7 @@ function DataTable<TRow>({
                       onRowClick ? () => onRowClick(row, rowIndex) : undefined
                     }
                     className={cn(
-                      "border-b last:border-b-0",
+                      "group border-b last:border-b-0",
                       hairline.field,
                       "transition-colors duration-fast ease-standard",
                       isSelected ? "bg-surface-selected" : "hover:bg-accent",
@@ -259,6 +294,11 @@ function DataTable<TRow>({
                         />
                       </td>
                     ) : null}
+                    {indexed ? (
+                      <td className="w-px whitespace-nowrap px-md py-md align-middle text-body-sm text-muted-foreground first:pl-none">
+                        {indexStart + rowIndex}
+                      </td>
+                    ) : null}
                     {columns.map((column) => (
                       <td
                         key={column.id}
@@ -271,6 +311,27 @@ function DataTable<TRow>({
                         {column.cell(row, rowIndex)}
                       </td>
                     ))}
+                    {rowActions ? (
+                      /* 锁定列自己铺底：横向滚动时业务列从其下方经过，
+                         bg-background 垫底、行 hover/选中态在其上再铺一层，
+                         与行的视觉状态保持同步。 */
+                      <td
+                        className="sticky right-0 w-px whitespace-nowrap bg-background p-none align-middle last:pr-none"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div
+                          className={cn(
+                            "flex items-center justify-end px-md py-md",
+                            "transition-colors duration-fast ease-standard",
+                            isSelected
+                              ? "bg-surface-selected"
+                              : "group-hover:bg-accent",
+                          )}
+                        >
+                          {rowActions(row, rowIndex)}
+                        </div>
+                      </td>
+                    ) : null}
                   </tr>
                 );
               })

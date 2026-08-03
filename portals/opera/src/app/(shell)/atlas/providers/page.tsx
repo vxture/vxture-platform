@@ -2,6 +2,11 @@
 
 /* Provider — opera-atlas-design.md §4：CRUD + 健康检查。
  *
+ * 同时是列表页五要件的参考实现（owner 拍板的 admin 租户列表语法，2026-08-03）：
+ * 工具行 {视图切换}-{计数}-{搜索}-{筛选组}-{主操作}、
+ * 表格列 {选择框}-{序号}-{两行主列}-{信息列}-{锁定操作列}、
+ * 表尾 {共 N 条 / 当前筛选 M 条}-{每页条数}-{翻页}。
+ *
  * 写路径先跑在本地状态上（BFF 未通，见 mocks/atlas.ts）：接入 / 编辑 / 启停 /
  * 删除都改本地行，结果走 toast。接 BFF 时只换各 handler 的实现，页面结构与
  * 对话框不动。 */
@@ -9,7 +14,10 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
+  BulkActionBar,
   Button,
+  Card,
+  CardContent,
   DataTable,
   DialogForm,
   Field,
@@ -17,11 +25,14 @@ import {
   FieldGroup,
   FieldLabel,
   FilterBar,
+  type FilterBarView,
   Icon,
   Input,
   ListPageTemplate,
   NativeSelect,
+  Pagination,
   StatusBadge,
+  TableTitleCell,
   ViewHeader,
   useToast,
 } from "@vxture/design-system";
@@ -65,10 +76,14 @@ export default function ProvidersPage() {
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">(
     "all",
   );
+  const [view, setView] = useState<FilterBarView>("list");
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<ProviderDraft>(EMPTY_DRAFT);
 
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return rows.filter(
       (r) =>
@@ -78,6 +93,13 @@ export default function ProvidersPage() {
           r.code.toLowerCase().includes(kw)),
     );
   }, [rows, keyword, statusFilter]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, pageCount);
+  const visible = filtered.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
 
   const openCreate = () => {
     setDraft(EMPTY_DRAFT);
@@ -106,6 +128,16 @@ export default function ProvidersPage() {
           ? "Router 会跳过该 Provider 下的全部模型。"
           : "该 Provider 重新参与路由。",
     });
+  };
+
+  const setStatusBulk = (status: ResourceStatus) => {
+    const ids = new Set(selectedKeys);
+    setRows((all) => all.map((r) => (ids.has(r.id) ? { ...r, status } : r)));
+    toast({
+      tone: status === "disabled" ? "warning" : "success",
+      title: `${ids.size} 家 Provider 已${status === "disabled" ? "停用" : "启用"}`,
+    });
+    setSelectedKeys([]);
   };
 
   const runHealthCheck = (row: ProviderRow) =>
@@ -172,6 +204,64 @@ export default function ProvidersPage() {
   const draftValid = draft.code.trim() !== "" && draft.name.trim() !== "";
   const editing = dialog?.kind === "edit";
 
+  const rowMenu = (r: ProviderRow) => (
+    <ActionMenu
+      label={`${r.name} 操作`}
+      items={[
+        {
+          id: "health",
+          label: "健康检查",
+          icon: "waveform",
+          onSelect: () => runHealthCheck(r),
+        },
+        {
+          id: "edit",
+          label: "编辑",
+          icon: "edit",
+          onSelect: () => openEdit(r),
+        },
+        r.status === "disabled"
+          ? {
+              id: "enable",
+              label: "启用",
+              icon: "play" as const,
+              onSelect: () => setStatus(r, "active"),
+            }
+          : {
+              id: "disable",
+              label: "禁用",
+              icon: "pause" as const,
+              onSelect: () => setStatus(r, "disabled"),
+            },
+        {
+          id: "delete",
+          label: "删除",
+          icon: "trash",
+          danger: true,
+          separatorBefore: true,
+          onSelect: () => setDialog({ kind: "delete", row: r }),
+        },
+      ]}
+    />
+  );
+
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={safePage}
+      pageCount={pageCount}
+      total={rows.length}
+      filteredTotal={filtered.length}
+      pageSize={pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={(size) => {
+        setPageSize(size);
+        setPage(1);
+      }}
+      onPageChange={setPage}
+    />
+  );
+
   return (
     <>
       <ListPageTemplate
@@ -180,16 +270,24 @@ export default function ProvidersPage() {
             icon="plugs-connected"
             title="Provider"
             description="模型供应商接入：区域、代理出口、健康检查与延迟画像。"
-            action={
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            count={
+              filtered.length === rows.length
+                ? rows.length
+                : `${filtered.length} / ${rows.length}`
+            }
+            actions={
               <Button onClick={openCreate}>
                 <Icon name="plus" size="sm" />
                 接入 Provider
               </Button>
             }
-          />
-        }
-        filters={
-          <FilterBar>
+          >
             <Input
               placeholder="搜索 Provider…"
               className="max-w-panel-sm"
@@ -199,9 +297,10 @@ export default function ProvidersPage() {
             <NativeSelect
               wrapperClassName="w-fit"
               value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value as ResourceStatus | "all")
-              }
+              onChange={(e) => {
+                setStatusFilter(e.target.value as ResourceStatus | "all");
+                setPage(1);
+              }}
               aria-label="状态筛选"
             >
               <option value="all">全部状态</option>
@@ -211,101 +310,116 @@ export default function ProvidersPage() {
             </NativeSelect>
           </FilterBar>
         }
-        table={
-          <DataTable
-            columns={[
+        bulkBar={
+          <BulkActionBar
+            count={selectedKeys.length}
+            noun="家"
+            onClear={() => setSelectedKeys([])}
+            actions={[
               {
-                id: "name",
-                header: "Provider",
-                cell: (r) => (
-                  <span className="flex flex-col">
-                    <span className="text-label-md text-foreground">
-                      {r.name}
-                    </span>
-                    <span className="text-body-sm text-muted-foreground">
-                      {r.code}
-                    </span>
-                  </span>
-                ),
+                id: "enable",
+                label: "启用",
+                icon: "play",
+                onSelect: () => setStatusBulk("active"),
               },
               {
-                id: "status",
-                header: "状态",
-                cell: (r) => (
-                  <StatusBadge tone={RESOURCE_STATUS_META[r.status].tone} dot>
-                    {RESOURCE_STATUS_META[r.status].label}
-                  </StatusBadge>
-                ),
-              },
-              { id: "region", header: "区域", cell: (r) => r.region },
-              { id: "proxy", header: "代理出口", cell: (r) => r.proxy },
-              {
-                id: "models",
-                header: "模型数",
-                align: "right",
-                cell: (r) => r.models,
-              },
-              {
-                id: "latency",
-                header: "P95 延迟",
-                align: "right",
-                cell: (r) => (r.latencyMs ? `${r.latencyMs}ms` : "—"),
-              },
-              {
-                id: "success",
-                header: "成功率",
-                align: "right",
-                cell: (r) => r.successRate,
-              },
-              {
-                id: "actions",
-                header: "",
-                align: "right",
-                cell: (r) => (
-                  <ActionMenu
-                    label={`${r.name} 操作`}
-                    items={[
-                      {
-                        id: "health",
-                        label: "健康检查",
-                        icon: "waveform",
-                        onSelect: () => runHealthCheck(r),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        onSelect: () => openEdit(r),
-                      },
-                      r.status === "disabled"
-                        ? {
-                            id: "enable",
-                            label: "启用",
-                            icon: "play" as const,
-                            onSelect: () => setStatus(r, "active"),
-                          }
-                        : {
-                            id: "disable",
-                            label: "禁用",
-                            icon: "pause" as const,
-                            onSelect: () => setStatus(r, "disabled"),
-                          },
-                      {
-                        id: "delete",
-                        label: "删除",
-                        icon: "trash",
-                        danger: true,
-                        separatorBefore: true,
-                        onSelect: () => setDialog({ kind: "delete", row: r }),
-                      },
-                    ]}
-                  />
-                ),
+                id: "disable",
+                label: "停用",
+                icon: "pause",
+                danger: true,
+                onSelect: () => setStatusBulk("disabled"),
               },
             ]}
-            rows={visible}
-            rowKey={(r) => r.id}
           />
+        }
+        table={
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "name",
+                  header: "Provider",
+                  cell: (r) => (
+                    <TableTitleCell
+                      icon="plugs-connected"
+                      title={r.name}
+                      description={`${r.code} · ${r.region}`}
+                      onTitleClick={() => openEdit(r)}
+                    />
+                  ),
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  cell: (r) => (
+                    <StatusBadge tone={RESOURCE_STATUS_META[r.status].tone} dot>
+                      {RESOURCE_STATUS_META[r.status].label}
+                    </StatusBadge>
+                  ),
+                },
+                { id: "proxy", header: "代理出口", cell: (r) => r.proxy },
+                {
+                  id: "models",
+                  header: "模型数",
+                  align: "right",
+                  cell: (r) => r.models,
+                },
+                {
+                  id: "latency",
+                  header: "P95 延迟",
+                  align: "right",
+                  cell: (r) => (r.latencyMs ? `${r.latencyMs}ms` : "—"),
+                },
+                {
+                  id: "success",
+                  header: "成功率",
+                  align: "right",
+                  cell: (r) => r.successRate,
+                },
+              ]}
+              rows={visible}
+              rowKey={(r) => r.id}
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              indexStart={(safePage - 1) * pageSize + 1}
+              rowActions={rowMenu}
+              footer={pagination}
+            />
+          ) : (
+            <div className="flex flex-col gap-sm">
+              <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-3">
+                {visible.map((r) => (
+                  <Card key={r.id} surface="soft">
+                    <CardContent className="flex flex-col gap-sm">
+                      <div className="flex items-start justify-between gap-sm">
+                        <TableTitleCell
+                          icon="plugs-connected"
+                          title={r.name}
+                          description={`${r.code} · ${r.region}`}
+                          onTitleClick={() => openEdit(r)}
+                        />
+                        {rowMenu(r)}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-sm">
+                        <StatusBadge
+                          tone={RESOURCE_STATUS_META[r.status].tone}
+                          dot
+                        >
+                          {RESOURCE_STATUS_META[r.status].label}
+                        </StatusBadge>
+                        <span className="text-body-sm text-muted-foreground">
+                          {r.models} 模型
+                          {r.latencyMs ? ` · P95 ${r.latencyMs}ms` : ""} ·
+                          成功率 {r.successRate}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {pagination}
+            </div>
+          )
         }
       />
 

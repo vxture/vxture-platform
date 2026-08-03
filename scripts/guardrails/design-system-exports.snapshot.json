@@ -270,6 +270,7 @@
       "TableHead",
       "TableHeader",
       "TableRow",
+      "TableTitleCell",
       "Tabs",
       "TabsContent",
       "TabsList",

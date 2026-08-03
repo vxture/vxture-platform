@@ -128,6 +128,7 @@ import {
   FilterBar,
   MetricGrid,
   type MetricGridItem,
+  TableTitleCell,
   NativeSelect,
   Section,
   SectionHeader,
@@ -1431,8 +1432,9 @@ export const ENTRIES: readonly Entry[] = [
     layer: "pattern",
     group: "图案",
     tags: ["vxture", "patterns"],
+    covers: ["TableTitleCell"],
     deviation:
-      "三态一次定齐：加载出骨架行（撑住高度不让页面跳）、空态出 EmptyState、有数据出行。选择态受控于 selectedKeys，与 BulkActionBar 对接；表头半选走 indeterminate。透明模式：无容器卡，顶边实线/表头实线/行间虚线，首末列内边距归零与上下文对齐；footer 槽位承分页。行操作列标准 = align:right 列 + ActionMenu",
+      "三态一次定齐：加载出骨架行（撑住高度不让页面跳）、空态出 EmptyState、有数据出行。选择态受控于 selectedKeys，与 BulkActionBar 对接；表头半选走 indeterminate。透明模式：无容器卡，顶边实线/表头实线/行间虚线，首末列内边距归零与上下文对齐；footer 槽位承分页。列语法（admin 列表惯例）：选择框-序号(indexStart)-两行主列(TableTitleCell)-信息列-锁定操作列(rowActions，横向滚动钉右)",
     render: () => <DataTableDemo />,
   },
   {
@@ -2497,17 +2499,46 @@ function DataTableDemo() {
         onSortChange={setSort}
         selectedKeys={selected}
         onSelectionChange={setSelected}
+        indexStart={1}
+        rowActions={() => (
+          <ActionMenu
+            items={[
+              { id: "edit", label: "编辑", icon: "edit" },
+              {
+                id: "delete",
+                label: "删除",
+                icon: "trash",
+                danger: true,
+                separatorBefore: true,
+              },
+            ]}
+          />
+        )}
         footer={
-          <>
-            <span className="text-body-sm text-muted-foreground">
-              共 {rows.length} 条记录
-            </span>
-            <Pagination page={1} pageCount={3} onPageChange={() => undefined} />
-          </>
+          <Pagination
+            className="w-full"
+            page={1}
+            pageCount={3}
+            total={rows.length * 3}
+            filteredTotal={rows.length}
+            pageSize={10}
+            onPageSizeChange={() => undefined}
+            onPageChange={() => undefined}
+          />
         }
         columns={[
-          { id: "name", header: "名称", cell: (row) => row.name },
-          { id: "owner", header: "归属", cell: (row) => row.owner },
+          {
+            id: "name",
+            header: "名称",
+            cell: (row) => (
+              <TableTitleCell
+                icon="stack"
+                title={row.name}
+                description={`ch-${row.id} · ${row.owner}`}
+                onTitleClick={() => undefined}
+              />
+            ),
+          },
           {
             id: "calls",
             header: "调用量",
@@ -2520,25 +2551,6 @@ function DataTableDemo() {
             header: "状态",
             cell: (row) => (
               <StatusBadge tone={row.tone}>{row.status}</StatusBadge>
-            ),
-          },
-          {
-            id: "actions",
-            header: "",
-            align: "right",
-            cell: () => (
-              <ActionMenu
-                items={[
-                  { id: "edit", label: "编辑", icon: "edit" },
-                  {
-                    id: "delete",
-                    label: "删除",
-                    icon: "trash",
-                    danger: true,
-                    separatorBefore: true,
-                  },
-                ]}
-              />
             ),
           },
         ]}

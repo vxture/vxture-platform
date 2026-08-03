@@ -139,6 +139,21 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
 - 亮/暗双模式浏览器实测：四指标卡品牌蓝顶缘+同色读数、padding 四向对称、Router 独立
   CardContent 卡顶部不再归零
 
+### 批 X — 列表页五要件（admin 租户列表语法，已完成）
+
+- owner 拍板（2026-08-03，参照 admin /tenants）：两行行模式保留、辅助行字重按 DS 收
+  （admin 700+ 字重靠字重打层次，DS 靠字号+前景色）；列语法、工具行、翻页三段定型
+- DataTable：`indexStart` 序号列（翻页由调用方递进）+ `rowActions` 锁定操作列
+  （sticky right，自铺 bg-background 垫底、行 hover/选中态同步上铺，横向滚动不透底）
+- 新件 TableTitleCell：icon + 主信息（可点进详情）+ 辅助行 body-sm/muted；
+  归 DataTable 预览条目 covers
+- FilterBar 升级为工具行：{list/cards 视图切换(SegmentedControl)}-{计数}-{children
+  搜索/筛选组}-{actions 主操作}，view/count 不传即退回纯筛选行
+- Pagination：左"共 N 条记录 / 当前筛选 M 条"，右{每页 N 条(NativeSelect)}+{翻页}
+- opera Provider 页为参考实现（选择+批量启停、序号翻页递进、卡片视图、每页条数），
+  浏览器实测：翻页/选择/批量/切视图全通
+- 快照 minor +1（TableTitleCell 具名导出）
+
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 
 | 决策                              | 取向                                                                                                               |
