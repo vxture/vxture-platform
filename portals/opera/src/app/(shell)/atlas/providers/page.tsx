@@ -16,8 +16,6 @@ import {
   ActionMenu,
   BulkActionBar,
   Button,
-  Card,
-  CardContent,
   DataTable,
   DialogForm,
   Field,
@@ -28,6 +26,8 @@ import {
   type FilterBarView,
   Icon,
   Input,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -387,36 +387,33 @@ export default function ProvidersPage() {
             />
           ) : (
             <div className="flex flex-col gap-sm">
-              <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-3">
+              <ListCardGrid>
                 {visible.map((r) => (
-                  <Card key={r.id} surface="soft">
-                    <CardContent className="flex flex-col gap-sm">
-                      <div className="flex items-start justify-between gap-sm">
-                        <TableTitleCell
-                          icon="plugs-connected"
-                          title={r.name}
-                          description={`${r.code} · ${r.region}`}
-                          onTitleClick={() => openEdit(r)}
-                        />
-                        {rowMenu(r)}
-                      </div>
-                      <div className="flex flex-wrap items-center gap-sm">
-                        <StatusBadge
-                          tone={RESOURCE_STATUS_META[r.status].tone}
-                          dot
-                        >
-                          {RESOURCE_STATUS_META[r.status].label}
-                        </StatusBadge>
-                        <span className="text-body-sm text-muted-foreground">
-                          {r.models} 模型
-                          {r.latencyMs ? ` · P95 ${r.latencyMs}ms` : ""} ·
-                          成功率 {r.successRate}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ListCard
+                    key={r.id}
+                    icon="plugs-connected"
+                    title={r.name}
+                    description={`${r.code} · ${r.region}`}
+                    onTitleClick={() => openEdit(r)}
+                    status={
+                      <StatusBadge
+                        tone={RESOURCE_STATUS_META[r.status].tone}
+                        dot
+                      >
+                        {RESOURCE_STATUS_META[r.status].label}
+                      </StatusBadge>
+                    }
+                    actions={rowMenu(r)}
+                    meta={
+                      <span>
+                        {r.models} 模型
+                        {r.latencyMs ? ` · P95 ${r.latencyMs}ms` : ""} · 成功率{" "}
+                        {r.successRate}
+                      </span>
+                    }
+                  />
                 ))}
-              </div>
+              </ListCardGrid>
               {pagination}
             </div>
           )

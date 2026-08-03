@@ -4,9 +4,9 @@
  * @layer Presentation
  * @category Components - Pattern
  *
- * 结构（admin 租户列表的工具行语法，owner 拍板保留，2026-08-03）：
- * {视图切换} - {计数} - {搜索 / 筛选组（children）} - {主要操作（actions）}。
- * 视图切换与计数是可选段：不传 `view` / `count` 时退回纯筛选行。
+ * 结构（owner 拍板 2026-08-03，二次修订）：
+ * 居左【{视图切换} {计数}】—【自适应留白】—居右【{搜索/筛选组（children）} {主操作（actions）}】。
+ * 视图切换与计数是可选段：不传 `view` / `count` 时左段为空，右段照常靠右。
  * 标题与描述由 `SectionHeader` 承担——板块的标题层级只有一个来源。
  *
  * 相对原实现：删 `title` / `description`（原先自己渲染 h2，与 SectionHeader 的
@@ -43,9 +43,8 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
         )}
         {...props}
       >
-        {/* flex-1：左组必须占满剩余宽，否则容器被内容反推，w-full 的搜索框
-            会把相邻筛选件挤下行（2026-08-03 opera 实测）。 */}
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-sm">
+        {/* 左段：视图切换 + 计数。shrink-0 保证窄屏下先折右段不挤左段。 */}
+        <div className="flex shrink-0 items-center gap-sm">
           {view && onViewChange ? (
             <SegmentedControl
               size="sm"
@@ -63,13 +62,12 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
               {count}
             </span>
           ) : null}
-          {children}
         </div>
-        {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-sm">
-            {actions}
-          </div>
-        ) : null}
+        {/* 右段：搜索 / 筛选组 / 主操作，一起靠右；中间由 justify-between 留白。 */}
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-sm">
+          {children}
+          {actions}
+        </div>
       </div>
     );
   },

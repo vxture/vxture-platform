@@ -20,8 +20,11 @@ import {
   FieldGroup,
   FieldLabel,
   FilterBar,
+  type FilterBarView,
   Icon,
   Input,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   Pagination,
   StatusBadge,
@@ -60,6 +63,7 @@ export default function EndpointsPage() {
   const [rows, setRows] = useState<EndpointRow[]>(seed);
   const [keyword, setKeyword] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
+  const [view, setView] = useState<FilterBarView>("list");
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<EndpointDraft>(EMPTY_DRAFT);
 
@@ -186,6 +190,56 @@ export default function EndpointsPage() {
     (routeOnly || draft.code.trim() !== "") &&
     draft.fallbackModel !== draft.primaryModel;
 
+  const rowMenu = (r: EndpointRow) => (
+    <ActionMenu
+      label={`${r.code} 操作`}
+      items={[
+        {
+          id: "route",
+          label: "调整路由",
+          icon: "tree-structure",
+          onSelect: () => openFrom(r, "route"),
+        },
+        {
+          id: "edit",
+          label: "编辑",
+          icon: "edit",
+          onSelect: () => openFrom(r, "edit"),
+        },
+        r.enabled
+          ? {
+              id: "disable",
+              label: "停用",
+              icon: "pause" as const,
+              danger: true,
+              separatorBefore: true,
+              onSelect: () => setEnabled(r, false),
+            }
+          : {
+              id: "enable",
+              label: "启用",
+              icon: "play" as const,
+              separatorBefore: true,
+              onSelect: () => setEnabled(r, true),
+            },
+      ]}
+    />
+  );
+
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={pager.page}
+      pageCount={pager.pageCount}
+      total={rows.length}
+      filteredTotal={filtered.length}
+      pageSize={pager.pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
+    />
+  );
+
   return (
     <>
       <ListPageTemplate
@@ -194,16 +248,18 @@ export default function EndpointsPage() {
             icon="plug"
             title="Endpoint"
             description="统一能力入口（chat/default、embedding/default…）。业务系统永远访问 Endpoint，不直接访问模型。"
-            action={
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            actions={
               <Button onClick={openCreate}>
                 <Icon name="plus" size="sm" />
                 新建 Endpoint
               </Button>
             }
-          />
-        }
-        filters={
-          <FilterBar
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -244,102 +300,91 @@ export default function EndpointsPage() {
           />
         }
         table={
-          <DataTable
-            columns={[
-              {
-                id: "code",
-                header: "Endpoint",
-                cell: (r) => (
-                  <TableTitleCell
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "code",
+                  header: "Endpoint",
+                  cell: (r) => (
+                    <TableTitleCell
+                      icon="plug"
+                      title={<span className="font-mono">{r.code}</span>}
+                      description={r.category}
+                      onTitleClick={() => openFrom(r, "edit")}
+                    />
+                  ),
+                },
+                {
+                  id: "primary",
+                  header: "Primary",
+                  cell: (r) => (
+                    <span className="text-code-sm">{r.primaryModel}</span>
+                  ),
+                },
+                {
+                  id: "fallback",
+                  header: "Fallback",
+                  cell: (r) =>
+                    r.fallbackModel ? (
+                      <span className="text-code-sm">{r.fallbackModel}</span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    ),
+                },
+                {
+                  id: "qps",
+                  header: "QPS",
+                  align: "right",
+                  cell: (r) => r.qps,
+                },
+                {
+                  id: "enabled",
+                  header: "状态",
+                  cell: (r) => (
+                    <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
+                      {r.enabled ? "已启用" : "已停用"}
+                    </StatusBadge>
+                  ),
+                },
+              ]}
+              rows={pager.pageRows}
+              rowKey={(r) => r.id}
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              indexStart={pager.indexStart}
+              rowActions={rowMenu}
+              footer={pagination}
+            />
+          ) : (
+            <div className="flex flex-col gap-sm">
+              <ListCardGrid>
+                {pager.pageRows.map((r) => (
+                  <ListCard
+                    key={r.id}
                     icon="plug"
                     title={<span className="font-mono">{r.code}</span>}
                     description={r.category}
                     onTitleClick={() => openFrom(r, "edit")}
+                    status={
+                      <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
+                        {r.enabled ? "已启用" : "已停用"}
+                      </StatusBadge>
+                    }
+                    actions={rowMenu(r)}
+                    meta={
+                      <span className="font-mono">
+                        {r.primaryModel}
+                        {r.fallbackModel ? ` → ${r.fallbackModel}` : ""} · QPS{" "}
+                        {r.qps}
+                      </span>
+                    }
                   />
-                ),
-              },
-              {
-                id: "primary",
-                header: "Primary",
-                cell: (r) => (
-                  <span className="text-code-sm">{r.primaryModel}</span>
-                ),
-              },
-              {
-                id: "fallback",
-                header: "Fallback",
-                cell: (r) =>
-                  r.fallbackModel ? (
-                    <span className="text-code-sm">{r.fallbackModel}</span>
-                  ) : (
-                    <span className="text-muted-foreground">—</span>
-                  ),
-              },
-              { id: "qps", header: "QPS", align: "right", cell: (r) => r.qps },
-              {
-                id: "enabled",
-                header: "状态",
-                cell: (r) => (
-                  <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
-                    {r.enabled ? "已启用" : "已停用"}
-                  </StatusBadge>
-                ),
-              },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r) => r.id}
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-            indexStart={pager.indexStart}
-            rowActions={(r) => (
-              <ActionMenu
-                label={`${r.code} 操作`}
-                items={[
-                  {
-                    id: "route",
-                    label: "调整路由",
-                    icon: "tree-structure",
-                    onSelect: () => openFrom(r, "route"),
-                  },
-                  {
-                    id: "edit",
-                    label: "编辑",
-                    icon: "edit",
-                    onSelect: () => openFrom(r, "edit"),
-                  },
-                  r.enabled
-                    ? {
-                        id: "disable",
-                        label: "停用",
-                        icon: "pause" as const,
-                        danger: true,
-                        separatorBefore: true,
-                        onSelect: () => setEnabled(r, false),
-                      }
-                    : {
-                        id: "enable",
-                        label: "启用",
-                        icon: "play" as const,
-                        separatorBefore: true,
-                        onSelect: () => setEnabled(r, true),
-                      },
-                ]}
-              />
-            )}
-            footer={
-              <Pagination
-                className="w-full"
-                page={pager.page}
-                pageCount={pager.pageCount}
-                total={rows.length}
-                filteredTotal={filtered.length}
-                pageSize={pager.pageSize}
-                pageSizeOptions={[5, 10, 20, 50]}
-                onPageSizeChange={pager.onPageSizeChange}
-                onPageChange={pager.onPageChange}
-              />
-            }
-          />
+                ))}
+              </ListCardGrid>
+              {pagination}
+            </div>
+          )
         }
       />
 

@@ -20,9 +20,12 @@ import {
   FieldGroup,
   FieldLabel,
   FilterBar,
+  type FilterBarView,
   Icon,
   Input,
   Label,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -77,6 +80,7 @@ export default function ModelsPage() {
   const [keyword, setKeyword] = useState("");
   const [capability, setCapability] = useState("all");
   const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
+  const [view, setView] = useState<FilterBarView>("list");
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<ModelDraft>(EMPTY_DRAFT);
 
@@ -194,6 +198,56 @@ export default function ModelsPage() {
     draft.capabilities.length > 0;
   const editing = dialog?.kind === "edit";
 
+  const rowMenu = (r: ModelRow) => (
+    <ActionMenu
+      label={`${r.code} 操作`}
+      items={[
+        {
+          id: "edit",
+          label: "编辑",
+          icon: "edit",
+          onSelect: () => openEdit(r),
+        },
+        r.status === "disabled"
+          ? {
+              id: "restore",
+              label: "重新上线",
+              icon: "play" as const,
+              onSelect: () => {
+                setRows((all) =>
+                  all.map((x) =>
+                    x.id === r.id ? { ...x, status: "active" } : x,
+                  ),
+                );
+                toast({ tone: "success", title: `${r.code} 已重新上线` });
+              },
+            }
+          : {
+              id: "retire",
+              label: "下线",
+              icon: "prohibit" as const,
+              danger: true,
+              separatorBefore: true,
+              onSelect: () => setDialog({ kind: "retire", row: r }),
+            },
+      ]}
+    />
+  );
+
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={pager.page}
+      pageCount={pager.pageCount}
+      total={rows.length}
+      filteredTotal={filtered.length}
+      pageSize={pager.pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
+    />
+  );
+
   return (
     <>
       <ListPageTemplate
@@ -202,16 +256,18 @@ export default function ModelsPage() {
             icon="brain"
             title="Model Registry"
             description="统一模型注册中心：模型编码、能力标签与上下文窗口。业务系统不直连模型，只经 Endpoint。"
-            action={
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            actions={
               <Button onClick={openCreate}>
                 <Icon name="plus" size="sm" />
                 注册模型
               </Button>
             }
-          />
-        }
-        filters={
-          <FilterBar
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -268,108 +324,97 @@ export default function ModelsPage() {
           />
         }
         table={
-          <DataTable
-            columns={[
-              {
-                id: "model",
-                header: "模型",
-                cell: (r) => (
-                  <TableTitleCell
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "model",
+                  header: "模型",
+                  cell: (r) => (
+                    <TableTitleCell
+                      icon="brain"
+                      title={r.name}
+                      description={r.code}
+                      onTitleClick={() => openEdit(r)}
+                    />
+                  ),
+                },
+                { id: "provider", header: "Provider", cell: (r) => r.provider },
+                { id: "version", header: "版本", cell: (r) => r.version },
+                {
+                  id: "context",
+                  header: "上下文",
+                  align: "right",
+                  cell: (r) => r.contextWindow,
+                },
+                {
+                  id: "capabilities",
+                  header: "能力",
+                  cell: (r) => (
+                    <span className="flex flex-wrap gap-2xs">
+                      {r.capabilities.map((c) => (
+                        <Badge key={c} variant="secondary">
+                          {c}
+                        </Badge>
+                      ))}
+                    </span>
+                  ),
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  cell: (r) => (
+                    <StatusBadge tone={RESOURCE_STATUS_META[r.status].tone} dot>
+                      {RESOURCE_STATUS_META[r.status].label}
+                    </StatusBadge>
+                  ),
+                },
+              ]}
+              rows={pager.pageRows}
+              rowKey={(r) => r.id}
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              indexStart={pager.indexStart}
+              rowActions={rowMenu}
+              footer={pagination}
+            />
+          ) : (
+            <div className="flex flex-col gap-sm">
+              <ListCardGrid>
+                {pager.pageRows.map((r) => (
+                  <ListCard
+                    key={r.id}
                     icon="brain"
                     title={r.name}
                     description={r.code}
                     onTitleClick={() => openEdit(r)}
+                    status={
+                      <StatusBadge
+                        tone={RESOURCE_STATUS_META[r.status].tone}
+                        dot
+                      >
+                        {RESOURCE_STATUS_META[r.status].label}
+                      </StatusBadge>
+                    }
+                    actions={rowMenu(r)}
+                    meta={
+                      <>
+                        <span>
+                          {r.provider} · {r.version} · {r.contextWindow}
+                        </span>
+                        {r.capabilities.map((c) => (
+                          <Badge key={c} variant="secondary">
+                            {c}
+                          </Badge>
+                        ))}
+                      </>
+                    }
                   />
-                ),
-              },
-              { id: "provider", header: "Provider", cell: (r) => r.provider },
-              { id: "version", header: "版本", cell: (r) => r.version },
-              {
-                id: "context",
-                header: "上下文",
-                align: "right",
-                cell: (r) => r.contextWindow,
-              },
-              {
-                id: "capabilities",
-                header: "能力",
-                cell: (r) => (
-                  <span className="flex flex-wrap gap-2xs">
-                    {r.capabilities.map((c) => (
-                      <Badge key={c} variant="secondary">
-                        {c}
-                      </Badge>
-                    ))}
-                  </span>
-                ),
-              },
-              {
-                id: "status",
-                header: "状态",
-                cell: (r) => (
-                  <StatusBadge tone={RESOURCE_STATUS_META[r.status].tone} dot>
-                    {RESOURCE_STATUS_META[r.status].label}
-                  </StatusBadge>
-                ),
-              },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r) => r.id}
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-            indexStart={pager.indexStart}
-            rowActions={(r) => (
-              <ActionMenu
-                label={`${r.code} 操作`}
-                items={[
-                  {
-                    id: "edit",
-                    label: "编辑",
-                    icon: "edit",
-                    onSelect: () => openEdit(r),
-                  },
-                  r.status === "disabled"
-                    ? {
-                        id: "restore",
-                        label: "重新上线",
-                        icon: "play" as const,
-                        onSelect: () => {
-                          setRows((all) =>
-                            all.map((x) =>
-                              x.id === r.id ? { ...x, status: "active" } : x,
-                            ),
-                          );
-                          toast({
-                            tone: "success",
-                            title: `${r.code} 已重新上线`,
-                          });
-                        },
-                      }
-                    : {
-                        id: "retire",
-                        label: "下线",
-                        icon: "prohibit" as const,
-                        danger: true,
-                        separatorBefore: true,
-                        onSelect: () => setDialog({ kind: "retire", row: r }),
-                      },
-                ]}
-              />
-            )}
-            footer={
-              <Pagination
-                className="w-full"
-                page={pager.page}
-                pageCount={pager.pageCount}
-                total={rows.length}
-                filteredTotal={filtered.length}
-                pageSize={pager.pageSize}
-                pageSizeOptions={[5, 10, 20, 50]}
-                onPageSizeChange={pager.onPageSizeChange}
-                onPageChange={pager.onPageChange}
-              />
-            }
-          />
+                ))}
+              </ListCardGrid>
+              {pagination}
+            </div>
+          )
         }
       />
 

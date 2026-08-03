@@ -5,9 +5,13 @@
 
 import { useMemo, useState } from "react";
 import {
+  Badge,
   DataTable,
   FilterBar,
+  type FilterBarView,
   Input,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -46,6 +50,21 @@ export default function AuditPage() {
 
   const filtered = keyword !== "" || action !== "all";
   const pager = useListPagination(visible);
+  const [view, setView] = useState<FilterBarView>("list");
+
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={pager.page}
+      pageCount={pager.pageCount}
+      total={auditTrail.length}
+      filteredTotal={visible.length}
+      pageSize={pager.pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
+    />
+  );
 
   return (
     <ListPageTemplate
@@ -58,6 +77,8 @@ export default function AuditPage() {
       }
       filters={
         <FilterBar
+          view={view}
+          onViewChange={setView}
           count={
             visible.length === auditTrail.length
               ? auditTrail.length
@@ -92,55 +113,65 @@ export default function AuditPage() {
         </FilterBar>
       }
       table={
-        <DataTable
-          columns={[
-            { id: "time", header: "时间", cell: (r) => r.time, sortable: true },
-            { id: "actor", header: "操作者", cell: (r) => r.actor },
-            { id: "action", header: "动作", cell: (r) => r.action },
-            {
-              id: "target",
-              header: "对象",
-              cell: (r) => (
-                <span className="text-label-md text-foreground">
-                  {r.target}
-                </span>
-              ),
-            },
-            {
-              id: "detail",
-              header: "明细",
-              cell: (r) => (
-                <span className="text-body-sm text-muted-foreground">
-                  {r.detail}
-                </span>
-              ),
-            },
-          ]}
-          rows={pager.pageRows}
-          rowKey={(r) => r.id}
-          indexStart={pager.indexStart}
-          sort={sort}
-          onSortChange={setSort}
-          footer={
-            <Pagination
-              className="w-full"
-              page={pager.page}
-              pageCount={pager.pageCount}
-              total={auditTrail.length}
-              filteredTotal={visible.length}
-              pageSize={pager.pageSize}
-              pageSizeOptions={[5, 10, 20, 50]}
-              onPageSizeChange={pager.onPageSizeChange}
-              onPageChange={pager.onPageChange}
-            />
-          }
-          emptyTitle={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
-          emptyDescription={
-            filtered
-              ? "换个动作或关键词再看。"
-              : "配置尚未发生过变更。审计只记录写操作，读操作不留痕。"
-          }
-        />
+        view === "list" ? (
+          <DataTable
+            columns={[
+              {
+                id: "time",
+                header: "时间",
+                cell: (r) => r.time,
+                sortable: true,
+              },
+              { id: "actor", header: "操作者", cell: (r) => r.actor },
+              { id: "action", header: "动作", cell: (r) => r.action },
+              {
+                id: "target",
+                header: "对象",
+                cell: (r) => (
+                  <span className="text-label-md text-foreground">
+                    {r.target}
+                  </span>
+                ),
+              },
+              {
+                id: "detail",
+                header: "明细",
+                cell: (r) => (
+                  <span className="text-body-sm text-muted-foreground">
+                    {r.detail}
+                  </span>
+                ),
+              },
+            ]}
+            rows={pager.pageRows}
+            rowKey={(r) => r.id}
+            indexStart={pager.indexStart}
+            sort={sort}
+            onSortChange={setSort}
+            footer={pagination}
+            emptyTitle={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
+            emptyDescription={
+              filtered
+                ? "换个动作或关键词再看。"
+                : "配置尚未发生过变更。审计只记录写操作，读操作不留痕。"
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-sm">
+            <ListCardGrid>
+              {pager.pageRows.map((r) => (
+                <ListCard
+                  key={r.id}
+                  title={r.target}
+                  description={`${r.time} · ${r.actor}`}
+                  status={<Badge variant="secondary">{r.action}</Badge>}
+                  meta={<span>{r.detail}</span>}
+                />
+              ))}
+            </ListCardGrid>
+            {pagination}
+          </div>
+        )
       }
     />
   );

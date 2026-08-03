@@ -21,9 +21,12 @@ import {
   FieldGroup,
   FieldLabel,
   FilterBar,
+  type FilterBarView,
   Icon,
   Input,
   Kbd,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -78,6 +81,7 @@ export default function KeysPage() {
   const [draft, setDraft] = useState<KeyDraft>(EMPTY_DRAFT);
   const [reveal, setReveal] = useState<RevealState | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
+  const [view, setView] = useState<FilterBarView>("list");
 
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -172,6 +176,58 @@ export default function KeysPage() {
 
   const draftValid = draft.name.trim() !== "" && draft.owner.trim() !== "";
 
+  const rowMenu = (r: ApiKeyRow) => (
+    <ActionMenu
+      label={`${r.name} 操作`}
+      items={[
+        {
+          id: "rotate",
+          label: "轮换",
+          icon: "refresh",
+          disabled: r.status !== "active",
+          onSelect: () => setDialog({ kind: "rotate", row: r }),
+        },
+        r.status === "disabled"
+          ? {
+              id: "enable",
+              label: "启用",
+              icon: "play" as const,
+              onSelect: () => setStatus(r, "active"),
+            }
+          : {
+              id: "disable",
+              label: "禁用",
+              icon: "pause" as const,
+              disabled: r.status !== "active",
+              onSelect: () => setStatus(r, "disabled"),
+            },
+        {
+          id: "revoke",
+          label: "吊销",
+          icon: "prohibit",
+          danger: true,
+          separatorBefore: true,
+          disabled: r.status === "revoked",
+          onSelect: () => setDialog({ kind: "revoke", row: r }),
+        },
+      ]}
+    />
+  );
+
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={pager.page}
+      pageCount={pager.pageCount}
+      total={rows.length}
+      filteredTotal={filtered.length}
+      pageSize={pager.pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
+    />
+  );
+
   return (
     <>
       <ListPageTemplate
@@ -180,7 +236,13 @@ export default function KeysPage() {
             icon="key"
             title="API Key"
             description="服务间调用走 Internal Key，外部应用走 External Key；轮换与吊销全部留痕进 Audit。"
-            action={
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            actions={
               <Button
                 onClick={() => {
                   setDraft(EMPTY_DRAFT);
@@ -191,10 +253,6 @@ export default function KeysPage() {
                 签发 Key
               </Button>
             }
-          />
-        }
-        filters={
-          <FilterBar
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -248,103 +306,92 @@ export default function KeysPage() {
           />
         }
         table={
-          <DataTable
-            columns={[
-              {
-                id: "name",
-                header: "名称",
-                cell: (r) => (
-                  <TableTitleCell
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "name",
+                  header: "名称",
+                  cell: (r) => (
+                    <TableTitleCell
+                      icon="key"
+                      title={r.name}
+                      description={r.owner}
+                    />
+                  ),
+                },
+                {
+                  id: "kind",
+                  header: "类型",
+                  cell: (r) => (
+                    <Badge
+                      variant={r.kind === "internal" ? "secondary" : "outline"}
+                    >
+                      {r.kind === "internal" ? "Internal" : "External"}
+                    </Badge>
+                  ),
+                },
+                {
+                  id: "prefix",
+                  header: "前缀",
+                  cell: (r) => <Kbd>{r.prefix}</Kbd>,
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  cell: (r) => (
+                    <StatusBadge tone={KEY_STATUS_META[r.status].tone} dot>
+                      {KEY_STATUS_META[r.status].label}
+                    </StatusBadge>
+                  ),
+                },
+                { id: "lastUsed", header: "最近使用", cell: (r) => r.lastUsed },
+                { id: "createdAt", header: "签发于", cell: (r) => r.createdAt },
+              ]}
+              rows={pager.pageRows}
+              rowKey={(r) => r.id}
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              indexStart={pager.indexStart}
+              rowActions={rowMenu}
+              footer={pagination}
+            />
+          ) : (
+            <div className="flex flex-col gap-sm">
+              <ListCardGrid>
+                {pager.pageRows.map((r) => (
+                  <ListCard
+                    key={r.id}
                     icon="key"
                     title={r.name}
                     description={r.owner}
+                    status={
+                      <StatusBadge tone={KEY_STATUS_META[r.status].tone} dot>
+                        {KEY_STATUS_META[r.status].label}
+                      </StatusBadge>
+                    }
+                    actions={rowMenu(r)}
+                    meta={
+                      <>
+                        <Badge
+                          variant={
+                            r.kind === "internal" ? "secondary" : "outline"
+                          }
+                        >
+                          {r.kind === "internal" ? "Internal" : "External"}
+                        </Badge>
+                        <Kbd>{r.prefix}</Kbd>
+                        <span>
+                          最近使用 {r.lastUsed} · 签发于 {r.createdAt}
+                        </span>
+                      </>
+                    }
                   />
-                ),
-              },
-              {
-                id: "kind",
-                header: "类型",
-                cell: (r) => (
-                  <Badge
-                    variant={r.kind === "internal" ? "secondary" : "outline"}
-                  >
-                    {r.kind === "internal" ? "Internal" : "External"}
-                  </Badge>
-                ),
-              },
-              {
-                id: "prefix",
-                header: "前缀",
-                cell: (r) => <Kbd>{r.prefix}</Kbd>,
-              },
-              {
-                id: "status",
-                header: "状态",
-                cell: (r) => (
-                  <StatusBadge tone={KEY_STATUS_META[r.status].tone} dot>
-                    {KEY_STATUS_META[r.status].label}
-                  </StatusBadge>
-                ),
-              },
-              { id: "lastUsed", header: "最近使用", cell: (r) => r.lastUsed },
-              { id: "createdAt", header: "签发于", cell: (r) => r.createdAt },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r) => r.id}
-            selectedKeys={selectedKeys}
-            onSelectionChange={setSelectedKeys}
-            indexStart={pager.indexStart}
-            rowActions={(r) => (
-              <ActionMenu
-                label={`${r.name} 操作`}
-                items={[
-                  {
-                    id: "rotate",
-                    label: "轮换",
-                    icon: "refresh",
-                    disabled: r.status !== "active",
-                    onSelect: () => setDialog({ kind: "rotate", row: r }),
-                  },
-                  r.status === "disabled"
-                    ? {
-                        id: "enable",
-                        label: "启用",
-                        icon: "play" as const,
-                        onSelect: () => setStatus(r, "active"),
-                      }
-                    : {
-                        id: "disable",
-                        label: "禁用",
-                        icon: "pause" as const,
-                        disabled: r.status !== "active",
-                        onSelect: () => setStatus(r, "disabled"),
-                      },
-                  {
-                    id: "revoke",
-                    label: "吊销",
-                    icon: "prohibit",
-                    danger: true,
-                    separatorBefore: true,
-                    disabled: r.status === "revoked",
-                    onSelect: () => setDialog({ kind: "revoke", row: r }),
-                  },
-                ]}
-              />
-            )}
-            footer={
-              <Pagination
-                className="w-full"
-                page={pager.page}
-                pageCount={pager.pageCount}
-                total={rows.length}
-                filteredTotal={filtered.length}
-                pageSize={pager.pageSize}
-                pageSizeOptions={[5, 10, 20, 50]}
-                onPageSizeChange={pager.onPageSizeChange}
-                onPageChange={pager.onPageChange}
-              />
-            }
-          />
+                ))}
+              </ListCardGrid>
+              {pagination}
+            </div>
+          )
         }
       />
 

@@ -153,6 +153,12 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
 - opera Provider 页为参考实现（选择+批量启停、序号翻页递进、卡片视图、每页条数），
   浏览器实测：翻页/选择/批量/切视图全通
 - 快照 minor +1（TableTitleCell 具名导出）
+- **二次修订（owner 三点，2026-08-03）**：①组件化确认（工具行/表格/翻页/两行主列全在
+  DS，页面只传数据）；②list/cards 切换升为清单页常备段——新件 ListCard/ListCardGrid
+  （行卡语法固定：两行主列+右上状态/操作+底部 meta；与 EntryCard 分工=引路 vs 数据行；
+  Grid 统一断点），六个清单页全部有 cards 形态；③FilterBar 布局定型：居左【切换+计数】
+  —自适应留白—居右【搜索+筛选组+主操作】，主操作从 ViewHeader 移入工具行；快照 minor
+  （ListCard/ListCardGrid 具名导出）
 - **全清单页推开（owner 指出只改一页≠通用）**：Models/Endpoints/Keys（全套：选择+批量、
   序号、两行主列、锁定操作列、计数、翻页）+ Logs/Audit（只读：计数+序号+翻页）+
   RBAC（4 固定角色：序号+两行主列+锁定操作列，不设翻页）；opera 新增 useListPagination

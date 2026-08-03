@@ -10,8 +10,11 @@ import { useMemo, useState } from "react";
 import {
   DataTable,
   FilterBar,
+  type FilterBarView,
   Input,
   Kbd,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -33,6 +36,7 @@ export default function LogsPage() {
     columnId: "time",
     direction: "desc",
   });
+  const [view, setView] = useState<FilterBarView>("list");
 
   const visible = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -55,6 +59,20 @@ export default function LogsPage() {
   const filtered = keyword !== "" || level !== "all" || source !== "all";
   const pager = useListPagination(visible);
 
+  const pagination = (
+    <Pagination
+      className="w-full"
+      page={pager.page}
+      pageCount={pager.pageCount}
+      total={logs.length}
+      filteredTotal={visible.length}
+      pageSize={pager.pageSize}
+      pageSizeOptions={[5, 10, 20, 50]}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
+    />
+  );
+
   return (
     <ListPageTemplate
       header={
@@ -66,6 +84,8 @@ export default function LogsPage() {
       }
       filters={
         <FilterBar
+          view={view}
+          onViewChange={setView}
           count={
             visible.length === logs.length
               ? logs.length
@@ -114,52 +134,66 @@ export default function LogsPage() {
         </FilterBar>
       }
       table={
-        <DataTable
-          columns={[
-            { id: "time", header: "时间", cell: (r) => r.time, sortable: true },
-            {
-              id: "level",
-              header: "级别",
-              cell: (r) => (
-                <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
-                  {LOG_LEVEL_META[r.level].label}
-                </StatusBadge>
-              ),
-            },
-            { id: "source", header: "来源", cell: (r) => r.source },
-            { id: "message", header: "内容", cell: (r) => r.message },
-            {
-              id: "trace",
-              header: "Trace",
-              align: "right",
-              cell: (r) => <Kbd>{r.trace}</Kbd>,
-            },
-          ]}
-          rows={pager.pageRows}
-          rowKey={(r) => r.id}
-          indexStart={pager.indexStart}
-          sort={sort}
-          onSortChange={setSort}
-          footer={
-            <Pagination
-              className="w-full"
-              page={pager.page}
-              pageCount={pager.pageCount}
-              total={logs.length}
-              filteredTotal={visible.length}
-              pageSize={pager.pageSize}
-              pageSizeOptions={[5, 10, 20, 50]}
-              onPageSizeChange={pager.onPageSizeChange}
-              onPageChange={pager.onPageChange}
-            />
-          }
-          emptyTitle={filtered ? "没有匹配的日志" : "窗口内没有日志"}
-          emptyDescription={
-            filtered
-              ? "放宽级别或来源，或换个关键词。"
-              : "该时间窗口内没有产生任何运行日志。"
-          }
-        />
+        view === "list" ? (
+          <DataTable
+            columns={[
+              {
+                id: "time",
+                header: "时间",
+                cell: (r) => r.time,
+                sortable: true,
+              },
+              {
+                id: "level",
+                header: "级别",
+                cell: (r) => (
+                  <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
+                    {LOG_LEVEL_META[r.level].label}
+                  </StatusBadge>
+                ),
+              },
+              { id: "source", header: "来源", cell: (r) => r.source },
+              { id: "message", header: "内容", cell: (r) => r.message },
+              {
+                id: "trace",
+                header: "Trace",
+                align: "right",
+                cell: (r) => <Kbd>{r.trace}</Kbd>,
+              },
+            ]}
+            rows={pager.pageRows}
+            rowKey={(r) => r.id}
+            indexStart={pager.indexStart}
+            sort={sort}
+            onSortChange={setSort}
+            footer={pagination}
+            emptyTitle={filtered ? "没有匹配的日志" : "窗口内没有日志"}
+            emptyDescription={
+              filtered
+                ? "放宽级别或来源，或换个关键词。"
+                : "该时间窗口内没有产生任何运行日志。"
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-sm">
+            <ListCardGrid>
+              {pager.pageRows.map((r) => (
+                <ListCard
+                  key={r.id}
+                  title={r.message}
+                  description={`${r.time} · ${r.source}`}
+                  status={
+                    <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
+                      {LOG_LEVEL_META[r.level].label}
+                    </StatusBadge>
+                  }
+                  meta={<Kbd>{r.trace}</Kbd>}
+                />
+              ))}
+            </ListCardGrid>
+            {pagination}
+          </div>
+        )
       }
     />
   );

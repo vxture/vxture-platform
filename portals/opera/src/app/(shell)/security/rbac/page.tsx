@@ -18,9 +18,13 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FilterBar,
+  type FilterBarView,
   Icon,
   Input,
   Label,
+  ListCard,
+  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   TableTitleCell,
@@ -50,6 +54,7 @@ export default function RbacPage() {
   const [roles, setRoles] = useState<RoleRow[]>(roleSeed);
   const [people, setPeople] = useState<MemberRow[]>(memberSeed);
   const [dialog, setDialog] = useState<DialogState>(null);
+  const [view, setView] = useState<FilterBarView>("list");
   const [draftDomains, setDraftDomains] = useState<OperaDomain[]>([]);
   const [invite, setInvite] = useState({ name: "", handle: "", roleId: "r-4" });
 
@@ -126,6 +131,26 @@ export default function RbacPage() {
   const membersOf = (roleId: string) =>
     people.filter((m) => m.roleId === roleId);
 
+  const rowMenu = (r: RoleRow) => (
+    <ActionMenu
+      label={`${r.role} 操作`}
+      items={[
+        {
+          id: "members",
+          label: "管理成员",
+          icon: "users",
+          onSelect: () => setDialog({ kind: "members", row: r }),
+        },
+        {
+          id: "scope",
+          label: "调整授权域",
+          icon: "faders",
+          onSelect: () => openScope(r),
+        },
+      ]}
+    />
+  );
+
   return (
     <>
       <ListPageTemplate
@@ -134,7 +159,14 @@ export default function RbacPage() {
             icon="role"
             title="RBAC"
             description="平台运维权限：角色 × 域授权。与业务侧 IAM 分立，只覆盖 Opera 六域。"
-            action={
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            count={roles.length}
+            actions={
               <Button
                 variant="outline"
                 onClick={() => {
@@ -149,54 +181,56 @@ export default function RbacPage() {
           />
         }
         table={
-          <DataTable
-            columns={[
-              {
-                id: "role",
-                header: "角色",
-                cell: (r) => (
-                  <TableTitleCell
-                    icon="role"
-                    title={r.role}
-                    description={r.permissions}
-                  />
-                ),
-              },
-              {
-                id: "scope",
-                header: "授权域",
-                cell: (r) => describeDomains(r.domains),
-              },
-              {
-                id: "members",
-                header: "成员数",
-                align: "right",
-                cell: (r) => countByRole.get(r.id) ?? 0,
-              },
-            ]}
-            rows={roles}
-            rowKey={(r) => r.id}
-            indexStart={1}
-            rowActions={(r) => (
-              <ActionMenu
-                label={`${r.role} 操作`}
-                items={[
-                  {
-                    id: "members",
-                    label: "管理成员",
-                    icon: "users",
-                    onSelect: () => setDialog({ kind: "members", row: r }),
-                  },
-                  {
-                    id: "scope",
-                    label: "调整授权域",
-                    icon: "faders",
-                    onSelect: () => openScope(r),
-                  },
-                ]}
-              />
-            )}
-          />
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "role",
+                  header: "角色",
+                  cell: (r) => (
+                    <TableTitleCell
+                      icon="role"
+                      title={r.role}
+                      description={r.permissions}
+                    />
+                  ),
+                },
+                {
+                  id: "scope",
+                  header: "授权域",
+                  cell: (r) => describeDomains(r.domains),
+                },
+                {
+                  id: "members",
+                  header: "成员数",
+                  align: "right",
+                  cell: (r) => countByRole.get(r.id) ?? 0,
+                },
+              ]}
+              rows={roles}
+              rowKey={(r) => r.id}
+              indexStart={1}
+              rowActions={rowMenu}
+            />
+          ) : (
+            <ListCardGrid>
+              {roles.map((r) => (
+                <ListCard
+                  key={r.id}
+                  icon="role"
+                  title={r.role}
+                  description={r.permissions}
+                  actions={rowMenu(r)}
+                  meta={
+                    <span>
+                      {describeDomains(r.domains)} · 成员{" "}
+                      {countByRole.get(r.id) ?? 0}
+                    </span>
+                  }
+                />
+              ))}
+            </ListCardGrid>
+          )
         }
       />
 

@@ -27,6 +27,7 @@ export * from "./data/EntryCard";
 export * from "./data/MetricCard";
 export * from "./data/MetricGrid";
 export * from "./data/TableTitleCell";
+export * from "./data/ListCard";
 export * from "./structure/Section";
 export * from "./structure/SectionHeader";
 export * from "./structure/SectionNav";

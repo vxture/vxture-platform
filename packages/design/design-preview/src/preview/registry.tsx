@@ -126,6 +126,8 @@ import {
   EmptyState,
   EntryCard,
   FilterBar,
+  ListCard,
+  ListCardGrid,
   MetricGrid,
   type MetricGridItem,
   TableTitleCell,
@@ -1197,6 +1199,53 @@ export const ENTRIES: readonly Entry[] = [
           description="邀请成员、分配角色、审计授权变更。"
         />
       </div>
+    ),
+  },
+  {
+    name: "ListCard",
+    layer: "pattern",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "清单页 cards 视图的行卡：与 DataTable 行同一份信息的卡片形态，语法固定为两行主列 + 右上状态/操作 + 底部 meta 行。与 EntryCard 分工：EntryCard 引路，ListCard 是数据行本身；ListCardGrid 统一断点，各页不自定义列数",
+    render: () => (
+      <ListCardGrid className="w-full">
+        <ListCard
+          icon="database"
+          title="通道甲"
+          description="ch-001 · 模型组"
+          onTitleClick={() => undefined}
+          status={
+            <StatusBadge tone="success" dot>
+              运行中
+            </StatusBadge>
+          }
+          actions={
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="操作">
+                  <Icon name="more-vertical" size="sm" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>编辑</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          }
+          meta={<span>调用 1,284,930 · P95 412ms</span>}
+        />
+        <ListCard
+          icon="users"
+          title="通道乙"
+          description="ch-002 · 检索组"
+          status={
+            <StatusBadge tone="warning" dot>
+              降级
+            </StatusBadge>
+          }
+          meta={<span>调用 88,120 · P95 940ms</span>}
+        />
+      </ListCardGrid>
     ),
   },
   {

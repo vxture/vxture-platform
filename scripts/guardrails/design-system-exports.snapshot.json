@@ -207,6 +207,8 @@
       "Kbd",
       "KbdGroup",
       "Label",
+      "ListCard",
+      "ListCardGrid",
       "ListPageTemplate",
       "LocaleSelectPanel",
       "MetricCard",
