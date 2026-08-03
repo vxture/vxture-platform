@@ -3,14 +3,18 @@
 /* Dashboard — opera-top-level-design.md §10：平台状态 / Atlas 状态 / 请求统计。
  * 阅读顺序由 DashboardTemplate 焊死：先看数、再选路、最后处理事项。 */
 
+import Link from "next/link";
 import {
   Banner,
+  Button,
   DashboardTemplate,
   DataTable,
   EntryCard,
+  Icon,
   MetricGrid,
   Section,
   StatusBadge,
+  TableTitleCell,
   ViewHeader,
 } from "@vxture/design-system";
 import { providers, logs } from "@/mocks/atlas";
@@ -98,10 +102,33 @@ export default function DashboardPage() {
         />
       ) : null}
 
-      <Section title="Provider 状态" icon="plugs-connected" level={2}>
+      <Section
+        title="Provider 状态"
+        icon="plugs-connected"
+        level={2}
+        description="各供应商的健康画像摘要；接入与启停到 Provider 页操作。"
+        action={
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/atlas/providers">
+              查看全部
+              <Icon name="chevron-right" size="sm" aria-hidden="true" />
+            </Link>
+          </Button>
+        }
+      >
         <DataTable
           columns={[
-            { id: "name", header: "Provider", cell: (r) => r.name },
+            {
+              id: "name",
+              header: "Provider",
+              cell: (r) => (
+                <TableTitleCell
+                  icon="plugs-connected"
+                  title={r.name}
+                  description={r.code}
+                />
+              ),
+            },
             {
               id: "status",
               header: "状态",
@@ -129,7 +156,20 @@ export default function DashboardPage() {
         />
       </Section>
 
-      <Section title="最近事件" icon="clock-counter-clockwise" level={2}>
+      <Section
+        title="最近事件"
+        icon="clock-counter-clockwise"
+        level={2}
+        description="近一小时的关键运行事件；完整检索与筛选进 Logs。"
+        action={
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/observability/logs">
+              查看全部
+              <Icon name="chevron-right" size="sm" aria-hidden="true" />
+            </Link>
+          </Button>
+        }
+      >
         <DataTable
           columns={[
             { id: "time", header: "时间", cell: (r) => r.time },

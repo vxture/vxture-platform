@@ -165,6 +165,21 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
   hook（翻页状态公共化，接 BFF 分页只换数据源）；Dashboard 摘要表与 Metering 聚合表
   刻意保持轻量——五要件是清单页语法，不是所有表格的语法
 
+### 批 Y — opera 全页巡检三项（已完成）
+
+- owner 三项巡检指令（2026-08-03）：card / 非历史表格上 list 模式 / 二级标题同构
+- 表尾细化（同日多轮）：每页条数按钮化=SegmentedControl（承旧 PageSizePicker，
+  Pagination 误用下拉被 owner 纠正）→ 去标签纯数字 → [auto|10|20|50|100]，auto=
+  按可视高度测首行算整页行数（hook 探测 main 首行，无 ref 接线），中英文都显示 auto
+- 工具行单行修正：搜索框 w-full 的假想宽度提前触发 flex-wrap→改 grow+basis-media-3xl
+  （192 基准、384 上限、真挤才折行）；搜索框换 InputGroup+放大镜（上游 Input 本无图标，
+  放大镜是 InputGroup 组合出来的，批 S 已引入但清单页未用）
+- 巡检落地：Dashboard Provider 状态表换两行主列+板块头补描述与"查看全部"；最近事件
+  按"历史纯表"保留；Router 端点卡换 ListCard；Metrics/Metering 板块头补描述；
+  Metrics Endpoint 表与 Metering 聚合表按"统计纯表"保留（无管理动作不套清单语法）
+- 二级标题本身早已同构（SectionHeader level 2=icon 24+title-md+描述+action），
+  缺的是页面没传 description/action——补齐即可，DS 零改动
+
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 
 | 决策                              | 取向                                                                                                               |

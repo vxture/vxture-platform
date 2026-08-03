@@ -85,6 +85,7 @@ export default function MeteringPage() {
         title={`按 ${active.label} 聚合`}
         icon={active.icon}
         level={2}
+        description="同一份请求事实的四个切面：Provider / Model / Endpoint / Tenant。"
         action={
           <NativeSelect
             wrapperClassName="w-fit"

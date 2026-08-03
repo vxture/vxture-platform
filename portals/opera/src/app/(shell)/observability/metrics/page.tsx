@@ -73,17 +73,32 @@ export default function MetricsPage() {
         description="时序趋势图依赖图表组件（DS 判据归 domain-ui），随功能期接入；本期先给指标事实。"
       />
 
-      <Section title="Gateway" icon="globe" level={2}>
+      <Section
+        title="Gateway"
+        icon="globe"
+        level={2}
+        description="入口网关的吞吐、时延与错误率——平台健康的第一读数。"
+      >
         <MetricGrid items={[...gateway]} columns={4} />
       </Section>
 
-      <Section title="Provider" icon="plugs-connected" level={2}>
+      <Section
+        title="Provider"
+        icon="plugs-connected"
+        level={2}
+        description="上游供应商的成功率与故障切换；降级判定依据健康探测。"
+      >
         <MetricGrid items={[...providerMetrics]} columns={4} />
       </Section>
 
       {/* §11 的第三层：Endpoint 只看请求数与 Token 数——延迟与成本归 Metering，
           同一个事实不在两个页面各给一份。 */}
-      <Section title="Endpoint" icon="plug" level={2}>
+      <Section
+        title="Endpoint"
+        icon="plug"
+        level={2}
+        description="各能力入口的调用量与 Token 事实；延迟与成本归 Metering。"
+      >
         <DataTable
           columns={[
             { id: "code", header: "Endpoint", cell: (r) => r.dimension },

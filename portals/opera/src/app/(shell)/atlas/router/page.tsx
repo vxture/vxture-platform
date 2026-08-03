@@ -7,10 +7,8 @@ import {
   Badge,
   Banner,
   Button,
-  Card,
-  CardContent,
-  Icon,
-  Kbd,
+  ListCard,
+  ListCardGrid,
   Section,
   StatusBadge,
   ViewHeader,
@@ -33,47 +31,50 @@ export default function RouterPage() {
         description="Weight 与 Canary 路由在 Atlas 2.0 排期；本期变更仅 Primary / Fallback，所有变更进入 Audit。"
       />
 
-      <Section title="Endpoint 路由表" icon="plug" level={2}>
-        <div className="grid gap-md md:grid-cols-2">
+      <Section
+        title="Endpoint 路由表"
+        icon="plug"
+        level={2}
+        description="每个入口的 Primary / Fallback 指派；路由细节到 Endpoint 页调整。"
+      >
+        <ListCardGrid>
           {endpoints.map((e) => (
-            <Card key={e.id} surface="base">
-              <CardContent className="flex flex-col gap-sm">
-                <div className="flex items-center justify-between gap-sm">
-                  <Kbd>{e.code}</Kbd>
-                  <StatusBadge tone={e.enabled ? "success" : "neutral"} dot>
-                    {e.enabled ? "生效中" : "已停用"}
-                  </StatusBadge>
-                </div>
-                <div className="flex items-center gap-sm text-body-md">
-                  <Badge>{"Primary"}</Badge>
-                  <span className="text-code-sm text-foreground">
-                    {e.primaryModel}
-                  </span>
-                </div>
-                {e.fallbackModel ? (
-                  <div className="flex items-center gap-sm text-body-md">
+            <ListCard
+              key={e.id}
+              icon="plug"
+              title={<span className="font-mono">{e.code}</span>}
+              description={e.category}
+              status={
+                <StatusBadge tone={e.enabled ? "success" : "neutral"} dot>
+                  {e.enabled ? "生效中" : "已停用"}
+                </StatusBadge>
+              }
+              meta={
+                e.fallbackModel ? (
+                  <>
+                    <Badge>Primary</Badge>
+                    <span className="text-code-sm text-foreground">
+                      {e.primaryModel}
+                    </span>
                     <Badge variant="secondary">Fallback</Badge>
                     <span className="text-code-sm text-foreground">
                       {e.fallbackModel}
                     </span>
-                    <Icon
-                      name="arrow-bend-up-left"
-                      size="xs"
-                      className="text-muted-foreground"
-                    />
-                    <span className="text-body-sm text-muted-foreground">
-                      超时 / 5xx 触发
-                    </span>
-                  </div>
+                    <span>超时 / 5xx 触发</span>
+                  </>
                 ) : (
-                  <p className="text-body-sm text-muted-foreground">
-                    未配置 fallback——单模型直路由
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                  <>
+                    <Badge>Primary</Badge>
+                    <span className="text-code-sm text-foreground">
+                      {e.primaryModel}
+                    </span>
+                    <span>未配置 fallback——单模型直路由</span>
+                  </>
+                )
+              }
+            />
           ))}
-        </div>
+        </ListCardGrid>
       </Section>
     </div>
   );
