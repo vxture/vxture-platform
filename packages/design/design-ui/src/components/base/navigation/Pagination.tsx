@@ -19,7 +19,7 @@ import * as React from "react";
 import { cn } from "../../../utils/cn";
 import { Icon } from "../../../icons";
 import { Button } from "../form/Button";
-import { NativeSelect } from "../form/NativeSelect";
+import { SegmentedControl } from "../form/SegmentedControl";
 
 export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   readonly page: number;
@@ -86,18 +86,26 @@ function Pagination({
       </div>
       <div className="flex flex-wrap items-center gap-sm">
         {onPageSizeChange && typeof pageSize === "number" ? (
-          <NativeSelect
-            wrapperClassName="w-fit"
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            aria-label="每页条数"
-          >
-            {pageSizeOptions.map((option) => (
-              <option key={option} value={option}>
-                每页 {option} 条
-              </option>
-            ))}
-          </NativeSelect>
+          /* 按钮化的每页条数（承旧 PageSizePicker，载体为 SegmentedControl）：
+             档位全部可见、一次点击到位，不走"点开—找—再点"的下拉。 */
+          <span className="flex items-center gap-xs">
+            <span className="whitespace-nowrap text-body-sm text-muted-foreground">
+              每页
+            </span>
+            <SegmentedControl
+              size="sm"
+              ariaLabel="每页条数"
+              value={pageSize}
+              onChange={onPageSizeChange}
+              items={pageSizeOptions.map((option) => ({
+                value: option,
+                label: option,
+              }))}
+            />
+            <span className="whitespace-nowrap text-body-sm text-muted-foreground">
+              条
+            </span>
+          </span>
         ) : null}
         <div className="flex items-center gap-2xs">
           <Button
