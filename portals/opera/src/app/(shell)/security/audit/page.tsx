@@ -54,6 +54,8 @@ export default function AuditPage() {
   const filtered = keyword !== "" || action !== "all";
   const pager = useListPagination(visible);
   const [view, setView] = useState<FilterBarView>("list");
+  /* 选择列全站占位（owner 定）：留痕只读，列先在。 */
+  const [selected, setSelected] = useState<readonly string[]>([]);
 
   const pagination = (
     <Pagination
@@ -152,6 +154,8 @@ export default function AuditPage() {
             ]}
             rows={pager.pageRows}
             rowKey={(r) => r.id}
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
             indexStart={pager.indexStart}
             sort={sort}
             onSortChange={setSort}

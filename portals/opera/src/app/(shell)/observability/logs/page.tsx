@@ -40,6 +40,8 @@ export default function LogsPage() {
     direction: "desc",
   });
   const [view, setView] = useState<FilterBarView>("list");
+  /* 选择列全站占位（owner 定）：日志暂无批量动作，列先在。 */
+  const [selected, setSelected] = useState<readonly string[]>([]);
 
   const visible = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -170,6 +172,8 @@ export default function LogsPage() {
             ]}
             rows={pager.pageRows}
             rowKey={(r) => r.id}
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
             indexStart={pager.indexStart}
             sort={sort}
             onSortChange={setSort}

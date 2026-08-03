@@ -8,12 +8,14 @@
 
 import { useState } from "react";
 import {
+  ActionMenu,
   DataTable,
   MetricGrid,
   NativeSelect,
   Section,
   SegmentedControl,
   ViewHeader,
+  useToast,
 } from "@vxture/design-system";
 import {
   meteringByEndpoint,
@@ -67,7 +69,10 @@ const DIMENSIONS: ReadonlyArray<{
 ];
 
 export default function MeteringPage() {
+  const { toast } = useToast();
   const [dimension, setDimension] = useState<Dimension>("provider");
+  /* 选择列全站占位（owner 定）：聚合行暂无批量动作，列先在。 */
+  const [selected, setSelected] = useState<readonly string[]>([]);
   const active =
     DIMENSIONS.find((d) => d.value === dimension) ?? DIMENSIONS[0]!;
 
@@ -105,7 +110,11 @@ export default function MeteringPage() {
             icon: d.icon,
           }))}
           value={dimension}
-          onChange={setDimension}
+          onChange={(d) => {
+            setDimension(d);
+            // 换维度即换行集，旧选择随之失效。
+            setSelected([]);
+          }}
           ariaLabel="聚合维度"
           /* 默认铺满容器宽，四档挤在左边、右侧拖一条空轨道。收成内容宽。 */
           className="w-fit"
@@ -147,6 +156,27 @@ export default function MeteringPage() {
           ]}
           rows={active.rows}
           rowKey={(r) => r.id}
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+          indexStart={1}
+          rowActions={(r) => (
+            <ActionMenu
+              label={`${r.dimension} 操作`}
+              items={[
+                {
+                  id: "detail",
+                  label: "查看明细",
+                  icon: "chart-line-up",
+                  onSelect: () =>
+                    toast({
+                      tone: "info",
+                      title: `${r.dimension} 明细`,
+                      description: "维度明细与趋势图随功能期接入。",
+                    }),
+                },
+              ]}
+            />
+          )}
         />
       </Section>
     </div>

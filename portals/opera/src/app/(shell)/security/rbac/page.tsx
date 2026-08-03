@@ -55,6 +55,8 @@ export default function RbacPage() {
   const [people, setPeople] = useState<MemberRow[]>(memberSeed);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [view, setView] = useState<FilterBarView>("list");
+  /* 选择列全站占位（owner 定）：角色固定四档，列先在。 */
+  const [selected, setSelected] = useState<readonly string[]>([]);
   const [draftDomains, setDraftDomains] = useState<OperaDomain[]>([]);
   const [invite, setInvite] = useState({ name: "", handle: "", roleId: "r-4" });
 
@@ -209,6 +211,8 @@ export default function RbacPage() {
               ]}
               rows={roles}
               rowKey={(r) => r.id}
+              selectedKeys={selected}
+              onSelectionChange={setSelected}
               indexStart={1}
               rowActions={rowMenu}
             />

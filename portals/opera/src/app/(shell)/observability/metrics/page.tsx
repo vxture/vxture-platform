@@ -3,6 +3,7 @@
 /* Metrics — opera-top-level-design.md §7：Gateway / Provider / Endpoint
  * 三层服务指标。图表组件按 DS 判据归 domain-ui 排期，本期以指标卡呈现。 */
 
+import { useState } from "react";
 import {
   Banner,
   DataTable,
@@ -59,6 +60,9 @@ const providerMetrics = [
 ] as const;
 
 export default function MetricsPage() {
+  /* 选择列全站占位（owner 定）：统计行暂无批量动作，列先在。 */
+  const [selected, setSelected] = useState<readonly string[]>([]);
+
   return (
     <div className="flex flex-col gap-xl">
       <ViewHeader
@@ -123,6 +127,9 @@ export default function MetricsPage() {
           ]}
           rows={meteringByEndpoint}
           rowKey={(r) => r.id}
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+          indexStart={1}
         />
       </Section>
     </div>

@@ -4,6 +4,7 @@
  * 阅读顺序由 DashboardTemplate 焊死：先看数、再选路、最后处理事项。 */
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Banner,
   Button,
@@ -57,6 +58,9 @@ const metrics = [
 
 export default function DashboardPage() {
   const degraded = providers.filter((p) => p.status === "degraded");
+  /* 选择列全站占位（owner 定）：摘要表暂无批量动作，列先在。 */
+  const [providerSel, setProviderSel] = useState<readonly string[]>([]);
+  const [eventSel, setEventSel] = useState<readonly string[]>([]);
 
   return (
     <DashboardTemplate
@@ -139,6 +143,12 @@ export default function DashboardPage() {
               ),
             },
             {
+              id: "models",
+              header: "模型数",
+              align: "right",
+              cell: (r) => r.models,
+            },
+            {
               id: "latency",
               header: "P95 延迟",
               align: "right",
@@ -153,6 +163,22 @@ export default function DashboardPage() {
           ]}
           rows={providers}
           rowKey={(r) => r.id}
+          selectedKeys={providerSel}
+          onSelectionChange={setProviderSel}
+          indexStart={1}
+          rowActions={() => (
+            /* 摘要行的操作从简：一键进 Provider 页处理。 */
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              aria-label="前往 Provider"
+            >
+              <Link href="/atlas/providers">
+                <Icon name="arrow-right" size="sm" aria-hidden="true" />
+              </Link>
+            </Button>
+          )}
         />
       </Section>
 
@@ -187,6 +213,9 @@ export default function DashboardPage() {
           ]}
           rows={logs.slice(0, 4)}
           rowKey={(r) => r.id}
+          selectedKeys={eventSel}
+          onSelectionChange={setEventSel}
+          indexStart={1}
         />
       </Section>
     </DashboardTemplate>
