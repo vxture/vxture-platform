@@ -21,22 +21,26 @@ import { Icon } from "../../../icons";
 import { Button } from "../form/Button";
 import { SegmentedControl } from "../form/SegmentedControl";
 
+/** 每页条数的取值："auto" = 自适应（由调用方按可视高度解析成实际行数）。 */
+export type PageSizeChoice = number | "auto";
+
 export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   readonly page: number;
   readonly pageCount: number;
   readonly total?: number;
   /** 筛选后的条数：与 `total` 不同时，左侧计数语补"当前筛选 N 条"。 */
   readonly filteredTotal?: number;
-  readonly pageSize?: number;
-  /** 给了 `onPageSizeChange` 才出"每页 N 条"选择器（翻页条左邻）。 */
-  readonly pageSizeOptions?: readonly number[];
-  readonly onPageSizeChange?: (pageSize: number) => void;
+  /** 当前选中的档（不是解析后的行数——"auto" 档就传 "auto"）。 */
+  readonly pageSize?: PageSizeChoice;
+  /** 给了 `onPageSizeChange` 才出每页条数选择器（翻页条左邻）。 */
+  readonly pageSizeOptions?: readonly PageSizeChoice[];
+  readonly onPageSizeChange?: (pageSize: PageSizeChoice) => void;
   readonly onPageChange: (page: number) => void;
   readonly previousLabel?: string;
   readonly nextLabel?: string;
 }
 
-const DEFAULT_PAGE_SIZES = [10, 20, 50, 100] as const;
+const DEFAULT_PAGE_SIZES: readonly PageSizeChoice[] = ["auto", 10, 20, 50, 100];
 
 function getVisiblePages(page: number, pageCount: number) {
   const start = Math.max(1, Math.min(page - 2, pageCount - 4));
@@ -87,9 +91,10 @@ function Pagination({
       {/* 每页条数与翻页条之间留大距（gap-2xl）：两组都是数字按钮，贴近了
           会读成同一排页码。 */}
       <div className="flex flex-wrap items-center gap-2xl">
-        {onPageSizeChange && typeof pageSize === "number" ? (
+        {onPageSizeChange && pageSize !== undefined ? (
           /* 按钮化的每页条数（承旧 PageSizePicker，载体为 SegmentedControl）：
-             纯数字、不带标签文字——档位一眼即懂；语义留给 aria-label。 */
+             纯数字、不带标签文字——档位一眼即懂；语义留给 aria-label。
+             "auto" 档=自适应，实际行数由调用方按可视高度解析。 */
           <SegmentedControl
             size="sm"
             ariaLabel="每页条数"
@@ -97,8 +102,10 @@ function Pagination({
             onChange={onPageSizeChange}
             items={pageSizeOptions.map((option) => ({
               value: option,
-              label: option,
-              ariaLabel: `每页 ${option} 条`,
+              // "auto" 档中英文一律显示 "auto"（owner 定，2026-08-03）。
+              label: option === "auto" ? "auto" : option,
+              ariaLabel:
+                option === "auto" ? "每页条数自适应" : `每页 ${option} 条`,
             }))}
           />
         ) : null}

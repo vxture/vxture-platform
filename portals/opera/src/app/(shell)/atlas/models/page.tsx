@@ -242,7 +242,6 @@ export default function ModelsPage() {
       total={rows.length}
       filteredTotal={filtered.length}
       pageSize={pager.pageSize}
-      pageSizeOptions={[5, 10, 20, 50]}
       onPageSizeChange={pager.onPageSizeChange}
       onPageChange={pager.onPageChange}
     />

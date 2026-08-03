@@ -60,7 +60,6 @@ export default function AuditPage() {
       total={auditTrail.length}
       filteredTotal={visible.length}
       pageSize={pager.pageSize}
-      pageSizeOptions={[5, 10, 20, 50]}
       onPageSizeChange={pager.onPageSizeChange}
       onPageChange={pager.onPageChange}
     />

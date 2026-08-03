@@ -38,6 +38,7 @@ import {
 } from "@vxture/design-system";
 import { providers as seed, type ProviderRow } from "@/mocks/atlas";
 import { RESOURCE_STATUS_META, type ResourceStatus } from "@/lib/status";
+import { useListPagination } from "@/lib/pagination";
 
 /** 对话框的三种用途；null = 关闭。 */
 type DialogState =
@@ -78,8 +79,6 @@ export default function ProvidersPage() {
   );
   const [view, setView] = useState<FilterBarView>("list");
   const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<ProviderDraft>(EMPTY_DRAFT);
 
@@ -94,12 +93,8 @@ export default function ProvidersPage() {
     );
   }, [rows, keyword, statusFilter]);
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const safePage = Math.min(page, pageCount);
-  const visible = filtered.slice(
-    (safePage - 1) * pageSize,
-    safePage * pageSize,
-  );
+  const pager = useListPagination(filtered);
+  const visible = pager.pageRows;
 
   const openCreate = () => {
     setDraft(EMPTY_DRAFT);
@@ -248,17 +243,13 @@ export default function ProvidersPage() {
   const pagination = (
     <Pagination
       className="w-full"
-      page={safePage}
-      pageCount={pageCount}
+      page={pager.page}
+      pageCount={pager.pageCount}
       total={rows.length}
       filteredTotal={filtered.length}
-      pageSize={pageSize}
-      pageSizeOptions={[5, 10, 20, 50]}
-      onPageSizeChange={(size) => {
-        setPageSize(size);
-        setPage(1);
-      }}
-      onPageChange={setPage}
+      pageSize={pager.pageSize}
+      onPageSizeChange={pager.onPageSizeChange}
+      onPageChange={pager.onPageChange}
     />
   );
 
@@ -292,14 +283,17 @@ export default function ProvidersPage() {
               placeholder="搜索 Provider…"
               className="max-w-panel-sm"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
             />
             <NativeSelect
               wrapperClassName="w-fit"
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value as ResourceStatus | "all");
-                setPage(1);
+                pager.resetPage();
               }}
               aria-label="状态筛选"
             >
@@ -381,7 +375,7 @@ export default function ProvidersPage() {
               rowKey={(r) => r.id}
               selectedKeys={selectedKeys}
               onSelectionChange={setSelectedKeys}
-              indexStart={(safePage - 1) * pageSize + 1}
+              indexStart={pager.indexStart}
               rowActions={rowMenu}
               footer={pagination}
             />
