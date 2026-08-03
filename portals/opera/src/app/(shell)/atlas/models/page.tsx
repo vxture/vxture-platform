@@ -10,6 +10,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
   Badge,
+  BulkActionBar,
   Button,
   Checkbox,
   DataTable,
@@ -24,12 +25,15 @@ import {
   Label,
   ListPageTemplate,
   NativeSelect,
+  Pagination,
   StatusBadge,
+  TableTitleCell,
   ViewHeader,
   useToast,
 } from "@vxture/design-system";
 import { models as seed, providers, type ModelRow } from "@/mocks/atlas";
 import { RESOURCE_STATUS_META } from "@/lib/status";
+import { useListPagination } from "@/lib/pagination";
 
 /** 能力标签的全集，opera-atlas-design.md §5「模型能力」。 */
 const CAPABILITIES = [
@@ -72,10 +76,11 @@ export default function ModelsPage() {
   const [rows, setRows] = useState<ModelRow[]>(seed);
   const [keyword, setKeyword] = useState("");
   const [capability, setCapability] = useState("all");
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<ModelDraft>(EMPTY_DRAFT);
 
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return rows.filter(
       (r) =>
@@ -85,6 +90,18 @@ export default function ModelsPage() {
           r.name.toLowerCase().includes(kw)),
     );
   }, [rows, keyword, capability]);
+
+  const pager = useListPagination(filtered);
+
+  const setStatusBulk = (status: ModelRow["status"]) => {
+    const ids = new Set(selectedKeys);
+    setRows((all) => all.map((r) => (ids.has(r.id) ? { ...r, status } : r)));
+    toast({
+      tone: status === "disabled" ? "warning" : "success",
+      title: `${ids.size} 个模型已${status === "disabled" ? "下线" : "上线"}`,
+    });
+    setSelectedKeys([]);
+  };
 
   /** 只接入中的 Provider 能挂新模型；已停用的不出现在下拉里。 */
   const selectableProviders = providers.filter((p) => p.status !== "disabled");
@@ -194,17 +211,29 @@ export default function ModelsPage() {
           />
         }
         filters={
-          <FilterBar>
+          <FilterBar
+            count={
+              filtered.length === rows.length
+                ? rows.length
+                : `${filtered.length} / ${rows.length}`
+            }
+          >
             <Input
               placeholder="搜索模型编码…"
               className="max-w-panel-sm"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
             />
             <NativeSelect
               wrapperClassName="w-fit"
               value={capability}
-              onChange={(e) => setCapability(e.target.value)}
+              onChange={(e) => {
+                setCapability(e.target.value);
+                pager.resetPage();
+              }}
               aria-label="能力筛选"
             >
               <option value="all">全部能力</option>
@@ -216,6 +245,28 @@ export default function ModelsPage() {
             </NativeSelect>
           </FilterBar>
         }
+        bulkBar={
+          <BulkActionBar
+            count={selectedKeys.length}
+            noun="个"
+            onClear={() => setSelectedKeys([])}
+            actions={[
+              {
+                id: "restore",
+                label: "重新上线",
+                icon: "play",
+                onSelect: () => setStatusBulk("active"),
+              },
+              {
+                id: "retire",
+                label: "下线",
+                icon: "prohibit",
+                danger: true,
+                onSelect: () => setStatusBulk("disabled"),
+              },
+            ]}
+          />
+        }
         table={
           <DataTable
             columns={[
@@ -223,14 +274,12 @@ export default function ModelsPage() {
                 id: "model",
                 header: "模型",
                 cell: (r) => (
-                  <span className="flex flex-col">
-                    <span className="text-label-md text-foreground">
-                      {r.name}
-                    </span>
-                    <span className="text-code-sm text-muted-foreground">
-                      {r.code}
-                    </span>
-                  </span>
+                  <TableTitleCell
+                    icon="brain"
+                    title={r.name}
+                    description={r.code}
+                    onTitleClick={() => openEdit(r)}
+                  />
                 ),
               },
               { id: "provider", header: "Provider", cell: (r) => r.provider },
@@ -263,55 +312,63 @@ export default function ModelsPage() {
                   </StatusBadge>
                 ),
               },
-              {
-                id: "actions",
-                header: "",
-                align: "right",
-                cell: (r) => (
-                  <ActionMenu
-                    label={`${r.code} 操作`}
-                    items={[
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        onSelect: () => openEdit(r),
-                      },
-                      r.status === "disabled"
-                        ? {
-                            id: "restore",
-                            label: "重新上线",
-                            icon: "play" as const,
-                            onSelect: () => {
-                              setRows((all) =>
-                                all.map((x) =>
-                                  x.id === r.id
-                                    ? { ...x, status: "active" }
-                                    : x,
-                                ),
-                              );
-                              toast({
-                                tone: "success",
-                                title: `${r.code} 已重新上线`,
-                              });
-                            },
-                          }
-                        : {
-                            id: "retire",
-                            label: "下线",
-                            icon: "prohibit" as const,
-                            danger: true,
-                            separatorBefore: true,
-                            onSelect: () =>
-                              setDialog({ kind: "retire", row: r }),
-                          },
-                    ]}
-                  />
-                ),
-              },
             ]}
-            rows={visible}
+            rows={pager.pageRows}
             rowKey={(r) => r.id}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            indexStart={pager.indexStart}
+            rowActions={(r) => (
+              <ActionMenu
+                label={`${r.code} 操作`}
+                items={[
+                  {
+                    id: "edit",
+                    label: "编辑",
+                    icon: "edit",
+                    onSelect: () => openEdit(r),
+                  },
+                  r.status === "disabled"
+                    ? {
+                        id: "restore",
+                        label: "重新上线",
+                        icon: "play" as const,
+                        onSelect: () => {
+                          setRows((all) =>
+                            all.map((x) =>
+                              x.id === r.id ? { ...x, status: "active" } : x,
+                            ),
+                          );
+                          toast({
+                            tone: "success",
+                            title: `${r.code} 已重新上线`,
+                          });
+                        },
+                      }
+                    : {
+                        id: "retire",
+                        label: "下线",
+                        icon: "prohibit" as const,
+                        danger: true,
+                        separatorBefore: true,
+                        onSelect: () => setDialog({ kind: "retire", row: r }),
+                      },
+                ]}
+              />
+            )}
+            footer={
+              <Pagination
+                className="w-full"
+                page={pager.page}
+                pageCount={pager.pageCount}
+                total={rows.length}
+                filteredTotal={filtered.length}
+                pageSize={pager.pageSize}
+                pageSizeOptions={[5, 10, 20, 50]}
+                onPageSizeChange={pager.onPageSizeChange}
+                onPageChange={pager.onPageChange}
+              />
+            }
           />
         }
       />

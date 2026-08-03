@@ -23,6 +23,7 @@ import {
   Label,
   ListPageTemplate,
   NativeSelect,
+  TableTitleCell,
   ViewHeader,
   useToast,
 } from "@vxture/design-system";
@@ -154,9 +155,11 @@ export default function RbacPage() {
                 id: "role",
                 header: "角色",
                 cell: (r) => (
-                  <span className="text-label-md text-foreground">
-                    {r.role}
-                  </span>
+                  <TableTitleCell
+                    icon="role"
+                    title={r.role}
+                    description={r.permissions}
+                  />
                 ),
               },
               {
@@ -170,34 +173,29 @@ export default function RbacPage() {
                 align: "right",
                 cell: (r) => countByRole.get(r.id) ?? 0,
               },
-              { id: "perm", header: "权限", cell: (r) => r.permissions },
-              {
-                id: "actions",
-                header: "",
-                align: "right",
-                cell: (r) => (
-                  <ActionMenu
-                    label={`${r.role} 操作`}
-                    items={[
-                      {
-                        id: "members",
-                        label: "管理成员",
-                        icon: "users",
-                        onSelect: () => setDialog({ kind: "members", row: r }),
-                      },
-                      {
-                        id: "scope",
-                        label: "调整授权域",
-                        icon: "faders",
-                        onSelect: () => openScope(r),
-                      },
-                    ]}
-                  />
-                ),
-              },
             ]}
             rows={roles}
             rowKey={(r) => r.id}
+            indexStart={1}
+            rowActions={(r) => (
+              <ActionMenu
+                label={`${r.role} 操作`}
+                items={[
+                  {
+                    id: "members",
+                    label: "管理成员",
+                    icon: "users",
+                    onSelect: () => setDialog({ kind: "members", row: r }),
+                  },
+                  {
+                    id: "scope",
+                    label: "调整授权域",
+                    icon: "faders",
+                    onSelect: () => openScope(r),
+                  },
+                ]}
+              />
+            )}
           />
         }
       />

@@ -10,10 +10,12 @@ import {
   Input,
   ListPageTemplate,
   NativeSelect,
+  Pagination,
   ViewHeader,
   type DataTableSort,
 } from "@vxture/design-system";
 import { auditTrail } from "@/mocks/atlas";
+import { useListPagination } from "@/lib/pagination";
 
 /** 动作档取自现有留痕，避免筛选项与数据脱节。 */
 const ACTIONS = Array.from(new Set(auditTrail.map((r) => r.action)));
@@ -43,6 +45,7 @@ export default function AuditPage() {
   }, [keyword, action, sort]);
 
   const filtered = keyword !== "" || action !== "all";
+  const pager = useListPagination(visible);
 
   return (
     <ListPageTemplate
@@ -54,17 +57,29 @@ export default function AuditPage() {
         />
       }
       filters={
-        <FilterBar>
+        <FilterBar
+          count={
+            visible.length === auditTrail.length
+              ? auditTrail.length
+              : `${visible.length} / ${auditTrail.length}`
+          }
+        >
           <Input
             placeholder="搜索对象 / 操作者…"
             className="max-w-panel-sm"
             value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+              pager.resetPage();
+            }}
           />
           <NativeSelect
             wrapperClassName="w-fit"
             value={action}
-            onChange={(e) => setAction(e.target.value)}
+            onChange={(e) => {
+              setAction(e.target.value);
+              pager.resetPage();
+            }}
             aria-label="动作筛选"
           >
             <option value="all">全部动作</option>
@@ -101,10 +116,24 @@ export default function AuditPage() {
               ),
             },
           ]}
-          rows={visible}
+          rows={pager.pageRows}
           rowKey={(r) => r.id}
+          indexStart={pager.indexStart}
           sort={sort}
           onSortChange={setSort}
+          footer={
+            <Pagination
+              className="w-full"
+              page={pager.page}
+              pageCount={pager.pageCount}
+              total={auditTrail.length}
+              filteredTotal={visible.length}
+              pageSize={pager.pageSize}
+              pageSizeOptions={[5, 10, 20, 50]}
+              onPageSizeChange={pager.onPageSizeChange}
+              onPageChange={pager.onPageChange}
+            />
+          }
           emptyTitle={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
           emptyDescription={
             filtered

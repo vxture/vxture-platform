@@ -12,6 +12,7 @@ import {
   ActionMenu,
   Badge,
   Banner,
+  BulkActionBar,
   Button,
   DataTable,
   DialogForm,
@@ -25,12 +26,15 @@ import {
   Kbd,
   ListPageTemplate,
   NativeSelect,
+  Pagination,
   StatusBadge,
+  TableTitleCell,
   ViewHeader,
   useToast,
 } from "@vxture/design-system";
 import { apiKeys as seed, type ApiKeyRow } from "@/mocks/atlas";
 import { KEY_STATUS_META } from "@/lib/status";
+import { useListPagination } from "@/lib/pagination";
 
 type KeyKind = ApiKeyRow["kind"];
 
@@ -73,8 +77,9 @@ export default function KeysPage() {
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<KeyDraft>(EMPTY_DRAFT);
   const [reveal, setReveal] = useState<RevealState | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
 
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return rows.filter(
       (r) =>
@@ -84,6 +89,24 @@ export default function KeysPage() {
           r.prefix.toLowerCase().includes(kw)),
     );
   }, [rows, keyword, kindFilter]);
+
+  const pager = useListPagination(filtered);
+
+  /** 批量只做可逆动作（禁用/启用）；吊销不可撤销，必须逐个走确认框。 */
+  const setStatusBulk = (status: "active" | "disabled") => {
+    const ids = new Set(selectedKeys);
+    setRows((all) =>
+      all.map((r) =>
+        ids.has(r.id) && r.status !== "revoked" ? { ...r, status } : r,
+      ),
+    );
+    toast({
+      tone: status === "active" ? "success" : "warning",
+      title: `${ids.size} 把 Key 已${status === "active" ? "启用" : "禁用"}`,
+      description: "已吊销的 Key 不受批量操作影响。",
+    });
+    setSelectedKeys([]);
+  };
 
   const setStatus = (row: ApiKeyRow, status: ApiKeyRow["status"]) => {
     setRows((all) => all.map((r) => (r.id === row.id ? { ...r, status } : r)));
@@ -171,17 +194,29 @@ export default function KeysPage() {
           />
         }
         filters={
-          <FilterBar>
+          <FilterBar
+            count={
+              filtered.length === rows.length
+                ? rows.length
+                : `${filtered.length} / ${rows.length}`
+            }
+          >
             <Input
               placeholder="搜索名称 / 前缀…"
               className="max-w-panel-sm"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
             />
             <NativeSelect
               wrapperClassName="w-fit"
               value={kindFilter}
-              onChange={(e) => setKindFilter(e.target.value as KeyKind | "all")}
+              onChange={(e) => {
+                setKindFilter(e.target.value as KeyKind | "all");
+                pager.resetPage();
+              }}
               aria-label="类型筛选"
             >
               <option value="all">全部类型</option>
@@ -190,6 +225,28 @@ export default function KeysPage() {
             </NativeSelect>
           </FilterBar>
         }
+        bulkBar={
+          <BulkActionBar
+            count={selectedKeys.length}
+            noun="把"
+            onClear={() => setSelectedKeys([])}
+            actions={[
+              {
+                id: "enable",
+                label: "启用",
+                icon: "play",
+                onSelect: () => setStatusBulk("active"),
+              },
+              {
+                id: "disable",
+                label: "禁用",
+                icon: "pause",
+                danger: true,
+                onSelect: () => setStatusBulk("disabled"),
+              },
+            ]}
+          />
+        }
         table={
           <DataTable
             columns={[
@@ -197,9 +254,11 @@ export default function KeysPage() {
                 id: "name",
                 header: "名称",
                 cell: (r) => (
-                  <span className="text-label-md text-foreground">
-                    {r.name}
-                  </span>
+                  <TableTitleCell
+                    icon="key"
+                    title={r.name}
+                    description={r.owner}
+                  />
                 ),
               },
               {
@@ -213,7 +272,6 @@ export default function KeysPage() {
                   </Badge>
                 ),
               },
-              { id: "owner", header: "归属", cell: (r) => r.owner },
               {
                 id: "prefix",
                 header: "前缀",
@@ -230,51 +288,62 @@ export default function KeysPage() {
               },
               { id: "lastUsed", header: "最近使用", cell: (r) => r.lastUsed },
               { id: "createdAt", header: "签发于", cell: (r) => r.createdAt },
-              {
-                id: "actions",
-                header: "",
-                align: "right",
-                cell: (r) => (
-                  <ActionMenu
-                    label={`${r.name} 操作`}
-                    items={[
-                      {
-                        id: "rotate",
-                        label: "轮换",
-                        icon: "refresh",
-                        disabled: r.status !== "active",
-                        onSelect: () => setDialog({ kind: "rotate", row: r }),
-                      },
-                      r.status === "disabled"
-                        ? {
-                            id: "enable",
-                            label: "启用",
-                            icon: "play" as const,
-                            onSelect: () => setStatus(r, "active"),
-                          }
-                        : {
-                            id: "disable",
-                            label: "禁用",
-                            icon: "pause" as const,
-                            disabled: r.status !== "active",
-                            onSelect: () => setStatus(r, "disabled"),
-                          },
-                      {
-                        id: "revoke",
-                        label: "吊销",
-                        icon: "prohibit",
-                        danger: true,
-                        separatorBefore: true,
-                        disabled: r.status === "revoked",
-                        onSelect: () => setDialog({ kind: "revoke", row: r }),
-                      },
-                    ]}
-                  />
-                ),
-              },
             ]}
-            rows={visible}
+            rows={pager.pageRows}
             rowKey={(r) => r.id}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            indexStart={pager.indexStart}
+            rowActions={(r) => (
+              <ActionMenu
+                label={`${r.name} 操作`}
+                items={[
+                  {
+                    id: "rotate",
+                    label: "轮换",
+                    icon: "refresh",
+                    disabled: r.status !== "active",
+                    onSelect: () => setDialog({ kind: "rotate", row: r }),
+                  },
+                  r.status === "disabled"
+                    ? {
+                        id: "enable",
+                        label: "启用",
+                        icon: "play" as const,
+                        onSelect: () => setStatus(r, "active"),
+                      }
+                    : {
+                        id: "disable",
+                        label: "禁用",
+                        icon: "pause" as const,
+                        disabled: r.status !== "active",
+                        onSelect: () => setStatus(r, "disabled"),
+                      },
+                  {
+                    id: "revoke",
+                    label: "吊销",
+                    icon: "prohibit",
+                    danger: true,
+                    separatorBefore: true,
+                    disabled: r.status === "revoked",
+                    onSelect: () => setDialog({ kind: "revoke", row: r }),
+                  },
+                ]}
+              />
+            )}
+            footer={
+              <Pagination
+                className="w-full"
+                page={pager.page}
+                pageCount={pager.pageCount}
+                total={rows.length}
+                filteredTotal={filtered.length}
+                pageSize={pager.pageSize}
+                pageSizeOptions={[5, 10, 20, 50]}
+                onPageSizeChange={pager.onPageSizeChange}
+                onPageChange={pager.onPageChange}
+              />
+            }
           />
         }
       />

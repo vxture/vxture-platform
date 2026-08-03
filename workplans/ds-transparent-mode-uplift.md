@@ -153,6 +153,11 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
 - opera Provider 页为参考实现（选择+批量启停、序号翻页递进、卡片视图、每页条数），
   浏览器实测：翻页/选择/批量/切视图全通
 - 快照 minor +1（TableTitleCell 具名导出）
+- **全清单页推开（owner 指出只改一页≠通用）**：Models/Endpoints/Keys（全套：选择+批量、
+  序号、两行主列、锁定操作列、计数、翻页）+ Logs/Audit（只读：计数+序号+翻页）+
+  RBAC（4 固定角色：序号+两行主列+锁定操作列，不设翻页）；opera 新增 useListPagination
+  hook（翻页状态公共化，接 BFF 分页只换数据源）；Dashboard 摘要表与 Metering 聚合表
+  刻意保持轻量——五要件是清单页语法，不是所有表格的语法
 
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 

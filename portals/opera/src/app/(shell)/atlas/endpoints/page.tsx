@@ -10,6 +10,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
+  BulkActionBar,
   Button,
   Combobox,
   DataTable,
@@ -21,13 +22,15 @@ import {
   FilterBar,
   Icon,
   Input,
-  Kbd,
   ListPageTemplate,
+  Pagination,
   StatusBadge,
+  TableTitleCell,
   ViewHeader,
   useToast,
 } from "@vxture/design-system";
 import { endpoints as seed, models, type EndpointRow } from "@/mocks/atlas";
+import { useListPagination } from "@/lib/pagination";
 
 /** fallback 的"不设"档。空串在 Combobox 里选不中，需要一个显式值。 */
 const NO_FALLBACK = "__none__";
@@ -56,15 +59,28 @@ export default function EndpointsPage() {
   const { toast } = useToast();
   const [rows, setRows] = useState<EndpointRow[]>(seed);
   const [keyword, setKeyword] = useState("");
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<EndpointDraft>(EMPTY_DRAFT);
 
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return kw === ""
       ? rows
       : rows.filter((r) => r.code.toLowerCase().includes(kw));
   }, [rows, keyword]);
+
+  const pager = useListPagination(filtered);
+
+  const setEnabledBulk = (enabled: boolean) => {
+    const ids = new Set(selectedKeys);
+    setRows((all) => all.map((r) => (ids.has(r.id) ? { ...r, enabled } : r)));
+    toast({
+      tone: enabled ? "success" : "warning",
+      title: `${ids.size} 个 Endpoint 已${enabled ? "启用" : "停用"}`,
+    });
+    setSelectedKeys([]);
+  };
 
   /** 已下线的模型不能挂：挂上去等于给 Endpoint 埋一个必然失败的 primary。 */
   const modelItems = useMemo(
@@ -187,14 +203,45 @@ export default function EndpointsPage() {
           />
         }
         filters={
-          <FilterBar>
+          <FilterBar
+            count={
+              filtered.length === rows.length
+                ? rows.length
+                : `${filtered.length} / ${rows.length}`
+            }
+          >
             <Input
               placeholder="搜索 Endpoint…"
               className="max-w-panel-sm"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
             />
           </FilterBar>
+        }
+        bulkBar={
+          <BulkActionBar
+            count={selectedKeys.length}
+            noun="个"
+            onClear={() => setSelectedKeys([])}
+            actions={[
+              {
+                id: "enable",
+                label: "启用",
+                icon: "play",
+                onSelect: () => setEnabledBulk(true),
+              },
+              {
+                id: "disable",
+                label: "停用",
+                icon: "pause",
+                danger: true,
+                onSelect: () => setEnabledBulk(false),
+              },
+            ]}
+          />
         }
         table={
           <DataTable
@@ -202,9 +249,15 @@ export default function EndpointsPage() {
               {
                 id: "code",
                 header: "Endpoint",
-                cell: (r) => <Kbd>{r.code}</Kbd>,
+                cell: (r) => (
+                  <TableTitleCell
+                    icon="plug"
+                    title={<span className="font-mono">{r.code}</span>}
+                    description={r.category}
+                    onTitleClick={() => openFrom(r, "edit")}
+                  />
+                ),
               },
-              { id: "category", header: "类别", cell: (r) => r.category },
               {
                 id: "primary",
                 header: "Primary",
@@ -232,49 +285,60 @@ export default function EndpointsPage() {
                   </StatusBadge>
                 ),
               },
-              {
-                id: "actions",
-                header: "",
-                align: "right",
-                cell: (r) => (
-                  <ActionMenu
-                    label={`${r.code} 操作`}
-                    items={[
-                      {
-                        id: "route",
-                        label: "调整路由",
-                        icon: "tree-structure",
-                        onSelect: () => openFrom(r, "route"),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        onSelect: () => openFrom(r, "edit"),
-                      },
-                      r.enabled
-                        ? {
-                            id: "disable",
-                            label: "停用",
-                            icon: "pause" as const,
-                            danger: true,
-                            separatorBefore: true,
-                            onSelect: () => setEnabled(r, false),
-                          }
-                        : {
-                            id: "enable",
-                            label: "启用",
-                            icon: "play" as const,
-                            separatorBefore: true,
-                            onSelect: () => setEnabled(r, true),
-                          },
-                    ]}
-                  />
-                ),
-              },
             ]}
-            rows={visible}
+            rows={pager.pageRows}
             rowKey={(r) => r.id}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            indexStart={pager.indexStart}
+            rowActions={(r) => (
+              <ActionMenu
+                label={`${r.code} 操作`}
+                items={[
+                  {
+                    id: "route",
+                    label: "调整路由",
+                    icon: "tree-structure",
+                    onSelect: () => openFrom(r, "route"),
+                  },
+                  {
+                    id: "edit",
+                    label: "编辑",
+                    icon: "edit",
+                    onSelect: () => openFrom(r, "edit"),
+                  },
+                  r.enabled
+                    ? {
+                        id: "disable",
+                        label: "停用",
+                        icon: "pause" as const,
+                        danger: true,
+                        separatorBefore: true,
+                        onSelect: () => setEnabled(r, false),
+                      }
+                    : {
+                        id: "enable",
+                        label: "启用",
+                        icon: "play" as const,
+                        separatorBefore: true,
+                        onSelect: () => setEnabled(r, true),
+                      },
+                ]}
+              />
+            )}
+            footer={
+              <Pagination
+                className="w-full"
+                page={pager.page}
+                pageCount={pager.pageCount}
+                total={rows.length}
+                filteredTotal={filtered.length}
+                pageSize={pager.pageSize}
+                pageSizeOptions={[5, 10, 20, 50]}
+                onPageSizeChange={pager.onPageSizeChange}
+                onPageChange={pager.onPageChange}
+              />
+            }
           />
         }
       />
