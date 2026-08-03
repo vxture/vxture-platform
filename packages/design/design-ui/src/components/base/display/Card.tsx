@@ -12,6 +12,9 @@
  *   错觉打破。要浮起的是浮层（popover/dialog），不是卡片。
  * - 内边距走刻度、标题层次走 `text-title-sm`，跟随密度与字号三档；
  *   上游的 p-6 / text-2xl 是裸数值，不跟随。
+ * - 竖向节奏落在 Card 本体（`py-xl` + `gap-xl`），Header / Content 只管横向
+ *   `px-xl`——上游现行 Card 即此模型。旧的 `pt-none`（假设内容永远跟在页头后）
+ *   让独立使用 CardContent 的卡顶部内边距归零（2026-08-03 opera 实测），退役。
  *
  * 原实现在每一件上都挂了 .vx-card__*，随遗留样式层一并退役。
  */
@@ -34,7 +37,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
   return (
     <div
       ref={ref}
-      className={cn("flex flex-col text-foreground", veil[surface], className)}
+      className={cn(
+        "flex flex-col gap-xl py-xl text-foreground",
+        veil[surface],
+        className,
+      )}
       {...props}
     />
   );
@@ -47,7 +54,7 @@ const CardHeader = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("flex flex-col gap-2xs p-xl", className)}
+      className={cn("flex flex-col gap-2xs px-xl", className)}
       {...props}
     />
   );
@@ -77,7 +84,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(function CardContent({ className, ...props }, ref) {
-  return <div ref={ref} className={cn("p-xl pt-none", className)} {...props} />;
+  return <div ref={ref} className={cn("px-xl", className)} {...props} />;
 });
 
 const CardFooter = React.forwardRef<
@@ -89,7 +96,8 @@ const CardFooter = React.forwardRef<
       ref={ref}
       className={cn(
         // footer 与正文的界是"字段级"分隔，走虚线（workplan §1 V4）。
-        "mx-xl mt-auto flex items-center gap-sm border-t py-md",
+        // 竖向只补 pt：与正文的间距由 Card 的 gap 给，底部由 Card 的 py 收。
+        "mx-xl mt-auto flex items-center gap-sm border-t pt-md",
         hairline.field,
         className,
       )}

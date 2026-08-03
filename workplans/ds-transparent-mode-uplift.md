@@ -88,6 +88,57 @@ alert-dialog, accordion, collapsible, progress, radio-group, slider, toggle, tog
   （accounts 6 文件 / website Header 消费中），ShellBrand 默认 label 去真实域名
 - 完成判据：守卫 72 组件全绿、消费方 type-check 零新增错误、PENDING_COMPONENTS 清空
 
+### 批 T — 目录分类法重构（已完成，`22ca6ccc`）
+
+- ui→base、patterns→composite、ai→ai-elements；StatusBadge/NativeSelect/SegmentedControl/Banner/EmptyState
+  移 base，SplitViewLayout/ViewLayout 移 layout（实测零视觉类）；tone.ts 上提 components/ 层级
+- 判据一句话（03 §8）：单件进 base，组合进 composite，零视觉纯排布进 layout，页面骨架进 templates；看消费不看构造
+- 根入口不变，消费方零感知；preview 的 atom/pattern 是构造粒度轴，刻意不对齐（跟进项）
+- owner 拍板：base/（弃 primitive，避 T1 与 Radix 双撞名）；"图案性样板"= preview blocks 区，后续计划
+
+### 批 S — 上游目录补齐七件（已完成）
+
+- Spinner / Kbd+KbdGroup / ButtonGroup+Text / InputGroup 族 / Field 族 / InputOTP / Resizable，全进 base/
+- 不引：Form(RHF，UI 层零框架绑定)、Menubar/NavigationMenu/Carousel(无场景)、Chart(归 domain-ui)、Item(与现有件撞语义)
+- 新依赖：input-otp、react-resizable-panels v4（API 与 shadcn 文档的 v2 不同代，按 data-separator/aria-orientation 重写）
+- 守卫 84 组件 / 828 类名列表全绿；Button 归集 base/Button/ 目录（约定：多文件成目录，单文件平铺）
+- **浏览器实测已完成（2026-08-03）**：七件计算值全对（Spinner 五档+spin 动画、Kbd 16px/muted/等宽、
+  ButtonGroup 接缝清角+-1px、InputGroup 焦点环包整组（放大截图确认）+失效红、Field alert 语义、
+  OTP 32×32 槽、Resizable 鼠标/键盘双通道调宽实测）；expandable 展开高亮修复实测生效（bg=muted）；
+  console 零产品错误（仅测量脚本自伤伪影）；教训：computer 工具坐标=截图空间(×0.8167)非 CSS 空间
+
+### 批 U — muted token + 展开高亮静默失败修复（已完成，`cb184042`）
+
+- **实弹**：expandable 配方 `aria-expanded:bg-muted` 引用不存在的 token——所有菜单/下拉触发器
+  的展开高亮从未生效；守卫多数票启发式放走"两 token 恰好一半失效"的串
+- owner 拍板建 `muted`（neutral-200/800）：上游 muted/muted-foreground 本是一对，此前只建了后者；
+  与 accent 分工写入 04 §2（accent=品牌微染交互反馈，muted=静态中性弱底）
+- Skeleton/Kbd/ButtonGroupText 迁 bg-muted；守卫对 recipes.ts 取消多数票（命中一个即全串实测）
+
+### 批 V — base 五组 / composite 三组功能分目录（已完成）
+
+- base：form 17 / display 15 / navigation 3 / overlay 9 / feedback 4；composite：form 3 / data 7 / structure 4
+- 归属以 preview 分组字段为准（同一分类法两个视图）：Calendar/Accordion/Collapsible/Skeleton 归
+  display、Command 归 overlay，与初表不同处均从 preview
+- 根入口不变，churn 全在仓内 import 与两个目录 index
+
+### 批 W — 统计卡对齐 admin + Card 竖向节奏 + 第三例 twMerge 静默丢类（已完成）
+
+- opera 对照线上 admin 首屏（owner 实测"差距很大"）：MetricCard 全落 neutral 档发灰。
+  修 DS 而非 opera：tone 默认改 `brand`（admin KPI 卡默认即品牌蓝），读数继承语气色
+  （neutral 档回落 foreground）+ font-bold；图标随卡根语气色自动着色
+- 统计卡两形态（owner 拍板）：`variant="default"`（带 icon 松散款，≤4/行）/
+  `"compact"`（无 icon 紧凑款，>4/行，只收 padding 行距、读数不缩、icon 传了不渲染）；
+  MetricGrid 整排透传；preview 补 compact 轴与示例排
+- **第三例 twMerge 静默丢类（与 vx-type / border-width 同族）**：T2 间距档不在
+  tailwind-merge 内置刻度表，`cn("p-xl pt-none", "p-xl")` 三条全存活、CSS 顺序裁决，
+  CardContent 的 `pt-none` 压掉调用方 padding→指标卡顶部内边距归零（owner 抓到）。
+  修法：theme.spacing 登记档名文法谓词（none/2xs…6xl/row-_/control-_），全间距组生效
+- Card 竖向节奏对齐上游现行模型：`py-xl + gap-xl` 落 Card 本体，Header/Content 只管
+  `px-xl`，Footer `pt-md`（底由 Card py 收）；`pt-none`（假设内容永远跟在页头后）退役
+- 亮/暗双模式浏览器实测：四指标卡品牌蓝顶缘+同色读数、padding 四向对称、Router 独立
+  CardContent 卡顶部不再归零
+
 ## 4. 判断记录（owner 未逐条拍板、由本计划定）
 
 | 决策                              | 取向                                                                                                               |

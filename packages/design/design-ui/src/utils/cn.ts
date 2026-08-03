@@ -61,8 +61,26 @@ const borderWidthGroups = Object.fromEntries(
   ).map(([group, prefix]) => [group, [{ [prefix]: [...BORDER_WIDTH_STEPS] }]]),
 );
 
+/**
+ * T2 间距档。`p-xl` / `pt-none` / `gap-control-md` 的档名不在 tailwind-merge 的
+ * 内置刻度表里，padding / margin / gap 这些组根本认不出它们——
+ * `cn("p-xl pt-none", "p-xl")` 三条类全部原样保留，冲突交给 CSS 声明顺序裁决。
+ * 实测症状：CardContent 基类的 `pt-none` 压过调用方后写的 `p-xl`，指标卡顶部
+ * 内边距静默归零（2026-08-03 opera 对照 admin 抓到，与 vx-type / border-width 同族）。
+ * 档名走文法谓词而非穷举：spacing 新增档位不必回来改这里。
+ */
+const isSpacingStep = (value: string) =>
+  /^(none|2xs|xs|sm|md|lg|[2-6]?xl|row-[a-z0-9-]+|control-[a-z0-9-]+)$/.test(
+    value,
+  );
+
 const twMergeConfigured = extendTailwindMerge<"vx-type">({
   extend: {
+    theme: {
+      // Tailwind v4 的 --spacing-* 供 p/m/gap/inset 等所有间距组共用，
+      // 在 theme 层登记一次即可全组生效。
+      spacing: [isSpacingStep],
+    },
     classGroups: {
       // 自成一组，与内置 `text-color` 互不相干，故二者可以共存。
       // ⚠ 必须用 Record 形式逐段声明；`"label-*"` 这种通配串在 v3 不匹配，

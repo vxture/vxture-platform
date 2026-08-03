@@ -43,10 +43,17 @@ export interface MetricGridItem {
 export interface MetricGridProps {
   readonly items: readonly MetricGridItem[];
   readonly columns?: MetricGridColumns;
+  /** 整排统一形态：一行 4 张以内用默认松散款，超过 4 张用无 icon 紧凑款。 */
+  readonly variant?: "default" | "compact";
   readonly className?: string;
 }
 
-function MetricGrid({ items, columns = 4, className }: MetricGridProps) {
+function MetricGrid({
+  items,
+  columns = 4,
+  variant = "default",
+  className,
+}: MetricGridProps) {
   return (
     <div
       className={cn(
@@ -69,6 +76,7 @@ function MetricGrid({ items, columns = 4, className }: MetricGridProps) {
             ? { trendTone: item.trendTone }
             : {})}
           {...(item.tone !== undefined ? { tone: item.tone } : {})}
+          variant={variant}
         />
       ))}
     </div>
