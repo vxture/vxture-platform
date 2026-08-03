@@ -86,7 +86,7 @@ export default function AuditPage() {
         >
           <Input
             placeholder="搜索对象 / 操作者…"
-            className="max-w-panel-sm"
+            className="grow basis-media-3xl max-w-panel-sm"
             value={keyword}
             onChange={(e) => {
               setKeyword(e.target.value);

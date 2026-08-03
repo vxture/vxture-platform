@@ -260,7 +260,7 @@ export default function KeysPage() {
           >
             <Input
               placeholder="搜索名称 / 前缀…"
-              className="max-w-panel-sm"
+              className="grow basis-media-3xl max-w-panel-sm"
               value={keyword}
               onChange={(e) => {
                 setKeyword(e.target.value);

@@ -275,7 +275,7 @@ export default function ModelsPage() {
           >
             <Input
               placeholder="搜索模型编码…"
-              className="max-w-panel-sm"
+              className="grow basis-media-3xl max-w-panel-sm"
               value={keyword}
               onChange={(e) => {
                 setKeyword(e.target.value);

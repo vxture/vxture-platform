@@ -281,7 +281,7 @@ export default function ProvidersPage() {
           >
             <Input
               placeholder="搜索 Provider…"
-              className="max-w-panel-sm"
+              className="grow basis-media-3xl max-w-panel-sm"
               value={keyword}
               onChange={(e) => {
                 setKeyword(e.target.value);

@@ -93,7 +93,7 @@ export default function LogsPage() {
         >
           <Input
             placeholder="搜索日志内容 / Trace…"
-            className="max-w-panel-sm"
+            className="grow basis-media-3xl max-w-panel-sm"
             value={keyword}
             onChange={(e) => {
               setKeyword(e.target.value);
