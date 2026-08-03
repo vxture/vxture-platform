@@ -329,27 +329,28 @@ function DataTable<TRow>({
                       </td>
                     ))}
                     {rowActions ? (
-                      /* 锁定列自己铺底：横向滚动时业务列从其下方经过，
-                         bg-background 垫底、行 hover/选中态在其上再铺一层，
-                         与行的视觉状态保持同步。h-full：内层 div 默认只随内容
-                         撑高，行内别的单元格更高（如两行主列）时它会矮一截，
-                         hover/选中背景上下留白（2026-08-03 owner 实测抓到）——
-                         撑满单元格高度才能让背景条与整行同高。 */
+                      /* 锁定列自己铺底：横向滚动时业务列从其下方经过，需要
+                         不透明底色遮住。背景色直接落在 td 本体上，不借内层
+                         div——`<td>` 在表格布局里的盒子天然与整行同高，div 的
+                         `height:100%` 在表格单元格里解析不出结果（父 td 高度
+                         由内容撑出，百分比高度按 CSS 规范退回 auto，即"只随
+                         内容撑高"），h-full 因此不生效：行内别的单元格更高时
+                         （如两行主列），背景条矮一截，上下露出容器底色
+                         （2026-08-03 owner 实测抓到，h-full 那版没修对）。
+                         垂直居中交给 `align-middle`（对真实 td 有效，不受
+                         百分比高度限制）；水平靠右交给 `text-right`
+                         （ActionMenu 触发按钮是 inline-flex，服从文本对齐）。 */
                       <td
-                        className="sticky right-0 w-px whitespace-nowrap bg-background p-none align-middle"
+                        className={cn(
+                          "sticky right-0 w-px whitespace-nowrap px-md align-middle text-right",
+                          "transition-colors duration-fast ease-standard",
+                          isSelected
+                            ? "bg-surface-selected"
+                            : "bg-background group-hover:bg-accent",
+                        )}
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <div
-                          className={cn(
-                            "flex h-full items-center justify-end px-md",
-                            "transition-colors duration-fast ease-standard",
-                            isSelected
-                              ? "bg-surface-selected"
-                              : "group-hover:bg-accent",
-                          )}
-                        >
-                          {rowActions(row, rowIndex)}
-                        </div>
+                        {rowActions(row, rowIndex)}
                       </td>
                     ) : null}
                   </tr>
