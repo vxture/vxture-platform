@@ -27,6 +27,14 @@
  * 首末列零边距——`first:` 选择器认的是 DOM 里真实的第一个 `<td>`，选择列一旦
  * 存在就是它，零边距会把复选框顶到容器边界外观（2026-08-03 owner 实测抓到）。
  * 零边距的意图仍在：没有选择/序号列时，业务首列照常贴边对齐上下文。
+ *
+ * hover / 选中的底色只在**每个单元格自己**身上画一遍，`<tr>` 本体不着色。
+ * `accent` / `surface-selected` 都是半透明 token（品牌色 8–15% alpha）——如果
+ * `<tr>` 也画一层、锁定列再在其上画一层，两层半透明会叠加合成，锁定列的颜色
+ * 会比其余单元格明显更深（2026-08-03 owner 实测抓到：同一个 token 画了两遍，
+ * 不是两个不同的颜色在打架）。改法：`<tr>` 只留 `group` 作为 hover 触发源，
+ * 每个 `<td>`（含锁定列）各自订阅一次 `group-hover:` / `isSelected`，全表只有
+ * 一层色。
  */
 
 import * as React from "react";
@@ -277,6 +285,11 @@ function DataTable<TRow>({
               rows.map((row, rowIndex) => {
                 const key = keys[rowIndex] as string;
                 const isSelected = selected.has(key);
+                /* 单层色：每个 <td> 各画一次，不假手 <tr>（见文件头注）。 */
+                const rowTone = cn(
+                  "transition-colors duration-fast ease-standard",
+                  isSelected ? "bg-surface-selected" : "group-hover:bg-accent",
+                );
                 return (
                   <tr
                     key={key}
@@ -287,14 +300,12 @@ function DataTable<TRow>({
                     className={cn(
                       "group border-b last:border-b-0",
                       hairline.field,
-                      "transition-colors duration-fast ease-standard",
-                      isSelected ? "bg-surface-selected" : "hover:bg-accent",
                       onRowClick && "cursor-pointer",
                     )}
                   >
                     {selectable ? (
                       <td
-                        className={cn(EDGE_COL, "py-md align-middle")}
+                        className={cn(EDGE_COL, "py-md align-middle", rowTone)}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-center">
@@ -311,6 +322,7 @@ function DataTable<TRow>({
                         className={cn(
                           EDGE_COL,
                           "py-md align-middle whitespace-nowrap text-body-sm text-muted-foreground",
+                          rowTone,
                         )}
                       >
                         {indexStart + rowIndex}
@@ -323,6 +335,7 @@ function DataTable<TRow>({
                           "px-md py-md align-middle text-foreground",
                           "first:pl-none last:pr-none",
                           ALIGN[column.align ?? "left"],
+                          rowTone,
                         )}
                       >
                         {column.cell(row, rowIndex)}
@@ -343,10 +356,12 @@ function DataTable<TRow>({
                       <td
                         className={cn(
                           "sticky right-0 w-px whitespace-nowrap px-md align-middle text-right",
-                          "transition-colors duration-fast ease-standard",
-                          isSelected
-                            ? "bg-surface-selected"
-                            : "bg-background group-hover:bg-accent",
+                          // 未选中态补一层不透明底：横向滚动时业务列从它下方
+                          // 经过，需要遮住。选中态的 surface-selected 本身也是
+                          // 半透明 token，遮不住滚动内容——与其余选中行同样的
+                          // 已知小缺口，不在本次两个 bug 的范围内。
+                          !isSelected && "bg-background",
+                          rowTone,
                         )}
                         onClick={(e) => e.stopPropagation()}
                       >
