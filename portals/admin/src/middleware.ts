@@ -28,8 +28,16 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 
-/** RP 会话 cookie：生产 https 走 `__Host-` 前缀，本地 http 走裸名，两个都认。 */
-const RP_SESSION_COOKIES = ["__Host-vx_rp_session", "vx_rp_session"];
+/* RP 会话 cookie。名字按 OIDC client id 分应用（`…_admin`）——本地四个门户同在
+ * `localhost` 且 **cookie 无视端口**，共用一个名字会让别的门户的会话被这里的
+ * "cookie 在不在" 判定当成已登录，渲染后才被自己 BFF 的 401 打回。
+ * 生产 https 走 `__Host-` 前缀，本地 http 走裸名，两个都认。
+ * 值在 @vxture/core-oidc-rp，这里重抄一份：edge middleware 不能 import 那个
+ * node 运行时的包。它只是一道便宜的前置闸，权威判定仍在 BFF。 */
+const RP_SESSION_COOKIES = [
+  "__Host-vx_rp_session_admin",
+  "vx_rp_session_admin",
+] as const;
 /** 身份状态缓存，由 admin-bff 在静默探测失败时种下（见 oidc-auth.router.ts）。 */
 const PRESENCE_COOKIE = "vx_admin_sso_presence";
 

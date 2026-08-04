@@ -23,13 +23,16 @@ import { routing } from "./lib/i18n/routing";
 
 const handleI18n = createMiddleware(routing);
 
-/**
- * RP session cookie names (set by the BFF OIDC-RP callback). Mirrors
- * @vxture/core-oidc-rp RP_SESSION_COOKIE / RP_SESSION_COOKIE_INSECURE; duplicated
- * here because edge middleware cannot import that node-runtime package. Presence
- * is a cheap pre-gate only — the BFF remains the authoritative session verifier.
- */
-const RP_SESSION_COOKIES = ["__Host-vx_rp_session", "vx_rp_session"] as const;
+/* RP 会话 cookie。名字按 OIDC client id 分应用（`…_console`）——本地四个门户同在
+ * `localhost` 且 **cookie 无视端口**，共用一个名字会让别的门户的会话被这里的
+ * "cookie 在不在" 判定当成已登录，渲染后才被自己 BFF 的 401 打回。
+ * 生产 https 走 `__Host-` 前缀，本地 http 走裸名，两个都认。
+ * 值在 @vxture/core-oidc-rp，这里重抄一份：edge middleware 不能 import 那个
+ * node 运行时的包。它只是一道便宜的前置闸，权威判定仍在 BFF。 */
+const RP_SESSION_COOKIES = [
+  "__Host-vx_rp_session_console",
+  "vx_rp_session_console",
+] as const;
 
 function hasRpSession(request: NextRequest): boolean {
   return RP_SESSION_COOKIES.some((name) => request.cookies.has(name));

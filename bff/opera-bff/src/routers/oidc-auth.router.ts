@@ -91,7 +91,7 @@ export class OidcAuthRouter {
 
   /** __Host- in prod https; bare name over local http so the browser stores it. */
   private get cookieName(): string {
-    return rpSessionCookieName(this.rt.cookieSecure);
+    return rpSessionCookieName(this.rt.cookieSecure, this.rt.config.clientId);
   }
 
   /** Begin login: stash PKCE/nonce/returnTo, redirect to the IdP authorize page. */

@@ -39,9 +39,16 @@ const MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
  * 它不承载任何凭据，最坏情况是别人替你把侧栏收起来。
  */
 export function writeNavCollapsed(prefix: string, collapsed: boolean): void {
-  if (typeof document === "undefined") return;
+  /* 经 globalThis 取 document，而不是直接引用它。
+   *
+   * shared 被四个 BFF 编译，它们的 tsconfig 不含 `dom` lib（后端本来就不该有）——
+   * 直接写 `document` 会让这四个包全部报 TS2584，一个纯前端的便利函数把 DOM 类型
+   * 强加给了整条后端链路。这不是配置问题，是"浏览器专用代码进了服务端共用包"的
+   * 信号：留在这里是因为它与读取端是同一条 cookie 约定，代价则是这三行取值。 */
+  const doc = (globalThis as { document?: { cookie: string } }).document;
+  if (!doc) return;
   const name = navCollapsedCookieName(prefix);
-  document.cookie = `${name}=${collapsed ? "1" : "0"}; path=/; max-age=${MAX_AGE_SECONDS}; samesite=lax`;
+  doc.cookie = `${name}=${collapsed ? "1" : "0"}; path=/; max-age=${MAX_AGE_SECONDS}; samesite=lax`;
 }
 
 /**
