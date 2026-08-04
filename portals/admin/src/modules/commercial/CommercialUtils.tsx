@@ -44,14 +44,7 @@ export function PageSizePicker({
   value: PageSize;
   onChange: (value: PageSize) => void;
 }) {
-  return (
-    <SharedPageSizePicker
-      value={value}
-      onChange={onChange}
-      activeVariant="ghost"
-      inactiveVariant="ghost"
-    />
-  );
+  return <SharedPageSizePicker value={value} onChange={onChange} />;
 }
 
 export function SummaryItem({

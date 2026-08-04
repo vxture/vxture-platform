@@ -146,37 +146,29 @@ function ProductActionsMenu({
     >
       <ActionMenu
         label={`${product.productName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "查看详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: onViewDetails,
           },
           {
             id: "edit",
             label: "编辑能力",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: true,
           },
           {
             id: "integration",
             label: "接入配置",
-            icon: <Icon name="shield-check" size="xs" fallback="placeholder" />,
+            icon: "shield-check",
             disabled: true,
           },
           {
             id: "toggle-status",
             label: product.status === "active" ? "下线能力" : "上线能力",
-            icon: (
-              <Icon
-                name={product.status === "active" ? "x" : "check"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: product.status === "active" ? "x" : "check",
             disabled: true,
           },
         ]}

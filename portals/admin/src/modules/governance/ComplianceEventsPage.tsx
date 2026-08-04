@@ -224,7 +224,7 @@ export function ComplianceEventsPage() {
       await reload();
       closeDialog();
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -237,7 +237,7 @@ export function ComplianceEventsPage() {
       await reload();
       toast({ tone: "success", title: label });
     } catch (error) {
-      toast({ tone: "error", title: `${label}失败`, ...describeError(error) });
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -317,7 +317,7 @@ export function ComplianceEventsPage() {
         <span className="vx-models-toolbar__count">{filtered.length} 条</span>
         <Button
           variant="default"
-          size="sm"
+          size="md"
           className="vx-admin-action-btn"
           onClick={openCreate}
           title="新建合规事件"
@@ -397,24 +397,19 @@ export function ComplianceEventsPage() {
                 <span className="vx-tenant-actions">
                   <ActionMenu
                     label="合规事件操作"
-                    triggerClassName="vx-tenant-actions__trigger"
-                    triggerProps={{ title: "操作", disabled: submitting }}
+                    disabled={submitting}
                     items={[
                       {
                         id: "assign",
                         label: item.handlerId ? "改派处理人" : "指派处理人",
-                        icon: (
-                          <Icon name="user" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "user",
                         disabled: submitting || TERMINAL.has(item.status),
                         onSelect: () => void openAssign(item),
                       },
                       {
                         id: "resolve",
                         label: "办结",
-                        icon: (
-                          <Icon name="check" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "check",
                         disabled:
                           submitting ||
                           item.status !== "in_review" ||
@@ -427,9 +422,7 @@ export function ComplianceEventsPage() {
                       {
                         id: "dismiss",
                         label: "驳回（误报/不适用）",
-                        icon: (
-                          <Icon name="stop" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "stop",
                         disabled: submitting || TERMINAL.has(item.status),
                         onSelect: () =>
                           void runAction("事件已驳回", () =>
@@ -439,18 +432,14 @@ export function ComplianceEventsPage() {
                       {
                         id: "edit",
                         label: "编辑",
-                        icon: (
-                          <Icon name="edit" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "edit",
                         disabled: submitting || TERMINAL.has(item.status),
                         onSelect: () => openEdit(item),
                       },
                       {
                         id: "delete",
                         label: "删除（仅终态）",
-                        icon: (
-                          <Icon name="trash" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "trash",
                         danger: true,
                         disabled: submitting || !TERMINAL.has(item.status),
                         separatorBefore: true,
@@ -483,7 +472,6 @@ export function ComplianceEventsPage() {
           submitLabel={dialogMode === "create" ? "创建" : "保存修改"}
           submitting={submitting}
           submitDisabled={form.eventType.trim().length === 0}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) closeDialog();
           }}
@@ -591,7 +579,7 @@ export function ComplianceEventsPage() {
           title="删除合规事件"
           description={`确认删除「${pendingDelete.eventType}」？记录将被软删并从列表隐藏。`}
           submitLabel="删除"
-          submitVariant="destructive"
+          danger
           submitting={submitting}
           onOpenChange={(open) => {
             if (!open) setPendingDelete(null);

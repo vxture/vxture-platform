@@ -51,12 +51,24 @@ export function AdminSessionProvider({ children }: { children: ReactNode }) {
       .then((snapshot) => {
         if (!active) return;
         setSession(snapshot);
-        setStatus("ready");
-        if (!snapshot.isAuthenticated && !silentJustFailed) {
-          window.location.replace(
-            buildRpLoginUrl(window.location.href, { prompt: "none" }),
-          );
+        if (snapshot.isAuthenticated) {
+          setStatus("ready");
+          return;
         }
+        /* 未登录：**不置 ready**，直接把浏览器送走。
+         *
+         * 原先这里先 setStatus('ready') 再跳转，于是外壳会拿着"已就绪但未登录"
+         * 的状态渲染一帧（骨架/空壳），紧接着整页被替换掉——冷启动要落回门户
+         * 两次，这一帧就闪两次。状态停在 loading，加载页一直盖着，直到导航发生。
+         *
+         * 静默失败过就直接走交互式登录，不再退回 `/login` 中转页：那一跳是一次
+         * 完整的页面加载，只为了在屏幕上写一句"正在跳转到登录…"再跳走。
+         * BFF 侧还记了一个 5 分钟的备忘 cookie，所以连着刷新也不会重复静默往返。 */
+        window.location.replace(
+          silentJustFailed
+            ? buildRpLoginUrl(window.location.href)
+            : buildRpLoginUrl(window.location.href, { prompt: "none" }),
+        );
       })
       .catch(() => {
         if (!active) return;

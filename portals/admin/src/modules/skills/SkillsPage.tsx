@@ -147,7 +147,7 @@ function SkillToolbar({
         <div className="vx-admin-view-toggle">
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-md"
             className={joinClasses(
               "vx-admin-view-toggle__btn",
               viewMode === "list" ? "vx-admin-view-toggle__btn--active" : "",
@@ -159,7 +159,7 @@ function SkillToolbar({
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-md"
             className={joinClasses(
               "vx-admin-view-toggle__btn",
               viewMode === "cards" ? "vx-admin-view-toggle__btn--active" : "",
@@ -237,7 +237,7 @@ function SkillList({
           <span className="vx-tenant-actions">
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-md"
               className="vx-tenant-actions__trigger"
               disabled={skill.isSystem}
               title={

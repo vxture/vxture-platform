@@ -211,7 +211,7 @@ export function RiskRecordsPage() {
       await reload();
       closeDialog();
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -224,7 +224,7 @@ export function RiskRecordsPage() {
       await reload();
       toast({ tone: "success", title: label });
     } catch (error) {
-      toast({ tone: "error", title: `${label}失败`, ...describeError(error) });
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -307,7 +307,7 @@ export function RiskRecordsPage() {
         <span className="vx-models-toolbar__count">{filtered.length} 条</span>
         <Button
           variant="default"
-          size="sm"
+          size="md"
           className="vx-admin-action-btn"
           onClick={openCreate}
           title="新建风险记录"
@@ -375,15 +375,12 @@ export function RiskRecordsPage() {
                 <span className="vx-tenant-actions">
                   <ActionMenu
                     label={`风险记录操作`}
-                    triggerClassName="vx-tenant-actions__trigger"
-                    triggerProps={{ title: "操作", disabled: submitting }}
+                    disabled={submitting}
                     items={[
                       {
                         id: "review",
                         label: item.reviewerId ? "重新审阅" : "标记已审阅",
-                        icon: (
-                          <Icon name="check" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "check",
                         disabled: submitting,
                         onSelect: () =>
                           void runAction("已标记审阅", () =>
@@ -393,18 +390,14 @@ export function RiskRecordsPage() {
                       {
                         id: "edit",
                         label: "编辑",
-                        icon: (
-                          <Icon name="edit" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "edit",
                         disabled: submitting,
                         onSelect: () => openEdit(item),
                       },
                       {
                         id: "delete",
                         label: "删除",
-                        icon: (
-                          <Icon name="trash" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "trash",
                         danger: true,
                         disabled: submitting,
                         separatorBefore: true,
@@ -441,7 +434,6 @@ export function RiskRecordsPage() {
           submitLabel={dialogMode === "create" ? "创建" : "保存修改"}
           submitting={submitting}
           submitDisabled={!formIsValid(form, dialogMode)}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) closeDialog();
           }}
@@ -530,7 +522,7 @@ export function RiskRecordsPage() {
           title="删除风险记录"
           description={`确认删除「${pendingDelete.tenantName ?? pendingDelete.tenantId}」的风险记录？记录将被软删并从列表隐藏。`}
           submitLabel="删除"
-          submitVariant="destructive"
+          danger
           submitting={submitting}
           onOpenChange={(open) => {
             if (!open) setPendingDelete(null);

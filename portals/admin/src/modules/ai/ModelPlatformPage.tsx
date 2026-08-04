@@ -315,7 +315,7 @@ function ModelOperationButtons({
     >
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title="启用"
         aria-label={`启用 ${model.modelName}`}
         disabled={submitting || model.isActive}
@@ -325,7 +325,7 @@ function ModelOperationButtons({
       </Button>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title="停用"
         aria-label={`停用 ${model.modelName}`}
         disabled={submitting || !model.isActive}
@@ -335,7 +335,7 @@ function ModelOperationButtons({
       </Button>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title={model.isActive ? "启用状态不可删除" : "删除"}
         aria-label={`删除 ${model.modelName}`}
         className="vx-model-operation-buttons__danger"
@@ -372,7 +372,7 @@ function ModelBatchOperationButtons({
     >
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title="批量启用"
         aria-label="批量启用"
         disabled={submitting || !canEnable}
@@ -387,7 +387,7 @@ function ModelBatchOperationButtons({
       </Button>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title="批量停用"
         aria-label="批量停用"
         disabled={submitting || !canDisable}
@@ -402,7 +402,7 @@ function ModelBatchOperationButtons({
       </Button>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-md"
         title="批量删除"
         aria-label="批量删除"
         className="vx-model-operation-buttons__danger"
@@ -918,7 +918,7 @@ export function ModelPlatformPage() {
       await reloadProviders();
       setProviderDialog(null);
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setCatalogBusy(false);
     }
@@ -939,7 +939,7 @@ export function ModelPlatformPage() {
         title: activate ? "厂商已启用" : "厂商已停用",
       });
     } catch (error) {
-      toast({ tone: "error", title: "操作失败", ...describeError(error) });
+      toast({ tone: "danger", title: "操作失败", ...describeError(error) });
     } finally {
       setCatalogBusy(false);
     }
@@ -956,7 +956,7 @@ export function ModelPlatformPage() {
       setPendingDeleteProvider(null);
       toast({ tone: "success", title: "厂商已删除" });
     } catch (error) {
-      toast({ tone: "error", title: "删除失败", ...describeError(error) });
+      toast({ tone: "danger", title: "删除失败", ...describeError(error) });
     } finally {
       setCatalogBusy(false);
     }
@@ -1002,7 +1002,7 @@ export function ModelPlatformPage() {
     try {
       if (priceRuleDialog.mode === "create") {
         if (!priceRuleForm.modelId) {
-          toast({ tone: "error", title: "请先选择模型" });
+          toast({ tone: "danger", title: "请先选择模型" });
           return;
         }
         await createModelPriceRule({
@@ -1017,7 +1017,7 @@ export function ModelPlatformPage() {
       await reloadPriceRules();
       setPriceRuleDialog(null);
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setCatalogBusy(false);
     }
@@ -1038,7 +1038,7 @@ export function ModelPlatformPage() {
         title: activate ? "规则已启用" : "规则已停用",
       });
     } catch (error) {
-      toast({ tone: "error", title: "操作失败", ...describeError(error) });
+      toast({ tone: "danger", title: "操作失败", ...describeError(error) });
     } finally {
       setCatalogBusy(false);
     }
@@ -1358,63 +1358,31 @@ export function ModelPlatformPage() {
                   >
                     <ActionMenu
                       label={t("actions.modelMenu", { name: model.modelName })}
-                      triggerClassName="vx-tenant-actions__trigger"
-                      triggerProps={{
-                        title: t("actions.modelMenu", {
-                          name: model.modelName,
-                        }),
-                      }}
                       items={[
                         {
                           id: "edit",
                           label: t("actions.editModel"),
-                          icon: (
-                            <Icon
-                              name="edit"
-                              size="xs"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "edit",
                           onSelect: () => openEditModelDialog(model),
                         },
                         {
                           id: "enable",
                           label: t("actions.enableModel"),
-                          icon: (
-                            <Icon
-                              name="play"
-                              size={16}
-                              weight="fill"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "play",
                           disabled: submitting || model.isActive,
                           onSelect: () => void handleToggleModel(model),
                         },
                         {
                           id: "disable",
                           label: t("actions.disableModel"),
-                          icon: (
-                            <Icon
-                              name="stop"
-                              size={16}
-                              weight="fill"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "stop",
                           disabled: submitting || !model.isActive,
                           onSelect: () => void handleToggleModel(model),
                         },
                         {
                           id: "delete",
                           label: t("actions.deleteModel"),
-                          icon: (
-                            <Icon
-                              name="trash"
-                              size={16}
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "trash",
                           disabled: submitting || model.isActive,
                           danger: true,
                           onSelect: () => void handleDeleteModel(model),
@@ -1533,14 +1501,7 @@ export function ModelPlatformPage() {
               })}
             </span>
             <div className="vx-tenant-pagination__actions">
-              <AdminPageSizePicker
-                value={pageSize}
-                onChange={setPageSize}
-                activeVariant="ghost"
-                inactiveVariant="ghost"
-                aria-label="page size"
-                optionAriaLabel={(option) => `Page size ${option}`}
-              />
+              <AdminPageSizePicker value={pageSize} onChange={setPageSize} />
               <Pagination
                 className="vx-tenant-pagination__pager"
                 page={safeCurrentPage}
@@ -1585,59 +1546,31 @@ export function ModelPlatformPage() {
                     </div>
                     <ActionMenu
                       label={`${provider.providerName} 操作`}
-                      triggerClassName="vx-tenant-actions__trigger"
-                      triggerProps={{ title: `${provider.providerName} 操作` }}
                       items={[
                         {
                           id: "edit",
                           label: "编辑",
-                          icon: (
-                            <Icon
-                              name="edit"
-                              size="xs"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "edit",
                           onSelect: () => openEditProviderDialog(provider),
                         },
                         {
                           id: "enable",
                           label: "启用",
-                          icon: (
-                            <Icon
-                              name="play"
-                              size={16}
-                              weight="fill"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "play",
                           disabled: catalogBusy || provider.isActive,
                           onSelect: () => void toggleProvider(provider, true),
                         },
                         {
                           id: "disable",
                           label: "停用",
-                          icon: (
-                            <Icon
-                              name="stop"
-                              size={16}
-                              weight="fill"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "stop",
                           disabled: catalogBusy || !provider.isActive,
                           onSelect: () => void toggleProvider(provider, false),
                         },
                         {
                           id: "delete",
                           label: "删除",
-                          icon: (
-                            <Icon
-                              name="trash"
-                              size={16}
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "trash",
                           disabled: catalogBusy || provider.isActive,
                           danger: true,
                           onSelect: () => setPendingDeleteProvider(provider),
@@ -1712,46 +1645,24 @@ export function ModelPlatformPage() {
                       </div>
                       <ActionMenu
                         label={`${ruleModel?.modelName ?? rule.modelId} 计价规则操作`}
-                        triggerClassName="vx-tenant-actions__trigger"
-                        triggerProps={{ title: "计价规则操作" }}
                         items={[
                           {
                             id: "edit",
                             label: "编辑",
-                            icon: (
-                              <Icon
-                                name="edit"
-                                size="xs"
-                                fallback="placeholder"
-                              />
-                            ),
+                            icon: "edit",
                             onSelect: () => openEditPriceRuleDialog(rule),
                           },
                           {
                             id: "enable",
                             label: "启用",
-                            icon: (
-                              <Icon
-                                name="play"
-                                size={16}
-                                weight="fill"
-                                fallback="placeholder"
-                              />
-                            ),
+                            icon: "play",
                             disabled: catalogBusy || rule.isActive,
                             onSelect: () => void togglePriceRule(rule, true),
                           },
                           {
                             id: "disable",
                             label: "停用",
-                            icon: (
-                              <Icon
-                                name="stop"
-                                size={16}
-                                weight="fill"
-                                fallback="placeholder"
-                              />
-                            ),
+                            icon: "stop",
                             disabled: catalogBusy || !rule.isActive,
                             onSelect: () => void togglePriceRule(rule, false),
                           },
@@ -1806,7 +1717,6 @@ export function ModelPlatformPage() {
           submitLabel={t("dialogs.actions.save")}
           cancelLabel={t("dialogs.actions.cancel")}
           submitting={submitting}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) setDialogMode(null);
           }}
@@ -1941,7 +1851,6 @@ export function ModelPlatformPage() {
           submitLabel={t("dialogs.actions.save")}
           cancelLabel={t("dialogs.actions.cancel")}
           submitting={catalogBusy}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) setProviderDialog(null);
           }}
@@ -2063,7 +1972,6 @@ export function ModelPlatformPage() {
           submitLabel={t("dialogs.actions.save")}
           cancelLabel={t("dialogs.actions.cancel")}
           submitting={catalogBusy}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) setPriceRuleDialog(null);
           }}
@@ -2208,7 +2116,7 @@ export function ModelPlatformPage() {
           title="删除厂商"
           description={`确认删除「${pendingDeleteProvider.providerName}」？此操作不可撤销。`}
           submitLabel="删除"
-          submitVariant="destructive"
+          danger
           submitting={catalogBusy}
           onOpenChange={(open) => {
             if (!open) setPendingDeleteProvider(null);

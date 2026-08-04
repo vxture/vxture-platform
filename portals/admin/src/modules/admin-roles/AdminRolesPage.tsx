@@ -289,51 +289,43 @@ function AdminRoleActionsMenu({
     >
       <ActionMenu
         label={`${roleLabel} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "authorization",
             label: "角色授权",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             onSelect: () => onOpenAuthorization(role),
           },
           {
             id: "permissions",
             label: "权限详情",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             onSelect: () => onOpenPermissions(role),
           },
           {
             id: "edit",
             label: "编辑角色",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: !managed,
             onSelect: () => onEdit(role),
           },
           {
             id: "copy",
             label: "复制角色",
-            icon: <Icon name="copy" size="xs" fallback="placeholder" />,
+            icon: "copy",
             onSelect: () => onCopy(role),
           },
           {
             id: "toggle",
             label: roleStatusCode(role) === "active" ? "停用角色" : "启用角色",
-            icon: (
-              <Icon
-                name={roleStatusCode(role) === "active" ? "x" : "check"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: roleStatusCode(role) === "active" ? "x" : "check",
             disabled: !managed,
             onSelect: () => onToggle(role),
           },
           {
             id: "delete",
             label: "删除角色",
-            icon: <Icon name="trash" size="xs" fallback="placeholder" />,
+            icon: "trash",
             danger: true,
             disabled: !managed,
             onSelect: () => onDelete(role),
@@ -1459,7 +1451,7 @@ export function AdminRolesPage() {
       return;
     }
     toast({
-      tone: "error",
+      tone: "danger",
       title: fallbackTitle,
       ...(error instanceof Error && error.message
         ? { description: error.message }
@@ -1871,7 +1863,7 @@ export function AdminRolesPage() {
             pendingDeleteRole.roleCode
           }」？此操作不可撤销。`}
           submitLabel="删除"
-          submitVariant="destructive"
+          danger
           submitting={submitting}
           onOpenChange={(open) => {
             if (!open && !submitting) setPendingDeleteRoleId(null);

@@ -270,39 +270,32 @@ function AccountActionsMenu({
     >
       <ActionMenu
         label={`${account.displayName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作", disabled: busy }}
+        disabled={busy}
         items={[
           {
             id: "details",
             label: "查看详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             disabled: true,
           },
           {
             id: "reset-password",
             label: "重置密码",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             // 凭据重置对 C 端用户（可能社交-only/无验证邮箱）需专用设计，C12 延后。
             disabled: true,
           },
           {
             id: "force-logout",
             label: "强制下线",
-            icon: <Icon name="sign-out" size="xs" fallback="placeholder" />,
+            icon: "sign-out",
             disabled: busy || isDisabled,
             onSelect: () => onForceLogout(account),
           },
           {
             id: "toggle-status",
             label: isDisabled ? "恢复账号" : "停用账号",
-            icon: (
-              <Icon
-                name={isDisabled ? "success" : "warning"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: isDisabled ? "success" : "warning",
             disabled: busy,
             onSelect: () => onToggleStatus(account),
           },
@@ -725,7 +718,7 @@ export function AccountsPage({
       setActionReason("");
     } catch (error) {
       toast({
-        tone: "error",
+        tone: "danger",
         title: "操作失败",
         ...(error instanceof Error && error.message
           ? { description: error.message }
@@ -1048,9 +1041,7 @@ export function AccountsPage({
                 ? "确认恢复"
                 : "确认下线"
           }
-          submitVariant={
-            pendingAction.kind === "disable" ? "destructive" : "default"
-          }
+          danger={pendingAction.kind === "disable"}
           submitting={actionBusy}
           onOpenChange={(open) => {
             if (!open) closePending();

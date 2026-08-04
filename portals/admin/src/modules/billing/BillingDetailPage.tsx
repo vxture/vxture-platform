@@ -431,7 +431,7 @@ function BillingDetails({
                       <Button
                         key={action}
                         variant={action === "red" ? "destructive" : "outline"}
-                        size="sm"
+                        size="md"
                         className={action === "red" ? "is-danger" : undefined}
                         disabled={!canRunInvoiceReceiptAction(action, receipt)}
                         title={

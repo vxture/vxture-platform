@@ -9,7 +9,9 @@ import {
   Badge,
   Button,
   Checkbox,
-  DetailDrawer,
+  DetailList,
+  DetailRow,
+  Drawer,
   DialogForm,
   Input,
   Label,
@@ -191,26 +193,24 @@ function TicketActionsMenu({
     >
       <ActionMenu
         label={`${ticket.title} 工单操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "detail",
             label: "工单详情",
-            icon: <Icon name="chat-circle" size="xs" fallback="placeholder" />,
+            icon: "chat-circle",
             onSelect: () => onOpenDetail(ticket),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(ticket.tenantId)}`),
           },
           {
             id: "ops-todos",
             label: "运营待办",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             onSelect: () => router.push("/ops-todos"),
           },
         ]}
@@ -578,12 +578,20 @@ function TicketDetailDrawer({
     : undefined;
 
   return (
-    <DetailDrawer
-      title={title}
-      {...(fields ? { fields } : {})}
-      onClose={onClose}
-      closeLabel="关闭工单详情"
-    >
+    /* DS 的 `DetailDrawer` 在分类重构里被拆成两件：容器归 `Drawer`（自带遮罩、
+     * 关闭按钮、焦点管理），字段表归 `DetailList`/`DetailRow`。原先那件把两者
+     * 焊死，字段只能走 `fields` 数组、值只能是纯文本；拆开后字段值可以是
+     * 「文本 + StatusBadge」这类就地拼的表达式。 */
+    <Drawer open onClose={onClose} title={title}>
+      {fields ? (
+        <DetailList>
+          {fields.map((field) => (
+            <DetailRow key={field.label} label={field.label}>
+              {field.value}
+            </DetailRow>
+          ))}
+        </DetailList>
+      ) : null}
       {loading ? (
         <EmptyState
           title="正在加载工单详情"
@@ -596,14 +604,14 @@ function TicketDetailDrawer({
           <div className="grid gap-2">
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={() => setAssignOpen(true)}
             >
               指派
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={() => setStatusOpen(true)}
             >
               改状态
@@ -650,7 +658,7 @@ function TicketDetailDrawer({
             <div>
               <Button
                 type="submit"
-                size="sm"
+                size="md"
                 disabled={replySubmitting || replyBody.trim().length === 0}
               >
                 {replySubmitting ? "处理中..." : "回复"}
@@ -680,7 +688,7 @@ function TicketDetailDrawer({
           }}
         />
       ) : null}
-    </DetailDrawer>
+    </Drawer>
   );
 }
 
@@ -915,7 +923,7 @@ export function TicketsPage() {
             <option value="p3">P3</option>
           </NativeSelect>
         </label>
-        <Button variant="outline" size="sm" onClick={resetFilters}>
+        <Button variant="outline" size="md" onClick={resetFilters}>
           重置
         </Button>
       </section>
@@ -934,7 +942,7 @@ export function TicketsPage() {
             <div className="vx-tenant-toolbar__spacer" aria-hidden="true" />
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={() => {
                 setBatchError(null);
                 setBatchStatusOpen(true);
@@ -944,7 +952,7 @@ export function TicketsPage() {
             </Button>
             <Button
               variant="ghost"
-              size="sm"
+              size="md"
               onClick={() => setSelectedTicketIds(new Set())}
             >
               清空选择

@@ -292,19 +292,17 @@ function TodoActionsMenu({ item }: { item: OpsTodoItem }) {
     >
       <ActionMenu
         label={`${item.title} 待办操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "entry",
             label: "处理入口",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () => router.push(item.href),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(item.tenantId)}`),
           },

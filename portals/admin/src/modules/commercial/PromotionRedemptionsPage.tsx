@@ -114,33 +114,31 @@ function RedemptionActionsMenu({
     >
       <ActionMenu
         label={`${record.redemptionNo} 核销操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "bill",
             label: "账单详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(`/billing/${encodeURIComponent(record.billId)}`),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(record.tenantId)}`),
           },
           {
             id: "orders",
             label: "订单列表",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             onSelect: () => router.push("/orders"),
           },
           {
             id: "promotions",
             label: "优惠活动",
-            icon: <Icon name="sparkles" size="xs" fallback="placeholder" />,
+            icon: "sparkles",
             onSelect: () => router.push("/promotions"),
           },
         ]}
@@ -603,21 +601,16 @@ export function PromotionRedemptionsPage() {
 
         {selectedRecords.length > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedRecords.length)} 项</>}
-            selectionActions={
-              <>
-                <ActionButton
-                  variant="outline"
-                  icon="arrow-down"
-                  onClick={handleExportSelected}
-                >
-                  导出所选
-                </ActionButton>
-                <Button variant="ghost" onClick={handleClearSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedRecords.length}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                icon: "arrow-down",
+                onSelect: handleExportSelected,
+              },
+            ]}
+            onClear={handleClearSelection}
           />
         ) : null}
 

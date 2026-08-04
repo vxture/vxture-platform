@@ -76,7 +76,7 @@ export function NotificationLogsPage() {
     fetchNotificationLogs()
       .then(setItems)
       .catch((error) =>
-        toast({ tone: "error", title: "加载失败", ...describeError(error) }),
+        toast({ tone: "danger", title: "加载失败", ...describeError(error) }),
       )
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps

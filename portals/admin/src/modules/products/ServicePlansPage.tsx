@@ -197,37 +197,29 @@ function ServicePlanActionsMenu({
     >
       <ActionMenu
         label={`${item.solution.solutionName} ${item.tier.tierName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "查看详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: onViewDetails,
           },
           {
             id: "quota",
             label: "配额配置",
-            icon: <Icon name="chart-bar" size="xs" fallback="placeholder" />,
+            icon: "chart-bar",
             disabled: true,
           },
           {
             id: "price",
             label: "价格配置",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: true,
           },
           {
             id: "toggle-status",
             label: item.tier.status === "active" ? "下架套餐" : "上架套餐",
-            icon: (
-              <Icon
-                name={item.tier.status === "active" ? "x" : "check"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: item.tier.status === "active" ? "x" : "check",
             disabled: true,
           },
         ]}

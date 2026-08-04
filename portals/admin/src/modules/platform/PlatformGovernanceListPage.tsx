@@ -227,25 +227,23 @@ function GovernanceActionsMenu({
     >
       <ActionMenu
         label={`${record.name} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "detail",
             label: labels.detail,
-            icon: <Icon name="info" size="xs" fallback="placeholder" />,
+            icon: "info",
             disabled: true,
           },
           {
             id: "edit",
             label: labels.edit,
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: true,
           },
           {
             id: "audit",
             label: labels.audit,
-            icon: <Icon name="shield-check" size="xs" fallback="placeholder" />,
+            icon: "shield-check",
             disabled: true,
           },
         ]}

@@ -124,39 +124,31 @@ function TenantActionsMenu({
     >
       <ActionMenu
         label={`${tenant.displayName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "查看详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(tenant.id)}`),
           },
           {
             id: "edit",
             label: "编辑资料",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: true,
           },
           {
             id: "subscription",
             label: "订阅处理",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             disabled: true,
           },
           {
             // 暂停 → suspendTenant / 已暂停恢复 → resumeTenant；已注销租户无切换语义，置灰。
             id: "toggle-status",
             label: isSuspended ? "恢复租户" : "暂停租户",
-            icon: (
-              <Icon
-                name={isSuspended ? "success" : "warning"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: isSuspended ? "success" : "warning",
             disabled: busy || tenant.status === "cancelled",
             onSelect: () => onToggleStatus(tenant),
           },
@@ -536,7 +528,7 @@ export function TenantsPage() {
     } catch (error) {
       if (isStepUpCancelled(error)) return;
       toast({
-        tone: "error",
+        tone: "danger",
         title: "操作失败",
         description:
           error instanceof Error

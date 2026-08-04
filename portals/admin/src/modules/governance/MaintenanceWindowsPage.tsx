@@ -239,7 +239,7 @@ export function MaintenanceWindowsPage() {
       await reload();
       closeDialog();
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -252,7 +252,7 @@ export function MaintenanceWindowsPage() {
       await reload();
       toast({ tone: "success", title: label });
     } catch (error) {
-      toast({ tone: "error", title: `${label}失败`, ...describeError(error) });
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -326,7 +326,7 @@ export function MaintenanceWindowsPage() {
         <span className="vx-models-toolbar__count">{filtered.length} 条</span>
         <Button
           variant="default"
-          size="sm"
+          size="md"
           className="vx-admin-action-btn"
           onClick={openCreate}
           title="新建维护窗口"
@@ -397,15 +397,12 @@ export function MaintenanceWindowsPage() {
                 <span className="vx-tenant-actions">
                   <ActionMenu
                     label="维护窗口操作"
-                    triggerClassName="vx-tenant-actions__trigger"
-                    triggerProps={{ title: "操作", disabled: submitting }}
+                    disabled={submitting}
                     items={[
                       {
                         id: "start",
                         label: "开始维护",
-                        icon: (
-                          <Icon name="play" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "play",
                         disabled: submitting || item.status !== "scheduled",
                         onSelect: () =>
                           void runAction("维护已开始", () =>
@@ -415,9 +412,7 @@ export function MaintenanceWindowsPage() {
                       {
                         id: "complete",
                         label: "完成维护",
-                        icon: (
-                          <Icon name="check" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "check",
                         disabled: submitting || item.status !== "in_progress",
                         onSelect: () =>
                           void runAction("维护已完成", () =>
@@ -427,9 +422,7 @@ export function MaintenanceWindowsPage() {
                       {
                         id: "edit",
                         label: "编辑",
-                        icon: (
-                          <Icon name="edit" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "edit",
                         disabled:
                           submitting ||
                           (item.status !== "scheduled" &&
@@ -439,9 +432,7 @@ export function MaintenanceWindowsPage() {
                       {
                         id: "cancel",
                         label: "取消窗口",
-                        icon: (
-                          <Icon name="stop" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "stop",
                         danger: true,
                         disabled:
                           submitting ||
@@ -481,7 +472,6 @@ export function MaintenanceWindowsPage() {
           submitLabel={dialogMode === "create" ? "创建" : "保存修改"}
           submitting={submitting}
           submitDisabled={!formIsValid(form)}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) closeDialog();
           }}
@@ -595,7 +585,7 @@ export function MaintenanceWindowsPage() {
           title="取消维护窗口"
           description={`确认取消「${pendingCancel.title}」？取消后窗口进入终态，保留历史记录。`}
           submitLabel="取消窗口"
-          submitVariant="destructive"
+          danger
           submitting={submitting}
           onOpenChange={(open) => {
             if (!open) setPendingCancel(null);

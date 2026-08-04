@@ -190,13 +190,11 @@ function SubscriptionActionsMenu({
     >
       <ActionMenu
         label={`${subscription.tenantName} 订阅操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "查看详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(
                 `/subscriptions/${encodeURIComponent(subscription.id)}`,
@@ -205,7 +203,7 @@ function SubscriptionActionsMenu({
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(
                 `/tenants/${encodeURIComponent(subscription.tenantId)}`,
@@ -214,21 +212,15 @@ function SubscriptionActionsMenu({
           {
             id: "plan",
             label: "调整套餐",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             disabled: true,
           },
           {
             id: "renew",
             label: subscriptionActionLabel("renew"),
-            icon: (
-              <Icon
-                name={subscriptionActionIcon("renew")}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: subscriptionActionIcon("renew"),
             disabled: !canRunSubscriptionAction("renew", subscription),
-            title:
+            hint:
               subscriptionActionDisabledReason("renew", subscription) ??
               undefined,
             onSelect: () => onAction(subscription, "renew"),
@@ -236,15 +228,9 @@ function SubscriptionActionsMenu({
           {
             id: toggleAction,
             label: subscriptionActionLabel(toggleAction),
-            icon: (
-              <Icon
-                name={subscriptionActionIcon(toggleAction)}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: subscriptionActionIcon(toggleAction),
             disabled: !canRunSubscriptionAction(toggleAction, subscription),
-            title:
+            hint:
               subscriptionActionDisabledReason(toggleAction, subscription) ??
               undefined,
             onSelect: () => onAction(subscription, toggleAction),
@@ -252,15 +238,9 @@ function SubscriptionActionsMenu({
           {
             id: "cancel",
             label: subscriptionActionLabel("cancel"),
-            icon: (
-              <Icon
-                name={subscriptionActionIcon("cancel")}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: subscriptionActionIcon("cancel"),
             disabled: !canRunSubscriptionAction("cancel", subscription),
-            title:
+            hint:
               subscriptionActionDisabledReason("cancel", subscription) ??
               undefined,
             danger: true,
@@ -965,22 +945,15 @@ export function SubscriptionsPage() {
 
         {selectedSubscriptions.length ? (
           <BulkActionBar
-            selectedLabel={
-              <>已选 {formatNumber(selectedSubscriptions.length)} 项</>
-            }
-            selectionActions={
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleExportSelectedSubscriptions}
-                >
-                  导出所选
-                </Button>
-                <Button variant="ghost" onClick={clearSubscriptionSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedSubscriptions.length}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                onSelect: handleExportSelectedSubscriptions,
+              },
+            ]}
+            onClear={clearSubscriptionSelection}
           />
         ) : null}
 

@@ -118,19 +118,17 @@ function PromotionActionsMenu({
     >
       <ActionMenu
         label={`${record.promotionName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "redemptions",
             label: "查看核销",
-            icon: <Icon name="check" size="xs" fallback="placeholder" />,
+            icon: "check",
             onSelect: () => router.push("/promotion-redemptions"),
           },
           {
             id: "service-plans",
             label: "服务套餐",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             onSelect: () => router.push("/service-plans"),
           },
         ]}
@@ -653,21 +651,16 @@ export function PromotionsPage() {
         </section>
         {selectedRecords.length > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedRecords.length)} 项</>}
-            selectionActions={
-              <>
-                <ActionButton
-                  variant="outline"
-                  icon="arrow-down"
-                  onClick={handleExportSelected}
-                >
-                  导出所选
-                </ActionButton>
-                <Button variant="ghost" onClick={handleClearSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedRecords.length}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                icon: "arrow-down",
+                onSelect: handleExportSelected,
+              },
+            ]}
+            onClear={handleClearSelection}
           />
         ) : null}
         <section className="vx-tenant-directory" aria-label="营销优惠清单">

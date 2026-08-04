@@ -497,12 +497,12 @@ function TenantInfoTab({
           </TenantConfigItem>
           <div className="vx-tenant-admin-actions">
             {/* 换 owner / 改主管理员无对应后端端点，保持 disabled（见 completion-plan）。 */}
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="md" disabled>
               <Icon name="user-switch" size="xs" fallback="placeholder" />
               <span>修改主管理员</span>
             </Button>
             {/* 凭据操作（重置密码）须经 IdP 内部端点，不在本轮直写库（见 completion-plan）。 */}
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="outline" size="md" disabled>
               <Icon name="key" size="xs" fallback="placeholder" />
               <span>重置密码</span>
             </Button>
@@ -541,13 +541,11 @@ function MemberActionsMenu({
     >
       <ActionMenu
         label={`${member.name} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "role",
             label: "调整权限",
-            icon: <Icon name="user-switch" size="xs" fallback="placeholder" />,
+            icon: "user-switch",
             disabled: actions.busy,
             onSelect: () => actions.onChangeRole(member),
           },
@@ -555,27 +553,21 @@ function MemberActionsMenu({
             // 凭据操作（重置密码）须经 IdP 内部端点，不在本轮直写库（见 completion-plan）。
             id: "password",
             label: "重置密码",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             disabled: true,
           },
           {
             // 仅提供停用；成员「恢复」暂无对应后端端点，已停用时置灰（见 completion-plan）。
             id: "status",
             label: isSuspended ? "恢复账号" : "停用账号",
-            icon: (
-              <Icon
-                name={isSuspended ? "success" : "warning"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: isSuspended ? "success" : "warning",
             disabled: actions.busy || isSuspended,
             onSelect: () => actions.onSuspend(member),
           },
           {
             id: "remove",
             label: "移除账号",
-            icon: <Icon name="trash" size="xs" fallback="placeholder" />,
+            icon: "trash",
             disabled: actions.busy,
             danger: true,
             onSelect: () => actions.onRemove(member),
@@ -905,7 +897,7 @@ function TenantMembersTab({ tenantId }: { tenantId: string }) {
       });
     } catch (error) {
       toast({
-        tone: "error",
+        tone: "danger",
         title: "操作失败",
         description:
           error instanceof Error ? error.message : "无法停用账号，请稍后重试。",
@@ -1108,7 +1100,7 @@ function TenantMembersTab({ tenantId }: { tenantId: string }) {
           title="移除成员账号"
           description={`将把 ${removeTarget.name}（${removeTarget.email || removeTarget.userId}）从该租户移除，移除后该成员将失去本租户的访问权限。`}
           submitLabel="确认移除"
-          submitVariant="destructive"
+          danger
           cancelLabel="取消"
           submitting={actionBusy}
           onOpenChange={(open) => {
@@ -1446,7 +1438,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
       });
     } catch (error) {
       toast({
-        tone: "error",
+        tone: "danger",
         title: "保存失败",
         description:
           error instanceof Error
@@ -1486,7 +1478,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
         <Button
           className="vx-tenant-detail-summary__toggle"
           variant="ghost"
-          size="icon"
+          size="icon-md"
           aria-expanded={summaryExpanded}
           aria-label={summaryExpanded ? "收起标题概要" : "展开标题概要"}
           title={summaryExpanded ? "收起标题概要" : "展开标题概要"}
@@ -1513,7 +1505,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
                 <h2>{tenant.displayName}</h2>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon-md"
                   className="vx-tenant-title-copy"
                   aria-label="复制租户名称"
                   title="复制租户名称"
@@ -1526,7 +1518,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
                 <p>{tenant.tenantCode}</p>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="icon-md"
                   className="vx-tenant-title-copy"
                   aria-label="复制租户代码"
                   title="复制租户代码"
@@ -1611,7 +1603,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
                 <Button
                   key={tab.id}
                   variant={activeTab === tab.id ? "secondary" : "ghost"}
-                  size="sm"
+                  size="md"
                   role="tab"
                   aria-selected={activeTab === tab.id}
                   className={activeTab === tab.id ? "is-active" : undefined}

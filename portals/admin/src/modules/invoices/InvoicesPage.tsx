@@ -18,7 +18,7 @@ import {
   EmptyState,
   ViewModeSwitch,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import type { ActionMenuItem, IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
 import {
@@ -248,45 +248,41 @@ function InvoiceActionsMenu({
     >
       <ActionMenu
         label={`${invoice.invoiceNo} 发票操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "bill",
             label: "账单详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(`/billing/${encodeURIComponent(invoice.billId)}`),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(invoice.tenantId)}`),
           },
-          ...(["update_shipping", "finish", "red"] as const).map((action) => ({
-            id: action,
-            label: invoiceReceiptActionLabel(action),
-            icon: (
-              <Icon
-                name={
-                  action === "red"
-                    ? "warning"
-                    : action === "finish"
-                      ? "check"
-                      : "table"
-                }
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
-            disabled: !canRunInvoiceReceiptAction(action, invoice),
-            title:
-              invoiceReceiptActionDisabledReason(action, invoice) ?? undefined,
-            danger: action === "red",
-            onSelect: () => onReceiptAction(invoice, action),
-          })),
+          // 标注返回类型：.map 会把三元推出的 icon 拓宽成 string，而
+          // ActionMenuItem.icon 现在收的是 IconName 联合。
+          ...(["update_shipping", "finish", "red"] as const).map(
+            (action): ActionMenuItem => ({
+              id: action,
+              label: invoiceReceiptActionLabel(action),
+              icon:
+                action === "red"
+                  ? "warning"
+                  : action === "finish"
+                    ? "check"
+                    : "table",
+              disabled: !canRunInvoiceReceiptAction(action, invoice),
+              hint:
+                invoiceReceiptActionDisabledReason(action, invoice) ??
+                undefined,
+              danger: action === "red",
+              onSelect: () => onReceiptAction(invoice, action),
+            }),
+          ),
         ]}
       />
     </div>
@@ -994,21 +990,16 @@ export function InvoicesPage() {
 
         {selectedInvoiceIds.size > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedInvoiceIds.size)} 项</>}
-            selectionActions={
-              <>
-                <ActionButton
-                  variant="outline"
-                  icon="table"
-                  onClick={handleExportSelected}
-                >
-                  导出所选
-                </ActionButton>
-                <Button variant="ghost" onClick={clearInvoiceSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedInvoiceIds.size}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                icon: "table",
+                onSelect: handleExportSelected,
+              },
+            ]}
+            onClear={clearInvoiceSelection}
           />
         ) : null}
 

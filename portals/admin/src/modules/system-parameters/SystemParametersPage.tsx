@@ -6,7 +6,6 @@ import {
   Badge,
   DialogForm,
   EmptyState,
-  Icon,
   Input,
   Label,
   NativeSelect,
@@ -56,7 +55,7 @@ export function SystemParametersPage() {
   useEffect(() => {
     load()
       .catch((error) =>
-        toast({ tone: "error", title: "加载失败", ...describeError(error) }),
+        toast({ tone: "danger", title: "加载失败", ...describeError(error) }),
       )
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +108,7 @@ export function SystemParametersPage() {
       toast({ tone: "success", title: "配置已更新" });
       setEditing(null);
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -207,19 +206,12 @@ export function SystemParametersPage() {
                   <span className="vx-tenant-actions">
                     <ActionMenu
                       label="配置操作"
-                      triggerClassName="vx-tenant-actions__trigger"
-                      triggerProps={{ title: "操作", disabled: submitting }}
+                      disabled={submitting}
                       items={[
                         {
                           id: "edit",
                           label: item.isEditable ? "编辑值" : "不可编辑",
-                          icon: (
-                            <Icon
-                              name="edit"
-                              size="xs"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "edit",
                           disabled: submitting || !item.isEditable,
                           onSelect: () => openEdit(item),
                         },

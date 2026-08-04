@@ -7,6 +7,12 @@ import {
   Badge,
   Button,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   DialogForm,
   Input,
   Label,
@@ -178,26 +184,24 @@ function PlatformUserActionsMenu({
     >
       <ActionMenu
         label={`${admin.displayName} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "profile",
             label: "查看详情",
-            icon: <Icon name="user" size="xs" fallback="placeholder" />,
+            icon: "user",
             onSelect: () => onView(admin),
           },
           {
             id: "role",
             label: "调整角色",
-            icon: <Icon name="shield-check" size="xs" fallback="placeholder" />,
+            icon: "shield-check",
             disabled: !managed,
             onSelect: () => onChangeRole(admin),
           },
           {
             id: "metadata",
             label: "编辑资料",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             disabled: !managed,
             onSelect: () => onEditMetadata(admin),
           },
@@ -207,15 +211,7 @@ function PlatformUserActionsMenu({
               platformAdminStatusCode(admin) === "active"
                 ? "停用用户"
                 : "启用用户",
-            icon: (
-              <Icon
-                name={
-                  platformAdminStatusCode(admin) === "active" ? "x" : "check"
-                }
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: platformAdminStatusCode(admin) === "active" ? "x" : "check",
             // B9-P1b-α：经 IdP 委托停用/启用（+ 停用即吊销会话）。
             disabled: !managed,
             onSelect: () => onToggleStatus(admin),
@@ -223,7 +219,7 @@ function PlatformUserActionsMenu({
           {
             id: "force-logout",
             label: "强制下线",
-            icon: <Icon name="clock" size="xs" fallback="placeholder" />,
+            icon: "clock",
             // B9-P1b-α：经 IdP 委托吊销该用户全部会话。
             disabled: !managed,
             onSelect: () => onForceLogout(admin),
@@ -231,7 +227,7 @@ function PlatformUserActionsMenu({
           {
             id: "mfa-reset",
             label: "重置 MFA",
-            icon: <Icon name="shield-check" size="xs" fallback="placeholder" />,
+            icon: "shield-check",
             // B9-P1b-α：经 IdP 委托清除已登记的第二因子（保留策略，下次登录重登记）+ 吊销会话。
             disabled: !managed,
             onSelect: () => onResetMfa(admin),
@@ -239,7 +235,7 @@ function PlatformUserActionsMenu({
           {
             id: "reset-password",
             label: "重置密码",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             // B9-P1b-β/TD-017：经 IdP 生成一次性重置链接并带外投递至目标本人邮箱，发起方不接触链接。
             disabled: !managed,
             onSelect: () => onResetPassword(admin),
@@ -517,68 +513,78 @@ function PlatformUserDetailDialog({
   onClose: () => void;
 }) {
   return (
-    <DialogForm
+    /* 这是只读详情，不是表单：DialogForm 现在固定渲染「取消 + 提交」两个按钮，
+     * 原来的 `footer` 逃生口随之取消。只读浮层直接用 Dialog 原语组装。 */
+    <Dialog
       open
-      title={admin.displayName || admin.username}
-      description={admin.username ? `@${admin.username}` : undefined}
-      footer={
-        <Button variant="outline" onClick={onClose}>
-          关闭
-        </Button>
-      }
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
     >
-      <dl className="vx-admin-permission-detail-dialog__grid">
-        <div>
-          <dt>显示名</dt>
-          <dd>{admin.displayName || EMPTY_MARK}</dd>
-        </div>
-        <div>
-          <dt>用户名</dt>
-          <dd>{admin.username || EMPTY_MARK}</dd>
-        </div>
-        <div>
-          <dt>角色</dt>
-          <dd>{roleLabel}</dd>
-        </div>
-        <div>
-          <dt>状态</dt>
-          <dd>{platformAdminStatusLabel(admin)}</dd>
-        </div>
-        <div>
-          <dt>邮箱</dt>
-          <dd>{admin.email || EMPTY_MARK}</dd>
-        </div>
-        <div>
-          <dt>手机</dt>
-          <dd>{admin.phone || EMPTY_MARK}</dd>
-        </div>
-        <div>
-          <dt>最后登录</dt>
-          <dd>
-            {admin.lastLoginAt ? formatDate(admin.lastLoginAt) : EMPTY_MARK}
-          </dd>
-        </div>
-        <div>
-          <dt>登录 IP</dt>
-          <dd>{admin.lastLoginIp || EMPTY_MARK}</dd>
-        </div>
-        <div>
-          <dt>排序</dt>
-          <dd>{formatNumber(admin.sort)}</dd>
-        </div>
-        <div>
-          <dt>创建时间</dt>
-          <dd>{admin.createdAt ? formatDate(admin.createdAt) : EMPTY_MARK}</dd>
-        </div>
-        <div className="vx-admin-permission-detail-dialog__wide">
-          <dt>备注</dt>
-          <dd>{admin.remark || EMPTY_MARK}</dd>
-        </div>
-      </dl>
-    </DialogForm>
+      <DialogContent className="max-w-panel-md">
+        <DialogHeader>
+          <DialogTitle>{admin.displayName || admin.username}</DialogTitle>
+          {admin.username ? (
+            <DialogDescription>{`@${admin.username}`}</DialogDescription>
+          ) : null}
+        </DialogHeader>
+        <dl className="vx-admin-permission-detail-dialog__grid">
+          <div>
+            <dt>显示名</dt>
+            <dd>{admin.displayName || EMPTY_MARK}</dd>
+          </div>
+          <div>
+            <dt>用户名</dt>
+            <dd>{admin.username || EMPTY_MARK}</dd>
+          </div>
+          <div>
+            <dt>角色</dt>
+            <dd>{roleLabel}</dd>
+          </div>
+          <div>
+            <dt>状态</dt>
+            <dd>{platformAdminStatusLabel(admin)}</dd>
+          </div>
+          <div>
+            <dt>邮箱</dt>
+            <dd>{admin.email || EMPTY_MARK}</dd>
+          </div>
+          <div>
+            <dt>手机</dt>
+            <dd>{admin.phone || EMPTY_MARK}</dd>
+          </div>
+          <div>
+            <dt>最后登录</dt>
+            <dd>
+              {admin.lastLoginAt ? formatDate(admin.lastLoginAt) : EMPTY_MARK}
+            </dd>
+          </div>
+          <div>
+            <dt>登录 IP</dt>
+            <dd>{admin.lastLoginIp || EMPTY_MARK}</dd>
+          </div>
+          <div>
+            <dt>排序</dt>
+            <dd>{formatNumber(admin.sort)}</dd>
+          </div>
+          <div>
+            <dt>创建时间</dt>
+            <dd>
+              {admin.createdAt ? formatDate(admin.createdAt) : EMPTY_MARK}
+            </dd>
+          </div>
+          <div className="vx-admin-permission-detail-dialog__wide">
+            <dt>备注</dt>
+            <dd>{admin.remark || EMPTY_MARK}</dd>
+          </div>
+        </dl>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            关闭
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -936,7 +942,7 @@ export function PlatformUsersPage() {
       return;
     }
     toast({
-      tone: "error",
+      tone: "danger",
       title: fallbackTitle,
       ...(error instanceof Error && error.message
         ? { description: error.message }

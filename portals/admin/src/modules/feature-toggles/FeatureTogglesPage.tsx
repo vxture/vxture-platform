@@ -142,7 +142,7 @@ export function FeatureTogglesPage() {
   useEffect(() => {
     load()
       .catch((error) =>
-        toast({ tone: "error", title: "加载失败", ...describeError(error) }),
+        toast({ tone: "danger", title: "加载失败", ...describeError(error) }),
       )
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,7 +219,7 @@ export function FeatureTogglesPage() {
       setDialogMode(null);
       setEditingId(null);
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -232,7 +232,7 @@ export function FeatureTogglesPage() {
       await load();
       toast({ tone: "success", title: label });
     } catch (error) {
-      toast({ tone: "error", title: `${label}失败`, ...describeError(error) });
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -327,7 +327,7 @@ export function FeatureTogglesPage() {
         <span className="vx-models-toolbar__count">{filtered.length} 条</span>
         <Button
           variant="default"
-          size="sm"
+          size="md"
           className="vx-admin-action-btn"
           onClick={openCreate}
           title="新建功能开关"
@@ -403,19 +403,12 @@ export function FeatureTogglesPage() {
                 <span className="vx-tenant-actions">
                   <ActionMenu
                     label="功能开关操作"
-                    triggerClassName="vx-tenant-actions__trigger"
-                    triggerProps={{ title: "操作", disabled: submitting }}
+                    disabled={submitting}
                     items={[
                       {
                         id: "toggle",
                         label: item.isGloballyEnabled ? "停用" : "启用",
-                        icon: (
-                          <Icon
-                            name={item.isGloballyEnabled ? "x" : "check"}
-                            size="xs"
-                            fallback="placeholder"
-                          />
-                        ),
+                        icon: item.isGloballyEnabled ? "x" : "check",
                         disabled: submitting || item.isArchived,
                         onSelect: () =>
                           void runAction(
@@ -426,26 +419,16 @@ export function FeatureTogglesPage() {
                       {
                         id: "edit",
                         label: "编辑",
-                        icon: (
-                          <Icon name="edit" size="xs" fallback="placeholder" />
-                        ),
+                        icon: "edit",
                         disabled: submitting || item.isArchived,
                         onSelect: () => openEdit(item),
                       },
                       {
                         id: "archive",
                         label: item.isArchived ? "恢复" : "归档",
-                        icon: (
-                          <Icon
-                            name={
-                              item.isArchived
-                                ? "clock-counter-clockwise"
-                                : "stop"
-                            }
-                            size="xs"
-                            fallback="placeholder"
-                          />
-                        ),
+                        icon: item.isArchived
+                          ? "clock-counter-clockwise"
+                          : "stop",
                         disabled: submitting,
                         onSelect: () =>
                           void runAction(

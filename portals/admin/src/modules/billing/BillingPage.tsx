@@ -297,27 +297,25 @@ function BillingActionsMenu({
     >
       <ActionMenu
         label={`${bill.billNo} 账单操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "账单详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(`/billing/${encodeURIComponent(bill.id)}`),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(bill.tenantId)}`),
           },
           {
             id: "subscription",
             label: "查看订阅",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             disabled: !bill.subscriptionId,
             onSelect: () => {
               if (!bill.subscriptionId) return;
@@ -329,7 +327,7 @@ function BillingActionsMenu({
           {
             id: "order",
             label: "查看订单",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             disabled: !bill.subscriptionId,
             onSelect: () => {
               if (!bill.subscriptionId) return;
@@ -339,7 +337,7 @@ function BillingActionsMenu({
           {
             id: "invoice",
             label: "登记发票",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             disabled: !canSyncOfflineInvoice(bill),
             ...(invoiceDisabledReason ? { title: invoiceDisabledReason } : {}),
             onSelect: () => onSyncInvoice(bill),
@@ -1075,23 +1073,21 @@ export function BillingPage() {
           </div>
         </section>
 
+        {/* BulkActionBar 改数据驱动：计数与"清除"由组件自己画，调用方只给动作
+            清单。原先两者都要调用方手拼，于是每个列表页的计数文案与清除按钮各
+            写一遍、样式各不相同。八个列表页同此改法。 */}
         {selectedBillIds.size > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedBillIds.size)} 项</>}
-            selectionActions={
-              <>
-                <ActionButton
-                  variant="outline"
-                  icon="table"
-                  onClick={handleExportSelected}
-                >
-                  导出所选
-                </ActionButton>
-                <Button variant="ghost" onClick={clearBillSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedBillIds.size}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                icon: "table",
+                onSelect: handleExportSelected,
+              },
+            ]}
+            onClear={clearBillSelection}
           />
         ) : null}
 

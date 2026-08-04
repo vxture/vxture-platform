@@ -273,7 +273,7 @@ function AnnouncementToolbar({
         <div className="vx-admin-view-toggle">
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-md"
             className={joinClasses(
               "vx-admin-view-toggle__btn",
               viewMode === "list" ? "vx-admin-view-toggle__btn--active" : "",
@@ -285,7 +285,7 @@ function AnnouncementToolbar({
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-md"
             className={joinClasses(
               "vx-admin-view-toggle__btn",
               viewMode === "cards" ? "vx-admin-view-toggle__btn--active" : "",
@@ -301,7 +301,7 @@ function AnnouncementToolbar({
       <span className="vx-models-toolbar__count">{total} 条</span>
       <Button
         variant="default"
-        size="sm"
+        size="md"
         className="vx-admin-action-btn"
         onClick={onCreate}
         title="新建公告"
@@ -379,34 +379,33 @@ function AnnouncementList({
           <span className="vx-tenant-actions">
             <ActionMenu
               label={`${item.title} 操作`}
-              triggerClassName="vx-tenant-actions__trigger"
-              triggerProps={{ title: "操作", disabled: busy }}
+              disabled={busy}
               items={[
                 {
                   id: "edit",
                   label: "编辑",
-                  icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+                  icon: "edit",
                   disabled: busy,
                   onSelect: () => onEdit(item),
                 },
                 {
                   id: "publish",
                   label: "发布",
-                  icon: <Icon name="check" size="xs" fallback="placeholder" />,
+                  icon: "check",
                   disabled: busy || item.status !== "draft",
                   onSelect: () => onPublish(item),
                 },
                 {
                   id: "archive",
                   label: "归档",
-                  icon: <Icon name="stop" size="xs" fallback="placeholder" />,
+                  icon: "stop",
                   disabled: busy || item.status !== "published",
                   onSelect: () => onArchive(item),
                 },
                 {
                   id: "delete",
                   label: "删除",
-                  icon: <Icon name="trash" size="xs" fallback="placeholder" />,
+                  icon: "trash",
                   danger: true,
                   disabled: busy,
                   separatorBefore: true,
@@ -473,7 +472,6 @@ function AnnouncementFormDialog({
       submitLabel={mode === "create" ? "创建草稿" : "保存修改"}
       submitting={submitting}
       submitDisabled={!formIsValid(form)}
-      contentClassName="max-w-3xl"
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
@@ -666,7 +664,7 @@ export function AnnouncementsPage() {
       await reload();
       closeDialog();
     } catch (error) {
-      toast({ tone: "error", title: "保存失败", ...describeError(error) });
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -679,7 +677,7 @@ export function AnnouncementsPage() {
       await reload();
       toast({ tone: "success", title: label });
     } catch (error) {
-      toast({ tone: "error", title: `${label}失败`, ...describeError(error) });
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
     } finally {
       setSubmitting(false);
     }
@@ -778,7 +776,7 @@ export function AnnouncementsPage() {
           title="删除公告"
           description={`确认删除「${pendingDelete.title}」？此操作不可撤销。`}
           submitLabel="删除"
-          submitVariant="destructive"
+          danger
           submitting={submitting}
           onOpenChange={(open) => {
             if (!open) setPendingDelete(null);

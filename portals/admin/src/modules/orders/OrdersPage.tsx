@@ -212,35 +212,33 @@ function OrderActionsMenu({
     >
       <ActionMenu
         label={`${order.orderNo} 订单操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "details",
             label: "订单详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             onSelect: () =>
               router.push(`/orders/${encodeURIComponent(order.id)}`),
           },
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(order.tenantId)}`),
           },
           {
             id: "confirm-payment",
             label: "确认收款",
-            icon: <Icon name="check" size="xs" fallback="placeholder" />,
+            icon: "check",
             disabled: !canConfirmOrderOfflinePayment(order),
-            title: confirmOfflinePaymentDisabledReason(order) ?? undefined,
+            hint: confirmOfflinePaymentDisabledReason(order) ?? undefined,
             onSelect: () => onConfirmPayment(order),
           },
           {
             id: "subscription",
             label: "查看订阅",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             onSelect: () =>
               router.push(
                 `/subscriptions/${encodeURIComponent(order.subscriptionId)}`,
@@ -905,26 +903,20 @@ export function OrdersPage() {
 
         {selectedOrderIds.size > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedOrderIds.size)} 项</>}
-            selectionActions={
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    exportRowsToCsv(
-                      "orders-export",
-                      ORDER_CSV_COLUMNS,
-                      selectedOrders,
-                    )
-                  }
-                >
-                  导出所选
-                </Button>
-                <Button variant="ghost" onClick={clearOrderSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedOrderIds.size}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                onSelect: () =>
+                  exportRowsToCsv(
+                    "orders-export",
+                    ORDER_CSV_COLUMNS,
+                    selectedOrders,
+                  ),
+              },
+            ]}
+            onClear={clearOrderSelection}
           />
         ) : null}
 

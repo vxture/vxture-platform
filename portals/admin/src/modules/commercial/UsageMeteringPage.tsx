@@ -121,20 +121,18 @@ function UsageActionsMenu({ record }: { record: UsageMeteringRecord }) {
     >
       <ActionMenu
         label={`${record.tenantName} 用量操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(record.tenantId)}`),
           },
           {
             id: "subscription",
             label: "查看订阅",
-            icon: <Icon name="star" size="xs" fallback="placeholder" />,
+            icon: "star",
             disabled: !record.subscriptionId,
             onSelect: () => {
               if (!record.subscriptionId) return;
@@ -146,7 +144,7 @@ function UsageActionsMenu({ record }: { record: UsageMeteringRecord }) {
           {
             id: "order",
             label: "查看订单",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             disabled: !record.subscriptionId,
             onSelect: () => {
               if (!record.subscriptionId) return;
@@ -652,17 +650,15 @@ export function UsageMeteringPage() {
 
         {selectedRecords.length ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedRecords.length)} 项</>}
-            selectionActions={
-              <>
-                <Button variant="outline" onClick={handleExportSelected}>
-                  导出所选
-                </Button>
-                <Button variant="ghost" onClick={clearRecordSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedRecords.length}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                onSelect: handleExportSelected,
+              },
+            ]}
+            onClear={clearRecordSelection}
           />
         ) : null}
 

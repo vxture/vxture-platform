@@ -229,40 +229,32 @@ function VerificationActionsMenu({
     >
       <ActionMenu
         label={`${tenant.displayName} 认证操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "review",
             label: isPending ? "进入审核" : "查看详情",
-            icon: (
-              <Icon
-                name={isPending ? "medal" : "arrow-right"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: isPending ? "medal" : "arrow-right",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(tenant.id)}`),
           },
           {
             id: "approve",
             label: "通过认证",
-            icon: <Icon name="check" size="xs" fallback="placeholder" />,
+            icon: "check",
             disabled: !isPending || busy,
             onSelect: () => onApprove(tenant),
           },
           {
             id: "reject",
             label: "驳回材料",
-            icon: <Icon name="x" size="xs" fallback="placeholder" />,
+            icon: "x",
             disabled: !isPending || busy,
             onSelect: () => onReject(tenant),
           },
           {
             id: "history",
             label: "审核记录",
-            icon: <Icon name="info" size="xs" fallback="placeholder" />,
+            icon: "info",
             disabled: true,
           },
         ]}
@@ -610,7 +602,7 @@ export function VerificationsPage() {
       } catch (error) {
         setVerificationsTruncated(false);
         toast({
-          tone: "error",
+          tone: "danger",
           title: "加载失败",
           description:
             error instanceof Error
@@ -745,7 +737,7 @@ export function VerificationsPage() {
       });
     } catch (error) {
       toast({
-        tone: "error",
+        tone: "danger",
         title: "操作失败",
         description:
           error instanceof Error ? error.message : "无法通过认证，请稍后重试。",
@@ -1013,7 +1005,7 @@ export function VerificationsPage() {
           title="驳回实名认证"
           description={`将驳回 ${rejectTarget.displayName}（${rejectTarget.tenantCode}）提交的实名材料，请填写驳回原因，租户可据此补充后重新提交。`}
           submitLabel="确认驳回"
-          submitVariant="destructive"
+          danger
           cancelLabel="放弃"
           submitting={actionBusy}
           submitDisabled={!rejectReason.trim()}

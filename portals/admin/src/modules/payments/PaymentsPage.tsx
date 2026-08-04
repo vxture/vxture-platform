@@ -21,7 +21,7 @@ import {
   EmptyState,
   ViewModeSwitch,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import type { ActionMenuItem, IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
 import {
@@ -316,29 +316,29 @@ function PaymentActionsMenu({
     >
       <ActionMenu
         label={`${payment.paymentNo} 收款操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
+          // 标注为 ActionMenuItem[]：条件展开会把字面量 icon 拓宽成 string，
+          // 而 ActionMenuItem.icon 现在收的是 IconName 联合。
           ...(isPendingVerify
-            ? [
+            ? ([
                 {
                   id: "verify",
                   label: "核销确认",
-                  icon: <Icon name="check" size="xs" fallback="placeholder" />,
+                  icon: "check",
                   onSelect: () => onVerify(payment),
                 },
                 {
                   id: "reject",
                   label: "驳回退回",
-                  icon: <Icon name="x" size="xs" fallback="placeholder" />,
+                  icon: "x",
                   onSelect: () => onReject(payment),
                 },
-              ]
+              ] satisfies ActionMenuItem[])
             : []),
           {
             id: "bill",
             label: "账单详情",
-            icon: <Icon name="arrow-right" size="xs" fallback="placeholder" />,
+            icon: "arrow-right",
             disabled: !payment.billId,
             onSelect: () => {
               if (!payment.billId) return;
@@ -348,7 +348,7 @@ function PaymentActionsMenu({
           {
             id: "order",
             label: "订单详情",
-            icon: <Icon name="table" size="xs" fallback="placeholder" />,
+            icon: "table",
             disabled: !payment.subscriptionId,
             onSelect: () => {
               if (!payment.subscriptionId) return;
@@ -360,14 +360,14 @@ function PaymentActionsMenu({
           {
             id: "tenant",
             label: "查看租户",
-            icon: <Icon name="buildings" size="xs" fallback="placeholder" />,
+            icon: "buildings",
             onSelect: () =>
               router.push(`/tenants/${encodeURIComponent(payment.tenantId)}`),
           },
           {
             id: "evidence",
             label: "查看凭证",
-            icon: <Icon name="key" size="xs" fallback="placeholder" />,
+            icon: "key",
             disabled: !payment.offlineEvidenceUrl,
             onSelect: () => {
               if (!payment.offlineEvidenceUrl) return;
@@ -1091,26 +1091,20 @@ export function PaymentsPage() {
 
         {selectedPaymentIds.size > 0 ? (
           <BulkActionBar
-            selectedLabel={<>已选 {formatNumber(selectedPaymentIds.size)} 项</>}
-            selectionActions={
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    exportRowsToCsv(
-                      "payments-export",
-                      PAYMENT_CSV_COLUMNS,
-                      selectedPayments,
-                    )
-                  }
-                >
-                  导出所选
-                </Button>
-                <Button variant="ghost" onClick={clearPaymentSelection}>
-                  清除
-                </Button>
-              </>
-            }
+            count={selectedPaymentIds.size}
+            actions={[
+              {
+                id: "export",
+                label: "导出所选",
+                onSelect: () =>
+                  exportRowsToCsv(
+                    "payments-export",
+                    PAYMENT_CSV_COLUMNS,
+                    selectedPayments,
+                  ),
+              },
+            ]}
+            onClear={clearPaymentSelection}
           />
         ) : null}
 

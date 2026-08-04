@@ -330,15 +330,15 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
   ];
 
   return (
+    /* getRowClassName 随 DataTable 收窄取消：按行改样式等于把行的视觉状态交回
+     * 调用方，行选中/禁用由本件自己画。这里原本靠整行染色表达健康度，而同一
+     * 信息"状态"列已用 Badge 说了一遍——去掉染色不丢信息。
+     * aria-label 也随之取消（DataTable 不再透传任意属性）。 */
     <DataTable
       className="vx-service-health-list"
       columns={columns}
       rows={services}
-      rowKey={(service) => service.id}
-      getRowClassName={(service) =>
-        `vx-service-health-list__row vx-service-health-status--${serviceStatus(service)}`
-      }
-      aria-label="服务健康列表"
+      rowKey={(service: DevServiceSnapshot) => service.id}
     />
   );
 }
@@ -558,7 +558,7 @@ export function ServiceHealthPage({
           placeholder="搜索服务、端口、探针、URL"
           aria-label="搜索服务健康"
         />
-        <Button variant="outline" size="sm" onClick={resetFilters}>
+        <Button variant="outline" size="md" onClick={resetFilters}>
           重置
         </Button>
 

@@ -1,7 +1,8 @@
 {
   "shell": {
     "loading": {
-      "label": "加载中"
+      "label": "加载中",
+      "unreachable": "无法连接服务，正在重试…"
     },
     "featureBoards": "功能板块",
     "searchPlaceholder": "搜索租户、用户、订单、配置…",
@@ -15,7 +16,7 @@
     "missingPhone": "缺少手机号",
     "missingEmail": "缺少 email",
     "prefsTitle": "偏好设置",
-    "themeSystem": "跟随系统",
+    "themeSystem": "系统",
     "themeLight": "亮色",
     "themeDark": "暗色",
     "densityCompact": "紧凑",
@@ -38,6 +39,20 @@
       "collapseNav": "收起导航",
       "expandAllGroups": "展开全部分组",
       "collapseAllGroups": "收起全部分组"
+    },
+    "verifyVerified": "已认证",
+    "search": {
+      "title": "全局搜索",
+      "description": "输入关键词检索页面与业务数据",
+      "empty": "没有匹配结果",
+      "error": "搜索服务暂时不可用，仅显示页面匹配",
+      "loading": "检索中",
+      "groups": {
+        "pages": "页面",
+        "tenant": "租户",
+        "order": "订单",
+        "operator": "平台账号"
+      }
     }
   },
   "role": {

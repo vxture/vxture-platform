@@ -3,33 +3,19 @@
  * @package @vxture/admin
  * @layer Presentation
  * @category Modules - Shared
- * @author AI-Generated
- * @date 2026-05-17
+ *
+ * DS 的 `DetailSectionHeading` 在分类重构（22ca6ccc）里被 `SectionHeader`
+ * 取代（那边的文件注释写明了继任关系），admin 没跟着改，这条 import 一直挂着。
+ *
+ * 保留这个薄壳而不是让 8 个调用点直接用 SectionHeader：详情页里的分区标题
+ * 固定是 level 2，写在这里一次，比在 8 处各写一个 `level={2}` 更难写歪。
+ * `admin-overview-heading*` 三个 class 钩子随之去掉，理由同 PageHeader.tsx。
  */
 
-import {
-  DetailSectionHeading as DesignDetailSectionHeading,
-  type DetailSectionHeadingProps,
-} from "@vxture/design-system";
+import { SectionHeader, type SectionHeaderProps } from "@vxture/design-system";
 
-export function DetailSectionHeading({
-  className,
-  iconClassName,
-  copyClassName,
-  ...props
-}: DetailSectionHeadingProps) {
-  return (
-    <DesignDetailSectionHeading
-      className={["admin-overview-heading", className]
-        .filter(Boolean)
-        .join(" ")}
-      iconClassName={["admin-overview-heading__icon", iconClassName]
-        .filter(Boolean)
-        .join(" ")}
-      copyClassName={["admin-overview-heading__copy", copyClassName]
-        .filter(Boolean)
-        .join(" ")}
-      {...props}
-    />
-  );
+export type DetailSectionHeadingProps = Omit<SectionHeaderProps, "level">;
+
+export function DetailSectionHeading(props: DetailSectionHeadingProps) {
+  return <SectionHeader level={2} {...props} />;
 }

@@ -754,19 +754,11 @@ export function ModelGrantsPage() {
                     >
                       <ActionMenu
                         label={`${policy.scopeName} 操作`}
-                        triggerClassName="vx-tenant-actions__trigger"
-                        triggerProps={{ title: "操作" }}
                         items={[
                           {
                             id: "readonly",
                             label: "策略只读",
-                            icon: (
-                              <Icon
-                                name="shield-check"
-                                size="xs"
-                                fallback="placeholder"
-                              />
-                            ),
+                            icon: "shield-check",
                             disabled: true,
                           },
                         ]}
@@ -1013,19 +1005,11 @@ export function ModelGrantsPage() {
                   >
                     <ActionMenu
                       label={t("actions.grantMenu")}
-                      triggerClassName="vx-tenant-actions__trigger"
-                      triggerProps={{ title: t("actions.grantMenu") }}
                       items={[
                         {
                           id: "edit",
                           label: t("actions.editGrant"),
-                          icon: (
-                            <Icon
-                              name="edit"
-                              size="xs"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: "edit",
                           onSelect: () => openEditGrantDialog(grant),
                         },
                         {
@@ -1033,13 +1017,7 @@ export function ModelGrantsPage() {
                           label: grant.isActive
                             ? t("actions.disableGrant")
                             : t("actions.enableGrant"),
-                          icon: (
-                            <Icon
-                              name={grant.isActive ? "x" : "check"}
-                              size="xs"
-                              fallback="placeholder"
-                            />
-                          ),
+                          icon: grant.isActive ? "x" : "check",
                           disabled: submitting,
                           onSelect: () => void handleToggleGrant(grant),
                         },
@@ -1073,7 +1051,6 @@ export function ModelGrantsPage() {
           submitLabel={t("dialogs.actions.save")}
           cancelLabel={t("dialogs.actions.cancel")}
           submitting={submitting}
-          contentClassName="max-w-3xl"
           onOpenChange={(open) => {
             if (!open) setDialogMode(null);
           }}

@@ -521,7 +521,7 @@ function reportPermissionError(
     return;
   }
   toast({
-    tone: "error",
+    tone: "danger",
     title: fallbackTitle,
     ...(error instanceof Error && error.message
       ? { description: error.message }
@@ -557,7 +557,6 @@ function PermissionFormDialog({
       submitLabel={mode === "create" ? "创建权限" : "保存修改"}
       submitting={submitting}
       submitDisabled={!valid}
-      contentClassName="max-w-3xl"
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
@@ -682,37 +681,29 @@ function PermissionActionsMenu({
     >
       <ActionMenu
         label={`${permissionDisplayName(permission)} 操作`}
-        triggerClassName="vx-tenant-actions__trigger"
-        triggerProps={{ title: "操作" }}
         items={[
           {
             id: "detail",
             label: "权限详情",
-            icon: <Icon name="info" size="xs" fallback="placeholder" />,
+            icon: "info",
             onSelect: () => onOpenDetail(permission),
           },
           {
             id: "edit",
             label: "编辑权限",
-            icon: <Icon name="edit" size="xs" fallback="placeholder" />,
+            icon: "edit",
             onSelect: () => onEdit(permission),
           },
           {
             id: "copy",
             label: "复制权限",
-            icon: <Icon name="copy" size="xs" fallback="placeholder" />,
+            icon: "copy",
             disabled: true,
           },
           {
             id: "toggle",
             label: permission.status ? "停用权限" : "启用权限",
-            icon: (
-              <Icon
-                name={permission.status ? "x" : "check"}
-                size="xs"
-                fallback="placeholder"
-              />
-            ),
+            icon: permission.status ? "x" : "check",
             onSelect: () => onToggle(permission),
           },
         ]}
@@ -993,7 +984,7 @@ function PermissionTreeNodeView({
         <span className="vx-admin-permission-tree-node__name">
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-md"
             className="vx-admin-permission-tree-node__toggle"
             onClick={() => onToggle(permission.id)}
             disabled={!children.length}

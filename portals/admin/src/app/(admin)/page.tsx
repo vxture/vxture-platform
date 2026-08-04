@@ -500,7 +500,7 @@ function pulseTagToneClass(tone?: Tone) {
 function DetailTip({ detail }: { detail: string }) {
   return (
     <span className="admin-overview-tip">
-      <Button variant="ghost" size="icon" aria-label={detail} title={detail}>
+      <Button variant="ghost" size="icon-md" aria-label={detail} title={detail}>
         <Icon name="help" size="xs" fallback="placeholder" />
       </Button>
       <span role="tooltip">{detail}</span>
@@ -540,7 +540,7 @@ function PeriodSwitch({
         <Button
           key={option.key}
           variant={value === option.key ? "secondary" : "ghost"}
-          size="sm"
+          size="md"
           role="tab"
           aria-selected={value === option.key}
           className={

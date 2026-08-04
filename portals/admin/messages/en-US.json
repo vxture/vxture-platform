@@ -1,7 +1,8 @@
 {
   "shell": {
     "loading": {
-      "label": "Loading"
+      "label": "Loading",
+      "unreachable": "Service unreachable, retrying…"
     },
     "featureBoards": "Feature boards",
     "searchPlaceholder": "Search tenants, users, orders, settings…",
@@ -38,6 +39,20 @@
       "collapseNav": "Collapse navigation",
       "expandAllGroups": "Expand all groups",
       "collapseAllGroups": "Collapse all groups"
+    },
+    "verifyVerified": "Verified",
+    "search": {
+      "title": "Global search",
+      "description": "Search pages and business data by keyword",
+      "empty": "No matches",
+      "error": "Search is unavailable; showing page matches only",
+      "loading": "Searching",
+      "groups": {
+        "pages": "Pages",
+        "tenant": "Tenants",
+        "order": "Orders",
+        "operator": "Platform accounts"
+      }
     }
   },
   "role": {
