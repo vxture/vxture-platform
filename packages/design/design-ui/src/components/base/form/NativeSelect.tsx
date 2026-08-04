@@ -46,7 +46,7 @@ export const NativeSelect = React.forwardRef<
         ref={ref}
         data-slot="native-select"
         className={cn(
-          "flex h-control-lg w-full min-w-0 appearance-none rounded-md border border-input pl-sm pr-xl py-2xs",
+          "flex h-control-md w-full min-w-0 appearance-none rounded-md border border-input pl-sm pr-xl py-2xs",
           "bg-transparent shadow-raised dark:bg-input/30",
           "text-body-lg md:text-body-md text-foreground",
           interactive,

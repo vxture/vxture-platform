@@ -15,9 +15,10 @@
 
 import * as React from "react";
 import { cn } from "../../../utils/cn";
-import { SegmentedControl } from "../../base/form/SegmentedControl";
+import { ViewModeSwitch, type ViewModeSwitchValue } from "./ViewModeSwitch";
 
-export type FilterBarView = "list" | "cards";
+/** 与 `ViewModeSwitchValue` 同一个值域；保留别名是因为调用方按板块命名。 */
+export type FilterBarView = ViewModeSwitchValue;
 
 export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 右侧操作区，通常是"新建"一类的主动作。 */
@@ -45,17 +46,11 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
       >
         {/* 左段：视图切换 + 计数。shrink-0 保证窄屏下先折右段不挤左段。 */}
         <div className="flex shrink-0 items-center gap-sm">
+          {/* 视图切换本身是独立一件（ViewModeSwitch）：不止工具行要用，
+              admin 的列表页有二十多处不经 FilterBar 直接摆一个。原先这里内联
+              了一份同样的 ToggleGroup，两处各改各的就会分叉。 */}
           {view && onViewChange ? (
-            <SegmentedControl
-              size="sm"
-              ariaLabel="展示方式"
-              value={view}
-              onChange={onViewChange}
-              items={[
-                { value: "list", icon: "list", ariaLabel: "列表视图" },
-                { value: "cards", icon: "squares-four", ariaLabel: "卡片视图" },
-              ]}
-            />
+            <ViewModeSwitch value={view} onChange={onViewChange} />
           ) : null}
           {count !== undefined ? (
             <span className="whitespace-nowrap text-label-md text-muted-foreground">

@@ -61,7 +61,7 @@ function BulkActionBar({
           已选择 {count} {noun}
         </span>
         {onClear ? (
-          <Button variant="ghost" size="sm" onClick={onClear}>
+          <Button variant="ghost" size="md" onClick={onClear}>
             清除
           </Button>
         ) : null}
@@ -70,7 +70,7 @@ function BulkActionBar({
         {actions.map((action) => (
           <Button
             key={action.id}
-            size="sm"
+            size="md"
             variant={action.danger ? "destructive" : "outline"}
             {...(action.disabled !== undefined
               ? { disabled: action.disabled }

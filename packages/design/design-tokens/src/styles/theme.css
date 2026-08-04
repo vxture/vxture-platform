@@ -248,6 +248,7 @@
   --spacing-control-xl: var(--space-control-xl);
   --spacing-control-2xl: var(--space-control-2xl);
   --spacing-control-3xl: var(--space-control-3xl);
+  --spacing-page-inset: var(--space-page-inset);
 }
 
 /* 无模式轴。断点与容器宽度落字面量——媒体查询与容器查询里 var() 不参与求值。 */

@@ -20,9 +20,20 @@ import { Icon, type IconName } from "../../../icons";
 
 export type SegmentedControlSize = "sm" | "md";
 
-const BY_SIZE: Record<SegmentedControlSize, string> = {
-  sm: "h-control-sm min-w-control-sm px-xs text-label-sm",
-  md: "h-control-md min-w-control-md px-sm text-label-md",
+/**
+ * 高度挂在**容器**上、分段 `h-full` 撑满，而不是给每个分段定高再靠容器内边距
+ * 撑开。后者会让控件的实际高度变成"分段高 + 2×内边距"这样一个算出来的数
+ * （sm 档 28+8=36px），跟同处一行的 Button（`size="sm"` = 32px）与
+ * NativeSelect（32px）永远差几个像素，排在一起参差不齐。定在容器上之后，
+ * `h-control-*` 是多少，控件就是多少。
+ */
+const BY_SIZE: Record<SegmentedControlSize, { root: string; item: string }> = {
+  // 两档都用 label-sm。档位在这里只决定**高度**，不连带改字号——md 档原先用
+  // label-md（= text-sm），比同尺寸 NativeSelect 的 text-body-sm（= text-xs）
+  // 大一号，两个控件上下排在同一栏里字号明显不一致。控件里的选项文字是标签
+  // 不是正文，不该比它旁边的下拉更抢眼。
+  sm: { root: "h-control-sm", item: "min-w-control-sm px-xs text-label-sm" },
+  md: { root: "h-control-md", item: "min-w-control-md px-sm text-label-sm" },
 };
 
 export interface SegmentedControlItem<TValue extends string | number> {
@@ -39,6 +50,12 @@ export interface SegmentedControlProps<TValue extends string | number> {
   readonly value: TValue;
   readonly onChange: (value: TValue) => void;
   readonly size?: SegmentedControlSize;
+  /**
+   * 撑满可用宽度，各分段等宽。默认 false（宽度随内容），适合工具条里跟别的
+   * 控件并排；表单里独占一行时置 true，否则控件缩在左边、右侧留一大片空白，
+   * 与同栏的输入框/下拉右边缘对不齐。
+   */
+  readonly fill?: boolean;
   readonly ariaLabel?: string;
   readonly className?: string;
 }
@@ -48,6 +65,7 @@ function SegmentedControl<TValue extends string | number>({
   value,
   onChange,
   size = "md",
+  fill = false,
   ariaLabel,
   className,
 }: SegmentedControlProps<TValue>) {
@@ -56,7 +74,23 @@ function SegmentedControl<TValue extends string | number>({
       role="radiogroup"
       {...(ariaLabel ? { "aria-label": ariaLabel } : {})}
       className={cn(
-        "inline-flex items-center gap-2xs rounded-lg bg-accent p-2xs",
+        // 形态是"槽 + 滑块"：外层是一条中性灰的**凹槽**（bg-muted + 一条淡
+        // 描边），选中项是槽**内部**浮起的一枚滑块。因此外层要有内边距——
+        // 滑块比槽矮一圈、四周留一线底色，才有"嵌在里面"的观感；分段直接顶
+        // 满外框会退化成三个方格子拼接，看不出这是一个可切换的控件。
+        //
+        // 两者都走 rounded-full 胶囊：槽和滑块的圆角必须同族，槽用大圆角而
+        // 滑块用方角的话，滑到两端时滑块的直角会戳出槽的弧线。
+        //
+        // 描边取 border（而非 input）：input 档是给输入框用的实边，放在这里
+        // 显得比同栏其他无边控件重得多；槽只需要一条能界定范围的淡线。
+        // 槽底走 surface-3（浅色档 neutral-50）而不是 muted（neutral-200）：
+        // 槽只需要"这里是个凹处"的一点点暗示，muted 那一档在白卡片上已经是
+        // 一块明确的灰色面，比它承载的滑块还抢眼。暗色档 surface-3 比 card
+        // 亮一级，凹陷感在两个模式下都成立。
+        "flex items-stretch rounded-full border border-border bg-surface-3 p-2xs",
+        fill ? "w-full" : "inline-flex",
+        BY_SIZE[size].root,
         className,
       )}
     >
@@ -72,13 +106,13 @@ function SegmentedControl<TValue extends string | number>({
             disabled={item.disabled}
             onClick={() => onChange(item.value)}
             className={cn(
-              "inline-flex items-center justify-center gap-2xs rounded-md",
-              "border border-transparent",
+              "inline-flex h-full items-center justify-center gap-2xs rounded-full",
+              fill && "flex-1",
               interactive,
-              BY_SIZE[size],
+              BY_SIZE[size].item,
               active
-                ? "bg-card text-foreground shadow-flat"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-primary text-primary-foreground shadow-flat"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
             {item.icon ? (

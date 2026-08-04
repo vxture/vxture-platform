@@ -836,7 +836,7 @@ export function AuthPrimaryButton({
   }
 
   return (
-    <Button type="submit" size="lg" className="w-full" disabled={blocked}>
+    <Button type="submit" size="xl" className="w-full" disabled={blocked}>
       {buttonContent}
     </Button>
   );
@@ -1117,7 +1117,7 @@ export function AuthPasswordLoginPanel({
               trailingAction={
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon-md"
                   className="text-muted-foreground hover:text-foreground"
                   aria-label={passwordVisibilityLabel}
                   title={passwordVisibilityLabel}
@@ -1425,7 +1425,7 @@ function AuthBackButton({
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size="md"
       className="self-start gap-xs px-xs text-muted-foreground hover:text-foreground"
       onClick={onClick}
     >

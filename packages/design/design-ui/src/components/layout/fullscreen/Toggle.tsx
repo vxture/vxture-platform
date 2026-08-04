@@ -71,7 +71,7 @@ export function FullscreenToggle({
     <Button
       ref={buttonRef}
       variant="ghost"
-      size="icon"
+      size="icon-md"
       onClick={handleToggle}
       title={getDefaultText()}
       className={cn(

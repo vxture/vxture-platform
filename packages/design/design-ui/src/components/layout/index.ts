@@ -15,3 +15,4 @@ export * from "./stack";
 export * from "./grid";
 export * from "./SplitViewLayout";
 export * from "./ViewLayout";
+export * from "./ShellLayout";

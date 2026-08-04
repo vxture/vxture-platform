@@ -34,7 +34,7 @@ const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants>
 >({
   variant: "default",
-  size: "default",
+  size: "md",
 });
 
 const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(

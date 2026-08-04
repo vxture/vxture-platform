@@ -35,7 +35,7 @@
   --surface-inverse: var(--vx-color-neutral-900);
 
   /* content */
-  --foreground: var(--vx-color-neutral-600);
+  --foreground: var(--vx-color-neutral-900);
   --muted-foreground: var(--vx-color-neutral-500);
   --content-tertiary: var(--vx-color-neutral-400);
   --content-disabled: var(--vx-color-neutral-300);

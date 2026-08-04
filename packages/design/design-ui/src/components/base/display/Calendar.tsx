@@ -88,11 +88,11 @@ function Calendar({
         // 导航钮绝对定位到两个角，月份标题因此可以稳居中。
         nav: "absolute inset-x-none top-none flex w-full items-center justify-between",
         button_previous: cn(
-          buttonVariants({ variant: "ghost", size: "icon-sm" }),
+          buttonVariants({ variant: "ghost", size: "icon-md" }),
           "text-muted-foreground",
         ),
         button_next: cn(
-          buttonVariants({ variant: "ghost", size: "icon-sm" }),
+          buttonVariants({ variant: "ghost", size: "icon-md" }),
           "text-muted-foreground",
         ),
         month_caption: "flex h-control-md items-center justify-center",

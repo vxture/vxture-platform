@@ -80,21 +80,37 @@ const buttonVariants = cva(
         ghost: cn("text-foreground hover:bg-accent", expandable),
         link: "text-link underline-offset-4 hover:underline hover:text-link-hover",
       },
+      /* 档名 = token 名，一一对应，没有第二套记法：
+       *   xs 24 · sm 28 · md 32 · lg 36 · xl 40   （= --space-control-*）
+       * `md` 是默认档，与外壳（header / 面板 / 侧栏）同高。
+       *
+       * 这套对应是 2026-08-04 补的。此前档名与 token 名整体错位一格
+       * （`sm` 指的是 control-md、`default` 也是 control-md、`lg` 是
+       * control-xl），于是同一个 32px 有两个名字、而 control-sm(28) 与
+       * control-lg(36) 根本叫不出来。错位本身不产生视觉问题，产生的是
+       * "读代码算不出高度"——每次都要回来查表。
+       *
+       * 横向内距跟着档位走（px-xs / px-sm / px-md / px-lg），不再由调用方
+       * 选档时顺带决定：改名前 `size="sm"` 是 px-sm、不传 size 是 px-md，
+       * 两者高度同为 32 却胖瘦不同，排在一行里能看出参差。这跟当初 32/36
+       * 并存是同一类毛病，一并收掉。 */
       size: {
-        // 小档另行封顶圆角：`rounded-md` 在基数调大后会让 24/32px 的按钮发胖。
+        // 小档另行封顶圆角：`rounded-md` 在基数调大后会让 24–32px 的按钮发胖。
         xs: cn("h-control-xs px-xs text-label-sm", radiusClamp),
-        sm: cn("h-control-md px-sm", radiusClamp),
-        default: "h-control-lg px-md",
-        lg: "h-control-xl px-lg",
+        sm: cn("h-control-sm px-sm text-label-sm", radiusClamp),
+        md: cn("h-control-md px-md", radiusClamp),
+        lg: "h-control-lg px-lg",
+        xl: "h-control-xl px-lg",
         "icon-xs": cn("size-control-xs p-0", radiusClamp),
-        "icon-sm": cn("size-control-md p-0", radiusClamp),
-        icon: "size-control-lg p-0",
-        "icon-lg": "size-control-xl p-0",
+        "icon-sm": cn("size-control-sm p-0", radiusClamp),
+        "icon-md": cn("size-control-md p-0", radiusClamp),
+        "icon-lg": "size-control-lg p-0",
+        "icon-xl": "size-control-xl p-0",
       },
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
+      size: "md",
     },
   },
 );

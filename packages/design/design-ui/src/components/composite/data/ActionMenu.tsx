@@ -29,6 +29,11 @@ export interface ActionMenuItem {
   readonly label: React.ReactNode;
   readonly icon?: IconName;
   readonly disabled?: boolean;
+  /**
+   * 悬停说明，落到原生 `title`。主要用途是**讲清楚这一项为什么灰着**——
+   * 禁用项不说理由，用户只能猜，而这一层信息在菜单里没有别的地方可放。
+   */
+  readonly hint?: string | undefined;
   /** 危险动作，用 destructive 语义色。 */
   readonly danger?: boolean;
   /** 在本项之前插一条分隔线，用于把危险动作与常规动作分开。 */
@@ -40,12 +45,19 @@ export interface ActionMenuProps {
   readonly items: readonly ActionMenuItem[];
   readonly label?: string;
   readonly align?: "start" | "center" | "end";
+  /**
+   * 整个菜单不可用（提交进行中、无权操作）。这跟"逐项 disabled"不是一回事：
+   * 逐项禁用仍然可以打开菜单看见有哪些动作，整体禁用连打开都不给。前者用于
+   * "这一项现在做不了"，后者用于"现在什么都别做"。
+   */
+  readonly disabled?: boolean;
 }
 
 function ActionMenu({
   items,
   label = "打开操作菜单",
   align = "end",
+  disabled = false,
 }: ActionMenuProps) {
   /**
    * 关闭时残留焦点环的修法：Radix 关菜单会把焦点还给触发器（无障碍要求，
@@ -62,8 +74,9 @@ function ActionMenu({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-md"
           aria-label={label}
+          disabled={disabled}
           onPointerDown={() => {
             lastInputRef.current = "pointer";
           }}
@@ -93,6 +106,7 @@ function ActionMenu({
               {...(item.onSelect !== undefined
                 ? { onSelect: item.onSelect }
                 : {})}
+              {...(item.hint !== undefined ? { title: item.hint } : {})}
               className={cn(
                 "gap-xs",
                 // 悬停时给一层淡底而不是把整条变实心红——菜单里危险项常和常规项

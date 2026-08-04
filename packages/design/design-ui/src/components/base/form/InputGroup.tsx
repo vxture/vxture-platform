@@ -29,7 +29,7 @@ export function InputGroup({
       role="group"
       data-slot="input-group"
       className={cn(
-        "relative flex h-control-lg w-full min-w-0 items-center",
+        "relative flex h-control-md w-full min-w-0 items-center",
         "rounded-md border border-input bg-transparent shadow-raised dark:bg-input/30",
         "transition-all duration-fast ease-standard",
         // interactive / invalid 配方挂在 :focus-visible / aria-invalid 本体上，

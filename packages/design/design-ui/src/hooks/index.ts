@@ -18,3 +18,6 @@ export { useControllableState } from "./useControllableState";
 export type { UseControllableStateProps } from "./useControllableState";
 
 export { useFullscreen } from "./useFullscreen";
+
+export { useListPagination } from "./useListPagination";
+export type { UseListPaginationReturn } from "./useListPagination";

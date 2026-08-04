@@ -31,6 +31,12 @@ export interface PopoverCloseProps extends React.ComponentPropsWithoutRef<
 const Popover = PopoverPrimitive.Root;
 const PopoverTrigger = PopoverPrimitive.Trigger;
 const PopoverClose = PopoverPrimitive.Close;
+/**
+ * 定位锚点，与触发器解耦。用在"浮层的开合由别的东西决定、但要贴着某个元素
+ * 定位"的场合——典型是行内搜索：输入框本身不是触发器（点它要落焦点、不是
+ * 开浮层），结果面板由"有没有输入"决定开合，位置贴着输入框。
+ */
+const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
   function PopoverContent(
@@ -61,4 +67,4 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
 
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverClose };
+export { Popover, PopoverAnchor, PopoverTrigger, PopoverContent, PopoverClose };

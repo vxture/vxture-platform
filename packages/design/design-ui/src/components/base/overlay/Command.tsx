@@ -38,6 +38,12 @@ export interface CommandDialogProps extends DialogProps {
   /** 无障碍标题：面板本身没有可见标题，读屏用户需要它知道弹出的是什么。 */
   readonly title?: string;
   readonly description?: string;
+  /**
+   * 透传给内层 `Command` 的 props（`shouldFilter` / `loop` / `filter` …）。
+   * 单开一个字段而不是散在顶层：顶层 props 整份进 Radix `Dialog`，cmdk 的
+   * 参数混在里面会被当成未知 DOM 属性透到元素上，React 会告警且行为失效。
+   */
+  readonly commandProps?: Omit<CommandProps, "children">;
 }
 
 export interface CommandInputProps extends React.ComponentPropsWithoutRef<
@@ -84,6 +90,7 @@ const CommandDialog = ({
   title = "命令面板",
   description = "搜索并执行命令",
   children,
+  commandProps,
   ...props
 }: CommandDialogProps) => {
   return (
@@ -94,7 +101,7 @@ const CommandDialog = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <Command>{children}</Command>
+        <Command {...commandProps}>{children}</Command>
       </DialogContent>
     </Dialog>
   );

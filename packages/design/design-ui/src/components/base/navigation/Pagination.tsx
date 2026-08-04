@@ -96,7 +96,10 @@ function Pagination({
              纯数字、不带标签文字——档位一眼即懂；语义留给 aria-label。
              "auto" 档=自适应，实际行数由调用方按可视高度解析。 */
           <SegmentedControl
-            size="sm"
+            /* md(32) 而不是 sm(28)：它与右侧翻页按钮同处一行，翻页按钮是
+               control-md。差 4px 时两组数字按钮的基线对不齐，一眼能看出来
+               （2026-08-04 opera/atlas/router 实测）。 */
+            size="md"
             ariaLabel="每页条数"
             value={pageSize}
             onChange={onPageSizeChange}
@@ -112,7 +115,7 @@ function Pagination({
         <div className="flex items-center gap-2xs">
           <Button
             variant="outline"
-            size="sm"
+            size="md"
             disabled={safePage <= 1}
             onClick={() => onPageChange(safePage - 1)}
           >
@@ -123,7 +126,7 @@ function Pagination({
             <Button
               key={item}
               variant={item === safePage ? "default" : "ghost"}
-              size="sm"
+              size="md"
               aria-current={item === safePage ? "page" : undefined}
               onClick={() => onPageChange(item)}
             >
@@ -132,7 +135,7 @@ function Pagination({
           ))}
           <Button
             variant="outline"
-            size="sm"
+            size="md"
             disabled={safePage >= safePageCount}
             onClick={() => onPageChange(safePage + 1)}
           >

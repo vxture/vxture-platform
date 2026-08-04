@@ -21,18 +21,25 @@ export const BUTTON_VARIANTS = [
 export type ButtonVariant = (typeof BUTTON_VARIANTS)[number];
 
 /**
- * 尺寸档与 shadcn vega 对齐：xs 24 / sm 32 / default 36 / lg 40（默认密度下）。
- * 四个 icon 档是同高的正方形，用于只有图标没有文字的按钮。
+ * 档名 = `--space-control-*` 的档名，默认密度下：
+ * **xs 24 · sm 28 · md 32 · lg 36 · xl 40**。默认档是 `md`。
+ * 五个 icon 档是同高的正方形，用于只有图标没有文字的按钮。
+ *
+ * 想知道一个按钮多高，读档名即可，不用回来查表——这正是 2026-08-04 那次
+ * 对齐要解决的事（此前 `sm` 指 control-md、`lg` 指 control-xl，整体错位
+ * 一格，而 control-sm/control-lg 叫不出名字）。理由见 Button.tsx 的尺寸表。
  */
 export const BUTTON_SIZES = [
   "xs",
   "sm",
-  "default",
+  "md",
   "lg",
+  "xl",
   "icon-xs",
   "icon-sm",
-  "icon",
+  "icon-md",
   "icon-lg",
+  "icon-xl",
 ] as const;
 
 export type ButtonSize = (typeof BUTTON_SIZES)[number];

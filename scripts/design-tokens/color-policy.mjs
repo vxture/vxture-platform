@@ -104,7 +104,7 @@ export const STANDALONE_COLORS = [
   ["muted", "neutral-200", "neutral-800"],
   ["surface-inverse", "neutral-900", "neutral-100"],
   /* content */
-  ["foreground", "neutral-600", "neutral-50"],
+  ["foreground", "neutral-900", "neutral-50"],
   ["muted-foreground", "neutral-500", "neutral-300"],
   ["content-tertiary", "neutral-400", "neutral-400"],
   ["content-disabled", "neutral-300", "neutral-600"],

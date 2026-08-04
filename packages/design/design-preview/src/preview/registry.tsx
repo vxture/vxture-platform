@@ -132,6 +132,8 @@ import {
   type MetricGridItem,
   TableTitleCell,
   NativeSelect,
+  DetailList,
+  DetailRow,
   Section,
   SectionHeader,
   SectionNav,
@@ -535,7 +537,7 @@ export const ENTRIES: readonly Entry[] = [
                 key={size}
                 variant={variant}
                 size={size}
-                defaultPressed={size === "default"}
+                defaultPressed={size === "md"}
                 title={size}
               >
                 <Icon name="star" />
@@ -1223,7 +1225,7 @@ export const ENTRIES: readonly Entry[] = [
           actions={
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="操作">
+                <Button variant="ghost" size="icon-md" aria-label="操作">
                   <Icon name="more-vertical" size="sm" />
                 </Button>
               </DropdownMenuTrigger>
@@ -1270,6 +1272,49 @@ export const ENTRIES: readonly Entry[] = [
           </>
         }
       />
+    ),
+  },
+  {
+    name: "DetailList",
+    layer: "pattern",
+    group: "图案",
+    tags: ["vxture", "patterns"],
+    covers: ["DetailRow"],
+    deviation:
+      "详情页的只读字段行（console 五个页面 42 行同形，admin 同形）。语义走 <dl>/<dt>/<dd>，读屏按名值对播报；label 收为 string（42/42 实据都是一句 t(...)），值走 children 以便就地拼状态标；不设 actionable 变体——遗留类名那个修饰符与是否真有操作并不对应，布局由 actions 有无推导。分隔线挂列表不挂行，末行天然无边框",
+    axes: [{ name: "actions", values: ["with", "without"] }],
+    render: () => (
+      <DetailList className="w-full">
+        <DetailRow label="显示名称">Zhang San</DetailRow>
+        <DetailRow
+          label="手机号"
+          actions={
+            <Button variant="ghost" size="md">
+              更换
+            </Button>
+          }
+        >
+          +86 138 0000 0000
+          <StatusBadge tone="success">已验证</StatusBadge>
+        </DetailRow>
+        <DetailRow
+          label="邮箱"
+          actions={
+            <>
+              <Button variant="ghost" size="md">
+                验证
+              </Button>
+              <Button variant="ghost" size="md">
+                更换
+              </Button>
+            </>
+          }
+        >
+          zhangsan@example.com
+          <StatusBadge tone="warning">未验证</StatusBadge>
+        </DetailRow>
+        <DetailRow label="注册时间">2026-08-04 01:33</DetailRow>
+      </DetailList>
     ),
   },
   {
@@ -2050,7 +2095,7 @@ export const ENTRIES: readonly Entry[] = [
         <Row label="horizontal（分裂按钮）">
           <ButtonGroup>
             <Button variant="outline">保存</Button>
-            <Button variant="outline" size="icon">
+            <Button variant="outline" size="icon-md">
               <Icon name="chevron-down" size="sm" />
             </Button>
           </ButtonGroup>
@@ -2206,7 +2251,7 @@ function CollapsibleDemo() {
       <div className="flex items-center justify-between">
         <span className="text-label-md">已挂载能力（3）</span>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="icon-sm" aria-label="展开或收起">
+          <Button variant="ghost" size="icon-md" aria-label="展开或收起">
             <Icon name={open ? "chevron-up" : "chevron-down"} />
           </Button>
         </CollapsibleTrigger>
@@ -2455,7 +2500,7 @@ function BannerDemo() {
         {...(dismissed ? {} : { onDismiss: () => setDismissed(true) })}
       />
       {dismissed ? (
-        <Button variant="ghost" size="sm" onClick={() => setDismissed(false)}>
+        <Button variant="ghost" size="md" onClick={() => setDismissed(false)}>
           恢复关闭按钮
         </Button>
       ) : null}
@@ -2747,10 +2792,10 @@ function BulkActionBarDemo() {
   return (
     <div className="flex w-full flex-col gap-sm">
       <Row label="count 归零后整条消失">
-        <Button variant="outline" size="sm" onClick={() => setCount(3)}>
+        <Button variant="outline" size="md" onClick={() => setCount(3)}>
           选中 3 项
         </Button>
-        <Button variant="outline" size="sm" onClick={() => setCount(0)}>
+        <Button variant="outline" size="md" onClick={() => setCount(0)}>
           清空选中
         </Button>
       </Row>
@@ -2985,7 +3030,7 @@ function PromptInputDemo() {
         <PromptInput value={value} onChange={setValue} busy />
       </Row>
       <Row label="—">
-        <Button size="sm" variant="outline" onClick={() => setBusy(!busy)}>
+        <Button size="md" variant="outline" onClick={() => setBusy(!busy)}>
           切换 busy（当前 {String(busy)}）
         </Button>
       </Row>

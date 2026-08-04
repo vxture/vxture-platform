@@ -18,6 +18,9 @@
  *
  * 三档之间是档位平移而非等比缩放（比值 1.0–1.5 不等），故必须逐档列表，
  * 不能靠一个乘数推导。
+ *
+ * 末尾的流体档三块各写一遍且文本相同：它的上下界引用同块内的固定档，自定义
+ * 属性在使用处求值，所以三档密度各自拿到自己的边界。
  */
 
 :root, .density-default {
@@ -54,6 +57,9 @@
   --space-control-xl: calc(var(--vx-spacing) * 10);
   --space-control-2xl: calc(var(--vx-spacing) * 12);
   --space-control-3xl: calc(var(--vx-spacing) * 14);
+
+  /* fluid */
+  --space-page-inset: clamp(var(--space-lg), 3.2vw, var(--space-3xl));  /* 内容区四周留白：窄屏贴到 lg，宽屏放开到 3xl */
 }
 
 .density-compact {
@@ -90,6 +96,9 @@
   --space-control-xl: calc(var(--vx-spacing) * 9);
   --space-control-2xl: calc(var(--vx-spacing) * 10);
   --space-control-3xl: calc(var(--vx-spacing) * 12);
+
+  /* fluid */
+  --space-page-inset: clamp(var(--space-lg), 3.2vw, var(--space-3xl));  /* 内容区四周留白：窄屏贴到 lg，宽屏放开到 3xl */
 }
 
 .density-comfortable {
@@ -126,4 +135,7 @@
   --space-control-xl: calc(var(--vx-spacing) * 11);
   --space-control-2xl: calc(var(--vx-spacing) * 14);
   --space-control-3xl: calc(var(--vx-spacing) * 16);
+
+  /* fluid */
+  --space-page-inset: clamp(var(--space-lg), 3.2vw, var(--space-3xl));  /* 内容区四周留白：窄屏贴到 lg，宽屏放开到 3xl */
 }

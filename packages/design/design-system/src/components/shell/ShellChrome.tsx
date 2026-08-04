@@ -43,6 +43,14 @@ import {
 } from "@vxture/design-ui";
 import type { FullscreenMode, IconName } from "@vxture/design-ui";
 import type { Density } from "../../density";
+import {
+  SHELL_PANEL_HAIRLINE,
+  ShellPanelContent,
+  ShellPanelControlRow,
+  ShellPanelHeader,
+  ShellPanelRow,
+  ShellPanelSectionTitle,
+} from "./ShellPanel";
 
 export type ShellFontSizePreference = "small" | "default" | "large";
 export type ShellThemePreference = Theme | "system";
@@ -77,6 +85,11 @@ export interface ShellBrandProps {
   logoSrc?: string | undefined;
   logoAlt?: string | undefined;
   label?: ReactNode | undefined;
+  /**
+   * 字标后的子名（产品代号、环境名之类）。渲染成品牌锁定式的第二段，比字标
+   * 略小一档、弱化一级色——它是标识的组成部分，不是旁边另起的一行文字。
+   */
+  tag?: ReactNode | undefined;
   className?: string | undefined;
   logoClassName?: string | undefined;
   labelClassName?: string | undefined;
@@ -195,6 +208,12 @@ export interface ShellUserMenuProps {
   user: ShellUserMenuUser;
   openLabel?: string | undefined;
   online?: boolean | undefined;
+  /**
+   * 产品自定义段落，插在头部之后、导航链接之前，自带分隔线。用于放本产品才
+   * 有的东西（成就槽位、配额摘要、任何 `ShellPanel*` 拼出来的内容）——DS 不
+   * 收这些语义，但给它们一个位置，各产品定制的部分才不会各自另起一套排版。
+   */
+  extras?: ReactNode | undefined;
   settings?: ReactNode | undefined;
   portalReturn?: ShellUserMenuPortalReturn | undefined;
   /** Navigation links rendered as their own divided section (e.g. 个人信息). */
@@ -252,9 +271,12 @@ const FONT_SIZE_OPTIONS: readonly ShellFontSizePreference[] = [
   "large",
 ];
 
-/** 用户菜单内的字段级分隔：发丝线，虚线分行（02-visual-spec.md §3）。 */
-const HAIRLINE_FIELD = "border-t border-dashed border-primary/10";
-const HAIRLINE_FIELD_DARK = "dark:border-primary/20";
+/**
+ * 用户菜单内的字段级分隔：发丝线，虚线分行（02-visual-spec.md §3）。取值与
+ * `ShellPanelSection` 同一常量——两处若各写各的，用户菜单与产品自拼的面板会
+ * 在同一个 header 上出现两种深浅的分隔线。
+ */
+const HAIRLINE_FIELD = SHELL_PANEL_HAIRLINE;
 
 export function LocaleSelectPanel({
   activeLocale,
@@ -303,6 +325,7 @@ export function ShellBrand({
   logoAlt = "",
   // 中性占位。真实品牌名由调用方传入——真名不入仓。
   label = "Brand",
+  tag,
   className,
   logoClassName,
   labelClassName,
@@ -319,15 +342,23 @@ export function ShellBrand({
           src={logoSrc}
           alt={logoAlt}
           aria-hidden={logoAlt ? undefined : true}
+          // 与 .vx-brand-mark 的 --spacing-icon-lg 同值。属性只用于预留版位
+          // 防抖动，实际尺寸由 CSS 决定；两处不同步会在图片加载前跳一下。
           width={24}
           height={24}
           className={cn("vx-brand-mark", logoClassName)}
           draggable={false}
         />
       ) : null}
-      <span className={cn("vx-brand-name", "text-title-lg", labelClassName)}>
-        {label}
-      </span>
+      {/* 不挂 `text-title-lg`：那是个**完整排版角色**（字族/字号/字重/行高/
+          字距五项一起来），只为了收字号却把 .vx-brand-name 的字重 700 压成了
+          600，且工具类层压 components 层，压得静默。字号已归到 brand.css 的
+          品牌基线里。 */}
+      <span className={cn("vx-brand-name", labelClassName)}>{label}</span>
+      {/* §7 品牌锁定式的第二段，样式见 brand.css 的 .vx-brand-local-name：
+          浅底 + 淡描边的贴片。**不再画分隔符**——贴片自己的边框已经把它和字标
+          分开了，中间再来个"·"是同一件事说两遍。 */}
+      {tag ? <span className="vx-brand-local-name">{tag}</span> : null}
     </a>
   );
 }
@@ -358,7 +389,7 @@ export const ShellIconButton = React.forwardRef<
     <Button
       ref={ref}
       variant="ghost"
-      size="icon-sm"
+      size="icon-md"
       title={label}
       aria-label={label}
       aria-pressed={active || undefined}
@@ -378,6 +409,118 @@ export const ShellIconButton = React.forwardRef<
 });
 
 ShellIconButton.displayName = "ShellIconButton";
+
+export interface ShellIconGroupProps {
+  label: string;
+  children: ReactNode;
+  className?: string | undefined;
+}
+
+/**
+ * 一组 `ShellIconButton` 的容器——admin 生产实测：组内没有真实边框，平时
+ * 透明，`:hover`/`:focus-within` 时整组点亮一层 `bg-accent` 的底色，标示
+ * "这几个按钮是一组"；单个按钮自己的 active/hover 反馈（`ShellIconButton` 的
+ * `bg-accent` 更强一档）继续独立生效，两层叠加。纯 CSS 伪类触发，不是受控
+ * active 状态，也不限定组内按钮个数。
+ *
+ * 圆角跟随子项：容器零内边距贴着子按钮的边框，若用比子按钮更大的圆角（比如
+ * `rounded-full`），外框的弧线会切过子按钮方形的角，hover 时出现错位的缺口。
+ * `ShellIconButton` 走 `radiusClamp`（`min(--radius-md, 8px)`），容器用同一
+ * 量级的 `rounded-lg`（= `--radius`，同为 8px 基准），弧度贴合。
+ */
+export function ShellIconGroup({
+  label,
+  children,
+  className,
+}: ShellIconGroupProps) {
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className={cn(
+        "inline-flex items-center gap-2xs rounded-lg transition-colors duration-fast hover:bg-accent focus-within:bg-accent",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export type ShellAgentButtonSize = "sm" | "md" | "lg" | "xl" | "2xl";
+
+const AGENT_BUTTON_PX: Record<ShellAgentButtonSize, number> = {
+  sm: 16,
+  md: 20,
+  lg: 24,
+  xl: 32,
+  "2xl": 48,
+};
+
+/** 与 `size-icon-*` 逐档同值（Icon.tsx 的 sizeClassMap 同一套表），两处改一处必须改另一处。 */
+const AGENT_BUTTON_SIZE_CLASS: Record<ShellAgentButtonSize, string> = {
+  sm: "size-icon-sm",
+  md: "size-icon-md",
+  lg: "size-icon-lg",
+  xl: "size-icon-xl",
+  "2xl": "size-icon-2xl",
+};
+
+export interface ShellAgentButtonProps {
+  iconSrc: string;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
+  /** 图标视觉尺寸，默认 "xl"（32px，跟其余 header 工具图标同档）。 */
+  size?: ShellAgentButtonSize;
+  onClick?: () => void;
+  className?: string | undefined;
+}
+
+/**
+ * header 里的 AI 助手入口——跟 `ShellIconButton` 分开建是因为素材不同：这里
+ * 装的是产品侧提供的动图头像（`iconSrc`，比如 Varda 的 gif），不是 Phosphor
+ * 线性图标。组件本身不认识"Varda"或任何具体助手，`iconSrc`/`label` 全由
+ * 调用方传入；`size` 决定用哪一档 `size-icon-*`，调用方按素材原始分辨率选
+ * 对应档位，避免缩放糊图（比如 32px 显示配 32px 素材）。
+ */
+export function ShellAgentButton({
+  iconSrc,
+  label,
+  active = false,
+  disabled = false,
+  size = "xl",
+  onClick,
+  className,
+}: ShellAgentButtonProps) {
+  const px = AGENT_BUTTON_PX[size];
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      aria-pressed={active || undefined}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "inline-grid shrink-0 place-items-center overflow-hidden rounded-full transition-colors duration-fast hover:bg-accent disabled:pointer-events-none disabled:opacity-disabled",
+        AGENT_BUTTON_SIZE_CLASS[size],
+        active && "bg-accent",
+        className,
+      )}
+    >
+      <img
+        src={iconSrc}
+        alt=""
+        aria-hidden="true"
+        width={px}
+        height={px}
+        className="size-full object-contain"
+        draggable={false}
+      />
+    </button>
+  );
+}
 
 export function ShellLocaleSwitcher({
   currentLocale,
@@ -511,11 +654,14 @@ export function ShellPreferencePanel({
   onFontSizeChange,
 }: ShellPreferencePanelProps) {
   return (
+    // 行距比面板其余段落宽一档（gap-xs → gap-sm）：这几行每行都是一个带描边
+    // 的控件，边框本身就是视觉重量；沿用无边框行的紧凑行距会让这一段挤成一
+    // 坨方块。段落标题走 ShellPanelSection 的同款样式，左缘对齐各行图标。
     <div className={cn("flex w-full flex-col gap-sm", className)}>
       {labels?.title ? (
-        <p className="text-label-sm text-muted-foreground">{labels.title}</p>
+        <ShellPanelSectionTitle>{labels.title}</ShellPanelSectionTitle>
       ) : null}
-      <ShellPreferenceRow icon="globe" label={labels?.locale}>
+      <ShellPanelControlRow icon="globe" label={labels?.locale}>
         <NativeSelect
           className="h-control-md text-body-md md:text-body-sm"
           value={locale}
@@ -527,26 +673,34 @@ export function ShellPreferencePanel({
             </option>
           ))}
         </NativeSelect>
-      </ShellPreferenceRow>
+      </ShellPanelControlRow>
 
-      <ShellPreferenceRow icon="sun" label={labels?.theme}>
+      <ShellPanelControlRow icon="sun" label={labels?.theme}>
         <SegmentedControl
-          size="sm"
+          // md 而非 sm：档位在这里决定的是**高度**（sm=h-control-sm 28px，
+          // md=h-control-md 32px），而同一栏里的 NativeSelect 与上下相邻的
+          // 链接/动作按钮都是 32px。取 sm 会让偏好区三行整体矮 4px，看着像
+          // 陷下去一块。
+          size="md"
+          fill
           value={theme}
           onChange={onThemeChange}
           items={THEME_OPTIONS.map((option) => ({
             value: option,
             label:
               labels?.themeOptions?.[option] ??
-              { system: "跟随系统", light: "浅色", dark: "深色" }[option],
+              // "系统"而非"跟随系统"：三档并排等宽，最长的一档决定分段宽度，
+              // 多两个字会把另外两档也一起撑开。语义没有损失。
+              { system: "系统", light: "浅色", dark: "深色" }[option],
           }))}
         />
-      </ShellPreferenceRow>
+      </ShellPanelControlRow>
 
       {showDensity ? (
-        <ShellPreferenceRow icon="rows" label={labels?.density}>
+        <ShellPanelControlRow icon="rows" label={labels?.density}>
           <SegmentedControl
-            size="sm"
+            size="md"
+            fill
             value={density}
             onChange={(value) => onDensityChange?.(value)}
             items={DENSITY_OPTIONS.map((option) => ({
@@ -558,13 +712,14 @@ export function ShellPreferencePanel({
                 ],
             }))}
           />
-        </ShellPreferenceRow>
+        </ShellPanelControlRow>
       ) : null}
 
       {showFontSize ? (
-        <ShellPreferenceRow icon="settings" label={labels?.fontSize}>
+        <ShellPanelControlRow icon="text-t" label={labels?.fontSize}>
           <SegmentedControl
-            size="sm"
+            size="md"
+            fill
             value={fontSize}
             onChange={(value) => onFontSizeChange?.(value)}
             items={FONT_SIZE_OPTIONS.map((option) => ({
@@ -574,7 +729,7 @@ export function ShellPreferencePanel({
                 { small: "小", default: "默认", large: "大" }[option],
             }))}
           />
-        </ShellPreferenceRow>
+        </ShellPanelControlRow>
       ) : null}
     </div>
   );
@@ -584,6 +739,7 @@ export function ShellUserMenu({
   user,
   openLabel = "用户菜单",
   online = true,
+  extras,
   settings,
   portalReturn,
   links = [],
@@ -601,7 +757,7 @@ export function ShellUserMenu({
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-md"
           aria-label={openLabel}
           title={openLabel}
           className={cn("relative rounded-full", triggerClassName)}
@@ -620,37 +776,40 @@ export function ShellUserMenu({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent
+      {/* 外壳走 ShellPanelContent：宽度 / 四周留白 / 段间距 / 打开不抢焦点
+          全部由它拥有，账户菜单与产品自拼的面板因此是同一个壳。 */}
+      <ShellPanelContent
         align={align}
         sideOffset={sideOffset}
-        className={cn("flex w-media-3xl flex-col gap-sm", contentClassName)}
+        {...(contentClassName ? { className: contentClassName } : {})}
       >
-        <div className="flex items-start gap-sm">
-          <ShellUserAvatar user={user} size="lg" />
-          <div className="flex min-w-0 flex-1 flex-col gap-2xs">
-            <div className="flex items-center justify-between gap-sm">
-              <p className="truncate text-label-lg text-foreground">
-                {user.displayName}
-              </p>
-              {user.statusTag ? (
-                <StatusBadge
-                  tone={user.statusTag.verified ? "success" : "neutral"}
-                >
-                  {user.statusTag.verified ? <Icon name="check" /> : null}
-                  {user.statusTag.label}
-                </StatusBadge>
-              ) : null}
-            </div>
-            {user.uniqueLine ? (
-              <p className="truncate text-body-sm text-muted-foreground">
-                {user.uniqueLine}
-              </p>
-            ) : null}
-            {user.meta ? (
-              <p className="text-body-sm text-muted-foreground">{user.meta}</p>
-            ) : null}
-          </div>
-        </div>
+        {/* 头部同样走 ShellPanelHeader：账户菜单的头部与产品自拼面板的头部
+            本来就是同一个东西（标识 + 标题 + 贴标 + 若干 meta 行），各写一份
+            必然漂移。 */}
+        <ShellPanelHeader
+          {...(user.avatarSrc ? { avatarSrc: user.avatarSrc } : {})}
+          avatarAlt={user.avatarAlt ?? user.displayName}
+          avatarFallback={<AvatarSilhouette className="size-media-xs" />}
+          title={user.displayName}
+          {...(user.statusTag
+            ? {
+                titleAside: (
+                  <StatusBadge
+                    tone={user.statusTag.verified ? "success" : "neutral"}
+                  >
+                    {user.statusTag.verified ? <Icon name="check" /> : null}
+                    {user.statusTag.label}
+                  </StatusBadge>
+                ),
+              }
+            : {})}
+          metaRows={[
+            ...(user.uniqueLine
+              ? [{ key: "unique", content: user.uniqueLine }]
+              : []),
+            ...(user.meta ? [{ key: "meta", content: user.meta }] : []),
+          ]}
+        />
 
         {user.badges && user.badges.length > 0 ? (
           <div className="flex flex-wrap items-center gap-2xs">
@@ -662,12 +821,14 @@ export function ShellUserMenu({
           </div>
         ) : null}
 
+        {extras ? <ShellUserMenuSection>{extras}</ShellUserMenuSection> : null}
+
         {portalReturn ? (
           <ShellUserMenuSection>
             <div className="flex items-center gap-2xs">
               <Button
                 variant="ghost"
-                size="sm"
+                size="md"
                 className="flex-1 justify-start gap-sm"
                 onClick={() => {
                   setOpen(false);
@@ -693,24 +854,21 @@ export function ShellUserMenu({
 
         {links.length > 0 ? (
           <ShellUserMenuSection>
+            {/* 走 ShellPanelRow 而不是自己拼 Button：行的列、高、图标色由组件
+                拥有，用了组件就自动一致，不必在这里跟着复刻一遍。 */}
             {links.map((link) => (
-              <Button
+              <ShellPanelRow
                 key={link.key}
-                asChild
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start gap-sm"
-              >
-                <a
-                  href={link.href}
-                  target={link.newTab ? "_blank" : undefined}
-                  rel={link.newTab ? "noreferrer noopener" : undefined}
-                  onClick={() => setOpen(false)}
-                >
-                  {link.icon ? <Icon name={link.icon} size="sm" /> : null}
-                  {link.label}
-                </a>
-              </Button>
+                icon={link.icon}
+                label={link.label}
+                href={link.href}
+                newTab={link.newTab ?? false}
+                // 这一行会离开当前面板去到另一个页面，右端给去向图标而不是
+                // 单纯的 chevron——chevron 在本面板里已经被"展开子面板"占用
+                // （见 TenantPanel 的切换范围），两种去向要能一眼分开。
+                trailingIcon="external-link"
+                onClick={() => setOpen(false)}
+              />
             ))}
           </ShellUserMenuSection>
         ) : null}
@@ -722,24 +880,22 @@ export function ShellUserMenu({
         {actions.length > 0 ? (
           <ShellUserMenuSection>
             {actions.map((action) => (
-              <Button
+              <ShellPanelRow
                 key={action.key}
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start gap-sm"
-                disabled={action.disabled}
-                onClick={async () => {
+                icon={action.icon}
+                label={action.label}
+                disabled={action.disabled ?? false}
+                // 动作就地生效，不去别处，所以右端不画去向图标。
+                chevron={false}
+                onClick={() => {
                   setOpen(false);
-                  await action.onClick();
+                  void action.onClick();
                 }}
-              >
-                {action.icon ? <Icon name={action.icon} size="sm" /> : null}
-                {action.label}
-              </Button>
+              />
             ))}
           </ShellUserMenuSection>
         ) : null}
-      </PopoverContent>
+      </ShellPanelContent>
     </Popover>
   );
 }
@@ -790,35 +946,25 @@ export function ShellLegalFooter({
 /** 用户菜单的分段：上缘一条虚线发丝线，段内纵排。 */
 function ShellUserMenuSection({ children }: { children: ReactNode }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2xs pt-sm",
-        HAIRLINE_FIELD,
-        HAIRLINE_FIELD_DARK,
-      )}
-    >
+    // 与 ShellPanelSection 同一组间距（gap-xs / pt-md）——用户菜单的分段和
+    // 产品自拼面板的分段是同一个东西，两处间距不同会在同一条 header 上被
+    // 直接对比出来。
+    <div className={cn("flex flex-col gap-xs pt-md", HAIRLINE_FIELD)}>
       {children}
     </div>
   );
 }
 
-function ShellUserAvatar({
-  user,
-  size = "md",
-}: {
-  user: ShellUserMenuUser;
-  size?: "md" | "lg";
-}) {
+function ShellUserAvatar({ user }: { user: ShellUserMenuUser }) {
   return (
+    // 只服务 header 上的触发器（32px）。面板里的大头像已经归 ShellPanelHeader，
+    // 这里不再保留第二个尺寸档——两处各有一套尺寸正是"同一个头像两种大小"的
+    // 由来。
     // key on src forces a remount when the avatar changes/clears so Radix does
     // not keep a stale "loaded" status that would hide the silhouette fallback.
     <Avatar
       key={user.avatarSrc ?? "__default__"}
-      className={cn(
-        "text-muted-foreground",
-        size === "md" && "size-icon-xl",
-        size === "lg" && "size-media-sm",
-      )}
+      className="size-icon-xl text-muted-foreground"
     >
       {user.avatarSrc ? (
         <AvatarImage
@@ -832,33 +978,8 @@ function ShellUserAvatar({
       >
         {/* 显式档位：触发器套在 Button 里，inlineIcon 配方会把不带 size-*
             的 svg 压到 16px，剪影必须自带尺寸类才不被截胖改瘦。 */}
-        <AvatarSilhouette
-          className={size === "lg" ? "size-icon-xl" : "size-icon-md"}
-        />
+        <AvatarSilhouette className="size-icon-md" />
       </AvatarFallback>
     </Avatar>
-  );
-}
-
-function ShellPreferenceRow({
-  icon,
-  label,
-  children,
-}: {
-  icon: IconName;
-  label?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex items-center gap-sm">
-      <span
-        className="flex size-icon-lg shrink-0 items-center justify-center text-muted-foreground"
-        title={typeof label === "string" ? label : undefined}
-        aria-hidden={label ? undefined : true}
-      >
-        <Icon name={icon} size="sm" />
-      </span>
-      <div className="min-w-0 flex-1">{children}</div>
-    </div>
   );
 }

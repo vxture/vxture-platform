@@ -6,5 +6,6 @@
  * 不是每件都要立目录。
  */
 
+export * from "./ActionButton";
 export * from "./Button";
 export * from "./Button.types";

@@ -48,6 +48,7 @@ import {
   PANEL_WIDTHS,
   SPACING_SCALE,
   SPACING_KINDS,
+  FLUID_SPACING,
   assertElevationOrdered,
 } from "./semantic-policy.mjs";
 import {
@@ -227,7 +228,37 @@ function buildSpacing(columnOf) {
     const value =
       n === 0 ? "0px" : `calc(${t1("--vx-spacing", `spacing/${step}`)} * ${n})`;
     return [`--space-${step}`, value, kind];
-  });
+  }).concat(buildFluidSpacing());
+}
+
+/**
+ * 流体档：取值不随密度块变化（上下界引用的 `--space-*` 已经按密度分块声明，
+ * 自定义属性在使用处求值，自然跟着走），但**仍要逐块声明一遍**——三个密度块
+ * 的键集必须完全一致，这是 check-design-tokens 的模式轴不变量，也是"切换密度
+ * 不会让某个变量突然没人定义"的保证。三块里的文本完全相同，不是重复定义了
+ * 三个不同的值。
+ */
+function buildFluidSpacing() {
+  return FLUID_SPACING.map(([step, minStep, vw, maxStep, why]) => [
+    `--space-${step}`,
+    `clamp(var(--space-${minStep}), ${vw}, var(--space-${maxStep}))`,
+    "fluid",
+    why,
+  ]);
+}
+
+/** 下界必须真的低于上界，否则 clamp 退化成一个常数且不报错。 */
+function assertFluidOrdered() {
+  const order = SPACING_SCALE.map(([step]) => step);
+  for (const [step, minStep, , maxStep] of FLUID_SPACING) {
+    const lo = order.indexOf(minStep);
+    const hi = order.indexOf(maxStep);
+    if (lo < 0 || hi < 0) {
+      errors.push(`流体间距 ${step}：边界档 ${minStep}/${maxStep} 不在 SPACING_SCALE 内`);
+    } else if (lo >= hi) {
+      errors.push(`流体间距 ${step}：下界 ${minStep} 不低于上界 ${maxStep}，clamp 会退化成常数`);
+    }
+  }
 }
 
 /** 同一行三档非递减、同一档沿族内递增——挡的是改表时把某一档写反。 */
@@ -428,6 +459,7 @@ function staticFile(file, label, source, rows, extra = "") {
 const t1Literals = loadT1();
 
 assertSpacingMonotonic();
+assertFluidOrdered();
 const typoBlocks = FONT_SIZE_MODES.map(([i, sel]) => [sel, buildRoles(i)]);
 const spaceBlocks = DENSITY_MODES.map(([cols, sel]) => [
   sel,
@@ -468,7 +500,10 @@ const outputs = [
  * 类重定向变量、任意深度生效，后者由类名逐处指定。组件不需要知道密度存在。
  *
  * 三档之间是档位平移而非等比缩放（比值 1.0–1.5 不等），故必须逐档列表，
- * 不能靠一个乘数推导。`,
+ * 不能靠一个乘数推导。
+ *
+ * 末尾的流体档三块各写一遍且文本相同：它的上下界引用同块内的固定档，自定义
+ * 属性在使用处求值，所以三档密度各自拿到自己的边界。`,
     ) +
       "\n" +
       spaceBlocks.map(([sel, rows]) => `${sel} {\n${render(rows)}\n}`).join("\n\n") +
