@@ -29,6 +29,7 @@ import {
   ShellPageContainer,
   ShellSidebarFrame,
   ShellSidebarNav,
+  writeNavCollapsed,
   Skeleton,
   type ShellNavSection,
 } from "@vxture/design-system";
@@ -49,14 +50,21 @@ import { AppCenter, type ConsoleApp } from "./AppCenter";
 const CONTENT_SCROLL = "min-w-0 flex-1 scroll-smooth overflow-y-auto";
 const CONTENT_SCROLL_ATTR = "data-content-scroll";
 
+/* nav 收起态已迁到 cookie（见 (console)/layout.tsx 与 navPreference.ts），不再
+ * 列在这里——留一个用不到的 key 会让下一个人以为它还是权威来源。 */
 const LS = {
   view: "vx-console-view",
-  nav: "vx-console-sidebar-collapsed",
   vela: "vx-console-vela-open",
   velaMode: "vx-console-vela-mode",
 };
 
-export function ConsoleAppShell({ children }: { children: ReactNode }) {
+export function ConsoleAppShell({
+  children,
+  initialNavCollapsed = false,
+}: {
+  children: ReactNode;
+  initialNavCollapsed?: boolean;
+}) {
   const { session, status } = useConsoleSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -65,7 +73,10 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
   const tDrawer = useTranslations("drawer");
 
   const [view, setViewState] = useState<ShellView>("console");
-  const [navCollapsed, setNavCollapsed] = useState(false);
+  /* 初始值由服务端从 cookie 读出后传入，首帧即最终态。写死 false 再在 effect 里
+   * 纠正，会让刷新时导航"先展开再收起"闪一下——localStorage 对服务端不可见，
+   * 那个时序问题无法在客户端解决。 */
+  const [navCollapsed, setNavCollapsed] = useState(initialNavCollapsed);
   const [velaOpen, setVelaOpen] = useState(false);
   const [assistantMode, setAssistantMode] = useState<AssistantMode>("narrow");
   const [drawer, setDrawer] = useState<ShellDrawerType | null>(null);
@@ -162,7 +173,7 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
     try {
       const v = window.localStorage.getItem(LS.view);
       if (v === "appcenter" || v === "console") setViewState(v);
-      setNavCollapsed(window.localStorage.getItem(LS.nav) === "true");
+      // nav 收起态不在这里读：已由服务端经 cookie 传入（见上）。
       setVelaOpen(window.localStorage.getItem(LS.vela) === "1");
       const m = window.localStorage.getItem(LS.velaMode);
       if (m === "narrow" || m === "wide" || m === "full") setAssistantMode(m);
@@ -183,7 +194,7 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
     setNavCollapsed((c) => {
       const n = !c;
       try {
-        window.localStorage.setItem(LS.nav, String(n));
+        writeNavCollapsed("console", n);
       } catch {
         /* ignore */
       }
@@ -214,7 +225,7 @@ export function ConsoleAppShell({ children }: { children: ReactNode }) {
     if (goingWide) {
       setNavCollapsed(true);
       try {
-        window.localStorage.setItem(LS.nav, "true");
+        writeNavCollapsed("console", true);
       } catch {
         /* ignore */
       }

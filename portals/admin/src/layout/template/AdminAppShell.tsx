@@ -19,6 +19,7 @@ import {
   ShellPageContainer,
   ShellSidebarFrame,
   ShellSidebarNav,
+  writeNavCollapsed,
   type ShellNavSection,
 } from "@vxture/design-system";
 import { useAdminSession } from "@/features/session/AdminSessionProvider";
@@ -41,13 +42,20 @@ import { TemplateDrawer, type DrawerNotif } from "./TemplateDrawer";
 const CONTENT_SCROLL = "min-w-0 flex-1 scroll-smooth overflow-y-auto";
 const CONTENT_SCROLL_ATTR = "data-content-scroll";
 
+/* nav 收起态已迁到 cookie（见 layout.tsx / navPreference.ts），不再列在这里——
+ * 留一个用不到的 key 会让下一个人以为它还是权威来源。 */
 const LS = {
-  nav: "vx-admin-tpl-nav-collapsed",
   vela: "vx-admin-tpl-vela-open",
   velaMode: "vx-admin-tpl-vela-mode",
 };
 
-function ShellFrame({ children }: { children: ReactNode }) {
+function ShellFrame({
+  children,
+  initialNavCollapsed,
+}: {
+  children: ReactNode;
+  initialNavCollapsed: boolean;
+}) {
   const { session, status, signOut } = useAdminSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -55,7 +63,10 @@ function ShellFrame({ children }: { children: ReactNode }) {
   const tShell = useConsoleTranslations("shell");
   const tDrawer = useConsoleTranslations("drawer");
 
-  const [navCollapsed, setNavCollapsed] = useState(false);
+  /* 初始值由服务端从 cookie 读出后传入，首帧即最终态。写死 false 再在 effect
+   * 里纠正，会让刷新时导航"先展开再收起"闪一下——localStorage 对服务端不可见，
+   * 那个时序问题无法在客户端解决。 */
+  const [navCollapsed, setNavCollapsed] = useState(initialNavCollapsed);
   const [velaOpen, setVelaOpen] = useState(false);
   const [assistantMode, setAssistantMode] = useState<AssistantMode>("narrow");
   const [drawer, setDrawer] = useState<ShellDrawerType | null>(null);
@@ -63,7 +74,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
   // hydrate persisted UI state (client-only, avoids SSR mismatch)
   useEffect(() => {
     try {
-      setNavCollapsed(window.localStorage.getItem(LS.nav) === "true");
+      // nav 收起态不在这里读：它已经由服务端经 cookie 传进来了（见上）。
       setVelaOpen(window.localStorage.getItem(LS.vela) === "1");
       const m = window.localStorage.getItem(LS.velaMode);
       if (m === "narrow" || m === "wide" || m === "full") setAssistantMode(m);
@@ -83,11 +94,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
   const toggleNav = () =>
     setNavCollapsed((c) => {
       const n = !c;
-      try {
-        window.localStorage.setItem(LS.nav, String(n));
-      } catch {
-        /* ignore */
-      }
+      writeNavCollapsed("admin", n);
       return n;
     });
   const persistVela = (open: boolean, mode: AssistantMode) => {
@@ -114,11 +121,7 @@ function ShellFrame({ children }: { children: ReactNode }) {
     persistVela(velaOpen, next);
     if (goingWide) {
       setNavCollapsed(true);
-      try {
-        window.localStorage.setItem(LS.nav, "true");
-      } catch {
-        /* ignore */
-      }
+      writeNavCollapsed("admin", true);
     }
   };
   const toggleAssistantFull = () => {
@@ -371,6 +374,16 @@ function ShellFrame({ children }: { children: ReactNode }) {
   );
 }
 
-export function AdminAppShell({ children }: { children: ReactNode }) {
-  return <ShellFrame>{children}</ShellFrame>;
+export function AdminAppShell({
+  children,
+  initialNavCollapsed = false,
+}: {
+  children: ReactNode;
+  initialNavCollapsed?: boolean;
+}) {
+  return (
+    <ShellFrame initialNavCollapsed={initialNavCollapsed}>
+      {children}
+    </ShellFrame>
+  );
 }

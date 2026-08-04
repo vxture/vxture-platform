@@ -90,6 +90,7 @@
       "BUTTON_VARIANTS",
       "Badge",
       "Banner",
+      "BootSplash",
       "BrandProviderIcon",
       "Breadcrumb",
       "BreadcrumbEllipsis",
@@ -324,6 +325,9 @@
       "densityClass",
       "fontSizeClass",
       "iconDictionary",
+      "markAppReady",
+      "navCollapsedCookieName",
+      "readNavCollapsed",
       "themeBootstrapScript",
       "toggleVariants",
       "toneEdgeClasses",
@@ -338,7 +342,8 @@
       "useMediaQuery",
       "useMounted",
       "useTheme",
-      "useToast"
+      "useToast",
+      "writeNavCollapsed"
     ],
     "./server": [
       "BADGE_VARIANTS",

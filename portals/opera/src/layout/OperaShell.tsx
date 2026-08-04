@@ -38,6 +38,7 @@ import {
   ShellPreferencePanel,
   ShellSearchBox,
   ShellSidebarNav,
+  writeNavCollapsed,
   ShellUserMenu,
   ShellViewport,
   ToastProvider,
@@ -49,7 +50,6 @@ import {
 import { operaNavSections } from "@/config/navigation";
 import { useOperatorSession } from "@/features/session/SessionProvider";
 
-const LS_NAV = "vx-opera-nav-collapsed";
 const LS_ASSISTANT_OPEN = "vx-opera-assistant-open";
 const LS_ASSISTANT_MODE = "vx-opera-assistant-mode";
 
@@ -116,20 +116,29 @@ function AssistantPlaceholder({
   );
 }
 
-export function OperaShell({ children }: { children: ReactNode }) {
+export function OperaShell({
+  children,
+  initialNavCollapsed = false,
+}: {
+  children: ReactNode;
+  initialNavCollapsed?: boolean;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { operator, status, signOut } = useOperatorSession();
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, setTheme, density, setDensity, fontSize, setFontSize } =
     useTheme();
-  const [collapsed, setCollapsed] = useState(false);
+  /* 初始值由服务端从 cookie 读出后传入，首帧即最终态。写死 false 再在 effect 里
+   * 纠正，会让刷新时导航"先展开再收起"闪一下——localStorage 对服务端不可见，
+   * 那个时序问题无法在客户端解决。 */
+  const [collapsed, setCollapsed] = useState(initialNavCollapsed);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantMode, setAssistantMode] = useState<AssistantMode>("narrow");
 
   useEffect(() => {
     try {
-      setCollapsed(window.localStorage.getItem(LS_NAV) === "true");
+      // 收起态不在这里读：已由服务端经 cookie 传入（见上）。
       setAssistantOpen(window.localStorage.getItem(LS_ASSISTANT_OPEN) === "1");
       const m = window.localStorage.getItem(LS_ASSISTANT_MODE);
       if (m === "narrow" || m === "wide" || m === "full") setAssistantMode(m);
@@ -141,11 +150,7 @@ export function OperaShell({ children }: { children: ReactNode }) {
   const toggleNav = () =>
     setCollapsed((c) => {
       const next = !c;
-      try {
-        window.localStorage.setItem(LS_NAV, String(next));
-      } catch {
-        /* ignore */
-      }
+      writeNavCollapsed("opera", next);
       return next;
     });
 
