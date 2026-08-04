@@ -82,6 +82,7 @@
     "db:migrate": "pnpm --filter @vxture/bff-website db:migrate",
     "db:reset": "pnpm --filter @vxture/bff-website db:reset",
     "db:seed": "pnpm --filter @vxture/bff-website db:seed",
+    "db:seed:demo": "node deploy/database/seed/seed-demo.mjs",
     "// === 部署相关 ===": "",
     "prepare": "husky || true",
     "precommit": "pnpm lint:fix && pnpm type-check",
