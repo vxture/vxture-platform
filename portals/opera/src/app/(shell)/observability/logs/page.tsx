@@ -24,10 +24,10 @@ import {
   StatusBadge,
   ViewHeader,
   type DataTableSort,
+  useListPagination,
 } from "@vxture/design-system";
 import { logs } from "@/mocks/atlas";
 import { LOG_LEVEL_META, type LogLevel } from "@/lib/status";
-import { useListPagination } from "@/lib/pagination";
 
 const SOURCES = ["gateway", "router", "metering", "health", "registry"];
 

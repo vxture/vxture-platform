@@ -1,5 +1,18 @@
 @import "@vxture/design-system/styles/globals.css";
 @import "@vxture/design-system/styles/brands/vxture.css";
-/* DS-only wiring, same as design-preview: the portal ships zero local CSS.
- * shell-template.css is retired here — the Opera shell is rebuilt on DS
- * components + T2 utilities (transparent mode), no legacy chrome classes. */
+/* Mostly DS-only wiring, same as design-preview — shell-template.css is
+ * retired here, the Opera shell is rebuilt on DS components + T2 utilities
+ * (transparent mode), no legacy chrome classes.
+ *
+ * One local override below: opera's own --background, scoped to this file
+ * only. DS keeps --background neutral (design-tokens' color-policy.mjs,
+ * "表面阶梯用中性档，不带品牌调") — this is a product-level customization on
+ * top of that neutral base, not a DS change, and does not affect any other
+ * portal (console/admin/website each ship their own globals.css). */
+:root {
+  /* Opera 专属浅蓝底。取值不再是就地写死的 oklch——已 token 化为 T1 的
+   * brand-20（品牌族最浅档，见 scripts/design-tokens/primitive-policy.mjs 的
+   * EXTRA_BRAND_ROWS）。只覆盖浅色档；暗色档没有生产参照，保留 DS 默认的
+   * neutral-950。 */
+  --background: var(--vx-color-brand-20);
+}

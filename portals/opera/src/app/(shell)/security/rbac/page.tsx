@@ -299,7 +299,7 @@ export default function RbacPage() {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="md"
                   onClick={() => removeMember(m)}
                 >
                   移出

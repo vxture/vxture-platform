@@ -36,10 +36,10 @@ import {
   TableTitleCell,
   ViewHeader,
   useToast,
+  useListPagination,
 } from "@vxture/design-system";
 import { models as seed, providers, type ModelRow } from "@/mocks/atlas";
 import { RESOURCE_STATUS_META } from "@/lib/status";
-import { useListPagination } from "@/lib/pagination";
 
 /** 能力标签的全集，opera-atlas-design.md §5「模型能力」。 */
 const CAPABILITIES = [

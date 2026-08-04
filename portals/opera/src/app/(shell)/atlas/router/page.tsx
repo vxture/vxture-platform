@@ -28,9 +28,9 @@ import {
   TableTitleCell,
   ViewHeader,
   useToast,
+  useListPagination,
 } from "@vxture/design-system";
 import { endpoints, type EndpointRow } from "@/mocks/atlas";
-import { useListPagination } from "@/lib/pagination";
 
 export default function RouterPage() {
   const router = useRouter();

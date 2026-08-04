@@ -34,9 +34,9 @@ import {
   TableTitleCell,
   ViewHeader,
   useToast,
+  useListPagination,
 } from "@vxture/design-system";
 import { endpoints as seed, models, type EndpointRow } from "@/mocks/atlas";
-import { useListPagination } from "@/lib/pagination";
 
 /** fallback 的"不设"档。空串在 Combobox 里选不中，需要一个显式值。 */
 const NO_FALLBACK = "__none__";

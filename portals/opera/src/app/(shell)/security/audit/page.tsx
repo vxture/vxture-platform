@@ -20,9 +20,9 @@ import {
   Pagination,
   ViewHeader,
   type DataTableSort,
+  useListPagination,
 } from "@vxture/design-system";
 import { auditTrail } from "@/mocks/atlas";
-import { useListPagination } from "@/lib/pagination";
 
 /** 动作档取自现有留痕，避免筛选项与数据脱节。 */
 const ACTIONS = Array.from(new Set(auditTrail.map((r) => r.action)));

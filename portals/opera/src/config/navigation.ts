@@ -1,22 +1,21 @@
 /**
- * navigation.ts — Opera 导航注册表。
+ * navigation.ts — Opera 导航注册表（业务配置，由产品侧组装）。
  *
  * 结构对应 docs/opera-top-level-design.md §9 菜单结构 + §10 Opera 1.0 范围：
  * Dashboard / Atlas / Observability / Security / Settings。
  * 图标一律取 DS iconDictionary 语义键（类型收窄为 IconName，写错编译期报）。
+ *
+ * 类型契约来自 DS 的 ShellSidebarNav（与业务无关的通用侧栏导航壳）而非反过来
+ * ——本文件只负责菜单内容，侧栏组件本身不 import 这里的任何数据。
  */
 
-import type { IconName } from "@vxture/design-system";
+import type { ShellNavItem, ShellNavSection } from "@vxture/design-system";
 
-export interface OperaNavItem {
-  href: string;
-  label: string;
-  icon: IconName;
+export interface OperaNavItem extends ShellNavItem {
   description?: string;
 }
 
-export interface OperaNavSection {
-  title: string;
+export interface OperaNavSection extends Omit<ShellNavSection, "items"> {
   items: OperaNavItem[];
 }
 

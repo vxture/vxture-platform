@@ -38,10 +38,10 @@ import {
   TableTitleCell,
   ViewHeader,
   useToast,
+  useListPagination,
 } from "@vxture/design-system";
 import { providers as seed, type ProviderRow } from "@/mocks/atlas";
 import { RESOURCE_STATUS_META, type ResourceStatus } from "@/lib/status";
-import { useListPagination } from "@/lib/pagination";
 
 /** 对话框的三种用途；null = 关闭。 */
 type DialogState =

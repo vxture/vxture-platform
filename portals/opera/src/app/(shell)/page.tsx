@@ -112,7 +112,7 @@ export default function DashboardPage() {
         level={2}
         description="各供应商的健康画像摘要；接入与启停到 Provider 页操作。"
         action={
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="md">
             <Link href="/atlas/providers">
               查看全部
               <Icon name="chevron-right" size="sm" aria-hidden="true" />
@@ -171,7 +171,7 @@ export default function DashboardPage() {
             <Button
               asChild
               variant="ghost"
-              size="sm"
+              size="md"
               aria-label="前往 Provider"
             >
               <Link href="/atlas/providers">
@@ -188,7 +188,7 @@ export default function DashboardPage() {
         level={2}
         description="近一小时的关键运行事件；完整检索与筛选进 Logs。"
         action={
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="md">
             <Link href="/observability/logs">
               查看全部
               <Icon name="chevron-right" size="sm" aria-hidden="true" />

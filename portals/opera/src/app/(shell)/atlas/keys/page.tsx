@@ -37,10 +37,10 @@ import {
   TableTitleCell,
   ViewHeader,
   useToast,
+  useListPagination,
 } from "@vxture/design-system";
 import { apiKeys as seed, type ApiKeyRow } from "@/mocks/atlas";
 import { KEY_STATUS_META } from "@/lib/status";
-import { useListPagination } from "@/lib/pagination";
 
 type KeyKind = ApiKeyRow["kind"];
 
