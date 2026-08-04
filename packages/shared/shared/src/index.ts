@@ -54,6 +54,15 @@ export type {
   MetricKind,
 } from "./constants";
 
+// 业务状态 → 展示语气的映射（跨门户共用；不进 DS，DS 零业务语义）
+export type { StatusTone } from "./constants";
+export {
+  SUBSCRIPTION_STATUS_TONE,
+  TIER_TONE,
+  PLAN_VERSION_STATUS_TONE,
+  resolveStatusTone,
+} from "./constants";
+
 // Value Exports
 export {
   // Auth constants

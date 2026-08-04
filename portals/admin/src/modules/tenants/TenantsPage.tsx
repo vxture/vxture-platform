@@ -15,6 +15,9 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricListCard,
+  StatusBadge,
+  ListCardGrid,
   useToast,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -30,7 +33,11 @@ import {
   PageSizePicker as AdminPageSizePicker,
   type PageSize,
 } from "@/modules/shared/PageSizePicker";
+import { resolveStatusTone } from "@vxture/shared";
 import {
+  TENANT_RISK_TONE,
+  TENANT_STATUS_TONE,
+  VERIFICATION_TONE,
   formatDate,
   formatNumber,
   joinClasses,
@@ -358,82 +365,82 @@ function TenantCards({
   const router = useRouter();
 
   return (
-    <div className="vx-tenant-directory-cards" aria-label="租户卡片">
-      {tenants.map((tenant) => (
-        <article
-          key={tenant.id}
-          className={joinClasses(
-            "vx-tenant-directory-card",
-            `vx-tenant-directory-card--${tenant.riskLevel}`,
-          )}
-          role="button"
-          tabIndex={0}
-          onClick={() =>
-            router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
-          }
-          onKeyDown={(event) => {
-            if (event.key === "Enter")
-              router.push(`/tenants/${encodeURIComponent(tenant.id)}`);
-          }}
-        >
-          <header>
-            <Icon
-              name={tenant.tenantType === "company" ? "buildings" : "user"}
-              size="lg"
-              fallback="placeholder"
-            />
-            <div>
-              <strong>{tenant.displayName}</strong>
-              <span>
-                {tenant.tenantCode} · {typeLabel(tenant.tenantType)}
-              </span>
-            </div>
-            <TenantActionsMenu
-              tenant={tenant}
-              busy={actionBusy}
-              onToggleStatus={onToggleStatus}
-            />
-          </header>
-          <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
-            >
-              {statusLabel(tenant.status)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
-            >
-              {verifiedLabel(tenant.verifiedStatus)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--risk-${tenant.riskLevel}`}
-            >
-              {riskLabel(tenant.riskLevel)}
-            </Badge>
-          </div>
-          <div className="vx-tenant-directory-card__metrics">
-            <span>
-              <b>{formatNumber(tenant.subscriptionCount)}</b>
-              <small>订阅</small>
-            </span>
-            <span>
-              <b>{formatNumber(tenant.memberCount)}</b>
-              <small>用户</small>
-            </span>
-            <span>
-              <b>{formatNumber(tenant.tokenUsed)}</b>
-              <small>Token</small>
-            </span>
-          </div>
-          <footer>
-            <span>{tenant.industry}</span>
-            <strong>
-              {tenant.ticketOpenCount} 工单 · {formatDate(tenant.lastActiveAt)}
-            </strong>
-          </footer>
-        </article>
-      ))}
-    </div>
+    /* 卡片视图改用 DS 的 MetricListCard + ListCardGrid。原实现是一套手搓的
+     * `vx-tenant-directory-card` 栅格（跨 4 个业务域抄了 17 份），卡内的三列读数、
+     * 顶缘色条、截断规则各页各写一遍。样式文件保留不动——里面的结构已被提炼进
+     * DS，类名只是不再被引用。 */
+    <ListCardGrid aria-label="租户卡片">
+      {tenants.map((tenant) => {
+        const riskLevel = normalizeTenantRiskLevel(tenant.riskLevel);
+        return (
+          <MetricListCard
+            key={tenant.id}
+            icon={tenant.tenantType === "company" ? "buildings" : "user"}
+            title={tenant.displayName}
+            description={`${tenant.tenantCode} · ${typeLabel(tenant.tenantType)}`}
+            /* 卡的语气取风险档：一屏卡片里最该先被看见的就是高风险那几张。
+             * 风险档目前没有共享值域，映射留在 admin 侧（见 status-tone 的边界）。 */
+            tone={TENANT_RISK_TONE[riskLevel]}
+            onClick={() =>
+              router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
+            }
+            actions={
+              <TenantActionsMenu
+                tenant={tenant}
+                busy={actionBusy}
+                onToggleStatus={onToggleStatus}
+              />
+            }
+            badges={
+              <>
+                <StatusBadge
+                  tone={resolveStatusTone(TENANT_STATUS_TONE, tenant.status)}
+                >
+                  {statusLabel(tenant.status)}
+                </StatusBadge>
+                <StatusBadge
+                  tone={resolveStatusTone(
+                    VERIFICATION_TONE,
+                    tenant.verifiedStatus,
+                  )}
+                >
+                  {verifiedLabel(tenant.verifiedStatus)}
+                </StatusBadge>
+                <StatusBadge tone={TENANT_RISK_TONE[riskLevel]}>
+                  {riskLabel(riskLevel)}
+                </StatusBadge>
+              </>
+            }
+            metrics={[
+              {
+                key: "subscriptions",
+                value: formatNumber(tenant.subscriptionCount),
+                label: "订阅",
+              },
+              {
+                key: "members",
+                value: formatNumber(tenant.memberCount),
+                label: "用户",
+              },
+              {
+                key: "tokens",
+                value: formatNumber(tenant.tokenUsed),
+                label: "Token",
+              },
+            ]}
+            footer={
+              <>
+                <span className="truncate">{tenant.industry}</span>
+                <span className="shrink-0">
+                  {tenant.ticketOpenCount} 工单 ·{" "}
+                  {formatDate(tenant.lastActiveAt)}
+                </span>
+              </>
+            }
+          />
+        );
+      })}
+    </ListCardGrid>
   );
 }
 
