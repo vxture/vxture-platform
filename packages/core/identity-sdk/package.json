@@ -1,7 +1,7 @@
 {
-  "name": "@vxture/core-oidc-rp",
+  "name": "@vxture/core-identity-sdk",
   "version": "0.1.0",
-  "description": "Vxture platform — OIDC Relying Party toolkit (RP session, PKCE, client interface)",
+  "description": "Vxture Identity SDK — SSO presence tri-state, cookie contract, and portal auth middleware",
   "private": true,
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -12,6 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./edge": {
+      "types": "./dist/edge.d.ts",
+      "import": "./dist/edge.mjs",
+      "require": "./dist/edge.cjs"
     }
   },
   "files": [
@@ -22,19 +27,16 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@vxture/core-identity-sdk": "workspace:*",
-    "@vxture/shared": "workspace:*",
-    "ioredis": "^5.0.0"
-  },
   "peerDependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0"
+    "next": "^15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.1.28",
-    "reflect-metadata": "^0.2.0",
+    "next": "^15.5.21",
     "rimraf": "^6.0.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

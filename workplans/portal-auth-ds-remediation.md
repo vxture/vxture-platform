@@ -24,7 +24,7 @@
 | --- | ---------------------------- | ------------------------------------------------- |
 | 1.1 | 排查 presence 5 分钟掉线     | 登录态下停留 >10 分钟刷新仍在系统内               |
 | 1.2 | RP 会话 cookie 按应用命名    | 登过 console 后访问 admin，不被误判 Authenticated |
-| 1.3 | 抽 Identity SDK + admin 回接 | admin 三态链路跳数与改造前一致（7/4/0）           |
+| 1.3 | 抽 Identity SDK + admin 回接 | ✅ 三态五种输入实测与改造前逐项一致               |
 | 1.4 | console + website 接入       | 两者冷启动门户 HTML 渲染 = 0 次                   |
 | 1.5 | opera 接入                   | 同上；且 SDK 未因 opera 的同源拓扑开逃生口        |
 
@@ -32,8 +32,13 @@
 
 **1.2 是本地专有陷阱。** 四个 BFF 共用 `vx_rp_session`（生产 `__Host-` 前缀 + 各自 host，不串）。本地四门户同在 `localhost`，cookie 无视端口 → middleware 的"cookie 在不在"判定会被别的门户的会话骗过。BFF 侧安全（会话存储按应用分 keyspace，查不到即 401），所以是体验问题不是安全问题。
 
-**1.3 的边界**：进 SDK = presence 三态读写 / `/auth/login` 静默决策 / 回调静默失败分支（含 `vx_sso_silent` 兜底）/ `createAuthMiddleware` 工厂。不进 SDK = 登录后去哪页、realm 选择、加载页外观（归 DS）、豁免路径清单。
-约束：middleware 跑在 Edge runtime，SDK 必须拆 edge-safe 子入口，不能顺依赖拖进 `ioredis`/`pg`。
+**1.3 落地形态**（2026-08-05）：`@vxture/core-identity-sdk`，双入口——`.` 给 BFF（presence cookie 描述 / `resolveLoginPrompt` / `silentFailureReturnTo`），`./edge` 给门户 middleware（`createAuthMiddleware` / 三态判定 / cookie 名契约）。分入口是硬约束：Edge runtime 拖进 node 内建会在**构建期**炸且错误指不到引入点；实测 `dist/edge.mjs` 只引 `next/server`。
+
+cookie 名契约从 `@vxture/core-oidc-rp` **移入** SDK，oidc-rp 改 re-export——middleware import 不了 oidc-rp（ioredis），原先在 middleware 里手抄了一份，现在只剩一处定义。
+
+不进 SDK = 登录后去哪页、realm 选择、加载页外观（归 DS）、各门户豁免路径。`createAuthMiddleware` 留 `onAuthenticated`/`onUnauthenticated` 两个口子：console/website 认证后要接 next-intl，且跳的是自己的 `/{locale}/signin`——**接 SDK 与改登录页拓扑是两件事**，混做会让回归不可归因。
+
+admin 回接后 middleware 只剩 `app` + `isExempt` 两行门户自有知识（113 行 → 12 行）。
 
 ---
 

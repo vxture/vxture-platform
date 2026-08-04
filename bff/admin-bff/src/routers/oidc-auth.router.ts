@@ -30,6 +30,13 @@ import {
   type RpSession,
   type RpSessionStore,
 } from "@vxture/core-oidc-rp";
+import {
+  anonymousPresenceCookie,
+  clearPresenceCookie,
+  presenceCookieName,
+  resolveLoginPrompt,
+  silentFailureReturnTo,
+} from "@vxture/core-identity-sdk";
 import type { Redis } from "ioredis";
 import {
   RP_AUTH_SERVICE,
@@ -67,48 +74,26 @@ export class OidcAuthRouter {
   }
 
   /**
-   * SSO Presence —— 身份状态缓存，认证链路的三态里唯一需要显式存储的那一态。
+   * SSO Presence —— 身份状态缓存，三态里唯一需要显式存储的那一态（Authenticated
+   * 由 RP 会话 cookie 自己表达，Unknown 是"两个都没有"）。
    *
-   *   Authenticated —— 由 RP 会话 cookie 本身表达，不需要额外标记
-   *   Anonymous     —— 本 cookie（值 `anonymous`）：刚问过 IdP，中央会话不存在
-   *   Unknown       —— 两个都没有：还没问过
-   *
-   * 为什么必须存下来：静默探测失败这件事**原先只写在 returnTo 的 URL 参数上**
-   * （`vx_sso_silent=0`），前端拿到后立刻 replaceState 抹掉——于是它是一次性的。
-   * 用户刷新一次、或重新输一次地址，整套「login → authorize → callback →
-   * 带着失败标记回门户」的往返就从头再跑一遍，4 跳 + 2 次整页绘制，只为得到
-   * 上一秒刚知道的答案。这正是"要闪好几次才进登录页"的根源（2026-08-04 实测：
-   * 冷启动 9 跳 3 次绘制）。
-   *
-   * **由服务端与 middleware 共同消费**：BFF 的 `/auth/login` 用它决定这一轮要不要
-   * 静默；门户的 middleware 用它在**渲染之前**决定是放行、去交互登录、还是探测
-   * 一次。因此保持 httpOnly——判断全在服务端，页面脚本不需要也不应该读它。
-   *
-   * 它只是缓存，不是授权凭据：最坏情况（被伪造 / 过期未清）是**多走**一次交互
-   * 登录，不会让任何人少走一步认证。
+   * 名字、值、时效与读写规则都在 `@vxture/core-identity-sdk`——**这一份契约必须被
+   * BFF 与门户 middleware 同时认同**，各写各的迟早分叉，而分叉的症状是无限重定向
+   * 或登不进去，都不好归因。这里只负责把 SDK 给的 cookie 描述接到 express 上。
    */
-  private readonly presenceCookie = "vx_admin_sso_presence";
-  /** 5 分钟：够覆盖"连续刷新几次"，短到中央会话真的建立后不会挡路太久。 */
-  private readonly presenceMaxAgeMs = 5 * 60 * 1000;
+  private get app(): string {
+    return this.rt.config.clientId;
+  }
 
   private markAnonymous(res: Response): void {
-    res.cookie(this.presenceCookie, "anonymous", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: this.rt.cookieSecure,
-      path: "/",
-      maxAge: this.presenceMaxAgeMs,
-    });
+    const c = anonymousPresenceCookie(this.app, this.rt.cookieSecure);
+    res.cookie(c.name, c.value, c.options);
   }
 
   /** 回到 Unknown。会话建立/注销时清掉，避免它继续压制静默探测。 */
   private clearPresence(res: Response): void {
-    res.clearCookie(this.presenceCookie, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: this.rt.cookieSecure,
-      path: "/",
-    });
+    const c = clearPresenceCookie(this.app, this.rt.cookieSecure);
+    res.clearCookie(c.name, c.options);
   }
 
   /** Begin login: stash PKCE/nonce/returnTo, redirect to the IdP authorize page. */
@@ -121,13 +106,14 @@ export class OidcAuthRouter {
   ): Promise<void> {
     /* 上一轮刚确认过没有中央会话 → 这一轮别再静默问一遍。省掉的正是
      * 「authorize(prompt=none) → callback(login_required) → 回门户」那 3 跳
-     * 和随之而来的一次整页绘制；用户直接落到 IdP 登录页。 */
-    if (
-      prompt === "none" &&
-      req.cookies?.[this.presenceCookie] === "anonymous"
-    ) {
-      prompt = undefined;
-    }
+     * 和随之而来的一次整页绘制；用户直接落到 IdP 登录页。
+     *
+     * 门户 middleware 也做同一判断，这里不是重复而是兜底：请求未必经过 middleware
+     * （直接访问 BFF 域名），且这里拿到的 presence 是最新值。 */
+    prompt = resolveLoginPrompt(
+      prompt,
+      req.cookies?.[presenceCookieName(this.app)] as string | undefined,
+    );
     const { verifier, challenge } = generatePkce();
     const state = randomToken();
     const nonce = randomToken();
@@ -179,9 +165,7 @@ export class OidcAuthRouter {
           if (authReq.prompt === "none") {
             // 记住这次静默失败，下一次 /auth/login?prompt=none 直接转交互式。
             this.markAnonymous(res);
-            const u = new URL(authReq.returnTo);
-            u.searchParams.set("vx_sso_silent", "0");
-            res.redirect(u.toString());
+            res.redirect(silentFailureReturnTo(authReq.returnTo));
             return;
           }
         }
