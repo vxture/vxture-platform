@@ -13,6 +13,7 @@
     "clean": "rimraf .next"
   },
   "dependencies": {
+    "@vxture/core-identity-sdk": "workspace:*",
     "@vxture/design-system": "workspace:*",
     "@vxture/shared": "workspace:*",
     "next": "^15.5.21",

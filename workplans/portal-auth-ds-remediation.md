@@ -26,7 +26,7 @@
 | 1.2 | RP 会话 cookie 按应用命名    | 登过 console 后访问 admin，不被误判 Authenticated |
 | 1.3 | 抽 Identity SDK + admin 回接 | ✅ 三态五种输入实测与改造前逐项一致               |
 | 1.4 | console + website 接入       | ✅ 两侧三态实测；`/signin` 中转已从链路上摘掉     |
-| 1.5 | opera 接入                   | 同上；且 SDK 未因 opera 的同源拓扑开逃生口        |
+| 1.5 | opera 接入                   | ✅ 零 `isExempt`/零 `onAllow`，未开任何逃生口     |
 
 **1.1 是回归嫌疑，不是既有缺陷。** 系统里没有任何 5 分钟会话时效（RP 会话 30 天 / opera 12 小时，access token 900s 提前 60s 刷新）。浏览器链路上唯一 5 分钟的东西是 `vx_admin_sso_presence`。可能的机制：RP 会话缺失但 IdP 中央会话仍在时，presence 让本可成功的静默 SSO 被跳过。**先证实再改**。
 
@@ -41,6 +41,10 @@ cookie 名契约从 `@vxture/core-oidc-rp` **移入** SDK，oidc-rp 改 re-expor
 admin 回接后 middleware 只剩 `app` + `isExempt` 两行门户自有知识（113 行 → 12 行）。
 
 **1.4 落地**（2026-08-05）：console 与 admin 同构；website 是公开站点，`isExempt` 取反（只保护 `/dashboard`）——这是 SDK 通用性的检验点，它表达得了就不必开特例。两侧都把 `/signin` 从认证链路上摘掉：那是个纯跳板页（渲染"正在跳转到登录…"→ 水合 → `location.assign` 去同一个 `/auth/login`），一次完整页面加载换零信息量，与 admin 已拆的 `/login` 同类。页面文件保留（可能有外链）并仍在豁免名单里。console-bff / website-bff 各补四处 presence 接线（静默决策 / 失败标记 / 建会话清 / 登出清）。
+
+**1.5 落地**（2026-08-05）：opera 是四个门户里配置最短的一个——`createAuthMiddleware({ app: "opera" })`，没有 `isExempt` 也没有 `onAllow`。它生产上有 nginx `auth_request` 网关（打 opera-bff `/auth/check`，204 放行 / 401 转登录），未认证请求到不了 Next，所以这道闸在**生产恒真**；吃这一层的是开发环境（无边缘网关，此前正是"渲染→水合→401→replace"的老路）。**没有为这个拓扑差异开逃生口**——"生产上另有网关"不构成放宽契约的理由。
+
+**遗留（非本次引入）**：nginx 网关 401 时直接转交互登录，因此 **opera 生产拿不到静默 SSO**，presence 三态只有 Authenticated 一态是活的。要享受静默 SSO 需改 nginx 那条 401 分支带 `prompt=none`，待 owner 定夺。
 
 **踩到并已修**：豁免路径原先直接 `NextResponse.next()`，绕过了 `onAllow`，于是 website 的 `/` 不再经 next-intl 补 locale 而静静 404，**没有任何一处报错指向 middleware**。豁免 = 不参与认证决策，≠ 不参与后续处理。已改为 `isDefaultExempt`（静态资源）才短路，门户自声明的豁免仍走 `onAllow`；钩子随之更名 `onAuthenticated` → `onAllow`，并加 `next-middleware.spec.ts` 锁住。
 
