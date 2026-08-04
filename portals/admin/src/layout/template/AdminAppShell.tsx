@@ -19,9 +19,9 @@ import {
   ShellPageContainer,
   ShellSidebarFrame,
   ShellSidebarNav,
-  writeNavCollapsed,
   type ShellNavSection,
 } from "@vxture/design-system";
+import { writeNavCollapsed } from "@vxture/shared";
 import { useAdminSession } from "@/features/session/AdminSessionProvider";
 import {
   adminWorkspaces,
@@ -42,7 +42,7 @@ import { TemplateDrawer, type DrawerNotif } from "./TemplateDrawer";
 const CONTENT_SCROLL = "min-w-0 flex-1 scroll-smooth overflow-y-auto";
 const CONTENT_SCROLL_ATTR = "data-content-scroll";
 
-/* nav 收起态已迁到 cookie（见 layout.tsx / navPreference.ts），不再列在这里——
+/* nav 收起态已迁到 cookie（见 layout.tsx / nav-preference.constants.ts），不再列在这里——
  * 留一个用不到的 key 会让下一个人以为它还是权威来源。 */
 const LS = {
   vela: "vx-admin-tpl-vela-open",

@@ -38,7 +38,6 @@ import {
   ShellPreferencePanel,
   ShellSearchBox,
   ShellSidebarNav,
-  writeNavCollapsed,
   ShellUserMenu,
   ShellViewport,
   ToastProvider,
@@ -48,6 +47,7 @@ import {
   useTheme,
 } from "@vxture/design-system";
 import { operaNavSections } from "@/config/navigation";
+import { writeNavCollapsed } from "@vxture/shared";
 import { useOperatorSession } from "@/features/session/SessionProvider";
 
 const LS_ASSISTANT_OPEN = "vx-opera-assistant-open";

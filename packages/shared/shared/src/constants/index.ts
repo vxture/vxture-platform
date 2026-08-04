@@ -46,3 +46,4 @@ export type {
   MetricKind,
 } from "./catalog-domains.constants";
 export * from "./status-tone.constants";
+export * from "./nav-preference.constants";

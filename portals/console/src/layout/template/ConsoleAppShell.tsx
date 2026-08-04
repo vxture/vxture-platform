@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/lib/i18n/navigation";
+import { writeNavCollapsed } from "@vxture/shared";
 import { useConsoleSession } from "@/features/session/ConsoleSessionProvider";
 import { consoleDomains } from "@/config/navigation";
 import {
@@ -29,7 +30,6 @@ import {
   ShellPageContainer,
   ShellSidebarFrame,
   ShellSidebarNav,
-  writeNavCollapsed,
   Skeleton,
   type ShellNavSection,
 } from "@vxture/design-system";
@@ -50,7 +50,7 @@ import { AppCenter, type ConsoleApp } from "./AppCenter";
 const CONTENT_SCROLL = "min-w-0 flex-1 scroll-smooth overflow-y-auto";
 const CONTENT_SCROLL_ATTR = "data-content-scroll";
 
-/* nav 收起态已迁到 cookie（见 (console)/layout.tsx 与 navPreference.ts），不再
+/* nav 收起态已迁到 cookie（见 (console)/layout.tsx 与 nav-preference.constants.ts），不再
  * 列在这里——留一个用不到的 key 会让下一个人以为它还是权威来源。 */
 const LS = {
   view: "vx-console-view",

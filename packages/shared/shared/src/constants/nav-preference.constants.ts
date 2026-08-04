@@ -1,8 +1,13 @@
 /**
- * navPreference.ts - 侧栏收起态的持久化（cookie，非 localStorage）。
- * @package @vxture/design-system
- * @layer Presentation
- * @category Theme
+ * nav-preference.constants.ts — 侧栏收起态的持久化约定（cookie，非 localStorage）。
+ *
+ * **放在 shared 而不是 DS**：读取端是**服务端组件**（layout 用 next/headers 的
+ * cookies() 拿到串再解析），而 DS 的入口是 `client.ts`（整包带 "use client"）——
+ * 从服务端 import 会直接报 "Attempted to call ... from the server but it is on
+ * the client"。这不是打包配置能绕过的，是 RSC 的边界本身：DS 是 UI 组件包，而
+ * 这里只是一条 cookie 约定 + 两个纯函数，本来就不该在那边。
+ *
+ * 与 status-tone 同一归属判断：跨门户共用的**契约**归 shared，UI 组件归 DS。
  *
  * **为什么是 cookie。** 收起态原先存在 localStorage 里，配 `useState(false)` +
  * `useEffect` 读取——localStorage 只有 JS 跑起来之后才读得到，所以**首帧一定是

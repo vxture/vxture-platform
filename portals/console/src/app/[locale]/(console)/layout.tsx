@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
-import { readNavCollapsed } from "@vxture/design-system";
+import { readNavCollapsed } from "@vxture/shared";
 import { ConsoleShell } from "@/layout/ConsoleShell";
 import { loadServerSessionSnapshot } from "@/lib/server/bff-server";
 
