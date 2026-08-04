@@ -50,10 +50,15 @@ export interface AuthMiddlewareOptions {
   /** RP 登录入口，同源相对路径。默认 `/auth/login`。 */
   loginPath?: string;
   /**
-   * 通过认证之后做什么。默认放行；console/website 在这里接 next-intl，
-   * 让 locale 处理排在认证之后（认证不通过就没必要算 locale）。
+   * **放行时**做什么——认证通过与豁免路径**都**走这里。默认 `NextResponse.next()`；
+   * console/website 在这里接 next-intl，让 locale 处理排在认证之后（认证不通过就
+   * 没必要算 locale）。
+   *
+   * 豁免也必须经过它：豁免的含义是"不参与认证决策"，不是"不参与后续处理"。
+   * 少了这一条，website 的 `/` 会因为不需要认证而绕过 next-intl，直接 404
+   * ——没有任何一处报错指向 middleware（2026-08-05 实测踩到）。
    */
-  onAuthenticated?: (req: NextRequest) => NextResponse;
+  onAllow?: (req: NextRequest) => NextResponse;
   /**
    * 未认证时去哪个登录入口。默认走 `loginPath` + `returnTo`。
    * console/website 目前跳的是自己的 `/{locale}/signin`，用这个口子表达，
@@ -80,17 +85,21 @@ export function createAuthMiddleware(
     app,
     isExempt,
     loginPath = "/auth/login",
-    onAuthenticated,
+    onAllow,
     onUnauthenticated,
   } = options;
+  const allow = (req: NextRequest): NextResponse =>
+    onAllow?.(req) ?? NextResponse.next();
   const sessionCookies = rpSessionCookieNames(app);
   const presence = presenceCookieName(app);
 
   return function authMiddleware(req: NextRequest): NextResponse {
     const { pathname } = req.nextUrl;
-    if (isDefaultExempt(pathname) || isExempt?.(pathname)) {
-      return NextResponse.next();
-    }
+    /* 静态资源与 Next 内部路径连 `onAllow` 都不该进——它们没有 locale 语义，
+     * 交给 next-intl 只会平白多一次改写。门户自己声明的豁免则要继续走 `allow`：
+     * 那些是真实页面，只是不参与认证决策。 */
+    if (isDefaultExempt(pathname)) return NextResponse.next();
+    if (isExempt?.(pathname)) return allow(req);
 
     const decision = decideAuth({
       hasRpSession: sessionCookies.some((name) => req.cookies.has(name)),
@@ -98,9 +107,7 @@ export function createAuthMiddleware(
       silentParam: req.nextUrl.searchParams.get(SILENT_FAILED_PARAM),
     });
 
-    if (decision.action === "allow") {
-      return onAuthenticated?.(req) ?? NextResponse.next();
-    }
+    if (decision.action === "allow") return allow(req);
     if (onUnauthenticated) {
       return onUnauthenticated(req, { prompt: decision.prompt });
     }

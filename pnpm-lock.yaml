@@ -445,6 +445,9 @@ importers:
       '@vxture/core-config':
         specifier: workspace:*
         version: link:../../packages/core/config
+      '@vxture/core-identity-sdk':
+        specifier: workspace:*
+        version: link:../../packages/core/identity-sdk
       '@vxture/core-mail':
         specifier: workspace:*
         version: link:../../packages/core/mail
@@ -682,6 +685,9 @@ importers:
       '@vxture/core-config':
         specifier: workspace:*
         version: link:../../packages/core/config
+      '@vxture/core-identity-sdk':
+        specifier: workspace:*
+        version: link:../../packages/core/identity-sdk
       '@vxture/core-oidc-rp':
         specifier: workspace:*
         version: link:../../packages/core/oidc-rp
@@ -1407,6 +1413,9 @@ importers:
       '@vxture/agent-studio-varda':
         specifier: workspace:*
         version: link:../../agent-studio/varda
+      '@vxture/core-identity-sdk':
+        specifier: workspace:*
+        version: link:../../packages/core/identity-sdk
       '@vxture/design-system':
         specifier: workspace:*
         version: link:../../packages/design/design-system
@@ -1526,6 +1535,9 @@ importers:
       '@types/uuid':
         specifier: ^11.0.0
         version: 11.0.0
+      '@vxture/core-identity-sdk':
+        specifier: workspace:*
+        version: link:../../packages/core/identity-sdk
       '@vxture/core-locale':
         specifier: workspace:*
         version: link:../../packages/core/locale
