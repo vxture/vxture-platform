@@ -1,17 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Icon,
+  MetricGrid,
+  PanelCard,
+  Section,
   SectionHeader,
   StatCard,
   ViewHeader,
 } from "@vxture/design-system";
 import { toStatusTone } from "@/modules/shared/tone";
-import type { IconName } from "@vxture/design-system";
+import type {
+  IconName,
+  MetricGridItem,
+  StatusBadgeTone,
+} from "@vxture/design-system";
 import type { Locale } from "@vxture/shared";
 import {
   fetchAiModelGrants,
@@ -49,15 +56,6 @@ type BusinessMetricIcon =
   | "cloud";
 type OverviewPulseTag = { label?: string; value: string; tone?: Tone };
 
-interface SummaryMetric {
-  label: string;
-  value: string;
-  secondary?: string;
-  delta?: string;
-  detail: string;
-  tone?: Tone;
-}
-
 interface ProductRankingRow {
   id: string;
   name: string;
@@ -67,20 +65,41 @@ interface ProductRankingRow {
   priceTag?: string;
 }
 
-interface ProductMetric extends SummaryMetric {
+/**
+ * 产品供给 / 模型技能 / 服务与工单 三处指标排共用的一份形状。
+ *
+ * 原本是 ProductMetric / ModelMetric / ServiceMetric 三个接口配三个本地卡组件，
+ * 三份 CSS 逐条比对下来是同一张卡（2.5rem 图标轨 + 标签 + 读数 + 标）。迁到
+ * DS MetricGrid 之后页面这边只剩数据，形状自然并成一个。
+ *
+ * `tone` 直接写 DS 语义名：这些值是前端写死的，不走 `toStatusTone`——那层只为
+ * admin-bff 的颜色名契约而留（见 modules/shared/tone.ts 的说明）。
+ */
+interface OverviewMetric {
+  label: string;
+  value: string;
+  /** 指标口径，落在标签行的 `?` 里。 */
+  detail: string;
   icon: IconName;
-  tags: Array<{ label: string; value: string; tone?: "neutral" | "warning" }>;
+  tone: StatusBadgeTone;
+  /** 读数旁的补充口径，成品字符串（"生效 12"）。 */
+  tags?: string[];
+  /** 卡面常驻的一行补充。 */
+  description?: string;
 }
 
-interface ModelMetric extends SummaryMetric {
-  icon: IconName;
-  tags: Array<{ label: string; value: string; tone?: "neutral" | "warning" }>;
-  badges?: string[];
-}
-
-interface ServiceMetric extends SummaryMetric {
-  icon: IconName;
-  display?: "stars" | "text";
+/** OverviewMetric → MetricGrid 的 item：口径进 `?`，其余直传。 */
+function metricItems(metrics: readonly OverviewMetric[]): MetricGridItem[] {
+  return metrics.map((metric) => ({
+    id: metric.label,
+    label: metric.label,
+    value: metric.value,
+    help: metric.detail,
+    icon: metric.icon,
+    tone: metric.tone,
+    ...(metric.tags ? { tags: metric.tags } : {}),
+    ...(metric.description ? { description: metric.description } : {}),
+  }));
 }
 
 interface OverviewPulseMetric {
@@ -398,10 +417,6 @@ function capabilityPolicyCoverage(
   };
 }
 
-function riskTagTone(value: number): "neutral" | "warning" {
-  return value > 0 ? "warning" : "neutral";
-}
-
 function fillCapabilityRows(rows: CapabilityServiceRow[], prefix: string) {
   if (rows.length >= 3) return rows.slice(0, 3);
 
@@ -434,31 +449,31 @@ function serviceMetricsFor(overview: DashboardOverviewRecord) {
       label: "工单总数",
       value: totalInPeriod.toLocaleString("en-US"),
       detail: `${label}工单 ${totalInPeriod.toLocaleString("en-US")}（按创建时间统计）。`,
-      tone: "blue",
+      tone: "brand",
       icon: "chat-circle",
     },
     {
       label: "已完成",
       value: resolved.toLocaleString("en-US"),
       detail: `${label}已完成（resolved/closed）${resolved.toLocaleString("en-US")}。`,
-      tone: "green",
+      tone: "success",
       icon: "success",
     },
     {
       label: "进行中",
       value: inProgress.toLocaleString("en-US"),
       detail: `${label}进行中（open/in_progress/reopened）${inProgress.toLocaleString("en-US")}。`,
-      tone: "cyan",
+      tone: "info",
       icon: "clock",
     },
     {
       label: "已搁置",
       value: pending.toLocaleString("en-US"),
       detail: `${label}已搁置（pending）${pending.toLocaleString("en-US")}。`,
-      tone: "amber",
+      tone: "warning",
       icon: "warning",
     },
-  ] satisfies ServiceMetric[];
+  ] satisfies OverviewMetric[];
 }
 
 // TD-036: no rating/CSAT/SLA-aggregate table exists in the schema (only a
@@ -469,35 +484,42 @@ function ratingMetricsFor(_overview: DashboardOverviewRecord) {
     value: "—",
     detail:
       "数据源待建设：平台暂无服务/产品评价聚合表，仅工单级评分字段，无法汇总展示。",
+    description: "达成率",
   };
 
   return [
     {
       label: "服务评价",
       ...unavailable,
-      tone: "blue",
+      tone: "brand",
       icon: "star",
-      display: "text",
     },
     {
       label: "产品评价",
       ...unavailable,
-      tone: "blue",
+      tone: "brand",
       icon: "medal",
-      display: "text",
     },
     {
       label: "SLA",
       ...unavailable,
-      tone: "blue",
+      tone: "brand",
       icon: "shield-check",
-      display: "text",
     },
-  ] satisfies ServiceMetric[];
+  ] satisfies OverviewMetric[];
 }
 
 function metricToneClass(tone: Tone = "blue") {
   return `admin-overview-tone admin-overview-tone--${tone}`;
+}
+
+/** 面板头右端的"详情"入口，四处面板同一个写法。 */
+function DetailLink({ href }: { href: string }) {
+  return (
+    <Link className="admin-overview-panel-detail" href={href}>
+      详情
+    </Link>
+  );
 }
 
 function DetailTip({ detail }: { detail: string }) {
@@ -1109,72 +1131,23 @@ function BusinessPanel({
   locale: Locale;
 }) {
   return (
-    <section
-      className={`admin-overview-business-panel ${metricToneClass(panel.tone)}`}
-      aria-label={panel.title}
-    >
-      <div className="admin-overview-business-panel__header">
-        <div className="admin-overview-business-panel__header-left">
-          <h3>{panel.title}</h3>
-          <Link
-            className="admin-overview-business-panel__chart"
-            href={`/usage-metering?period=${panel.period}&scope=${encodeURIComponent(panel.title)}`}
-            title={`${panel.title}图形化显示`}
-          >
-            <Icon name="chart-bar" size="sm" fallback="placeholder" />
-          </Link>
-        </div>
+    <PanelCard
+      title={panel.title}
+      titleSuffix={
         <Link
-          className="admin-overview-business-panel__detail"
-          href={panel.detailHref}
+          className="admin-overview-panel-chart"
+          href={`/usage-metering?period=${panel.period}&scope=${encodeURIComponent(panel.title)}`}
+          title={`${panel.title}图形化显示`}
         >
-          详情
+          <Icon name="chart-bar" size="sm" fallback="placeholder" />
         </Link>
-      </div>
-      <div className="admin-overview-business-panel__cards">
-        {businessCardMetrics(panel, overview, locale).map((metric) => (
-          <BusinessMetricCard key={metric.label} metric={metric} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ProductMetricCard({ metric }: { metric: ProductMetric }) {
-  return (
-    <article
-      className={`admin-overview-product-metric ${metricToneClass(metric.tone)}`}
+      }
+      action={<DetailLink href={panel.detailHref} />}
     >
-      <span className="admin-overview-product-metric__icon" aria-hidden="true">
-        <Icon name={metric.icon} size="lg" fallback="placeholder" />
-      </span>
-      <div className="admin-overview-product-metric__main">
-        <span className="admin-overview-product-metric__label">
-          {metric.label}
-          <DetailTip detail={metric.detail} />
-        </span>
-        <div className="admin-overview-product-metric__line">
-          <MetricValue
-            value={metric.value}
-            className="admin-overview-product-metric__value"
-          />
-          <span className="admin-overview-product-metric__tags">
-            {metric.tags.map((tag) => (
-              <em
-                key={`${tag.label}-${tag.value}`}
-                className={
-                  tag.tone
-                    ? `admin-overview-metric-tag--${tag.tone}`
-                    : undefined
-                }
-              >
-                {tag.label} {tag.value}
-              </em>
-            ))}
-          </span>
-        </div>
-      </div>
-    </article>
+      {businessCardMetrics(panel, overview, locale).map((metric) => (
+        <BusinessMetricCard key={metric.label} metric={metric} />
+      ))}
+    </PanelCard>
   );
 }
 
@@ -1194,19 +1167,14 @@ function ProductRankingCard({
   tone?: Tone;
 }) {
   return (
-    <article
+    <PanelCard
+      title={title}
+      titleSuffix={<DetailTip detail={detail} />}
+      description={summary}
+      action={<DetailLink href={href} />}
+      tone={toStatusTone(tone)}
       className={`admin-overview-product-ranking ${metricToneClass(tone)}`}
     >
-      <div className="admin-overview-product-ranking__header">
-        <div>
-          <div className="admin-overview-card-title-line">
-            <h3>{title}</h3>
-            <DetailTip detail={detail} />
-          </div>
-          <p>{summary}</p>
-        </div>
-        <Link href={href}>详情</Link>
-      </div>
       <div className="admin-overview-product-ranking__rows">
         {rows.length === 0 ? (
           <p className="admin-overview-model-category__empty">
@@ -1237,48 +1205,7 @@ function ProductRankingCard({
           ))
         )}
       </div>
-    </article>
-  );
-}
-
-function ModelMetricCard({ metric }: { metric: ModelMetric }) {
-  return (
-    <article
-      className={`admin-overview-model-metric ${metricToneClass(metric.tone)}`}
-    >
-      <span className="admin-overview-model-metric__icon" aria-hidden="true">
-        <Icon name={metric.icon} size="lg" fallback="placeholder" />
-      </span>
-      <div className="admin-overview-model-metric__main">
-        <span className="admin-overview-model-metric__label">
-          {metric.label}
-          {metric.badges?.map((badge) => (
-            <em key={badge}>{badge}</em>
-          ))}
-          <DetailTip detail={metric.detail} />
-        </span>
-        <div className="admin-overview-model-metric__line">
-          <MetricValue
-            value={metric.value}
-            className="admin-overview-model-metric__value"
-          />
-          <span className="admin-overview-model-metric__tags">
-            {metric.tags.map((tag) => (
-              <em
-                key={`${tag.label}-${tag.value}`}
-                className={
-                  tag.tone
-                    ? `admin-overview-metric-tag--${tag.tone}`
-                    : undefined
-                }
-              >
-                {tag.label} {tag.value}
-              </em>
-            ))}
-          </span>
-        </div>
-      </div>
-    </article>
+    </PanelCard>
   );
 }
 
@@ -1300,19 +1227,14 @@ function ModelCategoryCard({
   rows: CapabilityServiceRow[];
 }) {
   return (
-    <article
+    <PanelCard
+      title={title}
+      titleSuffix={<DetailTip detail={detail} />}
+      description={summary}
+      {...(href ? { action: <DetailLink href={href} /> } : {})}
+      tone={toStatusTone(tone)}
       className={`admin-overview-model-category ${metricToneClass(tone)}`}
     >
-      <div className="admin-overview-model-category__header">
-        <div>
-          <div className="admin-overview-card-title-line">
-            <h3>{title}</h3>
-            <DetailTip detail={detail} />
-          </div>
-          <p>{summary}</p>
-        </div>
-        {href ? <Link href={href}>详情</Link> : null}
-      </div>
       <div className="admin-overview-model-category__rows">
         {rows.length > 0 ? (
           rows.map((row, index) => (
@@ -1350,63 +1272,7 @@ function ModelCategoryCard({
           <p className="admin-overview-model-category__empty">暂无数据</p>
         )}
       </div>
-    </article>
-  );
-}
-
-function ServiceBlock({
-  title,
-  summary,
-  href,
-  tone,
-  children,
-}: {
-  title: string;
-  summary: string;
-  href: string;
-  tone: Tone;
-  children: ReactNode;
-}) {
-  return (
-    <article
-      className={`admin-overview-service-block ${metricToneClass(tone)}`}
-    >
-      <div className="admin-overview-service-block__header">
-        <div>
-          <h3>{title}</h3>
-          <p>{summary}</p>
-        </div>
-        <Link href={href}>详情</Link>
-      </div>
-      {children}
-    </article>
-  );
-}
-
-function ServiceMetricCard({ metric }: { metric: ServiceMetric }) {
-  return (
-    <article
-      className={`admin-overview-service-metric ${metricToneClass(metric.tone)}`}
-    >
-      <span className="admin-overview-service-metric__icon" aria-hidden="true">
-        <Icon name={metric.icon} size="lg" fallback="placeholder" />
-      </span>
-      <div className="admin-overview-service-metric__main">
-        <span>
-          {metric.label}
-          <DetailTip detail={metric.detail} />
-        </span>
-        {metric.display === "stars" ? (
-          <div className="admin-overview-service-metric__rating-line">
-            <RatingStars value={Number(metric.value)} />
-            <MetricValue value={metric.value} />
-          </div>
-        ) : (
-          <MetricValue value={metric.value} />
-        )}
-      </div>
-      {metric.display === "text" ? <small>达成率</small> : null}
-    </article>
+    </PanelCard>
   );
 }
 
@@ -1597,47 +1463,44 @@ export default function AdminOverviewPage() {
         label: "产品能力",
         value: String(productTotalCounts.total),
         detail: `产品能力是平台可被方案编排的底层产品供给，累计 ${productTotalCounts.total} 个，生效 ${activeProductCount} 个，自有 ${productTotalCounts.owned} 个，三方 ${productTotalCounts.thirdParty} 个；${productPeriodLabel}版本更新 ${versionUpdateCounts.total} 次。`,
-        tone: "blue",
+        tone: "brand",
         icon: "database",
         tags: [
-          { label: "生效", value: String(activeProductCount) },
-          { label: "更新", value: String(versionUpdateCounts.total) },
+          `生效 ${activeProductCount}`,
+          `更新 ${versionUpdateCounts.total}`,
         ],
       },
       {
         label: "方案组合",
         value: String(solutionCounts.total),
         detail: `方案组合承接行业、场景和客户分层，当前方案 ${solutionCounts.total} 个，生效 ${solutionCounts.active} 个，覆盖 ${solutionCounts.industryCount} 个行业。`,
-        tone: "blue",
+        tone: "brand",
         icon: "workflow",
         tags: [
-          { label: "生效", value: String(solutionCounts.active) },
-          { label: "行业", value: String(solutionCounts.industryCount) },
+          `生效 ${solutionCounts.active}`,
+          `行业 ${solutionCounts.industryCount}`,
         ],
       },
       {
         label: "套餐层级",
         value: String(tierCounts.total),
         detail: `套餐层级是方案下可售卖、可授权的权益包，当前套餐 ${tierCounts.total} 个，生效 ${tierCounts.active} 个，公开 ${tierCounts.public} 个。`,
-        tone: "blue",
+        tone: "brand",
         icon: "cube",
-        tags: [
-          { label: "生效", value: String(tierCounts.active) },
-          { label: "公开", value: String(tierCounts.public) },
-        ],
+        tags: [`生效 ${tierCounts.active}`, `公开 ${tierCounts.public}`],
       },
       {
         label: "供给异常",
         value: String(abnormalCounts.total),
         detail: `供给异常用于观察会影响售卖或交付的非正常状态：停用产品 ${abnormalCounts.stoppedProducts} 个，异常方案 ${abnormalCounts.abnormalSolutions} 个，未生效套餐 ${abnormalCounts.inactiveTiers} 个。`,
-        tone: abnormalCounts.total > 0 ? "amber" : "blue",
+        tone: abnormalCounts.total > 0 ? "warning" : "brand",
         icon: "warning",
         tags: [
-          { label: "产品", value: String(abnormalCounts.stoppedProducts) },
-          { label: "套餐", value: String(abnormalCounts.inactiveTiers) },
+          `产品 ${abnormalCounts.stoppedProducts}`,
+          `套餐 ${abnormalCounts.inactiveTiers}`,
         ],
       },
-    ] satisfies ProductMetric[];
+    ] satisfies OverviewMetric[];
   }, [productPeriod, productPeriodLabel, releases, solutions]);
 
   // TD-036: the old productTop ranking was a second, independent fabrication
@@ -1694,73 +1557,50 @@ export default function AdminOverviewPage() {
             detail: `服务监控显示当前纳入观测的服务 ${serviceHealth.total} 个，其中健康 ${serviceHealth.healthy} 个，异常 ${serviceHealth.abnormal} 个。`,
             tone:
               serviceHealth.abnormal > 0
-                ? ("amber" as const)
-                : ("blue" as const),
+                ? ("warning" as const)
+                : ("brand" as const),
             icon: "server" as const,
-            tags: [
-              {
-                label: "异常",
-                value: String(serviceHealth.abnormal),
-                tone: riskTagTone(serviceHealth.abnormal),
-              },
-            ],
+            tags: [`异常 ${serviceHealth.abnormal}`],
           }
         : {
             label: "服务监控",
             value: "—",
             detail:
               "数据源待建设：平台暂无真实基础设施健康/延迟监控落库，不展示编造数值。",
-            tone: "blue" as const,
+            tone: "brand" as const,
             icon: "server" as const,
-            tags: [{ label: "状态", value: "待建设" }],
+            tags: ["状态 待建设"],
           },
       {
         label: "模型平台",
         value: String(totalModelCounts.total),
         detail: `${modelPeriodLabel}模型平台观察平台可调度模型资源池，模型总数 ${totalModelCounts.total} 个，生效模型 ${activeModelCounts.total} 个，接入异常 ${abnormalModelCounts.total} 个${hasTokenData ? `，Token 总量 ${formatTokenCount(totalTokenCalls)}` : "；Token 用量数据源待建设（无模型用量写路径）"}。`,
-        tone: "blue",
+        // 异常台数抬进整卡语气——同段的服务监控/策略覆盖/技能市场三张都是这么做的，
+        // 只有这张原先写死 blue，靠标自己变色，一排四张里独一份（2026-08-05）。
+        tone: abnormalModelCounts.total > 0 ? "warning" : "brand",
         icon: "cloud",
         tags: [
-          {
-            label: "异常",
-            value: String(abnormalModelCounts.total),
-            tone: riskTagTone(abnormalModelCounts.total),
-          },
-          {
-            label: "Token",
-            value: hasTokenData ? formatTokenCount(totalTokenCalls) : "待建设",
-          },
+          `异常 ${abnormalModelCounts.total}`,
+          `Token ${hasTokenData ? formatTokenCount(totalTokenCalls) : "待建设"}`,
         ],
       },
       {
         label: "策略覆盖",
         value: String(policyCoverage.active),
         detail: `策略覆盖统计模型授权和租户授权的启用情况，当前有效策略 ${policyCoverage.active} 条，待配置或停用 ${policyCoverage.pending} 条。`,
-        tone: policyCoverage.pending > 0 ? "amber" : "blue",
+        tone: policyCoverage.pending > 0 ? "warning" : "brand",
         icon: "shield-check",
-        tags: [
-          {
-            label: "待配",
-            value: String(policyCoverage.pending),
-            tone: riskTagTone(policyCoverage.pending),
-          },
-        ],
+        tags: [`待配 ${policyCoverage.pending}`],
       },
       {
         label: "技能市场",
         value: String(activeAgents),
         detail: `技能市场当前以智能体可调用能力作为过渡口径，启用 ${activeAgents} 个，公开 ${publicAgents} 个，异常或停用 ${inactiveAgents} 个。`,
-        tone: inactiveAgents > 0 ? "amber" : "blue",
+        tone: inactiveAgents > 0 ? "warning" : "brand",
         icon: "cube",
-        tags: [
-          {
-            label: "异常",
-            value: String(inactiveAgents),
-            tone: riskTagTone(inactiveAgents),
-          },
-        ],
+        tags: [`异常 ${inactiveAgents}`],
       },
-    ] satisfies ModelMetric[];
+    ] satisfies OverviewMetric[];
   }, [
     agents,
     modelGrants,
@@ -1939,11 +1779,10 @@ export default function AdminOverviewPage() {
           period={productPeriod}
           onPeriodChange={setProductPeriod}
         />
-        <div className="admin-overview-product-metrics">
-          {productMetrics.map((metric) => (
-            <ProductMetricCard key={metric.label} metric={metric} />
-          ))}
-        </div>
+        <MetricGrid
+          aria-label="产品供给指标"
+          items={metricItems(productMetrics)}
+        />
         <div className="admin-overview-product-rankings">
           <ProductRankingCard
             title="产品能力排行"
@@ -1974,11 +1813,10 @@ export default function AdminOverviewPage() {
           period={modelPeriod}
           onPeriodChange={setModelPeriod}
         />
-        <div className="admin-overview-model-metrics">
-          {capabilityMetrics.map((metric) => (
-            <ModelMetricCard key={metric.label} metric={metric} />
-          ))}
-        </div>
+        <MetricGrid
+          aria-label="模型技能指标"
+          items={metricItems(capabilityMetrics)}
+        />
         <div className="admin-overview-model-categories">
           {capabilityPanels.map((panel) => (
             <ModelCategoryCard
@@ -2003,31 +1841,33 @@ export default function AdminOverviewPage() {
           period={servicePeriod}
           onPeriodChange={setServicePeriod}
         />
+        {/* 这两块不是面板卡：它们装的就是一排指标卡，套上卡壳会变成卡中卡
+            （2026-08-05）。同段的产品供给/模型技能也是"标题 + 一排卡"，这里只是
+            多一层，用 level 3 的板块标题表达层级即可。 */}
         <div className="admin-overview-service-stack">
-          <ServiceBlock
+          <Section
+            level={3}
             title="工单统计"
-            summary="工单总量、处理状态和搁置情况。"
-            href="/tickets"
-            tone="blue"
+            description="工单总量、处理状态和搁置情况。"
+            action={<DetailLink href="/tickets" />}
           >
-            <div className="admin-overview-service-metrics admin-overview-service-metrics--tickets">
-              {serviceMetrics.map((metric) => (
-                <ServiceMetricCard key={metric.label} metric={metric} />
-              ))}
-            </div>
-          </ServiceBlock>
-          <ServiceBlock
+            <MetricGrid
+              aria-label="工单统计指标"
+              items={metricItems(serviceMetrics)}
+            />
+          </Section>
+          <Section
+            level={3}
             title="服务评价"
-            summary="服务满意度、产品评价和 SLA 达成。"
-            href="/tickets"
-            tone="green"
+            description="服务满意度、产品评价和 SLA 达成。"
+            action={<DetailLink href="/tickets" />}
           >
-            <div className="admin-overview-service-metrics admin-overview-service-metrics--rating">
-              {ratingMetrics.map((metric) => (
-                <ServiceMetricCard key={metric.label} metric={metric} />
-              ))}
-            </div>
-          </ServiceBlock>
+            <MetricGrid
+              aria-label="服务评价指标"
+              columns={3}
+              items={metricItems(ratingMetrics)}
+            />
+          </Section>
         </div>
       </section>
     </div>

@@ -17,20 +17,6 @@
   color: var(--vx-color-warning);
 }
 
-.admin-overview-service-metrics--rating
-  .admin-overview-service-metric__rating-line
-  .admin-overview-stars {
-  gap: var(--vx-admin-overview-space-025r);
-  font-size: var(--vx-admin-overview-text-size-15r);
-}
-
-.admin-overview-service-metrics--rating
-  .admin-overview-service-metric__rating-line
-  .admin-overview-stars__item {
-  font-size: inherit;
-  line-height: 1;
-}
-
 .admin-overview-tip {
   position: relative;
   display: inline-flex;
