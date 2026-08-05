@@ -78,18 +78,22 @@ export const INTENT_SLOTS = {
  *
  * 数字越大等级越高，与色阶 50→950 同向。名次→等级的翻译归产品侧。
  *
- * `fill`/`deep` 是渐变两端（相差两档），`foreground` 按各档对比度定——300/400
- * 两档配白字不足 4.5:1，改深字。三者均不随主题变化，同意图族填充的理由：一个
- * "五级"记号在暗色下仍应是同一个五级。
+ * **档距均匀、整体偏浅**（owner 2026-08-06 实测后调）：初版取 200/400/600/700/900，
+ * L5→L4 跨 200 档而 L4→L3 只跨 100 档，于是第一名远远甩开、第二三名几乎分不出；
+ * 而且末档太深太重。现在每级 +100，立体感交给渐变与透明度，不靠把颜色调深。
+ *
+ * `fill`/`deep` 是渐变两端（相差两档）；`foreground` 按各档对比度定，前三档配白字
+ * 不足 4.5:1，改深字。三者均不随主题变化，同意图族填充的理由：一个"五级"记号在
+ * 暗色下仍应是同一个五级。
  */
 export const LEVEL_HUE = "brand";
 export const LEVELS = [1, 2, 3, 4, 5];
 export const LEVEL_RAMP = {
   1: { fill: 200, deep: 400, foreground: "neutral-900" },
-  2: { fill: 400, deep: 600, foreground: "neutral-900" },
-  3: { fill: 600, deep: 700, foreground: "white" },
-  4: { fill: 700, deep: 800, foreground: "white" },
-  5: { fill: 900, deep: 950, foreground: "white" },
+  2: { fill: 300, deep: 500, foreground: "neutral-900" },
+  3: { fill: 400, deep: 600, foreground: "neutral-900" },
+  4: { fill: 500, deep: 700, foreground: "white" },
+  5: { fill: 600, deep: 800, foreground: "white" },
 };
 
 /* 只给底座要的三档。曾另给 muted / text 供 pill 用，但单色相下五级的浅底

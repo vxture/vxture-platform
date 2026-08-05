@@ -38,6 +38,10 @@ export interface MetricCardProps {
    * （2026-08-05：admin 总览为此自建了 DetailTip，三处卡片各挂一份）。
    */
   readonly help?: string;
+  /**
+   * 读数旁的一句补充，与 `tags` 同行。**不另起一行**：卡就是两行——标签行与读数行
+   * （owner 2026-08-06）。此前它落在页脚，一张只有"—"的卡会被撑出大片空白。
+   */
   readonly description?: React.ReactNode;
   readonly icon?: IconName;
   /** 环比、同比一类的变化量，渲染为 StatusBadge。 */
@@ -53,7 +57,6 @@ export interface MetricCardProps {
    * 跟随而非独立着色（2026-08-05 对照 admin 41 处调用点）。
    */
   readonly tags?: readonly React.ReactNode[];
-  readonly action?: React.ReactNode;
   /**
    * 整块的语气：染顶缘色条、图标与读数，不染底。
    * 一排指标卡靠色条区分归属——底色染满会盖过读数本身。
@@ -82,13 +85,10 @@ function MetricCard({
   trend,
   trendTone = "neutral",
   tags,
-  action,
   tone = "brand",
   variant = "default",
   className,
 }: MetricCardProps) {
-  // trend 已经挪到读数旁边，不再算进页脚。
-  const hasFooter = Boolean(description || action);
   const compact = variant === "compact";
 
   return (
@@ -151,19 +151,14 @@ function MetricCard({
                   {tag}
                 </StatusBadge>
               ))}
+              {description ? (
+                <span className="min-w-0 text-body-sm text-muted-foreground">
+                  {description}
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
-        {hasFooter ? (
-          <div className="flex items-end justify-between gap-sm">
-            {description ? (
-              <span className="min-w-0 text-body-sm text-muted-foreground">
-                {description}
-              </span>
-            ) : null}
-            {action ? <div className="shrink-0">{action}</div> : null}
-          </div>
-        ) : null}
       </CardContent>
     </Card>
   );

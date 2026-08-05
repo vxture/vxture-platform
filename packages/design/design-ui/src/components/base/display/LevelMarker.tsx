@@ -58,14 +58,16 @@ function LevelMarker({
         ? { role: "img", "aria-label": ariaLabel }
         : { "aria-hidden": true })}
       style={{
-        background: `linear-gradient(160deg, var(${vars.fill}), var(${vars.deep}))`,
+        // 起点带一点透明、终点实心：立体感来自渐变与透明度，不靠把色阶取深
+        // （owner 2026-08-06：色阶淡一些、差距不用太大）。
+        background: `linear-gradient(160deg, color-mix(in srgb, var(${vars.fill}) 82%, transparent), var(${vars.deep}))`,
         color: `var(${vars.fg})`,
         boxShadow: [
           // 发光复用 brand 的 glow 两档——等级族本就是同色相，无需另开 token。
           "0 0 0 1px var(--gradient-glow-to)",
-          "0 2px 6px -1px var(--gradient-glow-from)",
+          "0 1px 4px -1px var(--gradient-glow-from)",
           // 内高光：上缘一道白，让圆面看起来是凸的而非贴纸。
-          "inset 0 1px 0 0 color-mix(in srgb, var(--vx-color-white) 28%, transparent)",
+          "inset 0 1px 0 0 color-mix(in srgb, var(--vx-color-white) 38%, transparent)",
         ].join(", "),
       }}
       className={cn(
