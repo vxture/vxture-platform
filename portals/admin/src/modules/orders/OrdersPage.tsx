@@ -11,15 +11,15 @@ import {
   Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   ListCardGrid,
   MetricGrid,
   MetricListCard,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
@@ -680,248 +680,260 @@ export function OrdersPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-orders-page">
-      <PageHeader
-        icon="table"
-        eyebrow="订阅交易"
-        title="订单管理"
-        description="运营侧查看租户订阅订单、账单和收款状态，支撑续期确认、异常处理和财务对账。"
-      />
-
-      <MetricGrid
-        aria-label="订单管理统计"
-        items={[
-          {
-            id: "total",
-            icon: "table",
-            label: "订单总数",
-            value: formatNumber(orders.length),
-            tags: [`筛选 ${formatNumber(filteredOrders.length)}`],
-          },
-          {
-            id: "pending",
-            icon: "clock",
-            label: "待处理",
-            value: formatNumber(pendingCount),
-            tags: [
-              `待复核 ${formatNumber(orders.filter((item) => item.orderStatus === "pending_verify").length)}`,
-            ],
-            tone: pendingCount ? "warning" : "success",
-          },
-          {
-            id: "confirmed-amount",
-            icon: "chart-bar",
-            label: "已确认金额",
-            value: formatCurrency(confirmedAmount, "CNY"),
-            tags: ["运营口径"],
-            tone: "success",
-          },
-          {
-            id: "abnormal",
-            icon: "warning",
-            label: "异常逾期",
-            value: formatNumber(overdueCount + abnormalCount + attentionCount),
-            tags: [
-              `异常 ${formatNumber(abnormalCount)}`,
-              `付未开通/挂账 ${formatNumber(attentionCount)}`,
-            ],
-            tone:
-              overdueCount || abnormalCount || attentionCount
-                ? "danger"
-                : "success",
-          },
-        ]}
-      />
-
-      {operationFeedback ? (
-        <div className="vx-subscription-operation-feedback">
-          {operationFeedback}
-        </div>
-      ) : null}
-
-      {ordersTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前订单列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标订单，请尝试缩小筛选范围（如按状态、支付方式等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="订单筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="订单展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-orders-page"
+        header={
+          <PageHeader
+            icon="table"
+            eyebrow="订阅交易"
+            title="订单管理"
+            description="运营侧查看租户订阅订单、账单和收款状态，支撑续期确认、异常处理和财务对账。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredOrders.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索订单、租户、方案、账单"
-            className="vx-tenant-search vx-order-search"
-            aria-label="搜索订单"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as OrderStatusFilter)
-              }
-              aria-label="订单状态"
-            >
-              <option value="all">全部订单</option>
-              <option value="pending">待付款</option>
-              <option value="pending_verify">待复核</option>
-              <option value="confirmed">已确认</option>
-              <option value="overdue">逾期</option>
-              <option value="closed">已关闭</option>
-              <option value="abnormal">异常</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={paymentFilter}
-              onChange={(event) =>
-                setPaymentFilter(event.target.value as PaymentStatusFilter)
-              }
-              aria-label="支付状态"
-            >
-              <option value="all">全部支付</option>
-              <option value="not_required">无需支付</option>
-              <option value="unpaid">未支付</option>
-              <option value="pending">支付中</option>
-              <option value="pending_verify">线下待核</option>
-              <option value="paid">已支付</option>
-              <option value="partial">部分支付</option>
-              <option value="failed">支付失败</option>
-              <option value="closed">已关闭</option>
-              <option value="refunding">退款中</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={paySourceFilter}
-              onChange={(event) =>
-                setPaySourceFilter(event.target.value as PaySourceFilter)
-              }
-              aria-label="支付来源"
-            >
-              <option value="all">全部来源</option>
-              <option value="online">线上</option>
-              <option value="offline">线下</option>
-              <option value="none">无</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={tierFilter}
-              onChange={(event) =>
-                setTierFilter(event.target.value as TierFilter)
-              }
-              aria-label="套餐版本"
-            >
-              <option value="all">全部套餐</option>
-              <option value="free">Free</option>
-              <option value="pro">Pro</option>
-              <option value="enterprise">Enterprise</option>
-              <option value="other">其他</option>
-            </NativeSelect>
-          </div>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={() =>
-              exportRowsToCsv(
-                "orders-export",
-                ORDER_CSV_COLUMNS,
-                filteredOrders,
-              )
-            }
-            disabled={filteredOrders.length === 0}
-          >
-            导出全部
-          </ActionButton>
-          <ActionButton variant="outline" icon="plus" disabled>
-            补录订单
-          </ActionButton>
-        </section>
-
-        {selectedOrderIds.size > 0 ? (
-          <BulkActionBar
-            count={selectedOrderIds.size}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                onSelect: () =>
-                  exportRowsToCsv(
-                    "orders-export",
-                    ORDER_CSV_COLUMNS,
-                    selectedOrders,
+        }
+        summary={
+          <>
+            <MetricGrid
+              aria-label="订单管理统计"
+              items={[
+                {
+                  id: "total",
+                  icon: "table",
+                  label: "订单总数",
+                  value: formatNumber(orders.length),
+                  tags: [`筛选 ${formatNumber(filteredOrders.length)}`],
+                },
+                {
+                  id: "pending",
+                  icon: "clock",
+                  label: "待处理",
+                  value: formatNumber(pendingCount),
+                  tags: [
+                    `待复核 ${formatNumber(orders.filter((item) => item.orderStatus === "pending_verify").length)}`,
+                  ],
+                  tone: pendingCount ? "warning" : "success",
+                },
+                {
+                  id: "confirmed-amount",
+                  icon: "chart-bar",
+                  label: "已确认金额",
+                  value: formatCurrency(confirmedAmount, "CNY"),
+                  tags: ["运营口径"],
+                  tone: "success",
+                },
+                {
+                  id: "abnormal",
+                  icon: "warning",
+                  label: "异常逾期",
+                  value: formatNumber(
+                    overdueCount + abnormalCount + attentionCount,
                   ),
-              },
-            ]}
-            onClear={clearOrderSelection}
-          />
-        ) : null}
+                  tags: [
+                    `异常 ${formatNumber(abnormalCount)}`,
+                    `付未开通/挂账 ${formatNumber(attentionCount)}`,
+                  ],
+                  tone:
+                    overdueCount || abnormalCount || attentionCount
+                      ? "danger"
+                      : "success",
+                },
+              ]}
+            />
 
-        <section className="vx-tenant-directory" aria-label="订单清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
+            {operationFeedback ? (
+              <div className="vx-subscription-operation-feedback">
+                {operationFeedback}
+              </div>
+            ) : null}
 
-          {visibleOrders.length ? (
-            viewMode === "list" ? (
-              <OrderListRows
-                orders={visibleOrders}
-                startIndex={(activePage - 1) * pageSize}
-                onConfirmPayment={requestConfirmPayment}
-                selectedOrderIds={selectedOrderIds}
-                isPageSelected={isOrderPageSelected}
-                onToggleOrder={toggleOrderSelection}
-                onTogglePage={toggleOrderPageSelection}
+            {ordersTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前订单列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标订单，请尝试缩小筛选范围（如按状态、支付方式等）重新查询。"
               />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredOrders.length)}
+            aria-label="订单筛选"
+            actions={
+              <>
+                <ActionButton
+                  variant="outline"
+                  icon="arrow-down"
+                  onClick={() =>
+                    exportRowsToCsv(
+                      "orders-export",
+                      ORDER_CSV_COLUMNS,
+                      filteredOrders,
+                    )
+                  }
+                  disabled={filteredOrders.length === 0}
+                >
+                  导出全部
+                </ActionButton>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  补录订单
+                </ActionButton>
+              </>
+            }
+          >
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索订单、租户、方案、账单"
+              className="vx-tenant-search vx-order-search"
+              aria-label="搜索订单"
+            />
+            <Button variant="outline" onClick={handleReset}>
+              重置
+            </Button>
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as OrderStatusFilter)
+                }
+                aria-label="订单状态"
+              >
+                <option value="all">全部订单</option>
+                <option value="pending">待付款</option>
+                <option value="pending_verify">待复核</option>
+                <option value="confirmed">已确认</option>
+                <option value="overdue">逾期</option>
+                <option value="closed">已关闭</option>
+                <option value="abnormal">异常</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={paymentFilter}
+                onChange={(event) =>
+                  setPaymentFilter(event.target.value as PaymentStatusFilter)
+                }
+                aria-label="支付状态"
+              >
+                <option value="all">全部支付</option>
+                <option value="not_required">无需支付</option>
+                <option value="unpaid">未支付</option>
+                <option value="pending">支付中</option>
+                <option value="pending_verify">线下待核</option>
+                <option value="paid">已支付</option>
+                <option value="partial">部分支付</option>
+                <option value="failed">支付失败</option>
+                <option value="closed">已关闭</option>
+                <option value="refunding">退款中</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={paySourceFilter}
+                onChange={(event) =>
+                  setPaySourceFilter(event.target.value as PaySourceFilter)
+                }
+                aria-label="支付来源"
+              >
+                <option value="all">全部来源</option>
+                <option value="online">线上</option>
+                <option value="offline">线下</option>
+                <option value="none">无</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={tierFilter}
+                onChange={(event) =>
+                  setTierFilter(event.target.value as TierFilter)
+                }
+                aria-label="套餐版本"
+              >
+                <option value="all">全部套餐</option>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+                <option value="other">其他</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedOrderIds.size > 0 ? (
+            <BulkActionBar
+              count={selectedOrderIds.size}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  onSelect: () =>
+                    exportRowsToCsv(
+                      "orders-export",
+                      ORDER_CSV_COLUMNS,
+                      selectedOrders,
+                    ),
+                },
+              ]}
+              onClear={clearOrderSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="订单清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleOrders.length ? (
+              viewMode === "list" ? (
+                <OrderListRows
+                  orders={visibleOrders}
+                  startIndex={(activePage - 1) * pageSize}
+                  onConfirmPayment={requestConfirmPayment}
+                  selectedOrderIds={selectedOrderIds}
+                  isPageSelected={isOrderPageSelected}
+                  onToggleOrder={toggleOrderSelection}
+                  onTogglePage={toggleOrderPageSelection}
+                />
+              ) : (
+                <OrderCards
+                  orders={visibleOrders}
+                  onConfirmPayment={requestConfirmPayment}
+                />
+              )
             ) : (
-              <OrderCards
-                orders={visibleOrders}
-                onConfirmPayment={requestConfirmPayment}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载订单"
-                    : loadError
-                      ? "订单数据读取失败"
-                      : "没有匹配的订单"
-                }
-                description={
-                  loading
-                    ? "正在读取订单、账单和支付状态。"
-                    : (loadError ?? "清空筛选条件后可查看全部订单记录。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载订单"
+                      : loadError
+                        ? "订单数据读取失败"
+                        : "没有匹配的订单"
+                  }
+                  description={
+                    loading
+                      ? "正在读取订单、账单和支付状态。"
+                      : (loadError ?? "清空筛选条件后可查看全部订单记录。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -932,9 +944,8 @@ export function OrdersPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
-
+        }
+      />
       {paymentTarget ? (
         <OrderOfflinePaymentDialog
           order={paymentTarget}
@@ -946,6 +957,6 @@ export function OrdersPage() {
           onSubmit={handleConfirmOfflinePayment}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
