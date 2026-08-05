@@ -272,7 +272,12 @@ export function OperaShell({
                     logoSrc="/brand/vxture-logo-icon.svg"
                   />
                   <span className="h-lg w-px bg-border" aria-hidden="true" />
-                  <span className="hidden text-body-md font-semibold text-muted-foreground md:inline">
+                  {/* 当前域标签与 admin 同一角色：`label-md` 自带 medium(500)。
+                      原先是 `body-md`（正文角色，normal 400）再手动 semibold 顶到
+                      600——字号颜色都与 admin 相同，只有字重差一档，在 muted 灰上
+                      看起来像换了颜色。排版角色是字号/字重/行高/字距一整套，
+                      单挑一项覆盖，同一个角色在各处就会长得不一样。 */}
+                  <span className="hidden truncate text-label-md text-muted-foreground md:inline">
                     基础设施控制平面
                   </span>
                 </>
