@@ -14,16 +14,16 @@ import {
   DialogForm,
   DialogTitle,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
   Textarea,
   useToast,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -1536,185 +1536,207 @@ export function AdminRolesPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-admin-roles-page">
-      <PageHeader
-        icon="role"
-        title="平台角色"
-        description="管理平台用户角色、权限集合和授权覆盖；不参与租户成员角色流转。"
-      />
-
-      <MetricGrid
-        aria-label="平台角色统计"
-        columns={3}
-        items={[
-          {
-            id: "total",
-            icon: "role",
-            label: "角色总数",
-            value: formatNumber(roles.length),
-            tags: [`系统预置 ${formatNumber(systemRoles)}`],
-          },
-          {
-            id: "enabled",
-            icon: "check",
-            label: "启用角色",
-            value: formatNumber(enabledRoles),
-            tags: ["可授权"],
-            tone: "success",
-          },
-          {
-            id: "other",
-            icon: "x",
-            label: "其他角色",
-            value: formatNumber(otherRoleCount),
-            tags: [
-              ...(disabledRoles ? [`停用 ${formatNumber(disabledRoles)}`] : []),
-              ...(archivedRoles ? [`归档 ${formatNumber(archivedRoles)}`] : []),
-            ],
-            tone: "danger",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="平台角色筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="平台角色展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-admin-roles-page"
+        header={
+          <PageHeader
+            icon="role"
+            title="平台角色"
+            description="管理平台用户角色、权限集合和授权覆盖；不参与租户成员角色流转。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredRoles.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索角色、权限、描述"
-            className="vx-tenant-search vx-admin-role-search"
-            aria-label="搜索平台角色"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="角色状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">启用</option>
-              <option value="disabled">停用</option>
-              <option value="archived">归档</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={roleKindFilter}
-              onChange={(event) =>
-                setRoleKindFilter(event.target.value as RoleKindFilter)
-              }
-              aria-label="角色类型"
-            >
-              <option value="all">全部类型</option>
-              <option value="system">系统角色</option>
-              <option value="custom">自定义角色</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={permissionFilter}
-              onChange={(event) =>
-                setPermissionFilter(event.target.value as PermissionFilter)
-              }
-              aria-label="权限类型"
-            >
-              <option value="all">全部权限</option>
-              <option value="MENU">菜单</option>
-              <option value="BUTTON">按钮</option>
-              <option value="API">接口</option>
-              <option value="empty">未授权</option>
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" onClick={openCreateRole}>
-            新建角色
-          </ActionButton>
-        </section>
-
-        <section className="vx-tenant-directory" aria-label="平台角色清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleRoles.length ? (
-            viewMode === "list" ? (
-              <AdminRoleListRows
-                roles={visibleRoles}
-                startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                selectedRoleIds={selectedRoleIds}
-                isPageSelected={isRolePageSelected}
-                onToggleRole={toggleRoleSelection}
-                onTogglePage={toggleRolePageSelection}
-                roleLabels={roleLabels}
-                t={t}
-                onOpenPermissions={(role) => setPermissionDialogRoleId(role.id)}
-                onOpenAuthorization={(role) => {
-                  setAuthorizationError(null);
-                  setAuthorizationRoleId(role.id);
-                }}
-                onEdit={openEditRole}
-                onCopy={openCopyRole}
-                onToggle={(role) => void handleToggleRole(role)}
-                onDelete={(role) => setPendingDeleteRoleId(role.id)}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="平台角色统计"
+              columns={3}
+              items={[
+                {
+                  id: "total",
+                  icon: "role",
+                  label: "角色总数",
+                  value: formatNumber(roles.length),
+                  tags: [`系统预置 ${formatNumber(systemRoles)}`],
+                },
+                {
+                  id: "enabled",
+                  icon: "check",
+                  label: "启用角色",
+                  value: formatNumber(enabledRoles),
+                  tags: ["可授权"],
+                  tone: "success",
+                },
+                {
+                  id: "other",
+                  icon: "x",
+                  label: "其他角色",
+                  value: formatNumber(otherRoleCount),
+                  tags: [
+                    ...(disabledRoles
+                      ? [`停用 ${formatNumber(disabledRoles)}`]
+                      : []),
+                    ...(archivedRoles
+                      ? [`归档 ${formatNumber(archivedRoles)}`]
+                      : []),
+                  ],
+                  tone: "danger",
+                },
+              ]}
+            />
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredRoles.length)}
+            aria-label="平台角色筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索角色、权限、描述"
+                className="vx-tenant-search vx-admin-role-search"
+                aria-label="搜索平台角色"
               />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant="outline"
+                  icon="plus"
+                  onClick={openCreateRole}
+                >
+                  新建角色
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="角色状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">启用</option>
+                <option value="disabled">停用</option>
+                <option value="archived">归档</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={roleKindFilter}
+                onChange={(event) =>
+                  setRoleKindFilter(event.target.value as RoleKindFilter)
+                }
+                aria-label="角色类型"
+              >
+                <option value="all">全部类型</option>
+                <option value="system">系统角色</option>
+                <option value="custom">自定义角色</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={permissionFilter}
+                onChange={(event) =>
+                  setPermissionFilter(event.target.value as PermissionFilter)
+                }
+                aria-label="权限类型"
+              >
+                <option value="all">全部权限</option>
+                <option value="MENU">菜单</option>
+                <option value="BUTTON">按钮</option>
+                <option value="API">接口</option>
+                <option value="empty">未授权</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="平台角色清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleRoles.length ? (
+              viewMode === "list" ? (
+                <AdminRoleListRows
+                  roles={visibleRoles}
+                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
+                  selectedRoleIds={selectedRoleIds}
+                  isPageSelected={isRolePageSelected}
+                  onToggleRole={toggleRoleSelection}
+                  onTogglePage={toggleRolePageSelection}
+                  roleLabels={roleLabels}
+                  t={t}
+                  onOpenPermissions={(role) =>
+                    setPermissionDialogRoleId(role.id)
+                  }
+                  onOpenAuthorization={(role) => {
+                    setAuthorizationError(null);
+                    setAuthorizationRoleId(role.id);
+                  }}
+                  onEdit={openEditRole}
+                  onCopy={openCopyRole}
+                  onToggle={(role) => void handleToggleRole(role)}
+                  onDelete={(role) => setPendingDeleteRoleId(role.id)}
+                />
+              ) : (
+                <AdminRoleCards
+                  roles={visibleRoles}
+                  roleLabels={roleLabels}
+                  t={t}
+                  onOpenPermissions={(role) =>
+                    setPermissionDialogRoleId(role.id)
+                  }
+                  onOpenAuthorization={(role) => {
+                    setAuthorizationError(null);
+                    setAuthorizationRoleId(role.id);
+                  }}
+                  onEdit={openEditRole}
+                  onCopy={openCopyRole}
+                  onToggle={(role) => void handleToggleRole(role)}
+                  onDelete={(role) => setPendingDeleteRoleId(role.id)}
+                />
+              )
             ) : (
-              <AdminRoleCards
-                roles={visibleRoles}
-                roleLabels={roleLabels}
-                t={t}
-                onOpenPermissions={(role) => setPermissionDialogRoleId(role.id)}
-                onOpenAuthorization={(role) => {
-                  setAuthorizationError(null);
-                  setAuthorizationRoleId(role.id);
-                }}
-                onEdit={openEditRole}
-                onCopy={openCopyRole}
-                onToggle={(role) => void handleToggleRole(role)}
-                onDelete={(role) => setPendingDeleteRoleId(role.id)}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载平台角色"
-                    : loadError
-                      ? "平台角色读取失败"
-                      : "没有匹配的平台角色"
-                }
-                description={
-                  loading
-                    ? "正在从 platform.platform_role 读取平台角色。"
-                    : (loadError ?? "清空筛选条件后可查看全部平台角色。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载平台角色"
+                      : loadError
+                        ? "平台角色读取失败"
+                        : "没有匹配的平台角色"
+                  }
+                  description={
+                    loading
+                      ? "正在从 platform.platform_role 读取平台角色。"
+                      : (loadError ?? "清空筛选条件后可查看全部平台角色。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
@@ -1725,8 +1747,8 @@ export function AdminRolesPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
+        }
+      />
       {permissionDialogRole ? (
         <AdminRolePermissionDialog
           role={permissionDialogRole}
@@ -1799,6 +1821,6 @@ export function AdminRolesPage() {
           onSubmit={(event) => void confirmDeleteRole(event)}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

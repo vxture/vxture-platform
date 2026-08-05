@@ -7,20 +7,19 @@ import {
   ActionMenu,
   Badge,
   Banner,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   ListCardGrid,
+  ListPageTemplate,
   MetricGrid,
   MetricListCard,
   NativeSelect,
   StatusBadge,
   TableTitleCell,
   useToast,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -584,202 +583,213 @@ export function TenantsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-tenant-operations-page">
-      <PageHeader
-        icon="buildings"
-        eyebrow="租户账号"
-        title="租户信息"
-        description="平台运营侧统一检索租户、识别风险、处理订阅和进入单租户管理。"
-      />
-
-      <MetricGrid
-        aria-label="租户运营统计"
-        items={[
-          {
-            id: "total",
-            icon: "buildings",
-            label: "租户总数",
-            value: formatNumber(tenants.length),
-            tags: [
-              `个人 ${formatNumber(individualTenants)}`,
-              `组织 ${formatNumber(companyTenants)}`,
-            ],
-          },
-          {
-            id: "pending-verification",
-            icon: "medal",
-            label: "认证待审",
-            value: formatNumber(pendingVerifications),
-            tags: [
-              `个人 ${formatNumber(pendingIndividualVerifications)}`,
-              `组织 ${formatNumber(pendingCompanyVerifications)}`,
-            ],
-            tone: "warning",
-          },
-          {
-            id: "trial",
-            icon: "star",
-            label: "试用租户",
-            value: formatNumber(trialProductTenants),
-            tags: ["未付费"],
-            tone: "warning",
-          },
-          {
-            id: "risk",
-            icon: "warning",
-            label: "风险租户",
-            value: formatNumber(riskTenants),
-            tags: ["需跟进"],
-            tone: riskTenants ? "danger" : "success",
-          },
-        ]}
-      />
-
-      {tenantsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前租户列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标租户，请尝试缩小筛选范围（如按状态、认证情况等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="租户筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="租户展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-tenant-operations-page"
+        header={
+          <PageHeader
+            icon="buildings"
+            eyebrow="租户账号"
+            title="租户信息"
+            description="平台运营侧统一检索租户、识别风险、处理订阅和进入单租户管理。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredTenants.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索租户、编码、联系人、产品"
-            className="vx-tenant-search"
-            aria-label="搜索租户"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="租户状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">正常</option>
-              <option value="trial">试用</option>
-              <option value="suspended">暂停</option>
-              <option value="cancelled">注销</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={typeFilter}
-              onChange={(event) =>
-                setTypeFilter(event.target.value as TypeFilter)
-              }
-              aria-label="租户类型"
-            >
-              <option value="all">全部类型</option>
-              <option value="company">企业租户</option>
-              <option value="individual">个人租户</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={verificationFilter}
-              onChange={(event) =>
-                setVerificationFilter(event.target.value as VerificationFilter)
-              }
-              aria-label="认证状态"
-            >
-              <option value="all">全部认证</option>
-              <option value="verified">已认证</option>
-              <option value="pending">待审核</option>
-              <option value="unverified">未认证</option>
-              <option value="rejected">已驳回</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={riskFilter}
-              onChange={(event) =>
-                setRiskFilter(event.target.value as RiskFilter)
-              }
-              aria-label="风险等级"
-            >
-              <option value="all">全部风险</option>
-              {tenantRiskOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            新建租户
-          </ActionButton>
-        </section>
-
-        <section className="vx-tenant-directory" aria-label="租户清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleTenants.length ? (
-            viewMode === "list" ? (
-              <TenantListRows
-                tenants={visibleTenants}
-                startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                selectedTenantIds={selectedTenantIds}
-                isPageSelected={isTenantPageSelected}
-                actionBusy={actionBusy}
-                onToggleTenant={toggleTenantSelection}
-                onTogglePage={toggleTenantPageSelection}
-                onToggleStatus={handleToggleTenantStatus}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="租户运营统计"
+              items={[
+                {
+                  id: "total",
+                  icon: "buildings",
+                  label: "租户总数",
+                  value: formatNumber(tenants.length),
+                  tags: [
+                    `个人 ${formatNumber(individualTenants)}`,
+                    `组织 ${formatNumber(companyTenants)}`,
+                  ],
+                },
+                {
+                  id: "pending-verification",
+                  icon: "medal",
+                  label: "认证待审",
+                  value: formatNumber(pendingVerifications),
+                  tags: [
+                    `个人 ${formatNumber(pendingIndividualVerifications)}`,
+                    `组织 ${formatNumber(pendingCompanyVerifications)}`,
+                  ],
+                  tone: "warning",
+                },
+                {
+                  id: "trial",
+                  icon: "star",
+                  label: "试用租户",
+                  value: formatNumber(trialProductTenants),
+                  tags: ["未付费"],
+                  tone: "warning",
+                },
+                {
+                  id: "risk",
+                  icon: "warning",
+                  label: "风险租户",
+                  value: formatNumber(riskTenants),
+                  tags: ["需跟进"],
+                  tone: riskTenants ? "danger" : "success",
+                },
+              ]}
+            />
+            {tenantsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前租户列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标租户，请尝试缩小筛选范围（如按状态、认证情况等）重新查询。"
               />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredTenants.length)}
+            aria-label="租户筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索租户、编码、联系人、产品"
+                className="vx-tenant-search"
+                aria-label="搜索租户"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  新建租户
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="租户状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">正常</option>
+                <option value="trial">试用</option>
+                <option value="suspended">暂停</option>
+                <option value="cancelled">注销</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={typeFilter}
+                onChange={(event) =>
+                  setTypeFilter(event.target.value as TypeFilter)
+                }
+                aria-label="租户类型"
+              >
+                <option value="all">全部类型</option>
+                <option value="company">企业租户</option>
+                <option value="individual">个人租户</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={verificationFilter}
+                onChange={(event) =>
+                  setVerificationFilter(
+                    event.target.value as VerificationFilter,
+                  )
+                }
+                aria-label="认证状态"
+              >
+                <option value="all">全部认证</option>
+                <option value="verified">已认证</option>
+                <option value="pending">待审核</option>
+                <option value="unverified">未认证</option>
+                <option value="rejected">已驳回</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={riskFilter}
+                onChange={(event) =>
+                  setRiskFilter(event.target.value as RiskFilter)
+                }
+                aria-label="风险等级"
+              >
+                <option value="all">全部风险</option>
+                {tenantRiskOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="租户清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleTenants.length ? (
+              viewMode === "list" ? (
+                <TenantListRows
+                  tenants={visibleTenants}
+                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
+                  selectedTenantIds={selectedTenantIds}
+                  isPageSelected={isTenantPageSelected}
+                  actionBusy={actionBusy}
+                  onToggleTenant={toggleTenantSelection}
+                  onTogglePage={toggleTenantPageSelection}
+                  onToggleStatus={handleToggleTenantStatus}
+                />
+              ) : (
+                <TenantCards
+                  tenants={visibleTenants}
+                  actionBusy={actionBusy}
+                  onToggleStatus={handleToggleTenantStatus}
+                />
+              )
             ) : (
-              <TenantCards
-                tenants={visibleTenants}
-                actionBusy={actionBusy}
-                onToggleStatus={handleToggleTenantStatus}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载租户"
-                    : loadError
-                      ? "租户数据读取失败"
-                      : "没有匹配的租户"
-                }
-                description={
-                  loading
-                    ? "正在读取平台租户运营数据。"
-                    : (loadError ?? "清空筛选条件后可查看全部租户。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载租户"
+                      : loadError
+                        ? "租户数据读取失败"
+                        : "没有匹配的租户"
+                  }
+                  description={
+                    loading
+                      ? "正在读取平台租户运营数据。"
+                      : (loadError ?? "清空筛选条件后可查看全部租户。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
@@ -790,8 +800,8 @@ export function TenantsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

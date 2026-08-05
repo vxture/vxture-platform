@@ -6,20 +6,19 @@ import {
   ActionMenu,
   Badge,
   Banner,
-  Button,
   Checkbox,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
   Textarea,
   useToast,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -746,192 +745,197 @@ export function AccountsPage({
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-account-management-page">
-      <PageHeader
-        icon="user"
-        eyebrow={pageCopy.eyebrow}
-        title={pageCopy.title}
-        description={pageCopy.description}
-      />
-
-      <MetricGrid
-        aria-label={pageCopy.summaryAriaLabel}
-        items={[
-          {
-            id: "total",
-            icon: "user",
-            label: "账号总数",
-            value: formatNumber(accounts.length),
-            tags: [`活跃 ${formatNumber(activeAccounts)}`],
-            // 身份类图标原本走 `--identity-icon` 修饰去色（gray-400）：这张卡是
-            // 基数不是状态，不该跟着染品牌色。neutral 是 DS 里表达"刻意去色"的档。
-            tone: "neutral",
-          },
-          {
-            id: "invited",
-            icon: "clock",
-            label: "待激活",
-            value: formatNumber(invitedAccounts),
-            tags: ["邀请中"],
-            tone: "warning",
-          },
-          {
-            id: "locked",
-            icon: "warning",
-            label: "已锁定",
-            value: formatNumber(lockedAccounts),
-            tags: ["临时锁定"],
-            tone: lockedAccounts ? "warning" : "success",
-          },
-          {
-            id: "disabled",
-            icon: "x",
-            label: "已停用",
-            value: formatNumber(disabledAccounts),
-            tags: ["长期未用"],
-            tone: disabledAccounts ? "danger" : "success",
-          },
-        ]}
-      />
-
-      {accountsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前账号列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标账号，请尝试缩小筛选范围（如按状态、权限等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section
-          className="vx-tenant-toolbar"
-          aria-label={pageCopy.toolbarAriaLabel}
-        >
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel={`${pageCopy.title}展示方式`}
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-account-management-page"
+        header={
+          <PageHeader
+            icon="user"
+            eyebrow={pageCopy.eyebrow}
+            title={pageCopy.title}
+            description={pageCopy.description}
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredAccounts.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={pageCopy.searchPlaceholder}
-            className="vx-tenant-search"
-            aria-label={pageCopy.searchAriaLabel}
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label={pageCopy.statusAriaLabel}
-            >
-              <option value="all">全部状态</option>
-              <option value="active">正常</option>
-              <option value="invited">待激活</option>
-              <option value="locked">已锁定</option>
-              <option value="disabled">已停用</option>
-            </NativeSelect>
-            {showTenantContext ? (
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label={pageCopy.summaryAriaLabel}
+              items={[
+                {
+                  id: "total",
+                  icon: "user",
+                  label: "账号总数",
+                  value: formatNumber(accounts.length),
+                  tags: [`活跃 ${formatNumber(activeAccounts)}`],
+                  // 身份类图标原本走 `--identity-icon` 修饰去色（gray-400）：这张卡是
+                  // 基数不是状态，不该跟着染品牌色。neutral 是 DS 里表达"刻意去色"的档。
+                  tone: "neutral",
+                },
+                {
+                  id: "invited",
+                  icon: "clock",
+                  label: "待激活",
+                  value: formatNumber(invitedAccounts),
+                  tags: ["邀请中"],
+                  tone: "warning",
+                },
+                {
+                  id: "locked",
+                  icon: "warning",
+                  label: "已锁定",
+                  value: formatNumber(lockedAccounts),
+                  tags: ["临时锁定"],
+                  tone: lockedAccounts ? "warning" : "success",
+                },
+                {
+                  id: "disabled",
+                  icon: "x",
+                  label: "已停用",
+                  value: formatNumber(disabledAccounts),
+                  tags: ["长期未用"],
+                  tone: disabledAccounts ? "danger" : "success",
+                },
+              ]}
+            />
+            {accountsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前账号列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标账号，请尝试缩小筛选范围（如按状态、权限等）重新查询。"
+              />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredAccounts.length)}
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={pageCopy.searchPlaceholder}
+                className="vx-tenant-search"
+                aria-label={pageCopy.searchAriaLabel}
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  {pageCopy.createActionLabel}
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
               <NativeSelect
                 className="vx-input vx-tenant-select"
-                value={tenantTypeFilter}
+                value={statusFilter}
                 onChange={(event) =>
-                  setTenantTypeFilter(event.target.value as TenantTypeFilter)
+                  setStatusFilter(event.target.value as StatusFilter)
                 }
-                aria-label={pageCopy.tenantTypeAriaLabel}
+                aria-label={pageCopy.statusAriaLabel}
               >
-                <option value="all">全部租户</option>
-                <option value="individual">个人</option>
-                <option value="company">组织</option>
-                <option value="mixed">个人+组织</option>
+                <option value="all">全部状态</option>
+                <option value="active">正常</option>
+                <option value="invited">待激活</option>
+                <option value="locked">已锁定</option>
+                <option value="disabled">已停用</option>
               </NativeSelect>
+              {showTenantContext ? (
+                <NativeSelect
+                  className="vx-input vx-tenant-select"
+                  value={tenantTypeFilter}
+                  onChange={(event) =>
+                    setTenantTypeFilter(event.target.value as TenantTypeFilter)
+                  }
+                  aria-label={pageCopy.tenantTypeAriaLabel}
+                >
+                  <option value="all">全部租户</option>
+                  <option value="individual">个人</option>
+                  <option value="company">组织</option>
+                  <option value="mixed">个人+组织</option>
+                </NativeSelect>
+              ) : null}
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={roleFilter}
+                onChange={(event) =>
+                  setRoleFilter(event.target.value as RoleFilter)
+                }
+                aria-label={pageCopy.roleAriaLabel}
+              >
+                <option value="all">全部权限</option>
+                <option value="owner">Owner</option>
+                <option value="admin">Admin</option>
+                <option value="member">Member</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section
+            className="vx-tenant-directory"
+            aria-label={pageCopy.directoryAriaLabel}
+          >
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
             ) : null}
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={roleFilter}
-              onChange={(event) =>
-                setRoleFilter(event.target.value as RoleFilter)
-              }
-              aria-label={pageCopy.roleAriaLabel}
-            >
-              <option value="all">全部权限</option>
-              <option value="owner">Owner</option>
-              <option value="admin">Admin</option>
-              <option value="member">Member</option>
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            {pageCopy.createActionLabel}
-          </ActionButton>
-        </section>
 
-        <section
-          className="vx-tenant-directory"
-          aria-label={pageCopy.directoryAriaLabel}
-        >
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleAccounts.length ? (
-            viewMode === "list" ? (
-              <AccountListRows
-                accounts={visibleAccounts}
-                startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                selectedAccountIds={selectedAccountIds}
-                isPageSelected={isAccountPageSelected}
-                showTenantContext={showTenantContext}
-                onToggleAccount={toggleAccountSelection}
-                onTogglePage={toggleAccountPageSelection}
-                actions={accountActions}
-              />
+            {visibleAccounts.length ? (
+              viewMode === "list" ? (
+                <AccountListRows
+                  accounts={visibleAccounts}
+                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
+                  selectedAccountIds={selectedAccountIds}
+                  isPageSelected={isAccountPageSelected}
+                  showTenantContext={showTenantContext}
+                  onToggleAccount={toggleAccountSelection}
+                  onTogglePage={toggleAccountPageSelection}
+                  actions={accountActions}
+                />
+              ) : (
+                <AccountCards
+                  accounts={visibleAccounts}
+                  showTenantContext={showTenantContext}
+                  actions={accountActions}
+                />
+              )
             ) : (
-              <AccountCards
-                accounts={visibleAccounts}
-                showTenantContext={showTenantContext}
-                actions={accountActions}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? pageCopy.loadingTitle
-                    : loadError
-                      ? "账号数据读取失败"
-                      : pageCopy.emptyTitle
-                }
-                description={
-                  loading
-                    ? pageCopy.loadingDescription
-                    : (loadError ?? pageCopy.emptyDescription)
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? pageCopy.loadingTitle
+                      : loadError
+                        ? "账号数据读取失败"
+                        : pageCopy.emptyTitle
+                  }
+                  description={
+                    loading
+                      ? pageCopy.loadingDescription
+                      : (loadError ?? pageCopy.emptyDescription)
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
@@ -942,8 +946,8 @@ export function AccountsPage({
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
+        }
+      />
       {pendingAction ? (
         <DialogForm
           open
@@ -987,6 +991,6 @@ export function AccountsPage({
           </Label>
         </DialogForm>
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

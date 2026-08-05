@@ -9,23 +9,22 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
-  Button,
+  Banner,
   Checkbox,
   DialogForm,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  Textarea,
-  ViewModeSwitch,
-  useToast,
+  FilterBar,
+  Icon,
+  Input,
+  ListPageTemplate,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
-  ViewLayout,
+  Textarea,
+  useToast,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -746,181 +745,192 @@ export function VerificationsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-verification-page">
-      <PageHeader
-        icon="medal"
-        title="实名认证"
-        description="集中处理组织租户提交的企业资质认证，按待审、通过、驳回和未提交状态推进审核流转。"
-      />
-
-      <MetricGrid
-        aria-label="实名认证统计"
-        items={[
-          {
-            id: "organizations",
-            icon: "buildings",
-            label: "组织总数",
-            value: formatNumber(organizationTenants.length),
-            tags: [`待审 ${formatNumber(pendingCount)}`],
-          },
-          {
-            id: "pending",
-            icon: "clock",
-            label: "待审核",
-            value: formatNumber(pendingCount),
-            tags: [`超 3 天 ${formatNumber(overdueCount)}`],
-            tone: "warning",
-          },
-          {
-            id: "verified",
-            icon: "check",
-            label: "已认证",
-            value: formatNumber(verifiedCount),
-            tags: [`通过率 ${formatNumber(passRate)}%`],
-            tone: "success",
-          },
-          {
-            id: "needs-supplement",
-            icon: "warning",
-            label: "需补充",
-            value: formatNumber(rejectedCount + unverifiedCount),
-            tags: [
-              `驳回 ${formatNumber(rejectedCount)}`,
-              `未提交 ${formatNumber(unverifiedCount)}`,
-            ],
-            tone: rejectedCount ? "danger" : "success",
-          },
-        ]}
-      />
-
-      {verificationsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前实名认证列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按认证状态、地区等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="实名认证筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="实名认证展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-verification-page"
+        header={
+          <PageHeader
+            icon="medal"
+            title="实名认证"
+            description="集中处理组织租户提交的企业资质认证，按待审、通过、驳回和未提交状态推进审核流转。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredTenants.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索组织、编码、联系人、地区"
-            className="vx-tenant-search vx-verification-search"
-            aria-label="搜索实名认证"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={verificationFilter}
-              onChange={(event) =>
-                setVerificationFilter(event.target.value as VerificationFilter)
-              }
-              aria-label="认证状态"
-            >
-              <option value="all">全部认证</option>
-              <option value="pending">待审核</option>
-              <option value="verified">已认证</option>
-              <option value="rejected">已驳回</option>
-              <option value="unverified">未认证</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={riskFilter}
-              onChange={(event) =>
-                setRiskFilter(event.target.value as RiskFilter)
-              }
-              aria-label="风险等级"
-            >
-              <option value="all">全部风险</option>
-              {tenantRiskOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={regionFilter}
-              onChange={(event) => setRegionFilter(event.target.value)}
-              aria-label="所属区域"
-            >
-              <option value="all">全部区域</option>
-              {regionOptions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="medal" disabled>
-            批量审核
-          </ActionButton>
-        </section>
-
-        <section className="vx-tenant-directory" aria-label="实名认证清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleTenants.length ? (
-            viewMode === "list" ? (
-              <VerificationListRows
-                tenants={visibleTenants}
-                startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                selectedTenantIds={selectedTenantIds}
-                isPageSelected={isTenantPageSelected}
-                actionBusy={actionBusy}
-                onToggleTenant={toggleTenantSelection}
-                onTogglePage={toggleTenantPageSelection}
-                onApprove={handleApprove}
-                onReject={openReject}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="实名认证统计"
+              items={[
+                {
+                  id: "organizations",
+                  icon: "buildings",
+                  label: "组织总数",
+                  value: formatNumber(organizationTenants.length),
+                  tags: [`待审 ${formatNumber(pendingCount)}`],
+                },
+                {
+                  id: "pending",
+                  icon: "clock",
+                  label: "待审核",
+                  value: formatNumber(pendingCount),
+                  tags: [`超 3 天 ${formatNumber(overdueCount)}`],
+                  tone: "warning",
+                },
+                {
+                  id: "verified",
+                  icon: "check",
+                  label: "已认证",
+                  value: formatNumber(verifiedCount),
+                  tags: [`通过率 ${formatNumber(passRate)}%`],
+                  tone: "success",
+                },
+                {
+                  id: "needs-supplement",
+                  icon: "warning",
+                  label: "需补充",
+                  value: formatNumber(rejectedCount + unverifiedCount),
+                  tags: [
+                    `驳回 ${formatNumber(rejectedCount)}`,
+                    `未提交 ${formatNumber(unverifiedCount)}`,
+                  ],
+                  tone: rejectedCount ? "danger" : "success",
+                },
+              ]}
+            />
+            {verificationsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前实名认证列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按认证状态、地区等）重新查询。"
               />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredTenants.length)}
+            aria-label="实名认证筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索组织、编码、联系人、地区"
+                className="vx-tenant-search vx-verification-search"
+                aria-label="搜索实名认证"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="medal" disabled>
+                  批量审核
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={verificationFilter}
+                onChange={(event) =>
+                  setVerificationFilter(
+                    event.target.value as VerificationFilter,
+                  )
+                }
+                aria-label="认证状态"
+              >
+                <option value="all">全部认证</option>
+                <option value="pending">待审核</option>
+                <option value="verified">已认证</option>
+                <option value="rejected">已驳回</option>
+                <option value="unverified">未认证</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={riskFilter}
+                onChange={(event) =>
+                  setRiskFilter(event.target.value as RiskFilter)
+                }
+                aria-label="风险等级"
+              >
+                <option value="all">全部风险</option>
+                {tenantRiskOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={regionFilter}
+                onChange={(event) => setRegionFilter(event.target.value)}
+                aria-label="所属区域"
+              >
+                <option value="all">全部区域</option>
+                {regionOptions.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="实名认证清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleTenants.length ? (
+              viewMode === "list" ? (
+                <VerificationListRows
+                  tenants={visibleTenants}
+                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
+                  selectedTenantIds={selectedTenantIds}
+                  isPageSelected={isTenantPageSelected}
+                  actionBusy={actionBusy}
+                  onToggleTenant={toggleTenantSelection}
+                  onTogglePage={toggleTenantPageSelection}
+                  onApprove={handleApprove}
+                  onReject={openReject}
+                />
+              ) : (
+                <VerificationCards
+                  tenants={visibleTenants}
+                  actionBusy={actionBusy}
+                  onApprove={handleApprove}
+                  onReject={openReject}
+                />
+              )
             ) : (
-              <VerificationCards
-                tenants={visibleTenants}
-                actionBusy={actionBusy}
-                onApprove={handleApprove}
-                onReject={openReject}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={loading ? "正在加载实名认证" : "没有匹配的实名认证"}
-                description={
-                  loading
-                    ? "正在读取租户认证数据。"
-                    : "清空筛选条件后可查看全部实名认证记录。"
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={loading ? "正在加载实名认证" : "没有匹配的实名认证"}
+                  description={
+                    loading
+                      ? "正在读取租户认证数据。"
+                      : "清空筛选条件后可查看全部实名认证记录。"
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
@@ -931,8 +941,8 @@ export function VerificationsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
+        }
+      />
 
       {rejectTarget ? (
         <DialogForm
@@ -967,6 +977,6 @@ export function VerificationsPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
