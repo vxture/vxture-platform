@@ -85,9 +85,7 @@ function intentRows(mode) {
               ? ramp.active
               : slot === "foreground"
                 ? ramp.foreground
-                : slot === "text"
-                  ? (slots.text ?? ramp.text)
-                  : slots[slot];
+                : slots[slot];
       if (step === undefined) {
         errors.push(`${where}：槽位无取值`);
         continue;

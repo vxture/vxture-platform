@@ -61,7 +61,7 @@
   --primary-muted-active: var(--vx-color-brand-200);
   --primary-muted-foreground: var(--vx-color-brand-800);
   --primary-border: var(--vx-color-brand-600);
-  --primary-text: var(--vx-color-brand-600);
+  --primary-text: var(--vx-color-brand-700);
   --destructive: var(--vx-color-red-600);
   --destructive-hover: var(--vx-color-red-700);
   --destructive-active: var(--vx-color-red-800);
@@ -71,7 +71,7 @@
   --destructive-muted-active: var(--vx-color-red-200);
   --destructive-muted-foreground: var(--vx-color-red-800);
   --destructive-border: var(--vx-color-red-600);
-  --destructive-text: var(--vx-color-red-600);
+  --destructive-text: var(--vx-color-red-700);
   --ai: var(--vx-color-purple-600);
   --ai-hover: var(--vx-color-purple-700);
   --ai-active: var(--vx-color-purple-800);
@@ -81,7 +81,7 @@
   --ai-muted-active: var(--vx-color-purple-200);
   --ai-muted-foreground: var(--vx-color-purple-800);
   --ai-border: var(--vx-color-purple-600);
-  --ai-text: var(--vx-color-purple-600);
+  --ai-text: var(--vx-color-purple-700);
   --success: var(--vx-color-emerald-700);
   --success-hover: var(--vx-color-emerald-800);
   --success-active: var(--vx-color-emerald-900);

@@ -27,17 +27,27 @@ export const INTENT_FAMILIES = [
   ["warning", "amber", "C"],
 ];
 
-/** 阶型：填充三态 + 前景 + 明色下的文字档。 */
+/**
+ * 阶型：填充三态 + 前景。`text` 档不在这里——它由 `INTENT_SLOTS` 统一给（见下），
+ * 阶型只管"实心块用哪一档"。
+ */
 export const INTENT_RAMPS = {
-  A: { fill: 600, hover: 700, active: 800, foreground: "white", text: 600 },
-  B: { fill: 700, hover: 800, active: 900, foreground: "white", text: 700 },
-  C: { fill: 400, hover: 500, active: 600, foreground: "neutral-900", text: 700 },
+  A: { fill: 600, hover: 700, active: 800, foreground: "white" },
+  B: { fill: 700, hover: 800, active: 900, foreground: "white" },
+  C: { fill: 400, hover: 500, active: 600, foreground: "neutral-900" },
 };
 
 /**
  * 六族共用的槽位。填充三态与前景**不随主题变化**——一个"危险"按钮在暗色下仍应
  * 是同一个红，否则同一个操作在两种主题下看起来是两件事。随主题变的是 muted 系列
  * （底色要贴合各自主题的表面明度）与 text / border（要在各自背景上保持对比度）。
+ *
+ * `text` **六族同档，不随阶型**（owner 2026-08-05）：它是"在浅底上说话的那档字"，
+ * 决定它的是背景明度，不是这一族实心块用得多深。此前它挂在阶型里，于是 A 族
+ * （primary / destructive / ai）拿的是 600——与自己的实心填充同档，而 B/C 族拿
+ * 700。结果 brand 语气的标、tag、链接比同场的 success / warning 高出整整一档
+ * 彩度，满页的品牌蓝发亮（owner 实测："大范围的 brand 色 tags/badge 太亮眼"）。
+ * 统一到 700 后六族在浅底上视重齐平。实心块不受影响——那走 fill，仍是各自阶型。
  */
 export const INTENT_SLOTS = {
   light: {
@@ -46,6 +56,7 @@ export const INTENT_SLOTS = {
     "muted-active": 200,
     "muted-foreground": 800,
     border: 600,
+    text: 700,
   },
   dark: {
     muted: 950,

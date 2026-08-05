@@ -10,6 +10,23 @@
  *   传递），本包的 peer 范围仍含 React 18，去掉会让 StatusBadge 这类包装件拿不到 ref。
  * - 尺度走 T2（px-sm / py-2xs / text-label-sm），跟随密度与字号三档；
  *   上游的裸数值 px-2.5 / py-0.5 / text-xs 不跟随，故不用。
+ * - **缺省是 `outline` 而非 `default`**（2026-08-05 owner 定，理由见下）。
+ *
+ * ## 缺省是描边
+ *
+ * 变体的名字与值域仍与上游一致（default/secondary/destructive/outline），只有
+ * `defaultVariants` 换了——`variant="default"` 依旧是实心品牌底，它只是不再是
+ * 缺省值。
+ *
+ * 起因：仓内 191 处 `<Badge>` 不带 variant，于是全都渲染成实心品牌蓝 + 白字。
+ * 而它们说的几乎全是"这是个标签"——探针名、时间戳、分类、计数。实心品牌底是
+ * **强调**手段，一屏几十个强调就等于没有强调，只剩满页跳眼的蓝。
+ *
+ * 上游那个缺省合理是因为上游的 Badge 通常一屏一两个。到我们这个量级，缺省必须
+ * 是最安静的那一档，强调改成显式索取（`variant="default"`）。
+ *
+ * 与 `StatusBadge` 的分工也因此清楚了：Badge 是中性标签，StatusBadge 才带语气
+ * 底色——后者本就建在 `outline` 之上再叠 `toneSurfaceClasses`，两件现在同源。
  *
  * 原实现用对象式 cn 手写变体，且挂了一个已随遗留样式层退役的 .vx-badge。
  */
@@ -52,7 +69,8 @@ const badgeVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      // 不是 `default`——见文件头"缺省是描边"。
+      variant: "outline",
     },
   },
 );
