@@ -13,15 +13,15 @@ import {
   Checkbox,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
   Textarea,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
@@ -860,246 +860,259 @@ export function PaymentsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-payments-page">
-      <PageHeader
-        icon="check"
-        eyebrow="财务结算"
-        title="收款管理"
-        description="运营侧收款台账 MVP：集中查看线下/线上收款记录、账单关联和对账状态；确认收款仍从订单侧进入。"
-        action={
-          <Button asChild variant="outline">
-            <Link href="/orders">
-              <Icon name="table" size="xs" fallback="placeholder" />
-              订单收款入口
-            </Link>
-          </Button>
-        }
-      />
-
-      <MetricGrid
-        aria-label="收款统计"
-        items={[
-          {
-            id: "records",
-            icon: "check",
-            label: "收款记录",
-            value: formatNumber(payments.length),
-            tags: [`筛选 ${formatNumber(filteredPayments.length)}`],
-          },
-          {
-            id: "paid-amount",
-            icon: "chart-bar",
-            label: "已收金额",
-            value: formatCurrency(paidAmount, "CNY"),
-            tags: [`线下 ${formatCurrency(offlineAmount, "CNY")}`],
-            tone: "success",
-          },
-          {
-            id: "pending-verify",
-            icon: "clock",
-            label: "待复核",
-            value: formatNumber(pendingVerifyCount),
-            tags: [`部分 ${formatNumber(partialCount)}`],
-            tone: pendingVerifyCount || partialCount ? "warning" : "success",
-          },
-          {
-            id: "attention",
-            icon: "warning",
-            label: "需关注",
-            value: formatNumber(attentionCount),
-            tags: ["对账异常"],
-            tone: attentionCount ? "danger" : "success",
-          },
-        ]}
-      />
-
-      {paymentsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前收款列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标收款记录，请尝试缩小筛选范围（如按状态、来源等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="收款筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="收款展示方式"
-          />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredPayments.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索流水、租户、账单、付款方"
-            className="vx-tenant-search vx-payment-search"
-            aria-label="搜索收款"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-tenant-select"
-              value={paymentStatusFilter}
-              onChange={(event) =>
-                setPaymentStatusFilter(
-                  event.target.value as PaymentStatusFilter,
-                )
-              }
-              aria-label="收款状态"
-            >
-              <option value="all">全部收款</option>
-              <option value="pending">支付中</option>
-              <option value="pending_verify">线下待核</option>
-              <option value="paid">已收款</option>
-              <option value="partial">部分收款</option>
-              <option value="failed">支付失败</option>
-              <option value="closed">已关闭</option>
-              <option value="refunding">退款中</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={paySourceFilter}
-              onChange={(event) =>
-                setPaySourceFilter(event.target.value as PaySourceFilter)
-              }
-              aria-label="收款来源"
-            >
-              <option value="all">全部来源</option>
-              <option value="offline">线下</option>
-              <option value="online">线上</option>
-              <option value="none">无</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={reconciliationFilter}
-              onChange={(event) =>
-                setReconciliationFilter(
-                  event.target.value as ReconciliationFilter,
-                )
-              }
-              aria-label="对账状态"
-            >
-              <option value="all">全部对账</option>
-              <option value="attention">需关注</option>
-              <option value="normal">已对账</option>
-              <option value="pending_verify">待复核</option>
-              <option value="partial">部分收款</option>
-              <option value="overpaid">超额收款</option>
-              <option value="bill_cancelled">账单作废</option>
-              <option value="failed">支付异常</option>
-              <option value="unlinked">未关联</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={offlineTypeFilter}
-              onChange={(event) =>
-                setOfflineTypeFilter(event.target.value as OfflineTypeFilter)
-              }
-              aria-label="收款方式"
-            >
-              <option value="all">全部方式</option>
-              <option value="bank_transfer">银行转账</option>
-              <option value="cash">现金</option>
-              <option value="other">其他线下</option>
-              <option value="online">线上</option>
-              <option value="none">无</option>
-            </NativeSelect>
-          </div>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={() =>
-              exportRowsToCsv(
-                "payments-export",
-                PAYMENT_CSV_COLUMNS,
-                filteredPayments,
-              )
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-payments-page"
+        header={
+          <PageHeader
+            icon="check"
+            eyebrow="财务结算"
+            title="收款管理"
+            description="运营侧收款台账 MVP：集中查看线下/线上收款记录、账单关联和对账状态；确认收款仍从订单侧进入。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/orders">
+                  <Icon name="table" size="xs" fallback="placeholder" />
+                  订单收款入口
+                </Link>
+              </Button>
             }
-            disabled={filteredPayments.length === 0}
-          >
-            导出全部
-          </ActionButton>
-        </section>
-
-        {selectedPaymentIds.size > 0 ? (
-          <BulkActionBar
-            count={selectedPaymentIds.size}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                onSelect: () =>
-                  exportRowsToCsv(
-                    "payments-export",
-                    PAYMENT_CSV_COLUMNS,
-                    selectedPayments,
-                  ),
-              },
-            ]}
-            onClear={clearPaymentSelection}
           />
-        ) : null}
-
-        <section className="vx-tenant-directory" aria-label="收款清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visiblePayments.length ? (
-            viewMode === "list" ? (
-              <PaymentListRows
-                payments={visiblePayments}
-                startIndex={(activePage - 1) * pageSize}
-                selectedPaymentIds={selectedPaymentIds}
-                isPageSelected={isPaymentPageSelected}
-                onTogglePayment={togglePaymentSelection}
-                onTogglePage={togglePaymentPageSelection}
-                onVerify={handleOpenVerify}
-                onReject={handleOpenReject}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="收款统计"
+              items={[
+                {
+                  id: "records",
+                  icon: "check",
+                  label: "收款记录",
+                  value: formatNumber(payments.length),
+                  tags: [`筛选 ${formatNumber(filteredPayments.length)}`],
+                },
+                {
+                  id: "paid-amount",
+                  icon: "chart-bar",
+                  label: "已收金额",
+                  value: formatCurrency(paidAmount, "CNY"),
+                  tags: [`线下 ${formatCurrency(offlineAmount, "CNY")}`],
+                  tone: "success",
+                },
+                {
+                  id: "pending-verify",
+                  icon: "clock",
+                  label: "待复核",
+                  value: formatNumber(pendingVerifyCount),
+                  tags: [`部分 ${formatNumber(partialCount)}`],
+                  tone:
+                    pendingVerifyCount || partialCount ? "warning" : "success",
+                },
+                {
+                  id: "attention",
+                  icon: "warning",
+                  label: "需关注",
+                  value: formatNumber(attentionCount),
+                  tags: ["对账异常"],
+                  tone: attentionCount ? "danger" : "success",
+                },
+              ]}
+            />
+            {paymentsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前收款列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标收款记录，请尝试缩小筛选范围（如按状态、来源等）重新查询。"
               />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredPayments.length)}
+            aria-label="收款筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索流水、租户、账单、付款方"
+                className="vx-tenant-search vx-payment-search"
+                aria-label="搜索收款"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant={selectedPaymentIds.size > 0 ? "default" : "outline"}
+                  icon="arrow-down"
+                  onClick={() =>
+                    exportRowsToCsv(
+                      "payments-export",
+                      PAYMENT_CSV_COLUMNS,
+                      filteredPayments.filter((item) =>
+                        selectedPaymentIds.has(item.id),
+                      ),
+                    )
+                  }
+                  disabled={selectedPaymentIds.size === 0}
+                >
+                  导出
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-tenant-select"
+                value={paymentStatusFilter}
+                onChange={(event) =>
+                  setPaymentStatusFilter(
+                    event.target.value as PaymentStatusFilter,
+                  )
+                }
+                aria-label="收款状态"
+              >
+                <option value="all">全部收款</option>
+                <option value="pending">支付中</option>
+                <option value="pending_verify">线下待核</option>
+                <option value="paid">已收款</option>
+                <option value="partial">部分收款</option>
+                <option value="failed">支付失败</option>
+                <option value="closed">已关闭</option>
+                <option value="refunding">退款中</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={paySourceFilter}
+                onChange={(event) =>
+                  setPaySourceFilter(event.target.value as PaySourceFilter)
+                }
+                aria-label="收款来源"
+              >
+                <option value="all">全部来源</option>
+                <option value="offline">线下</option>
+                <option value="online">线上</option>
+                <option value="none">无</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={reconciliationFilter}
+                onChange={(event) =>
+                  setReconciliationFilter(
+                    event.target.value as ReconciliationFilter,
+                  )
+                }
+                aria-label="对账状态"
+              >
+                <option value="all">全部对账</option>
+                <option value="attention">需关注</option>
+                <option value="normal">已对账</option>
+                <option value="pending_verify">待复核</option>
+                <option value="partial">部分收款</option>
+                <option value="overpaid">超额收款</option>
+                <option value="bill_cancelled">账单作废</option>
+                <option value="failed">支付异常</option>
+                <option value="unlinked">未关联</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={offlineTypeFilter}
+                onChange={(event) =>
+                  setOfflineTypeFilter(event.target.value as OfflineTypeFilter)
+                }
+                aria-label="收款方式"
+              >
+                <option value="all">全部方式</option>
+                <option value="bank_transfer">银行转账</option>
+                <option value="cash">现金</option>
+                <option value="other">其他线下</option>
+                <option value="online">线上</option>
+                <option value="none">无</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedPaymentIds.size > 0 ? (
+            <BulkActionBar
+              count={selectedPaymentIds.size}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  onSelect: () =>
+                    exportRowsToCsv(
+                      "payments-export",
+                      PAYMENT_CSV_COLUMNS,
+                      selectedPayments,
+                    ),
+                },
+              ]}
+              onClear={clearPaymentSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="收款清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visiblePayments.length ? (
+              viewMode === "list" ? (
+                <PaymentListRows
+                  payments={visiblePayments}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedPaymentIds={selectedPaymentIds}
+                  isPageSelected={isPaymentPageSelected}
+                  onTogglePayment={togglePaymentSelection}
+                  onTogglePage={togglePaymentPageSelection}
+                  onVerify={handleOpenVerify}
+                  onReject={handleOpenReject}
+                />
+              ) : (
+                <PaymentCards
+                  payments={visiblePayments}
+                  onVerify={handleOpenVerify}
+                  onReject={handleOpenReject}
+                />
+              )
             ) : (
-              <PaymentCards
-                payments={visiblePayments}
-                onVerify={handleOpenVerify}
-                onReject={handleOpenReject}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载收款记录"
-                    : loadError
-                      ? "收款记录读取失败"
-                      : "没有匹配的收款记录"
-                }
-                description={
-                  loading
-                    ? "正在读取收款台账和账单关联。"
-                    : (loadError ?? "清空筛选条件后可查看全部收款记录。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载收款记录"
+                      : loadError
+                        ? "收款记录读取失败"
+                        : "没有匹配的收款记录"
+                  }
+                  description={
+                    loading
+                      ? "正在读取收款台账和账单关联。"
+                      : (loadError ?? "清空筛选条件后可查看全部收款记录。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -1110,8 +1123,8 @@ export function PaymentsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
+        }
+      />
 
       {(verifyTarget ?? rejectTarget) ? (
         <PaymentRemarkDialog
@@ -1125,6 +1138,6 @@ export function PaymentsPage() {
           onCancel={handleCloseDialog}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

@@ -8,16 +8,15 @@ import {
   Badge,
   Banner,
   BulkActionBar,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -682,14 +681,6 @@ export function SubscriptionsPage() {
     );
   }
 
-  function handleExportAllSubscriptions() {
-    exportRowsToCsv(
-      "subscriptions-export",
-      SUBSCRIPTION_CSV_COLUMNS,
-      filteredSubscriptions,
-    );
-  }
-
   async function handleSubmitSubscriptionAction(reason: string) {
     if (!actionTarget) return;
 
@@ -718,228 +709,239 @@ export function SubscriptionsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-subscriptions-page">
-      <PageHeader
-        icon="star"
-        eyebrow="订阅交易"
-        title="租户订阅运营"
-        description="运营侧管理租户服务权益实例，跟进试用转正、续期、暂停、配额风险和收入状态。"
-      />
-
-      <MetricGrid
-        aria-label="租户订阅运营统计"
-        items={[
-          {
-            id: "instances",
-            icon: "star",
-            label: "订阅实例",
-            value: formatNumber(subscriptions.length),
-            tags: [`有效 ${formatNumber(effectiveCount)}`],
-          },
-          {
-            id: "follow-up",
-            icon: "warning",
-            label: "待跟进",
-            value: formatNumber(followUpCount),
-            tags: [
-              `逾期 ${formatNumber(subscriptions.filter((item) => item.status === "overdue").length)}`,
-            ],
-            tone: followUpCount ? "warning" : "success",
-          },
-          {
-            id: "monthly-revenue",
-            icon: "chart-bar",
-            label: "月收入",
-            value: formatMoney(monthlyRevenue),
-            tags: ["运营口径"],
-            tone: "success",
-          },
-          {
-            id: "quota-risk",
-            icon: "shield-check",
-            label: "配额风险",
-            value: formatNumber(dangerQuotaCount + warningQuotaCount),
-            tags: [`高风险 ${formatNumber(dangerQuotaCount)}`],
-            tone: dangerQuotaCount
-              ? "danger"
-              : warningQuotaCount
-                ? "warning"
-                : "success",
-          },
-        ]}
-      />
-
-      {operationFeedback ? (
-        <div className="vx-subscription-operation-feedback">
-          {operationFeedback}
-        </div>
-      ) : null}
-
-      {subscriptionsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前订阅列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标订阅，请尝试缩小筛选范围（如按状态、套餐等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="租户订阅筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="租户订阅展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-subscriptions-page"
+        header={
+          <PageHeader
+            icon="star"
+            eyebrow="订阅交易"
+            title="租户订阅运营"
+            description="运营侧管理租户服务权益实例，跟进试用转正、续期、暂停、配额风险和收入状态。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredSubscriptions.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索租户、方案、套餐、订单"
-            className="vx-tenant-search vx-subscription-search"
-            aria-label="搜索租户订阅"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={handleExportAllSubscriptions}
-            disabled={!filteredSubscriptions.length}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="租户订阅运营统计"
+              items={[
+                {
+                  id: "instances",
+                  icon: "star",
+                  label: "订阅实例",
+                  value: formatNumber(subscriptions.length),
+                  tags: [`有效 ${formatNumber(effectiveCount)}`],
+                },
+                {
+                  id: "follow-up",
+                  icon: "warning",
+                  label: "待跟进",
+                  value: formatNumber(followUpCount),
+                  tags: [
+                    `逾期 ${formatNumber(subscriptions.filter((item) => item.status === "overdue").length)}`,
+                  ],
+                  tone: followUpCount ? "warning" : "success",
+                },
+                {
+                  id: "monthly-revenue",
+                  icon: "chart-bar",
+                  label: "月收入",
+                  value: formatMoney(monthlyRevenue),
+                  tags: ["运营口径"],
+                  tone: "success",
+                },
+                {
+                  id: "quota-risk",
+                  icon: "shield-check",
+                  label: "配额风险",
+                  value: formatNumber(dangerQuotaCount + warningQuotaCount),
+                  tags: [`高风险 ${formatNumber(dangerQuotaCount)}`],
+                  tone: dangerQuotaCount
+                    ? "danger"
+                    : warningQuotaCount
+                      ? "warning"
+                      : "success",
+                },
+              ]}
+            />
+            {operationFeedback ? (
+              <div className="vx-subscription-operation-feedback">
+                {operationFeedback}
+              </div>
+            ) : null}
+            {subscriptionsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前订阅列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标订阅，请尝试缩小筛选范围（如按状态、套餐等）重新查询。"
+              />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredSubscriptions.length)}
+            aria-label="租户订阅筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索租户、方案、套餐、订单"
+                className="vx-tenant-search vx-subscription-search"
+                aria-label="搜索租户订阅"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant={
+                    selectedSubscriptions.length > 0 ? "default" : "outline"
+                  }
+                  icon="arrow-down"
+                  onClick={handleExportSelectedSubscriptions}
+                  disabled={selectedSubscriptions.length === 0}
+                >
+                  导出
+                </ActionButton>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  开通订阅
+                </ActionButton>
+              </>
+            }
           >
-            导出全部
-          </ActionButton>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="订阅状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="trial">试用</option>
-              <option value="active">已生效</option>
-              <option value="expiring">即将到期</option>
-              <option value="overdue">逾期</option>
-              <option value="suspended">暂停</option>
-              <option value="cancelled">已取消</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={tierFilter}
-              onChange={(event) =>
-                setTierFilter(event.target.value as TierFilter)
-              }
-              aria-label="套餐版本"
-            >
-              <option value="all">全部套餐</option>
-              <option value="free">Free</option>
-              <option value="pro">Pro</option>
-              <option value="enterprise">Enterprise</option>
-              <option value="other">其他</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={riskFilter}
-              onChange={(event) =>
-                setRiskFilter(event.target.value as RiskFilter)
-              }
-              aria-label="配额风险"
-            >
-              <option value="all">全部配额</option>
-              <option value="normal">正常</option>
-              <option value="warning">需关注</option>
-              <option value="danger">高风险</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={renewFilter}
-              onChange={(event) =>
-                setRenewFilter(event.target.value as RenewFilter)
-              }
-              aria-label="续期方式"
-            >
-              <option value="all">全部续期</option>
-              <option value="auto">自动续期</option>
-              <option value="manual">人工跟进</option>
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            开通订阅
-          </ActionButton>
-        </section>
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="订阅状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="trial">试用</option>
+                <option value="active">已生效</option>
+                <option value="expiring">即将到期</option>
+                <option value="overdue">逾期</option>
+                <option value="suspended">暂停</option>
+                <option value="cancelled">已取消</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={tierFilter}
+                onChange={(event) =>
+                  setTierFilter(event.target.value as TierFilter)
+                }
+                aria-label="套餐版本"
+              >
+                <option value="all">全部套餐</option>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+                <option value="other">其他</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={riskFilter}
+                onChange={(event) =>
+                  setRiskFilter(event.target.value as RiskFilter)
+                }
+                aria-label="配额风险"
+              >
+                <option value="all">全部配额</option>
+                <option value="normal">正常</option>
+                <option value="warning">需关注</option>
+                <option value="danger">高风险</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={renewFilter}
+                onChange={(event) =>
+                  setRenewFilter(event.target.value as RenewFilter)
+                }
+                aria-label="续期方式"
+              >
+                <option value="all">全部续期</option>
+                <option value="auto">自动续期</option>
+                <option value="manual">人工跟进</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedSubscriptions.length ? (
+            <BulkActionBar
+              count={selectedSubscriptions.length}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  onSelect: handleExportSelectedSubscriptions,
+                },
+              ]}
+              onClear={clearSubscriptionSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="租户订阅清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
 
-        {selectedSubscriptions.length ? (
-          <BulkActionBar
-            count={selectedSubscriptions.length}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                onSelect: handleExportSelectedSubscriptions,
-              },
-            ]}
-            onClear={clearSubscriptionSelection}
-          />
-        ) : null}
-
-        <section className="vx-tenant-directory" aria-label="租户订阅清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleSubscriptions.length ? (
-            viewMode === "list" ? (
-              <SubscriptionListRows
-                subscriptions={visibleSubscriptions}
-                startIndex={(activePage - 1) * pageSize}
-                selectedSubscriptionIds={selectedSubscriptionIds}
-                isPageSelected={isSubscriptionPageSelected}
-                onAction={requestSubscriptionAction}
-                onToggleSubscription={toggleSubscriptionSelection}
-                onTogglePage={toggleSubscriptionPageSelection}
-              />
+            {visibleSubscriptions.length ? (
+              viewMode === "list" ? (
+                <SubscriptionListRows
+                  subscriptions={visibleSubscriptions}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedSubscriptionIds={selectedSubscriptionIds}
+                  isPageSelected={isSubscriptionPageSelected}
+                  onAction={requestSubscriptionAction}
+                  onToggleSubscription={toggleSubscriptionSelection}
+                  onTogglePage={toggleSubscriptionPageSelection}
+                />
+              ) : (
+                <SubscriptionCards
+                  subscriptions={visibleSubscriptions}
+                  onAction={requestSubscriptionAction}
+                />
+              )
             ) : (
-              <SubscriptionCards
-                subscriptions={visibleSubscriptions}
-                onAction={requestSubscriptionAction}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载租户订阅"
-                    : loadError
-                      ? "订阅数据读取失败"
-                      : "没有匹配的订阅"
-                }
-                description={
-                  loading
-                    ? "正在读取租户订阅运营数据。"
-                    : (loadError ?? "清空筛选条件后可查看全部订阅实例。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载租户订阅"
+                      : loadError
+                        ? "订阅数据读取失败"
+                        : "没有匹配的订阅"
+                  }
+                  description={
+                    loading
+                      ? "正在读取租户订阅运营数据。"
+                      : (loadError ?? "清空筛选条件后可查看全部订阅实例。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -950,8 +952,8 @@ export function SubscriptionsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
+        }
+      />
 
       {actionTarget ? (
         <SubscriptionOperationDialog
@@ -965,6 +967,6 @@ export function SubscriptionsPage() {
           onSubmit={handleSubmitSubscriptionAction}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
