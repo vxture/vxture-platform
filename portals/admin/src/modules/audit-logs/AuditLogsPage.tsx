@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ActionButton,
   Badge,
-  Button,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   ListPageTemplate,
@@ -129,56 +129,58 @@ function AuditToolbar({
   onExport: () => void;
 }) {
   return (
-    <section className="vx-tenant-toolbar" aria-label="审计日志筛选">
-      <span className="vx-tenant-view-count">{total}</span>
-      <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-      <Input
-        placeholder="搜索操作员、操作类型、对象…"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="vx-tenant-search"
-        aria-label="搜索审计日志（当前结果内）"
-      />
-      <Button variant="outline" onClick={onReset}>
-        重置
-      </Button>
-      <div className="vx-tenant-filters">
+    <FilterBar
+      count={total}
+      aria-label="审计日志筛选"
+      search={
         <Input
-          type="datetime-local"
-          className="vx-input vx-tenant-select"
-          value={dateFrom}
-          onChange={(e) => onDateFromChange(e.target.value)}
-          aria-label="起始时间"
-          title="起始时间（服务端筛选）"
+          placeholder="搜索操作员、操作类型、对象…"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="vx-tenant-search"
+          aria-label="搜索审计日志（当前结果内）"
         />
-        <Input
-          type="datetime-local"
-          className="vx-input vx-tenant-select"
-          value={dateTo}
-          onChange={(e) => onDateToChange(e.target.value)}
-          aria-label="截止时间"
-          title="截止时间（服务端筛选）"
-        />
-        <NativeSelect
-          className="vx-input vx-tenant-select"
-          value={resultFilter}
-          onChange={(e) => onResultFilterChange(e.target.value as ResultFilter)}
-          aria-label="审计结果"
+      }
+      onReset={onReset}
+      actions={
+        <ActionButton
+          icon="shield-check"
+          variant={exportDisabled ? "outline" : "default"}
+          disabled={exportDisabled}
+          onClick={onExport}
         >
-          <option value="all">全部结果</option>
-          <option value="success">成功</option>
-          <option value="failure">失败</option>
-        </NativeSelect>
-      </div>
-      <ActionButton
-        icon="shield-check"
-        variant="outline"
-        disabled={exportDisabled}
-        onClick={onExport}
+          导出审计
+        </ActionButton>
+      }
+    >
+      <Input
+        type="datetime-local"
+        className="w-fit"
+        value={dateFrom}
+        onChange={(e) => onDateFromChange(e.target.value)}
+        aria-label="起始时间"
+        title="起始时间（服务端筛选）"
+      />
+      <Input
+        type="datetime-local"
+        className="w-fit"
+        value={dateTo}
+        onChange={(e) => onDateToChange(e.target.value)}
+        aria-label="截止时间"
+        title="截止时间（服务端筛选）"
+      />
+      <NativeSelect
+        wrapperClassName="w-fit"
+        className="vx-tenant-select"
+        value={resultFilter}
+        onChange={(e) => onResultFilterChange(e.target.value as ResultFilter)}
+        aria-label="审计结果"
       >
-        导出审计
-      </ActionButton>
-    </section>
+        <option value="all">全部结果</option>
+        <option value="success">成功</option>
+        <option value="failure">失败</option>
+      </NativeSelect>
+    </FilterBar>
   );
 }
 
