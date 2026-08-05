@@ -23,10 +23,33 @@
  * 表头与数据行共用同一个 `align` 轴——admin 表头居中、行左对齐的轴冲突（X1）
  * 在这里从结构上不可能发生。
  *
- * 选择列 / 序号列固定宽（`w-control-3xl`，约 64px）、内容居中，且**不**参与
- * 首末列零边距——`first:` 选择器认的是 DOM 里真实的第一个 `<td>`，选择列一旦
- * 存在就是它，零边距会把复选框顶到容器边界外观（2026-08-03 owner 实测抓到）。
- * 零边距的意图仍在：没有选择/序号列时，业务首列照常贴边对齐上下文。
+ * 列的对齐是一条**约定**，不是每张表各自决定（2026-08-05 owner 定）：
+ *
+ * | 列          | 宽              | 内容                          |
+ * | ----------- | --------------- | ----------------------------- |
+ * | 选择框      | 64px            | 居中                          |
+ * | 序号        | 64px            | 居中，表头写 `#`              |
+ * | 主列（图标+标题+辅助信息） | 自适应 | 居左           |
+ * | 状态        | 自适应          | 居中（`align:"center"`）      |
+ * | 信息列      | 自适应          | 数值右、文本左                |
+ * | 操作        | 64px            | 居中，单图标                  |
+ *
+ * **表头一律居中，且是常规字重的正文字号**，与该列数据的 `align` 无关：列名是
+ * 框架信息，不是展示重点，不该比它标注的数据更重、也不必跟着数据摆。序号列的
+ * 列名写 `#`——"序号"三个字比它下面的数字还长。
+ *
+ * 三根固定列（选择 / 序号 / 操作）都是 `w-control-3xl`+居中，两端等宽，表格
+ * 不会因为最右侧靠右对齐而在视觉上偏出去。
+ *
+ * 三根固定列**不**参与首末列零边距——`first:` 选择器认的是 DOM 里真实的第一个
+ * `<td>`，选择列一旦存在就是它，零边距会把复选框顶到容器边界外观（2026-08-03
+ * owner 实测抓到）。零边距的意图仍在：没有选择/序号列时，业务首列照常贴边
+ * 对齐上下文。
+ *
+ * **行不表达业务语气。** 曾短暂给过 `rowTone`（行首 2px 色缘），实测很难看：
+ * 一屏几十行，左缘的彩色短线读成一列断续的碎点，既不成列也不成块。业务语气
+ * 由**状态列**表达——需要语气的表格约定必须有一列状态，用 `StatusBadge` 出标，
+ * 那里的语气有形状、有文字、可读可筛。行只表达交互态（hover / 选中）。
  *
  * hover / 选中的底色只在**每个单元格自己**身上画一遍，`<tr>` 本体不着色。
  * `accent` / `surface-selected` 都是半透明 token（品牌色 8–15% alpha）——如果
@@ -44,7 +67,6 @@ import { Icon } from "../../../icons";
 import { Checkbox } from "../../base/form/Checkbox";
 import { Skeleton } from "../../base/display/Skeleton";
 import { EmptyState } from "../../base/display/EmptyState";
-import { toneLeadingEdgeClasses, type Tone } from "../../tone";
 
 export type DataTableAlign = "left" | "center" | "right";
 
@@ -56,13 +78,17 @@ const ALIGN: Record<DataTableAlign, string> = {
   right: "text-right",
 };
 
-/** 选择列 / 序号列共用：固定宽、居中，不吃首列零边距。 */
+/** 选择列 / 序号列 / 操作列共用：固定 64px、居中，不吃首末列零边距。 */
 const EDGE_COL = "w-control-3xl px-md text-center";
 
 export interface DataTableColumn<TRow> {
   readonly id: string;
   readonly header: React.ReactNode;
   readonly cell: (row: TRow, rowIndex: number) => React.ReactNode;
+  /**
+   * 表头与单元格共用一个轴（见文件头的对齐约定）。默认 `left`。
+   * 状态列一律 `center`；数值列 `right`；其余文本列留默认。
+   */
   readonly align?: DataTableAlign;
   /** 可排序。排序本身由调用方做，本件只出表头控件与方向指示。 */
   readonly sortable?: boolean;
@@ -94,30 +120,14 @@ export interface DataTableProps<TRow> {
    */
   readonly indexStart?: number;
   /**
-   * 给了才出行操作列：钉在最右、横向滚动时锁定不动（admin 列锁定惯例）。
+   * 给了才出行操作列：固定 64px、钉在最右、横向滚动时锁定不动（admin 列锁定
+   * 惯例），内容居中——放的是单个图标触发器（`ActionMenu`），不是一排按钮。
    * 单元格点击不冒泡到 `onRowClick`——行点击是选择/进详情，操作是操作。
    */
   readonly rowActions?: (row: TRow, rowIndex: number) => React.ReactNode;
   readonly rowActionsHeader?: React.ReactNode;
   readonly onRowClick?: (row: TRow, rowIndex: number) => void;
-  /**
-   * 行的业务语气，渲染为行首 2px 色缘（`toneLeadingEdgeClasses`）。
-   *
-   * 这是运营表格的核心：高风险租户、逾期账单、异常订单要能在一屏几十行里被一眼
-   * 扫出来。admin 的 29 个列表页里有 15 个在做这件事。
-   *
-   * **它不是被删掉的 `getRowClassName` 换个名字。** 那个口子交出去的是"行画成
-   * 什么样"，调用方给任意类名，各页很快就长得不一样；这里交出去的只是"这行是
-   * 哪一档语气"，画成什么样仍由本件决定，全站六档封闭。
-   *
-   * 只染行首色缘，不铺行底——理由见 `toneLeadingEdgeClasses`。行内的状态标各自
-   * 用 `StatusBadge` 表达同一个语气即可（两处取自同一张业务状态→语气映射表，
-   * 天然同源），本件不去染单元格里的任何前景色。
-   *
-   * 返回 `undefined` 即不出色缘（不画中性灰——那看起来像没渲染完，与
-   * `MetricListCard.tone` 同一处理）。
-   */
-  readonly rowTone?: (row: TRow, rowIndex: number) => Tone | undefined;
+  /* 没有 rowTone / getRowClassName：行不表达业务语气，见文件头。 */
   /** 表尾：分页、总数一类。渲染在虚线上边框之下，左右两端由调用方内容自摆。 */
   readonly footer?: React.ReactNode;
   readonly className?: string;
@@ -149,7 +159,6 @@ function DataTable<TRow>({
   rowActions,
   rowActionsHeader = "操作",
   onRowClick,
-  rowTone,
   footer,
   className,
 }: DataTableProps<TRow>) {
@@ -184,11 +193,16 @@ function DataTable<TRow>({
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-body-sm">
           <thead
-            className={cn("border-b", hairline.block, "text-muted-foreground")}
+            className={cn(
+              "border-b",
+              hairline.block,
+              // 常规字重的正文字号：列名是框架信息，不该比它标注的数据更重。
+              "text-body-sm font-normal text-muted-foreground",
+            )}
           >
             <tr>
               {selectable ? (
-                <th scope="col" className={cn(EDGE_COL, "py-sm")}>
+                <th scope="col" className={cn(EDGE_COL, "py-sm font-normal")}>
                   <div className="flex items-center justify-center">
                     <Checkbox
                       checked={allSelected || (someSelected && "indeterminate")}
@@ -203,14 +217,13 @@ function DataTable<TRow>({
                   scope="col"
                   className={cn(
                     EDGE_COL,
-                    "py-sm whitespace-nowrap text-label-sm",
+                    "py-sm font-normal whitespace-nowrap",
                   )}
                 >
-                  序号
+                  #
                 </th>
               ) : null}
               {columns.map((column) => {
-                const align = column.align ?? "left";
                 const active = sort?.columnId === column.id;
                 return (
                   <th
@@ -224,9 +237,10 @@ function DataTable<TRow>({
                         : undefined
                     }
                     className={cn(
-                      "whitespace-nowrap px-md py-sm text-label-sm",
+                      "whitespace-nowrap px-md py-sm font-normal",
                       "first:pl-none last:pr-none",
-                      ALIGN[align],
+                      // 表头一律居中，与列的 align 无关——align 说的是数据。
+                      "text-center",
                     )}
                   >
                     {column.sortable && onSortChange ? (
@@ -265,7 +279,10 @@ function DataTable<TRow>({
               {rowActions ? (
                 <th
                   scope="col"
-                  className="sticky right-0 w-px whitespace-nowrap bg-background px-md py-sm text-center text-label-sm"
+                  className={cn(
+                    EDGE_COL,
+                    "sticky right-0 whitespace-nowrap bg-background py-sm font-normal",
+                  )}
                 >
                   {rowActionsHeader}
                 </th>
@@ -310,12 +327,6 @@ function DataTable<TRow>({
                   "transition-colors duration-fast ease-standard",
                   isSelected ? "bg-surface-selected" : "group-hover:bg-accent",
                 );
-                /* 业务语气只落在**本行第一个** <td> 的左缘。挂在 <tr> 上不行：
-                   border-collapse 的表格里，行边框由单元格边框合并而来。 */
-                const tone = rowTone?.(row, rowIndex);
-                const leadingEdge = tone
-                  ? cn("border-l-2", toneLeadingEdgeClasses[tone])
-                  : null;
                 return (
                   <tr
                     key={key}
@@ -335,7 +346,6 @@ function DataTable<TRow>({
                           EDGE_COL,
                           "py-md align-middle",
                           cellSurface,
-                          leadingEdge,
                         )}
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -354,13 +364,12 @@ function DataTable<TRow>({
                           EDGE_COL,
                           "py-md align-middle whitespace-nowrap text-body-sm text-muted-foreground",
                           cellSurface,
-                          !selectable && leadingEdge,
                         )}
                       >
                         {indexStart + rowIndex}
                       </td>
                     ) : null}
-                    {columns.map((column, columnIndex) => (
+                    {columns.map((column) => (
                       <td
                         key={column.id}
                         className={cn(
@@ -368,10 +377,6 @@ function DataTable<TRow>({
                           "first:pl-none last:pr-none",
                           ALIGN[column.align ?? "left"],
                           cellSurface,
-                          !selectable &&
-                            !indexed &&
-                            columnIndex === 0 &&
-                            leadingEdge,
                         )}
                       >
                         {column.cell(row, rowIndex)}
@@ -387,11 +392,13 @@ function DataTable<TRow>({
                          （如两行主列），背景条矮一截，上下露出容器底色
                          （2026-08-03 owner 实测抓到，h-full 那版没修对）。
                          垂直居中交给 `align-middle`（对真实 td 有效，不受
-                         百分比高度限制）；水平靠右交给 `text-right`
-                         （ActionMenu 触发按钮是 inline-flex，服从文本对齐）。 */
+                         百分比高度限制）；水平居中交给 EDGE_COL 的 `text-center`
+                         （ActionMenu 触发按钮是 inline-flex，服从文本对齐），
+                         与选择列 / 序号列同宽同轴。 */
                       <td
                         className={cn(
-                          "sticky right-0 w-px whitespace-nowrap px-md align-middle text-right",
+                          EDGE_COL,
+                          "sticky right-0 whitespace-nowrap align-middle",
                           // 未选中态补一层不透明底：横向滚动时业务列从它下方
                           // 经过，需要遮住。选中态的 surface-selected 本身也是
                           // 半透明 token，遮不住滚动内容——与其余选中行同样的
