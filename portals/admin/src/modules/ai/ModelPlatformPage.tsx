@@ -9,16 +9,16 @@ import {
   Checkbox,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
   Textarea,
   useToast,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -1015,261 +1015,400 @@ export function ModelPlatformPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-model-platform-page">
-      <PageHeader
-        icon="code"
-        eyebrow={t("header.eyebrow")}
-        title={t("header.title")}
-        description={t("header.description")}
-        secondary={<Badge>{t("header.badge")}</Badge>}
-      />
-
-      {feedback ? (
-        <p
-          className={
-            feedback.tone === "success"
-              ? "vx-profile-message"
-              : "vx-profile-error"
-          }
-        >
-          {t(feedback.key, feedback.values)}
-        </p>
-      ) : null}
-
-      <MetricGrid
-        aria-label={t("summary.ariaLabel")}
-        columns={3}
-        items={[
-          {
-            id: "models",
-            icon: "plug",
-            label: t("summary.models"),
-            value: formatNumber(models.length),
-            tags: [
-              `${t("filters.online")} ${formatNumber(onlineModels)}`,
-              `${t("filters.private")} ${formatNumber(privateModels)}`,
-            ],
-          },
-          {
-            id: "active",
-            icon: "play",
-            label: t("filters.active"),
-            value: formatNumber(activeModels),
-            tags: ["可调度"],
-            tone: activeModels ? "success" : "warning",
-          },
-          {
-            id: "inactive",
-            icon: "code",
-            label: t("status.inactive"),
-            value: formatNumber(inactiveModels),
-            tags: inactiveModels ? ["需复核"] : ["无停用"],
-            tone: inactiveModels ? "warning" : "success",
-          },
-          {
-            id: "providers",
-            icon: "settings",
-            label: "Provider",
-            value: formatNumber(providers.length),
-            tags: [`启用 ${formatNumber(activeProviders.length)}`],
-            tone: activeProviders.length ? "success" : "warning",
-          },
-          {
-            id: "policies-cost",
-            icon: "database",
-            label: "策略 / 成本",
-            value: `${formatNumber(activePolicies.length)} / ${formatNumber(activePriceRules.length)}`,
-            tags: [
-              `策略 ${formatNumber(policies.length)}`,
-              `价格 ${formatNumber(priceRules.length)}`,
-            ],
-            tone: "brand",
-          },
-          {
-            id: "quota-usage",
-            icon: "chart-bar",
-            label: "配额 / 用量",
-            value: `${formatNumber(activeQuotas.length)} / ${formatNumber(totalUsageTokens)}`,
-            tags: [
-              `配额 ${formatNumber(quotas.length)}`,
-              `汇总 ${formatNumber(usageSummaries.length)}`,
-            ],
-            tone: usageSummaries.length ? "success" : "warning",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section
-          className="vx-tenant-toolbar"
-          aria-label={t("table.filterAriaLabel")}
-        >
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="模型展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-model-platform-page"
+        header={
+          <PageHeader
+            icon="code"
+            eyebrow={t("header.eyebrow")}
+            title={t("header.title")}
+            description={t("header.description")}
+            secondary={<Badge>{t("header.badge")}</Badge>}
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredModels.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t("table.searchPlaceholder")}
-            className="vx-tenant-search"
-            aria-label={t("table.searchAriaLabel")}
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as ModelStatusFilter)
-              }
-              aria-label="模型状态"
-            >
-              {statusFilters.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </NativeSelect>
-            <NativeSelect
-              className="vx-tenant-select"
-              value={sourceFilter}
-              onChange={(event) =>
-                setSourceFilter(event.target.value as ModelSourceFilter)
-              }
-              aria-label="模型来源"
-            >
-              {sourceFilters.map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-          <ModelBatchOperationButtons
-            canEnable={canBatchEnable}
-            canDisable={canBatchDisable}
-            canDelete={canBatchDelete}
-            submitting={submitting}
-            onEnable={() => void handleBatchEnableModels()}
-            onDisable={() => void handleBatchDisableModels()}
-            onDelete={() => void handleBatchDeleteModels()}
-          />
-          <ActionButton
-            icon="shield-check"
-            variant="outline"
-            disabled={detectingLinks || selectedModels.length === 0}
-            onClick={() => void handleDetectLinks()}
-          >
-            状态检测
-          </ActionButton>
-          <ActionButton icon="plus" onClick={openCreateModelDialog}>
-            {t("actions.addModel")}
-          </ActionButton>
-        </section>
-
-        <section
-          className="vx-tenant-directory"
-          aria-label={t("table.toolbarTitle", { count: filteredModels.length })}
-        >
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>{t("empty.loadingTitle")}</span>
-            </header>
-          ) : null}
-
-          {pagedModels.length && viewMode === "list" ? (
-            <div
-              className="vx-tenant-directory-list vx-model-platform-directory-list"
-              role="region"
-              aria-label={t("table.toolbarTitle", {
-                count: filteredModels.length,
-              })}
-            >
-              <div className="vx-tenant-directory-list__header">
-                <span>
-                  <Checkbox
-                    className="vx-model-select-checkbox"
-                    checked={
-                      isPagePartiallySelected ? "indeterminate" : isPageSelected
-                    }
-                    onCheckedChange={(checked) =>
-                      togglePageSelection(checked === true)
-                    }
-                    aria-label="选择当前页模型"
-                  />
-                </span>
-                <span>#</span>
-                <span>{t("table.columns.model")}</span>
-                <span>{t("table.columns.status")}</span>
-                <span>链路状态</span>
-                <span>来源</span>
-                <span>模型能力</span>
-                <span>操作</span>
-              </div>
-              {pagedModels.map((model, index) => (
-                <div
-                  key={model.id}
-                  className={`vx-tenant-directory-row vx-model-platform-row vx-model-platform-row--${modelTone(model)} ${selectedModelIds.has(model.id) ? "vx-model-platform-row--selected" : ""}`}
-                  title={`${model.modelName} · ${model.modelCode}`}
-                  onClick={(event) => {
-                    if (isInteractiveTarget(event.target)) return;
-                    toggleModelSelection(
-                      model.id,
-                      !selectedModelIds.has(model.id),
-                    );
-                  }}
+        }
+        summary={
+          <>
+            {" "}
+            {feedback ? (
+              <p
+                className={
+                  feedback.tone === "success"
+                    ? "vx-profile-message"
+                    : "vx-profile-error"
+                }
+              >
+                {t(feedback.key, feedback.values)}
+              </p>
+            ) : null}
+            <MetricGrid
+              aria-label={t("summary.ariaLabel")}
+              columns={3}
+              items={[
+                {
+                  id: "models",
+                  icon: "plug",
+                  label: t("summary.models"),
+                  value: formatNumber(models.length),
+                  tags: [
+                    `${t("filters.online")} ${formatNumber(onlineModels)}`,
+                    `${t("filters.private")} ${formatNumber(privateModels)}`,
+                  ],
+                },
+                {
+                  id: "active",
+                  icon: "play",
+                  label: t("filters.active"),
+                  value: formatNumber(activeModels),
+                  tags: ["可调度"],
+                  tone: activeModels ? "success" : "warning",
+                },
+                {
+                  id: "inactive",
+                  icon: "code",
+                  label: t("status.inactive"),
+                  value: formatNumber(inactiveModels),
+                  tags: inactiveModels ? ["需复核"] : ["无停用"],
+                  tone: inactiveModels ? "warning" : "success",
+                },
+                {
+                  id: "providers",
+                  icon: "settings",
+                  label: "Provider",
+                  value: formatNumber(providers.length),
+                  tags: [`启用 ${formatNumber(activeProviders.length)}`],
+                  tone: activeProviders.length ? "success" : "warning",
+                },
+                {
+                  id: "policies-cost",
+                  icon: "database",
+                  label: "策略 / 成本",
+                  value: `${formatNumber(activePolicies.length)} / ${formatNumber(activePriceRules.length)}`,
+                  tags: [
+                    `策略 ${formatNumber(policies.length)}`,
+                    `价格 ${formatNumber(priceRules.length)}`,
+                  ],
+                  tone: "brand",
+                },
+                {
+                  id: "quota-usage",
+                  icon: "chart-bar",
+                  label: "配额 / 用量",
+                  value: `${formatNumber(activeQuotas.length)} / ${formatNumber(totalUsageTokens)}`,
+                  tags: [
+                    `配额 ${formatNumber(quotas.length)}`,
+                    `汇总 ${formatNumber(usageSummaries.length)}`,
+                  ],
+                  tone: usageSummaries.length ? "success" : "warning",
+                },
+              ]}
+            />
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredModels.length)}
+            aria-label="模型状态"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t("table.searchPlaceholder")}
+                className="vx-tenant-search"
+                aria-label={t("table.searchAriaLabel")}
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ModelBatchOperationButtons
+                  canEnable={canBatchEnable}
+                  canDisable={canBatchDisable}
+                  canDelete={canBatchDelete}
+                  submitting={submitting}
+                  onEnable={() => void handleBatchEnableModels()}
+                  onDisable={() => void handleBatchDisableModels()}
+                  onDelete={() => void handleBatchDeleteModels()}
+                />
+                <ActionButton
+                  icon="shield-check"
+                  variant="outline"
+                  disabled={detectingLinks || selectedModels.length === 0}
+                  onClick={() => void handleDetectLinks()}
                 >
-                  <span className="vx-model-platform-row__select">
+                  状态检测
+                </ActionButton>
+                <ActionButton icon="plus" onClick={openCreateModelDialog}>
+                  {t("actions.addModel")}
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as ModelStatusFilter)
+                }
+                aria-label="模型状态"
+              >
+                {statusFilters.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </NativeSelect>
+              <NativeSelect
+                className="vx-tenant-select"
+                value={sourceFilter}
+                onChange={(event) =>
+                  setSourceFilter(event.target.value as ModelSourceFilter)
+                }
+                aria-label="模型来源"
+              >
+                {sourceFilters.map((item) => (
+                  <option key={item.value} value={item.value}>
+                    {item.label}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section
+            className="vx-tenant-directory"
+            aria-label={t("table.toolbarTitle", {
+              count: filteredModels.length,
+            })}
+          >
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>{t("empty.loadingTitle")}</span>
+              </header>
+            ) : null}
+
+            {pagedModels.length && viewMode === "list" ? (
+              <div
+                className="vx-tenant-directory-list vx-model-platform-directory-list"
+                role="region"
+                aria-label={t("table.toolbarTitle", {
+                  count: filteredModels.length,
+                })}
+              >
+                <div className="vx-tenant-directory-list__header">
+                  <span>
                     <Checkbox
                       className="vx-model-select-checkbox"
-                      checked={selectedModelIds.has(model.id)}
-                      onClick={(event) => event.stopPropagation()}
-                      onCheckedChange={(checked) =>
-                        toggleModelSelection(model.id, checked === true)
+                      checked={
+                        isPagePartiallySelected
+                          ? "indeterminate"
+                          : isPageSelected
                       }
-                      aria-label={`选择 ${model.modelName}`}
+                      onCheckedChange={(checked) =>
+                        togglePageSelection(checked === true)
+                      }
+                      aria-label="选择当前页模型"
                     />
                   </span>
-                  <span className="vx-tenant-directory-row__index">
-                    {formatNumber(pageStart + index + 1)}
-                  </span>
-                  <TableTitleCell
-                    className="vx-tenant-directory-row__tenant"
-                    icon={isPrivateProvider(model.provider) ? "code" : "plug"}
-                    title={model.modelName}
-                    description={model.modelCode}
-                    onTitleClick={() => openEditModelDialog(model)}
-                  />
-                  <span className="vx-model-platform-row__status">
-                    <span className="vx-tenant-directory-row__status-line">
-                      <span
-                        className={`vx-model-state-icon vx-model-state-icon--${model.isActive ? "active" : "inactive"}`}
-                        role="img"
-                        aria-label={
-                          model.isActive
-                            ? t("status.active")
-                            : t("status.inactive")
+                  <span>#</span>
+                  <span>{t("table.columns.model")}</span>
+                  <span>{t("table.columns.status")}</span>
+                  <span>链路状态</span>
+                  <span>来源</span>
+                  <span>模型能力</span>
+                  <span>操作</span>
+                </div>
+                {pagedModels.map((model, index) => (
+                  <div
+                    key={model.id}
+                    className={`vx-tenant-directory-row vx-model-platform-row vx-model-platform-row--${modelTone(model)} ${selectedModelIds.has(model.id) ? "vx-model-platform-row--selected" : ""}`}
+                    title={`${model.modelName} · ${model.modelCode}`}
+                    onClick={(event) => {
+                      if (isInteractiveTarget(event.target)) return;
+                      toggleModelSelection(
+                        model.id,
+                        !selectedModelIds.has(model.id),
+                      );
+                    }}
+                  >
+                    <span className="vx-model-platform-row__select">
+                      <Checkbox
+                        className="vx-model-select-checkbox"
+                        checked={selectedModelIds.has(model.id)}
+                        onClick={(event) => event.stopPropagation()}
+                        onCheckedChange={(checked) =>
+                          toggleModelSelection(model.id, checked === true)
                         }
-                        title={
-                          model.isActive
+                        aria-label={`选择 ${model.modelName}`}
+                      />
+                    </span>
+                    <span className="vx-tenant-directory-row__index">
+                      {formatNumber(pageStart + index + 1)}
+                    </span>
+                    <TableTitleCell
+                      className="vx-tenant-directory-row__tenant"
+                      icon={isPrivateProvider(model.provider) ? "code" : "plug"}
+                      title={model.modelName}
+                      description={model.modelCode}
+                      onTitleClick={() => openEditModelDialog(model)}
+                    />
+                    <span className="vx-model-platform-row__status">
+                      <span className="vx-tenant-directory-row__status-line">
+                        <span
+                          className={`vx-model-state-icon vx-model-state-icon--${model.isActive ? "active" : "inactive"}`}
+                          role="img"
+                          aria-label={
+                            model.isActive
+                              ? t("status.active")
+                              : t("status.inactive")
+                          }
+                          title={
+                            model.isActive
+                              ? t("status.active")
+                              : t("status.inactive")
+                          }
+                        >
+                          <Icon
+                            name={model.isActive ? "check" : "x"}
+                            size="xs"
+                            fallback="placeholder"
+                          />
+                        </span>
+                        <Badge
+                          className={`vx-tenant-pill vx-tenant-pill--${model.isActive ? "active" : "disabled"}`}
+                        >
+                          {model.isActive
                             ? t("status.active")
-                            : t("status.inactive")
-                        }
-                      >
-                        <Icon
-                          name={model.isActive ? "check" : "x"}
-                          size="xs"
-                          fallback="placeholder"
-                        />
+                            : t("status.inactive")}
+                        </Badge>
                       </span>
+                    </span>
+                    <span className="vx-model-platform-row__link">
+                      <Badge
+                        className={`vx-tenant-pill vx-model-link-pill--${linkStatusByModelId[model.id] ?? detectModelLinkStatus(model)}`}
+                      >
+                        {(linkStatusByModelId[model.id] ??
+                          detectModelLinkStatus(model)) === "checking"
+                          ? "检测中"
+                          : (linkStatusByModelId[model.id] ??
+                                detectModelLinkStatus(model)) === "normal"
+                            ? "正常"
+                            : "异常"}
+                      </Badge>
+                    </span>
+                    <span className="vx-model-platform-row__source">
+                      <Badge
+                        className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
+                      >
+                        {providerLabel(model.provider)}
+                      </Badge>
+                      <small>{model.protocol}</small>
+                    </span>
+                    <span className="vx-model-platform-row__capabilities">
+                      <span className="vx-tenant-directory-row__tag-line">
+                        {model.capabilities.slice(0, 3).map((capability) => (
+                          <Badge
+                            key={capability}
+                            className="vx-tenant-pill vx-tenant-pill--permission"
+                          >
+                            {capability}
+                          </Badge>
+                        ))}
+                        {model.capabilities.length > 3 ? (
+                          <Badge className="vx-tenant-pill vx-tenant-pill--quota">
+                            +{model.capabilities.length - 3}
+                          </Badge>
+                        ) : null}
+                      </span>
+                    </span>
+                    <div
+                      className="vx-tenant-actions"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <ActionMenu
+                        label={t("actions.modelMenu", {
+                          name: model.modelName,
+                        })}
+                        items={[
+                          {
+                            id: "edit",
+                            label: t("actions.editModel"),
+                            icon: "edit",
+                            onSelect: () => openEditModelDialog(model),
+                          },
+                          {
+                            id: "enable",
+                            label: t("actions.enableModel"),
+                            icon: "play",
+                            disabled: submitting || model.isActive,
+                            onSelect: () => void handleToggleModel(model),
+                          },
+                          {
+                            id: "disable",
+                            label: t("actions.disableModel"),
+                            icon: "stop",
+                            disabled: submitting || !model.isActive,
+                            onSelect: () => void handleToggleModel(model),
+                          },
+                          {
+                            id: "delete",
+                            label: t("actions.deleteModel"),
+                            icon: "trash",
+                            disabled: submitting || model.isActive,
+                            danger: true,
+                            onSelect: () => void handleDeleteModel(model),
+                          },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : pagedModels.length ? (
+              <div
+                className="vx-tenant-directory-cards vx-model-platform-cards"
+                aria-label={t("table.toolbarTitle", {
+                  count: filteredModels.length,
+                })}
+              >
+                {pagedModels.map((model) => (
+                  <article
+                    key={model.id}
+                    className={`vx-tenant-directory-card vx-model-platform-card vx-model-platform-card--${modelTone(model)}`}
+                  >
+                    <header>
+                      <Icon
+                        name={
+                          isPrivateProvider(model.provider) ? "code" : "plug"
+                        }
+                        size={24}
+                        fallback="placeholder"
+                      />
+                      <div>
+                        <TableTitleCell
+                          title={model.modelName}
+                          description={model.modelCode}
+                          onTitleClick={() => openEditModelDialog(model)}
+                        />
+                      </div>
+                      <ModelOperationButtons
+                        model={model}
+                        submitting={submitting}
+                        onEnable={(target) => void handleToggleModel(target)}
+                        onDisable={(target) => void handleToggleModel(target)}
+                        onDelete={(target) => void handleDeleteModel(target)}
+                      />
+                    </header>
+                    <div className="vx-tenant-directory-card__badges">
+                      <Badge
+                        className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
+                      >
+                        {providerLabel(model.provider)}
+                      </Badge>
                       <Badge
                         className={`vx-tenant-pill vx-tenant-pill--${model.isActive ? "active" : "disabled"}`}
                       >
@@ -1277,183 +1416,58 @@ export function ModelPlatformPage() {
                           ? t("status.active")
                           : t("status.inactive")}
                       </Badge>
-                    </span>
-                  </span>
-                  <span className="vx-model-platform-row__link">
-                    <Badge
-                      className={`vx-tenant-pill vx-model-link-pill--${linkStatusByModelId[model.id] ?? detectModelLinkStatus(model)}`}
-                    >
-                      {(linkStatusByModelId[model.id] ??
-                        detectModelLinkStatus(model)) === "checking"
-                        ? "检测中"
-                        : (linkStatusByModelId[model.id] ??
-                              detectModelLinkStatus(model)) === "normal"
-                          ? "正常"
-                          : "异常"}
-                    </Badge>
-                  </span>
-                  <span className="vx-model-platform-row__source">
-                    <Badge
-                      className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
-                    >
-                      {providerLabel(model.provider)}
-                    </Badge>
-                    <small>{model.protocol}</small>
-                  </span>
-                  <span className="vx-model-platform-row__capabilities">
-                    <span className="vx-tenant-directory-row__tag-line">
-                      {model.capabilities.slice(0, 3).map((capability) => (
-                        <Badge
-                          key={capability}
-                          className="vx-tenant-pill vx-tenant-pill--permission"
-                        >
-                          {capability}
-                        </Badge>
-                      ))}
-                      {model.capabilities.length > 3 ? (
-                        <Badge className="vx-tenant-pill vx-tenant-pill--quota">
-                          +{model.capabilities.length - 3}
-                        </Badge>
-                      ) : null}
-                    </span>
-                  </span>
-                  <div
-                    className="vx-tenant-actions"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <ActionMenu
-                      label={t("actions.modelMenu", { name: model.modelName })}
-                      items={[
-                        {
-                          id: "edit",
-                          label: t("actions.editModel"),
-                          icon: "edit",
-                          onSelect: () => openEditModelDialog(model),
-                        },
-                        {
-                          id: "enable",
-                          label: t("actions.enableModel"),
-                          icon: "play",
-                          disabled: submitting || model.isActive,
-                          onSelect: () => void handleToggleModel(model),
-                        },
-                        {
-                          id: "disable",
-                          label: t("actions.disableModel"),
-                          icon: "stop",
-                          disabled: submitting || !model.isActive,
-                          onSelect: () => void handleToggleModel(model),
-                        },
-                        {
-                          id: "delete",
-                          label: t("actions.deleteModel"),
-                          icon: "trash",
-                          disabled: submitting || model.isActive,
-                          danger: true,
-                          onSelect: () => void handleDeleteModel(model),
-                        },
-                      ]}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : pagedModels.length ? (
-            <div
-              className="vx-tenant-directory-cards vx-model-platform-cards"
-              aria-label={t("table.toolbarTitle", {
-                count: filteredModels.length,
-              })}
-            >
-              {pagedModels.map((model) => (
-                <article
-                  key={model.id}
-                  className={`vx-tenant-directory-card vx-model-platform-card vx-model-platform-card--${modelTone(model)}`}
-                >
-                  <header>
-                    <Icon
-                      name={isPrivateProvider(model.provider) ? "code" : "plug"}
-                      size={24}
-                      fallback="placeholder"
-                    />
-                    <div>
-                      <TableTitleCell
-                        title={model.modelName}
-                        description={model.modelCode}
-                        onTitleClick={() => openEditModelDialog(model)}
-                      />
                     </div>
-                    <ModelOperationButtons
-                      model={model}
-                      submitting={submitting}
-                      onEnable={(target) => void handleToggleModel(target)}
-                      onDisable={(target) => void handleToggleModel(target)}
-                      onDelete={(target) => void handleDeleteModel(target)}
-                    />
-                  </header>
-                  <div className="vx-tenant-directory-card__badges">
-                    <Badge
-                      className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
+                    <div className="vx-tenant-directory-card__metrics">
+                      <span>
+                        <b>{model.capabilities.length}</b>
+                        <small>{t("table.columns.capabilities")}</small>
+                      </span>
+                      <span>
+                        <b>
+                          {isPrivateProvider(model.provider)
+                            ? t("filters.private")
+                            : t("filters.online")}
+                        </b>
+                        <small>{t("table.columns.provider")}</small>
+                      </span>
+                      <span>
+                        <b>{model.protocol}</b>
+                        <small>{t("dialogs.fields.protocol")}</small>
+                      </span>
+                    </div>
+                    <footer>
+                      <span>
+                        {model.capabilities.slice(0, 2).join(", ") || "-"}
+                      </span>
+                      <strong>{model.keyReference?.name || "-"}</strong>
+                    </footer>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={loading ? t("empty.loadingTitle") : t("empty.title")}
+                  description={
+                    loading
+                      ? t("empty.loadingDescription")
+                      : t("empty.description")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
                     >
-                      {providerLabel(model.provider)}
-                    </Badge>
-                    <Badge
-                      className={`vx-tenant-pill vx-tenant-pill--${model.isActive ? "active" : "disabled"}`}
-                    >
-                      {model.isActive
-                        ? t("status.active")
-                        : t("status.inactive")}
-                    </Badge>
-                  </div>
-                  <div className="vx-tenant-directory-card__metrics">
-                    <span>
-                      <b>{model.capabilities.length}</b>
-                      <small>{t("table.columns.capabilities")}</small>
-                    </span>
-                    <span>
-                      <b>
-                        {isPrivateProvider(model.provider)
-                          ? t("filters.private")
-                          : t("filters.online")}
-                      </b>
-                      <small>{t("table.columns.provider")}</small>
-                    </span>
-                    <span>
-                      <b>{model.protocol}</b>
-                      <small>{t("dialogs.fields.protocol")}</small>
-                    </span>
-                  </div>
-                  <footer>
-                    <span>
-                      {model.capabilities.slice(0, 2).join(", ") || "-"}
-                    </span>
-                    <strong>{model.keyReference?.name || "-"}</strong>
-                  </footer>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={loading ? t("empty.loadingTitle") : t("empty.title")}
-                description={
-                  loading
-                    ? t("empty.loadingDescription")
-                    : t("empty.description")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    {t("empty.resetFilters")}
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+                      {t("empty.resetFilters")}
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={safeCurrentPage}
             pageCount={totalPages}
@@ -1468,8 +1482,8 @@ export function ModelPlatformPage() {
             onPageSizeChange={setPageSize}
             onPageChange={setCurrentPage}
           />
-        </section>
-      </div>
+        }
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="模型厂商管理">
@@ -2077,6 +2091,6 @@ export function ModelPlatformPage() {
           }}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

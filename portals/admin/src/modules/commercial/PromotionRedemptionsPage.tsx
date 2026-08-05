@@ -7,16 +7,15 @@ import {
   ActionMenu,
   Banner,
   BulkActionBar,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchPromotionRedemptionRecords } from "@/api/admin-bff";
@@ -499,169 +498,180 @@ export function PromotionRedemptionsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-redemptions-page">
-      <PageHeader
-        icon="check"
-        eyebrow="订阅交易"
-        title="优惠核销"
-        description="运营侧查看券核销台账（核销均为客户自助）。减免金额来自账单 discount_amount。"
-      />
-
-      <MetricGrid
-        aria-label="优惠核销统计"
-        items={[
-          {
-            id: "records",
-            icon: "check",
-            label: "核销记录",
-            value: formatNumber(records.length),
-            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
-          },
-          {
-            id: "discount",
-            icon: "chart-bar",
-            label: "减免金额",
-            value: formatCurrency(discountAmount, "CNY"),
-            tags: ["账单减免"],
-            tone: "success",
-          },
-          {
-            id: "tenant-reach",
-            icon: "buildings",
-            label: "覆盖租户",
-            value: formatNumber(tenantReach),
-            tags: ["去重"],
-            tone: "success",
-          },
-          {
-            id: "paid-bills",
-            icon: "sparkles",
-            label: "账单已结清",
-            value: formatNumber(paidBillCount),
-            tags: ["billStatus=paid"],
-            tone: "success",
-          },
-        ]}
-      />
-
-      {recordsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前核销列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按账单状态等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="优惠核销筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="优惠核销展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-redemptions-page"
+        header={
+          <PageHeader
+            icon="check"
+            eyebrow="订阅交易"
+            title="优惠核销"
+            description="运营侧查看券核销台账（核销均为客户自助）。减免金额来自账单 discount_amount。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredRecords.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索核销、租户、账单、套餐"
-            className="vx-tenant-search vx-commercial-search"
-            aria-label="搜索核销"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={billStatusFilter}
-              onChange={(event) =>
-                setBillStatusFilter(event.target.value as BillStatusFilter)
-              }
-              aria-label="账单状态"
-            >
-              <option value="all">全部账单</option>
-              <option value="unpaid">待收款</option>
-              <option value="paying">支付中</option>
-              <option value="partial">部分收款</option>
-              <option value="paid">已结清</option>
-              <option value="overdue">逾期</option>
-              <option value="cancelled">已作废</option>
-            </NativeSelect>
-          </div>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={handleExportAll}
-            disabled={filteredRecords.length === 0}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="优惠核销统计"
+              items={[
+                {
+                  id: "records",
+                  icon: "check",
+                  label: "核销记录",
+                  value: formatNumber(records.length),
+                  tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+                },
+                {
+                  id: "discount",
+                  icon: "chart-bar",
+                  label: "减免金额",
+                  value: formatCurrency(discountAmount, "CNY"),
+                  tags: ["账单减免"],
+                  tone: "success",
+                },
+                {
+                  id: "tenant-reach",
+                  icon: "buildings",
+                  label: "覆盖租户",
+                  value: formatNumber(tenantReach),
+                  tags: ["去重"],
+                  tone: "success",
+                },
+                {
+                  id: "paid-bills",
+                  icon: "sparkles",
+                  label: "账单已结清",
+                  value: formatNumber(paidBillCount),
+                  tags: ["billStatus=paid"],
+                  tone: "success",
+                },
+              ]}
+            />
+            {recordsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前核销列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按账单状态等）重新查询。"
+              />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredRecords.length)}
+            aria-label="优惠核销筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索核销、租户、账单、套餐"
+                className="vx-tenant-search vx-commercial-search"
+                aria-label="搜索核销"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant="outline"
+                  icon="arrow-down"
+                  onClick={handleExportAll}
+                  disabled={filteredRecords.length === 0}
+                >
+                  导出全部
+                </ActionButton>
+              </>
+            }
           >
-            导出全部
-          </ActionButton>
-        </section>
-
-        {selectedRecords.length > 0 ? (
-          <BulkActionBar
-            count={selectedRecords.length}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                icon: "arrow-down",
-                onSelect: handleExportSelected,
-              },
-            ]}
-            onClear={handleClearSelection}
-          />
-        ) : null}
-
-        <section className="vx-tenant-directory" aria-label="优惠核销清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-          {visibleRecords.length ? (
-            viewMode === "list" ? (
-              <RedemptionRows
-                records={visibleRecords}
-                startIndex={(activePage - 1) * pageSize}
-                selectedRecordIds={selectedRecordIds}
-                isPageSelected={isRecordPageSelected}
-                onToggleRecord={toggleRecordSelection}
-                onTogglePage={toggleRecordPageSelection}
-              />
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={billStatusFilter}
+                onChange={(event) =>
+                  setBillStatusFilter(event.target.value as BillStatusFilter)
+                }
+                aria-label="账单状态"
+              >
+                <option value="all">全部账单</option>
+                <option value="unpaid">待收款</option>
+                <option value="paying">支付中</option>
+                <option value="partial">部分收款</option>
+                <option value="paid">已结清</option>
+                <option value="overdue">逾期</option>
+                <option value="cancelled">已作废</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedRecords.length > 0 ? (
+            <BulkActionBar
+              count={selectedRecords.length}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  icon: "arrow-down",
+                  onSelect: handleExportSelected,
+                },
+              ]}
+              onClear={handleClearSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="优惠核销清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+            {visibleRecords.length ? (
+              viewMode === "list" ? (
+                <RedemptionRows
+                  records={visibleRecords}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedRecordIds={selectedRecordIds}
+                  isPageSelected={isRecordPageSelected}
+                  onToggleRecord={toggleRecordSelection}
+                  onTogglePage={toggleRecordPageSelection}
+                />
+              ) : (
+                <RedemptionCards records={visibleRecords} />
+              )
             ) : (
-              <RedemptionCards records={visibleRecords} />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载核销记录"
-                    : loadError
-                      ? "核销数据读取失败"
-                      : "没有匹配的核销记录"
-                }
-                description={
-                  loading
-                    ? "正在读取优惠核销台账。"
-                    : (loadError ?? "清空筛选条件后可查看全部核销记录。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载核销记录"
+                      : loadError
+                        ? "核销数据读取失败"
+                        : "没有匹配的核销记录"
+                  }
+                  description={
+                    loading
+                      ? "正在读取优惠核销台账。"
+                      : (loadError ?? "清空筛选条件后可查看全部核销记录。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -670,8 +680,8 @@ export function PromotionRedemptionsPage() {
             onPageSizeChange={setPageSize}
             onPageChange={setCurrentPage}
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

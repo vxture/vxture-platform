@@ -6,16 +6,15 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -591,174 +590,184 @@ export function ProductSolutionsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-product-solutions-page">
-      <PageHeader
-        icon="workflow"
-        title="解决方案"
-        description="按行业业务场景组合产品能力，定义方案边界、包含产品、服务套餐和适用客户。"
-      />
-
-      <MetricGrid
-        aria-label="解决方案统计"
-        items={[
-          {
-            id: "total",
-            icon: "workflow",
-            label: "方案总数",
-            value: formatNumber(solutions.length),
-            tags: [`启用 ${formatNumber(activeSolutions)}`],
-          },
-          {
-            id: "products",
-            icon: "cube",
-            label: "产品能力",
-            value: formatNumber(productCount),
-            tags: [`三方 ${formatNumber(partnerProductCount)}`],
-            tone: "success",
-          },
-          {
-            id: "tiers",
-            icon: "star",
-            label: "服务套餐",
-            value: formatNumber(tierCount),
-            tags: [`订阅 ${formatNumber(subscriptionCount)}`],
-            tone: "warning",
-          },
-          {
-            id: "revenue",
-            icon: "chart-bar",
-            label: "月度收入",
-            value: formatMoney(monthlyRevenue),
-            tags: [`场景 ${formatNumber(industries.length)}`],
-            tone: "brand",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="解决方案筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="解决方案展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-product-solutions-page"
+        header={
+          <PageHeader
+            icon="workflow"
+            title="解决方案"
+            description="按行业业务场景组合产品能力，定义方案边界、包含产品、服务套餐和适用客户。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredSolutions.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索方案、行业、产品能力"
-            className="vx-tenant-search vx-product-solution-search"
-            aria-label="搜索解决方案"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="方案状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">启用</option>
-              <option value="draft">草稿</option>
-              <option value="archived">归档</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={visibilityFilter}
-              onChange={(event) =>
-                setVisibilityFilter(event.target.value as VisibilityFilter)
-              }
-              aria-label="可见范围"
-            >
-              <option value="all">全部范围</option>
-              <option value="public">公开</option>
-              <option value="internal">内部</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select vx-product-solution-select--industry"
-              value={industryFilter}
-              onChange={(event) => setIndustryFilter(event.target.value)}
-              aria-label="行业场景"
-            >
-              <option value="all">全部行业</option>
-              {industries.map((industry) => (
-                <option key={industry} value={industry}>
-                  {industry}
-                </option>
-              ))}
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={sourceFilter}
-              onChange={(event) =>
-                setSourceFilter(event.target.value as SourceFilter)
-              }
-              aria-label="产品来源"
-            >
-              <option value="all">全部来源</option>
-              <option value="self">自建</option>
-              <option value="partner">三方</option>
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            新建方案
-          </ActionButton>
-        </section>
-
-        <section className="vx-tenant-directory" aria-label="解决方案清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleSolutions.length ? (
-            viewMode === "list" ? (
-              <ProductSolutionListRows
-                solutions={visibleSolutions}
-                startIndex={(activePage - 1) * pageSize}
-                selectedSolutionIds={selectedSolutionIds}
-                isPageSelected={isSolutionPageSelected}
-                onOpenDetails={handleOpenDetails}
-                onToggleSolution={toggleSolutionSelection}
-                onTogglePage={toggleSolutionPageSelection}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="解决方案统计"
+              items={[
+                {
+                  id: "total",
+                  icon: "workflow",
+                  label: "方案总数",
+                  value: formatNumber(solutions.length),
+                  tags: [`启用 ${formatNumber(activeSolutions)}`],
+                },
+                {
+                  id: "products",
+                  icon: "cube",
+                  label: "产品能力",
+                  value: formatNumber(productCount),
+                  tags: [`三方 ${formatNumber(partnerProductCount)}`],
+                  tone: "success",
+                },
+                {
+                  id: "tiers",
+                  icon: "star",
+                  label: "服务套餐",
+                  value: formatNumber(tierCount),
+                  tags: [`订阅 ${formatNumber(subscriptionCount)}`],
+                  tone: "warning",
+                },
+                {
+                  id: "revenue",
+                  icon: "chart-bar",
+                  label: "月度收入",
+                  value: formatMoney(monthlyRevenue),
+                  tags: [`场景 ${formatNumber(industries.length)}`],
+                  tone: "brand",
+                },
+              ]}
+            />
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredSolutions.length)}
+            aria-label="解决方案筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索方案、行业、产品能力"
+                className="vx-tenant-search vx-product-solution-search"
+                aria-label="搜索解决方案"
               />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  新建方案
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="方案状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">启用</option>
+                <option value="draft">草稿</option>
+                <option value="archived">归档</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={visibilityFilter}
+                onChange={(event) =>
+                  setVisibilityFilter(event.target.value as VisibilityFilter)
+                }
+                aria-label="可见范围"
+              >
+                <option value="all">全部范围</option>
+                <option value="public">公开</option>
+                <option value="internal">内部</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select vx-product-solution-select--industry"
+                value={industryFilter}
+                onChange={(event) => setIndustryFilter(event.target.value)}
+                aria-label="行业场景"
+              >
+                <option value="all">全部行业</option>
+                {industries.map((industry) => (
+                  <option key={industry} value={industry}>
+                    {industry}
+                  </option>
+                ))}
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={sourceFilter}
+                onChange={(event) =>
+                  setSourceFilter(event.target.value as SourceFilter)
+                }
+                aria-label="产品来源"
+              >
+                <option value="all">全部来源</option>
+                <option value="self">自建</option>
+                <option value="partner">三方</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="解决方案清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleSolutions.length ? (
+              viewMode === "list" ? (
+                <ProductSolutionListRows
+                  solutions={visibleSolutions}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedSolutionIds={selectedSolutionIds}
+                  isPageSelected={isSolutionPageSelected}
+                  onOpenDetails={handleOpenDetails}
+                  onToggleSolution={toggleSolutionSelection}
+                  onTogglePage={toggleSolutionPageSelection}
+                />
+              ) : (
+                <ProductSolutionCards
+                  solutions={visibleSolutions}
+                  onOpenDetails={handleOpenDetails}
+                />
+              )
             ) : (
-              <ProductSolutionCards
-                solutions={visibleSolutions}
-                onOpenDetails={handleOpenDetails}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={loading ? "正在加载解决方案" : "没有匹配的解决方案"}
-                description={
-                  loading
-                    ? "正在读取行业解决方案数据。"
-                    : "清空筛选条件后可查看全部解决方案。"
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={loading ? "正在加载解决方案" : "没有匹配的解决方案"}
+                  description={
+                    loading
+                      ? "正在读取行业解决方案数据。"
+                      : "清空筛选条件后可查看全部解决方案。"
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -769,8 +778,8 @@ export function ProductSolutionsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

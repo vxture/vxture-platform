@@ -7,16 +7,15 @@ import {
   ActionMenu,
   Banner,
   BulkActionBar,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -514,194 +513,205 @@ export function UsageMeteringPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-usage-page">
-      <PageHeader
-        icon="graph"
-        eyebrow="订阅交易"
-        title="用量计费"
-        description="运营侧查看租户、订阅、产品能力维度的计量消耗、配额使用率和超额风险。"
-      />
-
-      <MetricGrid
-        aria-label="用量计费统计"
-        items={[
-          {
-            id: "records",
-            icon: "graph",
-            label: "计量记录",
-            value: formatNumber(records.length),
-            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
-          },
-          {
-            id: "total-used",
-            icon: "chart-bar",
-            label: "总消耗",
-            value: formatNumber(totalUsed),
-            tags: [`计量项 ${formatNumber(records.length)}`],
-            tone: "success",
-          },
-          {
-            id: "near-limit",
-            icon: "clock",
-            label: "接近上限",
-            value: formatNumber(warningCount),
-            tags: [">=85%"],
-            tone: warningCount ? "warning" : "success",
-          },
-          {
-            id: "over-limit",
-            icon: "warning",
-            label: "超额异常",
-            value: formatNumber(dangerCount),
-            tags: [">100% / 异常"],
-            tone: dangerCount ? "danger" : "success",
-          },
-        ]}
-      />
-
-      {recordsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前用量列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按风险、产品类型、周期等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="用量筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="用量展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-usage-page"
+        header={
+          <PageHeader
+            icon="graph"
+            eyebrow="订阅交易"
+            title="用量计费"
+            description="运营侧查看租户、订阅、产品能力维度的计量消耗、配额使用率和超额风险。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredRecords.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索租户、产品、计量项"
-            className="vx-tenant-search vx-commercial-search"
-            aria-label="搜索用量"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={handleExportAll}
-            disabled={!filteredRecords.length}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="用量计费统计"
+              items={[
+                {
+                  id: "records",
+                  icon: "graph",
+                  label: "计量记录",
+                  value: formatNumber(records.length),
+                  tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+                },
+                {
+                  id: "total-used",
+                  icon: "chart-bar",
+                  label: "总消耗",
+                  value: formatNumber(totalUsed),
+                  tags: [`计量项 ${formatNumber(records.length)}`],
+                  tone: "success",
+                },
+                {
+                  id: "near-limit",
+                  icon: "clock",
+                  label: "接近上限",
+                  value: formatNumber(warningCount),
+                  tags: [">=85%"],
+                  tone: warningCount ? "warning" : "success",
+                },
+                {
+                  id: "over-limit",
+                  icon: "warning",
+                  label: "超额异常",
+                  value: formatNumber(dangerCount),
+                  tags: [">100% / 异常"],
+                  tone: dangerCount ? "danger" : "success",
+                },
+              ]}
+            />
+            {recordsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前用量列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标记录，请尝试缩小筛选范围（如按风险、产品类型、周期等）重新查询。"
+              />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredRecords.length)}
+            aria-label="用量筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索租户、产品、计量项"
+                className="vx-tenant-search vx-commercial-search"
+                aria-label="搜索用量"
+              />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant="outline"
+                  icon="arrow-down"
+                  onClick={handleExportAll}
+                  disabled={!filteredRecords.length}
+                >
+                  导出全部
+                </ActionButton>
+              </>
+            }
           >
-            导出全部
-          </ActionButton>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={riskFilter}
-              onChange={(event) =>
-                setRiskFilter(event.target.value as RiskFilter)
-              }
-              aria-label="风险状态"
-            >
-              <option value="all">全部风险</option>
-              <option value="normal">正常</option>
-              <option value="warning">接近上限</option>
-              <option value="danger">超额</option>
-              <option value="anomaly">计量异常</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={productTypeFilter}
-              onChange={(event) =>
-                setProductTypeFilter(event.target.value as ProductTypeFilter)
-              }
-              aria-label="产品类型"
-            >
-              <option value="all">全部产品</option>
-              <option value="智能体">智能体</option>
-              <option value="平台">平台</option>
-              <option value="大模型">大模型</option>
-              <option value="三方接入">三方接入</option>
-              <option value="产品能力">产品能力</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={cycleFilter}
-              onChange={(event) => setCycleFilter(event.target.value)}
-              aria-label="计量周期"
-            >
-              <option value="all">全部周期</option>
-              {cycles.map((cycle) => (
-                <option key={cycle} value={cycle}>
-                  {cycle}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-        </section>
-
-        {selectedRecords.length ? (
-          <BulkActionBar
-            count={selectedRecords.length}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                onSelect: handleExportSelected,
-              },
-            ]}
-            onClear={clearRecordSelection}
-          />
-        ) : null}
-
-        <section className="vx-tenant-directory" aria-label="用量清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-          {visibleRecords.length ? (
-            viewMode === "list" ? (
-              <UsageListRows
-                records={visibleRecords}
-                startIndex={(activePage - 1) * pageSize}
-                selectedRecordIds={selectedRecordIds}
-                isPageSelected={isRecordPageSelected}
-                onToggleRecord={toggleRecordSelection}
-                onTogglePage={toggleRecordPageSelection}
-              />
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={riskFilter}
+                onChange={(event) =>
+                  setRiskFilter(event.target.value as RiskFilter)
+                }
+                aria-label="风险状态"
+              >
+                <option value="all">全部风险</option>
+                <option value="normal">正常</option>
+                <option value="warning">接近上限</option>
+                <option value="danger">超额</option>
+                <option value="anomaly">计量异常</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={productTypeFilter}
+                onChange={(event) =>
+                  setProductTypeFilter(event.target.value as ProductTypeFilter)
+                }
+                aria-label="产品类型"
+              >
+                <option value="all">全部产品</option>
+                <option value="智能体">智能体</option>
+                <option value="平台">平台</option>
+                <option value="大模型">大模型</option>
+                <option value="三方接入">三方接入</option>
+                <option value="产品能力">产品能力</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={cycleFilter}
+                onChange={(event) => setCycleFilter(event.target.value)}
+                aria-label="计量周期"
+              >
+                <option value="all">全部周期</option>
+                {cycles.map((cycle) => (
+                  <option key={cycle} value={cycle}>
+                    {cycle}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedRecords.length ? (
+            <BulkActionBar
+              count={selectedRecords.length}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  onSelect: handleExportSelected,
+                },
+              ]}
+              onClear={clearRecordSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="用量清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+            {visibleRecords.length ? (
+              viewMode === "list" ? (
+                <UsageListRows
+                  records={visibleRecords}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedRecordIds={selectedRecordIds}
+                  isPageSelected={isRecordPageSelected}
+                  onToggleRecord={toggleRecordSelection}
+                  onTogglePage={toggleRecordPageSelection}
+                />
+              ) : (
+                <UsageCards records={visibleRecords} />
+              )
             ) : (
-              <UsageCards records={visibleRecords} />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载用量"
-                    : loadError
-                      ? "用量数据读取失败"
-                      : "没有匹配的用量记录"
-                }
-                description={
-                  loading
-                    ? "正在读取计量汇总数据。"
-                    : (loadError ?? "清空筛选条件后可查看全部计量记录。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载用量"
+                      : loadError
+                        ? "用量数据读取失败"
+                        : "没有匹配的用量记录"
+                  }
+                  description={
+                    loading
+                      ? "正在读取计量汇总数据。"
+                      : (loadError ?? "清空筛选条件后可查看全部计量记录。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -710,8 +720,8 @@ export function UsageMeteringPage() {
             onPageSizeChange={setPageSize}
             onPageChange={setCurrentPage}
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

@@ -6,14 +6,13 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Button,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchProductPlans, fetchProductSolutions } from "@/api/admin-bff";
@@ -494,172 +493,182 @@ export function ServicePlansPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-service-plans-page">
-      <PageHeader
-        icon="star"
-        title="服务套餐"
-        description="按解决方案铺开 Free / Pro / Enterprise 等服务套餐，维护配额、价格、售卖状态和适用范围。"
-      />
-
-      <MetricGrid
-        aria-label="服务套餐管理统计"
-        items={[
-          {
-            id: "solutions",
-            icon: "workflow",
-            label: "业务方案",
-            value: formatNumber(solutionCount),
-            tags: [`套餐 ${formatNumber(tierItems.length)}`],
-          },
-          {
-            id: "active-tiers",
-            icon: "star",
-            label: "启用套餐",
-            value: formatNumber(activeTierCount),
-            tags: [`公开 ${formatNumber(publicTierCount)}`],
-            tone: "success",
-          },
-          {
-            id: "subscriptions",
-            icon: "user",
-            label: "订阅使用",
-            value: formatNumber(subscriptionCount),
-            tags: [`场景 ${formatNumber(industries.length)}`],
-            tone: "warning",
-          },
-          {
-            id: "revenue",
-            icon: "chart-bar",
-            label: "月度收入",
-            value: formatMoney(monthlyRevenue),
-            tags: ["方案口径"],
-            tone: "brand",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="服务套餐筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="服务套餐展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-service-plans-page"
+        header={
+          <PageHeader
+            icon="star"
+            title="服务套餐"
+            description="按解决方案铺开 Free / Pro / Enterprise 等服务套餐，维护配额、价格、售卖状态和适用范围。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredTierItems.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索方案、套餐、配额"
-            className="vx-tenant-search vx-service-plan-search"
-            aria-label="搜索服务套餐"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="套餐状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">启用</option>
-              <option value="draft">草稿</option>
-              <option value="archived">归档</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={priceFilter}
-              onChange={(event) =>
-                setPriceFilter(event.target.value as PriceFilter)
-              }
-              aria-label="价格类型"
-            >
-              <option value="all">全部价格</option>
-              <option value="free">免费</option>
-              <option value="paid">标准付费</option>
-              <option value="contract">合同报价</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={visibilityFilter}
-              onChange={(event) =>
-                setVisibilityFilter(event.target.value as VisibilityFilter)
-              }
-              aria-label="适用范围"
-            >
-              <option value="all">全部范围</option>
-              <option value="public">公开</option>
-              <option value="internal">内部</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select vx-service-plan-select--industry"
-              value={industryFilter}
-              onChange={(event) => setIndustryFilter(event.target.value)}
-              aria-label="业务方案"
-            >
-              <option value="all">全部行业</option>
-              {industries.map((industry) => (
-                <option key={industry} value={industry}>
-                  {industry}
-                </option>
-              ))}
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            新建套餐
-          </ActionButton>
-        </section>
-
-        <section
-          className="vx-service-plan-directory"
-          aria-label="服务套餐清单"
-        >
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleGroups.length ? (
-            <div className="vx-service-plan-groups">
-              {visibleGroups.map((group) => (
-                <ServicePlanGroupBlock
-                  key={group.solution.id}
-                  group={group}
-                  viewMode={viewMode}
-                  onOpenDetails={handleOpenDetails}
-                />
-              ))}
-            </div>
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={loading ? "正在加载服务套餐" : "没有匹配的服务套餐"}
-                description={
-                  loading
-                    ? "正在读取业务方案和套餐版本。"
-                    : "清空筛选条件后可查看全部服务套餐。"
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="服务套餐管理统计"
+              items={[
+                {
+                  id: "solutions",
+                  icon: "workflow",
+                  label: "业务方案",
+                  value: formatNumber(solutionCount),
+                  tags: [`套餐 ${formatNumber(tierItems.length)}`],
+                },
+                {
+                  id: "active-tiers",
+                  icon: "star",
+                  label: "启用套餐",
+                  value: formatNumber(activeTierCount),
+                  tags: [`公开 ${formatNumber(publicTierCount)}`],
+                  tone: "success",
+                },
+                {
+                  id: "subscriptions",
+                  icon: "user",
+                  label: "订阅使用",
+                  value: formatNumber(subscriptionCount),
+                  tags: [`场景 ${formatNumber(industries.length)}`],
+                  tone: "warning",
+                },
+                {
+                  id: "revenue",
+                  icon: "chart-bar",
+                  label: "月度收入",
+                  value: formatMoney(monthlyRevenue),
+                  tags: ["方案口径"],
+                  tone: "brand",
+                },
+              ]}
+            />
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredTierItems.length)}
+            aria-label="服务套餐筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索方案、套餐、配额"
+                className="vx-tenant-search vx-service-plan-search"
+                aria-label="搜索服务套餐"
               />
-            </section>
-          )}
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  新建套餐
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="套餐状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">启用</option>
+                <option value="draft">草稿</option>
+                <option value="archived">归档</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={priceFilter}
+                onChange={(event) =>
+                  setPriceFilter(event.target.value as PriceFilter)
+                }
+                aria-label="价格类型"
+              >
+                <option value="all">全部价格</option>
+                <option value="free">免费</option>
+                <option value="paid">标准付费</option>
+                <option value="contract">合同报价</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={visibilityFilter}
+                onChange={(event) =>
+                  setVisibilityFilter(event.target.value as VisibilityFilter)
+                }
+                aria-label="适用范围"
+              >
+                <option value="all">全部范围</option>
+                <option value="public">公开</option>
+                <option value="internal">内部</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select vx-service-plan-select--industry"
+                value={industryFilter}
+                onChange={(event) => setIndustryFilter(event.target.value)}
+                aria-label="业务方案"
+              >
+                <option value="all">全部行业</option>
+                {industries.map((industry) => (
+                  <option key={industry} value={industry}>
+                    {industry}
+                  </option>
+                ))}
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section
+            className="vx-service-plan-directory"
+            aria-label="服务套餐清单"
+          >
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
 
+            {visibleGroups.length ? (
+              <div className="vx-service-plan-groups">
+                {visibleGroups.map((group) => (
+                  <ServicePlanGroupBlock
+                    key={group.solution.id}
+                    group={group}
+                    viewMode={viewMode}
+                    onOpenDetails={handleOpenDetails}
+                  />
+                ))}
+              </div>
+            ) : (
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={loading ? "正在加载服务套餐" : "没有匹配的服务套餐"}
+                  description={
+                    loading
+                      ? "正在读取业务方案和套餐版本。"
+                      : "清空筛选条件后可查看全部服务套餐。"
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -671,8 +680,8 @@ export function ServicePlansPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

@@ -6,16 +6,15 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -529,181 +528,191 @@ export function ProductsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-product-management-page">
-      <PageHeader
-        icon="database"
-        title="产品能力"
-        description="统一管理可组合、可授权、可计量的基础产品能力，作为解决方案、服务套餐和模型授权的供给目录。"
-      />
-
-      <MetricGrid
-        aria-label="产品能力管理统计"
-        items={[
-          {
-            id: "total",
-            icon: "database",
-            label: "能力总数",
-            value: formatNumber(products.length),
-            tags: [`上线 ${formatNumber(activeProducts)}`],
-          },
-          {
-            id: "types",
-            icon: "agent",
-            label: "能力类型",
-            value: formatNumber(agentProducts + platformProducts),
-            tags: [
-              `智能体 ${formatNumber(agentProducts)}`,
-              `平台 ${formatNumber(platformProducts)}`,
-            ],
-            tone: "success",
-          },
-          {
-            id: "partner",
-            icon: "cloud",
-            label: "三方接入",
-            value: formatNumber(partnerProducts),
-            tags: ["合作方"],
-            tone: partnerProducts ? "warning" : "success",
-          },
-          {
-            id: "solutions",
-            icon: "workflow",
-            label: "方案复用",
-            value: formatNumber(solutionCount),
-            tags: [`待配置 ${formatNumber(configRequiredProducts)}`],
-            tone: configRequiredProducts ? "warning" : "brand",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="产品能力筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="产品能力展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-product-management-page"
+        header={
+          <PageHeader
+            icon="database"
+            title="产品能力"
+            description="统一管理可组合、可授权、可计量的基础产品能力，作为解决方案、服务套餐和模型授权的供给目录。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredProducts.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索能力、code、方案、计量"
-            className="vx-tenant-search vx-product-search"
-            aria-label="搜索产品能力"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={typeFilter}
-              onChange={(event) =>
-                setTypeFilter(event.target.value as TypeFilter)
-              }
-              aria-label="能力类型"
-            >
-              <option value="all">全部类型</option>
-              <option value="platform">平台</option>
-              <option value="agent">智能体</option>
-              <option value="model">模型</option>
-              <option value="data">数据</option>
-              <option value="service">服务</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={sourceFilter}
-              onChange={(event) =>
-                setSourceFilter(event.target.value as SourceFilter)
-              }
-              aria-label="产品来源"
-            >
-              <option value="all">全部来源</option>
-              <option value="self">自建</option>
-              <option value="partner">三方接入</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="产品状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">已上线</option>
-              <option value="draft">草稿</option>
-              <option value="archived">已归档</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={accessFilter}
-              onChange={(event) =>
-                setAccessFilter(event.target.value as AccessFilter)
-              }
-              aria-label="接入状态"
-            >
-              <option value="all">全部接入</option>
-              <option value="connected">已接入</option>
-              <option value="testing">联调中</option>
-              <option value="config_required">待配置</option>
-              <option value="not_required">无需接入</option>
-            </NativeSelect>
-          </div>
-          <ActionButton variant="outline" icon="plus" disabled>
-            新建能力
-          </ActionButton>
-        </section>
-
-        <section className="vx-tenant-directory" aria-label="产品能力清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-
-          {visibleProducts.length ? (
-            viewMode === "list" ? (
-              <ProductListRows
-                products={visibleProducts}
-                startIndex={(activePage - 1) * pageSize}
-                selectedProductCodes={selectedProductCodes}
-                isPageSelected={isProductPageSelected}
-                onOpenDetails={handleOpenDetails}
-                onToggleProduct={toggleProductSelection}
-                onTogglePage={toggleProductPageSelection}
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="产品能力管理统计"
+              items={[
+                {
+                  id: "total",
+                  icon: "database",
+                  label: "能力总数",
+                  value: formatNumber(products.length),
+                  tags: [`上线 ${formatNumber(activeProducts)}`],
+                },
+                {
+                  id: "types",
+                  icon: "agent",
+                  label: "能力类型",
+                  value: formatNumber(agentProducts + platformProducts),
+                  tags: [
+                    `智能体 ${formatNumber(agentProducts)}`,
+                    `平台 ${formatNumber(platformProducts)}`,
+                  ],
+                  tone: "success",
+                },
+                {
+                  id: "partner",
+                  icon: "cloud",
+                  label: "三方接入",
+                  value: formatNumber(partnerProducts),
+                  tags: ["合作方"],
+                  tone: partnerProducts ? "warning" : "success",
+                },
+                {
+                  id: "solutions",
+                  icon: "workflow",
+                  label: "方案复用",
+                  value: formatNumber(solutionCount),
+                  tags: [`待配置 ${formatNumber(configRequiredProducts)}`],
+                  tone: configRequiredProducts ? "warning" : "brand",
+                },
+              ]}
+            />
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredProducts.length)}
+            aria-label="产品能力筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索能力、code、方案、计量"
+                className="vx-tenant-search vx-product-search"
+                aria-label="搜索产品能力"
               />
+            }
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton variant="outline" icon="plus" disabled>
+                  新建能力
+                </ActionButton>
+              </>
+            }
+          >
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={typeFilter}
+                onChange={(event) =>
+                  setTypeFilter(event.target.value as TypeFilter)
+                }
+                aria-label="能力类型"
+              >
+                <option value="all">全部类型</option>
+                <option value="platform">平台</option>
+                <option value="agent">智能体</option>
+                <option value="model">模型</option>
+                <option value="data">数据</option>
+                <option value="service">服务</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={sourceFilter}
+                onChange={(event) =>
+                  setSourceFilter(event.target.value as SourceFilter)
+                }
+                aria-label="产品来源"
+              >
+                <option value="all">全部来源</option>
+                <option value="self">自建</option>
+                <option value="partner">三方接入</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="产品状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">已上线</option>
+                <option value="draft">草稿</option>
+                <option value="archived">已归档</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={accessFilter}
+                onChange={(event) =>
+                  setAccessFilter(event.target.value as AccessFilter)
+                }
+                aria-label="接入状态"
+              >
+                <option value="all">全部接入</option>
+                <option value="connected">已接入</option>
+                <option value="testing">联调中</option>
+                <option value="config_required">待配置</option>
+                <option value="not_required">无需接入</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="产品能力清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+
+            {visibleProducts.length ? (
+              viewMode === "list" ? (
+                <ProductListRows
+                  products={visibleProducts}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedProductCodes={selectedProductCodes}
+                  isPageSelected={isProductPageSelected}
+                  onOpenDetails={handleOpenDetails}
+                  onToggleProduct={toggleProductSelection}
+                  onTogglePage={toggleProductPageSelection}
+                />
+              ) : (
+                <ProductCards
+                  products={visibleProducts}
+                  onOpenDetails={handleOpenDetails}
+                />
+              )
             ) : (
-              <ProductCards
-                products={visibleProducts}
-                onOpenDetails={handleOpenDetails}
-              />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={loading ? "正在加载产品能力" : "没有匹配的产品能力"}
-                description={
-                  loading
-                    ? "正在读取产品能力供给目录。"
-                    : "清空筛选条件后可查看全部产品能力。"
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
-
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={loading ? "正在加载产品能力" : "没有匹配的产品能力"}
+                  description={
+                    loading
+                      ? "正在读取产品能力供给目录。"
+                      : "清空筛选条件后可查看全部产品能力。"
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -714,8 +723,8 @@ export function ProductsPage() {
               setCurrentPage(Math.min(Math.max(page, 1), pageCount))
             }
           />
-        </section>
-      </div>
-    </ViewLayout>
+        }
+      />
+    </>
   );
 }

@@ -7,16 +7,15 @@ import {
   ActionMenu,
   Banner,
   BulkActionBar,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -505,208 +504,224 @@ export function PromotionsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-promotions-page">
-      <PageHeader
-        icon="sparkles"
-        eyebrow="产品体系"
-        title="营销优惠"
-        description="市场运营侧查看卡券批次、发放与核销台账（批次/发码/核销数据来自 promotion 域）。券面金额按 kind 存于 effect JSONB，暂不在本台账展示（见 TD-030）。"
-      />
-      <MetricGrid
-        aria-label="营销优惠统计"
-        items={[
-          {
-            id: "promotions",
-            icon: "sparkles",
-            label: "优惠活动",
-            value: formatNumber(records.length),
-            tags: [`生效 ${formatNumber(activeCount)}`],
-          },
-          {
-            id: "redemptions",
-            icon: "check",
-            label: "核销次数",
-            value: formatNumber(redemptionCount),
-            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
-            tone: "success",
-          },
-          {
-            id: "tenant-reach",
-            icon: "chart-bar",
-            label: "覆盖租户",
-            value: formatNumber(tenantReach),
-            tags: ["已核销租户数"],
-            tone: "success",
-          },
-          {
-            id: "pending-config",
-            icon: "clock",
-            label: "待配置",
-            value: formatNumber(
-              records.filter((record) => record.promotionType === "coupon")
-                .length,
-            ),
-            tags: ["优惠码"],
-            tone: "warning",
-          },
-        ]}
-      />
-      {recordsTruncated ? (
-        <Banner
-          tone="warning"
-          title="当前优惠列表可能未展示全部数据"
-          description="本次加载已达到单次读取上限（500 条），如未看到目标优惠活动，请尝试缩小筛选范围（如按状态、类型等）重新查询。"
-        />
-      ) : null}
-
-      <div className="vx-tenant-list-shell">
-        <section className="vx-tenant-toolbar" aria-label="营销优惠筛选">
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel="营销优惠展示方式"
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-promotions-page"
+        header={
+          <PageHeader
+            icon="sparkles"
+            eyebrow="产品体系"
+            title="营销优惠"
+            description="市场运营侧查看卡券批次、发放与核销台账（批次/发码/核销数据来自 promotion 域）。券面金额按 kind 存于 effect JSONB，暂不在本台账展示（见 TD-030）。"
           />
-          <span className="vx-tenant-view-count">
-            {formatNumber(filteredRecords.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索优惠、套餐、负责人"
-            className="vx-tenant-search vx-commercial-search"
-            aria-label="搜索优惠"
-          />
-          <Button variant="outline" onClick={handleReset}>
-            重置
-          </Button>
-          <div className="vx-tenant-filters">
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
-              aria-label="优惠状态"
-            >
-              <option value="all">全部状态</option>
-              <option value="active">生效中</option>
-              <option value="scheduled">待开始</option>
-              <option value="paused">已暂停</option>
-              <option value="expired">已结束</option>
-            </NativeSelect>
-            <NativeSelect
-              className="vx-input vx-tenant-select"
-              value={typeFilter}
-              onChange={(event) =>
-                setTypeFilter(event.target.value as TypeFilter)
-              }
-              aria-label="优惠类型"
-            >
-              <option value="all">全部类型</option>
-              <option value="discount">套餐折扣</option>
-              <option value="coupon">优惠码</option>
-              <option value="campaign">活动</option>
-            </NativeSelect>
-          </div>
-          <ActionButton
-            variant="outline"
-            icon="arrow-down"
-            onClick={handleExportAll}
-            disabled={filteredRecords.length === 0}
-          >
-            导出全部
-          </ActionButton>
-          <ActionButton
-            variant="outline"
-            icon="plus"
-            onClick={() => {
-              setWriteError(null);
-              setCreateOpen(true);
-            }}
-          >
-            新建优惠
-          </ActionButton>
-          <ActionButton
-            variant="outline"
-            icon="arrow-right"
-            disabled={selectedRecords.length !== 1}
-            title={
-              selectedRecords.length === 1
-                ? undefined
-                : "勾选一个批次后可发放券码"
+        }
+        summary={
+          <>
+            {" "}
+            <MetricGrid
+              aria-label="营销优惠统计"
+              items={[
+                {
+                  id: "promotions",
+                  icon: "sparkles",
+                  label: "优惠活动",
+                  value: formatNumber(records.length),
+                  tags: [`生效 ${formatNumber(activeCount)}`],
+                },
+                {
+                  id: "redemptions",
+                  icon: "check",
+                  label: "核销次数",
+                  value: formatNumber(redemptionCount),
+                  tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+                  tone: "success",
+                },
+                {
+                  id: "tenant-reach",
+                  icon: "chart-bar",
+                  label: "覆盖租户",
+                  value: formatNumber(tenantReach),
+                  tags: ["已核销租户数"],
+                  tone: "success",
+                },
+                {
+                  id: "pending-config",
+                  icon: "clock",
+                  label: "待配置",
+                  value: formatNumber(
+                    records.filter(
+                      (record) => record.promotionType === "coupon",
+                    ).length,
+                  ),
+                  tags: ["优惠码"],
+                  tone: "warning",
+                },
+              ]}
+            />
+            {recordsTruncated ? (
+              <Banner
+                tone="warning"
+                title="当前优惠列表可能未展示全部数据"
+                description="本次加载已达到单次读取上限（500 条），如未看到目标优惠活动，请尝试缩小筛选范围（如按状态、类型等）重新查询。"
+              />
+            ) : null}
+          </>
+        }
+        filters={
+          <FilterBar
+            view={viewMode}
+            onViewChange={setViewMode}
+            count={formatNumber(filteredRecords.length)}
+            aria-label="营销优惠筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索优惠、套餐、负责人"
+                className="vx-tenant-search vx-commercial-search"
+                aria-label="搜索优惠"
+              />
             }
-            onClick={() => {
-              const target = selectedRecords[0];
-              if (!target) return;
-              setWriteError(null);
-              setAssignedCodes(null);
-              setAssignTarget(target);
-            }}
+            onReset={handleReset}
+            actions={
+              <>
+                <ActionButton
+                  variant="outline"
+                  icon="arrow-down"
+                  onClick={handleExportAll}
+                  disabled={filteredRecords.length === 0}
+                >
+                  导出全部
+                </ActionButton>
+                <ActionButton
+                  variant="outline"
+                  icon="plus"
+                  onClick={() => {
+                    setWriteError(null);
+                    setCreateOpen(true);
+                  }}
+                >
+                  新建优惠
+                </ActionButton>
+                <ActionButton
+                  variant="outline"
+                  icon="arrow-right"
+                  disabled={selectedRecords.length !== 1}
+                  title={
+                    selectedRecords.length === 1
+                      ? undefined
+                      : "勾选一个批次后可发放券码"
+                  }
+                  onClick={() => {
+                    const target = selectedRecords[0];
+                    if (!target) return;
+                    setWriteError(null);
+                    setAssignedCodes(null);
+                    setAssignTarget(target);
+                  }}
+                >
+                  发放券码
+                </ActionButton>
+              </>
+            }
           >
-            发放券码
-          </ActionButton>
-        </section>
-        {selectedRecords.length > 0 ? (
-          <BulkActionBar
-            count={selectedRecords.length}
-            actions={[
-              {
-                id: "export",
-                label: "导出所选",
-                icon: "arrow-down",
-                onSelect: handleExportSelected,
-              },
-            ]}
-            onClear={handleClearSelection}
-          />
-        ) : null}
-        <section className="vx-tenant-directory" aria-label="营销优惠清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>读取中</span>
-            </header>
-          ) : null}
-          {visibleRecords.length ? (
-            viewMode === "list" ? (
-              <PromotionRows
-                records={visibleRecords}
-                startIndex={(activePage - 1) * pageSize}
-                selectedRecordIds={selectedRecordIds}
-                isPageSelected={isRecordPageSelected}
-                onToggleRecord={toggleRecordSelection}
-                onTogglePage={toggleRecordPageSelection}
-              />
+            <div className="vx-tenant-filters">
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as StatusFilter)
+                }
+                aria-label="优惠状态"
+              >
+                <option value="all">全部状态</option>
+                <option value="active">生效中</option>
+                <option value="scheduled">待开始</option>
+                <option value="paused">已暂停</option>
+                <option value="expired">已结束</option>
+              </NativeSelect>
+              <NativeSelect
+                className="vx-input vx-tenant-select"
+                value={typeFilter}
+                onChange={(event) =>
+                  setTypeFilter(event.target.value as TypeFilter)
+                }
+                aria-label="优惠类型"
+              >
+                <option value="all">全部类型</option>
+                <option value="discount">套餐折扣</option>
+                <option value="coupon">优惠码</option>
+                <option value="campaign">活动</option>
+              </NativeSelect>
+            </div>
+          </FilterBar>
+        }
+        bulkBar={
+          selectedRecords.length > 0 ? (
+            <BulkActionBar
+              count={selectedRecords.length}
+              actions={[
+                {
+                  id: "export",
+                  label: "导出所选",
+                  icon: "arrow-down",
+                  onSelect: handleExportSelected,
+                },
+              ]}
+              onClear={handleClearSelection}
+            />
+          ) : null
+        }
+        table={
+          <section className="vx-tenant-directory" aria-label="营销优惠清单">
+            {loading ? (
+              <header className="vx-tenant-directory__header">
+                <span>读取中</span>
+              </header>
+            ) : null}
+            {visibleRecords.length ? (
+              viewMode === "list" ? (
+                <PromotionRows
+                  records={visibleRecords}
+                  startIndex={(activePage - 1) * pageSize}
+                  selectedRecordIds={selectedRecordIds}
+                  isPageSelected={isRecordPageSelected}
+                  onToggleRecord={toggleRecordSelection}
+                  onTogglePage={toggleRecordPageSelection}
+                />
+              ) : (
+                <PromotionCards records={visibleRecords} />
+              )
             ) : (
-              <PromotionCards records={visibleRecords} />
-            )
-          ) : (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title={
-                  loading
-                    ? "正在加载优惠"
-                    : loadError
-                      ? "优惠数据读取失败"
-                      : "没有匹配的优惠"
-                }
-                description={
-                  loading
-                    ? "正在读取营销优惠台账。"
-                    : (loadError ?? "清空筛选条件后可查看全部优惠活动。")
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          )}
+              <section className="vx-tenant-empty">
+                <EmptyState
+                  title={
+                    loading
+                      ? "正在加载优惠"
+                      : loadError
+                        ? "优惠数据读取失败"
+                        : "没有匹配的优惠"
+                  }
+                  description={
+                    loading
+                      ? "正在读取营销优惠台账。"
+                      : (loadError ?? "清空筛选条件后可查看全部优惠活动。")
+                  }
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={handleReset}
+                    >
+                      清空筛选
+                    </ActionButton>
+                  }
+                />
+              </section>
+            )}
+          </section>
+        }
+        footer={
           <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
@@ -715,8 +730,8 @@ export function PromotionsPage() {
             onPageSizeChange={setPageSize}
             onPageChange={setCurrentPage}
           />
-        </section>
-      </div>
+        }
+      />
 
       {createOpen ? (
         <CreateVoucherBatchDialog
@@ -739,6 +754,6 @@ export function PromotionsPage() {
           onSubmit={(payload) => void handleAssign(payload)}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
