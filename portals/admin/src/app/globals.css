@@ -1,5 +1,6 @@
 @import "@vxture/design-system/styles/globals.css";
 @import "@vxture/design-system/styles/brands/vxture.css";
+@import "@vxture/design-system/styles/workbench.css";
 /* Shared portal shell visual system — single source of truth in the design
  * system, identical to console. Loaded after the DS packs so the template's
  * .app/.vxh/.sidebar/.assistant chrome and ergonomic aliases win. The Phosphor
