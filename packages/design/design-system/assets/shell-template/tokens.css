@@ -135,7 +135,10 @@
   --vx-color-info-surface:    var(--vx-color-info-50);
 
   /* ── Semantic · Shell (portal chrome) ─────────────────────────────────── */
-  --vx-color-shell-bg:       #f5f7fb;
+  /* 工作台浅蓝底。原本是就地写死的 #f5f7fb，与 opera 用的 T1 brand-20 (#f4f7fd)
+   * 差 1 个 r 通道、2 个 b 通道——本就是同一个意图的两次手写。改指 brand-20，
+   * 两个控制台从此同一取值：它们是同一套工作界面语言，底色不该各是各的。 */
+  --vx-color-shell-bg:       var(--vx-color-brand-20);
   --vx-color-shell-surface:  var(--vx-color-white);
   --vx-color-shell-border:   rgba(15, 23, 42, 0.07);
   --vx-color-shell-text:     #162033;
