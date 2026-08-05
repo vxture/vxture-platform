@@ -7,11 +7,11 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   EmptyState,
   Icon,
   MetricGrid,
-  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import {
@@ -632,118 +632,126 @@ export function BillingDetailPage({ billId }: { billId: string }) {
 
   if (!loading && !bill) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="key"
-          title="账单详情"
-          description="未找到对应的账单记录。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/billing">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="key"
+            title="账单详情"
+            description="未找到对应的账单记录。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/billing">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="账单不存在"
           description="该账单可能已归档，或当前账号无权访问。"
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page vx-billing-detail-page">
-      <PageHeader
-        icon="key"
-        title={bill ? bill.billNo : "账单详情"}
-        description={
-          bill
-            ? `${bill.tenantName} · ${bill.servicePlanName ?? "未关联套餐"} · ${invoiceStatusLabel(bill.invoiceStatus)}`
-            : "正在读取账单、收款和发票登记数据。"
-        }
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/billing">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            {bill?.subscriptionId ? (
+    <DetailPageTemplate
+      className="vx-product-capability-page vx-billing-detail-page"
+      header={
+        <PageHeader
+          icon="key"
+          title={bill ? bill.billNo : "账单详情"}
+          description={
+            bill
+              ? `${bill.tenantName} · ${bill.servicePlanName ?? "未关联套餐"} · ${invoiceStatusLabel(bill.invoiceStatus)}`
+              : "正在读取账单、收款和发票登记数据。"
+          }
+          action={
+            <div className="vx-product-capability-actions">
               <Button asChild variant="outline">
-                <Link
-                  href={`/orders/${encodeURIComponent(bill.subscriptionId)}`}
-                >
-                  <Icon name="table" size="xs" fallback="placeholder" />
-                  订单详情
+                <Link href="/billing">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
                 </Link>
               </Button>
-            ) : null}
-            {bill ? (
-              <>
-                {(
-                  [
-                    "mark_overdue",
-                    "discount",
-                    "create_adjustment",
-                    "create_supplement",
-                    "cancel",
-                  ] as const
-                ).map((action) => (
-                  <Button
-                    key={action}
-                    variant="outline"
-                    className={
-                      action === "cancel"
-                        ? "vx-subscription-action-button--danger"
-                        : undefined
-                    }
-                    onClick={() => requestBillAction(action)}
-                    disabled={!canRunBillingBillAction(action, bill)}
-                    title={
-                      billingBillActionDisabledReason(action, bill) ?? undefined
-                    }
+              {bill?.subscriptionId ? (
+                <Button asChild variant="outline">
+                  <Link
+                    href={`/orders/${encodeURIComponent(bill.subscriptionId)}`}
                   >
-                    <Icon
-                      name={
-                        action === "cancel"
-                          ? "warning"
-                          : action === "mark_overdue"
-                            ? "clock"
-                            : action === "discount"
-                              ? "chart-bar"
-                              : action === "create_adjustment"
-                                ? "edit"
-                                : "plus"
-                      }
-                      size="xs"
-                      fallback="placeholder"
-                    />
-                    {billingBillActionLabel(action)}
-                  </Button>
-                ))}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOperationError(null);
-                    setOperationFeedback(null);
-                    setInvoiceDialogOpen(true);
-                  }}
-                  disabled={!canSyncOfflineInvoice(bill)}
-                  title={offlineInvoiceDisabledReason(bill) ?? undefined}
-                >
-                  <Icon name="key" size="xs" fallback="placeholder" />
-                  登记发票
+                    <Icon name="table" size="xs" fallback="placeholder" />
+                    订单详情
+                  </Link>
                 </Button>
-              </>
-            ) : null}
-          </div>
-        }
-      />
-
+              ) : null}
+              {bill ? (
+                <>
+                  {(
+                    [
+                      "mark_overdue",
+                      "discount",
+                      "create_adjustment",
+                      "create_supplement",
+                      "cancel",
+                    ] as const
+                  ).map((action) => (
+                    <Button
+                      key={action}
+                      variant="outline"
+                      className={
+                        action === "cancel"
+                          ? "vx-subscription-action-button--danger"
+                          : undefined
+                      }
+                      onClick={() => requestBillAction(action)}
+                      disabled={!canRunBillingBillAction(action, bill)}
+                      title={
+                        billingBillActionDisabledReason(action, bill) ??
+                        undefined
+                      }
+                    >
+                      <Icon
+                        name={
+                          action === "cancel"
+                            ? "warning"
+                            : action === "mark_overdue"
+                              ? "clock"
+                              : action === "discount"
+                                ? "chart-bar"
+                                : action === "create_adjustment"
+                                  ? "edit"
+                                  : "plus"
+                        }
+                        size="xs"
+                        fallback="placeholder"
+                      />
+                      {billingBillActionLabel(action)}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setOperationError(null);
+                      setOperationFeedback(null);
+                      setInvoiceDialogOpen(true);
+                    }}
+                    disabled={!canSyncOfflineInvoice(bill)}
+                    title={offlineInvoiceDisabledReason(bill) ?? undefined}
+                  >
+                    <Icon name="key" size="xs" fallback="placeholder" />
+                    登记发票
+                  </Button>
+                </>
+              ) : null}
+            </div>
+          }
+        />
+      }
+    >
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">
           {operationFeedback}
@@ -798,6 +806,6 @@ export function BillingDetailPage({ billId }: { billId: string }) {
           onSubmit={handleSubmitBillAction}
         />
       ) : null}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

@@ -6,6 +6,7 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   DialogForm,
   EmptyState,
@@ -13,7 +14,6 @@ import {
   Label,
   MetricGrid,
   Textarea,
-  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import {
@@ -558,129 +558,136 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
 
   if (!loading && !order) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="table"
-          title="订单详情"
-          description="未找到对应的订单记录。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/orders">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="table"
+            title="订单详情"
+            description="未找到对应的订单记录。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/orders">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="订单不存在"
           description="该订单可能已归档，或当前账号无权访问。"
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page vx-order-detail-page">
-      <PageHeader
-        icon="table"
-        title={order ? order.orderNo : "订单详情"}
-        description={
-          order
-            ? `${order.tenantName} · ${order.solutionName} · ${order.servicePlanName}`
-            : "正在读取订单、账单和支付记录。"
-        }
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/orders">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            {order ? (
-              <>
-                <Button asChild variant="outline">
-                  <Link
-                    href={`/subscriptions/${encodeURIComponent(order.subscriptionId)}`}
-                  >
-                    <Icon name="star" size="xs" fallback="placeholder" />
-                    订阅详情
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOperationError(null);
-                    setOperationFeedback(null);
-                    setPaymentDialogOpen(true);
-                  }}
-                  disabled={!canConfirmOrderOfflinePayment(order)}
-                  title={
-                    confirmOfflinePaymentDisabledReason(order) ?? undefined
-                  }
-                >
-                  <Icon name="check" size="xs" fallback="placeholder" />
-                  确认收款
-                </Button>
-                {order.declaredPayment ? (
+    <DetailPageTemplate
+      className="vx-product-capability-page vx-order-detail-page"
+      header={
+        <PageHeader
+          icon="table"
+          title={order ? order.orderNo : "订单详情"}
+          description={
+            order
+              ? `${order.tenantName} · ${order.solutionName} · ${order.servicePlanName}`
+              : "正在读取订单、账单和支付记录。"
+          }
+          action={
+            <div className="vx-product-capability-actions">
+              <Button asChild variant="outline">
+                <Link href="/orders">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+              {order ? (
+                <>
+                  <Button asChild variant="outline">
+                    <Link
+                      href={`/subscriptions/${encodeURIComponent(order.subscriptionId)}`}
+                    >
+                      <Icon name="star" size="xs" fallback="placeholder" />
+                      订阅详情
+                    </Link>
+                  </Button>
                   <Button
                     variant="outline"
                     onClick={() => {
                       setOperationError(null);
                       setOperationFeedback(null);
-                      setRejectReason("");
-                      setRejectDialogOpen(true);
+                      setPaymentDialogOpen(true);
                     }}
+                    disabled={!canConfirmOrderOfflinePayment(order)}
+                    title={
+                      confirmOfflinePaymentDisabledReason(order) ?? undefined
+                    }
                   >
-                    <Icon name="warning" size="xs" fallback="placeholder" />
-                    驳回申报
+                    <Icon name="check" size="xs" fallback="placeholder" />
+                    确认收款
                   </Button>
-                ) : null}
-                {order.orderStatus === "paid_unprovisioned" ? (
+                  {order.declaredPayment ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setOperationError(null);
+                        setOperationFeedback(null);
+                        setRejectReason("");
+                        setRejectDialogOpen(true);
+                      }}
+                    >
+                      <Icon name="warning" size="xs" fallback="placeholder" />
+                      驳回申报
+                    </Button>
+                  ) : null}
+                  {order.orderStatus === "paid_unprovisioned" ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleRedriveProvisioning}
+                      disabled={submittingPayment}
+                    >
+                      <Icon name="play" size="xs" fallback="placeholder" />
+                      重试开通
+                    </Button>
+                  ) : null}
                   <Button
                     variant="outline"
-                    onClick={handleRedriveProvisioning}
-                    disabled={submittingPayment}
+                    onClick={() => {
+                      setOperationError(null);
+                      setOperationFeedback(null);
+                      setVoidReason("");
+                      setVoidDialogOpen(true);
+                    }}
+                    disabled={!canVoidOrder(order)}
+                    title={voidDisabledReason(order) ?? undefined}
+                  >
+                    <Icon name="x" size="xs" fallback="placeholder" />
+                    驳回订单
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setOperationError(null);
+                      setOperationFeedback(null);
+                      setRestoreReason("");
+                      setRestoreDialogOpen(true);
+                    }}
+                    disabled={!order.restorable}
+                    title={restoreDisabledReason(order) ?? undefined}
                   >
                     <Icon name="play" size="xs" fallback="placeholder" />
-                    重试开通
+                    恢复订单
                   </Button>
-                ) : null}
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOperationError(null);
-                    setOperationFeedback(null);
-                    setVoidReason("");
-                    setVoidDialogOpen(true);
-                  }}
-                  disabled={!canVoidOrder(order)}
-                  title={voidDisabledReason(order) ?? undefined}
-                >
-                  <Icon name="x" size="xs" fallback="placeholder" />
-                  驳回订单
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setOperationError(null);
-                    setOperationFeedback(null);
-                    setRestoreReason("");
-                    setRestoreDialogOpen(true);
-                  }}
-                  disabled={!order.restorable}
-                  title={restoreDisabledReason(order) ?? undefined}
-                >
-                  <Icon name="play" size="xs" fallback="placeholder" />
-                  恢复订单
-                </Button>
-              </>
-            ) : null}
-          </div>
-        }
-      />
-
+                </>
+              ) : null}
+            </div>
+          }
+        />
+      }
+    >
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">
           {operationFeedback}
@@ -876,6 +883,6 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
           ) : null}
         </DialogForm>
       ) : null}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

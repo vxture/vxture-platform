@@ -6,11 +6,11 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   EmptyState,
   Icon,
   MetricGrid,
-  ViewLayout,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
@@ -264,62 +264,69 @@ export function ServicePlanDetailPage({
 
   if (!loading && !plan) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="star"
-          title="服务套餐详情"
-          description="未找到对应的服务套餐。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/service-plans">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="star"
+            title="服务套餐详情"
+            description="未找到对应的服务套餐。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/service-plans">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="服务套餐不存在"
           description="该套餐可能已归档，或当前账号无权访问。"
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page">
-      <PageHeader
-        icon="star"
-        title={
-          plan ? `${plan.solutionName} / ${plan.tierName}` : "服务套餐详情"
-        }
-        description={plan?.summary ?? "正在读取服务套餐详情。"}
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/service-plans">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            {plan ? (
+    <DetailPageTemplate
+      className="vx-product-capability-page"
+      header={
+        <PageHeader
+          icon="star"
+          title={
+            plan ? `${plan.solutionName} / ${plan.tierName}` : "服务套餐详情"
+          }
+          description={plan?.summary ?? "正在读取服务套餐详情。"}
+          action={
+            <div className="vx-product-capability-actions">
               <Button asChild variant="outline">
-                <Link
-                  href={`/product-solutions/${encodeURIComponent(plan.solutionCode)}`}
-                >
-                  <Icon name="workflow" size="xs" fallback="placeholder" />
-                  业务方案
+                <Link href="/service-plans">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
                 </Link>
               </Button>
-            ) : null}
-            <Button variant="outline" disabled>
-              <Icon name="edit" size="xs" fallback="placeholder" />
-              修改
-            </Button>
-          </div>
-        }
-      />
-
+              {plan ? (
+                <Button asChild variant="outline">
+                  <Link
+                    href={`/product-solutions/${encodeURIComponent(plan.solutionCode)}`}
+                  >
+                    <Icon name="workflow" size="xs" fallback="placeholder" />
+                    业务方案
+                  </Link>
+                </Button>
+              ) : null}
+              <Button variant="outline" disabled>
+                <Icon name="edit" size="xs" fallback="placeholder" />
+                修改
+              </Button>
+            </div>
+          }
+        />
+      }
+    >
       {plan ? (
         <>
           <ServicePlanSummary plan={plan} />
@@ -330,6 +337,6 @@ export function ServicePlanDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

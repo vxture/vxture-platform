@@ -6,11 +6,11 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   EmptyState,
   Icon,
   MetricGrid,
-  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -412,130 +412,140 @@ export function SubscriptionDetailPage({
 
   if (!loading && !subscription) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="star"
-          title="订阅详情"
-          description="未找到对应的订阅实例。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/subscriptions">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="star"
+            title="订阅详情"
+            description="未找到对应的订阅实例。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/subscriptions">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="订阅实例不存在"
           description="该订阅可能已归档，或当前账号无权访问。"
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page vx-subscription-detail-page">
-      <PageHeader
-        icon="star"
-        title={
-          subscription
-            ? `${subscription.tenantName} / ${subscription.tierName}`
-            : "订阅详情"
-        }
-        description={
-          subscription?.solutionAssociation.note ?? "正在读取租户订阅权益实例。"
-        }
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/subscriptions">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            {subscription ? (
+    <DetailPageTemplate
+      className="vx-product-capability-page vx-subscription-detail-page"
+      header={
+        <PageHeader
+          icon="star"
+          title={
+            subscription
+              ? `${subscription.tenantName} / ${subscription.tierName}`
+              : "订阅详情"
+          }
+          description={
+            subscription?.solutionAssociation.note ??
+            "正在读取租户订阅权益实例。"
+          }
+          action={
+            <div className="vx-product-capability-actions">
               <Button asChild variant="outline">
-                <Link
-                  href={`/tenants/${encodeURIComponent(subscription.tenantId)}`}
-                >
-                  <Icon name="buildings" size="xs" fallback="placeholder" />
-                  租户详情
+                <Link href="/subscriptions">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
                 </Link>
               </Button>
-            ) : null}
-            {subscription ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => requestSubscriptionAction("renew")}
-                  disabled={!canRunSubscriptionAction("renew", subscription)}
-                  title={
-                    subscriptionActionDisabledReason("renew", subscription) ??
-                    undefined
-                  }
-                >
-                  <Icon
-                    name={subscriptionActionIcon("renew")}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                  {subscriptionActionLabel("renew")}
+              {subscription ? (
+                <Button asChild variant="outline">
+                  <Link
+                    href={`/tenants/${encodeURIComponent(subscription.tenantId)}`}
+                  >
+                    <Icon name="buildings" size="xs" fallback="placeholder" />
+                    租户详情
+                  </Link>
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    requestSubscriptionAction(
-                      subscriptionToggleAction(subscription.status),
-                    )
-                  }
-                  disabled={
-                    !canRunSubscriptionAction(
-                      subscriptionToggleAction(subscription.status),
-                      subscription,
-                    )
-                  }
-                  title={
-                    subscriptionActionDisabledReason(
-                      subscriptionToggleAction(subscription.status),
-                      subscription,
-                    ) ?? undefined
-                  }
-                >
-                  <Icon
-                    name={subscriptionActionIcon(
+              ) : null}
+              {subscription ? (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => requestSubscriptionAction("renew")}
+                    disabled={!canRunSubscriptionAction("renew", subscription)}
+                    title={
+                      subscriptionActionDisabledReason("renew", subscription) ??
+                      undefined
+                    }
+                  >
+                    <Icon
+                      name={subscriptionActionIcon("renew")}
+                      size="xs"
+                      fallback="placeholder"
+                    />
+                    {subscriptionActionLabel("renew")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      requestSubscriptionAction(
+                        subscriptionToggleAction(subscription.status),
+                      )
+                    }
+                    disabled={
+                      !canRunSubscriptionAction(
+                        subscriptionToggleAction(subscription.status),
+                        subscription,
+                      )
+                    }
+                    title={
+                      subscriptionActionDisabledReason(
+                        subscriptionToggleAction(subscription.status),
+                        subscription,
+                      ) ?? undefined
+                    }
+                  >
+                    <Icon
+                      name={subscriptionActionIcon(
+                        subscriptionToggleAction(subscription.status),
+                      )}
+                      size="xs"
+                      fallback="placeholder"
+                    />
+                    {subscriptionActionLabel(
                       subscriptionToggleAction(subscription.status),
                     )}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                  {subscriptionActionLabel(
-                    subscriptionToggleAction(subscription.status),
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="vx-subscription-action-button--danger"
-                  onClick={() => requestSubscriptionAction("cancel")}
-                  disabled={!canRunSubscriptionAction("cancel", subscription)}
-                  title={
-                    subscriptionActionDisabledReason("cancel", subscription) ??
-                    undefined
-                  }
-                >
-                  <Icon
-                    name={subscriptionActionIcon("cancel")}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                  {subscriptionActionLabel("cancel")}
-                </Button>
-              </>
-            ) : null}
-          </div>
-        }
-      />
-
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="vx-subscription-action-button--danger"
+                    onClick={() => requestSubscriptionAction("cancel")}
+                    disabled={!canRunSubscriptionAction("cancel", subscription)}
+                    title={
+                      subscriptionActionDisabledReason(
+                        "cancel",
+                        subscription,
+                      ) ?? undefined
+                    }
+                  >
+                    <Icon
+                      name={subscriptionActionIcon("cancel")}
+                      size="xs"
+                      fallback="placeholder"
+                    />
+                    {subscriptionActionLabel("cancel")}
+                  </Button>
+                </>
+              ) : null}
+            </div>
+          }
+        />
+      }
+    >
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">
           {operationFeedback}
@@ -565,6 +575,6 @@ export function SubscriptionDetailPage({
           onSubmit={handleSubmitSubscriptionAction}
         />
       ) : null}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

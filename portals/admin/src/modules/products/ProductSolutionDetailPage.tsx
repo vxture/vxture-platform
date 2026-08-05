@@ -6,11 +6,11 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   EmptyState,
   Icon,
   MetricGrid,
-  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -277,50 +277,57 @@ export function ProductSolutionDetailPage({
 
   if (!loading && !solution) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="workflow"
-          title="解决方案详情"
-          description="未找到对应的解决方案。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/product-solutions">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="workflow"
+            title="解决方案详情"
+            description="未找到对应的解决方案。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/product-solutions">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="解决方案不存在"
           description="该方案可能已归档，或当前账号无权访问。"
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page">
-      <PageHeader
-        icon="workflow"
-        title={solution?.solutionName ?? "解决方案详情"}
-        description={solution?.description ?? "正在读取解决方案详情。"}
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/product-solutions">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            <Button variant="outline" disabled>
-              <Icon name="edit" size="xs" fallback="placeholder" />
-              修改
-            </Button>
-          </div>
-        }
-      />
-
+    <DetailPageTemplate
+      className="vx-product-capability-page"
+      header={
+        <PageHeader
+          icon="workflow"
+          title={solution?.solutionName ?? "解决方案详情"}
+          description={solution?.description ?? "正在读取解决方案详情。"}
+          action={
+            <div className="vx-product-capability-actions">
+              <Button asChild variant="outline">
+                <Link href="/product-solutions">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+              <Button variant="outline" disabled>
+                <Icon name="edit" size="xs" fallback="placeholder" />
+                修改
+              </Button>
+            </div>
+          }
+        />
+      }
+    >
       {solution ? (
         <>
           <ProductSolutionSummary solution={solution} />
@@ -331,6 +338,6 @@ export function ProductSolutionDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

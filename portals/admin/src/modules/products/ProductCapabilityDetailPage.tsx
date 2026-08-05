@@ -6,11 +6,11 @@ import {
   Badge,
   Button,
   DetailList,
+  DetailPageTemplate,
   DetailRow,
   EmptyState,
   Icon,
   MetricGrid,
-  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -348,20 +348,24 @@ export function ProductCapabilityDetailPage({
 
   if (!loading && !product) {
     return (
-      <ViewLayout className="vx-product-capability-page">
-        <PageHeader
-          icon="database"
-          title="产品能力详情"
-          description="未找到对应的产品能力。"
-          action={
-            <Button asChild variant="outline">
-              <Link href="/products">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-          }
-        />
+      <DetailPageTemplate
+        className="vx-product-capability-page"
+        header={
+          <PageHeader
+            icon="database"
+            title="产品能力详情"
+            description="未找到对应的产品能力。"
+            action={
+              <Button asChild variant="outline">
+                <Link href="/products">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+            }
+          />
+        }
+      >
         <EmptyState
           title="产品能力不存在"
           description="该产品能力可能已下线，或当前账号无权访问。"
@@ -371,32 +375,35 @@ export function ProductCapabilityDetailPage({
             </Button>
           }
         />
-      </ViewLayout>
+      </DetailPageTemplate>
     );
   }
 
   return (
-    <ViewLayout className="vx-product-capability-page">
-      <PageHeader
-        icon={product ? capabilityTypeIcon(product.productType) : "database"}
-        title={product?.productName ?? "产品能力详情"}
-        description={product?.capabilitySummary ?? "正在读取产品能力详情。"}
-        action={
-          <div className="vx-product-capability-actions">
-            <Button asChild variant="outline">
-              <Link href="/products">
-                <Icon name="arrow-left" size="xs" fallback="placeholder" />
-                返回列表
-              </Link>
-            </Button>
-            <Button variant="outline" disabled>
-              <Icon name="edit" size="xs" fallback="placeholder" />
-              修改
-            </Button>
-          </div>
-        }
-      />
-
+    <DetailPageTemplate
+      className="vx-product-capability-page"
+      header={
+        <PageHeader
+          icon={product ? capabilityTypeIcon(product.productType) : "database"}
+          title={product?.productName ?? "产品能力详情"}
+          description={product?.capabilitySummary ?? "正在读取产品能力详情。"}
+          action={
+            <div className="vx-product-capability-actions">
+              <Button asChild variant="outline">
+                <Link href="/products">
+                  <Icon name="arrow-left" size="xs" fallback="placeholder" />
+                  返回列表
+                </Link>
+              </Button>
+              <Button variant="outline" disabled>
+                <Icon name="edit" size="xs" fallback="placeholder" />
+                修改
+              </Button>
+            </div>
+          }
+        />
+      }
+    >
       {product ? (
         <>
           <ProductCapabilitySummary product={product} />
@@ -407,6 +414,6 @@ export function ProductCapabilityDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }
