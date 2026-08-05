@@ -13,12 +13,12 @@ import {
   Checkbox,
   Input,
   NativeSelect,
-  Pagination as DsPagination,
   ActionButton,
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
@@ -34,10 +34,7 @@ import type {
   BillingInvoiceType,
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   canRunInvoiceReceiptAction,
   InvoiceReceiptActionDialog,
@@ -558,39 +555,6 @@ function InvoiceCards({
   );
 }
 
-function Pagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条发票记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <DsPagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function InvoicesPage() {
   const [invoices, setInvoices] = useState<BillingInvoiceLedgerRecord[]>([]);
   const [invoicesTruncated, setInvoicesTruncated] = useState(false);
@@ -1034,7 +998,7 @@ export function InvoicesPage() {
             </section>
           )}
 
-          <Pagination
+          <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
             total={filteredInvoices.length}

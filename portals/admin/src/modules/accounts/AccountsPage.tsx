@@ -12,7 +12,6 @@ import {
   Input,
   Label,
   NativeSelect,
-  Pagination,
   ActionButton,
   EmptyState,
   Textarea,
@@ -20,6 +19,7 @@ import {
   useToast,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
   disableAccount,
@@ -30,10 +30,7 @@ import {
 import type { AccountOperationRecord } from "@/entities/console";
 import { isListTruncated } from "@/lib/list-truncation";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   formatDate,
   formatNumber,
@@ -542,39 +539,6 @@ function AccountCards({
   );
 }
 
-function AccountPagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <Pagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function AccountsPage({
   copy = defaultAccountsPageCopy,
   loadAccounts = fetchAccountOperations,
@@ -977,7 +941,7 @@ export function AccountsPage({
             </section>
           )}
 
-          <AccountPagination
+          <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
             total={filteredAccounts.length}

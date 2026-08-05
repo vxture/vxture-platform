@@ -17,7 +17,6 @@ import {
   Input,
   Label,
   NativeSelect,
-  Pagination,
   Textarea,
   ActionButton,
   EmptyState,
@@ -25,6 +24,7 @@ import {
   useToast,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   changePlatformAdminRole,
   createPlatformAdmin,
@@ -45,10 +45,7 @@ import type {
   PlatformRoleRecord,
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import { useConsoleTranslations } from "@/lib/ConsoleIntl";
 import {
   formatDate,
@@ -809,39 +806,6 @@ function PlatformUserMetadataDialog({
   );
 }
 
-function PlatformUserPagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <Pagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function PlatformUsersPage() {
   const t = useConsoleTranslations();
   const { toast } = useToast();
@@ -1374,7 +1338,7 @@ export function PlatformUsersPage() {
             </section>
           )}
 
-          <PlatformUserPagination
+          <ListPagination
             currentPage={clampedCurrentPage}
             pageCount={pageCount}
             total={filteredAdmins.length}

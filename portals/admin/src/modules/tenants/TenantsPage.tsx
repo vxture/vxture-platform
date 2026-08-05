@@ -11,7 +11,6 @@ import {
   Checkbox,
   Input,
   NativeSelect,
-  Pagination,
   ActionButton,
   EmptyState,
   ViewModeSwitch,
@@ -21,6 +20,7 @@ import {
   useToast,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
   fetchTenantOperationsStrict,
@@ -30,10 +30,7 @@ import {
 import type { TenantOperationRecord } from "@/entities/console";
 import { isListTruncated } from "@/lib/list-truncation";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import { resolveStatusTone } from "@vxture/shared";
 import {
   TENANT_RISK_TONE,
@@ -416,39 +413,6 @@ function TenantCards({
   );
 }
 
-function TenantPagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <Pagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function TenantsPage() {
   const { toast } = useToast();
   const { runWithStepUp } = useStepUp();
@@ -828,7 +792,7 @@ export function TenantsPage() {
             </section>
           )}
 
-          <TenantPagination
+          <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
             total={filteredTenants.length}

@@ -449,7 +449,6 @@ export function MaintenanceWindowsPage() {
           </div>
           {pageCount > 1 ? (
             <Pagination
-              className="vx-tenant-pagination"
               page={page}
               pageCount={pageCount}
               total={filtered.length}

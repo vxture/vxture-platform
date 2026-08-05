@@ -843,23 +843,18 @@ export function ModelGrantsPage() {
             </section>
           )}
 
-          <footer className="vx-tenant-pagination">
-            <span className="vx-tenant-pagination__total">
-              {t("pagination.policySummary", {
-                page: safeCurrentPage,
-                totalPages,
-                total: filteredPolicies.length,
-              })}
-            </span>
-            <div className="vx-tenant-pagination__actions">
-              <Pagination
-                className="vx-tenant-pagination__pager"
-                page={safeCurrentPage}
-                pageCount={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
-          </footer>
+          {/* 这一页不给用户改每页条数，用 DS Pagination 本体即可，不经 ListPagination
+              （那件的存在理由是档位集与类型窄化，这里两样都用不上）。 */}
+          <Pagination
+            page={safeCurrentPage}
+            pageCount={totalPages}
+            countLabel={t("pagination.policySummary", {
+              page: safeCurrentPage,
+              totalPages,
+              total: filteredPolicies.length,
+            })}
+            onPageChange={setCurrentPage}
+          />
         </section>
       </div>
 

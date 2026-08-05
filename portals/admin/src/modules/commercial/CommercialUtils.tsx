@@ -1,8 +1,4 @@
 import { Badge } from "@vxture/design-system";
-import {
-  PageSizePicker as SharedPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
 
 export type { PageSize } from "@/modules/shared/PageSizePicker";
 export type ViewMode = "list" | "cards";
@@ -34,16 +30,6 @@ export function tierTone(tierName: string | null | undefined) {
   if (normalized === "pro") return "pro";
   if (normalized === "enterprise") return "enterprise";
   return "other";
-}
-
-export function PageSizePicker({
-  value,
-  onChange,
-}: {
-  value: PageSize;
-  onChange: (value: PageSize) => void;
-}) {
-  return <SharedPageSizePicker value={value} onChange={onChange} />;
 }
 
 export function Tag({

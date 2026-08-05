@@ -16,7 +16,6 @@ import {
   Input,
   Label,
   NativeSelect,
-  Pagination,
   Textarea,
   ActionButton,
   EmptyState,
@@ -24,6 +23,7 @@ import {
   useToast,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
   copyOperatorRole,
@@ -46,10 +46,7 @@ import type {
 } from "@/entities/console";
 import { useConsoleTranslations } from "@/lib/ConsoleIntl";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   formatDate,
   formatNumber,
@@ -983,39 +980,6 @@ function AdminRoleCards({
   );
 }
 
-function AdminRolePagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <Pagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 type RoleMfaLevel = "disabled" | "optional" | "required";
 
 interface RoleFormState {
@@ -1756,7 +1720,7 @@ export function AdminRolesPage() {
             </section>
           )}
 
-          <AdminRolePagination
+          <ListPagination
             currentPage={Math.min(currentPage, pageCount)}
             pageCount={pageCount}
             total={filteredRoles.length}

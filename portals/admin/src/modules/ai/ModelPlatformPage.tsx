@@ -11,7 +11,6 @@ import {
   Input,
   Label,
   NativeSelect,
-  Pagination,
   Textarea,
   ActionButton,
   EmptyState,
@@ -19,6 +18,7 @@ import {
   useToast,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   activateModelPriceRule,
   activateModelProvider,
@@ -51,10 +51,7 @@ import type {
 } from "@/entities/console";
 import { useConsoleTranslations } from "@/lib/ConsoleIntl";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 
 type ViewMode = "list" | "cards";
 type ModelStatusFilter = "all" | "active" | "inactive";
@@ -1470,24 +1467,20 @@ export function ModelPlatformPage() {
             </section>
           )}
 
-          <footer className="vx-tenant-pagination">
-            <span className="vx-tenant-pagination__total">
-              {t("pagination.summary", {
-                page: safeCurrentPage,
-                totalPages,
-                total: filteredModels.length,
-              })}
-            </span>
-            <div className="vx-tenant-pagination__actions">
-              <AdminPageSizePicker value={pageSize} onChange={setPageSize} />
-              <Pagination
-                className="vx-tenant-pagination__pager"
-                page={safeCurrentPage}
-                pageCount={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
-          </footer>
+          <ListPagination
+            currentPage={safeCurrentPage}
+            pageCount={totalPages}
+            // 这一页的计数语走 i18n（本页整体已接 useConsoleTranslations），
+            // 不是 DS 那句固定中文。
+            countLabel={t("pagination.summary", {
+              page: safeCurrentPage,
+              totalPages,
+              total: filteredModels.length,
+            })}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            onPageChange={setCurrentPage}
+          />
         </section>
       </div>
 

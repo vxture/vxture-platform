@@ -36,6 +36,14 @@ export interface PaginationProps extends React.HTMLAttributes<HTMLElement> {
   readonly pageSizeOptions?: readonly PageSizeChoice[];
   readonly onPageSizeChange?: (pageSize: PageSizeChoice) => void;
   readonly onPageChange: (page: number) => void;
+  /**
+   * 覆盖左侧计数语。
+   *
+   * 默认那句「共 N 条记录」覆盖了绝大多数列表，口子只为它说不了的情形留：数的
+   * 不是一样东西时（admin 服务套餐页要同时报"N 个方案、M 个套餐"），`total` 与
+   * `filteredTotal` 都表达不了。
+   */
+  readonly countLabel?: React.ReactNode;
   readonly previousLabel?: string;
   readonly nextLabel?: string;
 }
@@ -61,6 +69,7 @@ function Pagination({
   pageSizeOptions = DEFAULT_PAGE_SIZES,
   onPageSizeChange,
   onPageChange,
+  countLabel,
   previousLabel = "上一页",
   nextLabel = "下一页",
   ...props
@@ -80,13 +89,14 @@ function Pagination({
     >
       {/* 左侧计数语（admin 翻页惯例）：总数常驻，筛选生效时补一段。 */}
       <div className="text-body-sm text-muted-foreground">
-        {typeof total === "number"
-          ? `共 ${total} 条记录${
-              typeof filteredTotal === "number" && filteredTotal !== total
-                ? ` / 当前筛选 ${filteredTotal} 条`
-                : ""
-            }`
-          : `第 ${safePage} / ${safePageCount} 页`}
+        {countLabel ??
+          (typeof total === "number"
+            ? `共 ${total} 条记录${
+                typeof filteredTotal === "number" && filteredTotal !== total
+                  ? ` / 当前筛选 ${filteredTotal} 条`
+                  : ""
+              }`
+            : `第 ${safePage} / ${safePageCount} 页`)}
       </div>
       {/* 每页条数与翻页条之间留大距（gap-2xl）：两组都是数字按钮，贴近了
           会读成同一排页码。 */}

@@ -9,12 +9,12 @@ import {
   Button,
   Input,
   NativeSelect,
-  Pagination,
   ActionButton,
   EmptyState,
   ViewModeSwitch,
   MetricGrid,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchProductPlans, fetchProductSolutions } from "@/api/admin-bff";
 import type {
   ProductPlanRecord,
@@ -23,10 +23,7 @@ import type {
   ProductSolutionTier,
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   formatDate,
   formatMoney,
@@ -370,41 +367,6 @@ function ServicePlanGroupBlock({
   );
 }
 
-function ServicePlanPagination({
-  currentPage,
-  pageCount,
-  totalGroups,
-  totalTiers,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  totalGroups: number;
-  totalTiers: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(totalGroups)} 个方案，{formatNumber(totalTiers)} 个套餐
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <Pagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function ServicePlansPage() {
   const router = useRouter();
   const [solutions, setSolutions] = useState<ProductSolutionRecord[]>([]);
@@ -697,11 +659,11 @@ export function ServicePlansPage() {
             </section>
           )}
 
-          <ServicePlanPagination
+          <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
-            totalGroups={filteredGroups.length}
-            totalTiers={filteredTierItems.length}
+            // 这一页数的是两样东西，`total` + `unit` 说不了。
+            countLabel={`共 ${formatNumber(filteredGroups.length)} 个方案，${formatNumber(filteredTierItems.length)} 个套餐`}
             pageSize={pageSize}
             onPageSizeChange={setPageSize}
             onPageChange={(page) =>

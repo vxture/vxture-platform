@@ -11,12 +11,12 @@ import {
   Checkbox,
   Input,
   NativeSelect,
-  Pagination as DsPagination,
   ActionButton,
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { fetchUsageMeteringRecords } from "@/api/admin-bff";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -34,7 +34,6 @@ import {
 } from "@/modules/tenants/tenant-utils";
 import {
   formatPercent,
-  PageSizePicker,
   type PageSize,
   Tag,
   type ViewMode,
@@ -715,20 +714,14 @@ export function UsageMeteringPage() {
               />
             </section>
           )}
-          <footer className="vx-tenant-pagination">
-            <span className="vx-tenant-pagination__total">
-              共 {formatNumber(filteredRecords.length)} 条用量记录
-            </span>
-            <div className="vx-tenant-pagination__actions">
-              <PageSizePicker value={pageSize} onChange={setPageSize} />
-              <DsPagination
-                className="vx-tenant-pagination__pager"
-                page={activePage}
-                pageCount={pageCount}
-                onPageChange={setCurrentPage}
-              />
-            </div>
-          </footer>
+          <ListPagination
+            currentPage={activePage}
+            pageCount={pageCount}
+            total={filteredRecords.length}
+            pageSize={pageSize}
+            onPageSizeChange={setPageSize}
+            onPageChange={setCurrentPage}
+          />
         </section>
       </div>
     </div>

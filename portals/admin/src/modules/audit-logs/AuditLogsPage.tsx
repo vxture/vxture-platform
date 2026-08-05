@@ -449,7 +449,6 @@ export function AuditLogsPage() {
               <AuditList logs={pageLogs} startIndex={(page - 1) * PAGE_SIZE} />
               {pageCount > 1 ? (
                 <Pagination
-                  className="vx-tenant-pagination"
                   page={page}
                   pageCount={pageCount}
                   total={filtered.length}

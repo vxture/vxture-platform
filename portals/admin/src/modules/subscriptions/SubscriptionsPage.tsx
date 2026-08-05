@@ -12,12 +12,12 @@ import {
   Checkbox,
   Input,
   NativeSelect,
-  Pagination as DsPagination,
   ActionButton,
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
+import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
@@ -32,10 +32,7 @@ import type {
   SubscriptionOperationStatus,
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  PageSizePicker as AdminPageSizePicker,
-  type PageSize,
-} from "@/modules/shared/PageSizePicker";
+import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   canRunSubscriptionAction,
   SubscriptionOperationDialog,
@@ -510,39 +507,6 @@ function SubscriptionCards({
   );
 }
 
-function Pagination({
-  currentPage,
-  pageCount,
-  total,
-  pageSize,
-  onPageSizeChange,
-  onPageChange,
-}: {
-  currentPage: number;
-  pageCount: number;
-  total: number;
-  pageSize: PageSize;
-  onPageSizeChange: (value: PageSize) => void;
-  onPageChange: (page: number) => void;
-}) {
-  return (
-    <footer className="vx-tenant-pagination">
-      <span className="vx-tenant-pagination__total">
-        共 {formatNumber(total)} 条订阅记录
-      </span>
-      <div className="vx-tenant-pagination__actions">
-        <AdminPageSizePicker value={pageSize} onChange={onPageSizeChange} />
-        <DsPagination
-          className="vx-tenant-pagination__pager"
-          page={currentPage}
-          pageCount={pageCount}
-          onPageChange={onPageChange}
-        />
-      </div>
-    </footer>
-  );
-}
-
 export function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<
     SubscriptionOperationRecord[]
@@ -990,7 +954,7 @@ export function SubscriptionsPage() {
             </section>
           )}
 
-          <Pagination
+          <ListPagination
             currentPage={activePage}
             pageCount={pageCount}
             total={filteredSubscriptions.length}

@@ -386,7 +386,6 @@ export function SkillsPage() {
           )}
           {pageCount > 1 ? (
             <Pagination
-              className="vx-tenant-pagination"
               page={page}
               pageCount={pageCount}
               total={filtered.length}
