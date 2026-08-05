@@ -23,6 +23,7 @@ import {
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
+import { isUnset, UNSET_LABEL } from "@/modules/shared/display";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -331,18 +332,32 @@ function OrderListRows({
               </span>
             </span>
             <span className="vx-order-row__solution">
-              <strong>{order.solutionName}</strong>
+              {/* 缺失值弱化：深色粗体会让"未设置"读起来跟真的方案名一样重，
+                  而它右边一列的"未设置"当时还长成一枚彩色标——同一个空值两种画法。 */}
+              {isUnset(order.solutionName) ? (
+                <span className="vx-tenant-directory-row__unset">
+                  {UNSET_LABEL}
+                </span>
+              ) : (
+                <strong>{order.solutionName}</strong>
+              )}
               <small>
                 {order.industry} · {order.region}
               </small>
             </span>
             <span className="vx-order-row__plan">
               <span className="vx-tenant-directory-row__tag-line">
-                <Badge
-                  className={`vx-tenant-pill vx-order-pill--tier-${tierFilterValue(order)}`}
-                >
-                  {order.tierName}
-                </Badge>
+                {isUnset(order.tierName) ? (
+                  <span className="vx-tenant-directory-row__unset">
+                    {UNSET_LABEL}
+                  </span>
+                ) : (
+                  <Badge
+                    className={`vx-tenant-pill vx-order-pill--tier-${tierFilterValue(order)}`}
+                  >
+                    {order.tierName}
+                  </Badge>
+                )}
                 <Badge className="vx-tenant-pill vx-order-pill--source">
                   {cycleLabel(order.cycleType)}
                 </Badge>

@@ -536,8 +536,22 @@ function rankLevel(rank: number): Level {
   return Math.min(5, Math.max(1, 6 - rank)) as Level;
 }
 
-/** 前三名有徽章图，之后回落到等级记号——图只有三张。 */
-function RankMedal({ rank }: { rank: number }) {
+/**
+ * 前三名有徽章图，之后回落到等级记号——图只有三张。
+ *
+ * `muted` 给占位行：形状照旧但去色。否则"待接入 / 暂无数据"这样的空行也戴着金牌，
+ * 读起来像第一名就是待接入（owner 2026-08-06 实测）。
+ */
+function RankMedal({ rank, muted }: { rank: number; muted?: boolean }) {
+  if (muted) {
+    return (
+      <span
+        className="admin-overview-rank-medal admin-overview-rank-medal--muted"
+        aria-hidden="true"
+      />
+    );
+  }
+
   if (rank > 3) {
     return (
       <LevelMarker level={rankLevel(rank)} aria-label={`第 ${rank} 名`}>
@@ -1259,8 +1273,11 @@ function ModelCategoryCard({
             key={row.id}
             {...(row.placeholder ? { className: "opacity-60" } : {})}
             lead={
-              rankStyle === "medal" ? (
-                <RankMedal rank={index + 1} />
+              rankStyle === "medal" || row.placeholder ? (
+                <RankMedal
+                  rank={index + 1}
+                  {...(row.placeholder ? { muted: true } : {})}
+                />
               ) : (
                 <LevelMarker
                   level={rankLevel(index + 1)}

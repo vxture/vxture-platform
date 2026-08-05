@@ -137,6 +137,14 @@
   font-weight: 800;
 }
 
+/* 缺失值：占主信息的位置，但按辅助信息的语气——常规字重、弱化前景。
+   它不是一个值，是"没有值"。 */
+.vx-tenant-directory-row__unset {
+  color: var(--tenant-muted);
+  font-size: var(--vx-admin-body-size);
+  font-weight: 400;
+}
+
 /* 辅助行是常规字重。720 那版与主信息几乎同重，两行互相抢（2026-08-05 owner
  * 实测）——主辅层次由字号与前景色表达，不再叠字重。与 DS TableTitleCell 的
  * 辅助行同一取值，两种写法的行看起来才是同一件。

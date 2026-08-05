@@ -52,6 +52,13 @@
   background-image: url("https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/3rd%20place%20medal/Color/3rd_place_medal_color.svg");
 }
 
+/* 占位行：同一枚牌去色。金银铜是名次，占位行没有名次。 */
+.admin-overview-rank-medal--muted {
+  background-image: url("https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/1st%20place%20medal/Color/1st_place_medal_color.svg");
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
 /* ── 周期切换 ─────────────────────────────────────────────── */
 
 .admin-overview-period {

@@ -17,6 +17,19 @@
  * 不进 DS：占位文案是产品语汇（admin 说"未设置"，别处可能说"—"或留空），
  * DS 收了就得替所有产品选词。
  */
+export const UNSET_LABEL = "未设置";
+
 export function orUnset(value: string | null | undefined): string {
-  return value || "未设置";
+  return value || UNSET_LABEL;
+}
+
+/**
+ * 这个值是不是"没有值"。
+ *
+ * 列表里要用：缺失值若照主信息的深色粗体渲染，读起来跟真值一样重
+ * （owner 2026-08-06 在订单列表实测）。上游有时已经把空值投影成了字面量
+ * "未设置"，所以既认空也认这个词。
+ */
+export function isUnset(value: string | null | undefined): boolean {
+  return !value || value === UNSET_LABEL;
 }
