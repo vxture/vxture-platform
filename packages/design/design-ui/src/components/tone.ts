@@ -56,6 +56,28 @@ export const toneEdgeClasses: Record<Tone, string> = {
   danger: "border-t-destructive-border text-destructive-text",
 };
 
+/**
+ * 行首色缘：**只染边，不染字**。用于表格行的业务语气（`DataTable.rowTone`）。
+ *
+ * 与 `toneEdgeClasses` 的两处不同：
+ * - 方向是左缘（`border-l`）而非顶缘——顶缘属于"一块内容的开始"，行没有那个语义，
+ *   行需要的是在一列行里横向可扫。
+ * - 不带前景色。行内文字由各单元格自己决定（状态标、金额、链接各有各的颜色），
+ *   整行统一染字会把它们全部抹平。
+ *
+ * 只出色缘、不铺行底：一屏几十行，铺底会让表格变成色块；而且 DataTable 的
+ * hover / 选中已经在每个单元格上画了半透明底，业务色再叠一层就是文件头记的那种
+ * 两层半透明合成。
+ */
+export const toneLeadingEdgeClasses: Record<Tone, string> = {
+  neutral: "border-l-border",
+  brand: "border-l-primary",
+  info: "border-l-info-border",
+  success: "border-l-success-border",
+  warning: "border-l-warning-border",
+  danger: "border-l-destructive-border",
+};
+
 /** 语气对应的图标。调用方不传图标名，避免同一语气在各处配不同的图。 */
 export const toneIcons: Record<Tone, IconName> = {
   neutral: "info",

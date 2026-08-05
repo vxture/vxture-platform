@@ -44,6 +44,7 @@ import { Icon } from "../../../icons";
 import { Checkbox } from "../../base/form/Checkbox";
 import { Skeleton } from "../../base/display/Skeleton";
 import { EmptyState } from "../../base/display/EmptyState";
+import { toneLeadingEdgeClasses, type Tone } from "../../tone";
 
 export type DataTableAlign = "left" | "center" | "right";
 
@@ -99,6 +100,24 @@ export interface DataTableProps<TRow> {
   readonly rowActions?: (row: TRow, rowIndex: number) => React.ReactNode;
   readonly rowActionsHeader?: React.ReactNode;
   readonly onRowClick?: (row: TRow, rowIndex: number) => void;
+  /**
+   * 行的业务语气，渲染为行首 2px 色缘（`toneLeadingEdgeClasses`）。
+   *
+   * 这是运营表格的核心：高风险租户、逾期账单、异常订单要能在一屏几十行里被一眼
+   * 扫出来。admin 的 29 个列表页里有 15 个在做这件事。
+   *
+   * **它不是被删掉的 `getRowClassName` 换个名字。** 那个口子交出去的是"行画成
+   * 什么样"，调用方给任意类名，各页很快就长得不一样；这里交出去的只是"这行是
+   * 哪一档语气"，画成什么样仍由本件决定，全站六档封闭。
+   *
+   * 只染行首色缘，不铺行底——理由见 `toneLeadingEdgeClasses`。行内的状态标各自
+   * 用 `StatusBadge` 表达同一个语气即可（两处取自同一张业务状态→语气映射表，
+   * 天然同源），本件不去染单元格里的任何前景色。
+   *
+   * 返回 `undefined` 即不出色缘（不画中性灰——那看起来像没渲染完，与
+   * `MetricListCard.tone` 同一处理）。
+   */
+  readonly rowTone?: (row: TRow, rowIndex: number) => Tone | undefined;
   /** 表尾：分页、总数一类。渲染在虚线上边框之下，左右两端由调用方内容自摆。 */
   readonly footer?: React.ReactNode;
   readonly className?: string;
@@ -130,6 +149,7 @@ function DataTable<TRow>({
   rowActions,
   rowActionsHeader = "操作",
   onRowClick,
+  rowTone,
   footer,
   className,
 }: DataTableProps<TRow>) {
@@ -286,10 +306,16 @@ function DataTable<TRow>({
                 const key = keys[rowIndex] as string;
                 const isSelected = selected.has(key);
                 /* 单层色：每个 <td> 各画一次，不假手 <tr>（见文件头注）。 */
-                const rowTone = cn(
+                const cellSurface = cn(
                   "transition-colors duration-fast ease-standard",
                   isSelected ? "bg-surface-selected" : "group-hover:bg-accent",
                 );
+                /* 业务语气只落在**本行第一个** <td> 的左缘。挂在 <tr> 上不行：
+                   border-collapse 的表格里，行边框由单元格边框合并而来。 */
+                const tone = rowTone?.(row, rowIndex);
+                const leadingEdge = tone
+                  ? cn("border-l-2", toneLeadingEdgeClasses[tone])
+                  : null;
                 return (
                   <tr
                     key={key}
@@ -305,7 +331,12 @@ function DataTable<TRow>({
                   >
                     {selectable ? (
                       <td
-                        className={cn(EDGE_COL, "py-md align-middle", rowTone)}
+                        className={cn(
+                          EDGE_COL,
+                          "py-md align-middle",
+                          cellSurface,
+                          leadingEdge,
+                        )}
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-center">
@@ -322,20 +353,25 @@ function DataTable<TRow>({
                         className={cn(
                           EDGE_COL,
                           "py-md align-middle whitespace-nowrap text-body-sm text-muted-foreground",
-                          rowTone,
+                          cellSurface,
+                          !selectable && leadingEdge,
                         )}
                       >
                         {indexStart + rowIndex}
                       </td>
                     ) : null}
-                    {columns.map((column) => (
+                    {columns.map((column, columnIndex) => (
                       <td
                         key={column.id}
                         className={cn(
                           "px-md py-md align-middle text-foreground",
                           "first:pl-none last:pr-none",
                           ALIGN[column.align ?? "left"],
-                          rowTone,
+                          cellSurface,
+                          !selectable &&
+                            !indexed &&
+                            columnIndex === 0 &&
+                            leadingEdge,
                         )}
                       >
                         {column.cell(row, rowIndex)}
@@ -361,7 +397,7 @@ function DataTable<TRow>({
                           // 半透明 token，遮不住滚动内容——与其余选中行同样的
                           // 已知小缺口，不在本次两个 bug 的范围内。
                           !isSelected && "bg-background",
-                          rowTone,
+                          cellSurface,
                         )}
                         onClick={(e) => e.stopPropagation()}
                       >

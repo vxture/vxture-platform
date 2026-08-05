@@ -11,7 +11,7 @@ import {
   EmptyState,
   ViewModeSwitch,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import type { IconName, StatusBadgeTone } from "@vxture/design-system";
 import { fetchDevServices } from "@/api/admin-bff";
 import type { DevServiceSnapshot } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
@@ -81,6 +81,14 @@ function statusLabel(status: ServiceStatus) {
   if (status === "stopping") return "停止中";
   return "离线";
 }
+
+/** 服务态 → 语气。行首色缘与行内状态标共用这一张表，两处天生同源。 */
+const SERVICE_STATUS_TONE: Record<ServiceStatus, StatusBadgeTone> = {
+  healthy: "success",
+  degraded: "warning",
+  stopping: "warning",
+  offline: "danger",
+};
 
 function layerLabel(layer: ServiceLayer) {
   if (layer === "tooling") return "开发工具";
@@ -339,6 +347,9 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
       columns={columns}
       rows={services}
       rowKey={(service: DevServiceSnapshot) => service.id}
+      rowTone={(service: DevServiceSnapshot) =>
+        SERVICE_STATUS_TONE[serviceStatus(service)]
+      }
     />
   );
 }
