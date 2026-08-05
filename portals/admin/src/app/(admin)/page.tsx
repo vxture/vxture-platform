@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Icon } from "@vxture/design-system";
+import { Button, Icon, SectionHeader } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import type { Locale } from "@vxture/shared";
 import {
@@ -572,25 +572,22 @@ function OverviewHeading({
   onPeriodChange: (next: PeriodKey) => void;
   level?: "page" | "section";
 }) {
-  const TitleTag = level === "page" ? "h1" : "h2";
-
   return (
-    <div
-      className={`admin-overview-heading ${level === "page" ? "admin-overview-heading--page" : ""}`}
-    >
-      <span className="admin-overview-heading__icon" aria-hidden="true">
-        <Icon name={icon} size="lg" fallback="placeholder" />
-      </span>
-      <div className="admin-overview-heading__copy">
-        <TitleTag>{title}</TitleTag>
-        <p>{description}</p>
-      </div>
-      <PeriodSwitch
-        value={period}
-        options={["recent30", "total", "year", "quarter", "month"]}
-        onChange={onPeriodChange}
-      />
-    </div>
+    <SectionHeader
+      // "page" / "section" 是这一页自己的说法，SectionHeader 用层级数说同一件事
+      // （level 同时决定语义元素与排版角色：1 → h1，2 → h2）。
+      level={level === "page" ? 1 : 2}
+      icon={icon}
+      title={title}
+      description={description}
+      action={
+        <PeriodSwitch
+          value={period}
+          options={["recent30", "total", "year", "quarter", "month"]}
+          onChange={onPeriodChange}
+        />
+      }
+    />
   );
 }
 

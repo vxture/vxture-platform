@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Icon, EmptyState, MetricGrid } from "@vxture/design-system";
+import {
+  Button,
+  EmptyState,
+  Icon,
+  MetricGrid,
+  SectionHeader,
+} from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchCommerceOverview } from "@/api/admin-bff";
 import type {
@@ -117,18 +123,17 @@ function RiskPanel({ snapshot }: { snapshot: CommerceOverviewSnapshot }) {
       className="vx-commerce-panel vx-commerce-risk-panel"
       aria-label="商业风险"
     >
-      <header className="vx-commerce-panel__header">
-        <div className="admin-overview-heading">
-          <span className="admin-overview-heading__icon" aria-hidden="true">
-            <Icon name="warning" size="lg" fallback="placeholder" />
+      <SectionHeader
+        level={2}
+        icon="warning"
+        title="风险与待办"
+        description="从账单、收款、发票和用量中抽取运营侧需要跟进的事项。"
+        action={
+          <span className="text-body-sm text-muted-foreground">
+            生成 {formatDate(snapshot.generatedAt)}
           </span>
-          <div className="admin-overview-heading__copy">
-            <h2>风险与待办</h2>
-            <p>从账单、收款、发票和用量中抽取运营侧需要跟进的事项。</p>
-          </div>
-        </div>
-        <small>生成 {formatDate(snapshot.generatedAt)}</small>
-      </header>
+        }
+      />
       <div className="vx-commerce-risk-list">
         {snapshot.risks.map((risk) => (
           <Link
@@ -165,20 +170,17 @@ function PlanRevenuePanel({
       className="vx-commerce-panel vx-commerce-plan-panel"
       aria-label="套餐收入"
     >
-      <header className="vx-commerce-panel__header">
-        <div className="admin-overview-heading">
-          <span className="admin-overview-heading__icon" aria-hidden="true">
-            <Icon name="chart-bar" size="lg" fallback="placeholder" />
-          </span>
-          <div className="admin-overview-heading__copy">
-            <h2>套餐收入</h2>
-            <p>
-              按服务套餐汇总订阅数量与订阅应收（Σ subscriptions.pay_amount）。
-            </p>
-          </div>
-        </div>
-        <Link href="/service-plans">套餐管理</Link>
-      </header>
+      <SectionHeader
+        level={2}
+        icon="chart-bar"
+        title="套餐收入"
+        description="按服务套餐汇总订阅数量与订阅应收（Σ subscriptions.pay_amount）。"
+        action={
+          <Button variant="link" size="sm" asChild>
+            <Link href="/service-plans">套餐管理</Link>
+          </Button>
+        }
+      />
       {/* C15: tierName / paidAmount / discountAmount removed — no source (tier not
           grouped; paidAmount was a dup of revenueAmount; discount never computed). */}
       <div className="vx-commerce-plan-list">
@@ -215,17 +217,12 @@ function QuickLinkPanel() {
       className="vx-commerce-panel vx-commerce-link-panel"
       aria-label="商业财务入口"
     >
-      <header className="vx-commerce-panel__header">
-        <div className="admin-overview-heading">
-          <span className="admin-overview-heading__icon" aria-hidden="true">
-            <Icon name="squares-four" size="lg" fallback="placeholder" />
-          </span>
-          <div className="admin-overview-heading__copy">
-            <h2>业务入口</h2>
-            <p>商业财务域的运营台账入口，保持人工处理和规则配置边界清晰。</p>
-          </div>
-        </div>
-      </header>
+      <SectionHeader
+        level={2}
+        icon="squares-four"
+        title="业务入口"
+        description="商业财务域的运营台账入口，保持人工处理和规则配置边界清晰。"
+      />
       <div className="vx-commerce-link-grid">
         {quickLinks.map((link) => (
           <Link

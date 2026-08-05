@@ -15,7 +15,6 @@ import {
   Textarea,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
-import type { IconName } from "@vxture/design-system";
 import {
   confirmOrderOfflinePayment,
   fetchOrderOperation,
@@ -126,10 +125,6 @@ function subscriptionStatusLabel(
   return "已取消";
 }
 
-function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function OrderSummary({ order }: { order: OrderOperationDetailRecord }) {
   return (
     <section className="vx-product-capability-summary">
@@ -199,7 +194,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       aria-label={`${order.orderNo} 订单详情`}
     >
       <section className="vx-product-capability-section">
-        <SectionHeading icon="table" title="基础资料" />
+        <DetailSectionHeading icon="table" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="订单编号">{orUnset(order.orderNo)}</DetailRow>
           <DetailRow label="订单状态">
@@ -225,7 +220,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="buildings" title="租户与套餐" />
+        <DetailSectionHeading icon="buildings" title="租户与套餐" />
         <DetailList columns={3}>
           <DetailRow label="租户">{orUnset(order.tenantName)}</DetailRow>
           <DetailRow label="租户编码">{orUnset(order.tenantCode)}</DetailRow>
@@ -243,7 +238,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="star" title="关联订阅" />
+        <DetailSectionHeading icon="star" title="关联订阅" />
         <DetailList columns={3}>
           <DetailRow label="订阅 ID">{orUnset(order.subscriptionId)}</DetailRow>
           <DetailRow label="订阅状态">
@@ -272,7 +267,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="key" title="账单与收款" />
+        <DetailSectionHeading icon="key" title="账单与收款" />
         <DetailList columns={3}>
           <DetailRow label="账单编号">{order.billNo || "未生成"}</DetailRow>
           <DetailRow label="账单状态">{order.billStatus || "未生成"}</DetailRow>
@@ -295,7 +290,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="list" title="账单明细" />
+        <DetailSectionHeading icon="list" title="账单明细" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {order.invoiceItems.map((item) => (
             <div key={item.id} className="vx-product-detail-list__row">
@@ -318,7 +313,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="check" title="支付记录" />
+        <DetailSectionHeading icon="check" title="支付记录" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {order.paymentRecords.length ? (
             order.paymentRecords.map((payment) => (
@@ -351,7 +346,7 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="clock" title="运营记录" />
+        <DetailSectionHeading icon="clock" title="运营记录" />
         <div className="vx-subscription-timeline">
           {order.operationTimeline.map((event) => (
             <article

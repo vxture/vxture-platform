@@ -84,10 +84,6 @@ function capabilityTypeIcon(type: ProductSolutionCapabilityType): IconName {
   return "server";
 }
 
-function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function SubscriptionSummary({
   subscription,
 }: {
@@ -171,7 +167,7 @@ function SubscriptionDetails({
       aria-label={`${subscription.tenantName} 订阅详情`}
     >
       <section className="vx-product-capability-section">
-        <SectionHeading icon="database" title="基础资料" />
+        <DetailSectionHeading icon="database" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="订阅编码">
             {orUnset(subscription.subscriptionCode)}
@@ -211,7 +207,7 @@ function SubscriptionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="workflow" title="业务方案关联" />
+        <DetailSectionHeading icon="workflow" title="业务方案关联" />
         <DetailList columns={3}>
           <DetailRow label="业务方案">
             {orUnset(subscription.solutionAssociation.solutionName)}
@@ -254,7 +250,7 @@ function SubscriptionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="cube" title="权益快照" />
+        <DetailSectionHeading icon="cube" title="权益快照" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {subscription.entitlementSnapshot.map((item) => (
             <div key={item.productCode} className="vx-product-detail-list__row">
@@ -280,7 +276,7 @@ function SubscriptionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="chart-bar" title="配额快照" />
+        <DetailSectionHeading icon="chart-bar" title="配额快照" />
         <DetailList columns={3}>
           <DetailRow label="最大席位">
             {orUnset(`${formatNumber(subscription.quota.maxUsers)} 人`)}
@@ -312,7 +308,7 @@ function SubscriptionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="clock" title="运营记录" />
+        <DetailSectionHeading icon="clock" title="运营记录" />
         <div className="vx-subscription-timeline">
           {subscription.operationTimeline.map((event) => (
             <article

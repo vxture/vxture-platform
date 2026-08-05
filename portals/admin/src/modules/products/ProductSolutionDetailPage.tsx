@@ -54,10 +54,6 @@ function sourceLabel(source: ProductSolutionCapabilitySource) {
   return source === "self" ? "自建" : "三方";
 }
 
-function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function ProductSolutionSummary({
   solution,
 }: {
@@ -135,7 +131,7 @@ function ProductSolutionDetails({
       aria-label={`${solution.solutionName} 详情`}
     >
       <section className="vx-product-capability-section">
-        <SectionHeading icon="database" title="基础资料" />
+        <DetailSectionHeading icon="database" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="方案编码">
             {orUnset(solution.solutionCode)}
@@ -160,7 +156,7 @@ function ProductSolutionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="map-pin" title="适用行业" />
+        <DetailSectionHeading icon="map-pin" title="适用行业" />
         <DetailList columns={3}>
           <DetailRow label="行业领域">{orUnset(solution.industry)}</DetailRow>
           <DetailRow label="业务场景">{orUnset(solution.scenario)}</DetailRow>
@@ -187,7 +183,7 @@ function ProductSolutionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="cube" title="包含产品能力" />
+        <DetailSectionHeading icon="cube" title="包含产品能力" />
         <div className="vx-product-detail-list">
           {solution.products.map((product) => (
             <Link
@@ -215,7 +211,7 @@ function ProductSolutionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="shield-check" title="交付边界" />
+        <DetailSectionHeading icon="shield-check" title="交付边界" />
         <div className="vx-product-detail-notes">
           {solution.deliveryBoundaries.map((item) => (
             <article key={item}>
@@ -227,7 +223,7 @@ function ProductSolutionDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="star" title="关联服务套餐" />
+        <DetailSectionHeading icon="star" title="关联服务套餐" />
         <div className="vx-product-detail-list">
           {solution.relatedServicePlans.map((plan) => (
             <Link

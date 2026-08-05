@@ -71,16 +71,6 @@ function regionLabel(region: ProductCapabilityRecord["region"]) {
   return "全局";
 }
 
-function ProductSectionHeading({
-  icon,
-  title,
-}: {
-  icon: IconName;
-  title: string;
-}) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function ProductCapabilitySummary({
   product,
 }: {
@@ -165,7 +155,7 @@ function ProductCapabilityDetails({
       aria-label={`${product.productName} 产品能力详情`}
     >
       <section className="vx-product-capability-section">
-        <ProductSectionHeading icon="database" title="基础资料" />
+        <DetailSectionHeading icon="database" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="产品编码">{orUnset(product.productCode)}</DetailRow>
           <DetailRow label="产品名称">{orUnset(product.productName)}</DetailRow>
@@ -192,7 +182,7 @@ function ProductCapabilityDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <ProductSectionHeading icon="sparkles" title="能力属性" />
+        <DetailSectionHeading icon="sparkles" title="能力属性" />
         <div className="vx-product-capability-description">
           <strong>{product.capabilitySummary}</strong>
           <p>{product.description}</p>
@@ -234,7 +224,7 @@ function ProductCapabilityDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <ProductSectionHeading icon="api" title="接入配置" />
+        <DetailSectionHeading icon="api" title="接入配置" />
         <DetailList columns={3}>
           <DetailRow label="供应商">
             {orUnset(product.integration.providerName)}
@@ -268,7 +258,7 @@ function ProductCapabilityDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <ProductSectionHeading icon="chart-bar" title="计量配置" />
+        <DetailSectionHeading icon="chart-bar" title="计量配置" />
         <DetailList columns={3}>
           <DetailRow label="默认计量单位">
             {orUnset(product.meteringUnit)}
@@ -293,7 +283,7 @@ function ProductCapabilityDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <ProductSectionHeading icon="shield-check" title="可用状态" />
+        <DetailSectionHeading icon="shield-check" title="可用状态" />
         <DetailList columns={3}>
           <DetailRow label="能力状态">
             {orUnset(statusLabel(product.status))}

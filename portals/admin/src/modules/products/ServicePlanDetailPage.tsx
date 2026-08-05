@@ -45,10 +45,6 @@ function capabilityTypeLabel(type: ProductSolutionCapabilityType) {
   return "服务";
 }
 
-function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function ServicePlanSummary({
   plan,
 }: {
@@ -130,7 +126,7 @@ function ServicePlanDetails({
       aria-label={`${plan.solutionName} ${plan.tierName} 详情`}
     >
       <section className="vx-product-capability-section">
-        <SectionHeading icon="database" title="基础资料" />
+        <DetailSectionHeading icon="database" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="业务方案">{orUnset(plan.solutionName)}</DetailRow>
           <DetailRow label="方案编码">{orUnset(plan.solutionCode)}</DetailRow>
@@ -154,7 +150,7 @@ function ServicePlanDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="chart-bar" title="配额价格" />
+        <DetailSectionHeading icon="chart-bar" title="配额价格" />
         <DetailList columns={3}>
           <DetailRow label="价格">{orUnset(plan.price.priceLabel)}</DetailRow>
           <DetailRow label="币种">{orUnset(plan.price.currency)}</DetailRow>
@@ -171,7 +167,7 @@ function ServicePlanDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="cube" title="包含 / 不包含产品" />
+        <DetailSectionHeading icon="cube" title="包含 / 不包含产品" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {plan.entitlements.map((item) => (
             <Link
@@ -201,7 +197,7 @@ function ServicePlanDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="map-pin" title="适用范围" />
+        <DetailSectionHeading icon="map-pin" title="适用范围" />
         <div className="vx-product-detail-notes">
           {plan.applicableScope.map((item) => (
             <article key={item}>
@@ -213,7 +209,7 @@ function ServicePlanDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="shield-check" title="售卖状态" />
+        <DetailSectionHeading icon="shield-check" title="售卖状态" />
         <DetailList columns={3}>
           <DetailRow label="售卖状态">
             {orUnset(statusLabel(plan.status))}

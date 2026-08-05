@@ -165,16 +165,6 @@ function TenantKeyMetric({
   );
 }
 
-function TenantSectionHeading({
-  icon,
-  title,
-}: {
-  icon: IconName;
-  title: string;
-}) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function createTenantInfoDraft(tenant: TenantOperationRecord): TenantInfoDraft {
   return {
     tenantCode: tenant.tenantCode,
@@ -320,7 +310,7 @@ function TenantInfoTab({
     <div className="vx-tenant-tab-grid vx-tenant-tab-grid--info">
       <section className="vx-tenant-block">
         <header>
-          <TenantSectionHeading icon="buildings" title="基础资料" />
+          <DetailSectionHeading icon="buildings" title="基础资料" />
           <div className="vx-tenant-block__actions" aria-label="基础资料操作">
             {editing ? (
               <>
@@ -476,7 +466,7 @@ function TenantInfoTab({
 
       <section className="vx-tenant-block">
         <header>
-          <TenantSectionHeading icon="user-switch" title="主管理员" />
+          <DetailSectionHeading icon="user-switch" title="主管理员" />
         </header>
         <div className="vx-tenant-config-row vx-tenant-config-row--contact">
           <TenantConfigItem label="姓名">
@@ -512,7 +502,7 @@ function TenantInfoTab({
 
       <section className="vx-tenant-block vx-tenant-block--wide">
         <header>
-          <TenantSectionHeading icon="info" title="运营备注" />
+          <DetailSectionHeading icon="info" title="运营备注" />
         </header>
         <p className="vx-tenant-note">{tenant.notes}</p>
         <div className="vx-tenant-tags">

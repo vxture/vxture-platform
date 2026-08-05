@@ -13,7 +13,6 @@ import {
   MetricGrid,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
-import type { IconName } from "@vxture/design-system";
 import {
   fetchBillingRecord,
   submitBillingBillAction,
@@ -129,10 +128,6 @@ function paymentStatusLabel(status: string) {
   return "支付中";
 }
 
-function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
-  return <DetailSectionHeading icon={icon} title={title} />;
-}
-
 function BillingSummary({ bill }: { bill: BillingDetailRecord }) {
   return (
     <section className="vx-product-capability-summary">
@@ -211,7 +206,7 @@ function BillingDetails({
       aria-label={`${bill.billNo} 账单详情`}
     >
       <section className="vx-product-capability-section">
-        <SectionHeading icon="key" title="基础资料" />
+        <DetailSectionHeading icon="key" title="基础资料" />
         <DetailList columns={3}>
           <DetailRow label="账单编号">{orUnset(bill.billNo)}</DetailRow>
           <DetailRow label="账单状态">
@@ -243,7 +238,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="buildings" title="租户与订阅" />
+        <DetailSectionHeading icon="buildings" title="租户与订阅" />
         <DetailList columns={3}>
           <DetailRow label="租户">{orUnset(bill.tenantName)}</DetailRow>
           <DetailRow label="租户编码">{orUnset(bill.tenantCode)}</DetailRow>
@@ -292,7 +287,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="chart-bar" title="收款信息" />
+        <DetailSectionHeading icon="chart-bar" title="收款信息" />
         <DetailList columns={3}>
           <DetailRow label="账单原价">
             {orUnset(formatCurrency(bill.totalAmount, bill.currency))}
@@ -324,7 +319,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="list" title="账单明细" />
+        <DetailSectionHeading icon="list" title="账单明细" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {bill.invoiceItems.map((item) => (
             <div key={item.id} className="vx-product-detail-list__row">
@@ -347,7 +342,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="check" title="支付记录" />
+        <DetailSectionHeading icon="check" title="支付记录" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {bill.paymentRecords.length ? (
             bill.paymentRecords.map((payment) => (
@@ -380,7 +375,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="key" title="发票登记" />
+        <DetailSectionHeading icon="key" title="发票登记" />
         <div className="vx-product-detail-list vx-product-detail-list--entitlements">
           {bill.invoiceReceipts.length ? (
             bill.invoiceReceipts.map((receipt) => (
@@ -454,7 +449,7 @@ function BillingDetails({
       </section>
 
       <section className="vx-product-capability-section">
-        <SectionHeading icon="clock" title="运营记录" />
+        <DetailSectionHeading icon="clock" title="运营记录" />
         <div className="vx-subscription-timeline">
           {bill.operationTimeline.map((event) => (
             <article

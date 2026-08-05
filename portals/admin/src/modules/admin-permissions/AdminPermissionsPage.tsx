@@ -21,6 +21,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  SectionHeader,
 } from "@vxture/design-system";
 import type { IconName, ViewModeSwitchValue } from "@vxture/design-system";
 import {
@@ -1135,17 +1136,17 @@ function PermissionDomainSection({
   return (
     <section
       className="vx-admin-permission-domain"
-      aria-labelledby={`permission-domain-${group.key}`}
+      /* 原先靠 `aria-labelledby` 指向标题的 h2#id。SectionHeader 不保证 id 落在
+       * h2 上（透传属性去的是根元素），换成 aria-label——可访问名称一样，且不再
+       * 依赖别人的 DOM 内部结构。 */
+      aria-label={group.title}
     >
-      <header className="admin-overview-heading vx-admin-permission-domain__header">
-        <span className="admin-overview-heading__icon" aria-hidden="true">
-          <Icon name={group.icon} size="lg" fallback="placeholder" />
-        </span>
-        <div className="admin-overview-heading__copy">
-          <h2 id={`permission-domain-${group.key}`}>{group.title}</h2>
-          <p>{group.description}</p>
-        </div>
-      </header>
+      <SectionHeader
+        level={2}
+        icon={group.icon}
+        title={group.title}
+        description={group.description}
+      />
       <PermissionDomainStats group={group} />
       <section
         className="vx-tenant-toolbar vx-admin-permission-domain__toolbar"
