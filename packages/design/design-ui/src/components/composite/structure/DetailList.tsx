@@ -44,30 +44,63 @@
  *
  * 响应式：窄屏（<sm）字段名与值上下堆叠，宽屏并排且字段名列定宽
  * （`w-media-3xl` = 12rem），同一组内各行的值因此左对齐成一列。
+ *
+ * `columns`（2026-08-05 由 admin 详情页实据加入）：admin 六个详情页共 129 个字段，
+ * 单页最多 28 个，既有容器是 `repeat(3, 1fr)` 的网格。单列排 28 行会拉出一条谁也
+ * 读不完的长条——**多列是排布问题，不是语义问题**，`<dl>` 照旧，只是换个铺法。
+ * 多列时行内改为名上值下（并排 + 12rem 定宽名列在三分之一宽的格子里放不下），
+ * 行间虚线取消（网格里的横线会横穿相邻列，界不出行）。
+ *
+ * 列数走 context 而不是父级 arbitrary variant 覆盖：`sm:[&>*]:flex-col` 与
+ * `DetailRow` 自己的 `sm:flex-row` 特异性相同，谁赢取决于 Tailwind 的输出顺序，
+ * 那是碰运气。`DetailRow` 本就必须长在 `DetailList` 里（见上），context 是现成的。
  */
 
 import * as React from "react";
 import { cn } from "../../../utils/cn";
 
+export type DetailListColumns = 1 | 2 | 3;
+
+const BY_COLUMNS: Record<DetailListColumns, string> = {
+  1: "",
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+};
+
+/** 列数由 DetailList 下传，DetailRow 据此选行内布局。 */
+const ColumnsContext = React.createContext<DetailListColumns>(1);
+
 export interface DetailListProps extends React.HTMLAttributes<HTMLDListElement> {
   readonly children: React.ReactNode;
+  /**
+   * 宽屏下铺几列。默认 1 = 单列竖排（名左值右、行间虚线），
+   * 多列 = 网格（名上值下、无分隔线）。窄屏一律单列。
+   */
+  readonly columns?: DetailListColumns;
 }
 
 const DetailList = React.forwardRef<HTMLDListElement, DetailListProps>(
-  function DetailList({ className, children, ...props }, ref) {
+  function DetailList({ className, children, columns = 1, ...props }, ref) {
+    const grid = columns > 1;
     return (
-      <dl
-        ref={ref}
-        className={cn(
-          "flex flex-col",
-          "[&>*+*]:border-t [&>*+*]:border-dashed [&>*+*]:border-primary/10",
-          "dark:[&>*+*]:border-primary/20",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </dl>
+      <ColumnsContext.Provider value={columns}>
+        <dl
+          ref={ref}
+          className={cn(
+            grid
+              ? cn("grid gap-x-xl gap-y-md", BY_COLUMNS[columns])
+              : cn(
+                  "flex flex-col",
+                  "[&>*+*]:border-t [&>*+*]:border-dashed [&>*+*]:border-primary/10",
+                  "dark:[&>*+*]:border-primary/20",
+                ),
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </dl>
+      </ColumnsContext.Provider>
     );
   },
 );
@@ -86,17 +119,24 @@ export interface DetailRowProps extends Omit<
 
 const DetailRow = React.forwardRef<HTMLDivElement, DetailRowProps>(
   function DetailRow({ className, label, children, actions, ...props }, ref) {
+    // 多列时保持名上值下：并排 + 12rem 定宽的名列在三分之一宽的格子里放不下。
+    const stacked = React.useContext(ColumnsContext) > 1;
     return (
       <div
         ref={ref}
         className={cn(
-          "flex flex-col gap-2xs py-sm",
-          "sm:flex-row sm:items-center sm:gap-lg",
+          "flex flex-col gap-2xs",
+          stacked ? "py-0" : "py-sm sm:flex-row sm:items-center sm:gap-lg",
           className,
         )}
         {...props}
       >
-        <dt className="text-label-md text-muted-foreground sm:w-media-3xl sm:shrink-0">
+        <dt
+          className={cn(
+            "text-label-md text-muted-foreground",
+            !stacked && "sm:w-media-3xl sm:shrink-0",
+          )}
+        >
           {label}
         </dt>
         <dd className="flex min-w-0 flex-1 flex-wrap items-center gap-md">

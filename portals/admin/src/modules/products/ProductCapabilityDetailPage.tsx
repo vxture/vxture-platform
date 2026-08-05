@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Icon, Badge, Button, EmptyState } from "@vxture/design-system";
+import {
+  Badge,
+  Button,
+  DetailList,
+  DetailRow,
+  EmptyState,
+  Icon,
+  MetricGrid,
+} from "@vxture/design-system";
+import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
 import { fetchProductCapability } from "@/api/admin-bff";
 import type {
@@ -72,35 +81,6 @@ function ProductSectionHeading({
   return <DetailSectionHeading icon={icon} title={title} />;
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="vx-product-capability-field">
-      <span>{label}</span>
-      <strong>{value || "未设置"}</strong>
-    </div>
-  );
-}
-
-function DetailMetric({
-  label,
-  value,
-  tag,
-}: {
-  label: string;
-  value: string;
-  tag?: string;
-}) {
-  return (
-    <div className="vx-product-capability-metric">
-      <span>{label}</span>
-      <p>
-        <strong>{value}</strong>
-        {tag ? <em>{tag}</em> : null}
-      </p>
-    </div>
-  );
-}
-
 function ProductCapabilitySummary({
   product,
 }: {
@@ -141,28 +121,35 @@ function ProductCapabilitySummary({
           </div>
         </div>
       </div>
-      <div className="vx-product-capability-summary__metrics">
-        <DetailMetric
-          label="业务方案"
-          value={formatNumber(product.solutionCount)}
-          tag={`${formatNumber(product.planCount)} 套餐`}
-        />
-        <DetailMetric
-          label="接入状态"
-          value={integrationStatusLabel(product.integration.status)}
-          tag={product.integration.providerName}
-        />
-        <DetailMetric
-          label="计量单位"
-          value={product.meteringUnit}
-          tag={product.billingMode}
-        />
-        <DetailMetric
-          label="可用状态"
-          value={healthLabel(product.healthStatus)}
-          tag={`${formatNumber(product.modelPolicyCount)} 模型授权`}
-        />
-      </div>
+      <MetricGrid
+        variant="compact"
+        items={[
+          {
+            id: "solutions",
+            label: "业务方案",
+            value: formatNumber(product.solutionCount),
+            tags: [`${formatNumber(product.planCount)} 套餐`],
+          },
+          {
+            id: "integration",
+            label: "接入状态",
+            value: integrationStatusLabel(product.integration.status),
+            tags: [product.integration.providerName],
+          },
+          {
+            id: "metering",
+            label: "计量单位",
+            value: product.meteringUnit,
+            tags: [product.billingMode],
+          },
+          {
+            id: "health",
+            label: "可用状态",
+            value: healthLabel(product.healthStatus),
+            tags: [`${formatNumber(product.modelPolicyCount)} 模型授权`],
+          },
+        ]}
+      />
     </section>
   );
 }
@@ -179,23 +166,29 @@ function ProductCapabilityDetails({
     >
       <section className="vx-product-capability-section">
         <ProductSectionHeading icon="database" title="基础资料" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="产品编码" value={product.productCode} />
-          <DetailField label="产品名称" value={product.productName} />
-          <DetailField
-            label="产品类型"
-            value={capabilityTypeLabel(product.productType)}
-          />
-          <DetailField label="产品来源" value={sourceLabel(product.source)} />
-          <DetailField
-            label="可见范围"
-            value={product.visibility === "public" ? "公开" : "内部"}
-          />
-          <DetailField label="服务区域" value={regionLabel(product.region)} />
-          <DetailField label="负责团队" value={product.ownerTeam} />
-          <DetailField label="创建时间" value={formatDate(product.createdAt)} />
-          <DetailField label="更新时间" value={formatDate(product.updatedAt)} />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="产品编码">{orUnset(product.productCode)}</DetailRow>
+          <DetailRow label="产品名称">{orUnset(product.productName)}</DetailRow>
+          <DetailRow label="产品类型">
+            {orUnset(capabilityTypeLabel(product.productType))}
+          </DetailRow>
+          <DetailRow label="产品来源">
+            {orUnset(sourceLabel(product.source))}
+          </DetailRow>
+          <DetailRow label="可见范围">
+            {product.visibility === "public" ? "公开" : "内部"}
+          </DetailRow>
+          <DetailRow label="服务区域">
+            {orUnset(regionLabel(product.region))}
+          </DetailRow>
+          <DetailRow label="负责团队">{orUnset(product.ownerTeam)}</DetailRow>
+          <DetailRow label="创建时间">
+            {orUnset(formatDate(product.createdAt))}
+          </DetailRow>
+          <DetailRow label="更新时间">
+            {orUnset(formatDate(product.updatedAt))}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
@@ -242,50 +235,49 @@ function ProductCapabilityDetails({
 
       <section className="vx-product-capability-section">
         <ProductSectionHeading icon="api" title="接入配置" />
-        <div className="vx-product-capability-fields">
-          <DetailField
-            label="供应商"
-            value={product.integration.providerName}
-          />
-          <DetailField
-            label="供应商类型"
-            value={sourceLabel(product.integration.providerType)}
-          />
-          <DetailField
-            label="接入状态"
-            value={integrationStatusLabel(product.integration.status)}
-          />
-          <DetailField label="协议" value={product.integration.protocol} />
-          <DetailField label="认证方式" value={product.integration.authMode} />
-          <DetailField
-            label="结算方式"
-            value={product.integration.settlementMode ?? "无"}
-          />
-          <DetailField
-            label="接口地址"
-            value={product.integration.endpoint ?? "内部能力，无需外部接口"}
-          />
-          <DetailField
-            label="最近检测"
-            value={
+        <DetailList columns={3}>
+          <DetailRow label="供应商">
+            {orUnset(product.integration.providerName)}
+          </DetailRow>
+          <DetailRow label="供应商类型">
+            {orUnset(sourceLabel(product.integration.providerType))}
+          </DetailRow>
+          <DetailRow label="接入状态">
+            {orUnset(integrationStatusLabel(product.integration.status))}
+          </DetailRow>
+          <DetailRow label="协议">
+            {orUnset(product.integration.protocol)}
+          </DetailRow>
+          <DetailRow label="认证方式">
+            {orUnset(product.integration.authMode)}
+          </DetailRow>
+          <DetailRow label="结算方式">
+            {product.integration.settlementMode || "无"}
+          </DetailRow>
+          <DetailRow label="接口地址">
+            {product.integration.endpoint || "内部能力，无需外部接口"}
+          </DetailRow>
+          <DetailRow label="最近检测">
+            {orUnset(
               product.integration.lastCheckedAt
                 ? formatDate(product.integration.lastCheckedAt)
-                : "未检测"
-            }
-          />
-        </div>
+                : "未检测",
+            )}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
         <ProductSectionHeading icon="chart-bar" title="计量配置" />
-        <div className="vx-product-capability-fields vx-product-capability-fields--compact">
-          <DetailField label="默认计量单位" value={product.meteringUnit} />
-          <DetailField label="计费模式" value={product.billingMode} />
-          <DetailField
-            label="策略数量"
-            value={`${formatNumber(product.modelPolicyCount)} 个`}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="默认计量单位">
+            {orUnset(product.meteringUnit)}
+          </DetailRow>
+          <DetailRow label="计费模式">{orUnset(product.billingMode)}</DetailRow>
+          <DetailRow label="策略数量">
+            {orUnset(`${formatNumber(product.modelPolicyCount)} 个`)}
+          </DetailRow>
+        </DetailList>
         <div className="vx-product-capability-metric-rules">
           {product.metrics.map((metric) => (
             <article key={metric.metricCode}>
@@ -302,21 +294,20 @@ function ProductCapabilityDetails({
 
       <section className="vx-product-capability-section">
         <ProductSectionHeading icon="shield-check" title="可用状态" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="能力状态" value={statusLabel(product.status)} />
-          <DetailField
-            label="健康状态"
-            value={healthLabel(product.healthStatus)}
-          />
-          <DetailField
-            label="发布数量"
-            value={`${formatNumber(product.releaseCount)} 个`}
-          />
-          <DetailField
-            label="方案复用"
-            value={`${formatNumber(product.solutionCount)} 个`}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="能力状态">
+            {orUnset(statusLabel(product.status))}
+          </DetailRow>
+          <DetailRow label="健康状态">
+            {orUnset(healthLabel(product.healthStatus))}
+          </DetailRow>
+          <DetailRow label="发布数量">
+            {orUnset(`${formatNumber(product.releaseCount)} 个`)}
+          </DetailRow>
+          <DetailRow label="方案复用">
+            {orUnset(`${formatNumber(product.solutionCount)} 个`)}
+          </DetailRow>
+        </DetailList>
         <div className="vx-product-capability-related-list">
           {product.releases.length ? (
             product.releases.map((release) => (

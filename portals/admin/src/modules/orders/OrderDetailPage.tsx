@@ -3,14 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Icon,
   Badge,
   Button,
+  DetailList,
+  DetailRow,
   DialogForm,
   EmptyState,
+  Icon,
   Label,
+  MetricGrid,
   Textarea,
 } from "@vxture/design-system";
+import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
 import {
   confirmOrderOfflinePayment,
@@ -126,35 +130,6 @@ function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
   return <DetailSectionHeading icon={icon} title={title} />;
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="vx-product-capability-field">
-      <span>{label}</span>
-      <strong>{value || "未设置"}</strong>
-    </div>
-  );
-}
-
-function DetailMetric({
-  label,
-  value,
-  tag,
-}: {
-  label: string;
-  value: string;
-  tag?: string;
-}) {
-  return (
-    <div className="vx-product-capability-metric">
-      <span>{label}</span>
-      <p>
-        <strong>{value}</strong>
-        {tag ? <em>{tag}</em> : null}
-      </p>
-    </div>
-  );
-}
-
 function OrderSummary({ order }: { order: OrderOperationDetailRecord }) {
   return (
     <section className="vx-product-capability-summary">
@@ -184,28 +159,35 @@ function OrderSummary({ order }: { order: OrderOperationDetailRecord }) {
           </div>
         </div>
       </div>
-      <div className="vx-product-capability-summary__metrics">
-        <DetailMetric
-          label="订单金额"
-          value={formatCurrency(order.amount, order.currency)}
-          tag={cycleLabel(order.cycleType)}
-        />
-        <DetailMetric
-          label="已收金额"
-          value={formatCurrency(order.paidAmount, order.currency)}
-          tag={paySourceLabel(order.paySource)}
-        />
-        <DetailMetric
-          label="业务方案"
-          value={order.solutionName}
-          tag={order.servicePlanName}
-        />
-        <DetailMetric
-          label="运营动作"
-          value={order.operationHint}
-          tag={order.operatorName}
-        />
-      </div>
+      <MetricGrid
+        variant="compact"
+        items={[
+          {
+            id: "amount",
+            label: "订单金额",
+            value: formatCurrency(order.amount, order.currency),
+            tags: [cycleLabel(order.cycleType)],
+          },
+          {
+            id: "paid",
+            label: "已收金额",
+            value: formatCurrency(order.paidAmount, order.currency),
+            tags: [paySourceLabel(order.paySource)],
+          },
+          {
+            id: "solution",
+            label: "业务方案",
+            value: order.solutionName,
+            tags: [order.servicePlanName],
+          },
+          {
+            id: "operation",
+            label: "运营动作",
+            value: order.operationHint,
+            tags: [order.operatorName],
+          },
+        ]}
+      />
     </section>
   );
 }
@@ -218,51 +200,59 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
     >
       <section className="vx-product-capability-section">
         <SectionHeading icon="table" title="基础资料" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="订单编号" value={order.orderNo} />
-          <DetailField
-            label="订单状态"
-            value={orderStatusLabel(order.orderStatus)}
-          />
-          <DetailField
-            label="支付状态"
-            value={paymentStatusLabel(order.paymentStatus)}
-          />
-          <DetailField
-            label="支付来源"
-            value={paySourceLabel(order.paySource)}
-          />
-          <DetailField label="支付方式" value={order.payMethod ?? "未设置"} />
-          <DetailField label="创建时间" value={formatDate(order.createdAt)} />
-          <DetailField label="确认时间" value={formatDate(order.confirmedAt)} />
-          <DetailField label="更新时间" value={formatDate(order.updatedAt)} />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="订单编号">{orUnset(order.orderNo)}</DetailRow>
+          <DetailRow label="订单状态">
+            {orUnset(orderStatusLabel(order.orderStatus))}
+          </DetailRow>
+          <DetailRow label="支付状态">
+            {orUnset(paymentStatusLabel(order.paymentStatus))}
+          </DetailRow>
+          <DetailRow label="支付来源">
+            {orUnset(paySourceLabel(order.paySource))}
+          </DetailRow>
+          <DetailRow label="支付方式">{orUnset(order.payMethod)}</DetailRow>
+          <DetailRow label="创建时间">
+            {orUnset(formatDate(order.createdAt))}
+          </DetailRow>
+          <DetailRow label="确认时间">
+            {orUnset(formatDate(order.confirmedAt))}
+          </DetailRow>
+          <DetailRow label="更新时间">
+            {orUnset(formatDate(order.updatedAt))}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="buildings" title="租户与套餐" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="租户" value={order.tenantName} />
-          <DetailField label="租户编码" value={order.tenantCode} />
-          <DetailField label="租户类型" value={typeLabel(order.tenantType)} />
-          <DetailField label="所属区域" value={order.region} />
-          <DetailField label="所属行业" value={order.industry} />
-          <DetailField label="业务方案" value={order.solutionName} />
-          <DetailField label="服务套餐" value={order.servicePlanName} />
-          <DetailField label="套餐层级" value={order.tierName} />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="租户">{orUnset(order.tenantName)}</DetailRow>
+          <DetailRow label="租户编码">{orUnset(order.tenantCode)}</DetailRow>
+          <DetailRow label="租户类型">
+            {orUnset(typeLabel(order.tenantType))}
+          </DetailRow>
+          <DetailRow label="所属区域">{orUnset(order.region)}</DetailRow>
+          <DetailRow label="所属行业">{orUnset(order.industry)}</DetailRow>
+          <DetailRow label="业务方案">{orUnset(order.solutionName)}</DetailRow>
+          <DetailRow label="服务套餐">
+            {orUnset(order.servicePlanName)}
+          </DetailRow>
+          <DetailRow label="套餐层级">{orUnset(order.tierName)}</DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="star" title="关联订阅" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="订阅 ID" value={order.subscriptionId} />
-          <DetailField
-            label="订阅状态"
-            value={subscriptionStatusLabel(order.subscriptionStatus)}
-          />
-          <DetailField label="计费周期" value={cycleLabel(order.cycleType)} />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="订阅 ID">{orUnset(order.subscriptionId)}</DetailRow>
+          <DetailRow label="订阅状态">
+            {orUnset(subscriptionStatusLabel(order.subscriptionStatus))}
+          </DetailRow>
+          <DetailRow label="计费周期">
+            {orUnset(cycleLabel(order.cycleType))}
+          </DetailRow>
+        </DetailList>
         <div className="vx-product-capability-actions vx-subscription-detail-links">
           <Button asChild variant="outline">
             <Link
@@ -283,26 +273,25 @@ function OrderDetails({ order }: { order: OrderOperationDetailRecord }) {
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="key" title="账单与收款" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="账单编号" value={order.billNo ?? "未生成"} />
-          <DetailField label="账单状态" value={order.billStatus ?? "未生成"} />
-          <DetailField label="支付单号" value={order.paymentNo ?? "未生成"} />
-          <DetailField
-            label="订单金额"
-            value={formatCurrency(order.amount, order.currency)}
-          />
-          <DetailField
-            label="已收金额"
-            value={formatCurrency(order.paidAmount, order.currency)}
-          />
-          <DetailField
-            label="剩余应收"
-            value={formatCurrency(
-              Math.max(0, order.amount - order.paidAmount),
-              order.currency,
+        <DetailList columns={3}>
+          <DetailRow label="账单编号">{order.billNo || "未生成"}</DetailRow>
+          <DetailRow label="账单状态">{order.billStatus || "未生成"}</DetailRow>
+          <DetailRow label="支付单号">{order.paymentNo || "未生成"}</DetailRow>
+          <DetailRow label="订单金额">
+            {orUnset(formatCurrency(order.amount, order.currency))}
+          </DetailRow>
+          <DetailRow label="已收金额">
+            {orUnset(formatCurrency(order.paidAmount, order.currency))}
+          </DetailRow>
+          <DetailRow label="剩余应收">
+            {orUnset(
+              formatCurrency(
+                Math.max(0, order.amount - order.paidAmount),
+                order.currency,
+              ),
             )}
-          />
-        </div>
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">

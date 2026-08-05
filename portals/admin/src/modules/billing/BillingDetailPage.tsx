@@ -3,7 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Icon, Badge, Button, EmptyState } from "@vxture/design-system";
+import {
+  Badge,
+  Button,
+  DetailList,
+  DetailRow,
+  EmptyState,
+  Icon,
+  MetricGrid,
+} from "@vxture/design-system";
+import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
 import {
   fetchBillingRecord,
@@ -124,35 +133,6 @@ function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
   return <DetailSectionHeading icon={icon} title={title} />;
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="vx-product-capability-field">
-      <span>{label}</span>
-      <strong>{value || "未设置"}</strong>
-    </div>
-  );
-}
-
-function DetailMetric({
-  label,
-  value,
-  tag,
-}: {
-  label: string;
-  value: string;
-  tag?: string;
-}) {
-  return (
-    <div className="vx-product-capability-metric">
-      <span>{label}</span>
-      <p>
-        <strong>{value}</strong>
-        {tag ? <em>{tag}</em> : null}
-      </p>
-    </div>
-  );
-}
-
 function BillingSummary({ bill }: { bill: BillingDetailRecord }) {
   return (
     <section className="vx-product-capability-summary">
@@ -182,28 +162,35 @@ function BillingSummary({ bill }: { bill: BillingDetailRecord }) {
           </div>
         </div>
       </div>
-      <div className="vx-product-capability-summary__metrics">
-        <DetailMetric
-          label="账单应收"
-          value={formatCurrency(bill.payableAmount, bill.currency)}
-          tag={billTypeLabel(bill.billType)}
-        />
-        <DetailMetric
-          label="已收金额"
-          value={formatCurrency(bill.paidAmount, bill.currency)}
-          tag={bill.paymentMethod ?? "未收款"}
-        />
-        <DetailMetric
-          label="已开票"
-          value={formatCurrency(bill.invoicedAmount, bill.currency)}
-          tag={bill.invoiceNo ?? invoiceStatusLabel(bill.invoiceStatus)}
-        />
-        <DetailMetric
-          label="账期"
-          value={`${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`}
-          tag={cycleLabel(bill.billCycle)}
-        />
-      </div>
+      <MetricGrid
+        variant="compact"
+        items={[
+          {
+            id: "payable",
+            label: "账单应收",
+            value: formatCurrency(bill.payableAmount, bill.currency),
+            tags: [billTypeLabel(bill.billType)],
+          },
+          {
+            id: "paid",
+            label: "已收金额",
+            value: formatCurrency(bill.paidAmount, bill.currency),
+            tags: [bill.paymentMethod ?? "未收款"],
+          },
+          {
+            id: "invoiced",
+            label: "已开票",
+            value: formatCurrency(bill.invoicedAmount, bill.currency),
+            tags: [bill.invoiceNo ?? invoiceStatusLabel(bill.invoiceStatus)],
+          },
+          {
+            id: "cycle",
+            label: "账期",
+            value: `${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`,
+            tags: [cycleLabel(bill.billCycle)],
+          },
+        ]}
+      />
     </section>
   );
 }
@@ -225,48 +212,55 @@ function BillingDetails({
     >
       <section className="vx-product-capability-section">
         <SectionHeading icon="key" title="基础资料" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="账单编号" value={bill.billNo} />
-          <DetailField
-            label="账单状态"
-            value={billStatusLabel(bill.billStatus)}
-          />
-          <DetailField label="账单类型" value={billTypeLabel(bill.billType)} />
-          <DetailField label="账期类型" value={cycleLabel(bill.billCycle)} />
-          <DetailField
-            label="账期开始"
-            value={formatDate(bill.cycleStartDate)}
-          />
-          <DetailField label="账期结束" value={formatDate(bill.cycleEndDate)} />
-          <DetailField label="生成时间" value={formatDate(bill.createdAt)} />
-          <DetailField label="更新时间" value={formatDate(bill.updatedAt)} />
-          <DetailField label="经办人" value={bill.operatorName} />
-          <DetailField
-            label="运营备注"
-            value={bill.operationRemark ?? "未设置"}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="账单编号">{orUnset(bill.billNo)}</DetailRow>
+          <DetailRow label="账单状态">
+            {orUnset(billStatusLabel(bill.billStatus))}
+          </DetailRow>
+          <DetailRow label="账单类型">
+            {orUnset(billTypeLabel(bill.billType))}
+          </DetailRow>
+          <DetailRow label="账期类型">
+            {orUnset(cycleLabel(bill.billCycle))}
+          </DetailRow>
+          <DetailRow label="账期开始">
+            {orUnset(formatDate(bill.cycleStartDate))}
+          </DetailRow>
+          <DetailRow label="账期结束">
+            {orUnset(formatDate(bill.cycleEndDate))}
+          </DetailRow>
+          <DetailRow label="生成时间">
+            {orUnset(formatDate(bill.createdAt))}
+          </DetailRow>
+          <DetailRow label="更新时间">
+            {orUnset(formatDate(bill.updatedAt))}
+          </DetailRow>
+          <DetailRow label="经办人">{orUnset(bill.operatorName)}</DetailRow>
+          <DetailRow label="运营备注">
+            {orUnset(bill.operationRemark)}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="buildings" title="租户与订阅" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="租户" value={bill.tenantName} />
-          <DetailField label="租户编码" value={bill.tenantCode} />
-          <DetailField label="租户类型" value={typeLabel(bill.tenantType)} />
-          <DetailField label="所属区域" value={bill.region} />
-          <DetailField label="所属行业" value={bill.industry} />
-          <DetailField
-            label="服务套餐"
-            value={bill.servicePlanName ?? "未关联"}
-          />
-          <DetailField label="套餐版本" value={bill.tierName ?? "未关联"} />
-          <DetailField label="订单编号" value={bill.orderNo ?? "未关联"} />
-          <DetailField
-            label="订阅 ID"
-            value={bill.subscriptionId ?? "未关联"}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="租户">{orUnset(bill.tenantName)}</DetailRow>
+          <DetailRow label="租户编码">{orUnset(bill.tenantCode)}</DetailRow>
+          <DetailRow label="租户类型">
+            {orUnset(typeLabel(bill.tenantType))}
+          </DetailRow>
+          <DetailRow label="所属区域">{orUnset(bill.region)}</DetailRow>
+          <DetailRow label="所属行业">{orUnset(bill.industry)}</DetailRow>
+          <DetailRow label="服务套餐">
+            {bill.servicePlanName || "未关联"}
+          </DetailRow>
+          <DetailRow label="套餐版本">{bill.tierName || "未关联"}</DetailRow>
+          <DetailRow label="订单编号">{bill.orderNo || "未关联"}</DetailRow>
+          <DetailRow label="订阅 ID">
+            {bill.subscriptionId || "未关联"}
+          </DetailRow>
+        </DetailList>
         <div className="vx-product-capability-actions vx-subscription-detail-links">
           <Button asChild variant="outline">
             <Link href={`/tenants/${encodeURIComponent(bill.tenantId)}`}>
@@ -299,41 +293,34 @@ function BillingDetails({
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="chart-bar" title="收款信息" />
-        <div className="vx-product-capability-fields">
-          <DetailField
-            label="账单原价"
-            value={formatCurrency(bill.totalAmount, bill.currency)}
-          />
-          <DetailField
-            label="优惠金额"
-            value={formatCurrency(bill.discountAmount, bill.currency)}
-          />
-          <DetailField
-            label="应收金额"
-            value={formatCurrency(bill.payableAmount, bill.currency)}
-          />
-          <DetailField
-            label="已收金额"
-            value={formatCurrency(bill.paidAmount, bill.currency)}
-          />
-          <DetailField
-            label="剩余应收"
-            value={formatCurrency(
-              Math.max(0, bill.payableAmount - bill.paidAmount),
-              bill.currency,
+        <DetailList columns={3}>
+          <DetailRow label="账单原价">
+            {orUnset(formatCurrency(bill.totalAmount, bill.currency))}
+          </DetailRow>
+          <DetailRow label="优惠金额">
+            {orUnset(formatCurrency(bill.discountAmount, bill.currency))}
+          </DetailRow>
+          <DetailRow label="应收金额">
+            {orUnset(formatCurrency(bill.payableAmount, bill.currency))}
+          </DetailRow>
+          <DetailRow label="已收金额">
+            {orUnset(formatCurrency(bill.paidAmount, bill.currency))}
+          </DetailRow>
+          <DetailRow label="剩余应收">
+            {orUnset(
+              formatCurrency(
+                Math.max(0, bill.payableAmount - bill.paidAmount),
+                bill.currency,
+              ),
             )}
-          />
-          <DetailField label="收款时间" value={formatDate(bill.paidAt)} />
-          <DetailField
-            label="支付方式"
-            value={bill.paymentMethod ?? "未设置"}
-          />
-          <DetailField
-            label="交易流水"
-            value={bill.transactionNo ?? "未设置"}
-          />
-          <DetailField label="币种" value={bill.currency} />
-        </div>
+          </DetailRow>
+          <DetailRow label="收款时间">
+            {orUnset(formatDate(bill.paidAt))}
+          </DetailRow>
+          <DetailRow label="支付方式">{orUnset(bill.paymentMethod)}</DetailRow>
+          <DetailRow label="交易流水">{orUnset(bill.transactionNo)}</DetailRow>
+          <DetailRow label="币种">{orUnset(bill.currency)}</DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">

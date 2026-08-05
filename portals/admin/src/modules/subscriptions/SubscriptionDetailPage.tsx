@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Icon, Badge, Button, EmptyState } from "@vxture/design-system";
+import {
+  Badge,
+  Button,
+  DetailList,
+  DetailRow,
+  EmptyState,
+  Icon,
+  MetricGrid,
+} from "@vxture/design-system";
+import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
 import {
   fetchSubscriptionOperation,
@@ -79,35 +88,6 @@ function SectionHeading({ icon, title }: { icon: IconName; title: string }) {
   return <DetailSectionHeading icon={icon} title={title} />;
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="vx-product-capability-field">
-      <span>{label}</span>
-      <strong>{value || "未设置"}</strong>
-    </div>
-  );
-}
-
-function DetailMetric({
-  label,
-  value,
-  tag,
-}: {
-  label: string;
-  value: string;
-  tag?: string;
-}) {
-  return (
-    <div className="vx-product-capability-metric">
-      <span>{label}</span>
-      <p>
-        <strong>{value}</strong>
-        {tag ? <em>{tag}</em> : null}
-      </p>
-    </div>
-  );
-}
-
 function SubscriptionSummary({
   subscription,
 }: {
@@ -141,28 +121,37 @@ function SubscriptionSummary({
           </div>
         </div>
       </div>
-      <div className="vx-product-capability-summary__metrics">
-        <DetailMetric
-          label="业务方案"
-          value={subscription.solutionAssociation.solutionName}
-          tag={associationSourceLabel(subscription.solutionAssociation.source)}
-        />
-        <DetailMetric
-          label="月收入"
-          value={formatMoney(subscription.monthlyRevenue)}
-          tag={cycleLabel(subscription.cycleType)}
-        />
-        <DetailMetric
-          label="配额消耗"
-          value={`${formatNumber(subscription.quota.usageRate)}%`}
-          tag={`${formatNumber(subscription.quota.maxUsers)} 席位`}
-        />
-        <DetailMetric
-          label="运营动作"
-          value={subscription.operationHint}
-          tag={subscription.autoRenew ? "自动续期" : "人工跟进"}
-        />
-      </div>
+      <MetricGrid
+        variant="compact"
+        items={[
+          {
+            id: "solution",
+            label: "业务方案",
+            value: subscription.solutionAssociation.solutionName,
+            tags: [
+              associationSourceLabel(subscription.solutionAssociation.source),
+            ],
+          },
+          {
+            id: "revenue",
+            label: "月收入",
+            value: formatMoney(subscription.monthlyRevenue),
+            tags: [cycleLabel(subscription.cycleType)],
+          },
+          {
+            id: "quota",
+            label: "配额消耗",
+            value: `${formatNumber(subscription.quota.usageRate)}%`,
+            tags: [`${formatNumber(subscription.quota.maxUsers)} 席位`],
+          },
+          {
+            id: "operation",
+            label: "运营动作",
+            value: subscription.operationHint,
+            tags: [subscription.autoRenew ? "自动续期" : "人工跟进"],
+          },
+        ]}
+      />
     </section>
   );
 }
@@ -183,73 +172,62 @@ function SubscriptionDetails({
     >
       <section className="vx-product-capability-section">
         <SectionHeading icon="database" title="基础资料" />
-        <div className="vx-product-capability-fields">
-          <DetailField label="订阅编码" value={subscription.subscriptionCode} />
-          <DetailField
-            label="订单编号"
-            value={subscription.orderNo ?? "未设置"}
-          />
-          <DetailField label="租户" value={subscription.tenantName} />
-          <DetailField
-            label="租户类型"
-            value={typeLabel(subscription.tenantType)}
-          />
-          <DetailField
-            label="订阅状态"
-            value={subscriptionStatusLabel(subscription.status)}
-          />
-          <DetailField
-            label="计费周期"
-            value={cycleLabel(subscription.cycleType)}
-          />
-          <DetailField
-            label="自动续期"
-            value={subscription.autoRenew ? "是" : "否"}
-          />
-          <DetailField label="运营创建人" value={subscription.operatorName} />
-          <DetailField
-            label="开通时间"
-            value={formatDate(subscription.startAt)}
-          />
-          <DetailField
-            label="到期时间"
-            value={formatDate(subscription.endAt)}
-          />
-          <DetailField
-            label="试用结束"
-            value={formatDate(subscription.trialEndAt)}
-          />
-          <DetailField
-            label="更新时间"
-            value={formatDate(subscription.updatedAt)}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="订阅编码">
+            {orUnset(subscription.subscriptionCode)}
+          </DetailRow>
+          <DetailRow label="订单编号">
+            {orUnset(subscription.orderNo)}
+          </DetailRow>
+          <DetailRow label="租户">{orUnset(subscription.tenantName)}</DetailRow>
+          <DetailRow label="租户类型">
+            {orUnset(typeLabel(subscription.tenantType))}
+          </DetailRow>
+          <DetailRow label="订阅状态">
+            {orUnset(subscriptionStatusLabel(subscription.status))}
+          </DetailRow>
+          <DetailRow label="计费周期">
+            {orUnset(cycleLabel(subscription.cycleType))}
+          </DetailRow>
+          <DetailRow label="自动续期">
+            {subscription.autoRenew ? "是" : "否"}
+          </DetailRow>
+          <DetailRow label="运营创建人">
+            {orUnset(subscription.operatorName)}
+          </DetailRow>
+          <DetailRow label="开通时间">
+            {orUnset(formatDate(subscription.startAt))}
+          </DetailRow>
+          <DetailRow label="到期时间">
+            {orUnset(formatDate(subscription.endAt))}
+          </DetailRow>
+          <DetailRow label="试用结束">
+            {orUnset(formatDate(subscription.trialEndAt))}
+          </DetailRow>
+          <DetailRow label="更新时间">
+            {orUnset(formatDate(subscription.updatedAt))}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="workflow" title="业务方案关联" />
-        <div className="vx-product-capability-fields">
-          <DetailField
-            label="业务方案"
-            value={subscription.solutionAssociation.solutionName}
-          />
-          <DetailField
-            label="方案编码"
-            value={
-              subscription.solutionAssociation.solutionCode ?? "未显式绑定"
-            }
-          />
-          <DetailField
-            label="套餐层级"
-            value={subscription.solutionAssociation.tierName}
-          />
-          <DetailField
-            label="关联来源"
-            value={associationSourceLabel(
-              subscription.solutionAssociation.source,
+        <DetailList columns={3}>
+          <DetailRow label="业务方案">
+            {orUnset(subscription.solutionAssociation.solutionName)}
+          </DetailRow>
+          <DetailRow label="方案编码">
+            {subscription.solutionAssociation.solutionCode || "未显式绑定"}
+          </DetailRow>
+          <DetailRow label="套餐层级">
+            {orUnset(subscription.solutionAssociation.tierName)}
+          </DetailRow>
+          <DetailRow label="关联来源">
+            {orUnset(
+              associationSourceLabel(subscription.solutionAssociation.source),
             )}
-          />
-        </div>
+          </DetailRow>
+        </DetailList>
         <div className="vx-product-capability-description">
           <p>{subscription.solutionAssociation.note}</p>
         </div>
@@ -303,40 +281,34 @@ function SubscriptionDetails({
 
       <section className="vx-product-capability-section">
         <SectionHeading icon="chart-bar" title="配额快照" />
-        <div className="vx-product-capability-fields">
-          <DetailField
-            label="最大席位"
-            value={`${formatNumber(subscription.quota.maxUsers)} 人`}
-          />
-          <DetailField
-            label="Token 配额"
-            value={formatNumber(subscription.quota.periodTokens)}
-          />
-          <DetailField
-            label="已消耗 Token"
-            value={formatNumber(subscription.quota.usedTokens)}
-          />
-          <DetailField
-            label="消耗比例"
-            value={`${formatNumber(subscription.quota.usageRate)}%`}
-          />
-          <DetailField
-            label="配额周期"
-            value={cycleLabel(subscription.quota.quotaCycle)}
-          />
-          <DetailField
-            label="允许模型"
-            value={`${formatNumber(subscription.quota.allowedModelCount)} 个`}
-          />
-          <DetailField
-            label="自定义模型"
-            value={subscription.quota.allowCustomModel ? "允许" : "不允许"}
-          />
-          <DetailField
-            label="配额风险"
-            value={quotaRiskLabel(subscription.quota.risk)}
-          />
-        </div>
+        <DetailList columns={3}>
+          <DetailRow label="最大席位">
+            {orUnset(`${formatNumber(subscription.quota.maxUsers)} 人`)}
+          </DetailRow>
+          <DetailRow label="Token 配额">
+            {orUnset(formatNumber(subscription.quota.periodTokens))}
+          </DetailRow>
+          <DetailRow label="已消耗 Token">
+            {orUnset(formatNumber(subscription.quota.usedTokens))}
+          </DetailRow>
+          <DetailRow label="消耗比例">
+            {orUnset(`${formatNumber(subscription.quota.usageRate)}%`)}
+          </DetailRow>
+          <DetailRow label="配额周期">
+            {orUnset(cycleLabel(subscription.quota.quotaCycle))}
+          </DetailRow>
+          <DetailRow label="允许模型">
+            {orUnset(
+              `${formatNumber(subscription.quota.allowedModelCount)} 个`,
+            )}
+          </DetailRow>
+          <DetailRow label="自定义模型">
+            {subscription.quota.allowCustomModel ? "允许" : "不允许"}
+          </DetailRow>
+          <DetailRow label="配额风险">
+            {orUnset(quotaRiskLabel(subscription.quota.risk))}
+          </DetailRow>
+        </DetailList>
       </section>
 
       <section className="vx-product-capability-section">
