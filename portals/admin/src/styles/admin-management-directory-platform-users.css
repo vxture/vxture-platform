@@ -15,8 +15,6 @@
 .vx-platform-user-directory-list .vx-tenant-directory-list__header > span {
   min-width: 0;
   overflow: hidden;
-  justify-self: center;
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

@@ -1,74 +1,3 @@
-.vx-order-directory-list .vx-tenant-directory-list__header > span:nth-child(2),
-.vx-order-directory-list .vx-tenant-directory-list__header > span:nth-child(3),
-.vx-order-directory-list .vx-tenant-directory-list__header > span:nth-child(4),
-.vx-order-directory-list .vx-tenant-directory-list__header > span:nth-child(5) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-billing-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(2),
-.vx-billing-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(3),
-.vx-billing-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(4) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-invoice-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(2),
-.vx-invoice-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(3),
-.vx-invoice-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(4) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-payment-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(2),
-.vx-payment-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(3),
-.vx-payment-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(4) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-order-directory-list .vx-tenant-directory-list__header > span,
-.vx-billing-directory-list .vx-tenant-directory-list__header > span,
-.vx-invoice-directory-list .vx-tenant-directory-list__header > span,
-.vx-payment-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-order-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child),
-.vx-billing-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child),
-.vx-invoice-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child),
-.vx-payment-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child) {
-  justify-self: start;
-  text-align: left;
-}
-
 .vx-order-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(
@@ -89,7 +18,6 @@
   > span:not(.vx-tenant-directory-row__index):not(
     .vx-payment-operation-row__select
   ):not(.vx-tenant-actions) {
-  justify-self: start;
   text-align: left;
 }
 

@@ -7,14 +7,7 @@
   grid-template-columns:
     var(--vx-admin-management-track-25r) var(--vx-admin-management-track-275r) minmax(0, 1.55fr) minmax(0, 0.42fr)
     minmax(0, 0.82fr) minmax(0, 1.05fr) minmax(0, 0.96fr) var(--vx-admin-management-track-5r);
-}
-
-.vx-tenant-operation-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-tenant-operation-row {
+}.vx-tenant-operation-row {
   cursor: pointer;
 }
 
@@ -91,14 +84,7 @@
 
 .vx-account-management-page .vx-tenant-directory-row {
   cursor: default;
-}
-
-.vx-account-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-account-directory-list .vx-tenant-directory-list__header > span:first-child,
+}.vx-account-directory-list .vx-tenant-directory-list__header > span:first-child,
 .vx-account-directory-list
   .vx-tenant-directory-row
   > .vx-account-operation-row__select {

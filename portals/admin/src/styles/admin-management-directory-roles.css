@@ -19,21 +19,18 @@
 .vx-admin-role-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(.vx-tenant-actions) {
-  justify-self: center;
   text-align: center;
 }
 
 .vx-admin-role-directory-list
   .vx-tenant-directory-row
   > .vx-admin-role-row__identity {
-  justify-self: start;
   text-align: left;
 }
 
 .vx-admin-role-directory-list .vx-admin-role-row__identity,
 .vx-admin-role-directory-list .vx-admin-role-row__identity > span,
 .vx-admin-role-directory-list .vx-admin-role-row__identity .vx-tenant-directory-row__title-line {
-  justify-items: start;
   justify-content: flex-start;
   text-align: left;
 }
@@ -41,8 +38,6 @@
 .vx-admin-role-directory-list
   .vx-tenant-directory-row
   > .vx-tenant-directory-row__tenant.vx-admin-role-row__identity {
-  justify-self: stretch;
-  justify-items: start;
   text-align: left;
 }
 
@@ -51,7 +46,6 @@
   > .vx-tenant-directory-row__tenant.vx-admin-role-row__identity
   > span {
   width: 100%;
-  justify-items: start;
   text-align: left;
 }
 
@@ -69,8 +63,6 @@
 .vx-admin-role-directory-list .vx-tenant-directory-list__header > span {
   min-width: 0;
   overflow: hidden;
-  justify-self: center;
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

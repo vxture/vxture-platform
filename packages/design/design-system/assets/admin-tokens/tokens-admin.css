@@ -223,6 +223,13 @@
   --vx-admin-directory-row-identity-gap: 1rem;
   --vx-admin-directory-row-identity-track: 2rem;
   --vx-admin-directory-row-inline-gap: 0.5rem;
+  /* 行内两行的节奏（2026-08-05 owner 定型）。三个值一起决定"一行数据横向能否
+   * 连读"：主信息行钉在 badge 的高度上（--space-control-2xs = 20px），首行是
+   * 文字还是标都占同样高；辅助行 16px；行距 4px = DS 的 gap-2xs，与
+   * TableTitleCell 同值。不钉高就会因为某格首行放了标而整体下沉，与邻格错开。 */
+  --vx-admin-directory-row-line-main: var(--space-control-2xs);
+  --vx-admin-directory-row-line-aux: var(--space-control-3xs);
+  --vx-admin-directory-row-line-gap: var(--space-2xs);
   --vx-admin-directory-row-padding-y: 1rem;
   --vx-admin-directory-status-dot-halo-width: 0.125rem;
   --vx-admin-directory-status-dot-icon-size: 0.6875rem;

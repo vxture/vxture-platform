@@ -10,14 +10,7 @@
 
 .vx-audit-row {
   min-height: var(--vx-admin-operations-audit-row-min-height);
-}
-
-.vx-audit-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-audit-row__result {
+}.vx-audit-row__result {
   min-width: 0;
   display: inline-flex;
   align-items: center;

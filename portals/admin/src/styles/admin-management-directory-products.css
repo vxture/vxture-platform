@@ -11,28 +11,11 @@
 
 .vx-product-management-page .vx-tenant-directory-row {
   cursor: default;
-}
-
-.vx-product-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:last-child) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-product-directory-list
+}.vx-product-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(.vx-tenant-actions) {
-  justify-self: start;
   text-align: left;
-}
-
-.vx-product-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-product-directory-list .vx-tenant-directory-list__header > span:first-child,
+}.vx-product-directory-list .vx-tenant-directory-list__header > span:first-child,
 .vx-product-directory-list
   .vx-tenant-directory-row
   > .vx-product-operation-row__select {
@@ -97,28 +80,11 @@
 
 .vx-product-plans-page .vx-tenant-directory-row {
   cursor: default;
-}
-
-.vx-product-plan-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:last-child) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-product-plan-directory-list
+}.vx-product-plan-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(.vx-tenant-actions) {
-  justify-self: start;
   text-align: left;
-}
-
-.vx-product-plan-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-product-plan-directory-list
+}.vx-product-plan-directory-list
   .vx-tenant-directory-list__header
   > span:first-child,
 .vx-product-plan-directory-list

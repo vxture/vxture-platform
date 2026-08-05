@@ -1,3 +1,11 @@
+/* admin 列表的框架层。行内的两行节奏、列对齐、表头样式都在这里定死一次，
+ * 页面 CSS 只负责各自的栅格轨道与业务色（2026-08-05 owner 定型）。
+ *
+ * 本文件在 globals.css 里排在 admin-management.css 之后，因此与页面规则同特异性
+ * 时由它兜底。页面里原有的 justify-self / justify-items 已成批改写为 text-align
+ * （对齐只留一条轴，见下），表头的逐页 text-align 已成批删除（表头一律居中）。
+ */
+
 .vx-tenant-directory-list {
   min-width: 0;
   max-width: 100%;
@@ -15,20 +23,35 @@
   align-items: center;
   gap: var(--vx-admin-directory-row-gap);
   padding: var(--vx-admin-directory-row-padding-y) 0;
+  /* 单元格铺满各自的轨道。此前是 justify-items: center——单元格先按内容收缩、
+   * 再在轨道里居中，于是"单元格在轨道里的位置"和"文字在单元格里的位置"成了
+   * 两套对齐；内容长度一变，同一列各行的首字就左右浮动，看着像居中其实错位
+   * （2026-08-05 owner 实测）。铺满之后，对齐只由 text-align 一条轴表达。 */
+  justify-items: stretch;
 }
 
+.vx-tenant-directory-list__header > *,
+.vx-tenant-directory-row > * {
+  min-width: 0;
+  justify-self: stretch;
+}
+
+/* 表头是框架信息，不是展示重点：常规字重、正文字号、一律居中。
+ * 此前 820 字重 + 逐页各自定对齐，比它标注的数据还重、还乱。 */
 .vx-tenant-directory-list__header {
-  justify-items: center;
   border-bottom: var(--vx-admin-directory-list-border-width) solid color-mix(in srgb, var(--vx-color-auth-accent) 10%, transparent);
   color: var(--tenant-muted);
-  font-size: var(--vx-admin-caption-size);
-  font-weight: 820;
+  font-size: var(--vx-admin-body-size);
+  font-weight: 400;
+  text-align: center;
+}
+
+.vx-tenant-directory-list__header > * {
   text-align: center;
 }
 
 .vx-tenant-directory-row {
   position: relative;
-  justify-items: center;
   border-bottom: var(--vx-admin-directory-list-border-width) dashed var(--vx-color-auth-border);
   background: transparent;
   color: var(--vx-color-text-secondary);
@@ -47,22 +70,19 @@
   z-index: var(--vx-z-dropdown);
 }
 
+/* 序号不加粗：它是定位用的记号，不承载信息。 */
 .vx-tenant-directory-row__index {
   color: var(--tenant-muted);
   font-size: var(--vx-admin-caption-size);
-  font-weight: 800;
+  font-weight: 400;
   text-align: center;
 }
 
-.vx-tenant-directory-list__header > span:first-child {
-  text-align: center;
-}
-
-.vx-tenant-directory-list__header > span:first-child,
-.vx-tenant-directory-list__header > span:last-child,
-.vx-tenant-directory-row__index,
+/* 只放一个控件的两根边列：控件本身有固定尺寸，text-align 管不到它（它是
+ * 栅格项，不是行内内容），得用 justify-items 把它摆到中间。 */
+.vx-tenant-directory-row > [class*="__select"],
 .vx-tenant-directory-row > .vx-tenant-actions {
-  justify-self: center;
+  justify-items: center;
   text-align: center;
 }
 
@@ -71,20 +91,33 @@
   min-width: 0;
 }
 
-.vx-tenant-directory-row
-  > span:not(.vx-tenant-directory-row__tenant):not(
-    .vx-tenant-directory-row__status
-  ):not(.vx-tenant-directory-row__service):not(
-    .vx-tenant-directory-row__active
-  ):not(.vx-tenant-directory-row__member):not(
-    .vx-tenant-directory-row__subscription
-  ):not(.vx-commercial-row__tenant):not(.vx-commercial-row__main):not(
-    .vx-commercial-row__center
-  ) {
-  min-width: 0;
+/* ── 两行节奏 ────────────────────────────────────────────────
+ * 一行数据横向要能连读：主信息之间齐平、辅助信息之间齐平。做法是把两行的
+ * 行高钉死，而不是让内容自己撑——首行有时是文字、有时是 badge，badge 比
+ * 文字高一截，不钉死就会把这一格的两行整体推下去，与邻格错开。
+ *
+ * 首行 = badge 的高度（--space-control-2xs，20px）；次行 = 16px；行距 4px，
+ * 与 DS TableTitleCell 的 gap-2xs 同值。此前非主列走的是 8px 的 grid gap
+ * 外加 small 自带的 8px margin-top，合计 16px，是主列的四倍，于是"主列两行
+ * 挨得近、其他列离得远"（2026-08-05 owner 实测）。 */
+.vx-tenant-directory-row > * {
   display: grid;
-  gap: var(--vx-admin-directory-row-cell-gap);
-  justify-items: center;
+  align-content: center;
+}
+
+/* 首行：文字、标簇、状态行都钉在 badge 的高度上。用属性选择器而不是逐个列出
+ * 类名——各页给状态行/标签行起的名字不同（`vx-order-status-line`、
+ * `vx-model-tag-line`…），但后缀是一致的，这样新页面不必再来登记一次。 */
+.vx-tenant-directory-row strong,
+.vx-tenant-directory-row [class*="title-line"],
+.vx-tenant-directory-row [class*="tag-line"],
+.vx-tenant-directory-row [class*="status-line"],
+.vx-tenant-directory-row [class*="badges"] {
+  min-height: var(--vx-admin-directory-row-line-main);
+}
+
+.vx-tenant-directory-row small {
+  min-height: var(--vx-admin-directory-row-line-aux);
 }
 
 .vx-tenant-directory-row strong,
@@ -95,31 +128,43 @@
   white-space: nowrap;
 }
 
+/* 主信息一律 body 字号：非主列此前用 --vx-admin-font-base（16px），主列用
+ * 14px，横向读过去大小不一。加粗保留——次要列靠字重把主信息挑出来，是这套
+ * 列表原本就成立的表达。 */
 .vx-tenant-directory-row strong {
   color: var(--tenant-ink);
   font-size: var(--vx-admin-body-size);
   font-weight: 800;
 }
 
+/* 辅助行是常规字重。720 那版与主信息几乎同重，两行互相抢（2026-08-05 owner
+ * 实测）——主辅层次由字号与前景色表达，不再叠字重。与 DS TableTitleCell 的
+ * 辅助行同一取值，两种写法的行看起来才是同一件。
+ *
+ * 行距挂在 `small` 上而不是单元格的 grid gap：有些格是
+ * `<span><strong/><small/></span>` 这样多包了一层（图标在外、文字在内），gap 只
+ * 作用于直接子项，够不到里面那两行。此前是 8px 的 gap 再叠 8px 的 margin-top，
+ * 合计 16px，正是主列 4px 的四倍。 */
 .vx-tenant-directory-row small {
-  margin-top: var(--vx-admin-directory-row-cell-gap);
+  margin-top: var(--vx-admin-directory-row-line-gap);
   color: var(--tenant-muted);
   font-size: var(--vx-admin-caption-size);
-  font-weight: 720;
+  font-weight: 400;
 }
 
 /* Tenant directory identity and badge styles. */
 
+/* 左侧留白：主列紧挨着序号列，不留白的话图标会贴上序号，读起来像属于序号
+ * 而不是标题（2026-08-05 owner 实测）。内部排布由 TableTitleCell 出——它是
+ * flex + gap-sm，工具类会盖掉这里的 grid 与 gap；两条仍留着，是给尚未换件的
+ * 行用的。 */
 .vx-tenant-directory-row__tenant {
-  justify-self: start;
   display: grid;
   grid-template-columns: var(--vx-admin-directory-row-identity-track) minmax(0, 1fr);
   align-items: center;
+  padding-left: var(--vx-admin-directory-row-identity-gap);
   gap: var(--vx-admin-directory-row-identity-gap);
-}
-
-.vx-tenant-directory-row__tenant strong {
-  font-size: var(--vx-admin-font-base);
+  text-align: left;
 }
 
 .vx-tenant-directory-row__title-line,
@@ -131,7 +176,17 @@
   flex-wrap: wrap;
 }
 
-.vx-tenant-directory-row__tag-line {
+/* 行内成簇的标：对齐跟所在列走。这几个类是按列的角色分的——`__title-line`
+ * 只出现在居左的主列，`__tag-line` / `__badges` / `__status-line` 只出现在居中的
+ * 标签与状态列——所以对齐能在这里一次定死，不必逐页再写。
+ * （flex 容器的子项不受 text-align 影响，故必须用 justify-content 另说一遍。） */
+.vx-tenant-directory-row__title-line {
+  justify-content: flex-start;
+}
+
+.vx-tenant-directory-row__tag-line,
+.vx-tenant-directory-row__badges,
+.vx-tenant-directory-row__status-line {
   justify-content: center;
 }
 
@@ -147,14 +202,9 @@
   flex-wrap: wrap;
 }
 
-.vx-tenant-directory-row__badges {
-  justify-content: center;
-}
-
 .vx-tenant-directory-row__status-line {
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: var(--vx-admin-directory-row-inline-gap);
 }

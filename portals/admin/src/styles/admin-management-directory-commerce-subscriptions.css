@@ -13,14 +13,7 @@
     var(--vx-admin-management-track-25r) var(--vx-admin-management-track-275r) minmax(0, 1.12fr) minmax(0, 0.88fr)
     minmax(0, 0.84fr) minmax(0, 0.78fr) minmax(0, 0.64fr)
     minmax(0, 0.64fr) var(--vx-admin-management-track-5r);
-}
-
-.vx-subscription-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-subscription-directory-list
+}.vx-subscription-directory-list
   .vx-tenant-directory-list__header
   > span:first-child,
 .vx-subscription-directory-list
@@ -139,24 +132,9 @@
     var(--vx-admin-management-track-25r) var(--vx-admin-management-track-275r) minmax(0, 1.04fr) minmax(0, 0.94fr)
     minmax(0, 0.88fr) minmax(0, 0.74fr) minmax(0, 0.62fr)
     minmax(0, 0.62fr) var(--vx-admin-management-track-5r);
-}
-
-.vx-product-solution-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-product-solution-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:last-child) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-product-solution-directory-list
+}.vx-product-solution-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(.vx-tenant-actions) {
-  justify-self: start;
   text-align: left;
 }
 
@@ -222,17 +200,4 @@
   .vx-tenant-directory-list__header
   > span:last-child {
   z-index: 4;
-}
-
-.vx-subscription-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(2),
-.vx-subscription-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(3),
-.vx-subscription-directory-list
-  .vx-tenant-directory-list__header
-  > span:nth-child(4) {
-  justify-self: start;
-  text-align: left;
 }

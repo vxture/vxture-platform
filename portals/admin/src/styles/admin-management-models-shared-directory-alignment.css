@@ -77,7 +77,9 @@
   cursor: pointer;
   font: inherit;
   font-size: var(--vx-admin-body-size);
-  font-weight: 800;
+  /* 与 DS TableTitleCell 的主信息同一字重。800 那版是"链接改扮标题"留下的
+   * 补偿——当时整行是蓝色链接，只能靠重字压住；现在颜色本身就说明了层次。 */
+  font-weight: 500;
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -92,9 +94,7 @@
   .vx-tenant-directory-row
   > .vx-tenant-directory-row__tenant.vx-admin-role-row__identity {
   width: 100%;
-  justify-self: stretch;
   justify-content: start;
-  justify-items: start;
   text-align: left;
 }
 
@@ -108,6 +108,5 @@
   .vx-tenant-directory-row__title-line {
   width: 100%;
   justify-content: flex-start;
-  justify-items: start;
   text-align: left;
 }

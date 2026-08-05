@@ -75,27 +75,7 @@
   color: var(--tenant-muted);
   font-size: var(--vx-admin-caption-size);
   font-weight: 700;
-}
-
-/* Ops todo and ticket directory cell alignment styles. */
-
-.vx-ops-todo-directory-list .vx-tenant-directory-list__header > span,
-.vx-ticket-directory-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-ops-todo-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child),
-.vx-ticket-directory-list
-  .vx-tenant-directory-list__header
-  > span:not(:first-child):not(:nth-child(2)):not(:last-child) {
-  justify-self: start;
-  text-align: left;
-}
-
-.vx-ops-todo-directory-list
+}.vx-ops-todo-directory-list
   .vx-tenant-directory-row
   > span:not(.vx-tenant-directory-row__index):not(
     .vx-ops-todo-operation-row__select
@@ -105,7 +85,6 @@
   > span:not(.vx-tenant-directory-row__index):not(
     .vx-ticket-operation-row__select
   ):not(.vx-tenant-actions) {
-  justify-self: start;
   text-align: left;
 }
 

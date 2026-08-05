@@ -48,16 +48,7 @@
   color: var(--vx-console-muted);
   font-size: var(--vx-admin-meta-size);
   white-space: nowrap;
-}
-
-/* Admin platform governance sticky header styles. */
-
-.vx-platform-governance-list .vx-tenant-directory-list__header > span {
-  justify-self: center;
-  text-align: center;
-}
-
-.vx-platform-governance-list
+}.vx-platform-governance-list
   .vx-tenant-directory-list__header
   > span:first-child,
 .vx-platform-governance-list
@@ -171,7 +162,6 @@
 .vx-platform-governance-list
   .vx-tenant-directory-row
   > .vx-tenant-directory-row__tenant {
-  justify-self: start;
   text-align: left;
 }
 
