@@ -124,35 +124,12 @@
   border-radius: var(--vx-admin-management-radius-05r) var(--vx-admin-management-radius-05r) 0 0;
   background: transparent;
 }
-.vx-tenant-toolbar .vx-input {
-  height: var(--vx-admin-management-size-25r);
-  min-height: var(--vx-admin-management-size-25r);
-  padding-block: 0;
-  border-radius: var(--vx-radius-lg);
-  font-size: var(--vx-admin-meta-size);
-  font-weight: 400;
-}
-
+/* 控件外观归 DS：这里原本把 Input 重画了一遍——40px 高、自己的描边与焦点环，
+   于是工具行里搜索框比按钮和下拉高出一截。基准控件高度 32px（--space-control-md），
+   由 DS 的件统一出（owner 2026-08-06）。 */
 .vx-tenant-search {
   width: clamp(var(--vx-admin-management-size-11r-large), 14vw, var(--vx-admin-management-size-17r));
   flex: 0 0 clamp(var(--vx-admin-management-size-11r-large), 14vw, var(--vx-admin-management-size-17r));
-}
-
-.vx-tenant-toolbar .vx-input {
-  border: var(--vx-admin-management-line-width-1p) solid var(--vx-color-auth-border);
-  background-color: transparent;
-  color: var(--vx-color-text-secondary);
-}
-
-.vx-tenant-toolbar .vx-input::placeholder {
-  color: var(--vx-color-gray-400);
-  font-weight: 400;
-}
-
-.vx-tenant-toolbar .vx-input:focus {
-  border-color: color-mix(in srgb, var(--vx-color-auth-accent) 32%, transparent);
-  outline: var(--vx-admin-management-line-width-2p) solid color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
-  outline-offset: 0;
 }
 
 .vx-tenant-filters {
@@ -163,15 +140,11 @@
   flex: 0 1 auto;
 }
 
+/* 只留宽度。外观、内边距、箭头都归 DS 的 NativeSelect——这里原本自绘了第二个
+   箭头（data-uri 的 chevron），与件自带的那个重叠成两个（owner 2026-08-06 实测）。 */
 .vx-tenant-select {
-  appearance: none;
   width: var(--vx-admin-management-size-75r);
   min-width: 0;
-  padding-right: var(--vx-admin-management-space-225r);
-  background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.5 5.25L7 8.75L10.5 5.25' stroke='%2394A3B8' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--vx-admin-management-pattern-075r) center;
-  background-size: var(--vx-admin-management-pattern-0875r);
 }
 
 .vx-tenant-select option {

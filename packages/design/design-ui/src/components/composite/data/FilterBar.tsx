@@ -4,10 +4,17 @@
  * @layer Presentation
  * @category Components - Pattern
  *
- * 结构（owner 拍板 2026-08-03，二次修订）：
- * 居左【{视图切换} {计数}】—【自适应留白】—居右【{搜索/筛选组（children）} {主操作（actions）}】。
+ * 结构（owner 拍板 2026-08-03，三次修订 2026-08-06）：
+ * 居左【{视图切换} {计数}】—【自适应留白】—居右【{搜索} {重置} {筛选组} {操作区}】。
  * 视图切换与计数是可选段：不传 `view` / `count` 时左段为空，右段照常靠右。
  * 标题与描述由 `SectionHeader` 承担——板块的标题层级只有一个来源。
+ *
+ * **右段顺序是契约，不是建议**：`search` / `onReset` / `children`（筛选组）/ `actions`
+ * 四个槽按此顺序渲染，调用方给什么都改不了先后。此前右段只有 children 与 actions 两
+ * 段自由拼，于是 22 个列表页的搜索框、重置、下拉各排各的顺序（owner 2026-08-06）。
+ *
+ * 重置是图标按钮而非文字按钮：它跟在搜索框后面，一个"清空"的动作不该占掉与筛选项
+ * 同等的横向宽度。
  *
  * 相对原实现：删 `title` / `description`（原先自己渲染 h2，与 SectionHeader 的
  * h2 排版不一致）；`filters` 与 `children` 二选一改为只用 `children`。
@@ -15,13 +22,27 @@
 
 import * as React from "react";
 import { cn } from "../../../utils/cn";
+import { Icon } from "../../../icons";
+import { Button } from "../../base/form/Button";
 import { ViewModeSwitch, type ViewModeSwitchValue } from "./ViewModeSwitch";
 
 /** 与 `ViewModeSwitchValue` 同一个值域；保留别名是因为调用方按板块命名。 */
 export type FilterBarView = ViewModeSwitchValue;
 
 export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** 右侧操作区，通常是"新建"一类的主动作。 */
+  /** 搜索框，右段第一位。 */
+  readonly search?: React.ReactNode;
+  /** 给了就出重置图标按钮，排在搜索之后、筛选组之前。 */
+  readonly onReset?: () => void;
+  /** 重置按钮的读屏说法，缺省"重置筛选"。 */
+  readonly resetLabel?: string;
+  /**
+   * 右段末位的操作区：导出、新建一类作用于整个列表的动作。
+   *
+   * 两条约定归调用方执行，本件只管位置：导出以选中项为对象，无选中时禁用、有选中
+   * 时升为主按钮；新建是主按钮，无权限时禁用，业务上没有"新建"这回事就整个不给
+   * （owner 2026-08-06）。
+   */
   readonly actions?: React.ReactNode;
   /** 给了才出 list/cards 视图切换（工具行最左）。 */
   readonly view?: FilterBarView;
@@ -32,7 +53,18 @@ export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
   function FilterBar(
-    { className, actions, view, onViewChange, count, children, ...props },
+    {
+      className,
+      search,
+      onReset,
+      resetLabel = "重置筛选",
+      actions,
+      view,
+      onViewChange,
+      count,
+      children,
+      ...props
+    },
     ref,
   ) {
     return (
@@ -58,8 +90,20 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
             </span>
           ) : null}
         </div>
-        {/* 右段：搜索 / 筛选组 / 主操作，一起靠右；中间由 justify-between 留白。 */}
+        {/* 右段：搜索 → 重置 → 筛选组 → 操作区，一起靠右；中间由 justify-between 留白。 */}
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-sm">
+          {search}
+          {onReset ? (
+            <Button
+              variant="ghost"
+              size="icon-md"
+              onClick={onReset}
+              aria-label={resetLabel}
+              title={resetLabel}
+            >
+              <Icon name="x" size="sm" aria-hidden="true" />
+            </Button>
+          ) : null}
           {children}
           {actions}
         </div>

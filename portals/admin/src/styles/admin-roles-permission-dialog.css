@@ -74,7 +74,6 @@
 
 .vx-admin-role-permission-dialog__close {
   width: var(--vx-admin-roles-size-25r);
-  height: var(--vx-admin-roles-size-25r);
   display: inline-grid;
   place-items: center;
   border: 0;

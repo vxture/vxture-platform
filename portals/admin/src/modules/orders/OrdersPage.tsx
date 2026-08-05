@@ -8,7 +8,6 @@ import {
   Badge,
   Banner,
   BulkActionBar,
-  Button,
   Checkbox,
   EmptyState,
   FilterBar,
@@ -761,38 +760,40 @@ export function OrdersPage() {
             onViewChange={setViewMode}
             count={formatNumber(filteredOrders.length)}
             aria-label="订单筛选"
+            search={
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="搜索订单、租户、方案、账单"
+                className="vx-tenant-search vx-order-search"
+                aria-label="搜索订单"
+              />
+            }
+            onReset={handleReset}
             actions={
               <>
+                {/* 导出以选中项为对象：没选就没有导出的对象，选了就是当下要做的事。
+                    此前它导出全部筛选结果，与批量条里的"导出所选"是两个入口做同一件事。 */}
                 <ActionButton
-                  variant="outline"
+                  variant={selectedOrderIds.size > 0 ? "default" : "outline"}
                   icon="arrow-down"
                   onClick={() =>
                     exportRowsToCsv(
                       "orders-export",
                       ORDER_CSV_COLUMNS,
-                      filteredOrders,
+                      selectedOrders,
                     )
                   }
-                  disabled={filteredOrders.length === 0}
+                  disabled={selectedOrderIds.size === 0}
                 >
-                  导出全部
+                  导出
                 </ActionButton>
-                <ActionButton variant="outline" icon="plus" disabled>
+                <ActionButton icon="plus" disabled>
                   补录订单
                 </ActionButton>
               </>
             }
           >
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="搜索订单、租户、方案、账单"
-              className="vx-tenant-search vx-order-search"
-              aria-label="搜索订单"
-            />
-            <Button variant="outline" onClick={handleReset}>
-              重置
-            </Button>
             <div className="vx-tenant-filters">
               <NativeSelect
                 className="vx-tenant-select"
