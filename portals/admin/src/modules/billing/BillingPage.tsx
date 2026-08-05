@@ -16,7 +16,11 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  ListCardGrid,
+  MetricListCard,
 } from "@vxture/design-system";
+import { resolveStatusTone } from "@vxture/shared";
+import { BILL_STATUS_TONE } from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -528,83 +532,71 @@ function BillingCards({
   const router = useRouter();
 
   return (
-    <div
-      className="vx-tenant-directory-cards vx-billing-cards"
-      aria-label="账单中心卡片"
-    >
+    <ListCardGrid aria-label="账单中心卡片">
       {bills.map((bill) => (
-        <article
+        <MetricListCard
           key={bill.id}
-          className={joinClasses(
-            "vx-tenant-directory-card",
-            `vx-billing-card--${bill.billStatus}`,
-          )}
-          role="button"
-          tabIndex={0}
+          icon="key"
+          title={bill.billNo}
+          description={`${bill.tenantName} · ${bill.tierName ?? "未关联套餐"}`}
+          tone={resolveStatusTone(BILL_STATUS_TONE, bill.billStatus)}
           onClick={() => router.push(`/billing/${encodeURIComponent(bill.id)}`)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter")
-              router.push(`/billing/${encodeURIComponent(bill.id)}`);
-          }}
-        >
-          <header>
-            <Icon name="key" size="lg" fallback="placeholder" />
-            <div>
-              <strong>{bill.billNo}</strong>
-              <span>
-                {bill.tenantName} · {bill.tierName ?? "未关联套餐"}
-              </span>
-            </div>
+          actions={
             <BillingActionsMenu bill={bill} onSyncInvoice={onSyncInvoice} />
-          </header>
-          <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
-            >
-              {billStatusLabel(bill.billStatus)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
-            >
-              {invoiceStatusLabel(bill.invoiceStatus)}
-            </Badge>
-            {billingExceptionTags(bill).map((tag) => (
+          }
+          badges={
+            <>
               <Badge
-                key={tag.key}
-                className={`vx-tenant-pill vx-billing-exception-pill vx-billing-exception-pill--${tag.tone}`}
-                title={tag.title}
+                className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
               >
-                {tag.label}
+                {billStatusLabel(bill.billStatus)}
               </Badge>
-            ))}
-          </div>
-          <p className="vx-billing-card__plan">
-            {bill.servicePlanName ?? bill.orderNo ?? "未关联订阅"}
-          </p>
-          <div className="vx-tenant-directory-card__metrics">
-            <span>
-              <b>{formatCurrency(bill.payableAmount, bill.currency)}</b>
-              <small>账单应收</small>
-            </span>
-            <span>
-              <b>{formatCurrency(bill.paidAmount, bill.currency)}</b>
-              <small>已收金额</small>
-            </span>
-            <span>
-              <b>{formatCurrency(bill.invoicedAmount, bill.currency)}</b>
-              <small>已开票</small>
-            </span>
-          </div>
-          <footer>
-            <span>
-              {formatDate(bill.cycleStartDate)} -{" "}
-              {formatDate(bill.cycleEndDate)}
-            </span>
-            <strong>{bill.operatorName}</strong>
-          </footer>
-        </article>
+              <Badge
+                className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
+              >
+                {invoiceStatusLabel(bill.invoiceStatus)}
+              </Badge>
+              {billingExceptionTags(bill).map((tag) => (
+                <Badge
+                  key={tag.key}
+                  className={`vx-tenant-pill vx-billing-exception-pill vx-billing-exception-pill--${tag.tone}`}
+                  title={tag.title}
+                >
+                  {tag.label}
+                </Badge>
+              ))}
+            </>
+          }
+          note={bill.servicePlanName ?? bill.orderNo ?? "未关联订阅"}
+          metrics={[
+            {
+              key: "payable",
+              value: formatCurrency(bill.payableAmount, bill.currency),
+              label: "账单应收",
+            },
+            {
+              key: "paid",
+              value: formatCurrency(bill.paidAmount, bill.currency),
+              label: "已收金额",
+            },
+            {
+              key: "invoiced",
+              value: formatCurrency(bill.invoicedAmount, bill.currency),
+              label: "已开票",
+            },
+          ]}
+          footer={
+            <>
+              <span className="truncate">
+                {formatDate(bill.cycleStartDate)} -{" "}
+                {formatDate(bill.cycleEndDate)}
+              </span>
+              <span className="shrink-0">{bill.operatorName}</span>
+            </>
+          }
+        />
       ))}
-    </div>
+    </ListCardGrid>
   );
 }
 

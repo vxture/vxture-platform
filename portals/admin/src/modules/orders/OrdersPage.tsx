@@ -16,7 +16,11 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  ListCardGrid,
+  MetricListCard,
 } from "@vxture/design-system";
+import { resolveStatusTone } from "@vxture/shared";
+import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -402,77 +406,70 @@ function OrderCards({
   const router = useRouter();
 
   return (
-    <div
-      className="vx-tenant-directory-cards vx-order-cards"
-      aria-label="订单管理卡片"
-    >
+    <ListCardGrid aria-label="订单管理卡片">
       {orders.map((order) => (
-        <article
+        <MetricListCard
           key={order.id}
-          className={joinClasses(
-            "vx-tenant-directory-card",
-            `vx-order-card--${order.orderStatus}`,
-          )}
-          role="button"
-          tabIndex={0}
+          icon="table"
+          title={order.orderNo}
+          description={`${order.tenantName} · ${order.tierName}`}
+          /* 顶缘语气取订单态。此前走 `vx-order-card--${status}` 的 CSS，
+           * 但那条 border-top 的宽度是已退役的 --vx-admin-* 变量，整条声明失效，
+           * 色条实际一直没显示出来。 */
+          tone={resolveStatusTone(ORDER_STATUS_TONE, order.orderStatus)}
           onClick={() => router.push(`/orders/${encodeURIComponent(order.id)}`)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter")
-              router.push(`/orders/${encodeURIComponent(order.id)}`);
-          }}
-        >
-          <header>
-            <Icon name="table" size="lg" fallback="placeholder" />
-            <div>
-              <strong>{order.orderNo}</strong>
-              <span>
-                {order.tenantName} · {order.tierName}
-              </span>
-            </div>
+          actions={
             <OrderActionsMenu
               order={order}
               onConfirmPayment={onConfirmPayment}
             />
-          </header>
-          <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
-            >
-              {orderStatusLabel(order.orderStatus)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-order-pill--payment-${order.paymentStatus}`}
-            >
-              {paymentStatusLabel(order.paymentStatus)}
-            </Badge>
-            <Badge className="vx-tenant-pill vx-order-pill--source">
-              {paySourceLabel(order.paySource)}
-            </Badge>
-          </div>
-          <p className="vx-order-card__solution">
-            {order.solutionName} · {order.servicePlanName}
-          </p>
-          <div className="vx-tenant-directory-card__metrics">
-            <span>
-              <b>{formatCurrency(order.amount, order.currency)}</b>
-              <small>订单金额</small>
-            </span>
-            <span>
-              <b>{formatCurrency(order.paidAmount, order.currency)}</b>
-              <small>已收金额</small>
-            </span>
-            <span>
-              <b>{cycleLabel(order.cycleType)}</b>
-              <small>计费周期</small>
-            </span>
-          </div>
-          <footer>
-            <span>{order.operationHint}</span>
-            <strong>{formatDate(order.confirmedAt ?? order.updatedAt)}</strong>
-          </footer>
-        </article>
+          }
+          badges={
+            <>
+              <Badge
+                className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
+              >
+                {orderStatusLabel(order.orderStatus)}
+              </Badge>
+              <Badge
+                className={`vx-tenant-pill vx-order-pill--payment-${order.paymentStatus}`}
+              >
+                {paymentStatusLabel(order.paymentStatus)}
+              </Badge>
+              <Badge className="vx-tenant-pill vx-order-pill--source">
+                {paySourceLabel(order.paySource)}
+              </Badge>
+            </>
+          }
+          note={`${order.solutionName} · ${order.servicePlanName}`}
+          metrics={[
+            {
+              key: "amount",
+              value: formatCurrency(order.amount, order.currency),
+              label: "订单金额",
+            },
+            {
+              key: "paid",
+              value: formatCurrency(order.paidAmount, order.currency),
+              label: "已收金额",
+            },
+            {
+              key: "cycle",
+              value: cycleLabel(order.cycleType),
+              label: "计费周期",
+            },
+          ]}
+          footer={
+            <>
+              <span className="truncate">{order.operationHint}</span>
+              <span className="shrink-0">
+                {formatDate(order.confirmedAt ?? order.updatedAt)}
+              </span>
+            </>
+          }
+        />
       ))}
-    </div>
+    </ListCardGrid>
   );
 }
 

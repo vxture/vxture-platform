@@ -17,6 +17,7 @@
  * 个业务域 17 处）：
  *   header  图标 · 标题/副标题 · 行操作
  *   badges  一排状态徽章（可选）
+ *   note    整宽的一段说明（可选）
  *   metrics 等宽读数（2–4 列）
  *   footer  补充事实（可选）
  *
@@ -44,6 +45,15 @@ export interface MetricListCardProps {
   readonly actions?: React.ReactNode;
   /** 一排状态徽章。由调用方给成品 Badge——它们的语气来自业务状态，不归本件。 */
   readonly badges?: React.ReactNode;
+  /**
+   * 徽章与读数之间那段整宽说明。
+   *
+   * 与 `description` 分工：`description` 是标题的副标题（跟着标题截断成一行），
+   * `note` 是卡片主体里独立的一段（订单卡的"业务方案 · 服务套餐"、账单卡的关联
+   * 账单、方案卡的方案描述 + 一排能力标）。admin 十六个列表卡里九个有这一段，
+   * 塞进 `description` 会让副标题变成两件事拼起来的长句。
+   */
+  readonly note?: React.ReactNode;
   /** 等宽读数。2–4 个之间；超过 4 个一行读不过来，该换成详情页。 */
   readonly metrics?: readonly MetricListCardMetric[];
   readonly footer?: React.ReactNode;
@@ -75,6 +85,7 @@ const MetricListCard = React.forwardRef<HTMLElement, MetricListCardProps>(
       icon,
       actions,
       badges,
+      note,
       metrics,
       footer,
       tone,
@@ -143,6 +154,12 @@ const MetricListCard = React.forwardRef<HTMLElement, MetricListCardProps>(
 
         {badges ? (
           <div className="flex flex-wrap items-center gap-2xs">{badges}</div>
+        ) : null}
+
+        {note ? (
+          <div className="min-w-0 text-body-sm text-muted-foreground">
+            {note}
+          </div>
         ) : null}
 
         {metrics && metrics.length > 0 ? (

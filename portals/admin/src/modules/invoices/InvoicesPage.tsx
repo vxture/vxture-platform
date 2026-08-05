@@ -17,7 +17,11 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  ListCardGrid,
+  MetricListCard,
 } from "@vxture/design-system";
+import { resolveStatusTone } from "@vxture/shared";
+import { INVOICE_STATUS_TONE } from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -462,96 +466,82 @@ function InvoiceCards({
   const router = useRouter();
 
   return (
-    <div
-      className="vx-tenant-directory-cards vx-invoice-cards"
-      aria-label="线下发票卡片"
-    >
+    <ListCardGrid aria-label="线下发票卡片">
       {invoices.map((invoice) => (
-        <article
+        <MetricListCard
           key={invoice.id}
-          className={joinClasses(
-            "vx-tenant-directory-card",
-            `vx-invoice-card--${invoice.invoiceStatus}`,
-          )}
-          role="button"
-          tabIndex={0}
+          icon="key"
+          title={invoice.invoiceNo}
+          description={`${invoice.tenantName} · ${invoice.invoiceTitle}`}
+          tone={resolveStatusTone(INVOICE_STATUS_TONE, invoice.invoiceStatus)}
           onClick={() =>
             router.push(`/billing/${encodeURIComponent(invoice.billId)}`)
           }
-          onKeyDown={(event) => {
-            if (event.key === "Enter")
-              router.push(`/billing/${encodeURIComponent(invoice.billId)}`);
-          }}
-        >
-          <header>
-            <Icon name="key" size="lg" fallback="placeholder" />
-            <div>
-              <strong>{invoice.invoiceNo}</strong>
-              <span>
-                {invoice.tenantName} · {invoice.invoiceTitle}
-              </span>
-            </div>
+          actions={
             <InvoiceActionsMenu
               invoice={invoice}
               onReceiptAction={onReceiptAction}
             />
-          </header>
-          <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
-            >
-              {invoiceStatusLabel(invoice.invoiceStatus)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-invoice-pill--tax-${invoice.invoiceTaxType}`}
-            >
-              {taxTypeLabel(invoice.invoiceTaxType)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-invoice-pill--type-${invoice.invoiceType}`}
-            >
-              {invoiceTypeLabel(invoice.invoiceType)}
-            </Badge>
-          </div>
-          <p className="vx-invoice-card__bill">
-            {invoice.billNo} ·{" "}
-            {invoice.servicePlanName ?? invoice.orderNo ?? "未关联订阅"}
-          </p>
-          <div className="vx-tenant-directory-card__metrics">
-            <span>
-              <b>{formatCurrency(invoice.invoiceAmount, invoice.currency)}</b>
-              <small>开票金额</small>
-            </span>
-            <span>
-              <b>
-                {formatCurrency(invoice.billPayableAmount, invoice.currency)}
-              </b>
-              <small>账单应收</small>
-            </span>
-            <span>
-              <b>
-                {invoice.expressNo
-                  ? "已寄送"
-                  : invoice.invoiceStatus === "finished"
-                    ? "已完成"
-                    : "待处理"}
-              </b>
-              <small>交付状态</small>
-            </span>
-          </div>
-          <footer>
-            <span>
-              {formatDate(invoice.issuedAt)} · {invoice.auditorName}
-            </span>
-            <strong>
-              {invoice.sourceLabel === "offline"
-                ? "线下登记"
-                : invoice.sourceLabel}
-            </strong>
-          </footer>
-        </article>
+          }
+          badges={
+            <>
+              <Badge
+                className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
+              >
+                {invoiceStatusLabel(invoice.invoiceStatus)}
+              </Badge>
+              <Badge
+                className={`vx-tenant-pill vx-invoice-pill--tax-${invoice.invoiceTaxType}`}
+              >
+                {taxTypeLabel(invoice.invoiceTaxType)}
+              </Badge>
+              <Badge
+                className={`vx-tenant-pill vx-invoice-pill--type-${invoice.invoiceType}`}
+              >
+                {invoiceTypeLabel(invoice.invoiceType)}
+              </Badge>
+            </>
+          }
+          note={`${invoice.billNo} · ${invoice.servicePlanName ?? invoice.orderNo ?? "未关联订阅"}`}
+          metrics={[
+            {
+              key: "invoiced",
+              value: formatCurrency(invoice.invoiceAmount, invoice.currency),
+              label: "开票金额",
+            },
+            {
+              key: "payable",
+              value: formatCurrency(
+                invoice.billPayableAmount,
+                invoice.currency,
+              ),
+              label: "账单应收",
+            },
+            {
+              key: "delivery",
+              value: invoice.expressNo
+                ? "已寄送"
+                : invoice.invoiceStatus === "finished"
+                  ? "已完成"
+                  : "待处理",
+              label: "交付状态",
+            },
+          ]}
+          footer={
+            <>
+              <span className="truncate">
+                {formatDate(invoice.issuedAt)} · {invoice.auditorName}
+              </span>
+              <span className="shrink-0">
+                {invoice.sourceLabel === "offline"
+                  ? "线下登记"
+                  : invoice.sourceLabel}
+              </span>
+            </>
+          }
+        />
       ))}
-    </div>
+    </ListCardGrid>
   );
 }
 
