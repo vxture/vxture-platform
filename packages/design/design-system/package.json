@@ -10,6 +10,20 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.mjs",
+      "require": "./dist/server.cjs"
+    },
+    "./styles/admin-tokens.css": "./assets/admin-tokens.css",
+    "./styles/auth.css": "./src/styles/auth.css",
+    "./styles/brand.css": "./src/styles/brand.css",
+    "./styles/brands/ruyin.css": "./src/styles/brands/ruyin.css",
+    "./styles/brands/vxture.css": "./src/styles/brands/vxture.css",
+    "./styles/fullscreen.css": "./src/styles/fullscreen.css",
+    "./styles/globals.css": "./src/styles/globals.css",
+    "./styles/shell-template-user-panel.css": "./assets/shell-template-user-panel.css",
+    "./styles/shell-template.css": "./assets/shell-template.css",
     "./tokens": {
       "types": "./dist/tokens.d.ts",
       "import": "./dist/tokens.mjs",
@@ -19,20 +33,7 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.mjs",
       "require": "./dist/types.cjs"
-    },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.mjs",
-      "require": "./dist/server.cjs"
-    },
-    "./styles/auth.css": "./src/styles/auth.css",
-    "./styles/brand.css": "./src/styles/brand.css",
-    "./styles/fullscreen.css": "./src/styles/fullscreen.css",
-    "./styles/globals.css": "./src/styles/globals.css",
-    "./styles/shell-template.css": "./assets/shell-template.css",
-    "./styles/shell-template-user-panel.css": "./assets/shell-template-user-panel.css",
-    "./styles/brands/vxture.css": "./src/styles/brands/vxture.css",
-    "./styles/brands/ruyin.css": "./src/styles/brands/ruyin.css"
+    }
   },
   "files": [
     "dist",
