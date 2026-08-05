@@ -5,17 +5,26 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import {
   Button,
+  FactList,
   Icon,
+  LabeledValue,
+  LevelMarker,
   MetricGrid,
   PanelCard,
+  PanelItem,
+  PanelList,
   Section,
   SectionHeader,
   StatCard,
+  StatusBadge,
+  TableTitleCell,
   ViewHeader,
+  ViewLayout,
 } from "@vxture/design-system";
 import { toStatusTone } from "@/modules/shared/tone";
 import type {
   IconName,
+  Level,
   MetricGridItem,
   StatusBadgeTone,
 } from "@vxture/design-system";
@@ -513,6 +522,52 @@ function metricToneClass(tone: Tone = "blue") {
   return `admin-overview-tone admin-overview-tone--${tone}`;
 }
 
+const TONE_TEXT: Record<StatusBadgeTone, string> = {
+  neutral: "text-muted-foreground",
+  brand: "text-primary-text",
+  info: "text-info-text",
+  success: "text-success-text",
+  warning: "text-warning-text",
+  danger: "text-destructive-text",
+};
+
+/** 名次 → 等级：第 1 名最高（L5），第 5 名及以后落到 L1。 */
+function rankLevel(rank: number): Level {
+  return Math.min(5, Math.max(1, 6 - rank)) as Level;
+}
+
+/** 前三名有徽章图，之后回落到等级记号——图只有三张。 */
+function RankMedal({ rank }: { rank: number }) {
+  if (rank > 3) {
+    return (
+      <LevelMarker level={rankLevel(rank)} aria-label={`第 ${rank} 名`}>
+        {rank}
+      </LevelMarker>
+    );
+  }
+
+  return (
+    <span
+      className={`admin-overview-rank-medal admin-overview-rank-medal--${rank}`}
+      role="img"
+      aria-label={`第 ${rank} 名`}
+    />
+  );
+}
+
+/** 读数的单位（万 / % / K）压小一档，与读数同基线。 */
+function metricValueNode(value: string) {
+  const { prefix, number, unit } = splitMetricValue(value);
+
+  return (
+    <>
+      {prefix}
+      {number}
+      {unit ? <small className="text-body-sm font-normal">{unit}</small> : null}
+    </>
+  );
+}
+
 /** 面板头右端的"详情"入口，四处面板同一个写法。 */
 function DetailLink({ href }: { href: string }) {
   return (
@@ -838,36 +893,6 @@ function splitMetricValue(value: string) {
   };
 }
 
-function MetricValue({
-  value,
-  className,
-  danger,
-  as = "strong",
-}: {
-  value: string;
-  className?: string;
-  danger?: boolean;
-  as?: "strong" | "b";
-}) {
-  const valueParts = splitMetricValue(value);
-  const Tag = as;
-  const classNames = [
-    "admin-overview-metric-value",
-    className,
-    danger ? "admin-overview-metric-value--danger" : undefined,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  return (
-    <Tag className={classNames}>
-      {valueParts.prefix}
-      {valueParts.number}
-      {valueParts.unit ? <small>{valueParts.unit}</small> : null}
-    </Tag>
-  );
-}
-
 interface BusinessCardMetric {
   label: string;
   value: string;
@@ -1083,41 +1108,38 @@ function businessCardMetrics(
   ];
 }
 
-function BusinessMetricCard({ metric }: { metric: BusinessCardMetric }) {
+/** 一条经营读数：图标 · 标签与读数 · 右侧事实。 */
+function BusinessMetricRow({ metric }: { metric: BusinessCardMetric }) {
+  const tone = metric.tone ? toStatusTone(metric.tone) : "brand";
+
   return (
-    <article
-      className={`admin-overview-business-card ${metricToneClass(metric.tone)}`}
-    >
-      <span className="admin-overview-business-card__icon" aria-hidden="true">
-        <Icon name={metric.icon} size="lg" fallback="placeholder" />
-      </span>
-      <div className="admin-overview-business-card__main">
-        <span>
-          {metric.label}
-          <DetailTip detail={metric.detail} />
+    <PanelItem
+      lead={
+        <span className={TONE_TEXT[tone]} aria-hidden="true">
+          <Icon name={metric.icon} size="lg" fallback="placeholder" />
         </span>
-        <span className="admin-overview-business-card__value-line">
-          <MetricValue
-            value={metric.value}
-            danger={isNegativeDisplayValue(metric.value)}
-          />
-          {metric.valueTag ? <em>{metric.valueTag}</em> : null}
-        </span>
-      </div>
-      <div className="admin-overview-business-card__minor">
-        {metric.minor.map((item) => (
-          <div
-            key={item.label}
-            className={`admin-overview-business-card__minor-item ${item.tone === "rose" ? "admin-overview-business-card__minor-item--danger" : ""}`}
-          >
-            <small>{item.label}</small>
-            <span className="admin-overview-business-card__minor-value">
-              {displayMinorValue(item.label, item.value)}
-            </span>
-          </div>
-        ))}
-      </div>
-    </article>
+      }
+      main={
+        <LabeledValue
+          label={metric.label}
+          labelSuffix={<DetailTip detail={metric.detail} />}
+          value={metricValueNode(metric.value)}
+          tone={isNegativeDisplayValue(metric.value) ? "danger" : tone}
+          {...(metric.valueTag
+            ? { valueTag: metric.valueTag, valueTagTone: tone }
+            : {})}
+        />
+      }
+      trail={
+        <FactList
+          facts={metric.minor.map((item) => ({
+            label: item.label,
+            value: displayMinorValue(item.label, item.value),
+            ...(item.tone === "rose" ? { tone: "danger" as const } : {}),
+          }))}
+        />
+      }
+    />
   );
 }
 
@@ -1144,9 +1166,11 @@ function BusinessPanel({
       }
       action={<DetailLink href={panel.detailHref} />}
     >
-      {businessCardMetrics(panel, overview, locale).map((metric) => (
-        <BusinessMetricCard key={metric.label} metric={metric} />
-      ))}
+      <PanelList>
+        {businessCardMetrics(panel, overview, locale).map((metric) => (
+          <BusinessMetricRow key={metric.label} metric={metric} />
+        ))}
+      </PanelList>
     </PanelCard>
   );
 }
@@ -1175,36 +1199,30 @@ function ProductRankingCard({
       tone={toStatusTone(tone)}
       className={`admin-overview-product-ranking ${metricToneClass(tone)}`}
     >
-      <div className="admin-overview-product-ranking__rows">
-        {rows.length === 0 ? (
-          <p className="admin-overview-model-category__empty">
-            数据源待建设：暂无产品供给排行数据。
-          </p>
-        ) : (
-          rows.map((item, index) => (
-            <div key={item.id} className="admin-overview-product-ranking__row">
-              <span
-                className={`admin-overview-product-ranking__medal admin-overview-product-ranking__medal--${index + 1}`}
-                role="img"
-                aria-label={`第 ${index + 1} 名`}
+      <PanelList empty="数据源待建设：暂无产品供给排行数据。">
+        {rows.map((item, index) => (
+          <PanelItem
+            key={item.id}
+            lead={<RankMedal rank={index + 1} />}
+            main={
+              <TableTitleCell
+                title={item.name}
+                description={`${item.meta} · 新增 +${item.monthlyNew.toLocaleString("en-US")}`}
               />
-              <div>
-                <strong>{item.name}</strong>
-                <small>
-                  {item.meta} · 新增 +{item.monthlyNew.toLocaleString("en-US")}
-                </small>
-              </div>
-              <span className="admin-overview-product-ranking__value-line">
-                <MetricValue
-                  value={item.subscriptions.toLocaleString("en-US")}
-                  as="b"
-                />
-                {item.priceTag ? <em>{item.priceTag}</em> : null}
+            }
+            trail={
+              <span className="flex items-center gap-xs">
+                <b className="text-title-sm font-bold">
+                  {item.subscriptions.toLocaleString("en-US")}
+                </b>
+                {item.priceTag ? (
+                  <StatusBadge tone="neutral">{item.priceTag}</StatusBadge>
+                ) : null}
               </span>
-            </div>
-          ))
-        )}
-      </div>
+            }
+          />
+        ))}
+      </PanelList>
     </PanelCard>
   );
 }
@@ -1235,43 +1253,28 @@ function ModelCategoryCard({
       tone={toStatusTone(tone)}
       className={`admin-overview-model-category ${metricToneClass(tone)}`}
     >
-      <div className="admin-overview-model-category__rows">
-        {rows.length > 0 ? (
-          rows.map((row, index) => (
-            <div
-              key={row.id}
-              className={
-                row.placeholder
-                  ? "admin-overview-model-category__row admin-overview-model-category__row--placeholder"
-                  : "admin-overview-model-category__row"
-              }
-            >
-              <span
-                className={
-                  rankStyle === "medal"
-                    ? `admin-overview-product-ranking__medal admin-overview-product-ranking__medal--${index + 1}`
-                    : undefined
-                }
-                role={rankStyle === "medal" ? "img" : undefined}
-                aria-label={
-                  rankStyle === "medal" ? `第 ${index + 1} 名` : undefined
-                }
-              >
-                {rankStyle === "number" ? index + 1 : null}
-              </span>
-              <div>
-                <strong>{row.name}</strong>
-                <small>
-                  <span>{row.meta}</span>
-                  <em>{row.value}</em>
-                </small>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="admin-overview-model-category__empty">暂无数据</p>
-        )}
-      </div>
+      <PanelList empty="暂无数据">
+        {rows.map((row, index) => (
+          <PanelItem
+            key={row.id}
+            {...(row.placeholder ? { className: "opacity-60" } : {})}
+            lead={
+              rankStyle === "medal" ? (
+                <RankMedal rank={index + 1} />
+              ) : (
+                <LevelMarker
+                  level={rankLevel(index + 1)}
+                  aria-label={`第 ${index + 1} 位`}
+                >
+                  {index + 1}
+                </LevelMarker>
+              )
+            }
+            main={<TableTitleCell title={row.name} description={row.meta} />}
+            trail={<span className="text-body-sm">{row.value}</span>}
+          />
+        ))}
+      </PanelList>
     </PanelCard>
   );
 }
@@ -1729,7 +1732,7 @@ export default function AdminOverviewPage() {
   );
 
   return (
-    <div className="vx-page-stack admin-overview">
+    <ViewLayout className="admin-overview">
       <header className="admin-overview-header">
         <OverviewHeading
           icon="squares-four"
@@ -1741,9 +1744,9 @@ export default function AdminOverviewPage() {
         />
       </header>
 
-      {/* 四张一行，间距 2rem（space-xl）——与既有实现同值，窄屏折两列。 */}
+      {/* 四张一行，窄屏折两列。间距与其余卡组同为 16px。 */}
       <section
-        className="grid gap-xl sm:grid-cols-2 lg:grid-cols-4"
+        className="grid gap-md sm:grid-cols-2 lg:grid-cols-4"
         aria-label="平台核心态势"
       >
         {pulseMetrics.map((metric) => (
@@ -1870,6 +1873,6 @@ export default function AdminOverviewPage() {
           </Section>
         </div>
       </section>
-    </div>
+    </ViewLayout>
   );
 }
