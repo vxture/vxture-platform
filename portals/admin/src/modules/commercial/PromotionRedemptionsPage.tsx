@@ -3,19 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
-  ActionMenu,
-  Button,
-  BulkActionBar,
-  Checkbox,
-  Input,
-  NativeSelect,
   ActionButton,
+  ActionMenu,
+  Banner,
+  BulkActionBar,
+  Button,
+  Checkbox,
   EmptyState,
+  Icon,
+  Input,
   MetricGrid,
-  ViewModeSwitch,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchPromotionRedemptionRecords } from "@/api/admin-bff";
@@ -498,7 +499,7 @@ export function PromotionRedemptionsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-redemptions-page">
+    <ViewLayout className="vx-tenant-management-page vx-redemptions-page">
       <PageHeader
         icon="check"
         eyebrow="订阅交易"
@@ -671,6 +672,6 @@ export function PromotionRedemptionsPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

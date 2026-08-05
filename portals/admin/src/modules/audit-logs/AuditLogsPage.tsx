@@ -2,15 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  ActionButton,
   Badge,
   Button,
+  EmptyState,
   Icon,
   Input,
+  MetricGrid,
   NativeSelect,
   Pagination,
-  ActionButton,
-  EmptyState,
-  MetricGrid,
+  ViewLayout,
 } from "@vxture/design-system";
 import { fetchAuditLogs, type AuditLogFilters } from "@/api/admin-bff";
 import type { AuditLogRecord } from "@/entities/console";
@@ -368,12 +369,8 @@ export function AuditLogsPage() {
   };
 
   return (
-    <div
-      className={joinClasses(
-        "vx-page-stack",
-        "vx-tenant-management-page",
-        "vx-audit-page",
-      )}
+    <ViewLayout
+      className={joinClasses("vx-tenant-management-page", "vx-audit-page")}
     >
       <PageHeader
         icon="info"
@@ -460,6 +457,6 @@ export function AuditLogsPage() {
           ) : null}
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

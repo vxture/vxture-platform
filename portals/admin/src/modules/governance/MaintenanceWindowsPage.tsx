@@ -14,6 +14,7 @@ import {
   Pagination,
   Textarea,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   cancelMaintenanceWindow,
@@ -266,7 +267,7 @@ export function MaintenanceWindowsPage() {
   }
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-maintenance-page")}>
+    <ViewLayout className={joinClasses("vx-maintenance-page")}>
       <PageHeader
         icon="clock"
         title="维护窗口"
@@ -595,6 +596,6 @@ export function MaintenanceWindowsPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

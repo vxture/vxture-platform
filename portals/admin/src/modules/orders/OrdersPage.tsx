@@ -3,22 +3,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
+  Banner,
   BulkActionBar,
   Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  MetricGrid,
-  ViewModeSwitch,
+  Icon,
+  Input,
   ListCardGrid,
+  MetricGrid,
   MetricListCard,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
@@ -664,7 +665,7 @@ export function OrdersPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-orders-page">
+    <ViewLayout className="vx-tenant-management-page vx-orders-page">
       <PageHeader
         icon="table"
         eyebrow="订阅交易"
@@ -930,6 +931,6 @@ export function OrdersPage() {
           onSubmit={handleConfirmOfflinePayment}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

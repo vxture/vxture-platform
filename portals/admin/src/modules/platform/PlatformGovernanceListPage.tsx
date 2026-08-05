@@ -2,18 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  ViewModeSwitch,
+  Icon,
+  Input,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchPlatformGovernanceRecords } from "@/api/admin-bff";
@@ -356,9 +357,9 @@ export function PlatformGovernanceListPage({
   };
 
   return (
-    <div
+    <ViewLayout
       className={joinClasses(
-        "vx-page-stack vx-tenant-management-page vx-platform-governance-page",
+        "vx-tenant-management-page vx-platform-governance-page",
         `vx-platform-governance-page--${kind}`,
       )}
     >
@@ -647,6 +648,6 @@ export function PlatformGovernanceListPage({
           ) : null}
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

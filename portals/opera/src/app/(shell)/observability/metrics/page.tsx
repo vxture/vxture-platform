@@ -10,6 +10,7 @@ import {
   MetricGrid,
   Section,
   ViewHeader,
+  ViewLayout,
 } from "@vxture/design-system";
 import { meteringByEndpoint } from "@/mocks/atlas";
 
@@ -64,7 +65,7 @@ export default function MetricsPage() {
   const [selected, setSelected] = useState<readonly string[]>([]);
 
   return (
-    <div className="flex flex-col gap-xl">
+    <ViewLayout>
       <ViewHeader
         icon="chart-line-up"
         title="Metrics"
@@ -132,6 +133,6 @@ export default function MetricsPage() {
           indexStart={1}
         />
       </Section>
-    </div>
+    </ViewLayout>
   );
 }

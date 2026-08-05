@@ -459,6 +459,26 @@ const rules = [
     },
   },
   {
+    id: "ds/no-retired-page-stack",
+    description:
+      "vx-page-stack 已退役且无任何规则，页面纵向骨架用 DS 的 ViewLayout。",
+    checkLine(file, line, lineNumber) {
+      if (!/\.(tsx|css)$/.test(file)) return null;
+      // 只查真用法：JSX 的 className 与 CSS 选择器。散文里提到这个名字是在
+      // 解释它为什么退役，不该被判违规。
+      const isUsage =
+        (line.includes("vx-page-stack") && line.includes("className")) ||
+        /^\s*\.vx-page-stack/.test(line);
+      if (!isUsage) return null;
+      return violation(
+        file,
+        lineNumber,
+        "改用 <ViewLayout>：这个类没有规则，挂着它页级块之间没有任何间距。",
+        line,
+      );
+    },
+  },
+  {
     id: "ds/no-raw-color",
     description:
       "颜色只能在 DS token 层定义；应用层和普通包不能写 hex/rgb/hsl 硬编码颜色。",

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
@@ -11,19 +11,20 @@ import {
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogForm,
   DialogHeader,
   DialogTitle,
-  DialogForm,
+  EmptyState,
+  Icon,
   Input,
   Label,
-  NativeSelect,
-  Textarea,
-  ActionButton,
-  EmptyState,
-  ViewModeSwitch,
-  useToast,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  Textarea,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -1167,7 +1168,7 @@ export function PlatformUsersPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-platform-users-page">
+    <ViewLayout className="vx-tenant-management-page vx-platform-users-page">
       <PageHeader
         icon="user"
         eyebrow="身份权限"
@@ -1404,6 +1405,6 @@ export function PlatformUsersPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

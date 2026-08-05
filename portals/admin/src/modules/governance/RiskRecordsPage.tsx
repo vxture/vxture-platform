@@ -14,6 +14,7 @@ import {
   Pagination,
   Textarea,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   createRiskRecord,
@@ -242,7 +243,7 @@ export function RiskRecordsPage() {
   ).length;
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-risk-records-page")}>
+    <ViewLayout className={joinClasses("vx-risk-records-page")}>
       <PageHeader
         icon="warning"
         title="风险记录"
@@ -532,6 +533,6 @@ export function RiskRecordsPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

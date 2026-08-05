@@ -3,18 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  ViewModeSwitch,
+  Icon,
+  Input,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -528,7 +529,7 @@ export function ProductsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-product-management-page">
+    <ViewLayout className="vx-tenant-management-page vx-product-management-page">
       <PageHeader
         icon="database"
         title="产品能力"
@@ -715,6 +716,6 @@ export function ProductsPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

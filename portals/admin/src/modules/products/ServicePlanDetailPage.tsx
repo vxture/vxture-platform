@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Icon,
   Badge,
   Button,
   DetailList,
   DetailRow,
   EmptyState,
+  Icon,
   MetricGrid,
+  ViewLayout,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
@@ -263,7 +264,7 @@ export function ServicePlanDetailPage({
 
   if (!loading && !plan) {
     return (
-      <div className="vx-page-stack vx-product-capability-page">
+      <ViewLayout className="vx-product-capability-page">
         <PageHeader
           icon="star"
           title="服务套餐详情"
@@ -281,12 +282,12 @@ export function ServicePlanDetailPage({
           title="服务套餐不存在"
           description="该套餐可能已归档，或当前账号无权访问。"
         />
-      </div>
+      </ViewLayout>
     );
   }
 
   return (
-    <div className="vx-page-stack vx-product-capability-page">
+    <ViewLayout className="vx-product-capability-page">
       <PageHeader
         icon="star"
         title={
@@ -329,6 +330,6 @@ export function ServicePlanDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </div>
+    </ViewLayout>
   );
 }

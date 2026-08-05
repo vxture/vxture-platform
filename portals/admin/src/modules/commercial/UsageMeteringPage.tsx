@@ -3,19 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
-  ActionMenu,
-  Button,
-  BulkActionBar,
-  Checkbox,
-  Input,
-  NativeSelect,
   ActionButton,
+  ActionMenu,
+  Banner,
+  BulkActionBar,
+  Button,
+  Checkbox,
   EmptyState,
+  Icon,
+  Input,
   MetricGrid,
-  ViewModeSwitch,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -513,7 +514,7 @@ export function UsageMeteringPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-usage-page">
+    <ViewLayout className="vx-tenant-management-page vx-usage-page">
       <PageHeader
         icon="graph"
         eyebrow="订阅交易"
@@ -711,6 +712,6 @@ export function UsageMeteringPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

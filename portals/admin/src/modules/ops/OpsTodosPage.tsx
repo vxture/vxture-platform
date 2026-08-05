@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Icon,
   ActionMenu,
   Badge,
   EmptyState,
+  Icon,
   MetricGrid,
   TableTitleCell,
+  ViewLayout,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -391,7 +392,7 @@ export function OpsTodosPage() {
   }, []);
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-ops-todos-page">
+    <ViewLayout className="vx-tenant-management-page vx-ops-todos-page">
       <PageHeader
         icon="table"
         title="运营待办"
@@ -511,6 +512,6 @@ export function OpsTodosPage() {
           </div>
         </section>
       </section>
-    </div>
+    </ViewLayout>
   );
 }

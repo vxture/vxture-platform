@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { CSSProperties } from "react";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
@@ -12,16 +12,17 @@ import {
   DialogDescription,
   DialogForm,
   DialogTitle,
+  EmptyState,
+  Icon,
   Input,
   Label,
-  NativeSelect,
-  Textarea,
-  ActionButton,
-  EmptyState,
-  ViewModeSwitch,
-  useToast,
   MetricGrid,
+  NativeSelect,
   SectionHeader,
+  Textarea,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName, ViewModeSwitchValue } from "@vxture/design-system";
 import {
@@ -1546,7 +1547,7 @@ export function AdminPermissionsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-admin-permissions-page">
+    <ViewLayout className="vx-tenant-management-page vx-admin-permissions-page">
       <PageHeader
         icon="shield-check"
         title="权限策略"
@@ -1650,6 +1651,6 @@ export function AdminPermissionsPage() {
           onSubmit={submitPermissionForm}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

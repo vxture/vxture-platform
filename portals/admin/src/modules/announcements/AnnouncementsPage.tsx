@@ -6,14 +6,15 @@ import {
   Badge,
   Button,
   DialogForm,
+  EmptyState,
   Icon,
   Input,
   Label,
   NativeSelect,
   Pagination,
   Textarea,
-  EmptyState,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   archiveAnnouncement,
@@ -699,7 +700,7 @@ export function AnnouncementsPage() {
   }
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-announcement-page")}>
+    <ViewLayout className={joinClasses("vx-announcement-page")}>
       <PageHeader
         icon="bell"
         title="消息公告"
@@ -786,6 +787,6 @@ export function AnnouncementsPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

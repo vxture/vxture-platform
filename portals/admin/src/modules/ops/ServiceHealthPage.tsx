@@ -5,11 +5,12 @@ import {
   Badge,
   Button,
   DataTable,
+  EmptyState,
   Icon,
   Input,
   NativeSelect,
-  EmptyState,
   StatusBadge,
+  ViewLayout,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName, StatusBadgeTone } from "@vxture/design-system";
@@ -520,7 +521,7 @@ export function ServiceHealthPage({
   }
 
   return (
-    <div className="vx-page-stack vx-service-health-page">
+    <ViewLayout className="vx-service-health-page">
       <PageHeader
         icon="server"
         eyebrow={eyebrow}
@@ -681,6 +682,6 @@ export function ServiceHealthPage({
           />
         </section>
       )}
-    </div>
+    </ViewLayout>
   );
 }

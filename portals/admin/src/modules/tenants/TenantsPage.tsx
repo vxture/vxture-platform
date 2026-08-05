@@ -3,23 +3,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
+  Banner,
   Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  ViewModeSwitch,
-  MetricListCard,
-  StatusBadge,
+  Icon,
+  Input,
   ListCardGrid,
-  useToast,
   MetricGrid,
+  MetricListCard,
+  NativeSelect,
+  StatusBadge,
   TableTitleCell,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -583,7 +584,7 @@ export function TenantsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-tenant-operations-page">
+    <ViewLayout className="vx-tenant-management-page vx-tenant-operations-page">
       <PageHeader
         icon="buildings"
         eyebrow="租户账号"
@@ -791,6 +792,6 @@ export function TenantsPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

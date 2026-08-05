@@ -4,11 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Button,
+  EmptyState,
   Icon,
   Input,
   NativeSelect,
   Pagination,
-  EmptyState,
+  ViewLayout,
 } from "@vxture/design-system";
 import { fetchSkills } from "@/api/admin-bff";
 import type { SkillRecord } from "@/entities/console";
@@ -344,7 +345,7 @@ export function SkillsPage() {
   };
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-skills-page")}>
+    <ViewLayout className={joinClasses("vx-skills-page")}>
       <PageHeader
         icon="cube"
         title="技能市场"
@@ -395,6 +396,6 @@ export function SkillsPage() {
           ) : null}
         </>
       )}
-    </div>
+    </ViewLayout>
   );
 }

@@ -4,22 +4,23 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Icon,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
   DetailList,
   DetailRow,
-  Drawer,
   DialogForm,
+  Drawer,
+  EmptyState,
+  Icon,
   Input,
   Label,
   MetricGrid,
   NativeSelect,
-  Textarea,
-  EmptyState,
   TableTitleCell,
+  Textarea,
+  ViewLayout,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -814,7 +815,7 @@ export function TicketsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-tickets-page">
+    <ViewLayout className="vx-tenant-management-page vx-tickets-page">
       <PageHeader
         icon="chat-circle"
         eyebrow="客户服务"
@@ -1049,6 +1050,6 @@ export function TicketsPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

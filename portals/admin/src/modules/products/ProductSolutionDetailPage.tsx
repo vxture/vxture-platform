@@ -10,6 +10,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -276,7 +277,7 @@ export function ProductSolutionDetailPage({
 
   if (!loading && !solution) {
     return (
-      <div className="vx-page-stack vx-product-capability-page">
+      <ViewLayout className="vx-product-capability-page">
         <PageHeader
           icon="workflow"
           title="解决方案详情"
@@ -294,12 +295,12 @@ export function ProductSolutionDetailPage({
           title="解决方案不存在"
           description="该方案可能已归档，或当前账号无权访问。"
         />
-      </div>
+      </ViewLayout>
     );
   }
 
   return (
-    <div className="vx-page-stack vx-product-capability-page">
+    <ViewLayout className="vx-product-capability-page">
       <PageHeader
         icon="workflow"
         title={solution?.solutionName ?? "解决方案详情"}
@@ -330,6 +331,6 @@ export function ProductSolutionDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </div>
+    </ViewLayout>
   );
 }

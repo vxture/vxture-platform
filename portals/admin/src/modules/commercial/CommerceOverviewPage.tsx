@@ -8,6 +8,7 @@ import {
   Icon,
   MetricGrid,
   SectionHeader,
+  ViewLayout,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchCommerceOverview } from "@/api/admin-bff";
@@ -266,7 +267,7 @@ export function CommerceOverviewPage() {
   const metricCount = useMemo(() => snapshot?.metrics.length ?? 0, [snapshot]);
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-commerce-overview-page">
+    <ViewLayout className="vx-tenant-management-page vx-commerce-overview-page">
       <PageHeader
         icon="chart-bar"
         eyebrow="商业分析"
@@ -302,6 +303,6 @@ export function CommerceOverviewPage() {
           </footer>
         </>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

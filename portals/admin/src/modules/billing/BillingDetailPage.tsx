@@ -11,6 +11,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import {
@@ -631,7 +632,7 @@ export function BillingDetailPage({ billId }: { billId: string }) {
 
   if (!loading && !bill) {
     return (
-      <div className="vx-page-stack vx-product-capability-page">
+      <ViewLayout className="vx-product-capability-page">
         <PageHeader
           icon="key"
           title="账单详情"
@@ -649,12 +650,12 @@ export function BillingDetailPage({ billId }: { billId: string }) {
           title="账单不存在"
           description="该账单可能已归档，或当前账号无权访问。"
         />
-      </div>
+      </ViewLayout>
     );
   }
 
   return (
-    <div className="vx-page-stack vx-product-capability-page vx-billing-detail-page">
+    <ViewLayout className="vx-product-capability-page vx-billing-detail-page">
       <PageHeader
         icon="key"
         title={bill ? bill.billNo : "账单详情"}
@@ -797,6 +798,6 @@ export function BillingDetailPage({ billId }: { billId: string }) {
           onSubmit={handleSubmitBillAction}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

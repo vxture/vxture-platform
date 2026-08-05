@@ -4,16 +4,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import Link from "next/link";
 import {
-  Icon,
   ActionMenu,
   Badge,
   Button,
   DialogForm,
+  EmptyState,
+  Icon,
   Input,
   NativeSelect,
-  EmptyState,
-  ViewModeSwitch,
   useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -1353,7 +1354,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
 
   if (!tenant) {
     return (
-      <div className="vx-page-stack vx-tenant-management-page">
+      <ViewLayout className="vx-tenant-management-page">
         <Link className="vx-tenant-back-link" href="/tenants">
           <Icon name="arrow-left" size="xs" fallback="placeholder" />
           返回租户列表
@@ -1368,7 +1369,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
             }
           />
         </section>
-      </div>
+      </ViewLayout>
     );
   }
 
@@ -1451,7 +1452,7 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page">
+    <ViewLayout className="vx-tenant-management-page">
       <Link className="vx-tenant-back-link" href="/tenants">
         <Icon name="arrow-left" size="xs" fallback="placeholder" />
         返回租户列表
@@ -1641,6 +1642,6 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
           </section>
         </div>
       </section>
-    </div>
+    </ViewLayout>
   );
 }

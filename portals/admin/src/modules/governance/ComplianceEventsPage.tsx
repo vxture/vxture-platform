@@ -14,6 +14,7 @@ import {
   Pagination,
   Textarea,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   assignComplianceEvent,
@@ -261,7 +262,7 @@ export function ComplianceEventsPage() {
   }
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-compliance-page")}>
+    <ViewLayout className={joinClasses("vx-compliance-page")}>
       <PageHeader
         icon="shield-check"
         title="合规事件"
@@ -589,6 +590,6 @@ export function ComplianceEventsPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

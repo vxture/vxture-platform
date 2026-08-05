@@ -14,6 +14,7 @@ import {
   Pagination,
   Textarea,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   archiveFeatureFlag,
@@ -239,7 +240,7 @@ export function FeatureTogglesPage() {
   }
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-feature-flag-page")}>
+    <ViewLayout className={joinClasses("vx-feature-flag-page")}>
       <PageHeader
         icon="settings"
         title="功能开关"
@@ -536,6 +537,6 @@ export function FeatureTogglesPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

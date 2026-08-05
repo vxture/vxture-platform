@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Icon } from "@vxture/design-system";
+import { Icon, ViewLayout } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
   fetchAiModelGrants,
@@ -259,7 +259,7 @@ export function PlatformAutonomyPage() {
   );
 
   return (
-    <div className="vx-page-stack platform-autonomy-page">
+    <ViewLayout className="platform-autonomy-page">
       <PageHeader
         icon="shield-check"
         title="平台总览"
@@ -408,6 +408,6 @@ export function PlatformAutonomyPage() {
           </div>
         </article>
       </section>
-    </div>
+    </ViewLayout>
   );
 }

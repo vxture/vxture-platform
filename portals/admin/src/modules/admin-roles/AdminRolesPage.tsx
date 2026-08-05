@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import type { CSSProperties } from "react";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
@@ -13,16 +13,17 @@ import {
   DialogDescription,
   DialogForm,
   DialogTitle,
+  EmptyState,
+  Icon,
   Input,
   Label,
-  NativeSelect,
-  Textarea,
-  ActionButton,
-  EmptyState,
-  ViewModeSwitch,
-  useToast,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  Textarea,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -1535,7 +1536,7 @@ export function AdminRolesPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-admin-roles-page">
+    <ViewLayout className="vx-tenant-management-page vx-admin-roles-page">
       <PageHeader
         icon="role"
         title="平台角色"
@@ -1798,6 +1799,6 @@ export function AdminRolesPage() {
           onSubmit={(event) => void confirmDeleteRole(event)}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

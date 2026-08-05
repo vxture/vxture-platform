@@ -15,7 +15,6 @@ import {
   Button,
   DataTable,
   FilterBar,
-  type FilterBarView,
   Icon,
   InputGroup,
   InputGroupAddon,
@@ -26,9 +25,11 @@ import {
   Section,
   StatusBadge,
   TableTitleCell,
-  ViewHeader,
-  useToast,
+  type FilterBarView,
   useListPagination,
+  useToast,
+  ViewHeader,
+  ViewLayout,
 } from "@vxture/design-system";
 import { endpoints, type EndpointRow } from "@/mocks/atlas";
 
@@ -110,7 +111,7 @@ export default function RouterPage() {
     );
 
   return (
-    <div className="flex flex-col gap-xl">
+    <ViewLayout>
       <ViewHeader
         icon="tree-structure"
         title="Router"
@@ -240,6 +241,6 @@ export default function RouterPage() {
           )}
         </div>
       </Section>
-    </div>
+    </ViewLayout>
   );
 }

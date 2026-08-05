@@ -2,21 +2,22 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
   DialogForm,
+  EmptyState,
   Icon,
   Input,
   Label,
+  MetricGrid,
   NativeSelect,
   Pagination,
-  ActionButton,
-  EmptyState,
-  ViewModeSwitch,
-  MetricGrid,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import {
   createAiModelGrant,
@@ -497,7 +498,7 @@ export function ModelGrantsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-model-strategy-page">
+    <ViewLayout className="vx-tenant-management-page vx-model-strategy-page">
       <PageHeader
         icon="shield-check"
         eyebrow={t("header.eyebrow")}
@@ -1124,6 +1125,6 @@ export function ModelGrantsPage() {
           </div>
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

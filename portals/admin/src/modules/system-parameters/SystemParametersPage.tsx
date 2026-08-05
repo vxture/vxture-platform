@@ -12,6 +12,7 @@ import {
   Pagination,
   Textarea,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import { fetchPlatformSettings, updatePlatformSetting } from "@/api/admin-bff";
 import type { PlatformSettingRecord } from "@/entities/console";
@@ -115,7 +116,7 @@ export function SystemParametersPage() {
   }
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-setting-page")}>
+    <ViewLayout className={joinClasses("vx-setting-page")}>
       <PageHeader
         icon="settings"
         title="系统参数"
@@ -276,6 +277,6 @@ export function SystemParametersPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

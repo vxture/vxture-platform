@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ActionButton,
   ActionMenu,
   Badge,
   Banner,
@@ -11,16 +12,16 @@ import {
   Button,
   Checkbox,
   DialogForm,
+  EmptyState,
   Icon,
   Input,
   Label,
-  NativeSelect,
-  Textarea,
-  ActionButton,
-  EmptyState,
   MetricGrid,
-  ViewModeSwitch,
+  NativeSelect,
   TableTitleCell,
+  Textarea,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
@@ -859,7 +860,7 @@ export function PaymentsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-payments-page">
+    <ViewLayout className="vx-tenant-management-page vx-payments-page">
       <PageHeader
         icon="check"
         eyebrow="财务结算"
@@ -1124,6 +1125,6 @@ export function PaymentsPage() {
           onCancel={handleCloseDialog}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

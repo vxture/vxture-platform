@@ -3,20 +3,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
-  Button,
+  Banner,
   BulkActionBar,
+  Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
+  Icon,
+  Input,
   MetricGrid,
-  ViewModeSwitch,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -717,7 +718,7 @@ export function SubscriptionsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-subscriptions-page">
+    <ViewLayout className="vx-tenant-management-page vx-subscriptions-page">
       <PageHeader
         icon="star"
         eyebrow="订阅交易"
@@ -964,6 +965,6 @@ export function SubscriptionsPage() {
           onSubmit={handleSubmitSubscriptionAction}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

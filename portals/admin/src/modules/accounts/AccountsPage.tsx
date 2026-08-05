@@ -2,23 +2,24 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  Banner,
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
+  Banner,
   Button,
   Checkbox,
   DialogForm,
+  EmptyState,
+  Icon,
   Input,
   Label,
-  NativeSelect,
-  ActionButton,
-  EmptyState,
-  Textarea,
-  ViewModeSwitch,
-  useToast,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  Textarea,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -745,7 +746,7 @@ export function AccountsPage({
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-account-management-page">
+    <ViewLayout className="vx-tenant-management-page vx-account-management-page">
       <PageHeader
         icon="user"
         eyebrow={pageCopy.eyebrow}
@@ -986,6 +987,6 @@ export function AccountsPage({
           </Label>
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

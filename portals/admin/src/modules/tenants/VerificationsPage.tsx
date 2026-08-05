@@ -25,6 +25,7 @@ import {
   useToast,
   MetricGrid,
   TableTitleCell,
+  ViewLayout,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -745,7 +746,7 @@ export function VerificationsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-verification-page">
+    <ViewLayout className="vx-tenant-management-page vx-verification-page">
       <PageHeader
         icon="medal"
         title="实名认证"
@@ -966,6 +967,6 @@ export function VerificationsPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

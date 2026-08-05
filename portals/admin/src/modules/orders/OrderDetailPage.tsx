@@ -13,6 +13,7 @@ import {
   Label,
   MetricGrid,
   Textarea,
+  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import {
@@ -557,7 +558,7 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
 
   if (!loading && !order) {
     return (
-      <div className="vx-page-stack vx-product-capability-page">
+      <ViewLayout className="vx-product-capability-page">
         <PageHeader
           icon="table"
           title="订单详情"
@@ -575,12 +576,12 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
           title="订单不存在"
           description="该订单可能已归档，或当前账号无权访问。"
         />
-      </div>
+      </ViewLayout>
     );
   }
 
   return (
-    <div className="vx-page-stack vx-product-capability-page vx-order-detail-page">
+    <ViewLayout className="vx-product-capability-page vx-order-detail-page">
       <PageHeader
         icon="table"
         title={order ? order.orderNo : "订单详情"}
@@ -875,6 +876,6 @@ export function OrderDetailPage({ orderId }: { orderId: string }) {
           ) : null}
         </DialogForm>
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

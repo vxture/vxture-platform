@@ -2,22 +2,23 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
   DialogForm,
+  EmptyState,
   Icon,
   Input,
   Label,
-  NativeSelect,
-  Textarea,
-  ActionButton,
-  EmptyState,
-  ViewModeSwitch,
-  useToast,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  Textarea,
+  useToast,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -1014,7 +1015,7 @@ export function ModelPlatformPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-model-platform-page">
+    <ViewLayout className="vx-tenant-management-page vx-model-platform-page">
       <PageHeader
         icon="code"
         eyebrow={t("header.eyebrow")}
@@ -2076,6 +2077,6 @@ export function ModelPlatformPage() {
           }}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

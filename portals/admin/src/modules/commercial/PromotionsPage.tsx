@@ -3,19 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Banner,
-  Icon,
-  ActionMenu,
-  Button,
-  BulkActionBar,
-  Checkbox,
-  Input,
-  NativeSelect,
   ActionButton,
+  ActionMenu,
+  Banner,
+  BulkActionBar,
+  Button,
+  Checkbox,
   EmptyState,
+  Icon,
+  Input,
   MetricGrid,
-  ViewModeSwitch,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -504,7 +505,7 @@ export function PromotionsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-promotions-page">
+    <ViewLayout className="vx-tenant-management-page vx-promotions-page">
       <PageHeader
         icon="sparkles"
         eyebrow="产品体系"
@@ -738,6 +739,6 @@ export function PromotionsPage() {
           onSubmit={(payload) => void handleAssign(payload)}
         />
       ) : null}
-    </div>
+    </ViewLayout>
   );
 }

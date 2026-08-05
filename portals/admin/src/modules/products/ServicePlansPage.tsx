@@ -3,16 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  ViewModeSwitch,
+  Icon,
+  Input,
   MetricGrid,
+  NativeSelect,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchProductPlans, fetchProductSolutions } from "@/api/admin-bff";
@@ -493,7 +494,7 @@ export function ServicePlansPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-service-plans-page">
+    <ViewLayout className="vx-tenant-management-page vx-service-plans-page">
       <PageHeader
         icon="star"
         title="服务套餐"
@@ -672,6 +673,6 @@ export function ServicePlansPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }

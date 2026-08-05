@@ -14,8 +14,9 @@ import {
   NativeSelect,
   Section,
   SegmentedControl,
-  ViewHeader,
   useToast,
+  ViewHeader,
+  ViewLayout,
 } from "@vxture/design-system";
 import {
   meteringByEndpoint,
@@ -77,7 +78,7 @@ export default function MeteringPage() {
     DIMENSIONS.find((d) => d.value === dimension) ?? DIMENSIONS[0]!;
 
   return (
-    <div className="flex flex-col gap-xl">
+    <ViewLayout>
       <ViewHeader
         icon="gauge"
         title="Metering"
@@ -179,6 +180,6 @@ export default function MeteringPage() {
           )}
         />
       </Section>
-    </div>
+    </ViewLayout>
   );
 }

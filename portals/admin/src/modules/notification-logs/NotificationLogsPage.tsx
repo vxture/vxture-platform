@@ -8,6 +8,7 @@ import {
   NativeSelect,
   Pagination,
   useToast,
+  ViewLayout,
 } from "@vxture/design-system";
 import { fetchNotificationLogs } from "@/api/admin-bff";
 import type { NotificationLogRecord } from "@/entities/console";
@@ -111,7 +112,7 @@ export function NotificationLogsPage() {
   ).length;
 
   return (
-    <div className={joinClasses("vx-page-stack", "vx-notification-page")}>
+    <ViewLayout className={joinClasses("vx-notification-page")}>
       <PageHeader
         icon="bell"
         title="通知记录"
@@ -237,6 +238,6 @@ export function NotificationLogsPage() {
           ) : null}
         </>
       )}
-    </div>
+    </ViewLayout>
   );
 }

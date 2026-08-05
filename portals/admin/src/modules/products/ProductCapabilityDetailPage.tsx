@@ -10,6 +10,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  ViewLayout,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -347,7 +348,7 @@ export function ProductCapabilityDetailPage({
 
   if (!loading && !product) {
     return (
-      <div className="vx-page-stack vx-product-capability-page">
+      <ViewLayout className="vx-product-capability-page">
         <PageHeader
           icon="database"
           title="产品能力详情"
@@ -370,12 +371,12 @@ export function ProductCapabilityDetailPage({
             </Button>
           }
         />
-      </div>
+      </ViewLayout>
     );
   }
 
   return (
-    <div className="vx-page-stack vx-product-capability-page">
+    <ViewLayout className="vx-product-capability-page">
       <PageHeader
         icon={product ? capabilityTypeIcon(product.productType) : "database"}
         title={product?.productName ?? "产品能力详情"}
@@ -406,6 +407,6 @@ export function ProductCapabilityDetailPage({
           <span>读取中</span>
         </section>
       )}
-    </div>
+    </ViewLayout>
   );
 }

@@ -3,18 +3,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Icon,
+  ActionButton,
   ActionMenu,
   Badge,
   Button,
   Checkbox,
-  Input,
-  NativeSelect,
-  ActionButton,
   EmptyState,
-  ViewModeSwitch,
+  Icon,
+  Input,
   MetricGrid,
+  NativeSelect,
   TableTitleCell,
+  ViewLayout,
+  ViewModeSwitch,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -590,7 +591,7 @@ export function ProductSolutionsPage() {
   }
 
   return (
-    <div className="vx-page-stack vx-tenant-management-page vx-product-solutions-page">
+    <ViewLayout className="vx-tenant-management-page vx-product-solutions-page">
       <PageHeader
         icon="workflow"
         title="解决方案"
@@ -770,6 +771,6 @@ export function ProductSolutionsPage() {
           />
         </section>
       </div>
-    </div>
+    </ViewLayout>
   );
 }
