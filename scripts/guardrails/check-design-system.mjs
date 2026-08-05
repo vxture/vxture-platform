@@ -156,10 +156,6 @@ const IMPORT_ONLY_STYLE_ENTRIES = new Map([
     "DS tokens.css",
   ],
   [normalize("portals/admin/src/app/globals.css"), "admin globals.css"],
-  [
-    normalize("portals/admin/src/styles/admin-auth-captcha.css"),
-    "admin auth captcha.css",
-  ],
   [normalize("portals/admin/src/styles/admin-base.css"), "admin base.css"],
   [
     normalize("portals/admin/src/styles/admin-directory.css"),
@@ -196,10 +192,6 @@ const IMPORT_ONLY_STYLE_ENTRIES = new Map([
   [
     normalize("portals/admin/src/styles/admin-platform-autonomy.css"),
     "admin platform autonomy.css",
-  ],
-  [
-    normalize("portals/admin/src/styles/admin-products.css"),
-    "admin products.css",
   ],
   [normalize("portals/admin/src/styles/admin-roles.css"), "admin roles.css"],
   [
