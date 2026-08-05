@@ -15,6 +15,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -140,35 +141,6 @@ const SUBSCRIPTION_CSV_COLUMNS: CsvColumn<SubscriptionOperationRecord>[] = [
   { label: "开始时间", value: (record) => record.startAt },
   { label: "结束时间", value: (record) => record.endAt ?? "" },
 ];
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
-}
 
 function SubscriptionActionsMenu({
   subscription,
@@ -804,39 +776,48 @@ export function SubscriptionsPage() {
         description="运营侧管理租户服务权益实例，跟进试用转正、续期、暂停、配额风险和收入状态。"
       />
 
-      <section className="vx-tenant-summary" aria-label="租户订阅运营统计">
-        <SummaryItem
-          icon="star"
-          label="订阅实例"
-          value={formatNumber(subscriptions.length)}
-          tags={[`有效 ${formatNumber(effectiveCount)}`]}
-        />
-        <SummaryItem
-          icon="warning"
-          label="待跟进"
-          value={formatNumber(followUpCount)}
-          tags={[
-            `逾期 ${formatNumber(subscriptions.filter((item) => item.status === "overdue").length)}`,
-          ]}
-          tone={followUpCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="月收入"
-          value={formatMoney(monthlyRevenue)}
-          tags={["运营口径"]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="shield-check"
-          label="配额风险"
-          value={formatNumber(dangerQuotaCount + warningQuotaCount)}
-          tags={[`高风险 ${formatNumber(dangerQuotaCount)}`]}
-          tone={
-            dangerQuotaCount ? "rose" : warningQuotaCount ? "amber" : "green"
-          }
-        />
-      </section>
+      <MetricGrid
+        aria-label="租户订阅运营统计"
+        items={[
+          {
+            id: "instances",
+            icon: "star",
+            label: "订阅实例",
+            value: formatNumber(subscriptions.length),
+            tags: [`有效 ${formatNumber(effectiveCount)}`],
+          },
+          {
+            id: "follow-up",
+            icon: "warning",
+            label: "待跟进",
+            value: formatNumber(followUpCount),
+            tags: [
+              `逾期 ${formatNumber(subscriptions.filter((item) => item.status === "overdue").length)}`,
+            ],
+            tone: followUpCount ? "warning" : "success",
+          },
+          {
+            id: "monthly-revenue",
+            icon: "chart-bar",
+            label: "月收入",
+            value: formatMoney(monthlyRevenue),
+            tags: ["运营口径"],
+            tone: "success",
+          },
+          {
+            id: "quota-risk",
+            icon: "shield-check",
+            label: "配额风险",
+            value: formatNumber(dangerQuotaCount + warningQuotaCount),
+            tags: [`高风险 ${formatNumber(dangerQuotaCount)}`],
+            tone: dangerQuotaCount
+              ? "danger"
+              : warningQuotaCount
+                ? "warning"
+                : "success",
+          },
+        ]}
+      />
 
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">

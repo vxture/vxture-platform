@@ -14,6 +14,7 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchProductSolutions } from "@/api/admin-bff";
@@ -95,35 +96,6 @@ function solutionSearchText(solution: ProductSolutionRecord) {
   ]
     .join(" ")
     .toLowerCase();
-}
-
-function SolutionSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function ProductSolutionActionsMenu({
@@ -670,35 +642,42 @@ export function ProductSolutionsPage() {
         description="按行业业务场景组合产品能力，定义方案边界、包含产品、服务套餐和适用客户。"
       />
 
-      <section className="vx-tenant-summary" aria-label="解决方案统计">
-        <SolutionSummaryItem
-          icon="workflow"
-          label="方案总数"
-          value={formatNumber(solutions.length)}
-          tags={[`启用 ${formatNumber(activeSolutions)}`]}
-        />
-        <SolutionSummaryItem
-          icon="cube"
-          label="产品能力"
-          value={formatNumber(productCount)}
-          tags={[`三方 ${formatNumber(partnerProductCount)}`]}
-          tone="green"
-        />
-        <SolutionSummaryItem
-          icon="star"
-          label="服务套餐"
-          value={formatNumber(tierCount)}
-          tags={[`订阅 ${formatNumber(subscriptionCount)}`]}
-          tone="amber"
-        />
-        <SolutionSummaryItem
-          icon="chart-bar"
-          label="月度收入"
-          value={formatMoney(monthlyRevenue)}
-          tags={[`场景 ${formatNumber(industries.length)}`]}
-          tone="blue"
-        />
-      </section>
+      <MetricGrid
+        aria-label="解决方案统计"
+        items={[
+          {
+            id: "total",
+            icon: "workflow",
+            label: "方案总数",
+            value: formatNumber(solutions.length),
+            tags: [`启用 ${formatNumber(activeSolutions)}`],
+          },
+          {
+            id: "products",
+            icon: "cube",
+            label: "产品能力",
+            value: formatNumber(productCount),
+            tags: [`三方 ${formatNumber(partnerProductCount)}`],
+            tone: "success",
+          },
+          {
+            id: "tiers",
+            icon: "star",
+            label: "服务套餐",
+            value: formatNumber(tierCount),
+            tags: [`订阅 ${formatNumber(subscriptionCount)}`],
+            tone: "warning",
+          },
+          {
+            id: "revenue",
+            icon: "chart-bar",
+            label: "月度收入",
+            value: formatMoney(monthlyRevenue),
+            tags: [`场景 ${formatNumber(industries.length)}`],
+            tone: "brand",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="解决方案筛选">

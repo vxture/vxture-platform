@@ -14,6 +14,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import { fetchPromotionRedemptionRecords } from "@/api/admin-bff";
@@ -34,7 +35,6 @@ import {
   formatCurrency,
   PageSizePicker,
   type PageSize,
-  SummaryItem,
   Tag,
   type ViewMode,
 } from "./CommercialUtils";
@@ -512,35 +512,42 @@ export function PromotionRedemptionsPage() {
         description="运营侧查看券核销台账（核销均为客户自助）。减免金额来自账单 discount_amount。"
       />
 
-      <section className="vx-tenant-summary" aria-label="优惠核销统计">
-        <SummaryItem
-          icon="check"
-          label="核销记录"
-          value={formatNumber(records.length)}
-          tags={[`筛选 ${formatNumber(filteredRecords.length)}`]}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="减免金额"
-          value={formatCurrency(discountAmount, "CNY")}
-          tags={["账单减免"]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="buildings"
-          label="覆盖租户"
-          value={formatNumber(tenantReach)}
-          tags={["去重"]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="sparkles"
-          label="账单已结清"
-          value={formatNumber(paidBillCount)}
-          tags={["billStatus=paid"]}
-          tone="green"
-        />
-      </section>
+      <MetricGrid
+        aria-label="优惠核销统计"
+        items={[
+          {
+            id: "records",
+            icon: "check",
+            label: "核销记录",
+            value: formatNumber(records.length),
+            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+          },
+          {
+            id: "discount",
+            icon: "chart-bar",
+            label: "减免金额",
+            value: formatCurrency(discountAmount, "CNY"),
+            tags: ["账单减免"],
+            tone: "success",
+          },
+          {
+            id: "tenant-reach",
+            icon: "buildings",
+            label: "覆盖租户",
+            value: formatNumber(tenantReach),
+            tags: ["去重"],
+            tone: "success",
+          },
+          {
+            id: "paid-bills",
+            icon: "sparkles",
+            label: "账单已结清",
+            value: formatNumber(paidBillCount),
+            tags: ["billStatus=paid"],
+            tone: "success",
+          },
+        ]}
+      />
 
       {recordsTruncated ? (
         <Banner

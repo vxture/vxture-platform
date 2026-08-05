@@ -19,6 +19,7 @@ import {
   StatusBadge,
   ListCardGrid,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -81,35 +82,6 @@ function tenantStatusIndicator(tenant: TenantOperationRecord): {
   }
 
   return { tone: "normal", label: "正常", icon: "check" };
-}
-
-function TenantSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function TenantActionsMenu({
@@ -668,41 +640,48 @@ export function TenantsPage() {
         description="平台运营侧统一检索租户、识别风险、处理订阅和进入单租户管理。"
       />
 
-      <section className="vx-tenant-summary" aria-label="租户运营统计">
-        <TenantSummaryItem
-          icon="buildings"
-          label="租户总数"
-          value={formatNumber(tenants.length)}
-          tags={[
-            `个人 ${formatNumber(individualTenants)}`,
-            `组织 ${formatNumber(companyTenants)}`,
-          ]}
-        />
-        <TenantSummaryItem
-          icon="medal"
-          label="认证待审"
-          value={formatNumber(pendingVerifications)}
-          tags={[
-            `个人 ${formatNumber(pendingIndividualVerifications)}`,
-            `组织 ${formatNumber(pendingCompanyVerifications)}`,
-          ]}
-          tone="amber"
-        />
-        <TenantSummaryItem
-          icon="star"
-          label="试用租户"
-          value={formatNumber(trialProductTenants)}
-          tags={["未付费"]}
-          tone="amber"
-        />
-        <TenantSummaryItem
-          icon="warning"
-          label="风险租户"
-          value={formatNumber(riskTenants)}
-          tags={["需跟进"]}
-          tone={riskTenants ? "rose" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="租户运营统计"
+        items={[
+          {
+            id: "total",
+            icon: "buildings",
+            label: "租户总数",
+            value: formatNumber(tenants.length),
+            tags: [
+              `个人 ${formatNumber(individualTenants)}`,
+              `组织 ${formatNumber(companyTenants)}`,
+            ],
+          },
+          {
+            id: "pending-verification",
+            icon: "medal",
+            label: "认证待审",
+            value: formatNumber(pendingVerifications),
+            tags: [
+              `个人 ${formatNumber(pendingIndividualVerifications)}`,
+              `组织 ${formatNumber(pendingCompanyVerifications)}`,
+            ],
+            tone: "warning",
+          },
+          {
+            id: "trial",
+            icon: "star",
+            label: "试用租户",
+            value: formatNumber(trialProductTenants),
+            tags: ["未付费"],
+            tone: "warning",
+          },
+          {
+            id: "risk",
+            icon: "warning",
+            label: "风险租户",
+            value: formatNumber(riskTenants),
+            tags: ["需跟进"],
+            tone: riskTenants ? "danger" : "success",
+          },
+        ]}
+      />
 
       {tenantsTruncated ? (
         <Banner

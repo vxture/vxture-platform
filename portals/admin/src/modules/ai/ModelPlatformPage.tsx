@@ -17,8 +17,8 @@ import {
   EmptyState,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
 import {
   activateModelPriceRule,
   activateModelProvider,
@@ -263,35 +263,6 @@ function isInteractiveTarget(target: EventTarget | null) {
         'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
       ),
     )
-  );
-}
-
-function ModelSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size={24} fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
   );
 }
 
@@ -1066,61 +1037,68 @@ export function ModelPlatformPage() {
         </p>
       ) : null}
 
-      <section
-        className="vx-tenant-summary vx-model-platform-summary"
+      <MetricGrid
         aria-label={t("summary.ariaLabel")}
-      >
-        <ModelSummaryItem
-          icon="plug"
-          label={t("summary.models")}
-          value={formatNumber(models.length)}
-          tags={[
-            `${t("filters.online")} ${formatNumber(onlineModels)}`,
-            `${t("filters.private")} ${formatNumber(privateModels)}`,
-          ]}
-        />
-        <ModelSummaryItem
-          icon="play"
-          label={t("filters.active")}
-          value={formatNumber(activeModels)}
-          tags={["可调度"]}
-          tone={activeModels ? "green" : "amber"}
-        />
-        <ModelSummaryItem
-          icon="code"
-          label={t("status.inactive")}
-          value={formatNumber(inactiveModels)}
-          tags={inactiveModels ? ["需复核"] : ["无停用"]}
-          tone={inactiveModels ? "amber" : "green"}
-        />
-        <ModelSummaryItem
-          icon="settings"
-          label="Provider"
-          value={formatNumber(providers.length)}
-          tags={[`启用 ${formatNumber(activeProviders.length)}`]}
-          tone={activeProviders.length ? "green" : "amber"}
-        />
-        <ModelSummaryItem
-          icon="database"
-          label="策略 / 成本"
-          value={`${formatNumber(activePolicies.length)} / ${formatNumber(activePriceRules.length)}`}
-          tags={[
-            `策略 ${formatNumber(policies.length)}`,
-            `价格 ${formatNumber(priceRules.length)}`,
-          ]}
-          tone="blue"
-        />
-        <ModelSummaryItem
-          icon="chart-bar"
-          label="配额 / 用量"
-          value={`${formatNumber(activeQuotas.length)} / ${formatNumber(totalUsageTokens)}`}
-          tags={[
-            `配额 ${formatNumber(quotas.length)}`,
-            `汇总 ${formatNumber(usageSummaries.length)}`,
-          ]}
-          tone={usageSummaries.length ? "green" : "amber"}
-        />
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "models",
+            icon: "plug",
+            label: t("summary.models"),
+            value: formatNumber(models.length),
+            tags: [
+              `${t("filters.online")} ${formatNumber(onlineModels)}`,
+              `${t("filters.private")} ${formatNumber(privateModels)}`,
+            ],
+          },
+          {
+            id: "active",
+            icon: "play",
+            label: t("filters.active"),
+            value: formatNumber(activeModels),
+            tags: ["可调度"],
+            tone: activeModels ? "success" : "warning",
+          },
+          {
+            id: "inactive",
+            icon: "code",
+            label: t("status.inactive"),
+            value: formatNumber(inactiveModels),
+            tags: inactiveModels ? ["需复核"] : ["无停用"],
+            tone: inactiveModels ? "warning" : "success",
+          },
+          {
+            id: "providers",
+            icon: "settings",
+            label: "Provider",
+            value: formatNumber(providers.length),
+            tags: [`启用 ${formatNumber(activeProviders.length)}`],
+            tone: activeProviders.length ? "success" : "warning",
+          },
+          {
+            id: "policies-cost",
+            icon: "database",
+            label: "策略 / 成本",
+            value: `${formatNumber(activePolicies.length)} / ${formatNumber(activePriceRules.length)}`,
+            tags: [
+              `策略 ${formatNumber(policies.length)}`,
+              `价格 ${formatNumber(priceRules.length)}`,
+            ],
+            tone: "brand",
+          },
+          {
+            id: "quota-usage",
+            icon: "chart-bar",
+            label: "配额 / 用量",
+            value: `${formatNumber(activeQuotas.length)} / ${formatNumber(totalUsageTokens)}`,
+            tags: [
+              `配额 ${formatNumber(quotas.length)}`,
+              `汇总 ${formatNumber(usageSummaries.length)}`,
+            ],
+            tone: usageSummaries.length ? "success" : "warning",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section

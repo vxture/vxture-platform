@@ -20,6 +20,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName, ViewModeSwitchValue } from "@vxture/design-system";
 import {
@@ -809,43 +810,39 @@ function PermissionDetailDialog({
 
 function PermissionDomainStats({ group }: { group: PermissionDomainGroup }) {
   return (
-    <section
-      className="vx-tenant-summary vx-admin-permission-domain__stats vx-admin-permissions-summary"
+    <MetricGrid
       aria-label={`${group.title}统计`}
-    >
-      <article className="vx-tenant-summary__item vx-tenant-tone--blue">
-        <Icon name="shield-check" size="lg" fallback="placeholder" />
-        <div>
-          <span>权限总数</span>
-          <p>
-            <strong>{formatNumber(group.totalCount)}</strong>
-            <em>L1 {formatNumber(group.levelCounts.l1)}</em>
-            <em>L2 {formatNumber(group.levelCounts.l2)}</em>
-            <em>L3 {formatNumber(group.levelCounts.l3)}</em>
-          </p>
-        </div>
-      </article>
-      <article className="vx-tenant-summary__item vx-tenant-tone--green">
-        <Icon name="check" size="lg" fallback="placeholder" />
-        <div>
-          <span>启用权限</span>
-          <p>
-            <strong>{formatNumber(group.activeCount)}</strong>
-            <em>停用 {formatNumber(group.disabledCount)}</em>
-          </p>
-        </div>
-      </article>
-      <article className="vx-tenant-summary__item vx-tenant-tone--amber">
-        <Icon name="key" size="lg" fallback="placeholder" />
-        <div>
-          <span>绑定权限</span>
-          <p>
-            <strong>{formatNumber(group.assignedCount)}</strong>
-            <em>未绑定 {formatNumber(group.unassignedCount)}</em>
-          </p>
-        </div>
-      </article>
-    </section>
+      columns={3}
+      items={[
+        {
+          id: "total",
+          icon: "shield-check",
+          label: "权限总数",
+          value: formatNumber(group.totalCount),
+          tags: [
+            `L1 ${formatNumber(group.levelCounts.l1)}`,
+            `L2 ${formatNumber(group.levelCounts.l2)}`,
+            `L3 ${formatNumber(group.levelCounts.l3)}`,
+          ],
+        },
+        {
+          id: "active",
+          icon: "check",
+          label: "启用权限",
+          value: formatNumber(group.activeCount),
+          tags: [`停用 ${formatNumber(group.disabledCount)}`],
+          tone: "success",
+        },
+        {
+          id: "assigned",
+          icon: "key",
+          label: "绑定权限",
+          value: formatNumber(group.assignedCount),
+          tags: [`未绑定 ${formatNumber(group.unassignedCount)}`],
+          tone: "warning",
+        },
+      ]}
+    />
   );
 }
 
@@ -1555,43 +1552,39 @@ export function AdminPermissionsPage() {
         description="统一维护平台菜单、按钮和接口权限，用于角色授权、访问控制和平台自治治理。"
       />
 
-      <section
-        className="vx-tenant-summary vx-admin-permissions-summary"
+      <MetricGrid
         aria-label="平台权限统计"
-      >
-        <article className="vx-tenant-summary__item vx-tenant-tone--blue">
-          <Icon name="shield-check" size="lg" fallback="placeholder" />
-          <div>
-            <span>权限总数</span>
-            <p>
-              <strong>{formatNumber(permissions.length)}</strong>
-              <em>L1 {formatNumber(permissionLevelCounts.l1)}</em>
-              <em>L2 {formatNumber(permissionLevelCounts.l2)}</em>
-              <em>L3 {formatNumber(permissionLevelCounts.l3)}</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--green">
-          <Icon name="check" size="lg" fallback="placeholder" />
-          <div>
-            <span>启用权限</span>
-            <p>
-              <strong>{formatNumber(activeCount)}</strong>
-              <em>停用 {formatNumber(disabledCount)}</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--amber">
-          <Icon name="key" size="lg" fallback="placeholder" />
-          <div>
-            <span>绑定权限</span>
-            <p>
-              <strong>{formatNumber(assignedCount)}</strong>
-              <em>未绑定 {formatNumber(unassignedCount)}</em>
-            </p>
-          </div>
-        </article>
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "total",
+            icon: "shield-check",
+            label: "权限总数",
+            value: formatNumber(permissions.length),
+            tags: [
+              `L1 ${formatNumber(permissionLevelCounts.l1)}`,
+              `L2 ${formatNumber(permissionLevelCounts.l2)}`,
+              `L3 ${formatNumber(permissionLevelCounts.l3)}`,
+            ],
+          },
+          {
+            id: "active",
+            icon: "check",
+            label: "启用权限",
+            value: formatNumber(activeCount),
+            tags: [`停用 ${formatNumber(disabledCount)}`],
+            tone: "success",
+          },
+          {
+            id: "assigned",
+            icon: "key",
+            label: "绑定权限",
+            value: formatNumber(assignedCount),
+            tags: [`未绑定 ${formatNumber(unassignedCount)}`],
+            tone: "warning",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         {permissions.length ? (

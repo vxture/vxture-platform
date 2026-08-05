@@ -14,6 +14,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -35,7 +36,6 @@ import {
   formatPercent,
   PageSizePicker,
   type PageSize,
-  SummaryItem,
   Tag,
   type ViewMode,
 } from "./CommercialUtils";
@@ -535,35 +535,42 @@ export function UsageMeteringPage() {
         description="运营侧查看租户、订阅、产品能力维度的计量消耗、配额使用率和超额风险。"
       />
 
-      <section className="vx-tenant-summary" aria-label="用量计费统计">
-        <SummaryItem
-          icon="graph"
-          label="计量记录"
-          value={formatNumber(records.length)}
-          tags={[`筛选 ${formatNumber(filteredRecords.length)}`]}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="总消耗"
-          value={formatNumber(totalUsed)}
-          tags={[`计量项 ${formatNumber(records.length)}`]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="clock"
-          label="接近上限"
-          value={formatNumber(warningCount)}
-          tags={[">=85%"]}
-          tone={warningCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="warning"
-          label="超额异常"
-          value={formatNumber(dangerCount)}
-          tags={[">100% / 异常"]}
-          tone={dangerCount ? "rose" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="用量计费统计"
+        items={[
+          {
+            id: "records",
+            icon: "graph",
+            label: "计量记录",
+            value: formatNumber(records.length),
+            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+          },
+          {
+            id: "total-used",
+            icon: "chart-bar",
+            label: "总消耗",
+            value: formatNumber(totalUsed),
+            tags: [`计量项 ${formatNumber(records.length)}`],
+            tone: "success",
+          },
+          {
+            id: "near-limit",
+            icon: "clock",
+            label: "接近上限",
+            value: formatNumber(warningCount),
+            tags: [">=85%"],
+            tone: warningCount ? "warning" : "success",
+          },
+          {
+            id: "over-limit",
+            icon: "warning",
+            label: "超额异常",
+            value: formatNumber(dangerCount),
+            tags: [">100% / 异常"],
+            tone: dangerCount ? "danger" : "success",
+          },
+        ]}
+      />
 
       {recordsTruncated ? (
         <Banner

@@ -10,6 +10,7 @@ import {
   Pagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
 } from "@vxture/design-system";
 import { fetchAuditLogs, type AuditLogFilters } from "@/api/admin-bff";
 import type { AuditLogRecord } from "@/entities/console";
@@ -63,41 +64,35 @@ function AuditSummary({ logs }: { logs: AuditLogRecord[] }) {
   const operatorSet = new Set(logs.map((l) => l.operatorId));
 
   return (
-    <section
-      className="vx-tenant-summary vx-audit-summary"
+    <MetricGrid
       aria-label="审计日志统计"
-    >
-      <article className="vx-tenant-summary__item vx-tenant-tone--blue">
-        <Icon name="list" size="lg" fallback="placeholder" />
-        <div>
-          <span>日志总数</span>
-          <p>
-            <strong>{logs.length}</strong>
-            <em>操作员 {operatorSet.size}</em>
-          </p>
-        </div>
-      </article>
-      <article className="vx-tenant-summary__item vx-tenant-tone--green">
-        <Icon name="check" size="lg" fallback="placeholder" />
-        <div>
-          <span>今日操作</span>
-          <p>
-            <strong>{todayLogs.length}</strong>
-            <em>当日写入</em>
-          </p>
-        </div>
-      </article>
-      <article className="vx-tenant-summary__item vx-tenant-tone--rose">
-        <Icon name="x" size="lg" fallback="placeholder" />
-        <div>
-          <span>失败操作</span>
-          <p>
-            <strong>{failureCount}</strong>
-            <em>需复核</em>
-          </p>
-        </div>
-      </article>
-    </section>
+      columns={3}
+      items={[
+        {
+          id: "total",
+          icon: "list",
+          label: "日志总数",
+          value: logs.length,
+          tags: [`操作员 ${operatorSet.size}`],
+        },
+        {
+          id: "today",
+          icon: "check",
+          label: "今日操作",
+          value: todayLogs.length,
+          tags: ["当日写入"],
+          tone: "success",
+        },
+        {
+          id: "failures",
+          icon: "x",
+          label: "失败操作",
+          value: failureCount,
+          tags: ["需复核"],
+          tone: "danger",
+        },
+      ]}
+    />
   );
 }
 

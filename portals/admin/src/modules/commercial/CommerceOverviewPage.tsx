@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Icon, EmptyState } from "@vxture/design-system";
+import { Icon, EmptyState, MetricGrid } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchCommerceOverview } from "@/api/admin-bff";
 import type {
@@ -11,7 +11,8 @@ import type {
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
-import { formatCurrency, SummaryItem } from "./CommercialUtils";
+import { formatCurrency } from "./CommercialUtils";
+import { toStatusTone } from "@/modules/shared/tone";
 
 const quickLinks: Array<{
   href: string;
@@ -96,18 +97,17 @@ function OverviewMetricSummary({
   metrics: CommerceOverviewMetric[];
 }) {
   return (
-    <section className="vx-tenant-summary" aria-label="商业总览统计">
-      {metrics.map((metric) => (
-        <SummaryItem
-          key={metric.key}
-          icon={metricIcon(metric)}
-          label={metric.label}
-          value={metricValue(metric)}
-          tags={metricTags(metric)}
-          tone={metric.tone}
-        />
-      ))}
-    </section>
+    <MetricGrid
+      aria-label="商业总览统计"
+      items={metrics.map((metric) => ({
+        id: metric.key,
+        icon: metricIcon(metric),
+        label: metric.label,
+        value: metricValue(metric),
+        tags: metricTags(metric),
+        tone: toStatusTone(metric.tone),
+      }))}
+    />
   );
 }
 

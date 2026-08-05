@@ -12,6 +12,7 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchPlatformGovernanceRecords } from "@/api/admin-bff";
@@ -366,51 +367,45 @@ export function PlatformGovernanceListPage({
         description={config.description}
       />
 
-      <section
-        className="vx-tenant-summary vx-platform-governance-summary"
+      <MetricGrid
         aria-label={`${config.title}统计`}
-      >
-        <article className="vx-tenant-summary__item vx-tenant-tone--blue">
-          <Icon name={config.icon} size="lg" fallback="placeholder" />
-          <div>
-            <span>{config.summary.total.label}</span>
-            <p>
-              <strong>{formatNumber(summary.total)}</strong>
-              <em>{config.summary.total.tag}</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--green">
-          <Icon name="check" size="lg" fallback="placeholder" />
-          <div>
-            <span>{config.summary.normal.label}</span>
-            <p>
-              <strong>{formatNumber(summary.normal)}</strong>
-              <em>{config.summary.normal.tag}</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--amber">
-          <Icon name="info" size="lg" fallback="placeholder" />
-          <div>
-            <span>{config.summary.risk.label}</span>
-            <p>
-              <strong>{formatNumber(summary.risk + summary.pending)}</strong>
-              {summary.risk ? (
-                <em>
-                  {config.summary.risk.tag} {formatNumber(summary.risk)}
-                </em>
-              ) : null}
-              {summary.pending ? (
-                <em>
-                  {config.summary.pending.tag} {formatNumber(summary.pending)}
-                </em>
-              ) : null}
-              {!summary.risk && !summary.pending ? <em>无待处理</em> : null}
-            </p>
-          </div>
-        </article>
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "total",
+            icon: config.icon,
+            label: config.summary.total.label,
+            value: formatNumber(summary.total),
+            tags: [config.summary.total.tag],
+          },
+          {
+            id: "normal",
+            icon: "check",
+            label: config.summary.normal.label,
+            value: formatNumber(summary.normal),
+            tags: [config.summary.normal.tag],
+            tone: "success",
+          },
+          {
+            id: "risk",
+            icon: "info",
+            label: config.summary.risk.label,
+            value: formatNumber(summary.risk + summary.pending),
+            tags: [
+              ...(summary.risk
+                ? [`${config.summary.risk.tag} ${formatNumber(summary.risk)}`]
+                : []),
+              ...(summary.pending
+                ? [
+                    `${config.summary.pending.tag} ${formatNumber(summary.pending)}`,
+                  ]
+                : []),
+              ...(!summary.risk && !summary.pending ? ["无待处理"] : []),
+            ],
+            tone: "warning",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section

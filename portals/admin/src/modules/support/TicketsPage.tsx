@@ -15,6 +15,7 @@ import {
   DialogForm,
   Input,
   Label,
+  MetricGrid,
   NativeSelect,
   Textarea,
   EmptyState,
@@ -146,35 +147,6 @@ function ticketSearchText(ticket: SupportTicketRecord) {
   ]
     .join(" ")
     .toLowerCase();
-}
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-        <p>
-          {tags.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function TicketActionsMenu({
@@ -856,35 +828,42 @@ export function TicketsPage() {
         secondary={<Badge>只读聚合</Badge>}
       />
 
-      <section className="vx-tenant-summary" aria-label="工单统计">
-        <SummaryItem
-          icon="chat-circle"
-          label="未关闭工单"
-          value={formatNumber(openTickets.length)}
-          tags={[`影响租户 ${formatNumber(affectedTenants)}`]}
-          tone={openTickets.length ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="warning"
-          label="P0/P1 工单"
-          value={formatNumber(urgentTickets.length)}
-          tags={["优先处理"]}
-          tone={urgentTickets.length ? "rose" : "green"}
-        />
-        <SummaryItem
-          icon="clock"
-          label="阻塞中"
-          value={formatNumber(blockedTickets.length)}
-          tags={["需要协同"]}
-          tone={blockedTickets.length ? "rose" : "green"}
-        />
-        <SummaryItem
-          icon="table"
-          label="工单总数"
-          value={formatNumber(tickets.length)}
-          tags={["来自工单数据库"]}
-        />
-      </section>
+      <MetricGrid
+        aria-label="工单统计"
+        items={[
+          {
+            id: "open",
+            icon: "chat-circle",
+            label: "未关闭工单",
+            value: formatNumber(openTickets.length),
+            tags: [`影响租户 ${formatNumber(affectedTenants)}`],
+            tone: openTickets.length ? "warning" : "success",
+          },
+          {
+            id: "urgent",
+            icon: "warning",
+            label: "P0/P1 工单",
+            value: formatNumber(urgentTickets.length),
+            tags: ["优先处理"],
+            tone: urgentTickets.length ? "danger" : "success",
+          },
+          {
+            id: "blocked",
+            icon: "clock",
+            label: "阻塞中",
+            value: formatNumber(blockedTickets.length),
+            tags: ["需要协同"],
+            tone: blockedTickets.length ? "danger" : "success",
+          },
+          {
+            id: "total",
+            icon: "table",
+            label: "工单总数",
+            value: formatNumber(tickets.length),
+            tags: ["来自工单数据库"],
+          },
+        ]}
+      />
 
       <section className="vx-tenant-toolbar" aria-label="工单筛选">
         <Input

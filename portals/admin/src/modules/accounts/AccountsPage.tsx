@@ -18,6 +18,7 @@ import {
   Textarea,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -213,42 +214,6 @@ function accountSearchText(account: AccountOperationRecord) {
   ]
     .join(" ")
     .toLowerCase();
-}
-
-function AccountSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article
-      className={joinClasses(
-        `vx-tenant-summary__item vx-tenant-tone--${tone}`,
-        icon === "user" || icon === "role"
-          ? "vx-tenant-summary__item--identity-icon"
-          : "",
-      )}
-    >
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function AccountActionsMenu({
@@ -834,38 +799,45 @@ export function AccountsPage({
         description={pageCopy.description}
       />
 
-      <section
-        className="vx-tenant-summary"
+      <MetricGrid
         aria-label={pageCopy.summaryAriaLabel}
-      >
-        <AccountSummaryItem
-          icon="user"
-          label="账号总数"
-          value={formatNumber(accounts.length)}
-          tags={[`活跃 ${formatNumber(activeAccounts)}`]}
-        />
-        <AccountSummaryItem
-          icon="clock"
-          label="待激活"
-          value={formatNumber(invitedAccounts)}
-          tags={["邀请中"]}
-          tone="amber"
-        />
-        <AccountSummaryItem
-          icon="warning"
-          label="已锁定"
-          value={formatNumber(lockedAccounts)}
-          tags={["临时锁定"]}
-          tone={lockedAccounts ? "amber" : "green"}
-        />
-        <AccountSummaryItem
-          icon="x"
-          label="已停用"
-          value={formatNumber(disabledAccounts)}
-          tags={["长期未用"]}
-          tone={disabledAccounts ? "rose" : "green"}
-        />
-      </section>
+        items={[
+          {
+            id: "total",
+            icon: "user",
+            label: "账号总数",
+            value: formatNumber(accounts.length),
+            tags: [`活跃 ${formatNumber(activeAccounts)}`],
+            // 身份类图标原本走 `--identity-icon` 修饰去色（gray-400）：这张卡是
+            // 基数不是状态，不该跟着染品牌色。neutral 是 DS 里表达"刻意去色"的档。
+            tone: "neutral",
+          },
+          {
+            id: "invited",
+            icon: "clock",
+            label: "待激活",
+            value: formatNumber(invitedAccounts),
+            tags: ["邀请中"],
+            tone: "warning",
+          },
+          {
+            id: "locked",
+            icon: "warning",
+            label: "已锁定",
+            value: formatNumber(lockedAccounts),
+            tags: ["临时锁定"],
+            tone: lockedAccounts ? "warning" : "success",
+          },
+          {
+            id: "disabled",
+            icon: "x",
+            label: "已停用",
+            value: formatNumber(disabledAccounts),
+            tags: ["长期未用"],
+            tone: disabledAccounts ? "danger" : "success",
+          },
+        ]}
+      />
 
       {accountsTruncated ? (
         <Banner

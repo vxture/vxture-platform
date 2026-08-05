@@ -15,6 +15,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -165,35 +166,6 @@ function orderSearchText(record: OrderOperationRecord) {
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
-}
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function OrderActionsMenu({
@@ -746,42 +718,50 @@ export function OrdersPage() {
         description="运营侧查看租户订阅订单、账单和收款状态，支撑续期确认、异常处理和财务对账。"
       />
 
-      <section className="vx-tenant-summary" aria-label="订单管理统计">
-        <SummaryItem
-          icon="table"
-          label="订单总数"
-          value={formatNumber(orders.length)}
-          tags={[`筛选 ${formatNumber(filteredOrders.length)}`]}
-        />
-        <SummaryItem
-          icon="clock"
-          label="待处理"
-          value={formatNumber(pendingCount)}
-          tags={[
-            `待复核 ${formatNumber(orders.filter((item) => item.orderStatus === "pending_verify").length)}`,
-          ]}
-          tone={pendingCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="已确认金额"
-          value={formatCurrency(confirmedAmount, "CNY")}
-          tags={["运营口径"]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="warning"
-          label="异常逾期"
-          value={formatNumber(overdueCount + abnormalCount + attentionCount)}
-          tags={[
-            `异常 ${formatNumber(abnormalCount)}`,
-            `付未开通/挂账 ${formatNumber(attentionCount)}`,
-          ]}
-          tone={
-            overdueCount || abnormalCount || attentionCount ? "rose" : "green"
-          }
-        />
-      </section>
+      <MetricGrid
+        aria-label="订单管理统计"
+        items={[
+          {
+            id: "total",
+            icon: "table",
+            label: "订单总数",
+            value: formatNumber(orders.length),
+            tags: [`筛选 ${formatNumber(filteredOrders.length)}`],
+          },
+          {
+            id: "pending",
+            icon: "clock",
+            label: "待处理",
+            value: formatNumber(pendingCount),
+            tags: [
+              `待复核 ${formatNumber(orders.filter((item) => item.orderStatus === "pending_verify").length)}`,
+            ],
+            tone: pendingCount ? "warning" : "success",
+          },
+          {
+            id: "confirmed-amount",
+            icon: "chart-bar",
+            label: "已确认金额",
+            value: formatCurrency(confirmedAmount, "CNY"),
+            tags: ["运营口径"],
+            tone: "success",
+          },
+          {
+            id: "abnormal",
+            icon: "warning",
+            label: "异常逾期",
+            value: formatNumber(overdueCount + abnormalCount + attentionCount),
+            tags: [
+              `异常 ${formatNumber(abnormalCount)}`,
+              `付未开通/挂账 ${formatNumber(attentionCount)}`,
+            ],
+            tone:
+              overdueCount || abnormalCount || attentionCount
+                ? "danger"
+                : "success",
+          },
+        ]}
+      />
 
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">

@@ -14,6 +14,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import {
@@ -43,7 +44,6 @@ import {
 import {
   PageSizePicker,
   type PageSize,
-  SummaryItem,
   Tag,
   type ViewMode,
 } from "./CommercialUtils";
@@ -521,38 +521,45 @@ export function PromotionsPage() {
         title="营销优惠"
         description="市场运营侧查看卡券批次、发放与核销台账（批次/发码/核销数据来自 promotion 域）。券面金额按 kind 存于 effect JSONB，暂不在本台账展示（见 TD-030）。"
       />
-      <section className="vx-tenant-summary" aria-label="营销优惠统计">
-        <SummaryItem
-          icon="sparkles"
-          label="优惠活动"
-          value={formatNumber(records.length)}
-          tags={[`生效 ${formatNumber(activeCount)}`]}
-        />
-        <SummaryItem
-          icon="check"
-          label="核销次数"
-          value={formatNumber(redemptionCount)}
-          tags={[`筛选 ${formatNumber(filteredRecords.length)}`]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="覆盖租户"
-          value={formatNumber(tenantReach)}
-          tags={["已核销租户数"]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="clock"
-          label="待配置"
-          value={formatNumber(
-            records.filter((record) => record.promotionType === "coupon")
-              .length,
-          )}
-          tags={["优惠码"]}
-          tone="amber"
-        />
-      </section>
+      <MetricGrid
+        aria-label="营销优惠统计"
+        items={[
+          {
+            id: "promotions",
+            icon: "sparkles",
+            label: "优惠活动",
+            value: formatNumber(records.length),
+            tags: [`生效 ${formatNumber(activeCount)}`],
+          },
+          {
+            id: "redemptions",
+            icon: "check",
+            label: "核销次数",
+            value: formatNumber(redemptionCount),
+            tags: [`筛选 ${formatNumber(filteredRecords.length)}`],
+            tone: "success",
+          },
+          {
+            id: "tenant-reach",
+            icon: "chart-bar",
+            label: "覆盖租户",
+            value: formatNumber(tenantReach),
+            tags: ["已核销租户数"],
+            tone: "success",
+          },
+          {
+            id: "pending-config",
+            icon: "clock",
+            label: "待配置",
+            value: formatNumber(
+              records.filter((record) => record.promotionType === "coupon")
+                .length,
+            ),
+            tags: ["优惠码"],
+            tone: "warning",
+          },
+        ]}
+      />
       {recordsTruncated ? (
         <Banner
           tone="warning"

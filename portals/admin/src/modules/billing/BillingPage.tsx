@@ -15,6 +15,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
@@ -250,35 +251,6 @@ const billingCsvColumns: CsvColumn<BillingRecord>[] = [
   { label: "发票号", value: (b) => b.invoiceNo ?? "" },
   { label: "经办人", value: (b) => b.operatorName },
 ];
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
-}
 
 function BillingActionsMenu({
   bill,
@@ -904,46 +876,53 @@ export function BillingPage() {
         description="运营侧查看租户账单、收款进度和线下发票处理结果；当前仅支持人工同步登记，不调用在线开票接口。"
       />
 
-      <section className="vx-tenant-summary" aria-label="账单中心统计">
-        <SummaryItem
-          icon="key"
-          label="账单总数"
-          value={formatNumber(bills.length)}
-          tags={[
-            `筛选 ${formatNumber(filteredBills.length)}`,
-            `异常 ${formatNumber(exceptionCount)}`,
-          ]}
-        />
-        <SummaryItem
-          icon="clock"
-          label="待收款"
-          value={formatNumber(pendingCount)}
-          tags={[
-            `逾期 ${formatNumber(bills.filter((item) => item.billStatus === "overdue").length)}`,
-          ]}
-          tone={pendingCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="应收金额"
-          value={formatCurrency(receivableAmount, "CNY")}
-          tags={[
-            `已收 ${formatCurrency(paidAmount, "CNY")}`,
-            `减免 ${formatCurrency(discountedAmount, "CNY")}`,
-          ]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="table"
-          label="开票进度"
-          value={formatCurrency(invoicedAmount, "CNY")}
-          tags={[
-            `待处理 ${formatNumber(invoicePendingCount)}`,
-            `调整 ${formatNumber(exceptionBillCount)}`,
-          ]}
-          tone={invoicePendingCount ? "amber" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="账单中心统计"
+        items={[
+          {
+            id: "total",
+            icon: "key",
+            label: "账单总数",
+            value: formatNumber(bills.length),
+            tags: [
+              `筛选 ${formatNumber(filteredBills.length)}`,
+              `异常 ${formatNumber(exceptionCount)}`,
+            ],
+          },
+          {
+            id: "pending",
+            icon: "clock",
+            label: "待收款",
+            value: formatNumber(pendingCount),
+            tags: [
+              `逾期 ${formatNumber(bills.filter((item) => item.billStatus === "overdue").length)}`,
+            ],
+            tone: pendingCount ? "warning" : "success",
+          },
+          {
+            id: "receivable",
+            icon: "chart-bar",
+            label: "应收金额",
+            value: formatCurrency(receivableAmount, "CNY"),
+            tags: [
+              `已收 ${formatCurrency(paidAmount, "CNY")}`,
+              `减免 ${formatCurrency(discountedAmount, "CNY")}`,
+            ],
+            tone: "success",
+          },
+          {
+            id: "invoiced",
+            icon: "table",
+            label: "开票进度",
+            value: formatCurrency(invoicedAmount, "CNY"),
+            tags: [
+              `待处理 ${formatNumber(invoicePendingCount)}`,
+              `调整 ${formatNumber(exceptionBillCount)}`,
+            ],
+            tone: invoicePendingCount ? "warning" : "success",
+          },
+        ]}
+      />
 
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">

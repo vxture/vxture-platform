@@ -15,8 +15,8 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricGrid,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
 import {
   createAiModelGrant,
   fetchAiModelGrants,
@@ -166,35 +166,6 @@ function isInteractiveTarget(target: EventTarget | null) {
         'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
       ),
     )
-  );
-}
-
-function ModelStrategySummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size={24} fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
   );
 }
 
@@ -546,34 +517,38 @@ export function ModelGrantsPage() {
         </p>
       ) : null}
 
-      <section
-        className="vx-tenant-summary vx-model-strategy-summary"
+      <MetricGrid
         aria-label={t("summary.ariaLabel")}
-      >
-        <ModelStrategySummaryItem
-          icon="shield-check"
-          label={t("summary.policies")}
-          value={formatNumber(policies.length)}
-          tags={[`${t("filters.usable")} ${formatNumber(usablePolicies)}`]}
-        />
-        <ModelStrategySummaryItem
-          icon="play"
-          label={t("overrides.title")}
-          value={formatNumber(grants.length)}
-          tags={[
-            `${t("status.active")} ${formatNumber(grants.filter((grant) => grant.isActive).length)}`,
-            `平台主体 ${formatNumber(platformPolicyCount)}`,
-          ]}
-          tone="green"
-        />
-        <ModelStrategySummaryItem
-          icon="clock-counter-clockwise"
-          label={t("summary.undefinedPolicies")}
-          value={formatNumber(undefinedPolicies)}
-          tags={[t("filters.undefined")]}
-          tone={undefinedPolicies ? "amber" : "green"}
-        />
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "policies",
+            icon: "shield-check",
+            label: t("summary.policies"),
+            value: formatNumber(policies.length),
+            tags: [`${t("filters.usable")} ${formatNumber(usablePolicies)}`],
+          },
+          {
+            id: "overrides",
+            icon: "play",
+            label: t("overrides.title"),
+            value: formatNumber(grants.length),
+            tags: [
+              `${t("status.active")} ${formatNumber(grants.filter((grant) => grant.isActive).length)}`,
+              `平台主体 ${formatNumber(platformPolicyCount)}`,
+            ],
+            tone: "success",
+          },
+          {
+            id: "undefined",
+            icon: "clock-counter-clockwise",
+            label: t("summary.undefinedPolicies"),
+            value: formatNumber(undefinedPolicies),
+            tags: [t("filters.undefined")],
+            tone: undefinedPolicies ? "warning" : "success",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section

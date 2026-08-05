@@ -24,6 +24,7 @@ import {
   Textarea,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -177,35 +178,6 @@ function verificationTimeText(tenant: TenantOperationRecord) {
     return `等待 ${formatNumber(daysSince(tenant.verificationSubmittedAt))} 天`;
   if (tenant.verifiedStatus === "rejected") return "需补充材料";
   return "未提交材料";
-}
-
-function VerificationSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function VerificationActionsMenu({
@@ -825,38 +797,45 @@ export function VerificationsPage() {
         description="集中处理组织租户提交的企业资质认证，按待审、通过、驳回和未提交状态推进审核流转。"
       />
 
-      <section className="vx-tenant-summary" aria-label="实名认证统计">
-        <VerificationSummaryItem
-          icon="buildings"
-          label="组织总数"
-          value={formatNumber(organizationTenants.length)}
-          tags={[`待审 ${formatNumber(pendingCount)}`]}
-        />
-        <VerificationSummaryItem
-          icon="clock"
-          label="待审核"
-          value={formatNumber(pendingCount)}
-          tags={[`超 3 天 ${formatNumber(overdueCount)}`]}
-          tone="amber"
-        />
-        <VerificationSummaryItem
-          icon="check"
-          label="已认证"
-          value={formatNumber(verifiedCount)}
-          tags={[`通过率 ${formatNumber(passRate)}%`]}
-          tone="green"
-        />
-        <VerificationSummaryItem
-          icon="warning"
-          label="需补充"
-          value={formatNumber(rejectedCount + unverifiedCount)}
-          tags={[
-            `驳回 ${formatNumber(rejectedCount)}`,
-            `未提交 ${formatNumber(unverifiedCount)}`,
-          ]}
-          tone={rejectedCount ? "rose" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="实名认证统计"
+        items={[
+          {
+            id: "organizations",
+            icon: "buildings",
+            label: "组织总数",
+            value: formatNumber(organizationTenants.length),
+            tags: [`待审 ${formatNumber(pendingCount)}`],
+          },
+          {
+            id: "pending",
+            icon: "clock",
+            label: "待审核",
+            value: formatNumber(pendingCount),
+            tags: [`超 3 天 ${formatNumber(overdueCount)}`],
+            tone: "warning",
+          },
+          {
+            id: "verified",
+            icon: "check",
+            label: "已认证",
+            value: formatNumber(verifiedCount),
+            tags: [`通过率 ${formatNumber(passRate)}%`],
+            tone: "success",
+          },
+          {
+            id: "needs-supplement",
+            icon: "warning",
+            label: "需补充",
+            value: formatNumber(rejectedCount + unverifiedCount),
+            tags: [
+              `驳回 ${formatNumber(rejectedCount)}`,
+              `未提交 ${formatNumber(unverifiedCount)}`,
+            ],
+            tone: rejectedCount ? "danger" : "success",
+          },
+        ]}
+      />
 
       {verificationsTruncated ? (
         <Banner

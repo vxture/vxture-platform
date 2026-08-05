@@ -14,6 +14,7 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchProductCapabilities } from "@/api/admin-bff";
@@ -101,35 +102,6 @@ function productSearchText(product: ProductCapabilityRecord) {
   ]
     .join(" ")
     .toLowerCase();
-}
-
-function ProductSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function ProductActionsMenu({
@@ -612,38 +584,45 @@ export function ProductsPage() {
         description="统一管理可组合、可授权、可计量的基础产品能力，作为解决方案、服务套餐和模型授权的供给目录。"
       />
 
-      <section className="vx-tenant-summary" aria-label="产品能力管理统计">
-        <ProductSummaryItem
-          icon="database"
-          label="能力总数"
-          value={formatNumber(products.length)}
-          tags={[`上线 ${formatNumber(activeProducts)}`]}
-        />
-        <ProductSummaryItem
-          icon="agent"
-          label="能力类型"
-          value={formatNumber(agentProducts + platformProducts)}
-          tags={[
-            `智能体 ${formatNumber(agentProducts)}`,
-            `平台 ${formatNumber(platformProducts)}`,
-          ]}
-          tone="green"
-        />
-        <ProductSummaryItem
-          icon="cloud"
-          label="三方接入"
-          value={formatNumber(partnerProducts)}
-          tags={["合作方"]}
-          tone={partnerProducts ? "amber" : "green"}
-        />
-        <ProductSummaryItem
-          icon="workflow"
-          label="方案复用"
-          value={formatNumber(solutionCount)}
-          tags={[`待配置 ${formatNumber(configRequiredProducts)}`]}
-          tone={configRequiredProducts ? "amber" : "blue"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="产品能力管理统计"
+        items={[
+          {
+            id: "total",
+            icon: "database",
+            label: "能力总数",
+            value: formatNumber(products.length),
+            tags: [`上线 ${formatNumber(activeProducts)}`],
+          },
+          {
+            id: "types",
+            icon: "agent",
+            label: "能力类型",
+            value: formatNumber(agentProducts + platformProducts),
+            tags: [
+              `智能体 ${formatNumber(agentProducts)}`,
+              `平台 ${formatNumber(platformProducts)}`,
+            ],
+            tone: "success",
+          },
+          {
+            id: "partner",
+            icon: "cloud",
+            label: "三方接入",
+            value: formatNumber(partnerProducts),
+            tags: ["合作方"],
+            tone: partnerProducts ? "warning" : "success",
+          },
+          {
+            id: "solutions",
+            icon: "workflow",
+            label: "方案复用",
+            value: formatNumber(solutionCount),
+            tags: [`待配置 ${formatNumber(configRequiredProducts)}`],
+            tone: configRequiredProducts ? "warning" : "brand",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="产品能力筛选">

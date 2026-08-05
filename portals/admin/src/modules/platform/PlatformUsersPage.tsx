@@ -23,6 +23,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import {
   changePlatformAdminRole,
@@ -1218,50 +1219,44 @@ export function PlatformUsersPage() {
         description="管理平台内部管理员、运营人员和运维人员；平台用户不归属于任何租户。"
       />
 
-      <section
-        className="vx-tenant-summary vx-platform-users-summary"
+      <MetricGrid
         aria-label="平台用户统计"
-      >
-        <article className="vx-tenant-summary__item vx-tenant-summary__item--identity-icon vx-tenant-tone--blue">
-          <Icon name="user" size="lg" fallback="placeholder" />
-          <div>
-            <span>用户总数</span>
-            <p>
-              <strong>{formatNumber(admins.length)}</strong>
-              <em>系统用户 {formatNumber(systemCount)}人</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--green">
-          <Icon name="check" size="lg" fallback="placeholder" />
-          <div>
-            <span>启用用户</span>
-            <p>
-              <strong>{formatNumber(enabledCount)}</strong>
-              <em>可登录</em>
-            </p>
-          </div>
-        </article>
-        <article className="vx-tenant-summary__item vx-tenant-tone--rose">
-          <Icon name="x" size="lg" fallback="placeholder" />
-          <div>
-            <span>其他用户</span>
-            <p>
-              <strong>{formatNumber(otherUserCount)}</strong>
-              {disabledCount ? (
-                <em>停用 {formatNumber(disabledCount)}</em>
-              ) : null}
-              {lockedCount ? <em>锁定 {formatNumber(lockedCount)}</em> : null}
-              {pendingCount ? (
-                <em>待激活 {formatNumber(pendingCount)}</em>
-              ) : null}
-              {suspendedCount ? (
-                <em>暂停 {formatNumber(suspendedCount)}</em>
-              ) : null}
-            </p>
-          </div>
-        </article>
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "total",
+            icon: "user",
+            label: "用户总数",
+            value: formatNumber(admins.length),
+            tags: [`系统用户 ${formatNumber(systemCount)}人`],
+            // 身份类图标原本走 `--identity-icon` 修饰去色：这张是基数不是状态。
+            tone: "neutral",
+          },
+          {
+            id: "enabled",
+            icon: "check",
+            label: "启用用户",
+            value: formatNumber(enabledCount),
+            tags: ["可登录"],
+            tone: "success",
+          },
+          {
+            id: "other",
+            icon: "x",
+            label: "其他用户",
+            value: formatNumber(otherUserCount),
+            tags: [
+              ...(disabledCount ? [`停用 ${formatNumber(disabledCount)}`] : []),
+              ...(lockedCount ? [`锁定 ${formatNumber(lockedCount)}`] : []),
+              ...(pendingCount ? [`待激活 ${formatNumber(pendingCount)}`] : []),
+              ...(suspendedCount
+                ? [`暂停 ${formatNumber(suspendedCount)}`]
+                : []),
+            ],
+            tone: "danger",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="平台用户筛选">

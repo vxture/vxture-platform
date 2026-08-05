@@ -36,6 +36,8 @@ export interface MetricGridItem {
   readonly icon?: IconName;
   readonly trend?: React.ReactNode;
   readonly trendTone?: StatusBadgeTone;
+  /** 读数旁的补充口径，0..n 条。见 `MetricCardProps.tags`。 */
+  readonly tags?: readonly React.ReactNode[];
   /** 整块语气，染顶缘色条。批 E 给 MetricCard 加的，item 类型没跟上就传不进去。 */
   readonly tone?: StatusBadgeTone;
 }
@@ -45,6 +47,11 @@ export interface MetricGridProps {
   readonly columns?: MetricGridColumns;
   /** 整排统一形态：一行 4 张以内用默认松散款，超过 4 张用无 icon 紧凑款。 */
   readonly variant?: "default" | "compact";
+  /**
+   * 这一排指标是什么（"订单管理统计"一类）。给了就连同 `role="group"` 一起挂上——
+   * 一排读数对读屏器是一堆无名数字，没有组名就只能逐张听过去。
+   */
+  readonly "aria-label"?: string;
   readonly className?: string;
 }
 
@@ -52,10 +59,14 @@ function MetricGrid({
   items,
   columns = 4,
   variant = "default",
+  "aria-label": ariaLabel,
   className,
 }: MetricGridProps) {
   return (
     <div
+      {...(ariaLabel !== undefined
+        ? { role: "group", "aria-label": ariaLabel }
+        : {})}
       className={cn(
         "grid gap-md sm:grid-cols-2",
         BY_COLUMNS[columns],
@@ -75,6 +86,7 @@ function MetricGrid({
           {...(item.trendTone !== undefined
             ? { trendTone: item.trendTone }
             : {})}
+          {...(item.tags !== undefined ? { tags: item.tags } : {})}
           {...(item.tone !== undefined ? { tone: item.tone } : {})}
           variant={variant}
         />

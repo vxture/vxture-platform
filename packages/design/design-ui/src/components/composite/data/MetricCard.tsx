@@ -31,6 +31,16 @@ export interface MetricCardProps {
   /** 环比、同比一类的变化量，渲染为 StatusBadge。 */
   readonly trend?: React.ReactNode;
   readonly trendTone?: StatusBadgeTone;
+  /**
+   * 读数旁的补充口径，0..n 条，与读数同行换行排布。
+   *
+   * 与 `trend` 分开是因为语义不同：`trend` 是这一个读数的变化量（单个、有涨跌
+   * 方向、自带 tone）；`tags` 是同一读数的分项或口径说明（"筛选 12"、"运营口径"、
+   * "影响租户 3"），彼此并列、没有方向、颜色跟随整卡语气——admin 的既有实现里
+   * 它们就是 `.vx-tenant-summary__item em { color: var(--tenant-tone) }`，
+   * 跟随而非独立着色（2026-08-05 对照 admin 41 处调用点）。
+   */
+  readonly tags?: readonly React.ReactNode[];
   readonly action?: React.ReactNode;
   /**
    * 整块的语气：染顶缘色条、图标与读数，不染底。
@@ -58,6 +68,7 @@ function MetricCard({
   icon,
   trend,
   trendTone = "neutral",
+  tags,
   action,
   tone = "brand",
   variant = "default",
@@ -109,6 +120,13 @@ function MetricCard({
               {trend ? (
                 <StatusBadge tone={trendTone}>{trend}</StatusBadge>
               ) : null}
+              {/* 标跟随整卡语气：一排卡片里，标的颜色是"属于哪张卡"的线索，
+                  各自独立着色会把这条线索打散。 */}
+              {tags?.map((tag, index) => (
+                <StatusBadge key={index} tone={tone}>
+                  {tag}
+                </StatusBadge>
+              ))}
             </div>
           </div>
         </div>

@@ -13,8 +13,8 @@ import {
   ActionButton,
   EmptyState,
   ViewModeSwitch,
+  MetricGrid,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
 import { fetchProductPlans, fetchProductSolutions } from "@/api/admin-bff";
 import type {
   ProductPlanRecord,
@@ -152,35 +152,6 @@ function groupTierItems(items: ServicePlanTierItem[]) {
   }
 
   return Array.from(groups.values());
-}
-
-function ServicePlanSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function ServicePlanActionsMenu({
@@ -567,35 +538,42 @@ export function ServicePlansPage() {
         description="按解决方案铺开 Free / Pro / Enterprise 等服务套餐，维护配额、价格、售卖状态和适用范围。"
       />
 
-      <section className="vx-tenant-summary" aria-label="服务套餐管理统计">
-        <ServicePlanSummaryItem
-          icon="workflow"
-          label="业务方案"
-          value={formatNumber(solutionCount)}
-          tags={[`套餐 ${formatNumber(tierItems.length)}`]}
-        />
-        <ServicePlanSummaryItem
-          icon="star"
-          label="启用套餐"
-          value={formatNumber(activeTierCount)}
-          tags={[`公开 ${formatNumber(publicTierCount)}`]}
-          tone="green"
-        />
-        <ServicePlanSummaryItem
-          icon="user"
-          label="订阅使用"
-          value={formatNumber(subscriptionCount)}
-          tags={[`场景 ${formatNumber(industries.length)}`]}
-          tone="amber"
-        />
-        <ServicePlanSummaryItem
-          icon="chart-bar"
-          label="月度收入"
-          value={formatMoney(monthlyRevenue)}
-          tags={["方案口径"]}
-          tone="blue"
-        />
-      </section>
+      <MetricGrid
+        aria-label="服务套餐管理统计"
+        items={[
+          {
+            id: "solutions",
+            icon: "workflow",
+            label: "业务方案",
+            value: formatNumber(solutionCount),
+            tags: [`套餐 ${formatNumber(tierItems.length)}`],
+          },
+          {
+            id: "active-tiers",
+            icon: "star",
+            label: "启用套餐",
+            value: formatNumber(activeTierCount),
+            tags: [`公开 ${formatNumber(publicTierCount)}`],
+            tone: "success",
+          },
+          {
+            id: "subscriptions",
+            icon: "user",
+            label: "订阅使用",
+            value: formatNumber(subscriptionCount),
+            tags: [`场景 ${formatNumber(industries.length)}`],
+            tone: "warning",
+          },
+          {
+            id: "revenue",
+            icon: "chart-bar",
+            label: "月度收入",
+            value: formatMoney(monthlyRevenue),
+            tags: ["方案口径"],
+            tone: "brand",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="服务套餐筛选">

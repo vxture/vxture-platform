@@ -22,6 +22,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   useToast,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -222,42 +223,6 @@ function collectAncestorPermissionIds(
   }
 
   return ids;
-}
-
-function AdminRoleSummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article
-      className={joinClasses(
-        `vx-tenant-summary__item vx-tenant-tone--${tone}`,
-        icon === "user" || icon === "role"
-          ? "vx-tenant-summary__item--identity-icon"
-          : "",
-      )}
-    >
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function AdminRoleActionsMenu({
@@ -1619,34 +1584,38 @@ export function AdminRolesPage() {
         description="管理平台用户角色、权限集合和授权覆盖；不参与租户成员角色流转。"
       />
 
-      <section
-        className="vx-tenant-summary vx-admin-roles-summary"
+      <MetricGrid
         aria-label="平台角色统计"
-      >
-        <AdminRoleSummaryItem
-          icon="role"
-          label="角色总数"
-          value={formatNumber(roles.length)}
-          tags={[`系统预置 ${formatNumber(systemRoles)}`]}
-        />
-        <AdminRoleSummaryItem
-          icon="check"
-          label="启用角色"
-          value={formatNumber(enabledRoles)}
-          tags={["可授权"]}
-          tone="green"
-        />
-        <AdminRoleSummaryItem
-          icon="x"
-          label="其他角色"
-          value={formatNumber(otherRoleCount)}
-          tags={[
-            ...(disabledRoles ? [`停用 ${formatNumber(disabledRoles)}`] : []),
-            ...(archivedRoles ? [`归档 ${formatNumber(archivedRoles)}`] : []),
-          ]}
-          tone="rose"
-        />
-      </section>
+        columns={3}
+        items={[
+          {
+            id: "total",
+            icon: "role",
+            label: "角色总数",
+            value: formatNumber(roles.length),
+            tags: [`系统预置 ${formatNumber(systemRoles)}`],
+          },
+          {
+            id: "enabled",
+            icon: "check",
+            label: "启用角色",
+            value: formatNumber(enabledRoles),
+            tags: ["可授权"],
+            tone: "success",
+          },
+          {
+            id: "other",
+            icon: "x",
+            label: "其他角色",
+            value: formatNumber(otherRoleCount),
+            tags: [
+              ...(disabledRoles ? [`停用 ${formatNumber(disabledRoles)}`] : []),
+              ...(archivedRoles ? [`归档 ${formatNumber(archivedRoles)}`] : []),
+            ],
+            tone: "danger",
+          },
+        ]}
+      />
 
       <div className="vx-tenant-list-shell">
         <section className="vx-tenant-toolbar" aria-label="平台角色筛选">

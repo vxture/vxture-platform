@@ -1,5 +1,4 @@
-import { Icon, Badge } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import { Badge } from "@vxture/design-system";
 import {
   PageSizePicker as SharedPageSizePicker,
   type PageSize,
@@ -45,35 +44,6 @@ export function PageSizePicker({
   onChange: (value: PageSize) => void;
 }) {
   return <SharedPageSizePicker value={value} onChange={onChange} />;
-}
-
-export function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 export function Tag({

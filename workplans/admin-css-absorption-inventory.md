@@ -45,10 +45,13 @@ owner 勾选的清单，不是删除计划。勾中的做成组件，没勾的�
 
 ## 需要 owner 拍板的三点
 
-**① A1 做成什么形态？** 两条路：
+**① A1 做成什么形态？** ~~两条路~~ —— **已被后续工作回答（2026-08-05 复核）**：
+`MetricListCard` 已存在于 `design-ui/src/components/composite/data/`，走的是"新建、
+边界清晰"那条路。悬念只剩它是否覆盖 admin 的 4 域 17 处用法，属核实不属决策。
 
-- 扩 `ListCard`，加可选的 `metrics` 槽与 `tone` 色条 —— 改动小，但 ListCard 的 props 会变长
-- 新建 `MetricListCard` —— 边界清晰，但多一件要记的组件
+同批复核还发现：`MetricCard` 的 props 本就是照 admin 的 `SummaryItem` 抽象的（注释里
+写明"admin KPI 卡的既有视觉…2026-08-03 opera 对照 admin 实测"）。**DS 已经吸收了
+一部分 admin 结构，admin 自己没回接。**
 
 **② A2 值不值得做？** 它出现 170 次、收益最大，但也最难：要让**同一份列定义同时驱动表格行与卡片**，等于给 `DataTable` 加一个 `cards` 渲染模式。做对了四个门户都受益，做歪了会变成一个谁都不敢碰的巨件。可以先只做 A1/A3/A5，A2 留到列表页迁移时看实际需要。
 

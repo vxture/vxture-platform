@@ -19,6 +19,7 @@ import {
   Textarea,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
@@ -209,35 +210,6 @@ function matchesOfflineTypeFilter(
 function paymentTargetHref(payment: PaymentOperationRecord) {
   if (payment.billId) return `/billing/${encodeURIComponent(payment.billId)}`;
   return `/tenants/${encodeURIComponent(payment.tenantId)}`;
-}
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 function PaymentRemarkDialog({
@@ -945,35 +917,42 @@ export function PaymentsPage() {
         }
       />
 
-      <section className="vx-tenant-summary" aria-label="收款统计">
-        <SummaryItem
-          icon="check"
-          label="收款记录"
-          value={formatNumber(payments.length)}
-          tags={[`筛选 ${formatNumber(filteredPayments.length)}`]}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="已收金额"
-          value={formatCurrency(paidAmount, "CNY")}
-          tags={[`线下 ${formatCurrency(offlineAmount, "CNY")}`]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="clock"
-          label="待复核"
-          value={formatNumber(pendingVerifyCount)}
-          tags={[`部分 ${formatNumber(partialCount)}`]}
-          tone={pendingVerifyCount || partialCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="warning"
-          label="需关注"
-          value={formatNumber(attentionCount)}
-          tags={["对账异常"]}
-          tone={attentionCount ? "rose" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="收款统计"
+        items={[
+          {
+            id: "records",
+            icon: "check",
+            label: "收款记录",
+            value: formatNumber(payments.length),
+            tags: [`筛选 ${formatNumber(filteredPayments.length)}`],
+          },
+          {
+            id: "paid-amount",
+            icon: "chart-bar",
+            label: "已收金额",
+            value: formatCurrency(paidAmount, "CNY"),
+            tags: [`线下 ${formatCurrency(offlineAmount, "CNY")}`],
+            tone: "success",
+          },
+          {
+            id: "pending-verify",
+            icon: "clock",
+            label: "待复核",
+            value: formatNumber(pendingVerifyCount),
+            tags: [`部分 ${formatNumber(partialCount)}`],
+            tone: pendingVerifyCount || partialCount ? "warning" : "success",
+          },
+          {
+            id: "attention",
+            icon: "warning",
+            label: "需关注",
+            value: formatNumber(attentionCount),
+            tags: ["对账异常"],
+            tone: attentionCount ? "danger" : "success",
+          },
+        ]}
+      />
 
       {paymentsTruncated ? (
         <Banner

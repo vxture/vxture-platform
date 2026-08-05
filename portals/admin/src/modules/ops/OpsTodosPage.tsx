@@ -9,6 +9,7 @@ import {
   Badge,
   Button,
   EmptyState,
+  MetricGrid,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -231,35 +232,6 @@ function buildOpsTodos(
   });
 }
 
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags: string[];
-  tone?: TodoSeverity;
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-        <p>
-          {tags.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
-}
-
 function TodoTypeSummary({ type, count }: { type: TodoType; count: number }) {
   return (
     <Link
@@ -433,37 +405,44 @@ export function OpsTodosPage() {
         secondary={<Badge>只读聚合</Badge>}
       />
 
-      <section className="vx-tenant-summary" aria-label="运营待办统计">
-        <SummaryItem
-          icon="warning"
-          label="紧急事项"
-          value={formatNumber(urgentTodos.length)}
-          tags={[`影响租户 ${formatNumber(affectedTenants)}`]}
-          tone={urgentTodos.length ? "rose" : "green"}
-        />
-        <SummaryItem
-          icon="medal"
-          label="认证待审"
-          value={formatNumber(verificationTodos.length)}
-          tags={["组织资质"]}
-          tone={verificationTodos.length ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="chat-circle"
-          label="未关闭工单"
-          value={formatNumber(ticketTodos.length)}
-          tags={[
-            `P0/P1 ${formatNumber(ticketTodos.filter((todo) => todo.priority <= 10).length)}`,
-          ]}
-          tone={ticketTodos.length ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="table"
-          label="全部待办"
-          value={formatNumber(todos.length)}
-          tags={["按优先级排序"]}
-        />
-      </section>
+      <MetricGrid
+        aria-label="运营待办统计"
+        items={[
+          {
+            id: "urgent",
+            icon: "warning",
+            label: "紧急事项",
+            value: formatNumber(urgentTodos.length),
+            tags: [`影响租户 ${formatNumber(affectedTenants)}`],
+            tone: urgentTodos.length ? "danger" : "success",
+          },
+          {
+            id: "verification",
+            icon: "medal",
+            label: "认证待审",
+            value: formatNumber(verificationTodos.length),
+            tags: ["组织资质"],
+            tone: verificationTodos.length ? "warning" : "success",
+          },
+          {
+            id: "tickets",
+            icon: "chat-circle",
+            label: "未关闭工单",
+            value: formatNumber(ticketTodos.length),
+            tags: [
+              `P0/P1 ${formatNumber(ticketTodos.filter((todo) => todo.priority <= 10).length)}`,
+            ],
+            tone: ticketTodos.length ? "warning" : "success",
+          },
+          {
+            id: "all",
+            icon: "table",
+            label: "全部待办",
+            value: formatNumber(todos.length),
+            tags: ["按优先级排序"],
+          },
+        ]}
+      />
 
       <section
         className="vx-tenant-workspace vx-ops-todos-workspace"

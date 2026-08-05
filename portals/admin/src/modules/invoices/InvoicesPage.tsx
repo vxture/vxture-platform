@@ -16,6 +16,7 @@ import {
   Pagination as DsPagination,
   ActionButton,
   EmptyState,
+  MetricGrid,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
@@ -199,35 +200,6 @@ const invoiceCsvColumns: CsvColumn<BillingInvoiceLedgerRecord>[] = [
   { label: "开票时间", value: (v) => formatDate(v.issuedAt) },
   { label: "审核人", value: (v) => v.auditorName },
 ];
-
-function SummaryItem({
-  icon,
-  label,
-  value,
-  tags,
-  tone = "blue",
-}: {
-  icon: IconName;
-  label: string;
-  value: string;
-  tags?: string[];
-  tone?: "blue" | "green" | "amber" | "rose";
-}) {
-  return (
-    <article className={`vx-tenant-summary__item vx-tenant-tone--${tone}`}>
-      <Icon name={icon} size="lg" fallback="placeholder" />
-      <div>
-        <span>{label}</span>
-        <p>
-          <strong>{value}</strong>
-          {tags?.map((tag) => (
-            <em key={tag}>{tag}</em>
-          ))}
-        </p>
-      </div>
-    </article>
-  );
-}
 
 function InvoiceActionsMenu({
   invoice,
@@ -852,35 +824,42 @@ export function InvoicesPage() {
         }
       />
 
-      <section className="vx-tenant-summary" aria-label="发票统计">
-        <SummaryItem
-          icon="key"
-          label="发票总数"
-          value={formatNumber(invoices.length)}
-          tags={[`筛选 ${formatNumber(filteredInvoices.length)}`]}
-        />
-        <SummaryItem
-          icon="chart-bar"
-          label="有效开票"
-          value={formatCurrency(invoiceAmount, "CNY")}
-          tags={[`完成 ${formatNumber(finishedCount)}`]}
-          tone="green"
-        />
-        <SummaryItem
-          icon="table"
-          label="待交付"
-          value={formatNumber(deliveryPendingCount)}
-          tags={[`线下 ${formatNumber(invoices.length)}`]}
-          tone={deliveryPendingCount ? "amber" : "green"}
-        />
-        <SummaryItem
-          icon="warning"
-          label="发票异常"
-          value={formatNumber(exceptionCount)}
-          tags={["红冲/驳回"]}
-          tone={exceptionCount ? "rose" : "green"}
-        />
-      </section>
+      <MetricGrid
+        aria-label="发票统计"
+        items={[
+          {
+            id: "total",
+            icon: "key",
+            label: "发票总数",
+            value: formatNumber(invoices.length),
+            tags: [`筛选 ${formatNumber(filteredInvoices.length)}`],
+          },
+          {
+            id: "amount",
+            icon: "chart-bar",
+            label: "有效开票",
+            value: formatCurrency(invoiceAmount, "CNY"),
+            tags: [`完成 ${formatNumber(finishedCount)}`],
+            tone: "success",
+          },
+          {
+            id: "delivery-pending",
+            icon: "table",
+            label: "待交付",
+            value: formatNumber(deliveryPendingCount),
+            tags: [`线下 ${formatNumber(invoices.length)}`],
+            tone: deliveryPendingCount ? "warning" : "success",
+          },
+          {
+            id: "exception",
+            icon: "warning",
+            label: "发票异常",
+            value: formatNumber(exceptionCount),
+            tags: ["红冲/驳回"],
+            tone: exceptionCount ? "danger" : "success",
+          },
+        ]}
+      />
 
       {operationFeedback ? (
         <div className="vx-subscription-operation-feedback">
