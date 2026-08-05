@@ -255,19 +255,27 @@ export function FeatureTogglesPage() {
         summary={
           <MetricGrid
             aria-label="功能开关统计"
-            columns={2}
+            columns={3}
             items={[
               {
-                id: "开关总数",
+                id: "total",
                 icon: "list",
                 label: "开关总数",
                 value: String(items.filter((i) => !i.isArchived).length),
               },
               {
-                id: '已启用</span>\n          <strong>\n            {items.filter((i) => !i.isArchived && i.isGloballyEnabled).length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon\n            name="clock-counter-clockwise"\n            size="md"\n            fallback="placeholder"\n          />\n          <span>已归档',
+                id: "enabled",
                 icon: "check",
-                label:
-                  '已启用</span>\n          <strong>\n            {items.filter((i) => !i.isArchived && i.isGloballyEnabled).length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon\n            name="clock-counter-clockwise"\n            size="md"\n            fallback="placeholder"\n          />\n          <span>已归档',
+                label: "已启用",
+                value: String(
+                  items.filter((i) => !i.isArchived && i.isGloballyEnabled)
+                    .length,
+                ),
+              },
+              {
+                id: "archived",
+                icon: "clock-counter-clockwise",
+                label: "已归档",
                 value: String(items.filter((i) => i.isArchived).length),
               },
             ]}

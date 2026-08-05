@@ -5,20 +5,18 @@ import {
   Badge,
   Button,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
+  MetricGrid,
   NativeSelect,
   Pagination,
-  ViewLayout,
 } from "@vxture/design-system";
 import { fetchSkills } from "@/api/admin-bff";
 import type { SkillRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  formatDate,
-  formatNumber,
-  joinClasses,
-} from "@/modules/tenants/tenant-utils";
+import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
 
 // ─── 类型 ─────────────────────────────────────────────────────────────────────
 
@@ -64,23 +62,31 @@ function SkillSummary({ skills }: { skills: SkillRecord[] }) {
   const totalInvocations = skills.reduce((sum, s) => sum + s.invocations, 0);
 
   return (
-    <div className="vx-models-summary">
-      <div className="vx-models-summary__item">
-        <Icon name="cube" size="md" fallback="placeholder" />
-        <span>已上线技能</span>
-        <strong>{activeCount}</strong>
-      </div>
-      <div className="vx-models-summary__item">
-        <Icon name="x" size="md" fallback="placeholder" />
-        <span>已停用技能</span>
-        <strong>{disabledCount}</strong>
-      </div>
-      <div className="vx-models-summary__item">
-        <Icon name="sparkles" size="md" fallback="placeholder" />
-        <span>总调用次数</span>
-        <strong>{formatNumber(totalInvocations)}</strong>
-      </div>
-    </div>
+    <MetricGrid
+      aria-label="技能市场统计"
+      columns={3}
+      items={[
+        {
+          id: "active",
+          icon: "cube",
+          label: "已上线技能",
+          value: String(activeCount),
+        },
+        {
+          id: "disabled",
+          icon: "x",
+          label: "已停用技能",
+          value: String(disabledCount),
+          tone: disabledCount ? "warning" : "neutral",
+        },
+        {
+          id: "invocations",
+          icon: "sparkles",
+          label: "总调用次数",
+          value: formatNumber(totalInvocations),
+        },
+      ]}
+    />
   );
 }
 
@@ -110,71 +116,57 @@ function SkillToolbar({
   onViewModeChange: (v: ViewMode) => void;
 }) {
   return (
-    <div className="vx-models-toolbar">
-      <Input
-        className="vx-models-toolbar__search"
-        type="search"
-        placeholder="搜索技能名称、代码、描述…"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-      />
-      <div className="vx-models-toolbar__filters">
+    <FilterBar
+      view={viewMode}
+      onViewChange={onViewModeChange}
+      count={`${total} 个技能`}
+      aria-label="技能筛选"
+      search={
+        <Input
+          className="vx-tenant-search"
+          type="search"
+          placeholder="搜索技能名称、代码、描述…"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      }
+      onReset={() => {
+        onSearchChange("");
+        onStatusFilterChange("all");
+        onCategoryFilterChange("");
+      }}
+    >
+      <NativeSelect
+        wrapperClassName="w-fit"
+        className="vx-tenant-select"
+        value={statusFilter}
+        onChange={(e) =>
+          onStatusFilterChange(e.target.value as SkillStatusFilter)
+        }
+        aria-label="技能状态"
+      >
+        <option value="all">全部状态</option>
+        <option value="active">已上线</option>
+        <option value="disabled">已停用</option>
+        <option value="draft">草稿</option>
+      </NativeSelect>
+      {categories.length > 0 ? (
         <NativeSelect
-          className="vx-admin-filter-select"
-          value={statusFilter}
-          onChange={(e) =>
-            onStatusFilterChange(e.target.value as SkillStatusFilter)
-          }
+          wrapperClassName="w-fit"
+          className="vx-tenant-select"
+          value={categoryFilter}
+          onChange={(e) => onCategoryFilterChange(e.target.value)}
+          aria-label="技能分类"
         >
-          <option value="all">全部状态</option>
-          <option value="active">已上线</option>
-          <option value="disabled">已停用</option>
-          <option value="draft">草稿</option>
+          <option value="">全部分类</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </NativeSelect>
-        {categories.length > 0 && (
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={categoryFilter}
-            onChange={(e) => onCategoryFilterChange(e.target.value)}
-          >
-            <option value="">全部分类</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </NativeSelect>
-        )}
-        <div className="vx-admin-view-toggle">
-          <Button
-            variant="ghost"
-            size="icon-md"
-            className={joinClasses(
-              "vx-admin-view-toggle__btn",
-              viewMode === "list" ? "vx-admin-view-toggle__btn--active" : "",
-            )}
-            onClick={() => onViewModeChange("list")}
-            title="列表视图"
-          >
-            <Icon name="rows" size="sm" fallback="placeholder" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-md"
-            className={joinClasses(
-              "vx-admin-view-toggle__btn",
-              viewMode === "cards" ? "vx-admin-view-toggle__btn--active" : "",
-            )}
-            onClick={() => onViewModeChange("cards")}
-            title="卡片视图"
-          >
-            <Icon name="squares-four" size="sm" fallback="placeholder" />
-          </Button>
-        </div>
-      </div>
-      <div className="vx-models-toolbar__spacer" />
-      <span className="vx-models-toolbar__count">{total} 个技能</span>
-    </div>
+      ) : null}
+    </FilterBar>
   );
 }
 
@@ -345,57 +337,66 @@ export function SkillsPage() {
   };
 
   return (
-    <ViewLayout className={joinClasses("vx-skills-page")}>
-      <PageHeader
-        icon="cube"
-        title="技能市场"
-        description="注册和管理智能体可调用技能，配置上下线、端点和运行状态。"
-      />
-      <SkillSummary skills={skills} />
-      <SkillToolbar
-        search={search}
-        statusFilter={statusFilter}
-        categoryFilter={categoryFilter}
-        categories={categories}
-        viewMode={viewMode}
-        total={filtered.length}
-        onSearchChange={handleSearch}
-        onStatusFilterChange={handleStatusFilter}
-        onCategoryFilterChange={handleCategoryFilter}
-        onViewModeChange={setViewMode}
-      />
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无技能"
-          description={
-            search || statusFilter !== "all" || categoryFilter
-              ? "尝试调整筛选条件"
-              : "尚未接入任何 AI 技能，请通过 API 注册技能"
-          }
-        />
-      ) : (
-        <>
-          {viewMode === "list" ? (
-            <SkillList
-              skills={pageSkills}
-              startIndex={(page - 1) * PAGE_SIZE}
+    <>
+      <ListPageTemplate
+        className="vx-skills-page"
+        header={
+          <PageHeader
+            icon="cube"
+            title="技能市场"
+            description="注册和管理智能体可调用技能，配置上下线、端点和运行状态。"
+          />
+        }
+        summary={<SkillSummary skills={skills} />}
+        filters={
+          <SkillToolbar
+            search={search}
+            statusFilter={statusFilter}
+            categoryFilter={categoryFilter}
+            categories={categories}
+            viewMode={viewMode}
+            total={filtered.length}
+            onSearchChange={handleSearch}
+            onStatusFilterChange={handleStatusFilter}
+            onCategoryFilterChange={handleCategoryFilter}
+            onViewModeChange={setViewMode}
+          />
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无技能"
+              description={
+                search || statusFilter !== "all" || categoryFilter
+                  ? "尝试调整筛选条件"
+                  : "尚未接入任何 AI 技能，请通过 API 注册技能"
+              }
             />
           ) : (
-            <SkillCards skills={pageSkills} />
-          )}
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              total={filtered.length}
-              pageSize={PAGE_SIZE}
-              onPageChange={setPage}
-            />
-          ) : null}
-        </>
-      )}
-    </ViewLayout>
+            <>
+              {viewMode === "list" ? (
+                <SkillList
+                  skills={pageSkills}
+                  startIndex={(page - 1) * PAGE_SIZE}
+                />
+              ) : (
+                <SkillCards skills={pageSkills} />
+              )}
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
+    </>
   );
 }

@@ -277,19 +277,26 @@ export function ComplianceEventsPage() {
         summary={
           <MetricGrid
             aria-label="合规事件统计"
-            columns={2}
+            columns={3}
             items={[
               {
-                id: "待处理",
+                id: "open",
                 icon: "warning",
                 label: "待处理",
                 value: String(items.filter((i) => i.status === "open").length),
               },
               {
-                id: '处理中</span>\n          <strong>\n            {items.filter((i) => i.status === "in_review").length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon name="check" size="md" fallback="placeholder" />\n          <span>已办结',
+                id: "in_review",
                 icon: "clock",
-                label:
-                  '处理中</span>\n          <strong>\n            {items.filter((i) => i.status === "in_review").length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon name="check" size="md" fallback="placeholder" />\n          <span>已办结',
+                label: "处理中",
+                value: String(
+                  items.filter((i) => i.status === "in_review").length,
+                ),
+              },
+              {
+                id: "resolved",
+                icon: "check",
+                label: "已办结",
                 value: String(
                   items.filter((i) => i.status === "resolved").length,
                 ),

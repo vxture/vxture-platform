@@ -2,19 +2,20 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
+  ActionButton,
   ActionMenu,
   Badge,
-  Button,
   DialogForm,
   EmptyState,
-  Icon,
+  FilterBar,
   Input,
   Label,
+  ListPageTemplate,
+  MetricGrid,
   NativeSelect,
   Pagination,
   Textarea,
   useToast,
-  ViewLayout,
 } from "@vxture/design-system";
 import {
   archiveAnnouncement,
@@ -27,7 +28,7 @@ import {
 } from "@/api/admin-bff";
 import type { AnnouncementRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDate } from "@/modules/tenants/tenant-utils";
 
 // ─── 类型 ─────────────────────────────────────────────────────────────────────
 
@@ -191,23 +192,25 @@ function AnnouncementSummary({ items }: { items: AnnouncementRecord[] }) {
   }).length;
 
   return (
-    <div className="vx-models-summary">
-      <div className="vx-models-summary__item">
-        <Icon name="bell" size="md" fallback="placeholder" />
-        <span>已发布公告</span>
-        <strong>{published}</strong>
-      </div>
-      <div className="vx-models-summary__item">
-        <Icon name="edit" size="md" fallback="placeholder" />
-        <span>草稿中</span>
-        <strong>{drafts}</strong>
-      </div>
-      <div className="vx-models-summary__item">
-        <Icon name="calendar" size="md" fallback="placeholder" />
-        <span>本月已发送</span>
-        <strong>{thisMonth}</strong>
-      </div>
-    </div>
+    <MetricGrid
+      aria-label="公告统计"
+      columns={3}
+      items={[
+        {
+          id: "published",
+          icon: "bell",
+          label: "已发布公告",
+          value: String(published),
+        },
+        { id: "drafts", icon: "edit", label: "草稿中", value: String(drafts) },
+        {
+          id: "month",
+          icon: "calendar",
+          label: "本月已发送",
+          value: String(thisMonth),
+        },
+      ]}
+    />
   );
 }
 
@@ -237,80 +240,61 @@ function AnnouncementToolbar({
   onCreate: () => void;
 }) {
   return (
-    <div className="vx-models-toolbar">
-      <Input
-        className="vx-models-toolbar__search"
-        type="search"
-        placeholder="搜索标题、内容…"
-        value={search}
-        onChange={(e) => onSearchChange(e.target.value)}
-      />
-      <div className="vx-models-toolbar__filters">
-        <NativeSelect
-          className="vx-admin-filter-select"
-          value={typeFilter}
-          onChange={(e) =>
-            onTypeFilterChange(e.target.value as AnnouncementTypeFilter)
-          }
-        >
-          <option value="all">全部类型</option>
-          <option value="system">系统</option>
-          <option value="maintenance">维护</option>
-          <option value="marketing">营销</option>
-          <option value="security">安全</option>
-        </NativeSelect>
-        <NativeSelect
-          className="vx-admin-filter-select"
-          value={statusFilter}
-          onChange={(e) =>
-            onStatusFilterChange(e.target.value as AnnouncementStatusFilter)
-          }
-        >
-          <option value="all">全部状态</option>
-          <option value="draft">草稿</option>
-          <option value="published">已发布</option>
-          <option value="archived">已归档</option>
-        </NativeSelect>
-        <div className="vx-admin-view-toggle">
-          <Button
-            variant="ghost"
-            size="icon-md"
-            className={joinClasses(
-              "vx-admin-view-toggle__btn",
-              viewMode === "list" ? "vx-admin-view-toggle__btn--active" : "",
-            )}
-            onClick={() => onViewModeChange("list")}
-            title="列表视图"
-          >
-            <Icon name="rows" size="sm" fallback="placeholder" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-md"
-            className={joinClasses(
-              "vx-admin-view-toggle__btn",
-              viewMode === "cards" ? "vx-admin-view-toggle__btn--active" : "",
-            )}
-            onClick={() => onViewModeChange("cards")}
-            title="卡片视图"
-          >
-            <Icon name="squares-four" size="sm" fallback="placeholder" />
-          </Button>
-        </div>
-      </div>
-      <div className="vx-models-toolbar__spacer" />
-      <span className="vx-models-toolbar__count">{total} 条</span>
-      <Button
-        variant="default"
-        size="md"
-        className="vx-admin-action-btn"
-        onClick={onCreate}
-        title="新建公告"
+    <FilterBar
+      view={viewMode}
+      onViewChange={onViewModeChange}
+      count={`${total} 条`}
+      aria-label="公告筛选"
+      search={
+        <Input
+          className="vx-tenant-search"
+          type="search"
+          placeholder="搜索标题、内容…"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+      }
+      onReset={() => {
+        onSearchChange("");
+        onTypeFilterChange("all");
+        onStatusFilterChange("all");
+      }}
+      actions={
+        <ActionButton icon="plus" onClick={onCreate}>
+          新建公告
+        </ActionButton>
+      }
+    >
+      <NativeSelect
+        wrapperClassName="w-fit"
+        className="vx-tenant-select"
+        value={typeFilter}
+        onChange={(e) =>
+          onTypeFilterChange(e.target.value as AnnouncementTypeFilter)
+        }
+        aria-label="公告类型"
       >
-        <Icon name="plus" size="sm" fallback="placeholder" />
-        新建公告
-      </Button>
-    </div>
+        <option value="all">全部类型</option>
+        <option value="system">系统</option>
+        <option value="maintenance">维护</option>
+        <option value="marketing">营销</option>
+        <option value="security">安全</option>
+      </NativeSelect>
+      <NativeSelect
+        wrapperClassName="w-fit"
+        className="vx-tenant-select"
+        value={statusFilter}
+        onChange={(e) =>
+          onStatusFilterChange(e.target.value as AnnouncementStatusFilter)
+        }
+        aria-label="公告状态"
+      >
+        <option value="all">全部状态</option>
+        <option value="draft">草稿</option>
+        <option value="published">已发布</option>
+        <option value="archived">已归档</option>
+      </NativeSelect>
+    </FilterBar>
   );
 }
 
@@ -700,64 +684,73 @@ export function AnnouncementsPage() {
   }
 
   return (
-    <ViewLayout className={joinClasses("vx-announcement-page")}>
-      <PageHeader
-        icon="bell"
-        title="消息公告"
-        description="发布平台公告和定向通知，查询通知触达与历史记录。"
-      />
-      <AnnouncementSummary items={items} />
-      <AnnouncementToolbar
-        search={search}
-        typeFilter={typeFilter}
-        statusFilter={statusFilter}
-        viewMode={viewMode}
-        total={filtered.length}
-        onSearchChange={handleSearch}
-        onTypeFilterChange={handleTypeFilter}
-        onStatusFilterChange={handleStatusFilter}
-        onViewModeChange={setViewMode}
-        onCreate={openCreate}
-      />
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : loadError ? (
-        <EmptyState title="公告读取失败" description={loadError} />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无公告"
-          description={
-            search || typeFilter !== "all" || statusFilter !== "all"
-              ? "尝试调整筛选条件"
-              : "点击「新建公告」发布第一条平台通知"
-          }
-        />
-      ) : (
-        <>
-          {viewMode === "list" ? (
-            <AnnouncementList
-              items={pageItems}
-              startIndex={(page - 1) * PAGE_SIZE}
-              busy={submitting}
-              onEdit={openEdit}
-              onPublish={handlePublish}
-              onArchive={handleArchive}
-              onDelete={setPendingDelete}
+    <>
+      <ListPageTemplate
+        className="vx-announcement-page"
+        header={
+          <PageHeader
+            icon="bell"
+            title="消息公告"
+            description="发布平台公告和定向通知，查询通知触达与历史记录。"
+          />
+        }
+        summary={<AnnouncementSummary items={items} />}
+        filters={
+          <AnnouncementToolbar
+            search={search}
+            typeFilter={typeFilter}
+            statusFilter={statusFilter}
+            viewMode={viewMode}
+            total={filtered.length}
+            onSearchChange={handleSearch}
+            onTypeFilterChange={handleTypeFilter}
+            onStatusFilterChange={handleStatusFilter}
+            onViewModeChange={setViewMode}
+            onCreate={openCreate}
+          />
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : loadError ? (
+            <EmptyState title="公告读取失败" description={loadError} />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无公告"
+              description={
+                search || typeFilter !== "all" || statusFilter !== "all"
+                  ? "尝试调整筛选条件"
+                  : "点击「新建公告」发布第一条平台通知"
+              }
             />
           ) : (
-            <AnnouncementCards items={pageItems} />
-          )}
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              total={filtered.length}
-              pageSize={PAGE_SIZE}
-              onPageChange={setPage}
-            />
-          ) : null}
-        </>
-      )}
+            <>
+              {viewMode === "list" ? (
+                <AnnouncementList
+                  items={pageItems}
+                  startIndex={(page - 1) * PAGE_SIZE}
+                  busy={submitting}
+                  onEdit={openEdit}
+                  onPublish={handlePublish}
+                  onArchive={handleArchive}
+                  onDelete={setPendingDelete}
+                />
+              ) : (
+                <AnnouncementCards items={pageItems} />
+              )}
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
 
       {dialogMode ? (
         <AnnouncementFormDialog
@@ -787,6 +780,6 @@ export function AnnouncementsPage() {
           }}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
