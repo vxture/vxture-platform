@@ -68,6 +68,34 @@ export const INTENT_SLOTS = {
   },
 };
 
+/**
+ * 等级族 L1–L5：序数用明度表达，类别才用色相（owner 2026-08-06）。
+ *
+ * 等级是同一维度上的高低，不是六个意图那样的并列类别，所以它取单色相的五档，
+ * 而不是各占一个色相——后者正是现状的毛病：套餐层级借 success 表示免费、借
+ * warning 表示专业版，读起来像状态而不是层级。同样的判断在 `chart-seq-*` 上
+ * 已经成立（序数数据走 brand 明度阶）。
+ *
+ * 数字越大等级越高，与色阶 50→950 同向。名次→等级的翻译归产品侧。
+ *
+ * `fill`/`deep` 是渐变两端（相差两档），`foreground` 按各档对比度定——300/400
+ * 两档配白字不足 4.5:1，改深字。三者均不随主题变化，同意图族填充的理由：一个
+ * "五级"记号在暗色下仍应是同一个五级。
+ */
+export const LEVEL_HUE = "brand";
+export const LEVELS = [1, 2, 3, 4, 5];
+export const LEVEL_RAMP = {
+  1: { fill: 200, deep: 400, foreground: "neutral-900" },
+  2: { fill: 400, deep: 600, foreground: "neutral-900" },
+  3: { fill: 600, deep: 700, foreground: "white" },
+  4: { fill: 700, deep: 800, foreground: "white" },
+  5: { fill: 900, deep: 950, foreground: "white" },
+};
+
+/* 只给底座要的三档。曾另给 muted / text 供 pill 用，但单色相下五级的浅底
+   全落在 brand-50，表达不出等级差异——pill 要用等级色时按 fill 调透明度。 */
+export const LEVEL_SLOT_ORDER = ["", "deep", "foreground"];
+
 /** 槽位输出顺序，与既有产物一致。 */
 export const INTENT_SLOT_ORDER = [
   "",

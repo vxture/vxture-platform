@@ -53,6 +53,7 @@ export * from "./display/Skeleton";
 export * from "./form/Slider";
 export * from "./feedback/Spinner";
 export * from "./display/StatusBadge";
+export * from "./display/LevelMarker";
 export * from "./form/Switch";
 export * from "./display/Table";
 export * from "./navigation/Tabs";

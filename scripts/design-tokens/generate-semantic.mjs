@@ -22,6 +22,10 @@ import {
   INTENT_RAMPS,
   INTENT_SLOTS,
   INTENT_SLOT_ORDER,
+  LEVEL_HUE,
+  LEVEL_RAMP,
+  LEVEL_SLOT_ORDER,
+  LEVELS,
   STANDALONE_COLORS,
 } from "./color-policy.mjs";
 
@@ -96,10 +100,31 @@ function intentRows(mode) {
   return rows;
 }
 
+/* ── 等级族：单色相 × 五档 ──────────────────────────────────── */
+
+function levelRows(mode) {
+  const rows = [];
+  for (const level of LEVELS) {
+    const ramp = LEVEL_RAMP[level];
+    for (const slot of LEVEL_SLOT_ORDER) {
+      const name = slot ? `level-${level}-${slot}` : `level-${level}`;
+      const where = `${mode} ${name}`;
+      const step =
+        slot === ""
+          ? ramp.fill
+          : slot === "deep"
+            ? ramp.deep
+            : ramp.foreground;
+      rows.push([name, `var(${t1Ref(LEVEL_HUE, step, where)})`, "level"]);
+    }
+  }
+  return rows;
+}
+
 /* ── 渲染 ───────────────────────────────────────────────────── */
 
 /** 分组顺序保持稳定，便于逐行比对产物。 */
-const GROUP_ORDER = ["surface", "content", "stroke", "intent", "chart", "gradient"];
+const GROUP_ORDER = ["surface", "content", "stroke", "intent", "level", "chart", "gradient"];
 const groupOf = (name) => {
   if (/^(background|surface|card|popover|scrim|accent)/.test(name)) return "surface";
   if (/^(foreground|muted-foreground|content-|link)/.test(name)) return "content";
@@ -115,7 +140,7 @@ function buildMode(mode) {
     `var(${t1Ref(null, row[idx], `${mode} ${row[0]}`)})`,
     groupOf(row[0]),
   ]);
-  return [...rows, ...intentRows(mode)];
+  return [...rows, ...intentRows(mode), ...levelRows(mode)];
 }
 
 function render(rows, indent = "  ") {

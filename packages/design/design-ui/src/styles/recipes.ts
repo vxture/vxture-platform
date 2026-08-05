@@ -116,6 +116,12 @@ export const hairline = {
   block: "border-primary/10 dark:border-primary/20",
   /** 行 / 字段 / footer 分隔。 */
   field: "border-dashed border-primary/10 dark:border-primary/20",
+  /**
+   * 同上，但配 `divide-y` 用。必须另给一份：`divide-*` 生成的是**子项**的边框，
+   * 容器上的 `border-*` 颜色够不着它，而 v4 里边框默认色是 `currentColor`——
+   * 漏了这一档，分隔线就取正文前景色，一条条发黑（2026-08-06 owner 实测）。
+   */
+  divide: "divide-dashed divide-primary/10 dark:divide-primary/20",
 } as const;
 
 /**

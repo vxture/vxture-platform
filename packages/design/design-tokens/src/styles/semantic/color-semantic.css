@@ -113,6 +113,23 @@
   --warning-border: var(--vx-color-amber-600);
   --warning-text: var(--vx-color-amber-700);
 
+  /* level */
+  --level-1: var(--vx-color-brand-200);
+  --level-1-deep: var(--vx-color-brand-400);
+  --level-1-foreground: var(--vx-color-neutral-900);
+  --level-2: var(--vx-color-brand-400);
+  --level-2-deep: var(--vx-color-brand-600);
+  --level-2-foreground: var(--vx-color-neutral-900);
+  --level-3: var(--vx-color-brand-600);
+  --level-3-deep: var(--vx-color-brand-700);
+  --level-3-foreground: var(--vx-color-white);
+  --level-4: var(--vx-color-brand-700);
+  --level-4-deep: var(--vx-color-brand-800);
+  --level-4-foreground: var(--vx-color-white);
+  --level-5: var(--vx-color-brand-900);
+  --level-5-deep: var(--vx-color-brand-950);
+  --level-5-foreground: var(--vx-color-white);
+
   /* chart */
   --chart-other: var(--vx-color-neutral-400);
   --chart-grid: var(--vx-color-neutral-200);
@@ -242,6 +259,23 @@
   --warning-muted-foreground: var(--vx-color-amber-300);
   --warning-border: var(--vx-color-amber-500);
   --warning-text: var(--vx-color-amber-400);
+
+  /* level */
+  --level-1: var(--vx-color-brand-200);
+  --level-1-deep: var(--vx-color-brand-400);
+  --level-1-foreground: var(--vx-color-neutral-900);
+  --level-2: var(--vx-color-brand-400);
+  --level-2-deep: var(--vx-color-brand-600);
+  --level-2-foreground: var(--vx-color-neutral-900);
+  --level-3: var(--vx-color-brand-600);
+  --level-3-deep: var(--vx-color-brand-700);
+  --level-3-foreground: var(--vx-color-white);
+  --level-4: var(--vx-color-brand-700);
+  --level-4-deep: var(--vx-color-brand-800);
+  --level-4-foreground: var(--vx-color-white);
+  --level-5: var(--vx-color-brand-900);
+  --level-5-deep: var(--vx-color-brand-950);
+  --level-5-foreground: var(--vx-color-white);
 
   /* chart */
   --chart-other: var(--vx-color-neutral-500);
