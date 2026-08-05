@@ -96,17 +96,6 @@
   font-weight: 400;
 }
 
-.vx-btn.vx-subscription-action-button--danger {
-  border-color: color-mix(in srgb, var(--vx-color-danger) 18%, transparent);
-  color: var(--vx-color-danger);
-}
-
-.vx-btn.vx-subscription-action-button--danger:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--vx-color-danger) 32%, transparent);
-  background: color-mix(in srgb, var(--vx-color-danger) 8%, transparent);
-  color: var(--vx-color-danger);
-}
-
 .vx-tenant-actions__menu button.vx-subscription-menu-action--danger {
   color: var(--tenant-rose);
 }

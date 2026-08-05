@@ -123,14 +123,3 @@
   --order-status-dot: var(--vx-color-gray-400);
   --order-status-halo: color-mix(in srgb, var(--vx-color-gray-400) 14%, transparent);
 }
-
-.vx-order-card__solution {
-  margin: 0;
-  overflow: hidden;
-  color: var(--vx-color-gray-700);
-  font-size: var(--vx-admin-caption-size);
-  font-weight: 400;
-  line-height: 1.55;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}

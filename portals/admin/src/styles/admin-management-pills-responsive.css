@@ -15,15 +15,6 @@
   border-radius: var(--vx-radius-lg);
   background: color-mix(in srgb, var(--vx-color-white) 58%, transparent);
 }
-
-.vx-tenant-empty .vx-empty-state {
-  justify-items: center;
-  text-align: center;
-}
-
-.vx-model-row__identity p,
-.vx-model-grant-row__model p,
-.vx-model-row__muted,
 .vx-tenant-directory-row small,
 .vx-tenant-directory-card small,
 .vx-tenant-list-card__meta small,
@@ -51,8 +42,7 @@
   .vx-admin-permissions-summary,
   .vx-model-platform-summary,
   .vx-model-strategy-summary,
-  .vx-platform-governance-summary,
-  .vx-audit-summary {
+  .vx-platform-governance-summary{
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -79,8 +69,7 @@
 
   .vx-tenant-list > div {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
+  }}
 
 @media (max-width: 960px) {
   .vx-tenant-summary,
@@ -104,11 +93,9 @@
   .vx-admin-permissions-summary,
   .vx-model-platform-summary,
   .vx-model-strategy-summary,
-  .vx-platform-governance-summary,
-  .vx-audit-summary {
+  .vx-platform-governance-summary{
     grid-template-columns: 1fr;
-  }
-}
+  }}
 
 @media (max-width: 960px) {
   .vx-tenant-toolbar {
@@ -122,8 +109,7 @@
   }
 
   .vx-tenant-search,
-  .vx-tenant-select,
-  .vx-tenant-toolbar .vx-btn {
+  .vx-tenant-select{
     width: 100%;
     flex-basis: auto;
   }
@@ -150,8 +136,7 @@
     width: 100%;
     justify-content: flex-end;
     margin-left: 0;
-  }
-}
+  }}
 
 @media (max-width: 960px) {
   .vx-tenant-detail-summary {
@@ -185,8 +170,7 @@
     align-items: stretch;
     flex-direction: column;
     gap: var(--vx-admin-management-space-075r);
-  }
-}
+  }}
 
 @media (max-width: 960px) {
   .vx-tenant-block > .vx-tenant-config-stack,
@@ -208,22 +192,14 @@
     justify-content: flex-start;
   }
 
-  .vx-tenant-admin-actions .vx-btn {
-    width: fit-content;
-  }
-
   .vx-tenant-risk-panel {
     padding-right: 0;
     padding-bottom: var(--vx-admin-management-space-15r);
     border-right: 0;
     border-bottom: var(--vx-admin-management-line-width-1p) dashed var(--tenant-line);
-  }
-}
+  }}
 
 @media (max-width: 960px) {
-  .vx-view-mode-switch {
-    justify-content: flex-start;
-  }
 
   .vx-product-capability-summary,
   .vx-product-capability-summary__metrics,
@@ -247,5 +223,4 @@
   .vx-service-plan-tier-row {
     align-items: start;
     gap: var(--vx-admin-management-space-05r);
-  }
-}
+  }}

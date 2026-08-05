@@ -6,7 +6,6 @@
   --service-indigo: var(--vx-color-indigo-600);
   width: 100%;
   max-width: none;
-  gap: var(--vx-admin-service-health-page-gap);
   cursor: default;
 }
 
@@ -21,26 +20,6 @@
 
 .vx-service-health-page input {
   cursor: text;
-}
-
-.vx-service-health-page .vx-page-header.admin-overview-heading {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--vx-admin-service-health-header-gap);
-  margin-bottom: 0;
-}
-
-.vx-service-health-page .vx-page-header {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--vx-admin-service-health-page-header-gap);
-}
-
-.vx-service-health-page .vx-page-header__title-row .vx-badge {
-  min-height: var(--vx-admin-service-health-pill-min-height);
-  border-color: color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
-  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
-  color: var(--vx-color-auth-accent);
 }
 
 .vx-service-health-status--healthy {

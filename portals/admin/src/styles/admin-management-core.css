@@ -12,7 +12,6 @@
   --tenant-ink: var(--vx-color-brand-950);
   --tenant-muted: var(--vx-color-text-muted);
   --tenant-line: color-mix(in srgb, var(--vx-color-auth-accent) 14%, transparent);
-  gap: var(--vx-admin-management-space-2r);
 }
 
 .vx-tenant-management-page h2,
@@ -32,8 +31,7 @@
 .vx-admin-permissions-summary,
 .vx-model-platform-summary,
 .vx-model-strategy-summary,
-.vx-platform-governance-summary,
-.vx-audit-summary {
+.vx-platform-governance-summary{
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -126,8 +124,6 @@
   border-radius: var(--vx-admin-management-radius-05r) var(--vx-admin-management-radius-05r) 0 0;
   background: transparent;
 }
-
-.vx-tenant-toolbar .vx-btn,
 .vx-tenant-toolbar .vx-input {
   height: var(--vx-admin-management-size-25r);
   min-height: var(--vx-admin-management-size-25r);
@@ -159,19 +155,6 @@
   outline-offset: 0;
 }
 
-.vx-tenant-toolbar .vx-btn--outline {
-  border-color: var(--vx-color-auth-border);
-  background: transparent;
-  color: var(--vx-color-text-secondary);
-  font-weight: 400;
-}
-
-.vx-tenant-toolbar .vx-btn--outline:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--vx-color-auth-accent) 28%, transparent);
-  background: transparent;
-  color: var(--tenant-blue);
-}
-
 .vx-tenant-filters {
   min-width: 0;
   display: flex;
@@ -193,44 +176,6 @@
 
 .vx-tenant-select option {
   font-weight: 400;
-}
-
-.vx-view-mode-switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-}
-
-.vx-view-mode-switch button {
-  width: var(--vx-admin-management-size-225r);
-  height: var(--vx-admin-management-size-225r);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--vx-radius-md);
-  background: transparent;
-  color: var(--vx-color-gray-400);
-  cursor: pointer;
-  font-weight: 400;
-  transition:
-    background-color 160ms ease,
-    color 160ms ease;
-}
-
-.vx-view-mode-switch button:hover {
-  color: var(--tenant-blue);
-}
-
-.vx-view-mode-switch button.is-active {
-  background: var(--vx-color-auth-border);
-  color: var(--tenant-blue);
-}
-
-.vx-view-mode-switch svg {
-  width: var(--vx-admin-management-size-15r);
-  height: var(--vx-admin-management-size-15r);
 }
 
 .vx-tenant-view-count {

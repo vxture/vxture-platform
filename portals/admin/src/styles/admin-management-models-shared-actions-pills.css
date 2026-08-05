@@ -51,12 +51,6 @@
   opacity: 1;
 }
 
-.vx-btn.vx-model-operation-buttons__danger:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--vx-color-danger) 24%, transparent);
-  background: color-mix(in srgb, var(--vx-color-danger) 8%, transparent);
-  color: var(--vx-color-danger);
-}
-
 .vx-model-operation-buttons .vx-model-operation-buttons__danger:not(:disabled) {
   border-color: color-mix(in srgb, var(--vx-color-gray-500) 12%, transparent);
   background: transparent;

@@ -9,10 +9,6 @@
   border-bottom: var(--vx-admin-management-line-width-1p) dashed var(--vx-color-auth-border);
 }
 
-.vx-tenant-admin-actions .vx-btn {
-  white-space: nowrap;
-}
-
 .vx-tenant-review-field,
 .vx-tenant-readonly-field {
   min-width: 0;

@@ -8,10 +8,6 @@
   padding-top: 0;
 }
 
-.vx-tenant-member-toolbar .vx-btn:disabled {
-  opacity: 0.62;
-}
-
 .vx-tenant-member-summary {
   display: flex;
   align-items: center;

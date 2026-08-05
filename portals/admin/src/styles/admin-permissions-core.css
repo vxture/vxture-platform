@@ -55,12 +55,6 @@
   margin-top: var(--vx-admin-permission-space-0125r);
 }
 
-.vx-admin-permission-domain__badges .vx-btn {
-  min-height: var(--vx-admin-permission-size-1875r);
-  padding-inline: var(--vx-admin-permission-space-0625r);
-  font-size: var(--vx-admin-caption-size);
-}
-
 .vx-admin-permission-domain__badges .vx-badge {
   min-height: var(--vx-admin-permission-size-175r);
   border-color: color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);

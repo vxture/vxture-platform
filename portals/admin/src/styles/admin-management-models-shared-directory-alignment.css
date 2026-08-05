@@ -66,30 +66,6 @@
   justify-content: center;
 }
 
-.vx-model-name-button {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--tenant-ink);
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--vx-admin-body-size);
-  /* 与 DS TableTitleCell 的主信息同一字重。800 那版是"链接改扮标题"留下的
-   * 补偿——当时整行是蓝色链接，只能靠重字压住；现在颜色本身就说明了层次。 */
-  font-weight: 500;
-  text-align: left;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vx-model-name-button:hover,
-.vx-model-name-button:focus-visible {
-  color: var(--tenant-blue);
-}
-
 .vx-admin-role-directory-list
   .vx-tenant-directory-row
   > .vx-tenant-directory-row__tenant.vx-admin-role-row__identity {
