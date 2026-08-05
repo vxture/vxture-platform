@@ -5,9 +5,9 @@
  * @category Components - Pattern
  *
  * 与 `MetricCard` 的分工：`MetricCard` 是列表页顶部那一排常规指标（带图标、
- * 四张一行）；本件是**概览页最上方的重点指标**，靠带品牌调的渐变底与下方的常规
- * 卡片拉开层次——透明模式下不能靠加深底色拉层次（那会破坏"页面只有一层实色底"），
- * 所以改用底纹。
+ * 四张一行）；本件是**概览页最上方的重点指标**，靠一层极淡的品牌调底纹与下方的
+ * 常规卡片拉开层次——透明模式下不能靠加深底色拉层次（那会破坏"页面只有一层
+ * 实色底"），而底纹本身也必须压得住：它是背景，浓了就喧宾夺主。
  *
  * 结构照 admin 平台总览的 `admin-overview-pulse__item` 提炼（"活跃客户 / 订阅收入 /
  * 模型调用 / 平台稳定性"四张），取值逐条对照既有实现：
@@ -36,20 +36,22 @@ import { Button } from "../../base/form/Button";
 import type { StatusBadgeTone } from "../../base/display/StatusBadge";
 
 /**
- * 卡面底纹。
+ * 卡面底纹：上白下蓝，180deg 直上直下。
  *
- * 68% 与 `veil.base` 同档——本件仍是透明模式里的一张叠层卡，只是把"纯白 68%"
- * 换成"蓝 → 白 68%"，透明度语言不变。端点走 T2 的 `--gradient-card-*`，
- * 暗色由 token 自己重定向（brand-950 → neutral-800），组件不必知道主题。
+ * **它是背景不是前景，要的是似有似无。** 两端浓淡由 alpha 决定
+ * （`--opacity-veil-top` 0.56 / `--opacity-veil-bottom` 0.36），不是靠把色阶调深——
+ * 色阶一深就成了色块，会跟卡里的读数抢注意力。端点色与两个透明度都在 T2：
+ * 亮色 white → brand-50，暗色由 token 自己重定向（neutral-800 → brand-950），
+ * 组件不必知道主题。
  *
  * 用内联 style 而不是工具类：渐变函数里带逗号与空格，写成 Tailwind arbitrary
  * value 要把空格全换成下划线，读起来不像 CSS 也不像别的什么。
  */
 const SURFACE: React.CSSProperties = {
   backgroundImage: [
-    "linear-gradient(160deg,",
-    "color-mix(in srgb, var(--gradient-card-from) 68%, transparent) 0%,",
-    "color-mix(in srgb, var(--gradient-card-to) 68%, transparent) 100%)",
+    "linear-gradient(180deg,",
+    "color-mix(in srgb, var(--gradient-card-from) calc(var(--opacity-veil-top) * 100%), transparent),",
+    "color-mix(in srgb, var(--gradient-card-to) calc(var(--opacity-veil-bottom) * 100%), transparent))",
   ].join(" "),
 };
 

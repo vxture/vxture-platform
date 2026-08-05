@@ -22,4 +22,6 @@
   --opacity-overlay: 0.5;  /* 遮罩：盖住底层内容但仍可辨认 */
   --opacity-subtle: 0.6;  /* 次要信息：时间戳、辅助说明 */
   --opacity-muted: 0.75;  /* 弱化但仍需阅读：占位、提示 */
+  --opacity-veil-top: 0.56;  /* 卡面底纹上端：贴近纯表面色 */
+  --opacity-veil-bottom: 0.36;  /* 卡面底纹下端：透出品牌调 */
 }
