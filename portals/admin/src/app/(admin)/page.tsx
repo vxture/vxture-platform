@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Icon, SectionHeader } from "@vxture/design-system";
+import { Button, Icon, SectionHeader, ViewHeader } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import type { Locale } from "@vxture/shared";
 import {
@@ -572,21 +572,30 @@ function OverviewHeading({
   onPeriodChange: (next: PeriodKey) => void;
   level?: "page" | "section";
 }) {
-  return (
-    <SectionHeader
-      // "page" / "section" 是这一页自己的说法，SectionHeader 用层级数说同一件事
-      // （level 同时决定语义元素与排版角色：1 → h1，2 → h2）。
-      level={level === "page" ? 1 : 2}
+  const periodSwitch = (
+    <PeriodSwitch
+      value={period}
+      options={["recent30", "total", "year", "quarter", "month"]}
+      onChange={onPeriodChange}
+    />
+  );
+
+  // 页头与板块标题是两件不同的东西，不是同一件的两个层级：ViewHeader 是一页的
+  // 页头（本页仅"平台总览"一处），SectionHeader 管页内板块，从 level 2 起。
+  return level === "page" ? (
+    <ViewHeader
       icon={icon}
       title={title}
       description={description}
-      action={
-        <PeriodSwitch
-          value={period}
-          options={["recent30", "total", "year", "quarter", "month"]}
-          onChange={onPeriodChange}
-        />
-      }
+      action={periodSwitch}
+    />
+  ) : (
+    <SectionHeader
+      level={2}
+      icon={icon}
+      title={title}
+      description={description}
+      action={periodSwitch}
     />
   );
 }
