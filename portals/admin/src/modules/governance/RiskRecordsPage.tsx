@@ -7,14 +7,16 @@ import {
   Button,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
+  MetricGrid,
   NativeSelect,
   Pagination,
   Textarea,
   useToast,
-  ViewLayout,
 } from "@vxture/design-system";
 import {
   createRiskRecord,
@@ -26,7 +28,7 @@ import {
 } from "@/api/admin-bff";
 import type { RiskRecordItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDate } from "@/modules/tenants/tenant-utils";
 
 // TD-021 风险记录页。设计权威 = governance-write-paths.md §3.1/§5。
 // 「审阅」= 后端写 reviewer_id；risk_level 变更后端自动清空 reviewer_id。
@@ -243,184 +245,219 @@ export function RiskRecordsPage() {
   ).length;
 
   return (
-    <ViewLayout className={joinClasses("vx-risk-records-page")}>
-      <PageHeader
-        icon="warning"
-        title="风险记录"
-        description="管理租户风险评估记录：录入、跟进、审阅处置与标签归类。"
-      />
-      <div className="vx-models-summary">
-        <div className="vx-models-summary__item">
-          <Icon name="warning" size="md" fallback="placeholder" />
-          <span>待处置（需跟进/高风险）</span>
-          <strong>{pendingCount}</strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="check" size="md" fallback="placeholder" />
-          <span>已审阅</span>
-          <strong>{items.filter((i) => i.reviewerId !== null).length}</strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="table" size="md" fallback="placeholder" />
-          <span>记录总数</span>
-          <strong>{items.length}</strong>
-        </div>
-      </div>
-      <div className="vx-models-toolbar">
-        <Input
-          className="vx-models-toolbar__search"
-          type="search"
-          placeholder="搜索租户、范围、原因、标签…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-        <div className="vx-models-toolbar__filters">
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={levelFilter}
-            onChange={(e) => {
-              setLevelFilter(e.target.value as LevelFilter);
+    <>
+      <ListPageTemplate
+        className="vx-risk-records-page"
+        header={
+          <PageHeader
+            icon="warning"
+            title="风险记录"
+            description="管理租户风险评估记录：录入、跟进、审阅处置与标签归类。"
+          />
+        }
+        summary={
+          <MetricGrid
+            aria-label="风险记录统计"
+            columns={3}
+            items={[
+              {
+                id: "待处置（需跟进/高风险）",
+                icon: "warning",
+                label: "待处置（需跟进/高风险）",
+                value: String(pendingCount),
+              },
+              {
+                id: "已审阅",
+                icon: "check",
+                label: "已审阅",
+                value: String(
+                  items.filter((i) => i.reviewerId !== null).length,
+                ),
+              },
+              {
+                id: "记录总数",
+                icon: "table",
+                label: "记录总数",
+                value: String(items.length),
+              },
+            ]}
+          />
+        }
+        filters={
+          <FilterBar
+            count={`${filtered.length}条`}
+            aria-label="风险记录筛选"
+            search={
+              <Input
+                className="vx-tenant-search"
+                type="search"
+                placeholder="搜索租户、范围、原因、标签…"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
+            }
+            onReset={() => {
+              setSearch("");
+              setLevelFilter("all");
+              setReviewFilter("all");
               setPage(1);
             }}
+            actions={
+              <>
+                <Button
+                  variant="default"
+                  size="md"
+                  className="vx-admin-action-btn"
+                  onClick={openCreate}
+                  title="新建风险记录"
+                >
+                  <Icon name="plus" size="sm" fallback="placeholder" />
+                  新建记录
+                </Button>
+              </>
+            }
           >
-            <option value="all">全部等级</option>
-            <option value="normal">常规</option>
-            <option value="follow_up">需跟进</option>
-            <option value="high">高风险</option>
-          </NativeSelect>
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={reviewFilter}
-            onChange={(e) => {
-              setReviewFilter(e.target.value as ReviewFilter);
-              setPage(1);
-            }}
-          >
-            <option value="all">全部状态</option>
-            <option value="pending">待审阅</option>
-            <option value="reviewed">已审阅</option>
-          </NativeSelect>
-        </div>
-        <div className="vx-models-toolbar__spacer" />
-        <span className="vx-models-toolbar__count">{filtered.length} 条</span>
-        <Button
-          variant="default"
-          size="md"
-          className="vx-admin-action-btn"
-          onClick={openCreate}
-          title="新建风险记录"
-        >
-          <Icon name="plus" size="sm" fallback="placeholder" />
-          新建记录
-        </Button>
-      </div>
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : loadError ? (
-        <EmptyState title="风险记录读取失败" description={loadError} />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无风险记录"
-          description={
-            search || levelFilter !== "all" || reviewFilter !== "all"
-              ? "尝试调整筛选条件"
-              : "点击「新建记录」录入第一条租户风险评估"
-          }
-        />
-      ) : (
-        <>
-          <div
-            className="vx-tenant-directory-list vx-risk-directory-list"
-            role="region"
-            aria-label="风险记录列表"
-          >
-            <div className="vx-tenant-directory-list__header">
-              <span>#</span>
-              <span>租户</span>
-              <span>等级</span>
-              <span>评分</span>
-              <span>范围</span>
-              <span>标签</span>
-              <span>审阅人</span>
-              <span>更新时间</span>
-              <span>操作</span>
-            </div>
-            {pageItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="vx-tenant-directory-row vx-risk-row"
-                title={item.reason}
-              >
-                <span className="vx-tenant-directory-row__index">
-                  {(page - 1) * PAGE_SIZE + index + 1}
-                </span>
-                <span className="vx-risk-row__tenant">
-                  {item.tenantName ?? item.tenantId}
-                  {item.tenantNo ? <small>#{item.tenantNo}</small> : null}
-                </span>
-                <span>
-                  <Badge className={levelBadgeClass(item.riskLevel)}>
-                    {LEVEL_LABELS[item.riskLevel]}
-                  </Badge>
-                </span>
-                <span>{item.riskScore ?? "-"}</span>
-                <span className="vx-risk-row__scope">{item.scope ?? "-"}</span>
-                <span className="vx-risk-row__tags">
-                  {item.tags.length > 0 ? item.tags.join(", ") : "-"}
-                </span>
-                <span>{item.reviewerName ?? "待审阅"}</span>
-                <span>{formatDate(item.updatedAt)}</span>
-                <span className="vx-tenant-actions">
-                  <ActionMenu
-                    label={`风险记录操作`}
-                    disabled={submitting}
-                    items={[
-                      {
-                        id: "review",
-                        label: item.reviewerId ? "重新审阅" : "标记已审阅",
-                        icon: "check",
-                        disabled: submitting,
-                        onSelect: () =>
-                          void runAction("已标记审阅", () =>
-                            reviewRiskRecord(item.id),
-                          ),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        disabled: submitting,
-                        onSelect: () => openEdit(item),
-                      },
-                      {
-                        id: "delete",
-                        label: "删除",
-                        icon: "trash",
-                        danger: true,
-                        disabled: submitting,
-                        separatorBefore: true,
-                        onSelect: () => setPendingDelete(item),
-                      },
-                    ]}
-                  />
-                </span>
-              </div>
-            ))}
-          </div>
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              total={filtered.length}
-              pageSize={PAGE_SIZE}
-              onPageChange={setPage}
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={levelFilter}
+              onChange={(e) => {
+                setLevelFilter(e.target.value as LevelFilter);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部等级</option>
+              <option value="normal">常规</option>
+              <option value="follow_up">需跟进</option>
+              <option value="high">高风险</option>
+            </NativeSelect>
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={reviewFilter}
+              onChange={(e) => {
+                setReviewFilter(e.target.value as ReviewFilter);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部状态</option>
+              <option value="pending">待审阅</option>
+              <option value="reviewed">已审阅</option>
+            </NativeSelect>
+          </FilterBar>
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : loadError ? (
+            <EmptyState title="风险记录读取失败" description={loadError} />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无风险记录"
+              description={
+                search || levelFilter !== "all" || reviewFilter !== "all"
+                  ? "尝试调整筛选条件"
+                  : "点击「新建记录」录入第一条租户风险评估"
+              }
             />
-          ) : null}
-        </>
-      )}
+          ) : (
+            <>
+              <div
+                className="vx-tenant-directory-list vx-risk-directory-list"
+                role="region"
+                aria-label="风险记录列表"
+              >
+                <div className="vx-tenant-directory-list__header">
+                  <span>#</span>
+                  <span>租户</span>
+                  <span>等级</span>
+                  <span>评分</span>
+                  <span>范围</span>
+                  <span>标签</span>
+                  <span>审阅人</span>
+                  <span>更新时间</span>
+                  <span>操作</span>
+                </div>
+                {pageItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="vx-tenant-directory-row vx-risk-row"
+                    title={item.reason}
+                  >
+                    <span className="vx-tenant-directory-row__index">
+                      {(page - 1) * PAGE_SIZE + index + 1}
+                    </span>
+                    <span className="vx-risk-row__tenant">
+                      {item.tenantName ?? item.tenantId}
+                      {item.tenantNo ? <small>#{item.tenantNo}</small> : null}
+                    </span>
+                    <span>
+                      <Badge className={levelBadgeClass(item.riskLevel)}>
+                        {LEVEL_LABELS[item.riskLevel]}
+                      </Badge>
+                    </span>
+                    <span>{item.riskScore ?? "-"}</span>
+                    <span className="vx-risk-row__scope">
+                      {item.scope ?? "-"}
+                    </span>
+                    <span className="vx-risk-row__tags">
+                      {item.tags.length > 0 ? item.tags.join(", ") : "-"}
+                    </span>
+                    <span>{item.reviewerName ?? "待审阅"}</span>
+                    <span>{formatDate(item.updatedAt)}</span>
+                    <span className="vx-tenant-actions">
+                      <ActionMenu
+                        label={`风险记录操作`}
+                        disabled={submitting}
+                        items={[
+                          {
+                            id: "review",
+                            label: item.reviewerId ? "重新审阅" : "标记已审阅",
+                            icon: "check",
+                            disabled: submitting,
+                            onSelect: () =>
+                              void runAction("已标记审阅", () =>
+                                reviewRiskRecord(item.id),
+                              ),
+                          },
+                          {
+                            id: "edit",
+                            label: "编辑",
+                            icon: "edit",
+                            disabled: submitting,
+                            onSelect: () => openEdit(item),
+                          },
+                          {
+                            id: "delete",
+                            label: "删除",
+                            icon: "trash",
+                            danger: true,
+                            disabled: submitting,
+                            separatorBefore: true,
+                            onSelect: () => setPendingDelete(item),
+                          },
+                        ]}
+                      />
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
 
       {dialogMode ? (
         <DialogForm
@@ -533,6 +570,6 @@ export function RiskRecordsPage() {
           }}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

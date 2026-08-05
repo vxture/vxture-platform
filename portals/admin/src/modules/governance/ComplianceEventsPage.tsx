@@ -7,14 +7,16 @@ import {
   Button,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
+  MetricGrid,
   NativeSelect,
   Pagination,
   Textarea,
   useToast,
-  ViewLayout,
 } from "@vxture/design-system";
 import {
   assignComplianceEvent,
@@ -29,7 +31,7 @@ import {
 } from "@/api/admin-bff";
 import type { ComplianceEventItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDate } from "@/modules/tenants/tenant-utils";
 
 // TD-021 合规事件页。设计权威 = governance-write-paths.md §3.2/§5。
 // 状态机 open→(指派)in_review→resolved / open|in_review→dismissed；终态只读；
@@ -262,207 +264,231 @@ export function ComplianceEventsPage() {
   }
 
   return (
-    <ViewLayout className={joinClasses("vx-compliance-page")}>
-      <PageHeader
-        icon="shield-check"
-        title="合规事件"
-        description="跟踪平台与租户合规事件：指派处理人、办结与驳回、证据留存。"
-      />
-      <div className="vx-models-summary">
-        <div className="vx-models-summary__item">
-          <Icon name="warning" size="md" fallback="placeholder" />
-          <span>待处理</span>
-          <strong>{items.filter((i) => i.status === "open").length}</strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="clock" size="md" fallback="placeholder" />
-          <span>处理中</span>
-          <strong>
-            {items.filter((i) => i.status === "in_review").length}
-          </strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="check" size="md" fallback="placeholder" />
-          <span>已办结</span>
-          <strong>{items.filter((i) => i.status === "resolved").length}</strong>
-        </div>
-      </div>
-      <div className="vx-models-toolbar">
-        <Input
-          className="vx-models-toolbar__search"
-          type="search"
-          placeholder="搜索事件类型、租户、法规、处理人…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-        <div className="vx-models-toolbar__filters">
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value as StatusFilter);
+    <>
+      <ListPageTemplate
+        className="vx-compliance-page"
+        header={
+          <PageHeader
+            icon="shield-check"
+            title="合规事件"
+            description="跟踪平台与租户合规事件：指派处理人、办结与驳回、证据留存。"
+          />
+        }
+        summary={
+          <MetricGrid
+            aria-label="合规事件统计"
+            columns={2}
+            items={[
+              {
+                id: "待处理",
+                icon: "warning",
+                label: "待处理",
+                value: String(items.filter((i) => i.status === "open").length),
+              },
+              {
+                id: '处理中</span>\n          <strong>\n            {items.filter((i) => i.status === "in_review").length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon name="check" size="md" fallback="placeholder" />\n          <span>已办结',
+                icon: "clock",
+                label:
+                  '处理中</span>\n          <strong>\n            {items.filter((i) => i.status === "in_review").length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon name="check" size="md" fallback="placeholder" />\n          <span>已办结',
+                value: String(
+                  items.filter((i) => i.status === "resolved").length,
+                ),
+              },
+            ]}
+          />
+        }
+        filters={
+          <FilterBar
+            count={`${filtered.length}条`}
+            aria-label="合规事件筛选"
+            search={
+              <Input
+                className="vx-tenant-search"
+                type="search"
+                placeholder="搜索事件类型、租户、法规、处理人…"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
+            }
+            onReset={() => {
+              setSearch("");
+              setStatusFilter("all");
               setPage(1);
             }}
+            actions={
+              <>
+                <Button
+                  variant="default"
+                  size="md"
+                  className="vx-admin-action-btn"
+                  onClick={openCreate}
+                  title="新建合规事件"
+                >
+                  <Icon name="plus" size="sm" fallback="placeholder" />
+                  新建事件
+                </Button>
+              </>
+            }
           >
-            <option value="all">全部状态</option>
-            <option value="open">待处理</option>
-            <option value="in_review">处理中</option>
-            <option value="resolved">已办结</option>
-            <option value="dismissed">已驳回</option>
-          </NativeSelect>
-        </div>
-        <div className="vx-models-toolbar__spacer" />
-        <span className="vx-models-toolbar__count">{filtered.length} 条</span>
-        <Button
-          variant="default"
-          size="md"
-          className="vx-admin-action-btn"
-          onClick={openCreate}
-          title="新建合规事件"
-        >
-          <Icon name="plus" size="sm" fallback="placeholder" />
-          新建事件
-        </Button>
-      </div>
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : loadError ? (
-        <EmptyState title="合规事件读取失败" description={loadError} />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无合规事件"
-          description={
-            search || statusFilter !== "all"
-              ? "尝试调整筛选条件"
-              : "点击「新建事件」登记第一条合规事件"
-          }
-        />
-      ) : (
-        <>
-          <div
-            className="vx-tenant-directory-list vx-compliance-directory-list"
-            role="region"
-            aria-label="合规事件列表"
-          >
-            <div className="vx-tenant-directory-list__header">
-              <span>#</span>
-              <span>事件类型</span>
-              <span>租户</span>
-              <span>状态</span>
-              <span>法规条款</span>
-              <span>处理人</span>
-              <span>更新时间</span>
-              <span>操作</span>
-            </div>
-            {pageItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="vx-tenant-directory-row vx-compliance-row"
-              >
-                <span className="vx-tenant-directory-row__index">
-                  {(page - 1) * PAGE_SIZE + index + 1}
-                </span>
-                <span className="vx-compliance-row__type">
-                  {item.eventType}
-                  {item.evidenceUrl ? (
-                    <a
-                      href={item.evidenceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="查看证据材料"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Icon
-                        name="arrow-long-right"
-                        size="xs"
-                        fallback="placeholder"
-                      />
-                    </a>
-                  ) : null}
-                </span>
-                <span>
-                  {item.tenantName ??
-                    (item.tenantId ? item.tenantId : "平台级")}
-                </span>
-                <span>
-                  <Badge className={statusBadgeClass(item.status)}>
-                    {STATUS_LABELS[item.status]}
-                  </Badge>
-                </span>
-                <span>{item.regulationCode ?? "-"}</span>
-                <span>{item.handlerName ?? "-"}</span>
-                <span>{formatDate(item.updatedAt)}</span>
-                <span className="vx-tenant-actions">
-                  <ActionMenu
-                    label="合规事件操作"
-                    disabled={submitting}
-                    items={[
-                      {
-                        id: "assign",
-                        label: item.handlerId ? "改派处理人" : "指派处理人",
-                        icon: "user",
-                        disabled: submitting || TERMINAL.has(item.status),
-                        onSelect: () => void openAssign(item),
-                      },
-                      {
-                        id: "resolve",
-                        label: "办结",
-                        icon: "check",
-                        disabled:
-                          submitting ||
-                          item.status !== "in_review" ||
-                          !item.handlerId,
-                        onSelect: () =>
-                          void runAction("事件已办结", () =>
-                            resolveComplianceEvent(item.id),
-                          ),
-                      },
-                      {
-                        id: "dismiss",
-                        label: "驳回（误报/不适用）",
-                        icon: "stop",
-                        disabled: submitting || TERMINAL.has(item.status),
-                        onSelect: () =>
-                          void runAction("事件已驳回", () =>
-                            dismissComplianceEvent(item.id),
-                          ),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        disabled: submitting || TERMINAL.has(item.status),
-                        onSelect: () => openEdit(item),
-                      },
-                      {
-                        id: "delete",
-                        label: "删除（仅终态）",
-                        icon: "trash",
-                        danger: true,
-                        disabled: submitting || !TERMINAL.has(item.status),
-                        separatorBefore: true,
-                        onSelect: () => setPendingDelete(item),
-                      },
-                    ]}
-                  />
-                </span>
-              </div>
-            ))}
-          </div>
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              total={filtered.length}
-              pageSize={PAGE_SIZE}
-              onPageChange={setPage}
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as StatusFilter);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部状态</option>
+              <option value="open">待处理</option>
+              <option value="in_review">处理中</option>
+              <option value="resolved">已办结</option>
+              <option value="dismissed">已驳回</option>
+            </NativeSelect>
+          </FilterBar>
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : loadError ? (
+            <EmptyState title="合规事件读取失败" description={loadError} />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无合规事件"
+              description={
+                search || statusFilter !== "all"
+                  ? "尝试调整筛选条件"
+                  : "点击「新建事件」登记第一条合规事件"
+              }
             />
-          ) : null}
-        </>
-      )}
+          ) : (
+            <>
+              <div
+                className="vx-tenant-directory-list vx-compliance-directory-list"
+                role="region"
+                aria-label="合规事件列表"
+              >
+                <div className="vx-tenant-directory-list__header">
+                  <span>#</span>
+                  <span>事件类型</span>
+                  <span>租户</span>
+                  <span>状态</span>
+                  <span>法规条款</span>
+                  <span>处理人</span>
+                  <span>更新时间</span>
+                  <span>操作</span>
+                </div>
+                {pageItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="vx-tenant-directory-row vx-compliance-row"
+                  >
+                    <span className="vx-tenant-directory-row__index">
+                      {(page - 1) * PAGE_SIZE + index + 1}
+                    </span>
+                    <span className="vx-compliance-row__type">
+                      {item.eventType}
+                      {item.evidenceUrl ? (
+                        <a
+                          href={item.evidenceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="查看证据材料"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Icon
+                            name="arrow-long-right"
+                            size="xs"
+                            fallback="placeholder"
+                          />
+                        </a>
+                      ) : null}
+                    </span>
+                    <span>
+                      {item.tenantName ??
+                        (item.tenantId ? item.tenantId : "平台级")}
+                    </span>
+                    <span>
+                      <Badge className={statusBadgeClass(item.status)}>
+                        {STATUS_LABELS[item.status]}
+                      </Badge>
+                    </span>
+                    <span>{item.regulationCode ?? "-"}</span>
+                    <span>{item.handlerName ?? "-"}</span>
+                    <span>{formatDate(item.updatedAt)}</span>
+                    <span className="vx-tenant-actions">
+                      <ActionMenu
+                        label="合规事件操作"
+                        disabled={submitting}
+                        items={[
+                          {
+                            id: "assign",
+                            label: item.handlerId ? "改派处理人" : "指派处理人",
+                            icon: "user",
+                            disabled: submitting || TERMINAL.has(item.status),
+                            onSelect: () => void openAssign(item),
+                          },
+                          {
+                            id: "resolve",
+                            label: "办结",
+                            icon: "check",
+                            disabled:
+                              submitting ||
+                              item.status !== "in_review" ||
+                              !item.handlerId,
+                            onSelect: () =>
+                              void runAction("事件已办结", () =>
+                                resolveComplianceEvent(item.id),
+                              ),
+                          },
+                          {
+                            id: "dismiss",
+                            label: "驳回（误报/不适用）",
+                            icon: "stop",
+                            disabled: submitting || TERMINAL.has(item.status),
+                            onSelect: () =>
+                              void runAction("事件已驳回", () =>
+                                dismissComplianceEvent(item.id),
+                              ),
+                          },
+                          {
+                            id: "edit",
+                            label: "编辑",
+                            icon: "edit",
+                            disabled: submitting || TERMINAL.has(item.status),
+                            onSelect: () => openEdit(item),
+                          },
+                          {
+                            id: "delete",
+                            label: "删除（仅终态）",
+                            icon: "trash",
+                            danger: true,
+                            disabled: submitting || !TERMINAL.has(item.status),
+                            separatorBefore: true,
+                            onSelect: () => setPendingDelete(item),
+                          },
+                        ]}
+                      />
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
 
       {dialogMode ? (
         <DialogForm
@@ -590,6 +616,6 @@ export function ComplianceEventsPage() {
           }}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

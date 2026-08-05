@@ -7,14 +7,15 @@ import {
   Button,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   NativeSelect,
   Pagination,
   Textarea,
   useToast,
-  ViewLayout,
 } from "@vxture/design-system";
 import {
   cancelMaintenanceWindow,
@@ -27,7 +28,7 @@ import {
 } from "@/api/admin-bff";
 import type { MaintenanceWindowItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDate } from "@/modules/tenants/tenant-utils";
 
 // TD-021 维护窗口页。设计权威 = governance-write-paths.md §3.3/§5。
 // scheduled→start→in_progress→complete→completed；scheduled|in_progress→cancel；
@@ -267,198 +268,198 @@ export function MaintenanceWindowsPage() {
   }
 
   return (
-    <ViewLayout className={joinClasses("vx-maintenance-page")}>
-      <PageHeader
-        icon="clock"
-        title="维护窗口"
-        description="声明与管理平台维护窗口：计划、执行、完成与取消，实际结束时间对账。需要对外通知时经「消息公告」手工发布。"
-      />
-      <div className="vx-models-summary">
-        <div className="vx-models-summary__item">
-          <Icon name="calendar" size="md" fallback="placeholder" />
-          <span>已计划</span>
-          <strong>
-            {items.filter((i) => i.status === "scheduled").length}
-          </strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="clock" size="md" fallback="placeholder" />
-          <span>进行中</span>
-          <strong>
-            {items.filter((i) => i.status === "in_progress").length}
-          </strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="check" size="md" fallback="placeholder" />
-          <span>已完成</span>
-          <strong>
-            {items.filter((i) => i.status === "completed").length}
-          </strong>
-        </div>
-      </div>
-      <div className="vx-models-toolbar">
-        <Input
-          className="vx-models-toolbar__search"
-          type="search"
-          placeholder="搜索标题、描述、受影响服务…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-        <div className="vx-models-toolbar__filters">
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value as StatusFilter);
+    <>
+      <ListPageTemplate
+        className="vx-maintenance-page"
+        header={
+          <PageHeader
+            icon="clock"
+            title="维护窗口"
+            description="声明与管理平台维护窗口：计划、执行、完成与取消，实际结束时间对账。需要对外通知时经「消息公告」手工发布。"
+          />
+        }
+        filters={
+          <FilterBar
+            count={`${filtered.length}条`}
+            aria-label="维护窗口筛选"
+            search={
+              <Input
+                className="vx-tenant-search"
+                type="search"
+                placeholder="搜索标题、描述、受影响服务…"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
+            }
+            onReset={() => {
+              setSearch("");
+              setStatusFilter("all");
               setPage(1);
             }}
+            actions={
+              <>
+                <Button
+                  variant="default"
+                  size="md"
+                  className="vx-admin-action-btn"
+                  onClick={openCreate}
+                  title="新建维护窗口"
+                >
+                  <Icon name="plus" size="sm" fallback="placeholder" />
+                  新建窗口
+                </Button>
+              </>
+            }
           >
-            <option value="all">全部状态</option>
-            <option value="scheduled">已计划</option>
-            <option value="in_progress">进行中</option>
-            <option value="completed">已完成</option>
-            <option value="cancelled">已取消</option>
-          </NativeSelect>
-        </div>
-        <div className="vx-models-toolbar__spacer" />
-        <span className="vx-models-toolbar__count">{filtered.length} 条</span>
-        <Button
-          variant="default"
-          size="md"
-          className="vx-admin-action-btn"
-          onClick={openCreate}
-          title="新建维护窗口"
-        >
-          <Icon name="plus" size="sm" fallback="placeholder" />
-          新建窗口
-        </Button>
-      </div>
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : loadError ? (
-        <EmptyState title="维护窗口读取失败" description={loadError} />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无维护窗口"
-          description={
-            search || statusFilter !== "all"
-              ? "尝试调整筛选条件"
-              : "点击「新建窗口」声明第一个平台维护窗口"
-          }
-        />
-      ) : (
-        <>
-          <div
-            className="vx-tenant-directory-list vx-maintenance-directory-list"
-            role="region"
-            aria-label="维护窗口列表"
-          >
-            <div className="vx-tenant-directory-list__header">
-              <span>#</span>
-              <span>标题</span>
-              <span>严重度</span>
-              <span>状态</span>
-              <span>计划开始</span>
-              <span>计划结束</span>
-              <span>实际结束</span>
-              <span>操作</span>
-            </div>
-            {pageItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="vx-tenant-directory-row vx-maintenance-row"
-                title={
-                  item.affectedServices.length > 0
-                    ? `受影响服务：${item.affectedServices.join(", ")}`
-                    : undefined
-                }
-              >
-                <span className="vx-tenant-directory-row__index">
-                  {(page - 1) * PAGE_SIZE + index + 1}
-                </span>
-                <span className="vx-maintenance-row__title">{item.title}</span>
-                <span>
-                  <Badge className={severityBadgeClass(item.severity)}>
-                    {SEVERITY_LABELS[item.severity]}
-                  </Badge>
-                </span>
-                <span>
-                  <Badge className={statusBadgeClass(item.status)}>
-                    {STATUS_LABELS[item.status]}
-                  </Badge>
-                </span>
-                <span>{formatDate(item.startAt)}</span>
-                <span>{formatDate(item.endAt)}</span>
-                <span>
-                  {item.actualEndAt ? formatDate(item.actualEndAt) : "-"}
-                </span>
-                <span className="vx-tenant-actions">
-                  <ActionMenu
-                    label="维护窗口操作"
-                    disabled={submitting}
-                    items={[
-                      {
-                        id: "start",
-                        label: "开始维护",
-                        icon: "play",
-                        disabled: submitting || item.status !== "scheduled",
-                        onSelect: () =>
-                          void runAction("维护已开始", () =>
-                            startMaintenanceWindow(item.id),
-                          ),
-                      },
-                      {
-                        id: "complete",
-                        label: "完成维护",
-                        icon: "check",
-                        disabled: submitting || item.status !== "in_progress",
-                        onSelect: () =>
-                          void runAction("维护已完成", () =>
-                            completeMaintenanceWindow(item.id),
-                          ),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        disabled:
-                          submitting ||
-                          (item.status !== "scheduled" &&
-                            item.status !== "in_progress"),
-                        onSelect: () => openEdit(item),
-                      },
-                      {
-                        id: "cancel",
-                        label: "取消窗口",
-                        icon: "stop",
-                        danger: true,
-                        disabled:
-                          submitting ||
-                          (item.status !== "scheduled" &&
-                            item.status !== "in_progress"),
-                        separatorBefore: true,
-                        onSelect: () => setPendingCancel(item),
-                      },
-                    ]}
-                  />
-                </span>
-              </div>
-            ))}
-          </div>
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              total={filtered.length}
-              pageSize={PAGE_SIZE}
-              onPageChange={setPage}
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as StatusFilter);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部状态</option>
+              <option value="scheduled">已计划</option>
+              <option value="in_progress">进行中</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+            </NativeSelect>
+          </FilterBar>
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : loadError ? (
+            <EmptyState title="维护窗口读取失败" description={loadError} />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无维护窗口"
+              description={
+                search || statusFilter !== "all"
+                  ? "尝试调整筛选条件"
+                  : "点击「新建窗口」声明第一个平台维护窗口"
+              }
             />
-          ) : null}
-        </>
-      )}
+          ) : (
+            <>
+              <div
+                className="vx-tenant-directory-list vx-maintenance-directory-list"
+                role="region"
+                aria-label="维护窗口列表"
+              >
+                <div className="vx-tenant-directory-list__header">
+                  <span>#</span>
+                  <span>标题</span>
+                  <span>严重度</span>
+                  <span>状态</span>
+                  <span>计划开始</span>
+                  <span>计划结束</span>
+                  <span>实际结束</span>
+                  <span>操作</span>
+                </div>
+                {pageItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="vx-tenant-directory-row vx-maintenance-row"
+                    title={
+                      item.affectedServices.length > 0
+                        ? `受影响服务：${item.affectedServices.join(", ")}`
+                        : undefined
+                    }
+                  >
+                    <span className="vx-tenant-directory-row__index">
+                      {(page - 1) * PAGE_SIZE + index + 1}
+                    </span>
+                    <span className="vx-maintenance-row__title">
+                      {item.title}
+                    </span>
+                    <span>
+                      <Badge className={severityBadgeClass(item.severity)}>
+                        {SEVERITY_LABELS[item.severity]}
+                      </Badge>
+                    </span>
+                    <span>
+                      <Badge className={statusBadgeClass(item.status)}>
+                        {STATUS_LABELS[item.status]}
+                      </Badge>
+                    </span>
+                    <span>{formatDate(item.startAt)}</span>
+                    <span>{formatDate(item.endAt)}</span>
+                    <span>
+                      {item.actualEndAt ? formatDate(item.actualEndAt) : "-"}
+                    </span>
+                    <span className="vx-tenant-actions">
+                      <ActionMenu
+                        label="维护窗口操作"
+                        disabled={submitting}
+                        items={[
+                          {
+                            id: "start",
+                            label: "开始维护",
+                            icon: "play",
+                            disabled: submitting || item.status !== "scheduled",
+                            onSelect: () =>
+                              void runAction("维护已开始", () =>
+                                startMaintenanceWindow(item.id),
+                              ),
+                          },
+                          {
+                            id: "complete",
+                            label: "完成维护",
+                            icon: "check",
+                            disabled:
+                              submitting || item.status !== "in_progress",
+                            onSelect: () =>
+                              void runAction("维护已完成", () =>
+                                completeMaintenanceWindow(item.id),
+                              ),
+                          },
+                          {
+                            id: "edit",
+                            label: "编辑",
+                            icon: "edit",
+                            disabled:
+                              submitting ||
+                              (item.status !== "scheduled" &&
+                                item.status !== "in_progress"),
+                            onSelect: () => openEdit(item),
+                          },
+                          {
+                            id: "cancel",
+                            label: "取消窗口",
+                            icon: "stop",
+                            danger: true,
+                            disabled:
+                              submitting ||
+                              (item.status !== "scheduled" &&
+                                item.status !== "in_progress"),
+                            separatorBefore: true,
+                            onSelect: () => setPendingCancel(item),
+                          },
+                        ]}
+                      />
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  total={filtered.length}
+                  pageSize={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
 
       {dialogMode ? (
         <DialogForm
@@ -596,6 +597,6 @@ export function MaintenanceWindowsPage() {
           }}
         />
       ) : null}
-    </ViewLayout>
+    </>
   );
 }

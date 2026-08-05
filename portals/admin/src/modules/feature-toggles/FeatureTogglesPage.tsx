@@ -7,14 +7,16 @@ import {
   Button,
   DialogForm,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
   Label,
+  ListPageTemplate,
+  MetricGrid,
   NativeSelect,
   Pagination,
   Textarea,
   useToast,
-  ViewLayout,
 } from "@vxture/design-system";
 import {
   archiveFeatureFlag,
@@ -26,7 +28,7 @@ import {
 } from "@/api/admin-bff";
 import type { FeatureFlagRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDate } from "@/modules/tenants/tenant-utils";
 
 // P2 占位板块建设：功能开关（admin.feature_flags）。全局开关 + 灰度百分比 +
 // 逐租户覆盖（tenant_overrides，本页只读携带、不在 UI 编辑）+ 归档。
@@ -240,218 +242,242 @@ export function FeatureTogglesPage() {
   }
 
   return (
-    <ViewLayout className={joinClasses("vx-feature-flag-page")}>
-      <PageHeader
-        icon="settings"
-        title="功能开关"
-        description="管理平台功能开关：全局启停、灰度百分比与逐租户覆盖。灰度按 flag_key 匹配，逐租户覆盖命中优先于灰度百分比。"
-      />
-      <div className="vx-models-summary">
-        <div className="vx-models-summary__item">
-          <Icon name="list" size="md" fallback="placeholder" />
-          <span>开关总数</span>
-          <strong>{items.filter((i) => !i.isArchived).length}</strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon name="check" size="md" fallback="placeholder" />
-          <span>已启用</span>
-          <strong>
-            {items.filter((i) => !i.isArchived && i.isGloballyEnabled).length}
-          </strong>
-        </div>
-        <div className="vx-models-summary__item">
-          <Icon
-            name="clock-counter-clockwise"
-            size="md"
-            fallback="placeholder"
+    <>
+      <ListPageTemplate
+        className="vx-feature-flag-page"
+        header={
+          <PageHeader
+            icon="settings"
+            title="功能开关"
+            description="管理平台功能开关：全局启停、灰度百分比与逐租户覆盖。灰度按 flag_key 匹配，逐租户覆盖命中优先于灰度百分比。"
           />
-          <span>已归档</span>
-          <strong>{items.filter((i) => i.isArchived).length}</strong>
-        </div>
-      </div>
-      <div className="vx-models-toolbar">
-        <Input
-          className="vx-models-toolbar__search"
-          type="search"
-          placeholder="搜索开关键、描述、分类…"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-        />
-        <div className="vx-models-toolbar__filters">
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={categoryFilter}
-            onChange={(e) => {
-              setCategoryFilter(e.target.value);
+        }
+        summary={
+          <MetricGrid
+            aria-label="功能开关统计"
+            columns={2}
+            items={[
+              {
+                id: "开关总数",
+                icon: "list",
+                label: "开关总数",
+                value: String(items.filter((i) => !i.isArchived).length),
+              },
+              {
+                id: '已启用</span>\n          <strong>\n            {items.filter((i) => !i.isArchived && i.isGloballyEnabled).length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon\n            name="clock-counter-clockwise"\n            size="md"\n            fallback="placeholder"\n          />\n          <span>已归档',
+                icon: "check",
+                label:
+                  '已启用</span>\n          <strong>\n            {items.filter((i) => !i.isArchived && i.isGloballyEnabled).length}\n          </strong>\n        </div>\n        <div className="vx-models-summary__item">\n          <Icon\n            name="clock-counter-clockwise"\n            size="md"\n            fallback="placeholder"\n          />\n          <span>已归档',
+                value: String(items.filter((i) => i.isArchived).length),
+              },
+            ]}
+          />
+        }
+        filters={
+          <FilterBar
+            count={`${filtered.length}条`}
+            aria-label="功能开关筛选"
+            search={
+              <Input
+                className="vx-tenant-search"
+                type="search"
+                placeholder="搜索开关键、描述、分类…"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+              />
+            }
+            onReset={() => {
+              setSearch("");
+              setCategoryFilter("all");
+              setEnvironmentFilter("all");
+              setArchivedFilter("all");
               setPage(1);
             }}
+            actions={
+              <>
+                <Button
+                  variant="default"
+                  size="md"
+                  className="vx-admin-action-btn"
+                  onClick={openCreate}
+                  title="新建功能开关"
+                >
+                  <Icon name="plus" size="sm" fallback="placeholder" />
+                  新建开关
+                </Button>
+              </>
+            }
           >
-            <option value="all">全部分类</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </NativeSelect>
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={environmentFilter}
-            onChange={(e) => {
-              setEnvironmentFilter(e.target.value);
-              setPage(1);
-            }}
-          >
-            <option value="all">全部环境</option>
-            {environments.map((env) => (
-              <option key={env} value={env}>
-                {env}
-              </option>
-            ))}
-          </NativeSelect>
-          <NativeSelect
-            className="vx-admin-filter-select"
-            value={archivedFilter}
-            onChange={(e) => {
-              setArchivedFilter(e.target.value as ArchivedFilter);
-              setPage(1);
-            }}
-          >
-            <option value="active">未归档</option>
-            <option value="archived">已归档</option>
-            <option value="all">全部</option>
-          </NativeSelect>
-        </div>
-        <div className="vx-models-toolbar__spacer" />
-        <span className="vx-models-toolbar__count">{filtered.length} 条</span>
-        <Button
-          variant="default"
-          size="md"
-          className="vx-admin-action-btn"
-          onClick={openCreate}
-          title="新建功能开关"
-        >
-          <Icon name="plus" size="sm" fallback="placeholder" />
-          新建开关
-        </Button>
-      </div>
-      {loading ? (
-        <EmptyState title="加载中…" />
-      ) : filtered.length === 0 ? (
-        <EmptyState
-          title="暂无功能开关"
-          description={
-            search ||
-            categoryFilter !== "all" ||
-            environmentFilter !== "all" ||
-            archivedFilter !== "active"
-              ? "尝试调整筛选条件"
-              : "点击「新建开关」创建第一个功能开关"
-          }
-        />
-      ) : (
-        <>
-          <div
-            className="vx-tenant-directory-list vx-feature-flag-directory-list"
-            role="region"
-            aria-label="功能开关列表"
-          >
-            <div className="vx-tenant-directory-list__header">
-              <span>#</span>
-              <span>开关键 / 分类</span>
-              <span>环境</span>
-              <span>状态</span>
-              <span>灰度</span>
-              <span>更新时间</span>
-              <span>操作</span>
-            </div>
-            {pageItems.map((item, index) => (
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部分类</option>
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </NativeSelect>
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={environmentFilter}
+              onChange={(e) => {
+                setEnvironmentFilter(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="all">全部环境</option>
+              {environments.map((env) => (
+                <option key={env} value={env}>
+                  {env}
+                </option>
+              ))}
+            </NativeSelect>
+            <NativeSelect
+              wrapperClassName="w-fit"
+              className="vx-tenant-select"
+              value={archivedFilter}
+              onChange={(e) => {
+                setArchivedFilter(e.target.value as ArchivedFilter);
+                setPage(1);
+              }}
+            >
+              <option value="active">未归档</option>
+              <option value="archived">已归档</option>
+              <option value="all">全部</option>
+            </NativeSelect>
+          </FilterBar>
+        }
+        table={
+          loading ? (
+            <EmptyState title="加载中…" />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="暂无功能开关"
+              description={
+                search ||
+                categoryFilter !== "all" ||
+                environmentFilter !== "all" ||
+                archivedFilter !== "active"
+                  ? "尝试调整筛选条件"
+                  : "点击「新建开关」创建第一个功能开关"
+              }
+            />
+          ) : (
+            <>
               <div
-                key={item.id}
-                className="vx-tenant-directory-row vx-feature-flag-row"
-                title={
-                  item.description
-                    ? item.description
-                    : `逐租户覆盖：${overrideSummary(item.tenantOverrides)}`
-                }
+                className="vx-tenant-directory-list vx-feature-flag-directory-list"
+                role="region"
+                aria-label="功能开关列表"
               >
-                <span className="vx-tenant-directory-row__index">
-                  {(page - 1) * PAGE_SIZE + index + 1}
-                </span>
-                <span className="vx-feature-flag-row__key">
-                  {item.flagKey}
-                  <small>
-                    {item.category}
-                    {item.isArchived ? " · 已归档" : ""}
-                  </small>
-                </span>
-                <span>{item.environment}</span>
-                <span>
-                  <Badge
-                    className={
-                      item.isGloballyEnabled
-                        ? "vx-admin-role-status-pill--enabled"
-                        : "vx-admin-role-status-pill--disabled"
+                <div className="vx-tenant-directory-list__header">
+                  <span>#</span>
+                  <span>开关键 / 分类</span>
+                  <span>环境</span>
+                  <span>状态</span>
+                  <span>灰度</span>
+                  <span>更新时间</span>
+                  <span>操作</span>
+                </div>
+                {pageItems.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="vx-tenant-directory-row vx-feature-flag-row"
+                    title={
+                      item.description
+                        ? item.description
+                        : `逐租户覆盖：${overrideSummary(item.tenantOverrides)}`
                     }
                   >
-                    {item.isGloballyEnabled ? "已启用" : "已停用"}
-                  </Badge>
-                </span>
-                <span>{item.rolloutPercentage}%</span>
-                <span>{formatDate(item.updatedAt)}</span>
-                <span className="vx-tenant-actions">
-                  <ActionMenu
-                    label="功能开关操作"
-                    disabled={submitting}
-                    items={[
-                      {
-                        id: "toggle",
-                        label: item.isGloballyEnabled ? "停用" : "启用",
-                        icon: item.isGloballyEnabled ? "x" : "check",
-                        disabled: submitting || item.isArchived,
-                        onSelect: () =>
-                          void runAction(
-                            item.isGloballyEnabled ? "已停用" : "已启用",
-                            () => toggleFeatureFlag(item.id),
-                          ),
-                      },
-                      {
-                        id: "edit",
-                        label: "编辑",
-                        icon: "edit",
-                        disabled: submitting || item.isArchived,
-                        onSelect: () => openEdit(item),
-                      },
-                      {
-                        id: "archive",
-                        label: item.isArchived ? "恢复" : "归档",
-                        icon: item.isArchived
-                          ? "clock-counter-clockwise"
-                          : "stop",
-                        disabled: submitting,
-                        onSelect: () =>
-                          void runAction(
-                            item.isArchived ? "已恢复" : "已归档",
-                            () => archiveFeatureFlag(item.id, !item.isArchived),
-                          ),
-                      },
-                    ]}
-                  />
-                </span>
+                    <span className="vx-tenant-directory-row__index">
+                      {(page - 1) * PAGE_SIZE + index + 1}
+                    </span>
+                    <span className="vx-feature-flag-row__key">
+                      {item.flagKey}
+                      <small>
+                        {item.category}
+                        {item.isArchived ? " · 已归档" : ""}
+                      </small>
+                    </span>
+                    <span>{item.environment}</span>
+                    <span>
+                      <Badge
+                        className={
+                          item.isGloballyEnabled
+                            ? "vx-admin-role-status-pill--enabled"
+                            : "vx-admin-role-status-pill--disabled"
+                        }
+                      >
+                        {item.isGloballyEnabled ? "已启用" : "已停用"}
+                      </Badge>
+                    </span>
+                    <span>{item.rolloutPercentage}%</span>
+                    <span>{formatDate(item.updatedAt)}</span>
+                    <span className="vx-tenant-actions">
+                      <ActionMenu
+                        label="功能开关操作"
+                        disabled={submitting}
+                        items={[
+                          {
+                            id: "toggle",
+                            label: item.isGloballyEnabled ? "停用" : "启用",
+                            icon: item.isGloballyEnabled ? "x" : "check",
+                            disabled: submitting || item.isArchived,
+                            onSelect: () =>
+                              void runAction(
+                                item.isGloballyEnabled ? "已停用" : "已启用",
+                                () => toggleFeatureFlag(item.id),
+                              ),
+                          },
+                          {
+                            id: "edit",
+                            label: "编辑",
+                            icon: "edit",
+                            disabled: submitting || item.isArchived,
+                            onSelect: () => openEdit(item),
+                          },
+                          {
+                            id: "archive",
+                            label: item.isArchived ? "恢复" : "归档",
+                            icon: item.isArchived
+                              ? "clock-counter-clockwise"
+                              : "stop",
+                            disabled: submitting,
+                            onSelect: () =>
+                              void runAction(
+                                item.isArchived ? "已恢复" : "已归档",
+                                () =>
+                                  archiveFeatureFlag(item.id, !item.isArchived),
+                              ),
+                          },
+                        ]}
+                      />
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          {pageCount > 1 ? (
-            <Pagination
-              page={page}
-              pageCount={pageCount}
-              onPageChange={setPage}
-            />
-          ) : null}
-        </>
-      )}
+              {pageCount > 1 ? (
+                <Pagination
+                  page={page}
+                  pageCount={pageCount}
+                  onPageChange={setPage}
+                />
+              ) : null}
+            </>
+          )
+        }
+      />
+
       {dialogMode ? (
         <DialogForm
           open
@@ -537,6 +563,6 @@ export function FeatureTogglesPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
