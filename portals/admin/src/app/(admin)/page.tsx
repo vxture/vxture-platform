@@ -3,7 +3,14 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Icon, SectionHeader, ViewHeader } from "@vxture/design-system";
+import {
+  Button,
+  Icon,
+  SectionHeader,
+  StatCard,
+  ViewHeader,
+} from "@vxture/design-system";
+import { toStatusTone } from "@/modules/shared/tone";
 import type { IconName } from "@vxture/design-system";
 import type { Locale } from "@vxture/shared";
 import {
@@ -602,38 +609,32 @@ function OverviewHeading({
 
 function OverviewPulseCard({ metric }: { metric: OverviewPulseMetric }) {
   return (
-    <article
-      className={`admin-overview-pulse__item ${metricToneClass(metric.tone)}`}
-    >
-      <span className="admin-overview-pulse__label">
-        {metric.title}
-        <DetailTip detail={metric.detail} />
-      </span>
-      <div className="admin-overview-pulse__line">
-        {metric.rating ? (
-          <span className="admin-overview-pulse__rating">
+    <StatCard
+      label={metric.title}
+      help={metric.detail}
+      tone={toStatusTone(metric.tone)}
+      value={
+        metric.rating ? (
+          /* 评分档：星标在读数左侧，两者当作一个读数整体传进去。 */
+          <span className="inline-flex items-end gap-xs">
             <RatingStars value={metric.rating} />
-            <MetricValue value={metric.value} />
+            {metric.value}
           </span>
         ) : (
-          <MetricValue
-            value={metric.value}
-            className="admin-overview-pulse__value"
-          />
-        )}
-        <span className="admin-overview-pulse__tags">
-          {metric.tags.map((tag) => (
-            <em
-              className={pulseTagToneClass(tag.tone)}
-              key={`${tag.label ?? "value"}-${tag.value}`}
-            >
-              {tag.label ? `${tag.label} ` : ""}
-              {tag.value}
-            </em>
-          ))}
-        </span>
-      </div>
-    </article>
+          metric.value
+        )
+      }
+      tags={metric.tags.map((tag) => (
+        // 小标仍挂 pulse 的语气类——那是 pill 色调族，归后续那一批统一换 Badge。
+        <em
+          className={pulseTagToneClass(tag.tone)}
+          key={`${tag.label ?? "value"}-${tag.value}`}
+        >
+          {tag.label ? `${tag.label} ` : ""}
+          {tag.value}
+        </em>
+      ))}
+    />
   );
 }
 
@@ -1902,7 +1903,11 @@ export default function AdminOverviewPage() {
         />
       </header>
 
-      <section className="admin-overview-pulse" aria-label="平台核心态势">
+      {/* 四张一行，间距 2rem（space-xl）——与既有实现同值，窄屏折两列。 */}
+      <section
+        className="grid gap-xl sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="平台核心态势"
+      >
         {pulseMetrics.map((metric) => (
           <OverviewPulseCard key={metric.id} metric={metric} />
         ))}

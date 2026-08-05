@@ -146,6 +146,15 @@ export const STANDALONE_COLORS = [
   ["gradient-ai-to", "purple-800", "purple-700"],
   ["gradient-surface-from", "neutral-200", "neutral-800"],
   ["gradient-surface-to", "white", "neutral-900"],
+  // 卡片表面的底纹。与 `gradient-surface-*` 刻意相对：那一档"表面阶梯用中性档、
+  // 不带品牌调"，这一档就是要带品牌调——概览页顶部的重点指标卡靠它与下方的常规
+  // 卡片拉开层次，而不再靠加深底色（透明模式下加深底色会破坏"一层实色底"）。
+  //
+  // 端点按底纹判据（ΔL* 5–9）挑，不是凭观感：亮色 brand-100(L*91.8) → white(100)
+  // 差 8.2，暗色 brand-950(18.6) → neutral-800(26.9) 差 8.3。brand-50 只差 3.8，
+  // 蓝调看不出来；brand-200 差 16.6，落进强调渐变那一档去了。
+  ["gradient-card-from", "brand-100", "brand-950"],
+  ["gradient-card-to", "white", "neutral-800"],
   ["gradient-glow-from", "brand-600-alpha-22", "brand-600-alpha-22"],
   ["gradient-glow-to", "brand-600-alpha-08", "brand-600-alpha-08"],
 ];

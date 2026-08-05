@@ -27,6 +27,7 @@ export * from "./data/ViewModeSwitch";
 export * from "./data/EntryCard";
 export * from "./data/MetricCard";
 export * from "./data/MetricListCard";
+export * from "./data/StatCard";
 export * from "./data/MetricGrid";
 export * from "./data/TableTitleCell";
 export * from "./data/ListCard";

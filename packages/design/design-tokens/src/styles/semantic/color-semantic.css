@@ -143,6 +143,8 @@
   --gradient-ai-to: var(--vx-color-purple-800);
   --gradient-surface-from: var(--vx-color-neutral-200);
   --gradient-surface-to: var(--vx-color-white);
+  --gradient-card-from: var(--vx-color-brand-100);
+  --gradient-card-to: var(--vx-color-white);
   --gradient-glow-from: var(--vx-color-brand-600-alpha-22);
   --gradient-glow-to: var(--vx-color-brand-600-alpha-08);
 }
@@ -271,6 +273,8 @@
   --gradient-ai-to: var(--vx-color-purple-700);
   --gradient-surface-from: var(--vx-color-neutral-800);
   --gradient-surface-to: var(--vx-color-neutral-900);
+  --gradient-card-from: var(--vx-color-brand-950);
+  --gradient-card-to: var(--vx-color-neutral-800);
   --gradient-glow-from: var(--vx-color-brand-600-alpha-22);
   --gradient-glow-to: var(--vx-color-brand-600-alpha-08);
 }
