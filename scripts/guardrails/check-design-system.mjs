@@ -1072,7 +1072,9 @@ const rules = [
           if (!text.includes("*/")) inBlockComment = true;
           return;
         }
-        if (/^@import\s+["'][^"']+["'];$/.test(text)) return;
+        // `layer(...)` 是 @import 的标准形式，仍然只是聚合导入，不是样式规则。
+        if (/^@import\s+["'][^"']+["'](\s+layer\([a-z-]+\))?;$/.test(text))
+          return;
         // `@source` 和 @import 一样是构建指令，不是样式规则：它告诉 Tailwind 去哪
         // 扫类名。路径相对声明它的文件，挪进分层模块只会让这条极易失效的声明更难
         // 维护——而它一旦失效，DS 组件的工具类全部不产出且不报错。
@@ -1774,7 +1776,7 @@ function isImportOnlyStyleContent(content) {
       if (!text.includes("*/")) inBlockComment = true;
       return true;
     }
-    return /^@import\s+["'][^"']+["'];$/.test(text);
+    return /^@import\s+["'][^"']+["'](\s+layer\([a-z-]+\))?;$/.test(text);
   });
 }
 
