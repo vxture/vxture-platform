@@ -500,10 +500,6 @@ function metricToneClass(tone: Tone = "blue") {
   return `admin-overview-tone admin-overview-tone--${tone}`;
 }
 
-function pulseTagToneClass(tone?: Tone) {
-  return tone ? `admin-overview-pulse__tag--${tone}` : undefined;
-}
-
 function DetailTip({ detail }: { detail: string }) {
   return (
     <span className="admin-overview-tip">
@@ -608,6 +604,11 @@ function OverviewHeading({
 }
 
 function OverviewPulseCard({ metric }: { metric: OverviewPulseMetric }) {
+  /* 带标签的是补充口径（"新增 +12"），语气跟随整卡；不带标签的是纯涨跌值，
+   * 自带涨绿跌红的语气——正好对上 StatCard 的 tags / trend 两个槽。 */
+  const delta = metric.tags.find((tag) => !tag.label);
+  const captions = metric.tags.filter((tag) => tag.label);
+
   return (
     <StatCard
       label={metric.title}
@@ -624,16 +625,13 @@ function OverviewPulseCard({ metric }: { metric: OverviewPulseMetric }) {
           metric.value
         )
       }
-      tags={metric.tags.map((tag) => (
-        // 小标仍挂 pulse 的语气类——那是 pill 色调族，归后续那一批统一换 Badge。
-        <em
-          className={pulseTagToneClass(tag.tone)}
-          key={`${tag.label ?? "value"}-${tag.value}`}
-        >
-          {tag.label ? `${tag.label} ` : ""}
-          {tag.value}
-        </em>
-      ))}
+      {...(delta
+        ? {
+            trend: delta.value,
+            ...(delta.tone ? { trendTone: toStatusTone(delta.tone) } : {}),
+          }
+        : {})}
+      tags={captions.map((tag) => `${tag.label} ${tag.value}`)}
     />
   );
 }

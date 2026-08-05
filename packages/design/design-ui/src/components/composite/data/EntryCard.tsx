@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { Icon, type IconName } from "../../../icons";
-import { interactive, veil } from "../../../styles/recipes";
+import { cardVeil, interactive, veil } from "../../../styles/recipes";
 import { cn } from "../../../utils/cn";
 
 export interface EntryCardProps extends Omit<
@@ -34,12 +34,14 @@ export interface EntryCardProps extends Omit<
 
 const EntryCard = React.forwardRef<HTMLAnchorElement, EntryCardProps>(
   function EntryCard(
-    { className, icon, title, meta, description, children, ...props },
+    { className, style, icon, title, meta, description, children, ...props },
     ref,
   ) {
     return (
       <a
         ref={ref}
+        // 底纹与其余卡片同一份配方，见 recipes 的 cardVeil。
+        style={{ ...cardVeil, ...style }}
         className={cn(
           "flex items-start gap-lg p-xl text-foreground",
           veil.strong,

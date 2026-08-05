@@ -165,3 +165,24 @@ export const overlayMotion = [
   "data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2",
   "data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2",
 ].join(" ");
+
+/**
+ * 卡面底纹：上白下蓝，180deg 直上直下。
+ *
+ * **它是背景不是前景，要的是似有似无。** 两端浓淡由 alpha 决定
+ * （`--opacity-veil-top` 0.56 / `--opacity-veil-bottom` 0.36），不是靠把色阶调深——
+ * 色阶一深就成了色块，会跟卡里的读数抢注意力。端点色与两个透明度都在 T2：
+ * 亮色 white → brand-50，暗色由 token 自己重定向（neutral-800 → brand-950），
+ * 组件不必知道主题。
+ *
+ * 是 style 对象而不是类名片段（本文件里唯一的例外）：渐变函数带逗号与空格，
+ * 写成 Tailwind arbitrary value 要把空格全换成下划线，读起来不像 CSS 也不像
+ * 别的什么。它仍然属于这里——"跨组件恒定的规则"正是本文件的收录判据。
+ */
+export const cardVeil: import("react").CSSProperties = {
+  backgroundImage: [
+    "linear-gradient(180deg,",
+    "color-mix(in srgb, var(--gradient-card-from) calc(var(--opacity-veil-top) * 100%), transparent),",
+    "color-mix(in srgb, var(--gradient-card-to) calc(var(--opacity-veil-bottom) * 100%), transparent))",
+  ].join(" "),
+};

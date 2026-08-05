@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { hairline, veil } from "../../../styles/recipes";
+import { cardVeil, hairline, veil } from "../../../styles/recipes";
 import { cn } from "../../../utils/cn";
 
 export type CardSurface = keyof typeof veil;
@@ -31,12 +31,15 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
-  { className, surface = "base", ...props },
+  { className, style, surface = "base", ...props },
   ref,
 ) {
   return (
     <div
       ref={ref}
+      // 底纹在基座上，基于 Card 的卡片全都继承——卡面不该各长各的。
+      // 调用方的 style 后写，需要盖掉底纹时仍然盖得掉。
+      style={{ ...cardVeil, ...style }}
       className={cn(
         "flex flex-col gap-xl py-xl text-foreground",
         veil[surface],

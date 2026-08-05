@@ -26,6 +26,7 @@
  */
 
 import * as React from "react";
+import { cardVeil } from "../../../styles/recipes";
 import { cn } from "../../../utils/cn";
 import { Icon, type IconName } from "../../../icons";
 import type { StatusBadgeTone } from "../../base/display/StatusBadge";
@@ -65,6 +66,7 @@ export interface MetricListCardProps {
   /** 整卡可点时给。给了才有 hover 反馈与键盘可达性。 */
   readonly onClick?: () => void;
   readonly className?: string;
+  readonly style?: React.CSSProperties;
 }
 
 /** 顶缘色条。tone 未给则不出色条（而不是画一条中性灰——那看起来像没渲染完）。 */
@@ -91,6 +93,7 @@ const MetricListCard = React.forwardRef<HTMLElement, MetricListCardProps>(
       tone,
       onClick,
       className,
+      style,
     },
     ref,
   ) {
@@ -98,6 +101,8 @@ const MetricListCard = React.forwardRef<HTMLElement, MetricListCardProps>(
     return (
       <article
         ref={ref}
+        // 底纹与其余卡片同一份配方，见 recipes 的 cardVeil。
+        style={{ ...cardVeil, ...style }}
         className={cn(
           "flex min-w-0 flex-col gap-sm rounded-lg p-md",
           "border border-border bg-card",
