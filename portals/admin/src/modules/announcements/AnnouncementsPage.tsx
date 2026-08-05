@@ -339,7 +339,7 @@ function AnnouncementList({
       aria-label="公告列表"
     >
       <div className="vx-tenant-directory-list__header">
-        <span>序号</span>
+        <span>#</span>
         <span>标题</span>
         <span>类型</span>
         <span>对象范围</span>

@@ -15,6 +15,7 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchPromotionRedemptionRecords } from "@/api/admin-bff";
@@ -187,7 +188,7 @@ function RedemptionRows({
             aria-label="选择当前页核销记录"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>核销记录</span>
         <span>租户</span>
         <span>账单</span>
@@ -232,20 +233,14 @@ function RedemptionRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-commercial-row__main">
-              <Button
-                variant="link"
-                className="vx-model-name-button"
-                onClick={() =>
-                  router.push(`/billing/${encodeURIComponent(record.billId)}`)
-                }
-              >
-                {record.redemptionNo}
-              </Button>
-              <small>
-                {record.promotionCode} · {record.promotionName}
-              </small>
-            </span>
+            <TableTitleCell
+              className="vx-commercial-row__main"
+              title={record.redemptionNo}
+              description={`${record.promotionCode} · ${record.promotionName}`}
+              onTitleClick={() =>
+                router.push(`/billing/${encodeURIComponent(record.billId)}`)
+              }
+            />
             <span className="vx-commercial-row__tenant">
               <Icon
                 name={record.tenantType === "company" ? "buildings" : "user"}

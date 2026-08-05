@@ -633,7 +633,7 @@ function TenantMemberList({
   return (
     <div className="vx-tenant-member-list" role="region" aria-label="账号列表">
       <div className="vx-tenant-member-list__header">
-        <span>序号</span>
+        <span>#</span>
         <span>账号</span>
         <span>权限</span>
         <span>状态</span>

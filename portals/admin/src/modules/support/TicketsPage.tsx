@@ -19,6 +19,7 @@ import {
   NativeSelect,
   Textarea,
   EmptyState,
+  TableTitleCell,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -232,20 +233,14 @@ function TicketRow({
       <span className="vx-tenant-directory-row__index">
         {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="vx-commercial-row__main">
-        <Button
-          variant="link"
-          className="vx-model-name-button"
-          onClick={() =>
-            router.push(`/tenants/${encodeURIComponent(ticket.tenantId)}`)
-          }
-        >
-          {ticket.title}
-        </Button>
-        <small>
-          {ticket.id} / {ticket.ownerName}
-        </small>
-      </span>
+      <TableTitleCell
+        className="vx-commercial-row__main"
+        title={ticket.title}
+        description={`${ticket.id} / ${ticket.ownerName}`}
+        onTitleClick={() =>
+          router.push(`/tenants/${encodeURIComponent(ticket.tenantId)}`)
+        }
+      />
       <span className="vx-commercial-row__tenant">
         <Icon
           name={ticket.tenantType === "company" ? "buildings" : "user"}

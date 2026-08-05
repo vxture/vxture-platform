@@ -17,6 +17,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -1204,7 +1205,7 @@ export function ModelPlatformPage() {
                     aria-label="选择当前页模型"
                   />
                 </span>
-                <span>序号</span>
+                <span>#</span>
                 <span>{t("table.columns.model")}</span>
                 <span>{t("table.columns.status")}</span>
                 <span>链路状态</span>
@@ -1239,25 +1240,13 @@ export function ModelPlatformPage() {
                   <span className="vx-tenant-directory-row__index">
                     {formatNumber(pageStart + index + 1)}
                   </span>
-                  <span className="vx-tenant-directory-row__tenant">
-                    <Icon
-                      name={isPrivateProvider(model.provider) ? "code" : "plug"}
-                      size={20}
-                      fallback="placeholder"
-                    />
-                    <span>
-                      <span className="vx-tenant-directory-row__title-line">
-                        <Button
-                          variant="link"
-                          className="vx-model-name-button"
-                          onClick={() => openEditModelDialog(model)}
-                        >
-                          {model.modelName}
-                        </Button>
-                      </span>
-                      <small>{model.modelCode}</small>
-                    </span>
-                  </span>
+                  <TableTitleCell
+                    className="vx-tenant-directory-row__tenant"
+                    icon={isPrivateProvider(model.provider) ? "code" : "plug"}
+                    title={model.modelName}
+                    description={model.modelCode}
+                    onTitleClick={() => openEditModelDialog(model)}
+                  />
                   <span className="vx-model-platform-row__status">
                     <span className="vx-tenant-directory-row__status-line">
                       <span
@@ -1387,14 +1376,11 @@ export function ModelPlatformPage() {
                       fallback="placeholder"
                     />
                     <div>
-                      <Button
-                        variant="link"
-                        className="vx-model-name-button"
-                        onClick={() => openEditModelDialog(model)}
-                      >
-                        {model.modelName}
-                      </Button>
-                      <span>{model.modelCode}</span>
+                      <TableTitleCell
+                        title={model.modelName}
+                        description={model.modelCode}
+                        onTitleClick={() => openEditModelDialog(model)}
+                      />
                     </div>
                     <ModelOperationButtons
                       model={model}
@@ -1506,14 +1492,11 @@ export function ModelPlatformPage() {
                   <header>
                     <Icon name="settings" size={24} fallback="placeholder" />
                     <div>
-                      <Button
-                        variant="link"
-                        className="vx-model-name-button"
-                        onClick={() => openEditProviderDialog(provider)}
-                      >
-                        {provider.providerName}
-                      </Button>
-                      <span>{provider.providerCode}</span>
+                      <TableTitleCell
+                        title={provider.providerName}
+                        description={provider.providerCode}
+                        onTitleClick={() => openEditProviderDialog(provider)}
+                      />
                     </div>
                     <ActionMenu
                       label={`${provider.providerName} 操作`}
@@ -1603,16 +1586,11 @@ export function ModelPlatformPage() {
                     <header>
                       <Icon name="database" size={24} fallback="placeholder" />
                       <div>
-                        <Button
-                          variant="link"
-                          className="vx-model-name-button"
-                          onClick={() => openEditPriceRuleDialog(rule)}
-                        >
-                          {ruleModel?.modelName ?? rule.modelId}
-                        </Button>
-                        <span>
-                          {rule.billingMode} · {rule.currency}
-                        </span>
+                        <TableTitleCell
+                          title={ruleModel?.modelName ?? rule.modelId}
+                          description={`${rule.billingMode} · ${rule.currency}`}
+                          onTitleClick={() => openEditPriceRuleDialog(rule)}
+                        />
                       </div>
                       <ActionMenu
                         label={`${ruleModel?.modelName ?? rule.modelId} 计价规则操作`}

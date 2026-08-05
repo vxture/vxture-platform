@@ -24,6 +24,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -281,7 +282,7 @@ function VerificationListRows({
             aria-label="选择当前页实名认证"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>组织</span>
         <span>认证状态</span>
         <span>主体信息</span>
@@ -329,25 +330,15 @@ function VerificationListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-tenant-directory-row__tenant">
-              <Icon name="buildings" size="sm" fallback="placeholder" />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={() =>
-                      router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
-                    }
-                  >
-                    {tenant.displayName}
-                  </Button>
-                </span>
-                <small>
-                  {tenant.tenantCode} · {tenant.region}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-tenant-directory-row__tenant"
+              icon="buildings"
+              title={tenant.displayName}
+              description={`${tenant.tenantCode} · ${tenant.region}`}
+              onTitleClick={() =>
+                router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
+              }
+            />
             <span className="vx-verification-row__status">
               <span className="vx-tenant-directory-row__status-line">
                 <span

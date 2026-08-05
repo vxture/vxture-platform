@@ -358,7 +358,7 @@ export function FeatureTogglesPage() {
             aria-label="功能开关列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>开关键 / 分类</span>
               <span>环境</span>
               <span>状态</span>

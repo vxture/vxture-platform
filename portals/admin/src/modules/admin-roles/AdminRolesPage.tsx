@@ -22,6 +22,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -750,7 +751,7 @@ function AdminRoleListRows({
             aria-label="选择当前页角色"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>角色</span>
         <span>状态</span>
         <span>成员</span>
@@ -801,29 +802,22 @@ function AdminRoleListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span
+            <TableTitleCell
               className="vx-tenant-directory-row__tenant vx-admin-role-row__identity"
-              title={roleDescription(role, t) || undefined}
-            >
-              <Icon name="role" size="sm" fallback="placeholder" />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    {roleLabel}
-                  </Button>
-                  {role.isSystem ? (
-                    <Badge className="vx-tenant-pill vx-tenant-pill--system">
-                      系统
-                    </Badge>
-                  ) : null}
-                </span>
-                <small>{role.roleCode}</small>
-              </span>
-            </span>
+              {...(roleDescription(role, t)
+                ? { tooltip: roleDescription(role, t) }
+                : {})}
+              icon="role"
+              title={roleLabel}
+              titleSuffix={
+                role.isSystem ? (
+                  <Badge className="vx-tenant-pill vx-tenant-pill--system">
+                    系统
+                  </Badge>
+                ) : null
+              }
+              description={role.roleCode}
+            />
             <span className="vx-admin-role-row__status">
               <span className="vx-tenant-directory-row__status-line">
                 <span

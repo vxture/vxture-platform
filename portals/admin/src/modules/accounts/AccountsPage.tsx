@@ -18,6 +18,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -322,7 +323,7 @@ function AccountListRows({
             aria-label="选择当前页账号"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>账号</span>
         {showTenantContext ? <span>租户</span> : null}
         <span>状态</span>
@@ -369,23 +370,12 @@ function AccountListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-tenant-directory-row__tenant">
-              <Icon name="user" size="sm" fallback="placeholder" />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    {account.displayName}
-                  </Button>
-                </span>
-                <small>
-                  {account.accountCode} · {account.email}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-tenant-directory-row__tenant"
+              icon="user"
+              title={account.displayName}
+              description={`${account.accountCode} · ${account.email}`}
+            />
             {showTenantContext ? (
               <span className="vx-tenant-directory-row__subscription">
                 <span className="vx-tenant-directory-row__tag-line">

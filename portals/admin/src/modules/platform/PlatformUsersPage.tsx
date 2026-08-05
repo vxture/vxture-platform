@@ -23,6 +23,7 @@ import {
   ViewModeSwitch,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -296,7 +297,7 @@ function PlatformUsersList({
             aria-label="选择当前页平台用户"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>用户</span>
         <span>状态</span>
         <span>角色</span>
@@ -342,28 +343,19 @@ function PlatformUsersList({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-tenant-directory-row__tenant">
-              <Icon name="user" size="sm" fallback="placeholder" />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    {admin.displayName || admin.username}
-                  </Button>
-                  {admin.isSystem ? (
-                    <Badge className="vx-tenant-pill vx-tenant-pill--system">
-                      系统
-                    </Badge>
-                  ) : null}
-                </span>
-                <small>
-                  {admin.username ? `@${admin.username}` : EMPTY_MARK}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-tenant-directory-row__tenant"
+              icon="user"
+              title={admin.displayName || admin.username}
+              titleSuffix={
+                admin.isSystem ? (
+                  <Badge className="vx-tenant-pill vx-tenant-pill--system">
+                    系统
+                  </Badge>
+                ) : null
+              }
+              description={admin.username ? `@${admin.username}` : EMPTY_MARK}
+            />
             <span className="vx-tenant-directory-row__status">
               <span className="vx-tenant-directory-row__status-line">
                 <span

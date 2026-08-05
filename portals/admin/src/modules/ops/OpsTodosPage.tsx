@@ -7,9 +7,9 @@ import {
   Icon,
   ActionMenu,
   Badge,
-  Button,
   EmptyState,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -294,19 +294,13 @@ function TodoRow({ item, index }: { item: OpsTodoItem; index: number }) {
       <span className="vx-tenant-directory-row__index">
         {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="vx-tenant-directory-row__tenant">
-        <Icon name={item.icon} size="sm" fallback="placeholder" />
-        <span>
-          <Button
-            variant="link"
-            className="vx-model-name-button"
-            onClick={() => router.push(item.href)}
-          >
-            {item.title}
-          </Button>
-          <small>{item.description}</small>
-        </span>
-      </span>
+      <TableTitleCell
+        className="vx-tenant-directory-row__tenant"
+        icon={item.icon}
+        title={item.title}
+        description={item.description}
+        onTitleClick={() => router.push(item.href)}
+      />
       <span>
         <strong>{item.tenantName}</strong>
         <small>{item.tenantMeta}</small>

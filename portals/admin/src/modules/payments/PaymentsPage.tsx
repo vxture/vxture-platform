@@ -20,6 +20,7 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
@@ -394,7 +395,7 @@ function PaymentListRows({
             aria-label="选择当前页收款"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>收款流水</span>
         <span>租户</span>
         <span>关联账单</span>
@@ -439,23 +440,16 @@ function PaymentListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-payment-row__payment">
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() => router.push(paymentTargetHref(payment))}
-                >
-                  {payment.paymentNo}
-                </Button>
-              </span>
-              <small>
-                {paySourceLabel(payment.paySource)} ·{" "}
-                {payment.paySource === "offline"
+            <TableTitleCell
+              className="vx-payment-row__payment"
+              title={payment.paymentNo}
+              description={`${paySourceLabel(payment.paySource)} · ${
+                payment.paySource === "offline"
                   ? offlineTypeLabel(payment.offlinePayType)
-                  : (payment.payMethod ?? "未设置")}
-              </small>
-            </span>
+                  : (payment.payMethod ?? "未设置")
+              }`}
+              onTitleClick={() => router.push(paymentTargetHref(payment))}
+            />
             <span className="vx-payment-row__tenant">
               <Icon
                 name={payment.tenantType === "company" ? "buildings" : "user"}

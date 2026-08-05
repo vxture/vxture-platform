@@ -216,7 +216,7 @@ function AuditList({
       aria-label="审计日志列表"
     >
       <div className="vx-tenant-directory-list__header">
-        <span>序号</span>
+        <span>#</span>
         <span>操作员</span>
         <span>操作</span>
         <span>对象</span>

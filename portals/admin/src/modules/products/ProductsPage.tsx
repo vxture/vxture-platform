@@ -14,6 +14,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -190,7 +191,7 @@ function ProductListRows({
             aria-label="选择当前页产品能力"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>产品能力</span>
         <span>类型</span>
         <span>状态</span>
@@ -238,27 +239,13 @@ function ProductListRows({
           <span className="vx-tenant-directory-row__index">
             {formatNumber(startIndex + index + 1)}
           </span>
-          <span className="vx-tenant-directory-row__tenant vx-product-row__identity">
-            <Icon
-              name={productTypeIcon(product.productType)}
-              size="sm"
-              fallback="placeholder"
-            />
-            <span>
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() => onOpenDetails(product.productCode)}
-                >
-                  {product.productName}
-                </Button>
-              </span>
-              <small>
-                {product.productCode} · {productRegionLabel(product.region)}
-              </small>
-            </span>
-          </span>
+          <TableTitleCell
+            className="vx-tenant-directory-row__tenant vx-product-row__identity"
+            icon={productTypeIcon(product.productType)}
+            title={product.productName}
+            description={`${product.productCode} · ${productRegionLabel(product.region)}`}
+            onTitleClick={() => onOpenDetails(product.productCode)}
+          />
           <span className="vx-product-row__type">
             <span className="vx-tenant-directory-row__tag-line">
               <Badge

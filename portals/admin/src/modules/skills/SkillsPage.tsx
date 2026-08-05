@@ -193,7 +193,7 @@ function SkillList({
       aria-label="技能列表"
     >
       <div className="vx-tenant-directory-list__header">
-        <span>序号</span>
+        <span>#</span>
         <span>技能</span>
         <span>分类</span>
         <span>版本</span>

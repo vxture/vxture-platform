@@ -337,7 +337,7 @@ export function RiskRecordsPage() {
             aria-label="风险记录列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>租户</span>
               <span>等级</span>
               <span>评分</span>

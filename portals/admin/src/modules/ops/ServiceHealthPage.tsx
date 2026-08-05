@@ -9,6 +9,7 @@ import {
   Input,
   NativeSelect,
   EmptyState,
+  StatusBadge,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName, StatusBadgeTone } from "@vxture/design-system";
@@ -82,7 +83,7 @@ function statusLabel(status: ServiceStatus) {
   return "离线";
 }
 
-/** 服务态 → 语气。行首色缘与行内状态标共用这一张表，两处天生同源。 */
+/** 服务态 → 语气。卡片视图与列表状态列共用这一张表，两处天生同源。 */
 const SERVICE_STATUS_TONE: Record<ServiceStatus, StatusBadgeTone> = {
   healthy: "success",
   degraded: "warning",
@@ -219,10 +220,13 @@ function ServiceHealthCard({ service }: { service: DevServiceSnapshot }) {
           <p>{layerLabel(layer)}</p>
           <h2>{service.name}</h2>
         </div>
-        <Badge className="vx-service-health-status-badge">
-          <Icon name={statusIcon(status)} size="xs" fallback="placeholder" />
+        <StatusBadge
+          className="vx-service-health-status-badge"
+          tone={SERVICE_STATUS_TONE[status]}
+          icon={statusIcon(status)}
+        >
           {statusLabel(status)}
-        </Badge>
+        </StatusBadge>
       </header>
 
       <div className="vx-service-health-card__meta">
@@ -283,15 +287,21 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
       },
     },
     {
+      /* 状态列居中，且用 StatusBadge 出语气——行不再染色，业务语气全靠这一列
+       * （DataTable 的对齐约定与"需要语气就必须有状态列"的约定，见其文件头）。 */
       id: "status",
       header: "状态",
+      align: "center" as const,
       cell: (service: DevServiceSnapshot) => {
         const status = serviceStatus(service);
+        /* icon 显式给：stopping 是 warning 语气，但时钟比感叹号准。 */
         return (
-          <Badge className="vx-service-health-status-badge">
-            <Icon name={statusIcon(status)} size="xs" fallback="placeholder" />
+          <StatusBadge
+            tone={SERVICE_STATUS_TONE[status]}
+            icon={statusIcon(status)}
+          >
             {statusLabel(status)}
-          </Badge>
+          </StatusBadge>
         );
       },
     },
@@ -303,6 +313,7 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
     {
       id: "port",
       header: "端口",
+      align: "right" as const,
       cell: (service: DevServiceSnapshot) => service.port,
     },
     {
@@ -328,6 +339,7 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
     {
       id: "duration",
       header: "响应",
+      align: "right" as const,
       cell: (service: DevServiceSnapshot) => `${maxDuration(service)}ms`,
     },
     {
@@ -338,18 +350,13 @@ function ServiceHealthList({ services }: { services: DevServiceSnapshot[] }) {
   ];
 
   return (
-    /* getRowClassName 随 DataTable 收窄取消：按行改样式等于把行的视觉状态交回
-     * 调用方，行选中/禁用由本件自己画。这里原本靠整行染色表达健康度，而同一
-     * 信息"状态"列已用 Badge 说了一遍——去掉染色不丢信息。
-     * aria-label 也随之取消（DataTable 不再透传任意属性）。 */
+    /* 行不染色：健康度由"状态"列的 StatusBadge 说，且只说一遍。
+     * aria-label 随 DataTable 收窄取消（本件不再透传任意属性）。 */
     <DataTable
       className="vx-service-health-list"
       columns={columns}
       rows={services}
       rowKey={(service: DevServiceSnapshot) => service.id}
-      rowTone={(service: DevServiceSnapshot) =>
-        SERVICE_STATUS_TONE[serviceStatus(service)]
-      }
     />
   );
 }

@@ -14,6 +14,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -214,7 +215,7 @@ function ProductSolutionListRows({
             aria-label="选择当前页业务方案"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>业务方案</span>
         <span>行业场景</span>
         <span>产品能力</span>
@@ -266,23 +267,13 @@ function ProductSolutionListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-tenant-directory-row__tenant vx-product-solution-row__identity">
-              <Icon name="workflow" size="sm" fallback="placeholder" />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={() => onOpenDetails(solution.solutionCode)}
-                  >
-                    {solution.solutionName}
-                  </Button>
-                </span>
-                <small>
-                  {solution.solutionCode} · {solution.ownerTeam}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-tenant-directory-row__tenant vx-product-solution-row__identity"
+              icon="workflow"
+              title={solution.solutionName}
+              description={`${solution.solutionCode} · ${solution.ownerTeam}`}
+              onTitleClick={() => onOpenDetails(solution.solutionCode)}
+            />
             <span className="vx-product-solution-row__scenario">
               <span className="vx-tenant-directory-row__tag-line">
                 <Badge

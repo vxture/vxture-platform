@@ -347,7 +347,7 @@ export function ComplianceEventsPage() {
             aria-label="合规事件列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>事件类型</span>
               <span>租户</span>
               <span>状态</span>

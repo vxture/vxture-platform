@@ -19,6 +19,7 @@ import {
   ListCardGrid,
   useToast,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -181,7 +182,7 @@ function TenantListRows({
             aria-label="选择当前页租户"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>租户</span>
         <span>成员</span>
         <span>状态</span>
@@ -235,29 +236,15 @@ function TenantListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-tenant-directory-row__tenant">
-              <Icon
-                name={tenant.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
-                fallback="placeholder"
-              />
-              <span>
-                <span className="vx-tenant-directory-row__title-line">
-                  <Button
-                    variant="link"
-                    className="vx-model-name-button"
-                    onClick={() =>
-                      router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
-                    }
-                  >
-                    {tenant.displayName}
-                  </Button>
-                </span>
-                <small>
-                  {tenant.tenantCode} · {tenant.region}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-tenant-directory-row__tenant"
+              icon={tenant.tenantType === "company" ? "buildings" : "user"}
+              title={tenant.displayName}
+              description={`${tenant.tenantCode} · ${tenant.region}`}
+              onTitleClick={() =>
+                router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
+              }
+            />
             <span className="vx-tenant-directory-row__member">
               <strong>{formatNumber(tenant.memberCount)}</strong>
             </span>

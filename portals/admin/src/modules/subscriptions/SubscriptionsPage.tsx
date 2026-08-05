@@ -16,6 +16,7 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -263,7 +264,7 @@ function SubscriptionListRows({
             aria-label="选择当前页订阅"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>租户</span>
         <span>业务方案</span>
         <span>套餐权益</span>
@@ -312,33 +313,17 @@ function SubscriptionListRows({
           <span className="vx-tenant-directory-row__index">
             {formatNumber(startIndex + index + 1)}
           </span>
-          <span className="vx-subscription-row__tenant">
-            <Icon
-              name={
-                subscription.tenantType === "company" ? "buildings" : "user"
-              }
-              size="sm"
-              fallback="placeholder"
-            />
-            <span>
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() =>
-                    router.push(
-                      `/subscriptions/${encodeURIComponent(subscription.id)}`,
-                    )
-                  }
-                >
-                  {subscription.tenantName}
-                </Button>
-              </span>
-              <small>
-                {subscription.tenantCode} · {subscription.region}
-              </small>
-            </span>
-          </span>
+          <TableTitleCell
+            className="vx-subscription-row__tenant"
+            icon={subscription.tenantType === "company" ? "buildings" : "user"}
+            title={subscription.tenantName}
+            description={`${subscription.tenantCode} · ${subscription.region}`}
+            onTitleClick={() =>
+              router.push(
+                `/subscriptions/${encodeURIComponent(subscription.id)}`,
+              )
+            }
+          />
           <span className="vx-subscription-row__solution">
             <strong>{subscription.solutionName}</strong>
             <small>{subscription.industry}</small>

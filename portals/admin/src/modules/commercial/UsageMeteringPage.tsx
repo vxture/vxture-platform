@@ -15,6 +15,7 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -199,7 +200,7 @@ function UsageListRows({
             aria-label="选择当前页用量记录"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>租户</span>
         <span>产品能力</span>
         <span>计量项</span>
@@ -244,29 +245,15 @@ function UsageListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-commercial-row__tenant">
-              <Icon
-                name={record.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
-                fallback="placeholder"
-              />
-              <span>
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() =>
-                    router.push(
-                      `/tenants/${encodeURIComponent(record.tenantId)}`,
-                    )
-                  }
-                >
-                  {record.tenantName}
-                </Button>
-                <small>
-                  {record.tenantCode} · {typeLabel(record.tenantType)}
-                </small>
-              </span>
-            </span>
+            <TableTitleCell
+              className="vx-commercial-row__tenant"
+              icon={record.tenantType === "company" ? "buildings" : "user"}
+              title={record.tenantName}
+              description={`${record.tenantCode} · ${typeLabel(record.tenantType)}`}
+              onTitleClick={() =>
+                router.push(`/tenants/${encodeURIComponent(record.tenantId)}`)
+              }
+            />
             <span className="vx-commercial-row__main">
               <strong>{record.productName}</strong>
               <small>

@@ -15,6 +15,7 @@ import {
   EmptyState,
   MetricGrid,
   ViewModeSwitch,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
@@ -173,7 +174,7 @@ function PromotionRows({
             aria-label="选择当前页优惠活动"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>优惠活动</span>
         <span>适用范围</span>
         <span>优惠</span>
@@ -218,18 +219,12 @@ function PromotionRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-commercial-row__main">
-              <Button
-                variant="link"
-                className="vx-model-name-button"
-                onClick={() => router.push("/promotion-redemptions")}
-              >
-                {record.promotionName}
-              </Button>
-              <small>
-                {record.promotionCode} · {typeLabel(record.promotionType)}
-              </small>
-            </span>
+            <TableTitleCell
+              className="vx-commercial-row__main"
+              title={record.promotionName}
+              description={`${record.promotionCode} · ${typeLabel(record.promotionType)}`}
+              onTitleClick={() => router.push("/promotion-redemptions")}
+            />
             <span className="vx-commercial-row__main">
               <span className="vx-tenant-directory-row__tag-line">
                 <Tag tone="muted">{record.scopeLabel}</Tag>

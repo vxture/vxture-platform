@@ -1241,7 +1241,7 @@ function PermissionDomainSection({
             aria-label={group.title}
           >
             <div className="vx-admin-permission-tree__header">
-              <span>序号</span>
+              <span>#</span>
               <span>权限名称</span>
               <span>状态</span>
               <span>类型</span>

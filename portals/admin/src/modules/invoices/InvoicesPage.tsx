@@ -19,6 +19,7 @@ import {
   ViewModeSwitch,
   ListCardGrid,
   MetricListCard,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { INVOICE_STATUS_TONE } from "@/modules/shared/status-tone";
@@ -308,7 +309,7 @@ function InvoiceListRows({
             aria-label="选择当前页发票"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>发票</span>
         <span>租户</span>
         <span>账单</span>
@@ -353,24 +354,14 @@ function InvoiceListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-invoice-row__invoice">
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() =>
-                    router.push(
-                      `/billing/${encodeURIComponent(invoice.billId)}`,
-                    )
-                  }
-                >
-                  {invoice.invoiceNo}
-                </Button>
-              </span>
-              <small>
-                {invoice.invoiceTitle} · {taxTypeLabel(invoice.invoiceTaxType)}
-              </small>
-            </span>
+            <TableTitleCell
+              className="vx-invoice-row__invoice"
+              title={invoice.invoiceNo}
+              description={`${invoice.invoiceTitle} · ${taxTypeLabel(invoice.invoiceTaxType)}`}
+              onTitleClick={() =>
+                router.push(`/billing/${encodeURIComponent(invoice.billId)}`)
+              }
+            />
             <span className="vx-invoice-row__tenant">
               <Icon
                 name={invoice.tenantType === "company" ? "buildings" : "user"}

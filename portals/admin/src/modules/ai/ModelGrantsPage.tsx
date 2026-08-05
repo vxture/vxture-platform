@@ -16,6 +16,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import {
   createAiModelGrant,
@@ -630,7 +631,7 @@ export function ModelGrantsPage() {
                     aria-label="选择当前页策略"
                   />
                 </span>
-                <span>序号</span>
+                <span>#</span>
                 <span>{t("policyTable.columns.scope")}</span>
                 <span>{t("policyTable.columns.status")}</span>
                 <span>{t("policyTable.columns.model")}</span>
@@ -886,7 +887,7 @@ export function ModelGrantsPage() {
                 aria-label="选择当前覆盖授权"
               />
             </span>
-            <span>序号</span>
+            <span>#</span>
             <span>{t("table.columns.model")}</span>
             <span>{t("table.columns.status")}</span>
             <span>{t("table.columns.tenant")}</span>
@@ -927,25 +928,13 @@ export function ModelGrantsPage() {
                   <span className="vx-tenant-directory-row__index">
                     {formatNumber(index + 1)}
                   </span>
-                  <span className="vx-tenant-directory-row__tenant">
-                    <Icon
-                      name={grant.isActive ? "play" : "stop"}
-                      size={20}
-                      fallback="placeholder"
-                    />
-                    <span>
-                      <span className="vx-tenant-directory-row__title-line">
-                        <Button
-                          variant="link"
-                          className="vx-model-name-button"
-                          onClick={() => openEditGrantDialog(grant)}
-                        >
-                          {modelName}
-                        </Button>
-                      </span>
-                      <small>{model?.modelCode ?? grant.modelId}</small>
-                    </span>
-                  </span>
+                  <TableTitleCell
+                    className="vx-tenant-directory-row__tenant"
+                    icon={grant.isActive ? "play" : "stop"}
+                    title={modelName}
+                    description={model?.modelCode ?? grant.modelId}
+                    onTitleClick={() => openEditGrantDialog(grant)}
+                  />
                   <span className="vx-model-strategy-row__status">
                     <Badge
                       className={`vx-tenant-pill vx-tenant-pill--${grant.isActive ? "active" : "disabled"}`}

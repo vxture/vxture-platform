@@ -356,7 +356,7 @@ export function MaintenanceWindowsPage() {
             aria-label="维护窗口列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>标题</span>
               <span>严重度</span>
               <span>状态</span>

@@ -18,6 +18,7 @@ import {
   ViewModeSwitch,
   ListCardGrid,
   MetricListCard,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { BILL_STATUS_TONE } from "@/modules/shared/status-tone";
@@ -360,7 +361,7 @@ function BillingListRows({
             aria-label="选择当前页账单"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>账单</span>
         <span>租户</span>
         <span>订阅套餐</span>
@@ -406,23 +407,14 @@ function BillingListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-billing-row__bill">
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() =>
-                    router.push(`/billing/${encodeURIComponent(bill.id)}`)
-                  }
-                >
-                  {bill.billNo}
-                </Button>
-              </span>
-              <small>
-                {cycleLabel(bill.billCycle)} · {formatDate(bill.cycleStartDate)}{" "}
-                - {formatDate(bill.cycleEndDate)}
-              </small>
-            </span>
+            <TableTitleCell
+              className="vx-billing-row__bill"
+              title={bill.billNo}
+              description={`${cycleLabel(bill.billCycle)} · ${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`}
+              onTitleClick={() =>
+                router.push(`/billing/${encodeURIComponent(bill.id)}`)
+              }
+            />
             <span className="vx-billing-row__tenant">
               <Icon
                 name={bill.tenantType === "company" ? "buildings" : "user"}

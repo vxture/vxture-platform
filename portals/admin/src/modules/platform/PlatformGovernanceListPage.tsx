@@ -13,6 +13,7 @@ import {
   EmptyState,
   ViewModeSwitch,
   MetricGrid,
+  TableTitleCell,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchPlatformGovernanceRecords } from "@/api/admin-bff";
@@ -516,7 +517,7 @@ export function PlatformGovernanceListPage({
                     aria-label={`选择当前页${config.objectLabel}`}
                   />
                 </span>
-                <span>序号</span>
+                <span>#</span>
                 <span>{config.objectLabel}</span>
                 <span>状态</span>
                 <span>{config.scopeLabel}</span>
@@ -553,25 +554,12 @@ export function PlatformGovernanceListPage({
                     <span className="vx-platform-governance-row__index">
                       {formatNumber(index + 1)}
                     </span>
-                    <span className="vx-tenant-directory-row__tenant vx-platform-governance-row__identity">
-                      <Icon
-                        name={config.icon}
-                        size="sm"
-                        fallback="placeholder"
-                      />
-                      <span>
-                        <span className="vx-tenant-directory-row__title-line">
-                          <Button
-                            variant="link"
-                            className="vx-model-name-button"
-                            onClick={(event) => event.stopPropagation()}
-                          >
-                            {record.name}
-                          </Button>
-                        </span>
-                        <small>{record.description}</small>
-                      </span>
-                    </span>
+                    <TableTitleCell
+                      className="vx-tenant-directory-row__tenant vx-platform-governance-row__identity"
+                      icon={config.icon}
+                      title={record.name}
+                      description={record.description}
+                    />
                     <span className="vx-platform-governance-row__status">
                       <Badge
                         className={`vx-platform-governance-status ${meta.className}`}

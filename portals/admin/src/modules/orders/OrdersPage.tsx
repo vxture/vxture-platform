@@ -18,6 +18,7 @@ import {
   ViewModeSwitch,
   ListCardGrid,
   MetricListCard,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
@@ -262,7 +263,7 @@ function OrderListRows({
             aria-label="选择当前页订单"
           />
         </span>
-        <span>序号</span>
+        <span>#</span>
         <span>订单</span>
         <span>租户</span>
         <span>业务方案</span>
@@ -307,22 +308,14 @@ function OrderListRows({
             <span className="vx-tenant-directory-row__index">
               {formatNumber(startIndex + index + 1)}
             </span>
-            <span className="vx-order-row__order">
-              <span className="vx-tenant-directory-row__title-line">
-                <Button
-                  variant="link"
-                  className="vx-model-name-button"
-                  onClick={() =>
-                    router.push(`/orders/${encodeURIComponent(order.id)}`)
-                  }
-                >
-                  {order.orderNo}
-                </Button>
-              </span>
-              <small>
-                {order.billNo ?? "未生成账单"} · {formatDate(order.createdAt)}
-              </small>
-            </span>
+            <TableTitleCell
+              className="vx-order-row__order"
+              title={order.orderNo}
+              description={`${order.billNo ?? "未生成账单"} · ${formatDate(order.createdAt)}`}
+              onTitleClick={() =>
+                router.push(`/orders/${encodeURIComponent(order.id)}`)
+              }
+            />
             <span className="vx-order-row__tenant">
               <Icon
                 name={order.tenantType === "company" ? "buildings" : "user"}

@@ -192,7 +192,7 @@ export function NotificationLogsPage() {
             aria-label="通知记录列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>时间</span>
               <span>渠道</span>
               <span>模板</span>

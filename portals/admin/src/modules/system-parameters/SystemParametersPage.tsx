@@ -171,7 +171,7 @@ export function SystemParametersPage() {
             aria-label="平台配置列表"
           >
             <div className="vx-tenant-directory-list__header">
-              <span>序号</span>
+              <span>#</span>
               <span>配置键 / 分组</span>
               <span>类型</span>
               <span>值</span>
