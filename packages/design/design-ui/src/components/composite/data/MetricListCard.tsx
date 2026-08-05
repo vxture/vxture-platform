@@ -102,10 +102,10 @@ const MetricListCard = React.forwardRef<HTMLElement, MetricListCardProps>(
       <article
         ref={ref}
         // 底纹与其余卡片同一份配方，见 recipes 的 cardVeil。
-        style={{ ...cardVeil, ...style }}
+        style={{ ...cardVeil("soft"), ...style }}
         className={cn(
           "flex min-w-0 flex-col gap-sm rounded-lg p-md",
-          "border border-border bg-card",
+          "border border-border",
           // 顶缘加粗承载语气色；未给 tone 时与其余三边同宽，看不出差别。
           tone ? cn("border-t-2", TONE_ACCENT[tone]) : null,
           interactive &&

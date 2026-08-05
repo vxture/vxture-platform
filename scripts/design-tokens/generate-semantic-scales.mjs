@@ -40,6 +40,7 @@ import {
   RADIUS_STEPS,
   BORDER_WIDTHS,
   OPACITIES,
+  VEIL_ALPHAS,
   ICON_SIZES,
   MEDIA_SIZES,
   SIDEBAR_WIDTHS,
@@ -302,6 +303,15 @@ function buildBorder() {
   ]);
 }
 
+function buildVeilAlphas() {
+  return VEIL_ALPHAS.map(([name, value, why]) => [
+    `--opacity-${name}`,
+    String(value),
+    "veil",
+    why,
+  ]);
+}
+
 function buildOpacity() {
   return OPACITIES.map(([name, value, why]) => [
     `--opacity-${name}`,
@@ -450,8 +460,12 @@ function header(file, label, source, extra = "") {
 }
 
 /** 无模式轴的族：名字即命名空间名，在 `@theme` 里一处声明即完成注册。 */
-function staticFile(file, label, source, rows, extra = "") {
-  return [file, header(file, label, source, extra) + `\n@theme {\n${render(rows)}\n}\n`];
+function staticFile(file, label, source, rows, extra = "", rootRows = null) {
+  const theme = `\n@theme {\n${render(rows)}\n}\n`;
+  /* 只给 var() 用、不产工具类的值走 `:root`——`@theme` 里没被任何工具类引用的
+   * 变量会被 Tailwind v4 摇掉（见 semantic-policy 的 VEIL_ALPHAS 注释）。 */
+  const root = rootRows ? `\n:root {\n${render(rootRows)}\n}\n` : "";
+  return [file, header(file, label, source, extra) + theme + root];
 }
 
 /* ── 生成 ───────────────────────────────────────────────────── */
@@ -553,7 +567,11 @@ const outputs = [
     buildOpacity(),
     `
  *
- * 无 T1 可指：上游对 opacity 既无 theme 变量也无封闭档位表，接受任意 0–100。`,
+ * 无 T1 可指：上游对 opacity 既无 theme 变量也无封闭档位表，接受任意 0–100。
+ *
+ * 末尾的 \`:root\` 块是卡面底纹的浓淡（VEIL_ALPHAS）：只给 var() 用、不产工具类，
+ * 留在 @theme 里会被 Tailwind 摇掉。`,
+    buildVeilAlphas(),
   ),
   staticFile(
     "border-semantic.css",

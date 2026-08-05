@@ -66,7 +66,7 @@ function StatCard({
 }: StatCardProps) {
   return (
     <article
-      style={cardVeil}
+      style={cardVeil("strong")}
       className={cn(
         "flex min-h-media-xl min-w-0 flex-col gap-md rounded-md p-lg",
         "border border-primary/10 dark:border-primary/20",

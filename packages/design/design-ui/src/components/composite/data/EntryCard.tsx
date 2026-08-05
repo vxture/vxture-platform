@@ -41,7 +41,7 @@ const EntryCard = React.forwardRef<HTMLAnchorElement, EntryCardProps>(
       <a
         ref={ref}
         // 底纹与其余卡片同一份配方，见 recipes 的 cardVeil。
-        style={{ ...cardVeil, ...style }}
+        style={{ ...cardVeil("strong"), ...style }}
         className={cn(
           "flex items-start gap-lg p-xl text-foreground",
           veil.strong,

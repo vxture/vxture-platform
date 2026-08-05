@@ -122,22 +122,24 @@ export const hairline = {
  * 叠层容器（透明模式）：页面只有一层实色底，容器以半透明表面叠在其上。
  *
  * 三档共用同一副骨架（发丝线描边 + 8px 圆角），只差表面透明度——层级差异
- * 用透明度而非亮度表达（workplan §1 V1）。三档取值来自 admin 内容区实测
- * （58 / 68 / 72）。
+ * 用透明度而非亮度表达（workplan §1 V1）。
  *
- * 表面不新增 token：`card/58` 的透明度修饰符作用在现有 `--card` 上，
- * 明色下是白 58%、暗色下自动是 neutral-800 58%——正是叠层要的双主题行为。
+ * **表面本身在 `cardVeil` 里，不在这里。** 这里只出骨架。原先这三档各带一个
+ * `bg-card/58|68|72`，与 `cardVeil` 叠起来是两层半透明白做同一件事，后者的品牌调
+ * 会被前者冲掉——opera 的卡片因此看不出底纹（2026-08-05 实测）。
  *
  * 语义色永不填充叠层的底；要表达状态用 `toneEdgeClasses`（顶缘色条，见 tone.ts）。
  */
-export const veil = {
-  /** 最透（58%）：大面积实体卡、列表卡。 */
-  soft: `rounded-md border ${hairline.block} bg-card/58`,
-  /** 默认（68%）：面板、统计卡。 */
-  base: `rounded-md border ${hairline.block} bg-card/68`,
-  /** 最实（72%）：入口卡、重点卡。 */
-  strong: `rounded-md border ${hairline.block} bg-card/72`,
-} as const;
+export type VeilSurface = "soft" | "base" | "strong";
+
+export const veil: Record<VeilSurface, string> = {
+  /** 最透：大面积实体卡、列表卡。 */
+  soft: `rounded-md border ${hairline.block}`,
+  /** 默认：面板、统计卡。 */
+  base: `rounded-md border ${hairline.block}`,
+  /** 最实：入口卡、重点卡。 */
+  strong: `rounded-md border ${hairline.block}`,
+};
 
 /**
  * 次要操作随父容器 hover / focus 渐显（workplan §1 V9）。
@@ -167,22 +169,30 @@ export const overlayMotion = [
 ].join(" ");
 
 /**
- * 卡面底纹：上白下蓝，180deg 直上直下。
+ * 卡面：上白下蓝，180deg 直上直下。**这就是叠层的表面本身**，`veil` 只出骨架。
  *
- * **它是背景不是前景，要的是似有似无。** 两端浓淡由 alpha 决定
- * （`--opacity-veil-top` 0.56 / `--opacity-veil-bottom` 0.36），不是靠把色阶调深——
- * 色阶一深就成了色块，会跟卡里的读数抢注意力。端点色与两个透明度都在 T2：
- * 亮色 white → brand-50，暗色由 token 自己重定向（neutral-800 → brand-950），
+ * **它是背景不是前景，要的是似有似无。** 两端浓淡由 alpha 决定，不是靠把色阶
+ * 调深——色阶一深就成了色块，会跟卡里的读数抢注意力。端点色与六个透明度都在
+ * T2：亮色 white → brand-50，暗色由 token 自己重定向（neutral-800 → brand-950），
  * 组件不必知道主题。
+ *
+ * 三档对应 `veil` 的三档，整体加实而不是加深：
+ *   soft   56 / 36   大面积实体卡、列表卡
+ *   base   66 / 46   面板、统计卡
+ *   strong 72 / 52   入口卡、重点卡
  *
  * 是 style 对象而不是类名片段（本文件里唯一的例外）：渐变函数带逗号与空格，
  * 写成 Tailwind arbitrary value 要把空格全换成下划线，读起来不像 CSS 也不像
  * 别的什么。它仍然属于这里——"跨组件恒定的规则"正是本文件的收录判据。
  */
-export const cardVeil: import("react").CSSProperties = {
-  backgroundImage: [
-    "linear-gradient(180deg,",
-    "color-mix(in srgb, var(--gradient-card-from) calc(var(--opacity-veil-top) * 100%), transparent),",
-    "color-mix(in srgb, var(--gradient-card-to) calc(var(--opacity-veil-bottom) * 100%), transparent))",
-  ].join(" "),
-};
+export function cardVeil(
+  surface: VeilSurface = "base",
+): import("react").CSSProperties {
+  return {
+    backgroundImage: [
+      "linear-gradient(180deg,",
+      `color-mix(in srgb, var(--gradient-card-from) calc(var(--opacity-veil-${surface}-top) * 100%), transparent),`,
+      `color-mix(in srgb, var(--gradient-card-to) calc(var(--opacity-veil-${surface}-bottom) * 100%), transparent))`,
+    ].join(" "),
+  };
+}
