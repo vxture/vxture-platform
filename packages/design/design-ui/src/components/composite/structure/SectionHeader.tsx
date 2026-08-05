@@ -45,6 +45,14 @@ export interface SectionHeaderProps extends Omit<
   "title"
 > {
   readonly title: React.ReactNode;
+  /**
+   * 标题行内、紧跟标题的挂件：口径说明的 `?`、跳去图表的小图标一类。
+   *
+   * 与 `action` 分工：`action` 靠右、是这个板块的动作；本槽贴着标题、是标题的
+   * 一部分——admin 总览的四个面板头里，"详情"在右端而 `?` 紧贴标题，分属两处
+   * （2026-08-05）。同 `TableTitleCell.titleSuffix` 的先例。
+   */
+  readonly titleSuffix?: React.ReactNode;
   /** 1–4，同时决定语义元素与排版角色。 */
   readonly level?: SectionHeaderLevel;
   readonly description?: React.ReactNode;
@@ -68,6 +76,7 @@ const BY_LEVEL = {
 function SectionHeader({
   className,
   title,
+  titleSuffix,
   level = 2,
   description,
   action,
@@ -99,7 +108,14 @@ function SectionHeader({
         </span>
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col gap-2xs">
-        <Tag className={cn(type, "text-foreground")}>{title}</Tag>
+        {titleSuffix ? (
+          <span className="flex min-w-0 items-center gap-xs">
+            <Tag className={cn(type, "min-w-0 text-foreground")}>{title}</Tag>
+            <span className="shrink-0">{titleSuffix}</span>
+          </span>
+        ) : (
+          <Tag className={cn(type, "text-foreground")}>{title}</Tag>
+        )}
         {description ? (
           <p className="text-body-sm text-muted-foreground">{description}</p>
         ) : null}

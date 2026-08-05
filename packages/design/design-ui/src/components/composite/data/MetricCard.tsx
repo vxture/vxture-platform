@@ -16,6 +16,7 @@
 import * as React from "react";
 import { Icon, type IconName } from "../../../icons";
 import { cn } from "../../../utils/cn";
+import { Button } from "../../base/form/Button";
 import { Card, CardContent } from "../../base/display/Card";
 import {
   StatusBadge,
@@ -26,6 +27,17 @@ import { toneEdgeClasses } from "../../tone";
 export interface MetricCardProps {
   readonly label: React.ReactNode;
   readonly value: React.ReactNode;
+  /**
+   * 标签行内 `?` 的说明文字：这个指标怎么算出来的。不给则不出图标。
+   *
+   * 与 `description` 分工：`description` 是卡面上常驻的一行补充，占版面；口径说明
+   * 往往是整句（"按创建时间统计"、"billing.payments, pay_status=paid"），常驻会把
+   * 一排指标卡撑成一排段落，所以收进 `?` 里按需展开。
+   *
+   * 与 `StatCard.help` 同一形状——同一件事不该在两件上有两种待遇
+   * （2026-08-05：admin 总览为此自建了 DetailTip，三处卡片各挂一份）。
+   */
+  readonly help?: string;
   readonly description?: React.ReactNode;
   readonly icon?: IconName;
   /** 环比、同比一类的变化量，渲染为 StatusBadge。 */
@@ -64,6 +76,7 @@ export interface MetricCardProps {
 function MetricCard({
   label,
   value,
+  help,
   description,
   icon,
   trend,
@@ -103,8 +116,19 @@ function MetricCard({
             />
           ) : null}
           <div className="flex min-w-0 flex-col gap-xs">
-            <span className="truncate text-label-md text-muted-foreground">
-              {label}
+            <span className="flex min-w-0 items-center gap-xs text-label-md text-muted-foreground">
+              <span className="truncate">{label}</span>
+              {help ? (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={help}
+                  title={help}
+                  className="shrink-0"
+                >
+                  <Icon name="help" size="xs" aria-hidden="true" />
+                </Button>
+              ) : null}
             </span>
             <div className="flex flex-wrap items-center gap-sm">
               {/* 读数继承整卡语气色（admin 的读数即语气色本体）；neutral 档的

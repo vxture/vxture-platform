@@ -32,6 +32,8 @@ export interface MetricGridItem {
   readonly id: string;
   readonly label: React.ReactNode;
   readonly value: React.ReactNode;
+  /** 指标口径说明，落在标签行的 `?` 里。见 `MetricCardProps.help`。 */
+  readonly help?: string;
   readonly description?: React.ReactNode;
   readonly icon?: IconName;
   readonly trend?: React.ReactNode;
@@ -78,6 +80,7 @@ function MetricGrid({
           key={item.id}
           label={item.label}
           value={item.value}
+          {...(item.help !== undefined ? { help: item.help } : {})}
           {...(item.description !== undefined
             ? { description: item.description }
             : {})}

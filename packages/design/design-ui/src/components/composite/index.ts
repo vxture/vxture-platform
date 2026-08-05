@@ -32,6 +32,7 @@ export * from "./data/MetricGrid";
 export * from "./data/TableTitleCell";
 export * from "./data/ListCard";
 export * from "./structure/DetailList";
+export * from "./structure/PanelCard";
 export * from "./structure/Section";
 export * from "./structure/SectionHeader";
 export * from "./structure/SectionNav";
