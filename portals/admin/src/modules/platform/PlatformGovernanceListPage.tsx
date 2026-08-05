@@ -5,16 +5,15 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Button,
   Checkbox,
   EmptyState,
+  FilterBar,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
-  ViewLayout,
-  ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { fetchPlatformGovernanceRecords } from "@/api/admin-bff";
@@ -357,82 +356,96 @@ export function PlatformGovernanceListPage({
   };
 
   return (
-    <ViewLayout
+    <ListPageTemplate
       className={joinClasses(
         "vx-tenant-management-page vx-platform-governance-page",
         `vx-platform-governance-page--${kind}`,
       )}
-    >
-      <PageHeader
-        icon={config.icon}
-        title={config.title}
-        description={config.description}
-      />
-
-      <MetricGrid
-        aria-label={`${config.title}统计`}
-        columns={3}
-        items={[
-          {
-            id: "total",
-            icon: config.icon,
-            label: config.summary.total.label,
-            value: formatNumber(summary.total),
-            tags: [config.summary.total.tag],
-          },
-          {
-            id: "normal",
-            icon: "check",
-            label: config.summary.normal.label,
-            value: formatNumber(summary.normal),
-            tags: [config.summary.normal.tag],
-            tone: "success",
-          },
-          {
-            id: "risk",
-            icon: "info",
-            label: config.summary.risk.label,
-            value: formatNumber(summary.risk + summary.pending),
-            tags: [
-              ...(summary.risk
-                ? [`${config.summary.risk.tag} ${formatNumber(summary.risk)}`]
-                : []),
-              ...(summary.pending
-                ? [
-                    `${config.summary.pending.tag} ${formatNumber(summary.pending)}`,
-                  ]
-                : []),
-              ...(!summary.risk && !summary.pending ? ["无待处理"] : []),
-            ],
-            tone: "warning",
-          },
-        ]}
-      />
-
-      <div className="vx-tenant-list-shell">
-        <section
-          className="vx-tenant-toolbar"
+      header={
+        <PageHeader
+          icon={config.icon}
+          title={config.title}
+          description={config.description}
+        />
+      }
+      summary={
+        <>
+          {" "}
+          <MetricGrid
+            aria-label={`${config.title}统计`}
+            columns={3}
+            items={[
+              {
+                id: "total",
+                icon: config.icon,
+                label: config.summary.total.label,
+                value: formatNumber(summary.total),
+                tags: [config.summary.total.tag],
+              },
+              {
+                id: "normal",
+                icon: "check",
+                label: config.summary.normal.label,
+                value: formatNumber(summary.normal),
+                tags: [config.summary.normal.tag],
+                tone: "success",
+              },
+              {
+                id: "risk",
+                icon: "info",
+                label: config.summary.risk.label,
+                value: formatNumber(summary.risk + summary.pending),
+                tags: [
+                  ...(summary.risk
+                    ? [
+                        `${config.summary.risk.tag} ${formatNumber(summary.risk)}`,
+                      ]
+                    : []),
+                  ...(summary.pending
+                    ? [
+                        `${config.summary.pending.tag} ${formatNumber(summary.pending)}`,
+                      ]
+                    : []),
+                  ...(!summary.risk && !summary.pending ? ["无待处理"] : []),
+                ],
+                tone: "warning",
+              },
+            ]}
+          />
+        </>
+      }
+      filters={
+        <FilterBar
+          view={viewMode}
+          onViewChange={setViewMode}
+          count={formatNumber(records.length)}
           aria-label={`${config.title}筛选`}
+          search={
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={config.searchPlaceholder}
+              className="vx-tenant-search"
+              aria-label={`搜索${config.objectLabel}`}
+            />
+          }
+          onReset={resetFilters}
+          actions={
+            <>
+              <ActionButton
+                icon="shield-check"
+                variant="outline"
+                disabled={selectedIds.size === 0}
+              >
+                {config.batchAction}
+                {selectedIds.size ? ` (${selectedIds.size})` : ""}
+              </ActionButton>
+              <ActionButton icon="plus" disabled>
+                {config.primaryAction}
+              </ActionButton>
+            </>
+          }
         >
-          <ViewModeSwitch
-            value={viewMode}
-            onChange={setViewMode}
-            ariaLabel={`${config.title}展示方式`}
-          />
-          <span className="vx-tenant-view-count">
-            {formatNumber(records.length)}
-          </span>
-          <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={config.searchPlaceholder}
-            className="vx-tenant-search"
-            aria-label={`搜索${config.objectLabel}`}
-          />
-          <Button variant="outline" onClick={resetFilters}>
-            重置
-          </Button>
           <div className="vx-tenant-filters">
             <NativeSelect
               value={statusFilter}
@@ -451,19 +464,9 @@ export function PlatformGovernanceListPage({
               <option value="pending">待处理</option>
             </NativeSelect>
           </div>
-          <ActionButton
-            icon="shield-check"
-            variant="outline"
-            disabled={selectedIds.size === 0}
-          >
-            {config.batchAction}
-            {selectedIds.size ? ` (${selectedIds.size})` : ""}
-          </ActionButton>
-          <ActionButton icon="plus" disabled>
-            {config.primaryAction}
-          </ActionButton>
-        </section>
-
+        </FilterBar>
+      }
+      table={
         <section
           className="vx-tenant-directory vx-platform-governance-directory"
           aria-label={`${config.title}清单`}
@@ -647,7 +650,7 @@ export function PlatformGovernanceListPage({
             </div>
           ) : null}
         </section>
-      </div>
-    </ViewLayout>
+      }
+    />
   );
 }

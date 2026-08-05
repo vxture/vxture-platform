@@ -8,10 +8,10 @@ import {
   EmptyState,
   Icon,
   Input,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   Pagination,
-  ViewLayout,
 } from "@vxture/design-system";
 import { fetchAuditLogs, type AuditLogFilters } from "@/api/admin-bff";
 import type { AuditLogRecord } from "@/entities/console";
@@ -369,36 +369,44 @@ export function AuditLogsPage() {
   };
 
   return (
-    <ViewLayout
+    <ListPageTemplate
       className={joinClasses("vx-tenant-management-page", "vx-audit-page")}
-    >
-      <PageHeader
-        icon="info"
-        title="审计日志"
-        description="追溯运营后台关键操作，按操作员、时间和对象筛选审计记录。"
-      />
-      <AuditSummary logs={logs} />
-      <AuditToolbar
-        search={search}
-        resultFilter={resultFilter}
-        dateFrom={dateFrom}
-        dateTo={dateTo}
-        total={filtered.length}
-        exportDisabled={filtered.length === 0}
-        onSearchChange={handleSearch}
-        onResultFilterChange={handleResultFilter}
-        onDateFromChange={(v) => {
-          setDateFrom(v);
-          setPage(1);
-        }}
-        onDateToChange={(v) => {
-          setDateTo(v);
-          setPage(1);
-        }}
-        onReset={handleReset}
-        onExport={handleExport}
-      />
-      <div className="vx-tenant-list-shell">
+      header={
+        <PageHeader
+          icon="info"
+          title="审计日志"
+          description="追溯运营后台关键操作，按操作员、时间和对象筛选审计记录。"
+        />
+      }
+      summary={
+        <>
+          {" "}
+          <AuditSummary logs={logs} />
+        </>
+      }
+      filters={
+        <AuditToolbar
+          search={search}
+          resultFilter={resultFilter}
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          total={filtered.length}
+          exportDisabled={filtered.length === 0}
+          onSearchChange={handleSearch}
+          onResultFilterChange={handleResultFilter}
+          onDateFromChange={(v) => {
+            setDateFrom(v);
+            setPage(1);
+          }}
+          onDateToChange={(v) => {
+            setDateTo(v);
+            setPage(1);
+          }}
+          onReset={handleReset}
+          onExport={handleExport}
+        />
+      }
+      table={
         <section className="vx-tenant-directory" aria-label="审计日志清单">
           {loading ? (
             <header className="vx-tenant-directory__header">
@@ -456,7 +464,7 @@ export function AuditLogsPage() {
             </>
           ) : null}
         </section>
-      </div>
-    </ViewLayout>
+      }
+    />
   );
 }
