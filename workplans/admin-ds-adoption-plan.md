@@ -138,12 +138,12 @@ B4 是盘点里的 A2，收益最大（170 处，几乎每个域）也最危险�
 | **1** | A 类重复定义 → DS 组件（实际 60+ 份，非 32）       | ✅ `ad33f26a` `11dd3d37` `394cfad4` `862207b7` + 页头修正 `9c7f815a`                   |
 | **2** | B1 列表卡                                          | 部分：4 页已迁 + DS `note` 槽 + tone 映射表（`5886d0da`）；**剩 15 页 owner 决定不迁** |
 | **3** | 页面骨架换 `ListPageTemplate`/`DetailPageTemplate` | 未开始                                                                                 |
-| **4** | pill 色调族 → `Badge`                              | 未开始；拍板②已由 shared 既有文件回答                                                  |
+| **4** | pill 色调族 → `Badge`                              | 未开始；拍板②已由 shared 既有文件回答；**须一并处理 §十一 的缺色与前缀撞车**           |
 | **5** | B3/B4（卡片选中态、卡表同源）                      | 未评估                                                                                 |
 | **6** | 登录态视觉走查                                     | 未开始                                                                                 |
 
 **列表本体的收敛另起一条线**：`admin-table-consolidation.md` —— 29 个手搓列表页约 3279 行，
-DataTable 已补齐唯一缺口 `rowTone`（`9dda0129`），按结构相似度分 T1–T5 五批。本份的批 3
+按结构相似度分 T1–T5 五批（`rowTone` 曾作为唯一缺口补齐，后于 2026-08-05 owner 实测后退役——行的语气改由状态列表达，见 `950ac3ae`）。本份的批 3
 （页面骨架）与批 4（pill）与之相邻但不同批：一次改动不跨两个语义面。
 
 **A 类的实际规模是盘点的两倍。** 每一批都炸出同一族的三种形态：裸名定义、带模块前缀的
@@ -260,3 +260,57 @@ CSS 本身没问题——`var()` 找不到值，整条声明才 invalid。
 菜单尺寸）值得沉淀进 DS——**这就是 owner 说的"沉淀在 DS 中"**。等 admin 页面 CSS 直接
 用上 T2，`admin-tokens` 即可缩小直至消失，那才是 `8ca6284e` 写的
 "Products converge to the tier layer in batches"。搭桥再过河，而不是拆了桥让人游过去。
+
+## 十一、状态类与值域的对账（2026-08-06）
+
+起因是一次"死代码排查"：CSS 里定义、tsx 里搜不到的类有 127 个。按类名整体比对会
+误判——`vx-order-pill--payment-${status}` 这类是模板拼出来的，尤其带下划线的状态值
+（`pending_verify`、`bill_cancelled`）不可能在 tsx 里以字面量出现。改成按前缀逐段
+回退匹配后降到 19 个，那 19 个才是批 1 迁 DS 之后的遗留（`vx-btn` / `vx-empty-state` /
+`vx-view-mode-switch` / `vx-page-header*`），已随本轮清理退役 213 行。
+
+**判据记下来**：判断 CSS 类是否在用，必须考虑模板拼接。只做字面量比对会删掉线上正在
+用的状态色，而且删掉之后页面只是"变灰"，不报错、不崩，测不出来。
+
+余下 108 个逐条对了值域（权威：`@vxture/shared` 的 catalog-domains，以及 admin
+`entities/console.ts` 的联合类型）。**没有一个是垃圾**，但对出三类真问题：
+
+### 1. 缺色：状态有值，CSS 没有对应类
+
+| 家族                                                    | 缺的值                                  | 后果                                                                                |
+| ------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------- |
+| `vx-order-pill--*`                                      | `paid_unprovisioned`、`partial_pending` | product_321 §4.2 新增的两个非终态，CSS 没跟上，标只剩基础样式，与正常订单看不出差别 |
+| `*-pill--tier-*`（order / billing / subscription 三处） | `starter`、`business`                   | @shared 的 TIERS 是五档，admin 只写了 free/pro/enterprise，另两档掉进 `other` 灰色  |
+
+第二条是等级色 L1–L5 的实证需求：五档里有两档在视觉上根本不存在。
+
+**去向：批 4**（pill 族 → Badge + 业务状态映射表）。现在临时补 CSS，批 4 时还要拆。
+tier 那条直接用已落地的 `--level-1..5`。
+
+### 2. 契约漂移：admin 的订阅状态与 @shared 对不上
+
+```
+@shared（唯一权威）：active trialing overdue suspended expired  cancelled
+admin 的类型与 CSS ：active trial    overdue suspended expiring cancelled
+```
+
+`trialing→trial` 是改名；`expired→expiring` 不是改名——"快到期"与"已过期"是两件事，
+admin 侧因此**没有"已过期"这个状态**。CSS 只是跟着 admin 的类型走，根因在 view-model。
+
+**去向：不属于 DS 线**，归 admin-bff view-model 那条（与 console-bff 的同类漂移一并处理）。
+
+### 3. 前缀撞车：一个前缀被两个字段共用
+
+```tsx
+vx-invoice-pill--type-${invoice.billType}     // adjust / normal / prepaid / supplement
+vx-invoice-pill--type-${invoice.invoiceType}  // electronic / paper / normal_vat / special_vat / other
+```
+
+两个值域挤在 `--type-` 下。今天没撞是因为值恰好不重名；将来任一侧新增同名值，颜色会
+互相覆盖且无声。**去向：批 4 顺手拆成 `--bill-type-` / `--doc-type-`。**
+
+### 同批的其他排查结论（均无问题）
+
+- 111 份样式文件全在 `globals.css` 的 import 闭包里，无孤儿文件。
+- 548 个 `--vx-admin-*` token 全部在用。
+- 无人 import 的模块只有 `src/modules/shared/index.ts`（5 行空壳桶），已删。
