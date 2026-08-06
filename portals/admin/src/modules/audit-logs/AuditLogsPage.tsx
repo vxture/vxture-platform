@@ -3,17 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ActionButton,
-  Badge,
-  EmptyState,
+  DataTable,
   FilterBar,
-  Icon,
   Input,
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
   Pagination,
+  StatusBadge,
+  TableTitleCell,
 } from "@vxture/design-system";
 import { fetchAuditLogs, type AuditLogFilters } from "@/api/admin-bff";
+import type { DataTableColumn } from "@vxture/design-system";
 import type { AuditLogRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
@@ -26,16 +27,6 @@ const EMPTY_MARK = "-";
 
 function resultLabel(result: AuditLogRecord["result"]) {
   return result === "success" ? "成功" : "失败";
-}
-
-function resultBadgeClass(result: AuditLogRecord["result"]) {
-  return result === "success"
-    ? "vx-admin-role-status-pill--enabled"
-    : "vx-admin-role-status-pill--disabled";
-}
-
-function resultIcon(result: AuditLogRecord["result"]) {
-  return result === "success" ? "check" : "x";
 }
 
 function auditLogSearchText(log: AuditLogRecord) {
@@ -205,94 +196,51 @@ function localInputToIso(value: string): string | undefined {
 
 // ─── 子组件：列表 ──────────────────────────────────────────────────────────────
 
-function AuditList({
-  logs,
-  startIndex,
-}: {
-  logs: AuditLogRecord[];
-  startIndex: number;
-}) {
-  return (
-    <div
-      className="vx-tenant-directory-list vx-audit-directory-list"
-      role="region"
-      aria-label="审计日志列表"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>#</span>
-        <span>操作员</span>
-        <span>操作</span>
-        <span>对象</span>
-        <span>模块</span>
-        <span>结果</span>
-        <span>IP</span>
-        <span>时间</span>
-      </div>
-      {logs.map((log, index) => (
-        <div key={log.id} className="vx-tenant-directory-row vx-audit-row">
-          <span className="vx-audit-row__index">{startIndex + index + 1}</span>
-          <span className="vx-audit-row__operator">
-            <span className="vx-audit-row__operator-name">
-              {log.operatorName}
-            </span>
-            <span className="vx-audit-row__operator-email">
-              {log.operatorEmail}
-            </span>
-          </span>
-          <span className="vx-audit-row__action">
-            <span className="vx-audit-row__action-label">
-              {log.actionLabel}
-            </span>
-            <span className="vx-audit-row__action-code">{log.action}</span>
-          </span>
-          <span className="vx-audit-row__target">
-            {log.targetLabel ? (
-              <>
-                <span className="vx-audit-row__target-label">
-                  {log.targetLabel}
-                </span>
-                <span className="vx-audit-row__target-type">
-                  {log.targetType}
-                </span>
-              </>
-            ) : (
-              <span className="vx-audit-row__target-empty">{EMPTY_MARK}</span>
-            )}
-          </span>
-          <span className="vx-audit-row__module">{log.module}</span>
-          <span className="vx-audit-row__result">
-            <span className="vx-tenant-directory-row__status-line">
-              <span
-                className={`vx-model-state-icon vx-model-state-icon--${log.result === "success" ? "active" : "inactive"}`}
-                role="img"
-                aria-label={resultLabel(log.result)}
-                title={resultLabel(log.result)}
-              >
-                <Icon
-                  name={resultIcon(log.result)}
-                  size="xs"
-                  fallback="placeholder"
-                />
-              </span>
-              <Badge className={resultBadgeClass(log.result)}>
-                {resultLabel(log.result)}
-              </Badge>
-            </span>
-            {log.errorMessage ? (
-              <span className="vx-audit-row__error" title={log.errorMessage}>
-                <Icon name="info" size="xs" fallback="placeholder" />
-              </span>
-            ) : null}
-          </span>
-          <span className="vx-audit-row__ip">{log.ip ?? EMPTY_MARK}</span>
-          <span className="vx-audit-row__time">
-            {formatDate(log.createdAt)}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+const AUDIT_COLUMNS: readonly DataTableColumn<AuditLogRecord>[] = [
+  {
+    id: "operator",
+    header: "操作员",
+    cell: (log) => (
+      <TableTitleCell
+        title={log.operatorName}
+        description={log.operatorEmail}
+      />
+    ),
+  },
+  {
+    id: "action",
+    header: "操作",
+    cell: (log) => (
+      <TableTitleCell title={log.actionLabel} description={log.action} />
+    ),
+  },
+  {
+    id: "target",
+    header: "对象",
+    cell: (log) =>
+      log.targetLabel ? (
+        <TableTitleCell title={log.targetLabel} description={log.targetType} />
+      ) : (
+        <span className="text-muted-foreground">{EMPTY_MARK}</span>
+      ),
+  },
+  { id: "module", header: "模块", cell: (log) => log.module },
+  {
+    id: "result",
+    header: "结果",
+    align: "center",
+    cell: (log) => (
+      <StatusBadge
+        tone={log.result === "success" ? "success" : "danger"}
+        {...(log.errorMessage ? { title: log.errorMessage } : {})}
+      >
+        {resultLabel(log.result)}
+      </StatusBadge>
+    ),
+  },
+  { id: "ip", header: "IP", cell: (log) => log.ip ?? EMPTY_MARK },
+  { id: "time", header: "时间", cell: (log) => formatDate(log.createdAt) },
+];
 
 // ─── 主组件 ───────────────────────────────────────────────────────────────────
 
@@ -302,6 +250,7 @@ export function AuditLogsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [resultFilter, setResultFilter] = useState<ResultFilter>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
@@ -366,8 +315,13 @@ export function AuditLogsPage() {
     setDateTo("");
     setPage(1);
   };
+  // 导出以选中项为对象（工具行契约）：没选就没有导出的对象。
   const handleExport = () => {
-    exportRowsToCsv("audit-logs-export", AUDIT_CSV_COLUMNS, filtered);
+    exportRowsToCsv(
+      "audit-logs-export",
+      AUDIT_CSV_COLUMNS,
+      filtered.filter((log) => selectedIds.has(log.id)),
+    );
   };
 
   return (
@@ -393,7 +347,7 @@ export function AuditLogsPage() {
           dateFrom={dateFrom}
           dateTo={dateTo}
           total={filtered.length}
-          exportDisabled={filtered.length === 0}
+          exportDisabled={selectedIds.size === 0}
           onSearchChange={handleSearch}
           onResultFilterChange={handleResultFilter}
           onDateFromChange={(v) => {
@@ -409,63 +363,38 @@ export function AuditLogsPage() {
         />
       }
       table={
-        <section className="vx-tenant-directory" aria-label="审计日志清单">
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>正在加载审计日志</span>
-            </header>
-          ) : null}
-          {!loading && loadError ? (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title="审计日志读取失败"
-                description={loadError}
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    重置筛选
-                  </ActionButton>
-                }
+        <DataTable
+          columns={AUDIT_COLUMNS}
+          rows={pageLogs}
+          rowKey={(log) => log.id}
+          loading={loading}
+          indexStart={(page - 1) * PAGE_SIZE + 1}
+          selectedKeys={[...selectedIds]}
+          onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
+          emptyTitle={loadError ? "审计日志读取失败" : "暂无审计记录"}
+          emptyDescription={
+            loadError ??
+            (search || resultFilter !== "all" || dateFrom || dateTo
+              ? "尝试调整筛选条件或时间范围"
+              : "后台操作记录将在此处显示")
+          }
+          emptyAction={
+            <ActionButton variant="outline" icon="undo" onClick={handleReset}>
+              重置筛选
+            </ActionButton>
+          }
+          footer={
+            pageCount > 1 ? (
+              <Pagination
+                page={page}
+                pageCount={pageCount}
+                total={filtered.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
               />
-            </section>
-          ) : !loading && filtered.length === 0 ? (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title="暂无审计记录"
-                description={
-                  search || resultFilter !== "all" || dateFrom || dateTo
-                    ? "尝试调整筛选条件或时间范围"
-                    : "后台操作记录将在此处显示"
-                }
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    重置筛选
-                  </ActionButton>
-                }
-              />
-            </section>
-          ) : filtered.length ? (
-            <>
-              <AuditList logs={pageLogs} startIndex={(page - 1) * PAGE_SIZE} />
-              {pageCount > 1 ? (
-                <Pagination
-                  page={page}
-                  pageCount={pageCount}
-                  total={filtered.length}
-                  pageSize={PAGE_SIZE}
-                  onPageChange={setPage}
-                />
-              ) : null}
-            </>
-          ) : null}
-        </section>
+            ) : null
+          }
+        />
       }
     />
   );
