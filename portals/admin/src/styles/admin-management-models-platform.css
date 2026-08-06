@@ -1,101 +1,7 @@
-/* Model platform directory layout and row state styles. */
-
-.vx-model-platform-directory-list .vx-tenant-directory-list__header,
-.vx-model-platform-directory-list .vx-tenant-directory-row {
-  min-width: var(--vx-admin-directory-row-min-width);
-  grid-template-columns:
-    var(--vx-admin-management-track-25r) var(--vx-admin-management-track-275r) minmax(0, 1.25fr) minmax(0, 0.5fr)
-    minmax(0, 0.5fr) minmax(0, 0.68fr) minmax(0, 0.9fr) var(--vx-admin-management-track-5r);
-}
-
-.vx-model-platform-page .vx-tenant-directory-row {
-  cursor: default;
-}
-
-.vx-model-platform-page .vx-model-platform-row {
-  cursor: pointer;
-}
-
-.vx-model-platform-page .vx-model-platform-row--selected {
-  background: var(--vx-color-brand-50);
-}
+/* Model platform directory layout styles. */
 
 .vx-model-platform-card {
   cursor: default;
-}/* Model platform directory sticky start column styles. */
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-list__header
-  > span:first-child,
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-model-platform-row__select {
-  position: sticky;
-  left: 0;
-  z-index: 3;
-  align-self: stretch;
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  box-shadow: var(--vx-admin-management-effect-1p) 0 0 color-mix(in srgb, var(--vx-color-auth-accent) 6%, transparent);
-}
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-list__header
-  > span:first-child {
-  z-index: 4;
-}
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-list__header
-  > span:last-child,
-.vx-model-platform-directory-list .vx-tenant-directory-row > .vx-tenant-actions {
-  position: sticky;
-  right: 0;
-  z-index: 3;
-  align-self: stretch;
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  box-shadow: calc(var(--vx-admin-management-effect-1p) * -1) 0 0 color-mix(in srgb, var(--vx-color-auth-accent) 10%, transparent);
-}
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-list__header
-  > span:last-child {
-  z-index: 4;
-}
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-tenant-directory-row__tenant,
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-model-platform-row__capabilities {
-  text-align: left;
-}
-
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-model-platform-row__status,
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-model-platform-row__link,
-.vx-model-platform-directory-list
-  .vx-tenant-directory-row
-  > .vx-model-platform-row__source {
-  text-align: center;
-}
-
-.vx-model-platform-row__select {
-  justify-self: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* 这个类原本是给原生表单复选框写的：accent-color 配色、:checked 提亮、常态压到
@@ -110,17 +16,14 @@
   cursor: pointer;
 }
 
-.vx-model-platform-row--private,
 .vx-model-platform-card--private {
   --tenant-row-tone: var(--tenant-green);
 }
 
-.vx-model-platform-row--active,
 .vx-model-platform-card--active {
   --tenant-row-tone: var(--tenant-blue);
 }
 
-.vx-model-platform-row--muted,
 .vx-model-platform-card--muted {
   --tenant-row-tone: var(--vx-color-gray-400);
 }

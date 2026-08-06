@@ -313,4 +313,9 @@ vx-invoice-pill--type-${invoice.invoiceType}  // electronic / paper / normal_vat
 
 - 111 份样式文件全在 `globals.css` 的 import 闭包里，无孤儿文件。
 - 548 个 `--vx-admin-*` token 全部在用。
+  **2026-08-06 复测已不成立**：534 个定义里 74 个无人 `var()` 引用，主要是
+  `--vx-admin-platform-*`（33）与 `--vx-admin-overview-*`（32）。核对 git 后确认
+  这两族在 HEAD 上就已经没有引用方，**不是 DataTable 迁移造成的**，归批 §十的
+  桥收敛（任务 #34）一并清。T5 收尾自己产生的 14 个 `--vx-admin-governance-*`
+  孤儿已随改动删除。
 - 无人 import 的模块只有 `src/modules/shared/index.ts`（5 行空壳桶），已删。

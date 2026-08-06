@@ -85,54 +85,6 @@
   color: var(--tenant-green);
 }
 
-.vx-model-link-pill--normal {
-  background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
-  color: var(--tenant-green);
-}
-
-.vx-model-link-pill--abnormal {
-  background: color-mix(in srgb, var(--vx-color-danger) 10%, transparent);
-  color: var(--tenant-rose);
-}
-
-.vx-model-link-pill--checking {
-  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
-  color: var(--tenant-blue);
-}
-
-.vx-model-state-icon {
-  width: var(--vx-admin-management-size-1125r);
-  height: var(--vx-admin-management-size-1125r);
-  display: inline-grid;
-  place-items: center;
-  border-radius: var(--vx-radius-full);
-  color: var(--vx-color-white);
-}
-
-.vx-model-state-icon--active {
-  background: var(--tenant-blue);
-}
-
-.vx-model-state-icon--inactive {
-  background: var(--tenant-amber);
-}
-
-.vx-model-state-icon svg {
-  width: var(--vx-admin-management-size-06875r);
-  height: var(--vx-admin-management-size-06875r);
-  stroke-width: 2.8;
-}
-
-.vx-model-platform-row__status .vx-tenant-pill--active {
-  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
-  color: var(--tenant-blue);
-}
-
-.vx-model-platform-row__status .vx-tenant-pill--disabled {
-  background: color-mix(in srgb, var(--vx-color-warning-600) 10%, transparent);
-  color: var(--tenant-amber);
-}
-
 .vx-verification-row__status small,
 .vx-verification-row__subject small,
 .vx-verification-row__contact small,

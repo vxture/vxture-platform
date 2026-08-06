@@ -38,34 +38,6 @@
   justify-content: flex-start;
 }
 
-.vx-model-platform-row__source,
-.vx-model-platform-row__capabilities,
-.vx-model-platform-row__link,
-.vx-model-platform-row__status {
-  min-width: 0;
-  display: grid;
-  gap: var(--vx-admin-management-space-05r);
-  justify-items: start;
-  text-align: left;
-}
-
-.vx-model-platform-row__capabilities .vx-tenant-directory-row__tag-line,
-.vx-model-platform-row__status .vx-tenant-directory-row__status-line {
-  justify-content: flex-start;
-}
-
-.vx-model-platform-row__source,
-.vx-model-platform-row__link,
-.vx-model-platform-row__status {
-  justify-items: center;
-}
-
-.vx-model-platform-row__source .vx-tenant-directory-row__tag-line,
-.vx-model-platform-row__link .vx-tenant-directory-row__status-line,
-.vx-model-platform-row__status .vx-tenant-directory-row__status-line {
-  justify-content: center;
-}
-
 .vx-admin-role-directory-list
   .vx-tenant-directory-row
   > .vx-tenant-directory-row__tenant.vx-admin-role-row__identity {

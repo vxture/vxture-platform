@@ -5,7 +5,7 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -13,9 +13,14 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import type {
+  DataTableColumn,
+  IconName,
+  StatusBadgeTone,
+} from "@vxture/design-system";
 import { fetchPlatformGovernanceRecords } from "@/api/admin-bff";
 import type {
   PlatformGovernanceKind,
@@ -51,57 +56,22 @@ interface GovernanceConfig {
   };
 }
 
-const statusMeta = {
-  normal: {
-    label: "正常",
-    icon: "check",
-    className: "vx-platform-governance-status--normal",
-  },
-  warning: {
-    label: "关注",
-    icon: "info",
-    className: "vx-platform-governance-status--warning",
-  },
-  blocked: {
-    label: "阻断",
-    icon: "x",
-    className: "vx-platform-governance-status--blocked",
-  },
-  pending: {
-    label: "待处理",
-    icon: "clock",
-    className: "vx-platform-governance-status--pending",
-  },
-} satisfies Record<
-  PlatformGovernanceStatus,
-  { label: string; icon: IconName; className: string }
->;
+type StatusMeta = { label: string; icon: IconName; tone: StatusBadgeTone };
 
+const statusMeta = {
+  normal: { label: "正常", icon: "check", tone: "success" },
+  warning: { label: "关注", icon: "info", tone: "warning" },
+  blocked: { label: "阻断", icon: "x", tone: "danger" },
+  pending: { label: "待处理", icon: "clock", tone: "warning" },
+} satisfies Record<PlatformGovernanceStatus, StatusMeta>;
+
+/* 审批中心的四档说的是审批流的位置，不是对象健康度，故另给一套文案；语气同源。 */
 const approvalStatusMeta = {
-  normal: {
-    label: "已完成",
-    icon: "check",
-    className: "vx-platform-governance-status--normal",
-  },
-  warning: {
-    label: "待执行",
-    icon: "info",
-    className: "vx-platform-governance-status--warning",
-  },
-  blocked: {
-    label: "已阻断",
-    icon: "x",
-    className: "vx-platform-governance-status--blocked",
-  },
-  pending: {
-    label: "待审批",
-    icon: "clock",
-    className: "vx-platform-governance-status--pending",
-  },
-} satisfies Record<
-  PlatformGovernanceStatus,
-  { label: string; icon: IconName; className: string }
->;
+  normal: { label: "已完成", icon: "check", tone: "success" },
+  warning: { label: "待执行", icon: "info", tone: "warning" },
+  blocked: { label: "已阻断", icon: "x", tone: "danger" },
+  pending: { label: "待审批", icon: "clock", tone: "warning" },
+} satisfies Record<PlatformGovernanceStatus, StatusMeta>;
 
 const governanceConfigs = {
   admins: {
@@ -204,17 +174,6 @@ function governanceStatusMeta(
   return kind === "approvals" ? approvalStatusMeta[status] : statusMeta[status];
 }
 
-function isInteractiveTarget(target: EventTarget | null) {
-  return (
-    target instanceof HTMLElement &&
-    Boolean(
-      target.closest(
-        'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-      ),
-    )
-  );
-}
-
 function GovernanceActionsMenu({
   record,
   labels,
@@ -223,34 +182,19 @@ function GovernanceActionsMenu({
   labels: GovernanceConfig["actions"];
 }) {
   return (
-    <div
-      className="vx-tenant-actions"
-      onClick={(event) => event.stopPropagation()}
-    >
-      <ActionMenu
-        label={`${record.name} 操作`}
-        items={[
-          {
-            id: "detail",
-            label: labels.detail,
-            icon: "info",
-            disabled: true,
-          },
-          {
-            id: "edit",
-            label: labels.edit,
-            icon: "edit",
-            disabled: true,
-          },
-          {
-            id: "audit",
-            label: labels.audit,
-            icon: "shield-check",
-            disabled: true,
-          },
-        ]}
-      />
-    </div>
+    <ActionMenu
+      label={`${record.name} 操作`}
+      items={[
+        { id: "detail", label: labels.detail, icon: "info", disabled: true },
+        { id: "edit", label: labels.edit, icon: "edit", disabled: true },
+        {
+          id: "audit",
+          label: labels.audit,
+          icon: "shield-check",
+          disabled: true,
+        },
+      ]}
+    />
   );
 }
 
@@ -312,33 +256,58 @@ export function PlatformGovernanceListPage({
     };
   }, [config.title, kind]);
 
-  const selectedOnPage = records.filter((record) =>
-    selectedIds.has(record.id),
-  ).length;
-  const isPageSelected =
-    records.length > 0 && selectedOnPage === records.length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < records.length;
-
-  function toggleRecord(recordId: string, checked: boolean) {
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(recordId);
-      else next.delete(recordId);
-      return next;
-    });
-  }
-
-  function togglePage(checked: boolean) {
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      records.forEach((record) => {
-        if (checked) next.add(record.id);
-        else next.delete(record.id);
-      });
-      return next;
-    });
-  }
+  const columns = useMemo<DataTableColumn<PlatformGovernanceRecord>[]>(
+    () => [
+      {
+        id: "identity",
+        header: config.objectLabel,
+        cell: (record) => (
+          <TableTitleCell
+            icon={config.icon}
+            title={record.name}
+            description={record.description}
+          />
+        ),
+      },
+      {
+        id: "status",
+        header: "状态",
+        align: "center",
+        cell: (record) => {
+          const meta = governanceStatusMeta(kind, record.status);
+          return (
+            <StatusBadge tone={meta.tone} icon={meta.icon}>
+              {meta.label}
+            </StatusBadge>
+          );
+        },
+      },
+      {
+        id: "scope",
+        header: config.scopeLabel,
+        align: "center",
+        cell: (record) => <Badge>{record.scope}</Badge>,
+      },
+      {
+        id: "owner",
+        header: config.ownerLabel,
+        cell: (record) => (
+          <TableTitleCell title={record.owner} description={record.updatedAt} />
+        ),
+      },
+      {
+        id: "policy",
+        header: config.policyLabel,
+        cell: (record) => (
+          <TableTitleCell
+            title={record.policy}
+            description={record.tags.join(" / ")}
+          />
+        ),
+      },
+    ],
+    [config, kind],
+  );
 
   function resetFilters() {
     setQuery("");
@@ -474,132 +443,41 @@ export function PlatformGovernanceListPage({
           className="vx-tenant-directory vx-platform-governance-directory"
           aria-label={`${config.title}清单`}
         >
-          {loading ? (
-            <header className="vx-tenant-directory__header">
-              <span>正在加载自治数据</span>
-            </header>
-          ) : null}
-
-          {!loading && loadError ? (
+          {/* 读取失败是第三态，DataTable 只认加载/空/有数据，故留在外层。 */}
+          {loadError ? (
             <section className="vx-tenant-empty">
               <EmptyState
                 title={`${config.title}数据读取失败`}
                 description={loadError}
               />
             </section>
-          ) : !loading && records.length === 0 ? (
-            <section className="vx-tenant-empty">
-              <EmptyState
-                title="暂无匹配记录"
-                description="调整关键词或筛选条件后再查看。"
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={resetFilters}
-                  >
-                    重置筛选
-                  </ActionButton>
-                }
-              />
-            </section>
           ) : viewMode === "list" ? (
-            <div
-              className="vx-tenant-directory-list vx-platform-governance-list"
-              role="region"
-              aria-label={`${config.title}清单`}
-            >
-              <div className="vx-tenant-directory-list__header">
-                <span>
-                  <Checkbox
-                    className="vx-model-select-checkbox"
-                    checked={
-                      isPageSelected
-                        ? true
-                        : isPagePartiallySelected
-                          ? "indeterminate"
-                          : false
-                    }
-                    onCheckedChange={(value) => togglePage(value === true)}
-                    aria-label={`选择当前页${config.objectLabel}`}
-                  />
-                </span>
-                <span>#</span>
-                <span>{config.objectLabel}</span>
-                <span>状态</span>
-                <span>{config.scopeLabel}</span>
-                <span>{config.ownerLabel}</span>
-                <span>{config.policyLabel}</span>
-                <span>操作</span>
-              </div>
-              {records.map((record, index) => {
-                const meta = governanceStatusMeta(kind, record.status);
-                const selected = selectedIds.has(record.id);
-                return (
-                  <div
-                    key={record.id}
-                    className={joinClasses(
-                      "vx-tenant-directory-row vx-platform-governance-row",
-                      selected ? "vx-platform-governance-row--selected" : "",
-                    )}
-                    onClick={(event) => {
-                      if (isInteractiveTarget(event.target)) return;
-                      toggleRecord(record.id, !selected);
-                    }}
-                  >
-                    <span className="vx-platform-governance-row__select">
-                      <Checkbox
-                        className="vx-model-select-checkbox"
-                        checked={selected}
-                        onClick={(event) => event.stopPropagation()}
-                        onCheckedChange={(value) =>
-                          toggleRecord(record.id, value === true)
-                        }
-                        aria-label={`选择 ${record.name}`}
-                      />
-                    </span>
-                    <span className="vx-platform-governance-row__index">
-                      {formatNumber(index + 1)}
-                    </span>
-                    <TableTitleCell
-                      className="vx-tenant-directory-row__tenant vx-platform-governance-row__identity"
-                      icon={config.icon}
-                      title={record.name}
-                      description={record.description}
-                    />
-                    <span className="vx-platform-governance-row__status">
-                      <Badge
-                        className={`vx-platform-governance-status ${meta.className}`}
-                      >
-                        <Icon
-                          name={meta.icon}
-                          size="xs"
-                          fallback="placeholder"
-                        />
-                        {meta.label}
-                      </Badge>
-                    </span>
-                    <span className="vx-platform-governance-row__scope">
-                      <Badge className="vx-tenant-pill vx-model-provider-pill--online">
-                        {record.scope}
-                      </Badge>
-                    </span>
-                    <span className="vx-platform-governance-row__owner">
-                      <strong>{record.owner}</strong>
-                      <small>{record.updatedAt}</small>
-                    </span>
-                    <span className="vx-platform-governance-row__policy">
-                      <strong>{record.policy}</strong>
-                      <small>{record.tags.join(" / ")}</small>
-                    </span>
-                    <GovernanceActionsMenu
-                      record={record}
-                      labels={config.actions}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+            <DataTable
+              columns={columns}
+              rows={records}
+              rowKey={(record) => record.id}
+              loading={loading}
+              indexStart={1}
+              selectedKeys={[...selectedIds]}
+              onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
+              rowActions={(record) => (
+                <GovernanceActionsMenu
+                  record={record}
+                  labels={config.actions}
+                />
+              )}
+              emptyTitle="暂无匹配记录"
+              emptyDescription="调整关键词或筛选条件后再查看。"
+              emptyAction={
+                <ActionButton variant="outline" icon="x" onClick={resetFilters}>
+                  重置筛选
+                </ActionButton>
+              }
+            />
+          ) : loading ? (
+            <header className="vx-tenant-directory__header">
+              <span>正在加载自治数据</span>
+            </header>
           ) : records.length ? (
             <div
               className="vx-tenant-directory-cards vx-platform-governance-cards"
@@ -624,16 +502,9 @@ export function PlatformGovernanceListPage({
                           {record.scope} · {record.owner}
                         </span>
                       </div>
-                      <Badge
-                        className={`vx-platform-governance-status ${meta.className}`}
-                      >
-                        <Icon
-                          name={meta.icon}
-                          size="xs"
-                          fallback="placeholder"
-                        />
+                      <StatusBadge tone={meta.tone} icon={meta.icon}>
                         {meta.label}
-                      </Badge>
+                      </StatusBadge>
                     </header>
                     <p>{record.description}</p>
                     <div className="vx-platform-governance-card__tags">
@@ -651,7 +522,23 @@ export function PlatformGovernanceListPage({
                 );
               })}
             </div>
-          ) : null}
+          ) : (
+            <section className="vx-tenant-empty">
+              <EmptyState
+                title="暂无匹配记录"
+                description="调整关键词或筛选条件后再查看。"
+                action={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={resetFilters}
+                  >
+                    重置筛选
+                  </ActionButton>
+                }
+              />
+            </section>
+          )}
         </section>
       }
     />

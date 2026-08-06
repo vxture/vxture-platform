@@ -6,7 +6,7 @@ import {
   ActionMenu,
   Badge,
   Button,
-  Checkbox,
+  DataTable,
   DialogForm,
   EmptyState,
   FilterBar,
@@ -16,10 +16,12 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   activateModelPriceRule,
@@ -246,23 +248,24 @@ function modelTone(model: AiModelRecord) {
   return isPrivateProvider(model.provider) ? "private" : "active";
 }
 
+const LINK_STATUS_TONE: Record<ModelLinkStatus, StatusBadgeTone> = {
+  normal: "success",
+  abnormal: "danger",
+  checking: "info",
+};
+
+const LINK_STATUS_LABEL: Record<ModelLinkStatus, string> = {
+  normal: "正常",
+  abnormal: "异常",
+  checking: "检测中",
+};
+
 function detectModelLinkStatus(model: AiModelRecord): ModelLinkStatus {
   return model.endpointUrl.trim() &&
     model.protocol.trim() &&
     (model.keyReference === null || model.keyReference.configured)
     ? "normal"
     : "abnormal";
-}
-
-function isInteractiveTarget(target: EventTarget | null) {
-  return (
-    target instanceof HTMLElement &&
-    Boolean(
-      target.closest(
-        'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-      ),
-    )
-  );
 }
 
 function ModelOperationButtons({
@@ -513,14 +516,6 @@ export function ModelPlatformPage() {
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pageStart = (safeCurrentPage - 1) * pageSize;
   const pagedModels = filteredModels.slice(pageStart, pageStart + pageSize);
-  const pagedModelIds = pagedModels.map((model) => model.id);
-  const selectedOnPage = pagedModelIds.filter((id) =>
-    selectedModelIds.has(id),
-  ).length;
-  const isPageSelected =
-    pagedModelIds.length > 0 && selectedOnPage === pagedModelIds.length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < pagedModelIds.length;
   const selectedModel = selectedModelId
     ? (modelById.get(selectedModelId) ?? null)
     : null;
@@ -566,6 +561,74 @@ export function ModelPlatformPage() {
     const label = t(`providers.${provider}`);
     return label.startsWith("modelPlatformPage.providers.") ? provider : label;
   }
+
+  /* 列定义每次渲染重建：单元格取值依赖 t / 对话框开关等本次渲染的闭包，
+     memo 起来反而要把它们全列进依赖数组。 */
+  const modelColumns: DataTableColumn<AiModelRecord>[] = [
+    {
+      id: "model",
+      header: t("table.columns.model"),
+      cell: (model) => (
+        <TableTitleCell
+          icon={isPrivateProvider(model.provider) ? "code" : "plug"}
+          title={model.modelName}
+          description={model.modelCode}
+          onTitleClick={() => openEditModelDialog(model)}
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: t("table.columns.status"),
+      align: "center",
+      cell: (model) => (
+        <StatusBadge
+          tone={model.isActive ? "success" : "neutral"}
+          icon={model.isActive ? "check" : "x"}
+        >
+          {model.isActive ? t("status.active") : t("status.inactive")}
+        </StatusBadge>
+      ),
+    },
+    {
+      id: "link",
+      header: "链路状态",
+      align: "center",
+      cell: (model) => {
+        const link =
+          linkStatusByModelId[model.id] ?? detectModelLinkStatus(model);
+        return (
+          <StatusBadge tone={LINK_STATUS_TONE[link]}>
+            {LINK_STATUS_LABEL[link]}
+          </StatusBadge>
+        );
+      },
+    },
+    {
+      id: "source",
+      header: "来源",
+      cell: (model) => (
+        <TableTitleCell
+          title={providerLabel(model.provider)}
+          description={model.protocol}
+        />
+      ),
+    },
+    {
+      id: "capabilities",
+      header: "模型能力",
+      cell: (model) => (
+        <span className="flex flex-wrap gap-2xs">
+          {model.capabilities.slice(0, 3).map((capability) => (
+            <Badge key={capability}>{capability}</Badge>
+          ))}
+          {model.capabilities.length > 3 ? (
+            <Badge>+{model.capabilities.length - 3}</Badge>
+          ) : null}
+        </span>
+      ),
+    },
+  ];
 
   function handleReset() {
     setQuery("");
@@ -817,32 +880,6 @@ export function ModelPlatformPage() {
     } finally {
       setDetectingLinks(false);
     }
-  }
-
-  function toggleModelSelection(modelId: string, checked: boolean) {
-    setSelectedModelIds((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(modelId);
-      } else {
-        next.delete(modelId);
-      }
-      return next;
-    });
-  }
-
-  function togglePageSelection(checked: boolean) {
-    setSelectedModelIds((current) => {
-      const next = new Set(current);
-      for (const modelId of pagedModelIds) {
-        if (checked) {
-          next.add(modelId);
-        } else {
-          next.delete(modelId);
-        }
-      }
-      return next;
-    });
   }
 
   // ── Provider 写路径 ────────────────────────────────────────────────────────
@@ -1191,189 +1228,69 @@ export function ModelPlatformPage() {
               count: filteredModels.length,
             })}
           >
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>{t("empty.loadingTitle")}</span>
               </header>
             ) : null}
 
-            {pagedModels.length && viewMode === "list" ? (
-              <div
-                className="vx-tenant-directory-list vx-model-platform-directory-list"
-                role="region"
-                aria-label={t("table.toolbarTitle", {
-                  count: filteredModels.length,
-                })}
-              >
-                <div className="vx-tenant-directory-list__header">
-                  <span>
-                    <Checkbox
-                      className="vx-model-select-checkbox"
-                      checked={
-                        isPagePartiallySelected
-                          ? "indeterminate"
-                          : isPageSelected
-                      }
-                      onCheckedChange={(checked) =>
-                        togglePageSelection(checked === true)
-                      }
-                      aria-label="选择当前页模型"
-                    />
-                  </span>
-                  <span>#</span>
-                  <span>{t("table.columns.model")}</span>
-                  <span>{t("table.columns.status")}</span>
-                  <span>链路状态</span>
-                  <span>来源</span>
-                  <span>模型能力</span>
-                  <span>操作</span>
-                </div>
-                {pagedModels.map((model, index) => (
-                  <div
-                    key={model.id}
-                    className={`vx-tenant-directory-row vx-model-platform-row vx-model-platform-row--${modelTone(model)} ${selectedModelIds.has(model.id) ? "vx-model-platform-row--selected" : ""}`}
-                    title={`${model.modelName} · ${model.modelCode}`}
-                    onClick={(event) => {
-                      if (isInteractiveTarget(event.target)) return;
-                      toggleModelSelection(
-                        model.id,
-                        !selectedModelIds.has(model.id),
-                      );
-                    }}
+            {viewMode === "list" ? (
+              <DataTable
+                columns={modelColumns}
+                rows={pagedModels}
+                rowKey={(model) => model.id}
+                loading={loading}
+                indexStart={pageStart + 1}
+                selectedKeys={[...selectedModelIds]}
+                onSelectionChange={(keys) => setSelectedModelIds(new Set(keys))}
+                rowActions={(model) => (
+                  <ActionMenu
+                    label={t("actions.modelMenu", { name: model.modelName })}
+                    items={[
+                      {
+                        id: "edit",
+                        label: t("actions.editModel"),
+                        icon: "edit",
+                        onSelect: () => openEditModelDialog(model),
+                      },
+                      {
+                        id: "enable",
+                        label: t("actions.enableModel"),
+                        icon: "play",
+                        disabled: submitting || model.isActive,
+                        onSelect: () => void handleToggleModel(model),
+                      },
+                      {
+                        id: "disable",
+                        label: t("actions.disableModel"),
+                        icon: "stop",
+                        disabled: submitting || !model.isActive,
+                        onSelect: () => void handleToggleModel(model),
+                      },
+                      {
+                        id: "delete",
+                        label: t("actions.deleteModel"),
+                        icon: "trash",
+                        disabled: submitting || model.isActive,
+                        danger: true,
+                        onSelect: () => void handleDeleteModel(model),
+                      },
+                    ]}
+                  />
+                )}
+                emptyTitle={t("empty.title")}
+                emptyDescription={t("empty.description")}
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
                   >
-                    <span className="vx-model-platform-row__select">
-                      <Checkbox
-                        className="vx-model-select-checkbox"
-                        checked={selectedModelIds.has(model.id)}
-                        onClick={(event) => event.stopPropagation()}
-                        onCheckedChange={(checked) =>
-                          toggleModelSelection(model.id, checked === true)
-                        }
-                        aria-label={`选择 ${model.modelName}`}
-                      />
-                    </span>
-                    <span className="vx-tenant-directory-row__index">
-                      {formatNumber(pageStart + index + 1)}
-                    </span>
-                    <TableTitleCell
-                      className="vx-tenant-directory-row__tenant"
-                      icon={isPrivateProvider(model.provider) ? "code" : "plug"}
-                      title={model.modelName}
-                      description={model.modelCode}
-                      onTitleClick={() => openEditModelDialog(model)}
-                    />
-                    <span className="vx-model-platform-row__status">
-                      <span className="vx-tenant-directory-row__status-line">
-                        <span
-                          className={`vx-model-state-icon vx-model-state-icon--${model.isActive ? "active" : "inactive"}`}
-                          role="img"
-                          aria-label={
-                            model.isActive
-                              ? t("status.active")
-                              : t("status.inactive")
-                          }
-                          title={
-                            model.isActive
-                              ? t("status.active")
-                              : t("status.inactive")
-                          }
-                        >
-                          <Icon
-                            name={model.isActive ? "check" : "x"}
-                            size="xs"
-                            fallback="placeholder"
-                          />
-                        </span>
-                        <Badge
-                          className={`vx-tenant-pill vx-tenant-pill--${model.isActive ? "active" : "disabled"}`}
-                        >
-                          {model.isActive
-                            ? t("status.active")
-                            : t("status.inactive")}
-                        </Badge>
-                      </span>
-                    </span>
-                    <span className="vx-model-platform-row__link">
-                      <Badge
-                        className={`vx-tenant-pill vx-model-link-pill--${linkStatusByModelId[model.id] ?? detectModelLinkStatus(model)}`}
-                      >
-                        {(linkStatusByModelId[model.id] ??
-                          detectModelLinkStatus(model)) === "checking"
-                          ? "检测中"
-                          : (linkStatusByModelId[model.id] ??
-                                detectModelLinkStatus(model)) === "normal"
-                            ? "正常"
-                            : "异常"}
-                      </Badge>
-                    </span>
-                    <span className="vx-model-platform-row__source">
-                      <Badge
-                        className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
-                      >
-                        {providerLabel(model.provider)}
-                      </Badge>
-                      <small>{model.protocol}</small>
-                    </span>
-                    <span className="vx-model-platform-row__capabilities">
-                      <span className="vx-tenant-directory-row__tag-line">
-                        {model.capabilities.slice(0, 3).map((capability) => (
-                          <Badge
-                            key={capability}
-                            className="vx-tenant-pill vx-tenant-pill--permission"
-                          >
-                            {capability}
-                          </Badge>
-                        ))}
-                        {model.capabilities.length > 3 ? (
-                          <Badge className="vx-tenant-pill vx-tenant-pill--quota">
-                            +{model.capabilities.length - 3}
-                          </Badge>
-                        ) : null}
-                      </span>
-                    </span>
-                    <div
-                      className="vx-tenant-actions"
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <ActionMenu
-                        label={t("actions.modelMenu", {
-                          name: model.modelName,
-                        })}
-                        items={[
-                          {
-                            id: "edit",
-                            label: t("actions.editModel"),
-                            icon: "edit",
-                            onSelect: () => openEditModelDialog(model),
-                          },
-                          {
-                            id: "enable",
-                            label: t("actions.enableModel"),
-                            icon: "play",
-                            disabled: submitting || model.isActive,
-                            onSelect: () => void handleToggleModel(model),
-                          },
-                          {
-                            id: "disable",
-                            label: t("actions.disableModel"),
-                            icon: "stop",
-                            disabled: submitting || !model.isActive,
-                            onSelect: () => void handleToggleModel(model),
-                          },
-                          {
-                            id: "delete",
-                            label: t("actions.deleteModel"),
-                            icon: "trash",
-                            disabled: submitting || model.isActive,
-                            danger: true,
-                            onSelect: () => void handleDeleteModel(model),
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    {t("empty.resetFilters")}
+                  </ActionButton>
+                }
+              />
             ) : pagedModels.length ? (
               <div
                 className="vx-tenant-directory-cards vx-model-platform-cards"
