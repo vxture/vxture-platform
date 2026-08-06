@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { IDLE_MS, startIdleWatcher } from "@vxture/core-identity-sdk";
 import { buildRpLoginUrl, logout, restoreSession } from "@/api/admin-bff";
 import type { SessionSnapshot } from "@/entities/console";
 
@@ -79,6 +80,26 @@ export function AdminSessionProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
+  }, []);
+
+  /**
+   * 闲置钟。运营面 30 分钟，到点**直接登出，不弹窗询问**。
+   *
+   * "要不要继续"是消费级网银的 UX 惯例而非安全要求（NIST 800-63B 未要求），对
+   * 正在操作的人定期打断是荒谬的（owner 2026-08-07 判，见 workplans §二十三）。
+   * 判据由真实交互事件给出，不是请求频率——读长表格、填长表单的人一个请求都不发，
+   * 但他在场。
+   */
+  useEffect(() => {
+    return startIdleWatcher({
+      idleMs: IDLE_MS.workforce,
+      storageKey: "vx:admin:last-activity",
+      onIdle: () => {
+        void signOut();
+      },
+    });
+    // signOut 只依赖模块级的 logout 与两个 setter，身份稳定，不必进依赖数组。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function signOut() {

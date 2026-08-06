@@ -32,6 +32,12 @@ export {
 } from "./decide";
 
 export {
+  IDLE_MS,
+  startIdleWatcher,
+  type IdleWatcherOptions,
+} from "./idle";
+
+export {
   anonymousPresenceCookie,
   clearPresenceCookie,
   silentFailureReturnTo,
