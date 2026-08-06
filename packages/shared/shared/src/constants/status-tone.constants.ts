@@ -49,6 +49,8 @@ export type StatusTone =
 export const SUBSCRIPTION_STATUS_TONE: Record<SubscriptionStatus, StatusTone> =
   {
     active: "success",
+    // 权益仍在、只是快到期——值得留意但没出事，落 warning 不落 danger。
+    expiring: "warning",
     trialing: "info",
     overdue: "warning",
     suspended: "warning",

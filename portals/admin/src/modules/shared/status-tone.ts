@@ -122,16 +122,23 @@ export const RECONCILIATION_TONE: Record<
   unlinked: "neutral",
 };
 
-/** 订阅运营态。 */
+/**
+ * 订阅运营态。值域取自 `@vxture/shared`（七值），admin 不再自建。
+ *
+ * 三处按 `@shared` 的语义纠正：`trialing` 是"进行中"不是"要留意"，落 info；
+ * `overdue` 是欠费宽限、**权益仍在**，落 warning 不落 danger——用 danger 会让运营
+ * 以为服务已经停了；`expired` 是权益已终止，是一件已经结束的事，落 neutral。
+ */
 export const SUBSCRIPTION_OPERATION_TONE: Record<
   SubscriptionOperationStatus,
   StatusTone
 > = {
   active: "success",
-  trial: "warning",
   expiring: "warning",
-  overdue: "danger",
+  trialing: "info",
+  overdue: "warning",
   suspended: "danger",
+  expired: "neutral",
   cancelled: "neutral",
 };
 

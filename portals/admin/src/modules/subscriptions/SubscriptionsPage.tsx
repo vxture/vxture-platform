@@ -69,7 +69,7 @@ type RiskFilter = "all" | SubscriptionOperationQuotaRisk;
 type RenewFilter = "all" | "auto" | "manual";
 
 function subscriptionStatusLabel(status: SubscriptionOperationStatus) {
-  if (status === "trial") return "试用";
+  if (status === "trialing") return "试用";
   if (status === "active") return "已生效";
   if (status === "expiring") return "即将到期";
   if (status === "overdue") return "逾期";
@@ -79,7 +79,7 @@ function subscriptionStatusLabel(status: SubscriptionOperationStatus) {
 
 function subscriptionStatusIcon(status: SubscriptionOperationStatus): IconName {
   if (status === "active") return "check";
-  if (status === "trial" || status === "expiring") return "clock";
+  if (status === "trialing" || status === "expiring") return "clock";
   if (status === "cancelled") return "x";
   return "warning";
 }
@@ -516,7 +516,7 @@ export function SubscriptionsPage() {
   ).length;
   const followUpCount = subscriptions.filter(
     (item) =>
-      item.status === "trial" ||
+      item.status === "trialing" ||
       item.status === "expiring" ||
       item.status === "overdue" ||
       item.quota.risk !== "normal",
@@ -723,7 +723,7 @@ export function SubscriptionsPage() {
                 aria-label="订阅状态"
               >
                 <option value="all">全部状态</option>
-                <option value="trial">试用</option>
+                <option value="trialing">试用</option>
                 <option value="active">已生效</option>
                 <option value="expiring">即将到期</option>
                 <option value="overdue">逾期</option>

@@ -118,7 +118,7 @@ function restoreDisabledReason(order: OrderOperationDetailRecord) {
 function subscriptionStatusLabel(
   status: OrderOperationDetailRecord["subscriptionStatus"],
 ) {
-  if (status === "trial") return "试用";
+  if (status === "trialing") return "试用";
   if (status === "active") return "已生效";
   if (status === "expiring") return "即将到期";
   if (status === "overdue") return "逾期";
