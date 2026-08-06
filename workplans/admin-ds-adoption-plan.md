@@ -454,3 +454,34 @@ pill 引用 266 → 210 处，选择器 239 → 146 个，admin CSS 6484 → 627
 `admin-management-pills-products-service-plans.css` 清空后删除。
 
 **复测**：pill 引用 266 → 173 处，选择器 239 → 93 个，admin CSS 6484 → 6087 行。
+
+### 第四刀：拆掉 `vx-tenant-pill` 这个漏斗（2026-08-06）
+
+39 档、12 个值域共用一个前缀，`.vx-tenant-pill--active` 一条规则同时是「租户正常」
+「成员在职」「订阅生效」「模型已启用」。按值域拆成 6 张表（新文件
+`modules/shared/tenant-tone.ts`）。
+
+**按值域拆表立刻逼出四个缺口**，全是 `Record` 报出来的，肉眼看不到：
+
+1. **成员态 `invited` 没有颜色**——值域三个值，CSS 只画了两个，已邀请未加入的成员
+   一直是默认样式。归 `brand`（新来的，等人接手），与账号态的 `invited` 同档。
+2. **策略态 `disabled` 没有颜色**——值域四个值，CSS 画了三个。归 `neutral`：
+   "关掉了"不是"配错了"，与 `undefined`（没配）的红分开。
+3. **租户详情页的订阅态和订阅列表页不是一个值域**：这里是
+   `TenantOperationSubscription.status`（trial/active/**past_due**/cancelled），
+   那里是 `SubscriptionOperationStatus`（…/**overdue**/…）。同一件"欠费"两个名字。
+   这正是 TD #33 的契约漂移——此前两边都往同一个 CSS 前缀里塞，撞不出来。
+   本轮只如实建表，改名连 BFF 与 view-model 一起动，仍归 #33。
+4. **`past_due` 不是死档**——我先前按"类名全仓 0 引用"判它已死，错了：它由模板拼接
+   产生（`--${subscription.status}`），字面量搜不到。判死码必须考虑模板拼接，
+   这条 `admin-table-consolidation.md` 已经记过一次，这里又踩。
+
+**另一处自我纠正**：`modules/tenants/tenant-utils.ts` **早就有**
+`TENANT_STATUS_TONE` / `VERIFICATION_TONE` / `TENANT_RISK_TONE` 三张表，而且已经在用
+`info`（试用=进行中、待审=流程中）。我一度重建了同名表，且此前说"`info` 从来没被
+用过"——那只对 `status-tone.ts` 成立，说过头了。重复的已删，调用点改指既有表。
+
+**复测**：className 用法 266 → 40 处，选择器 239 → 50 个，admin CSS 6484 → 5977 行，
+`admin-management-pills-directory.css` 清空后删除。剩下的 40 处全是**分类标与等级标**
+（`--source` / `--cycle` / `--tier-*` / 权限层 L1–L3 / 产品能力 mode·tag / 角色 api·menu·button），
+按定好的规矩它们本就留在 admin。

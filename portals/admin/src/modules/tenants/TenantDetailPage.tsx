@@ -5,7 +5,6 @@ import type { FormEvent, ReactNode } from "react";
 import Link from "next/link";
 import {
   ActionMenu,
-  Badge,
   Button,
   DetailPageTemplate,
   DialogForm,
@@ -13,6 +12,7 @@ import {
   Icon,
   Input,
   NativeSelect,
+  StatusBadge,
   useToast,
   ViewLayout,
   ViewModeSwitch,
@@ -35,6 +35,14 @@ import type {
   TenantOperationSubscription,
   TenantOperationUsageMetric,
 } from "@/entities/console";
+import {
+  AUDIT_RESULT_TONE,
+  MEMBER_STATUS_TONE,
+  POLICY_STATE_TONE,
+  TENANT_SUBSCRIPTION_TONE,
+  TICKET_STATUS_TONE,
+} from "@/modules/shared/tenant-tone";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import { resolveIpLocation } from "@/shared/ip-location";
 import {
@@ -45,12 +53,16 @@ import {
   joinClasses,
   memberStatusLabel,
   modelPolicyStateLabel,
+  normalizeTenantRiskLevel,
   policySourceLabel,
   riskLabel,
   statusLabel,
   subscriptionStatusLabel,
+  TENANT_RISK_TONE,
+  TENANT_STATUS_TONE,
   ticketStatusLabel,
   usagePercent,
+  VERIFICATION_TONE,
   verifiedLabel,
 } from "./tenant-utils";
 
@@ -406,15 +418,13 @@ function TenantInfoTab({
                   ))}
                 </NativeSelect>
               ) : (
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--${draft.tenantType}`}
-                >
+                <StatusBadge tone={categoryTone()}>
                   {
                     tenantTypeOptions.find(
                       (option) => option.value === draft.tenantType,
                     )?.label
                   }
-                </Badge>
+                </StatusBadge>
               )}
             </TenantConfigItem>
             <TenantConfigItem label="租户状态">
@@ -436,19 +446,15 @@ function TenantInfoTab({
                   ))}
                 </NativeSelect>
               ) : (
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--${draft.status}`}
-                >
+                <StatusBadge tone={TENANT_STATUS_TONE[draft.status]}>
                   {statusLabel(draft.status)}
-                </Badge>
+                </StatusBadge>
               )}
             </TenantConfigItem>
             <TenantConfigItem label="认证状态">
-              <Badge
-                className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
-              >
+              <StatusBadge tone={VERIFICATION_TONE[tenant.verifiedStatus]}>
                 {verifiedLabel(tenant.verifiedStatus)}
-              </Badge>
+              </StatusBadge>
             </TenantConfigItem>
           </div>
 
@@ -475,9 +481,7 @@ function TenantInfoTab({
             <TenantConfigValue>
               {tenant.ownerName}
               {tenant.tenantType === "individual" ? (
-                <Badge className="vx-tenant-pill vx-tenant-pill--owner">
-                  owner
-                </Badge>
+                <StatusBadge tone={categoryTone()}>owner</StatusBadge>
               ) : null}
             </TenantConfigValue>
           </TenantConfigItem>
@@ -593,11 +597,9 @@ function TenantMemberStatus({ member }: { member: TenantOperationMember }) {
 
   return (
     <span className="vx-tenant-member-row__status">
-      <Badge
-        className={`vx-tenant-pill vx-tenant-member-status-pill vx-tenant-pill--${member.status}`}
-      >
+      <StatusBadge tone={MEMBER_STATUS_TONE[member.status]}>
         {memberStatusLabel(member.status)}
-      </Badge>
+      </StatusBadge>
       <small
         title={`注册激活时间 ${statusTime}`}
         aria-label={`注册激活时间 ${statusTime}`}
@@ -655,9 +657,7 @@ function TenantMemberList({
           </span>
           <TenantMemberIdentity member={member} />
           <span className="vx-tenant-member-row__permission">
-            <Badge className="vx-tenant-pill vx-tenant-pill--permission">
-              {member.role}
-            </Badge>
+            <StatusBadge tone={categoryTone()}>{member.role}</StatusBadge>
           </span>
           <TenantMemberStatus member={member} />
           <TenantMemberActiveAt member={member} />
@@ -707,14 +707,10 @@ function TenantMemberCards({
               <MemberActionsMenu member={member} actions={actions} />
             </header>
             <div className="vx-tenant-member-card__badges">
-              <Badge className="vx-tenant-pill vx-tenant-pill--permission">
-                {member.role}
-              </Badge>
-              <Badge
-                className={`vx-tenant-pill vx-tenant-member-status-pill vx-tenant-pill--${member.status}`}
-              >
+              <StatusBadge tone={categoryTone()}>{member.role}</StatusBadge>
+              <StatusBadge tone={MEMBER_STATUS_TONE[member.status]}>
                 {memberStatusLabel(member.status)}
-              </Badge>
+              </StatusBadge>
             </div>
             <div className="vx-tenant-member-card__metrics">
               <span>
@@ -956,15 +952,15 @@ function TenantMembersTab({ tenantId }: { tenantId: string }) {
           {formatNumber(filteredMembers.length)}
         </span>
         <div className="vx-tenant-member-summary" aria-label="账号统计">
-          <Badge className="vx-tenant-pill vx-tenant-pill--active">
+          <StatusBadge tone={"success"}>
             活跃 {formatNumber(activeCount)}
-          </Badge>
-          <Badge className="vx-tenant-pill vx-tenant-pill--invited">
+          </StatusBadge>
+          <StatusBadge tone={"brand"}>
             邀请 {formatNumber(invitedCount)}
-          </Badge>
-          <Badge className="vx-tenant-pill vx-tenant-pill--suspended">
+          </StatusBadge>
+          <StatusBadge tone={"danger"}>
             停用 {formatNumber(suspendedCount)}
-          </Badge>
+          </StatusBadge>
         </div>
         <span className="vx-tenant-toolbar__spacer" aria-hidden="true" />
         <Input
@@ -1128,11 +1124,9 @@ function TenantSubscriptionsTab({
               <strong>{subscription.productName}</strong>
               <span>{subscription.releaseName}</span>
             </div>
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--${subscription.status}`}
-            >
+            <StatusBadge tone={TENANT_SUBSCRIPTION_TONE[subscription.status]}>
               {subscriptionStatusLabel(subscription.status)}
-            </Badge>
+            </StatusBadge>
           </header>
           <div className="vx-tenant-subscription__metrics">
             <TenantKeyMetric label="发布版本" value={subscription.planName} />
@@ -1214,9 +1208,9 @@ function TenantModelsTab({
             {formatNumber(policy.quotaTokens)}
           </span>
           <span>
-            <Badge className={`vx-tenant-pill vx-tenant-pill--${policy.state}`}>
+            <StatusBadge tone={POLICY_STATE_TONE[policy.state]}>
               {modelPolicyStateLabel(policy.state)}
-            </Badge>
+            </StatusBadge>
           </span>
         </div>
       ))}
@@ -1257,9 +1251,9 @@ function TenantRiskTab({ tenant }: { tenant: TenantOperationRecord }) {
               <small>{event.actor}</small>
             </span>
             <em>{formatDate(event.at)}</em>
-            <Badge className={`vx-tenant-pill vx-tenant-pill--${event.result}`}>
+            <StatusBadge tone={AUDIT_RESULT_TONE[event.result]}>
               {auditResultLabel(event.result)}
-            </Badge>
+            </StatusBadge>
           </div>
         ))}
       </section>
@@ -1292,9 +1286,9 @@ function TenantTicketsTab({ tenant }: { tenant: TenantOperationRecord }) {
               {ticket.id} · {ticket.priority.toUpperCase()}
             </small>
           </span>
-          <Badge className={`vx-tenant-pill vx-tenant-pill--${ticket.status}`}>
+          <StatusBadge tone={TICKET_STATUS_TONE[ticket.status]}>
             {ticketStatusLabel(ticket.status)}
-          </Badge>
+          </StatusBadge>
           <em>{formatDate(ticket.updatedAt)}</em>
         </article>
       ))}
@@ -1528,21 +1522,23 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
                     </Button>
                   </div>
                   <div>
-                    <Badge
-                      className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
-                    >
+                    <StatusBadge tone={TENANT_STATUS_TONE[tenant.status]}>
                       {statusLabel(tenant.status)}
-                    </Badge>
-                    <Badge
-                      className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
+                    </StatusBadge>
+                    <StatusBadge
+                      tone={VERIFICATION_TONE[tenant.verifiedStatus]}
                     >
                       {verifiedLabel(tenant.verifiedStatus)}
-                    </Badge>
-                    <Badge
-                      className={`vx-tenant-pill vx-tenant-pill--risk-${tenant.riskLevel}`}
+                    </StatusBadge>
+                    <StatusBadge
+                      tone={
+                        TENANT_RISK_TONE[
+                          normalizeTenantRiskLevel(tenant.riskLevel)
+                        ]
+                      }
                     >
                       {riskLabel(tenant.riskLevel)}
-                    </Badge>
+                    </StatusBadge>
                   </div>
                 </div>
               </section>

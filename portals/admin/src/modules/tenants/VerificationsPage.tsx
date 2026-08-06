@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
-  Badge,
   Banner,
   DataTable,
   DialogForm,
@@ -28,6 +27,7 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -51,6 +51,7 @@ import {
   joinClasses,
   normalizeTenantRiskLevel,
   riskLabel,
+  TENANT_RISK_TONE,
   tenantRiskOptions,
   verifiedLabel,
 } from "./tenant-utils";
@@ -294,12 +295,8 @@ function useVerificationColumns(): DataTableColumn<VerificationRow>[] {
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <Badge className="vx-tenant-pill vx-tenant-pill--company">
-                {tenant.industry}
-              </Badge>
-              <Badge className="vx-tenant-pill vx-verification-muted-pill">
-                {tenant.scale}
-              </Badge>
+              <StatusBadge tone={categoryTone()}>{tenant.industry}</StatusBadge>
+              <StatusBadge tone={categoryTone()}>{tenant.scale}</StatusBadge>
             </span>
           }
           description={tenant.tenantName}
@@ -390,11 +387,9 @@ function VerificationCards({
               <StatusBadge tone={VERIFIED_TONE[tenant.verifiedStatus]}>
                 {verifiedLabel(tenant.verifiedStatus)}
               </StatusBadge>
-              <Badge
-                className={`vx-tenant-pill vx-tenant-pill--risk-${riskLevel}`}
-              >
+              <StatusBadge tone={TENANT_RISK_TONE[riskLevel]}>
                 {riskLabel(riskLevel)}
-              </Badge>
+              </StatusBadge>
             </div>
             <div className="vx-tenant-directory-card__metrics">
               <span>

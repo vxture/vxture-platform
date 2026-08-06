@@ -37,6 +37,7 @@ import type {
   PlatformAdminPermissionRecord,
   PlatformPermissionType,
 } from "@/entities/console";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { formatNumber, joinClasses } from "@/modules/tenants/tenant-utils";
 import { useStepUp, isStepUpCancelled } from "@/providers/StepUpProvider";
@@ -758,9 +759,9 @@ function PermissionDetailDialog({
           </div>
         </header>
         <div className="vx-admin-role-permission-dialog__summary">
-          <Badge className="vx-tenant-pill vx-tenant-pill--system">
+          <StatusBadge tone={categoryTone()}>
             {permissionTypeMetaOf(permission.permType).label}
-          </Badge>
+          </StatusBadge>
           <StatusBadge tone={permission.status ? "success" : "neutral"}>
             <Icon
               name={statusIndicator.icon}
@@ -769,9 +770,9 @@ function PermissionDetailDialog({
             />
             {statusIndicator.label}
           </StatusBadge>
-          <Badge className="vx-tenant-pill vx-tenant-pill--system">
+          <StatusBadge tone={categoryTone()}>
             {permissionSourceLabel(permission)}
-          </Badge>
+          </StatusBadge>
         </div>
         <dl className="vx-admin-permission-detail-dialog__grid">
           <div>
@@ -901,9 +902,9 @@ function PermissionCardGrid({
               </span>
               <div>
                 <strong>{permissionDisplayName(permission)}</strong>
-                <Badge className="vx-tenant-pill vx-tenant-pill--system">
+                <StatusBadge tone={categoryTone()}>
                   {permissionSourceLabel(permission)}
-                </Badge>
+                </StatusBadge>
               </div>
               <PermissionActionsMenu
                 permission={permission}
@@ -913,9 +914,7 @@ function PermissionCardGrid({
               />
             </header>
             <span className="vx-admin-permission-card__type">
-              <Badge className="vx-tenant-pill vx-tenant-pill--system">
-                {meta.label}
-              </Badge>
+              <StatusBadge tone={categoryTone()}>{meta.label}</StatusBadge>
             </span>
             <dl>
               <div>
@@ -1036,14 +1035,12 @@ function PermissionTreeNodeView({
                 {depth === 0 ? "根权限" : `L${depth}`}
               </Badge>
               {children.length ? (
-                <Badge className="vx-tenant-pill vx-tenant-pill--system">
+                <StatusBadge tone={categoryTone()}>
                   {formatNumber(children.length)} 子级
-                </Badge>
+                </StatusBadge>
               ) : null}
               {isSectionPermission(permission) ? (
-                <Badge className="vx-tenant-pill vx-tenant-pill--system">
-                  业务分组
-                </Badge>
+                <StatusBadge tone={categoryTone()}>业务分组</StatusBadge>
               ) : null}
             </span>
           </span>
@@ -1059,14 +1056,12 @@ function PermissionTreeNodeView({
           </StatusBadge>
         </span>
         <span className="vx-admin-permission-tree-node__type">
-          <Badge className="vx-tenant-pill vx-tenant-pill--system">
-            {meta.label}
-          </Badge>
+          <StatusBadge tone={categoryTone()}>{meta.label}</StatusBadge>
         </span>
         <span className="vx-admin-permission-tree-node__source">
-          <Badge className="vx-tenant-pill vx-tenant-pill--system">
+          <StatusBadge tone={categoryTone()}>
             {permissionSourceLabel(permission)}
-          </Badge>
+          </StatusBadge>
         </span>
         <span className="vx-admin-permission-tree-node__roles">
           <strong>

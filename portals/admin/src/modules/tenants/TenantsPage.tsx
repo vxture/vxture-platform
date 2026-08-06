@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
-  Badge,
   Banner,
   DataTable,
   EmptyState,
   FilterBar,
-  Icon,
   Input,
   ListCardGrid,
   ListPageTemplate,
@@ -22,6 +20,7 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -136,8 +135,8 @@ function TenantActionsMenu({
 }
 
 /**
- * 行内的状态标仍是 pill（`vx-tenant-pill--*`）而非 `StatusBadge`：那一族是业务
- * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ * 状态标走 `StatusBadge`，语气按值域各自取表（`tenant-tone.ts`）——这一族此前
+ * 是 12 个值域共用一个 CSS 前缀，见那个文件的文件头。
  */
 function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
   const router = useRouter();
@@ -171,20 +170,16 @@ function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
         const indicator = tenantStatusIndicator(tenant);
         return (
           <span className="inline-flex flex-wrap items-center justify-center gap-2xs">
-            {/* 记号图标放在标**内**：它靠标的文字色着色，摆在标外面会退成表格
-                的正文灰，一列状态里只有它没有语气。 */}
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
+            <StatusBadge
+              tone={TENANT_STATUS_TONE[tenant.status]}
+              icon={indicator.icon}
               title={indicator.label}
             >
-              <Icon name={indicator.icon} size="xs" fallback="placeholder" />
               {statusLabel(tenant.status)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={VERIFICATION_TONE[tenant.verifiedStatus]}>
               {verifiedLabel(tenant.verifiedStatus)}
-            </Badge>
+            </StatusBadge>
           </span>
         );
       },
@@ -196,12 +191,12 @@ function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
       cell: (tenant) => (
         <TableTitleCell
           title={
-            <Badge className="vx-tenant-pill vx-tenant-pill--product">
+            <StatusBadge tone={categoryTone()}>
               {formatNumber(
                 tenant.subscriptions.length || tenant.subscriptionCount,
               )}{" "}
               产品
-            </Badge>
+            </StatusBadge>
           }
           description={`本月：¥ ${formatNumber(tenant.monthlyRevenue)} 元`}
         />
@@ -220,11 +215,9 @@ function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
         return (
           <TableTitleCell
             title={
-              <Badge
-                className={`vx-tenant-pill vx-tenant-pill--risk-${riskLevel}`}
-              >
+              <StatusBadge tone={TENANT_RISK_TONE[riskLevel]}>
                 {riskLabel(riskLevel)}
-              </Badge>
+              </StatusBadge>
             }
             description={`总工单 ${formatNumber(ticketTotal)} | 待处理 ${formatNumber(tenant.ticketOpenCount)}`}
           />

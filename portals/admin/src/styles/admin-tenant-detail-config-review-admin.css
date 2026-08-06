@@ -6,7 +6,8 @@
   justify-content: flex-end;
   gap: var(--vx-admin-management-space-05r);
   padding-bottom: var(--vx-admin-management-space-075r);
-  border-bottom: var(--vx-admin-management-line-width-1p) dashed var(--vx-color-auth-border);
+  border-bottom: var(--vx-admin-management-line-width-1p) dashed
+    var(--vx-color-auth-border);
 }
 
 .vx-tenant-review-field,
@@ -54,7 +55,8 @@
 
 .vx-tenant-readonly-field {
   padding-bottom: var(--vx-admin-management-space-075r);
-  border-bottom: var(--vx-admin-management-line-width-1p) dashed var(--vx-color-auth-border);
+  border-bottom: var(--vx-admin-management-line-width-1p) dashed
+    var(--vx-color-auth-border);
 }
 
 .vx-tenant-readonly-field strong {
@@ -70,7 +72,11 @@
   min-width: 0;
   display: grid;
   grid-template-columns:
-    minmax(var(--vx-admin-management-track-9r), 0.85fr) minmax(var(--vx-admin-management-grid-column-md), 1.2fr) minmax(var(--vx-admin-management-track-8r), 0.7fr)
+    minmax(var(--vx-admin-management-track-9r), 0.85fr) minmax(
+      var(--vx-admin-management-grid-column-md),
+      1.2fr
+    )
+    minmax(var(--vx-admin-management-track-8r), 0.7fr)
     auto;
   align-items: center;
   gap: var(--vx-admin-management-space-1r);
@@ -93,9 +99,4 @@
   font-weight: 780;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.vx-tenant-pill--owner {
-  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
-  color: var(--tenant-blue);
 }

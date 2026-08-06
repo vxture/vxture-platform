@@ -22,6 +22,7 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -351,9 +352,9 @@ function useAccountColumns(
       cell: (account) => (
         <TableTitleCell
           title={
-            <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--permission">
+            <StatusBadge tone={categoryTone()}>
               {accountHighestRoleLabel(account)}
-            </Badge>
+            </StatusBadge>
           }
           description={
             showTenantContext
@@ -370,9 +371,9 @@ function useAccountColumns(
       cell: (account) => (
         <TableTitleCell
           title={
-            <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--product">
+            <StatusBadge tone={categoryTone()}>
               {account.lastActiveLocation}
-            </Badge>
+            </StatusBadge>
           }
           description={`${formatDate(account.lastActiveAt)} · ${formatNumber(account.loginCount30d)} 次`}
         />
@@ -423,9 +424,9 @@ function AccountCards({
                   </Badge>
                 ))
               : null}
-            <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--permission">
+            <StatusBadge tone={categoryTone()}>
               {accountHighestRoleLabel(account)}
-            </Badge>
+            </StatusBadge>
           </div>
           <div className="vx-tenant-directory-card__metrics">
             {showTenantContext ? (

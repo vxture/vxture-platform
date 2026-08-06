@@ -22,6 +22,8 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
+import { activeTone } from "@/modules/shared/tenant-tone";
+import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   activateModelPriceRule,
@@ -1336,13 +1338,11 @@ export function ModelPlatformPage() {
                       >
                         {providerLabel(model.provider)}
                       </Badge>
-                      <Badge
-                        className={`vx-tenant-pill vx-tenant-pill--${model.isActive ? "active" : "disabled"}`}
-                      >
+                      <StatusBadge tone={activeTone(model.isActive)}>
                         {model.isActive
                           ? t("status.active")
                           : t("status.inactive")}
-                      </Badge>
+                      </StatusBadge>
                     </div>
                     <div className="vx-tenant-directory-card__metrics">
                       <span>
@@ -1475,16 +1475,14 @@ export function ModelPlatformPage() {
                     />
                   </header>
                   <div className="vx-tenant-directory-card__badges">
-                    <Badge className="vx-tenant-pill vx-tenant-pill--permission">
+                    <StatusBadge tone={categoryTone()}>
                       {provider.providerType}
-                    </Badge>
-                    <Badge
-                      className={`vx-tenant-pill vx-tenant-pill--${provider.isActive ? "active" : "disabled"}`}
-                    >
+                    </StatusBadge>
+                    <StatusBadge tone={activeTone(provider.isActive)}>
                       {provider.isActive
                         ? t("status.active")
                         : t("status.inactive")}
-                    </Badge>
+                    </StatusBadge>
                   </div>
                 </article>
               ))}
@@ -1561,16 +1559,14 @@ export function ModelPlatformPage() {
                       />
                     </header>
                     <div className="vx-tenant-directory-card__badges">
-                      <Badge className="vx-tenant-pill vx-tenant-pill--permission">
+                      <StatusBadge tone={categoryTone()}>
                         {rule.currency}
-                      </Badge>
-                      <Badge
-                        className={`vx-tenant-pill vx-tenant-pill--${rule.isActive ? "active" : "disabled"}`}
-                      >
+                      </StatusBadge>
+                      <StatusBadge tone={activeTone(rule.isActive)}>
                         {rule.isActive
                           ? t("status.active")
                           : t("status.inactive")}
-                      </Badge>
+                      </StatusBadge>
                     </div>
                     <div className="vx-tenant-directory-card__metrics">
                       <span>
