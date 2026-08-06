@@ -1509,7 +1509,14 @@ export interface AccountOperationRecord {
   tenantBindings: AccountTenantBinding[];
 }
 
-export type PlatformPermissionType = "MENU" | "BUTTON" | "API";
+/**
+ * platform_permissions.perm_type 的真实取值——**小写**，与接口返回一致
+ * （`/api/admin-permissions` 实测 2026-08-06：55 条全是 "api"）。
+ *
+ * 此前声明为大写 MENU|BUTTON|API，前端据此建的查表全部落空，权限树整页崩在
+ * `meta.className` 上。类型说的是契约，不是期望。
+ */
+export type PlatformPermissionType = "menu" | "button" | "api";
 
 export interface PlatformRolePermissionRecord {
   id: string;

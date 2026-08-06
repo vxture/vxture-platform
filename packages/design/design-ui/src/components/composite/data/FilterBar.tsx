@@ -101,7 +101,8 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
               aria-label={resetLabel}
               title={resetLabel}
             >
-              <Icon name="x" size="sm" aria-hidden="true" />
+              {/* 回转箭头，不是叉：叉是"关掉"，这里做的是"复位"。 */}
+              <Icon name="undo" size="sm" aria-hidden="true" />
             </Button>
           ) : null}
           {children}

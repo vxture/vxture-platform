@@ -314,12 +314,12 @@ function AdminRolePermissionDialog({
       PlatformPermissionType,
       PlatformRoleRecord["permissions"]
     > = {
-      MENU: [],
-      BUTTON: [],
-      API: [],
+      menu: [],
+      button: [],
+      api: [],
     };
     for (const permission of role.permissions) {
-      groups[permission.permType].push(permission);
+      groups[permission.permType]?.push(permission);
     }
     return groups;
   }, [role.permissions]);
@@ -358,15 +358,15 @@ function AdminRolePermissionDialog({
           </Badge>
         </div>
         <div className="vx-admin-role-permission-dialog__body">
-          {(["MENU", "BUTTON", "API"] as const).map((type) => (
+          {(["menu", "button", "api"] as const).map((type) => (
             <section
               key={type}
               className="vx-admin-role-permission-dialog__group"
             >
               <h3>
-                {type === "MENU"
+                {type === "menu"
                   ? "菜单权限"
-                  : type === "BUTTON"
+                  : type === "button"
                     ? "按钮权限"
                     : "接口权限"}
               </h3>
@@ -445,9 +445,9 @@ function PermissionAuthorizationNode({
             <Badge
               className={`vx-tenant-pill vx-admin-role-pill--${node.permission.permType.toLowerCase()}`}
             >
-              {node.permission.permType === "MENU"
+              {node.permission.permType === "menu"
                 ? "菜单"
-                : node.permission.permType === "BUTTON"
+                : node.permission.permType === "button"
                   ? "按钮"
                   : "接口"}
             </Badge>
@@ -553,13 +553,13 @@ function AdminRoleAuthorizationDialog({
     selectedIds.has(permission.id),
   );
   const selectedMenuCount = selectedPermissions.filter(
-    (permission) => permission.permType === "MENU",
+    (permission) => permission.permType === "menu",
   ).length;
   const selectedButtonCount = selectedPermissions.filter(
-    (permission) => permission.permType === "BUTTON",
+    (permission) => permission.permType === "button",
   ).length;
   const selectedApiCount = selectedPermissions.filter(
-    (permission) => permission.permType === "API",
+    (permission) => permission.permType === "api",
   ).length;
   const changed =
     role.permissions.length !== selectedIds.size ||
@@ -1650,9 +1650,9 @@ export function AdminRolesPage() {
                 aria-label="权限类型"
               >
                 <option value="all">全部权限</option>
-                <option value="MENU">菜单</option>
-                <option value="BUTTON">按钮</option>
-                <option value="API">接口</option>
+                <option value="menu">菜单</option>
+                <option value="button">按钮</option>
+                <option value="api">接口</option>
                 <option value="empty">未授权</option>
               </NativeSelect>
             </div>

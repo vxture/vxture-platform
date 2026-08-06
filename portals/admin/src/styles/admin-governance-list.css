@@ -1,9 +1,5 @@
 /* Admin platform governance list shell styles. Component dimensions are owned by DS tokens. */
 
-.vx-platform-governance-page {
-  max-width: var(--vx-admin-governance-page-max-width);
-}
-
 .vx-platform-governance-directory {
   min-width: 0;
 }

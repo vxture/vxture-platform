@@ -327,7 +327,7 @@ export function PlatformAutonomyPage() {
         />
       }
       entries={
-        <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-4">
           {autonomyDomains.map((domain) => (
             <PanelCard
               key={domain.title}

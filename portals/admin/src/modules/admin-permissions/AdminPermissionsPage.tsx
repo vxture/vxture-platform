@@ -56,22 +56,36 @@ const DEFAULT_DOMAIN_FILTERS: DomainFilterState = {
 };
 
 const permissionTypeMeta = {
-  MENU: {
+  menu: {
     label: "菜单",
     icon: "table",
     className: "vx-admin-permission-type--menu",
   },
-  BUTTON: {
+  button: {
     label: "按钮",
     icon: "check",
     className: "vx-admin-permission-type--button",
   },
-  API: {
+  api: {
     label: "接口",
     icon: "api",
     className: "vx-admin-permission-type--api",
   },
 } as const;
+
+/** 查不到就退回中性档：一个没见过的类型不该让整棵权限树崩掉。 */
+const UNKNOWN_PERMISSION_TYPE = {
+  label: "未知类型",
+  icon: "info",
+  className: "",
+} as const;
+
+function permissionTypeMetaOf(type: string) {
+  return (
+    permissionTypeMeta[type as keyof typeof permissionTypeMeta] ??
+    UNKNOWN_PERMISSION_TYPE
+  );
+}
 
 function permissionStatusIndicator(permission: PlatformAdminPermissionRecord): {
   label: string;
@@ -492,7 +506,7 @@ interface PermissionFormState {
 const EMPTY_PERMISSION_FORM: PermissionFormState = {
   permCode: "",
   permName: "",
-  permType: "MENU",
+  permType: "menu",
   parentId: "",
   routePath: "",
   component: "",
@@ -596,9 +610,9 @@ function PermissionFormDialog({
               })
             }
           >
-            <option value="MENU">菜单</option>
-            <option value="BUTTON">按钮</option>
-            <option value="API">接口</option>
+            <option value="menu">菜单</option>
+            <option value="button">按钮</option>
+            <option value="api">接口</option>
           </NativeSelect>
         </Label>
         <Label>
@@ -744,7 +758,7 @@ function PermissionDetailDialog({
         </header>
         <div className="vx-admin-role-permission-dialog__summary">
           <Badge className="vx-tenant-pill vx-tenant-pill--system">
-            {permissionTypeMeta[permission.permType].label}
+            {permissionTypeMetaOf(permission.permType).label}
           </Badge>
           <Badge
             className={`vx-tenant-pill ${permission.status ? "vx-admin-role-status-pill--enabled" : "vx-admin-role-status-pill--disabled"}`}
@@ -864,7 +878,7 @@ function PermissionCardGrid({
   return (
     <div className="vx-admin-permission-card-grid" aria-label="权限卡片清单">
       {flattenedNodes.map(({ permission, depth }) => {
-        const meta = permissionTypeMeta[permission.permType];
+        const meta = permissionTypeMetaOf(permission.permType);
         const statusIndicator = permissionStatusIndicator(permission);
 
         return (
@@ -954,7 +968,7 @@ function PermissionTreeNodeView({
   onTogglePermission: (permission: PlatformAdminPermissionRecord) => void;
 }) {
   const { permission, children, depth } = node;
-  const meta = permissionTypeMeta[permission.permType];
+  const meta = permissionTypeMetaOf(permission.permType);
   const expanded = expandedIds.has(permission.id);
   const titleClassName =
     isSectionPermission(permission) || depth === 0
@@ -1184,9 +1198,9 @@ function PermissionDomainSection({
             aria-label={`${group.title}权限类型`}
           >
             <option value="all">全部类型</option>
-            <option value="MENU">菜单权限</option>
-            <option value="BUTTON">按钮权限</option>
-            <option value="API">接口权限</option>
+            <option value="menu">菜单权限</option>
+            <option value="button">按钮权限</option>
+            <option value="api">接口权限</option>
           </NativeSelect>
           <NativeSelect
             className="vx-input vx-tenant-select"
