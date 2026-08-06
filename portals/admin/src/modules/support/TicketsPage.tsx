@@ -7,7 +7,7 @@ import {
   ActionMenu,
   Badge,
   Button,
-  Checkbox,
+  DataTable,
   DetailList,
   DetailRow,
   DialogForm,
@@ -22,7 +22,7 @@ import {
   Textarea,
   ViewLayout,
 } from "@vxture/design-system";
-import type { IconName } from "@vxture/design-system";
+import type { DataTableColumn, IconName } from "@vxture/design-system";
 import {
   AdminBffError,
   addTicketComment,
@@ -193,101 +193,88 @@ function TicketActionsMenu({
   );
 }
 
-function TicketRow({
-  ticket,
-  index,
-  selected,
-  onToggleSelected,
-  onOpenDetail,
-}: {
-  ticket: SupportTicketRecord;
-  index: number;
-  selected: boolean;
-  onToggleSelected: (checked: boolean) => void;
-  onOpenDetail: (ticket: SupportTicketRecord) => void;
-}) {
-  const tone = ticketTone(ticket);
+/** 工单号只在租户内唯一，行 key 必须带上租户。 */
+function ticketKey(ticket: SupportTicketRecord) {
+  return `${ticket.tenantId}-${ticket.id}`;
+}
+
+/**
+ * 行内的状态/优先级标仍是 pill（`vx-commercial-pill--*`）而非 `StatusBadge`：
+ * 那一族与商业域各页共用，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ */
+function useTicketColumns(): DataTableColumn<SupportTicketRecord>[] {
   const router = useRouter();
 
-  return (
-    <div
-      className={`vx-tenant-directory-row vx-ticket-row vx-ticket-operation-row vx-commercial-row--${tone} ${selected ? "vx-ticket-operation-row--selected" : ""}`}
-      onClick={(event) => {
-        const target = event.target as HTMLElement;
-        if (
-          target.closest(
-            'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-          )
-        )
-          return;
-        onToggleSelected(!selected);
-      }}
-    >
-      <span className="vx-ticket-operation-row__select">
-        <Checkbox
-          className="vx-model-select-checkbox"
-          checked={selected}
-          onCheckedChange={(value) => onToggleSelected(value === true)}
-          aria-label={`选择工单 ${ticket.id}`}
+  return [
+    {
+      id: "ticket",
+      header: "工单",
+      cell: (ticket) => (
+        <TableTitleCell
+          title={ticket.title}
+          description={`${ticket.id} / ${ticket.ownerName}`}
+          onTitleClick={() =>
+            router.push(`/tenants/${encodeURIComponent(ticket.tenantId)}`)
+          }
         />
-      </span>
-      <span className="vx-tenant-directory-row__index">
-        {String(index + 1).padStart(2, "0")}
-      </span>
-      <TableTitleCell
-        className="vx-commercial-row__main"
-        title={ticket.title}
-        description={`${ticket.id} / ${ticket.ownerName}`}
-        onTitleClick={() =>
-          router.push(`/tenants/${encodeURIComponent(ticket.tenantId)}`)
-        }
-      />
-      <span className="vx-commercial-row__tenant">
-        <Icon
-          name={ticket.tenantType === "company" ? "buildings" : "user"}
-          size="sm"
-          fallback="placeholder"
+      ),
+    },
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (ticket) => (
+        <TableTitleCell
+          icon={ticket.tenantType === "company" ? "buildings" : "user"}
+          title={ticket.tenantName}
+          description={`${ticket.tenantCode} / ${typeLabel(ticket.tenantType)}`}
         />
-        <span>
-          <strong>{ticket.tenantName}</strong>
-          <small>
-            {ticket.tenantCode} / {typeLabel(ticket.tenantType)}
-          </small>
-        </span>
-      </span>
-      <span className="vx-commercial-status-line">
-        <span
-          className={`vx-commercial-status-dot vx-commercial-status-dot--${tone === "danger" ? "danger" : tone === "warning" ? "warning" : tone === "muted" ? "muted" : "normal"}`}
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (ticket) => (
+        <Badge
+          className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${ticketTone(ticket)}`}
         >
           <Icon
             name={ticketStatusIcon(ticket.status)}
             size="xs"
             fallback="placeholder"
           />
-        </span>
-        <Badge
-          className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${tone}`}
-        >
           {ticketStatusLabel(ticket.status)}
         </Badge>
-      </span>
-      <span className="vx-tenant-directory-row__tag-line">
-        <Badge
-          className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${tone}`}
-        >
-          {priorityLabels[ticket.priority]}
-        </Badge>
-        <Badge className="vx-tenant-pill vx-commercial-pill vx-commercial-pill--muted">
-          {ticket.industry}
-        </Badge>
-      </span>
-      <span>
-        <strong>{formatDateTime(ticket.updatedAt)}</strong>
-        <small>{ticket.region}</small>
-      </span>
-      <TicketActionsMenu ticket={ticket} onOpenDetail={onOpenDetail} />
-    </div>
-  );
+      ),
+    },
+    {
+      id: "tags",
+      header: "标签",
+      align: "center",
+      cell: (ticket) => (
+        <span className="inline-flex flex-wrap justify-center gap-2xs">
+          <Badge
+            className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${ticketTone(ticket)}`}
+          >
+            {priorityLabels[ticket.priority]}
+          </Badge>
+          <Badge className="vx-tenant-pill vx-commercial-pill vx-commercial-pill--muted">
+            {ticket.industry}
+          </Badge>
+        </span>
+      ),
+    },
+    {
+      id: "updated",
+      header: "更新时间",
+      cell: (ticket) => (
+        <TableTitleCell
+          title={formatDateTime(ticket.updatedAt)}
+          description={ticket.region}
+        />
+      ),
+    },
+  ];
 }
 
 function TicketAssignDialog({
@@ -731,41 +718,13 @@ export function TicketsPage() {
   );
   const affectedTenants = new Set(openTickets.map((ticket) => ticket.tenantId))
     .size;
-  const visibleTicketIds = useMemo(
-    () => visibleTickets.map((ticket) => `${ticket.tenantId}-${ticket.id}`),
-    [visibleTickets],
-  );
-  const selectedVisibleTicketCount = visibleTicketIds.filter((id) =>
-    selectedTicketIds.has(id),
-  ).length;
-  const isTicketPageSelected =
-    visibleTicketIds.length > 0 &&
-    selectedVisibleTicketCount === visibleTicketIds.length;
+
+  const ticketColumns = useTicketColumns();
 
   function resetFilters() {
     setQuery("");
     setStatus("all");
     setPriority("all");
-  }
-
-  function toggleTicketSelection(id: string, checked: boolean) {
-    setSelectedTicketIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleTicketPageSelection(checked: boolean) {
-    setSelectedTicketIds((current) => {
-      const next = new Set(current);
-      visibleTicketIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   function applyTicketUpdate(updated: SupportTicketRecord) {
@@ -938,75 +897,36 @@ export function TicketsPage() {
             </Button>
           </div>
         ) : null}
-        {isLoading ? (
-          <div className="vx-service-health-empty">
-            <EmptyState
-              title="正在加载工单"
-              description="正在从工单数据库读取数据。"
-            />
-          </div>
-        ) : loadError ? (
+        {/* 读取失败是第三态，DataTable 只认加载/空/有数据，故留在外层。 */}
+        {loadError ? (
           <div className="vx-service-health-empty">
             <EmptyState title="工单数据读取失败" description={loadError} />
           </div>
-        ) : visibleTickets.length ? (
-          <div className="vx-tenant-directory-list vx-ticket-directory-list">
-            <div className="vx-tenant-directory-list__header">
-              <span>
-                <Checkbox
-                  className="vx-model-select-checkbox"
-                  checked={
-                    isTicketPageSelected
-                      ? true
-                      : selectedVisibleTicketCount > 0
-                        ? "indeterminate"
-                        : false
-                  }
-                  onCheckedChange={(value) =>
-                    toggleTicketPageSelection(value === true)
-                  }
-                  aria-label="选择当前页工单"
-                />
-              </span>
-              <span>#</span>
-              <span>工单</span>
-              <span>租户</span>
-              <span>状态</span>
-              <span>标签</span>
-              <span>更新时间</span>
-              <span>操作</span>
-            </div>
-            {visibleTickets.map((ticket, index) => {
-              const ticketKey = `${ticket.tenantId}-${ticket.id}`;
-
-              return (
-                <TicketRow
-                  key={ticketKey}
-                  ticket={ticket}
-                  index={index}
-                  selected={selectedTicketIds.has(ticketKey)}
-                  onToggleSelected={(checked) =>
-                    toggleTicketSelection(ticketKey, checked)
-                  }
-                  onOpenDetail={(selectedTicket) =>
-                    setDetailTicketId(selectedTicket.id)
-                  }
-                />
-              );
-            })}
-          </div>
         ) : (
-          <div className="vx-service-health-empty">
-            <EmptyState
-              title="没有匹配的工单"
-              description="调整筛选条件，或重置后查看全部工单。"
-              action={
-                <Button variant="outline" onClick={resetFilters}>
-                  重置
-                </Button>
-              }
-            />
-          </div>
+          <DataTable
+            columns={ticketColumns}
+            rows={visibleTickets}
+            rowKey={ticketKey}
+            loading={isLoading}
+            indexStart={1}
+            selectedKeys={[...selectedTicketIds]}
+            onSelectionChange={(keys) => setSelectedTicketIds(new Set(keys))}
+            rowActions={(ticket) => (
+              <TicketActionsMenu
+                ticket={ticket}
+                onOpenDetail={(selectedTicket) =>
+                  setDetailTicketId(selectedTicket.id)
+                }
+              />
+            )}
+            emptyTitle="没有匹配的工单"
+            emptyDescription="调整筛选条件，或重置后查看全部工单。"
+            emptyAction={
+              <Button variant="outline" onClick={resetFilters}>
+                重置
+              </Button>
+            }
+          />
         )}
       </section>
 

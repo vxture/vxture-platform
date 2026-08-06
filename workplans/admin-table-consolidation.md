@@ -66,7 +66,7 @@
 | T1  | 6    | 6    | ✅ **整批清零**（2026-08-06）          |
 | T2  | 5    | 0    | 未开始                                 |
 | T3  | 4    | 0    | 未开始                                 |
-| T4  | 5    | 2    | `AuditLogsPage` / `OpsTodosPage` 已迁  |
+| T4  | 5    | 5    | ✅ **整批清零**（2026-08-06 收尾三页） |
 | T5  | 9    | 9    | ✅ **整批清零**（2026-08-06 收尾三页） |
 
 前置已完成。以下按**结构相似度**分批，同批内一份 `columns` 写法可直接复用到下一页。
@@ -115,6 +115,26 @@
 `TicketsPage` · `AnnouncementsPage` · `AuditLogsPage` · `SkillsPage` · `OpsTodosPage`
 
 工单分级尚无共享值域，映射先落 admin 侧（同 `status-tone.ts` 的边界判据）。
+
+**已完成（2026-08-06）。收益是全部五批里最小的一批，如实记下来**：三页 tsx
+2257 → 2207，只减 50 行。`TicketsPage` 减 80，而 `AnnouncementsPage` 与 `SkillsPage`
+反而各涨了 22 / 8——原先列表与卡片共用一段加载/空态/翻页，拆开后卡片那一支要自己
+写一份。行渲染本来就薄的页面，迁进 DataTable 并不省代码，省的是**一致性**：三态、
+选择、序号、列对齐从此和其余 19 个列表同一个来源。CSS 减 38 条规则、164 行，
+`admin-operations-tickets.css` 清空后删除。
+
+**跨域借用的着色类就地换掉。** `SkillsPage` 与 `AnnouncementsPage` 的状态/类型标
+原先借 `vx-admin-role-status-pill--*` 和 `vx-platform-user-status-pill--*`——那是
+角色域与平台用户域的类，跟本页毫无关系，批 4 重排那两族时会连带变色。它们本身
+只是页面自己的几档语气，换 `StatusBadge` 即可（判据同 T5）。换之前先查了原色值：
+`--enabled`=success、`--disabled`=neutral、`--pending`=**info（蓝，不是黄）**、
+`--attention`=warning，照着映射才不会改变观感。`TicketsPage` 的 `vx-commercial-pill--*`
+是商业域各页共用的一族，留给批 4。
+
+**清死 CSS 的脚本要先摘注释再拆选择器。** `.vx-ticket-operation-row` 头上那句注释里
+带逗号（"ops-todo is read-only, no row selection"），按逗号切分组选择器时把注释切成了
+两段，其中一段不匹配死类，整条规则就被判成"还活着"而留了下来。同理，分组里只有
+一部分死掉时（`.vx-usage-*` 死、`.vx-promotion-*` 还活着）要删的是**那几段**，不是整条规则。
 
 ### 批 T5 · 轻量页（9 页 / 约 180 行）
 

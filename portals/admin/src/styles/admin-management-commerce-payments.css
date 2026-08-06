@@ -1,5 +1,3 @@
-
-
 /* Payment transaction card styles. */
 
 .vx-payment-card__bill {
@@ -14,8 +12,16 @@
 }
 
 .vx-commercial-search {
-  width: clamp(var(--vx-admin-management-size-13r), 16vw, var(--vx-admin-management-size-20r));
-  flex-basis: clamp(var(--vx-admin-management-size-13r), 16vw, var(--vx-admin-management-size-20r));
+  width: clamp(
+    var(--vx-admin-management-size-13r),
+    16vw,
+    var(--vx-admin-management-size-20r)
+  );
+  flex-basis: clamp(
+    var(--vx-admin-management-size-13r),
+    16vw,
+    var(--vx-admin-management-size-20r)
+  );
 }
 
 .vx-promotions-page .vx-tenant-directory-row {
@@ -76,51 +82,4 @@
   line-height: 1.55;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.vx-commercial-status-line {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--vx-admin-management-space-05r);
-}
-
-.vx-commercial-status-dot {
-  width: var(--vx-admin-management-size-1125r);
-  height: var(--vx-admin-management-size-1125r);
-  flex: 0 0 auto;
-  display: inline-grid;
-  place-items: center;
-  border-radius: var(--vx-radius-full);
-  background: var(--commercial-status-dot, var(--vx-color-gray-400));
-  color: var(--vx-color-white);
-  box-shadow: 0 0 0 var(--vx-admin-management-effect-0125r)
-    var(--commercial-status-halo, color-mix(in srgb, var(--vx-color-gray-400) 14%, transparent));
-}
-
-.vx-commercial-status-dot svg {
-  width: var(--vx-admin-management-size-06875r);
-  height: var(--vx-admin-management-size-06875r);
-  stroke-width: 2.5;
-}
-
-.vx-commercial-status-dot--normal {
-  --commercial-status-dot: var(--tenant-green);
-  --commercial-status-halo: color-mix(in srgb, var(--vx-color-success) 12%, transparent);
-}
-
-.vx-commercial-status-dot--warning {
-  --commercial-status-dot: var(--tenant-amber);
-  --commercial-status-halo: color-mix(in srgb, var(--vx-color-warning-600) 14%, transparent);
-}
-
-.vx-commercial-status-dot--danger {
-  --commercial-status-dot: var(--tenant-rose);
-  --commercial-status-halo: color-mix(in srgb, var(--vx-color-danger) 14%, transparent);
-}
-
-.vx-commercial-status-dot--muted {
-  --commercial-status-dot: var(--vx-color-gray-400);
-  --commercial-status-halo: color-mix(in srgb, var(--vx-color-gray-400) 14%, transparent);
 }

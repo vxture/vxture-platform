@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Badge,
   Button,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -12,7 +12,10 @@ import {
   MetricGrid,
   NativeSelect,
   Pagination,
+  StatusBadge,
+  TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { fetchSkills } from "@/api/admin-bff";
 import type { SkillRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
@@ -33,12 +36,6 @@ const STATUS_LABELS: Record<SkillRecord["status"], string> = {
   disabled: "已停用",
   draft: "草稿",
 };
-
-function statusBadgeClass(status: SkillRecord["status"]) {
-  if (status === "active") return "vx-admin-role-status-pill--enabled";
-  if (status === "draft") return "vx-platform-user-status-pill--pending";
-  return "vx-admin-role-status-pill--disabled";
-}
 
 function skillSearchText(skill: SkillRecord) {
   return [
@@ -173,81 +170,63 @@ function SkillToolbar({
   );
 }
 
-// ─── 子组件：列表视图 ──────────────────────────────────────────────────────────
+// ─── 列表列定义 ───────────────────────────────────────────────────────────────
 
-function SkillList({
-  skills,
-  startIndex,
-}: {
-  skills: SkillRecord[];
-  startIndex: number;
-}) {
-  return (
-    <div
-      className="vx-tenant-directory-list vx-skills-directory-list"
-      role="region"
-      aria-label="技能列表"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>#</span>
-        <span>技能</span>
-        <span>分类</span>
-        <span>版本</span>
-        <span>调用端点</span>
-        <span>调用次数</span>
-        <span>状态</span>
-        <span>更新时间</span>
-        <span>操作</span>
-      </div>
-      {skills.map((skill, index) => (
-        <div key={skill.id} className="vx-tenant-directory-row vx-skill-row">
-          <span className="vx-skill-row__index">{startIndex + index + 1}</span>
-          <span className="vx-skill-row__info">
-            <span className="vx-skill-row__name">{skill.skillName}</span>
-            <span className="vx-skill-row__code">{skill.skillCode}</span>
-          </span>
-          <span className="vx-skill-row__category">{skill.category}</span>
-          <span className="vx-skill-row__version">{skill.version}</span>
-          <span
-            className="vx-skill-row__endpoint"
-            title={skill.endpointUrl ?? EMPTY_MARK}
-          >
-            {skill.endpointUrl ?? EMPTY_MARK}
-          </span>
-          <span className="vx-skill-row__invocations">
-            {formatNumber(skill.invocations)}
-          </span>
-          <span className="vx-skill-row__status">
-            <Badge className={statusBadgeClass(skill.status)}>
-              {STATUS_LABELS[skill.status]}
-            </Badge>
-            {skill.isSystem && (
-              <Badge className="vx-platform-user-status-pill--pending">
-                系统
-              </Badge>
-            )}
-          </span>
-          <span className="vx-skill-row__updated">
-            {formatDate(skill.updatedAt)}
-          </span>
-          <span className="vx-tenant-actions">
-            <Button
-              variant="ghost"
-              size="icon-md"
-              className="vx-tenant-actions__trigger"
-              disabled={skill.isSystem}
-              title={
-                skill.isSystem ? "系统技能不可修改" : "操作（数据层待接入）"
-              }
-            >
-              <Icon name="more-vertical" size="lg" fallback="placeholder" />
-            </Button>
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+/**
+ * 状态标换 `StatusBadge`：技能的三档状态原先借用了 `vx-admin-role-status-pill--*`
+ * 与 `vx-platform-user-status-pill--pending`——那是另外两个域的着色类，跨域借用
+ * 一旦批 4 重排那两族就会跟着变。它本身是页面自己的三档语气，归 DS 语气即可。
+ */
+const SKILL_STATUS_TONE: Record<SkillRecord["status"], StatusBadgeTone> = {
+  active: "success",
+  disabled: "neutral",
+  draft: "info",
+};
+
+const SKILL_COLUMNS: readonly DataTableColumn<SkillRecord>[] = [
+  {
+    id: "skill",
+    header: "技能",
+    cell: (skill) => (
+      <TableTitleCell title={skill.skillName} description={skill.skillCode} />
+    ),
+  },
+  { id: "category", header: "分类", cell: (skill) => skill.category },
+  { id: "version", header: "版本", cell: (skill) => skill.version },
+  {
+    id: "endpoint",
+    header: "调用端点",
+    cell: (skill) => (
+      <span title={skill.endpointUrl ?? EMPTY_MARK}>
+        {skill.endpointUrl ?? EMPTY_MARK}
+      </span>
+    ),
+  },
+  {
+    id: "invocations",
+    header: "调用次数",
+    align: "right",
+    cell: (skill) => formatNumber(skill.invocations),
+  },
+  {
+    id: "status",
+    header: "状态",
+    align: "center",
+    cell: (skill) => (
+      <span className="inline-flex flex-wrap items-center justify-center gap-2xs">
+        <StatusBadge tone={SKILL_STATUS_TONE[skill.status]}>
+          {STATUS_LABELS[skill.status]}
+        </StatusBadge>
+        {skill.isSystem ? <StatusBadge tone="info">系统</StatusBadge> : null}
+      </span>
+    ),
+  },
+  {
+    id: "updated",
+    header: "更新时间",
+    cell: (skill) => formatDate(skill.updatedAt),
+  },
+];
 
 // ─── 子组件：卡片视图 ──────────────────────────────────────────────────────────
 
@@ -261,14 +240,10 @@ function SkillCards({ skills }: { skills: SkillRecord[] }) {
               <Icon name="cube" size="md" fallback="placeholder" />
             </span>
             <div className="vx-skill-card__badges">
-              <Badge className={statusBadgeClass(skill.status)}>
+              <StatusBadge tone={SKILL_STATUS_TONE[skill.status]}>
                 {STATUS_LABELS[skill.status]}
-              </Badge>
-              {skill.isSystem && (
-                <Badge className="vx-platform-user-status-pill--pending">
-                  系统
-                </Badge>
-              )}
+              </StatusBadge>
+              {skill.isSystem && <StatusBadge tone="info">系统</StatusBadge>}
             </div>
           </div>
           <h3 className="vx-skill-card__name">{skill.skillName}</h3>
@@ -366,27 +341,48 @@ export function SkillsPage() {
           />
         }
         table={
-          loading ? (
-            <EmptyState title="加载中…" />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              title="暂无技能"
-              description={
+          viewMode === "list" ? (
+            <DataTable
+              columns={SKILL_COLUMNS}
+              rows={pageSkills}
+              rowKey={(skill) => skill.id}
+              loading={loading}
+              indexStart={(page - 1) * PAGE_SIZE + 1}
+              rowActions={(skill) => (
+                <Button
+                  variant="ghost"
+                  size="icon-md"
+                  disabled={skill.isSystem}
+                  title={
+                    skill.isSystem ? "系统技能不可修改" : "操作（数据层待接入）"
+                  }
+                >
+                  <Icon name="more-vertical" size="lg" fallback="placeholder" />
+                </Button>
+              )}
+              emptyTitle="暂无技能"
+              emptyDescription={
                 search || statusFilter !== "all" || categoryFilter
                   ? "尝试调整筛选条件"
                   : "尚未接入任何 AI 技能，请通过 API 注册技能"
               }
+              footer={
+                pageCount > 1 ? (
+                  <Pagination
+                    page={page}
+                    pageCount={pageCount}
+                    total={filtered.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setPage}
+                  />
+                ) : null
+              }
             />
-          ) : (
+          ) : loading ? (
+            <EmptyState title="加载中…" />
+          ) : pageSkills.length ? (
             <>
-              {viewMode === "list" ? (
-                <SkillList
-                  skills={pageSkills}
-                  startIndex={(page - 1) * PAGE_SIZE}
-                />
-              ) : (
-                <SkillCards skills={pageSkills} />
-              )}
+              <SkillCards skills={pageSkills} />
               {pageCount > 1 ? (
                 <Pagination
                   page={page}
@@ -397,6 +393,15 @@ export function SkillsPage() {
                 />
               ) : null}
             </>
+          ) : (
+            <EmptyState
+              title="暂无技能"
+              description={
+                search || statusFilter !== "all" || categoryFilter
+                  ? "尝试调整筛选条件"
+                  : "尚未接入任何 AI 技能，请通过 API 注册技能"
+              }
+            />
           )
         }
       />
