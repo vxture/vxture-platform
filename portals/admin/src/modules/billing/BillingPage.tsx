@@ -28,7 +28,7 @@ import {
 } from "@/modules/shared/status-tone";
 import {
   TIER_FILTER_OPTIONS,
-  tierVariant,
+  tierBadgeClass,
   tierFilterOf,
   type TierFilterValue,
 } from "@/modules/shared/tier-level";
@@ -368,7 +368,7 @@ function useBillingColumns(): DataTableColumn<BillingRecord>[] {
       cell: (bill) => (
         <TableTitleCell
           title={
-            <Badge variant={tierVariant(bill.tierName)}>
+            <Badge className={tierBadgeClass(bill.tierName)}>
               {bill.tierName ?? "未关联"}
             </Badge>
           }

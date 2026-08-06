@@ -28,7 +28,7 @@ import {
 } from "@/modules/shared/status-tone";
 import {
   TIER_FILTER_OPTIONS,
-  tierVariant,
+  tierBadgeClass,
   tierFilterOf,
   type TierFilterValue,
 } from "@/modules/shared/tier-level";
@@ -287,7 +287,7 @@ function useOrderColumns(): DataTableColumn<OrderOperationRecord>[] {
                   {UNSET_LABEL}
                 </span>
               ) : (
-                <Badge variant={tierVariant(order.tierName)}>
+                <Badge className={tierBadgeClass(order.tierName)}>
                   {order.tierName}
                 </Badge>
               )}
