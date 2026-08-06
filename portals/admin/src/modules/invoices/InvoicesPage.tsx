@@ -670,7 +670,7 @@ export function InvoicesPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="发票统计"
               items={[
                 {

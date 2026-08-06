@@ -315,7 +315,7 @@ export function RiskRecordsPage() {
           />
         }
         summary={
-          <MetricGrid
+          <MetricGrid loading={loading}
             aria-label="风险记录统计"
             columns={3}
             items={[

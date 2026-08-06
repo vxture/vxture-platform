@@ -420,7 +420,7 @@ export function PromotionRedemptionsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="优惠核销统计"
               items={[
                 {

@@ -1046,7 +1046,7 @@ export function PlatformUsersPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="平台用户统计"
               columns={3}
               items={[

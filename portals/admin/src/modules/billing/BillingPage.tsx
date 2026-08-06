@@ -742,7 +742,7 @@ export function BillingPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="账单中心统计"
               items={[
                 {

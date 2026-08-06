@@ -443,7 +443,7 @@ export function PromotionsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="营销优惠统计"
               items={[
                 {

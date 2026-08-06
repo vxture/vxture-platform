@@ -431,7 +431,7 @@ export function UsageMeteringPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="用量计费统计"
               items={[
                 {

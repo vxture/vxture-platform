@@ -656,7 +656,7 @@ export function VerificationsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="实名认证统计"
               items={[
                 {

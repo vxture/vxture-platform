@@ -1079,7 +1079,7 @@ export function ModelPlatformPage() {
                 {t(feedback.key, feedback.values)}
               </p>
             ) : null}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label={t("summary.ariaLabel")}
               columns={3}
               items={[

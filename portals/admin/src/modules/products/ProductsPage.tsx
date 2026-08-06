@@ -439,7 +439,7 @@ export function ProductsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="产品能力管理统计"
               items={[
                 {

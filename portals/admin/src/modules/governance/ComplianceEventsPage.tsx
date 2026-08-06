@@ -329,7 +329,7 @@ export function ComplianceEventsPage() {
           />
         }
         summary={
-          <MetricGrid
+          <MetricGrid loading={loading}
             aria-label="合规事件统计"
             columns={3}
             items={[

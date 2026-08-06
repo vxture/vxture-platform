@@ -619,7 +619,7 @@ export function SubscriptionsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="租户订阅运营统计"
               items={[
                 {

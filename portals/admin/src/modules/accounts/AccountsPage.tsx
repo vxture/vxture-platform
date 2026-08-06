@@ -650,7 +650,7 @@ export function AccountsPage({
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label={pageCopy.summaryAriaLabel}
               items={[
                 {

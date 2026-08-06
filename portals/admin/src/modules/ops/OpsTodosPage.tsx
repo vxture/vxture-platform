@@ -406,7 +406,7 @@ export function OpsTodosPage() {
         />
       }
       summary={
-        <MetricGrid
+        <MetricGrid loading={isLoading}
           aria-label="待办任务统计"
           items={[
             {

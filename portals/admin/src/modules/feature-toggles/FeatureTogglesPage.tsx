@@ -292,7 +292,7 @@ export function FeatureTogglesPage() {
           />
         }
         summary={
-          <MetricGrid
+          <MetricGrid loading={loading}
             aria-label="功能开关统计"
             columns={3}
             items={[

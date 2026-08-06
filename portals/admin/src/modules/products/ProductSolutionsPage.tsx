@@ -498,7 +498,7 @@ export function ProductSolutionsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid
+            <MetricGrid loading={loading}
               aria-label="解决方案统计"
               items={[
                 {
