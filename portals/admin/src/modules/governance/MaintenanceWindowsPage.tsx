@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
-  Badge,
   Button,
+  DataTable,
   DialogForm,
-  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -14,6 +13,7 @@ import {
   ListPageTemplate,
   NativeSelect,
   Pagination,
+  StatusBadge,
   Textarea,
   useToast,
 } from "@vxture/design-system";
@@ -26,6 +26,7 @@ import {
   updateMaintenanceWindow,
   type MaintenanceWindowWriteInput,
 } from "@/api/admin-bff";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import type { MaintenanceWindowItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { formatDate } from "@/modules/tenants/tenant-utils";
@@ -62,18 +63,20 @@ const SEVERITY_LABELS: Record<MaintenanceWindowItem["severity"], string> = {
   critical: "严重",
 };
 
-function statusBadgeClass(status: MaintenanceWindowItem["status"]) {
-  if (status === "in_progress")
-    return "vx-platform-user-status-pill--attention";
-  if (status === "scheduled") return "vx-platform-user-status-pill--pending";
-  if (status === "completed") return "vx-admin-role-status-pill--enabled";
-  return "vx-admin-role-status-pill--disabled";
+/** 窗口状态 -> DS 语气。业务状态到语气的映射留产品侧。 */
+function statusTone(status: MaintenanceWindowItem["status"]): StatusBadgeTone {
+  if (status === "in_progress") return "warning";
+  if (status === "scheduled") return "info";
+  if (status === "completed") return "success";
+  return "neutral";
 }
 
-function severityBadgeClass(severity: MaintenanceWindowItem["severity"]) {
-  if (severity === "critical") return "vx-platform-user-status-pill--attention";
-  if (severity === "major") return "vx-platform-user-status-pill--pending";
-  return "vx-admin-role-status-pill--enabled";
+function severityTone(
+  severity: MaintenanceWindowItem["severity"],
+): StatusBadgeTone {
+  if (severity === "critical") return "danger";
+  if (severity === "major") return "warning";
+  return "success";
 }
 
 function toLocalInputValue(date: Date) {
@@ -143,6 +146,41 @@ function formIsValid(form: WindowForm) {
   );
 }
 
+const COLUMNS: readonly DataTableColumn<MaintenanceWindowItem>[] = [
+  { id: "title", header: "标题", cell: (item) => item.title },
+  {
+    id: "severity",
+    header: "严重度",
+    align: "center",
+    cell: (item) => (
+      <StatusBadge tone={severityTone(item.severity)}>
+        {SEVERITY_LABELS[item.severity]}
+      </StatusBadge>
+    ),
+  },
+  {
+    id: "status",
+    header: "状态",
+    align: "center",
+    cell: (item) => (
+      <StatusBadge tone={statusTone(item.status)}>
+        {STATUS_LABELS[item.status]}
+      </StatusBadge>
+    ),
+  },
+  {
+    id: "startAt",
+    header: "计划开始",
+    cell: (item) => formatDate(item.startAt),
+  },
+  { id: "endAt", header: "计划结束", cell: (item) => formatDate(item.endAt) },
+  {
+    id: "actualEndAt",
+    header: "实际结束",
+    cell: (item) => (item.actualEndAt ? formatDate(item.actualEndAt) : "-"),
+  },
+];
+
 export function MaintenanceWindowsPage() {
   const { toast } = useToast();
   const [items, setItems] = useState<MaintenanceWindowItem[]>([]);
@@ -151,6 +189,7 @@ export function MaintenanceWindowsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -332,122 +371,73 @@ export function MaintenanceWindowsPage() {
           </FilterBar>
         }
         table={
-          loading ? (
-            <EmptyState title="加载中…" />
-          ) : loadError ? (
-            <EmptyState title="维护窗口读取失败" description={loadError} />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              title="暂无维护窗口"
-              description={
-                search || statusFilter !== "all"
-                  ? "尝试调整筛选条件"
-                  : "点击「新建窗口」声明第一个平台维护窗口"
-              }
-            />
-          ) : (
-            <>
-              <div
-                className="vx-tenant-directory-list vx-maintenance-directory-list"
-                role="region"
-                aria-label="维护窗口列表"
-              >
-                <div className="vx-tenant-directory-list__header">
-                  <span>#</span>
-                  <span>标题</span>
-                  <span>严重度</span>
-                  <span>状态</span>
-                  <span>计划开始</span>
-                  <span>计划结束</span>
-                  <span>实际结束</span>
-                  <span>操作</span>
-                </div>
-                {pageItems.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="vx-tenant-directory-row vx-maintenance-row"
-                    title={
-                      item.affectedServices.length > 0
-                        ? `受影响服务：${item.affectedServices.join(", ")}`
-                        : undefined
-                    }
-                  >
-                    <span className="vx-tenant-directory-row__index">
-                      {(page - 1) * PAGE_SIZE + index + 1}
-                    </span>
-                    <span className="vx-maintenance-row__title">
-                      {item.title}
-                    </span>
-                    <span>
-                      <Badge className={severityBadgeClass(item.severity)}>
-                        {SEVERITY_LABELS[item.severity]}
-                      </Badge>
-                    </span>
-                    <span>
-                      <Badge className={statusBadgeClass(item.status)}>
-                        {STATUS_LABELS[item.status]}
-                      </Badge>
-                    </span>
-                    <span>{formatDate(item.startAt)}</span>
-                    <span>{formatDate(item.endAt)}</span>
-                    <span>
-                      {item.actualEndAt ? formatDate(item.actualEndAt) : "-"}
-                    </span>
-                    <span className="vx-tenant-actions">
-                      <ActionMenu
-                        label="维护窗口操作"
-                        disabled={submitting}
-                        items={[
-                          {
-                            id: "start",
-                            label: "开始维护",
-                            icon: "play",
-                            disabled: submitting || item.status !== "scheduled",
-                            onSelect: () =>
-                              void runAction("维护已开始", () =>
-                                startMaintenanceWindow(item.id),
-                              ),
-                          },
-                          {
-                            id: "complete",
-                            label: "完成维护",
-                            icon: "check",
-                            disabled:
-                              submitting || item.status !== "in_progress",
-                            onSelect: () =>
-                              void runAction("维护已完成", () =>
-                                completeMaintenanceWindow(item.id),
-                              ),
-                          },
-                          {
-                            id: "edit",
-                            label: "编辑",
-                            icon: "edit",
-                            disabled:
-                              submitting ||
-                              (item.status !== "scheduled" &&
-                                item.status !== "in_progress"),
-                            onSelect: () => openEdit(item),
-                          },
-                          {
-                            id: "cancel",
-                            label: "取消窗口",
-                            icon: "stop",
-                            danger: true,
-                            disabled:
-                              submitting ||
-                              (item.status !== "scheduled" &&
-                                item.status !== "in_progress"),
-                            separatorBefore: true,
-                            onSelect: () => setPendingCancel(item),
-                          },
-                        ]}
-                      />
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {pageCount > 1 ? (
+          <DataTable
+            columns={COLUMNS}
+            rows={pageItems}
+            rowKey={(item) => item.id}
+            loading={loading}
+            indexStart={(page - 1) * PAGE_SIZE + 1}
+            selectedKeys={[...selectedIds]}
+            onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
+            rowActions={(item) => (
+              <ActionMenu
+                label="维护窗口操作"
+                disabled={submitting}
+                items={[
+                  {
+                    id: "start",
+                    label: "开始维护",
+                    icon: "play",
+                    disabled: submitting || item.status !== "scheduled",
+                    onSelect: () =>
+                      void runAction("维护已开始", () =>
+                        startMaintenanceWindow(item.id),
+                      ),
+                  },
+                  {
+                    id: "complete",
+                    label: "完成维护",
+                    icon: "check",
+                    disabled: submitting || item.status !== "in_progress",
+                    onSelect: () =>
+                      void runAction("维护已完成", () =>
+                        completeMaintenanceWindow(item.id),
+                      ),
+                  },
+                  {
+                    id: "edit",
+                    label: "编辑",
+                    icon: "edit",
+                    disabled:
+                      submitting ||
+                      (item.status !== "scheduled" &&
+                        item.status !== "in_progress"),
+                    onSelect: () => openEdit(item),
+                  },
+                  {
+                    id: "cancel",
+                    label: "取消窗口",
+                    icon: "stop",
+                    danger: true,
+                    disabled:
+                      submitting ||
+                      (item.status !== "scheduled" &&
+                        item.status !== "in_progress"),
+                    separatorBefore: true,
+                    onSelect: () => setPendingCancel(item),
+                  },
+                ]}
+              />
+            )}
+            emptyTitle={loadError ? "维护窗口读取失败" : "暂无维护窗口"}
+            emptyDescription={
+              loadError ??
+              (search || statusFilter !== "all"
+                ? "尝试调整筛选条件"
+                : "点击「新建窗口」安排第一个维护窗口")
+            }
+            footer={
+              pageCount > 1 ? (
                 <Pagination
                   page={page}
                   pageCount={pageCount}
@@ -455,9 +445,9 @@ export function MaintenanceWindowsPage() {
                   pageSize={PAGE_SIZE}
                   onPageChange={setPage}
                 />
-              ) : null}
-            </>
-          )
+              ) : null
+            }
+          />
         }
       />
 

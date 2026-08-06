@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
-  Badge,
   Button,
+  DataTable,
   DialogForm,
-  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -15,6 +14,8 @@ import {
   MetricGrid,
   NativeSelect,
   Pagination,
+  StatusBadge,
+  TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
@@ -26,6 +27,7 @@ import {
   updateFeatureFlag,
   type FeatureFlagWriteInput,
 } from "@/api/admin-bff";
+import type { DataTableColumn } from "@vxture/design-system";
 import type { FeatureFlagRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { formatDate } from "@/modules/tenants/tenant-utils";
@@ -122,6 +124,41 @@ function overrideSummary(overrides: Record<string, boolean>): string {
   return n === 0 ? "无" : `${n} 个租户`;
 }
 
+const COLUMNS: readonly DataTableColumn<FeatureFlagRecord>[] = [
+  {
+    id: "key",
+    header: "开关键 / 分类",
+    cell: (item) => (
+      <TableTitleCell
+        title={item.flagKey}
+        description={`${item.category}${item.isArchived ? " · 已归档" : ""}`}
+      />
+    ),
+  },
+  { id: "environment", header: "环境", cell: (item) => item.environment },
+  {
+    id: "status",
+    header: "状态",
+    align: "center",
+    cell: (item) => (
+      <StatusBadge tone={item.isGloballyEnabled ? "success" : "neutral"}>
+        {item.isGloballyEnabled ? "已启用" : "已停用"}
+      </StatusBadge>
+    ),
+  },
+  {
+    id: "rollout",
+    header: "灰度",
+    align: "right",
+    cell: (item) => `${item.rolloutPercentage}%`,
+  },
+  {
+    id: "updatedAt",
+    header: "更新时间",
+    cell: (item) => formatDate(item.updatedAt),
+  },
+];
+
 export function FeatureTogglesPage() {
   const { toast } = useToast();
   const [items, setItems] = useState<FeatureFlagRecord[]>([]);
@@ -132,6 +169,7 @@ export function FeatureTogglesPage() {
   const [archivedFilter, setArchivedFilter] =
     useState<ArchivedFilter>("active");
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -367,122 +405,70 @@ export function FeatureTogglesPage() {
           </FilterBar>
         }
         table={
-          loading ? (
-            <EmptyState title="加载中…" />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              title="暂无功能开关"
-              description={
-                search ||
-                categoryFilter !== "all" ||
-                environmentFilter !== "all" ||
-                archivedFilter !== "active"
-                  ? "尝试调整筛选条件"
-                  : "点击「新建开关」创建第一个功能开关"
-              }
-            />
-          ) : (
-            <>
-              <div
-                className="vx-tenant-directory-list vx-feature-flag-directory-list"
-                role="region"
-                aria-label="功能开关列表"
-              >
-                <div className="vx-tenant-directory-list__header">
-                  <span>#</span>
-                  <span>开关键 / 分类</span>
-                  <span>环境</span>
-                  <span>状态</span>
-                  <span>灰度</span>
-                  <span>更新时间</span>
-                  <span>操作</span>
-                </div>
-                {pageItems.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="vx-tenant-directory-row vx-feature-flag-row"
-                    title={
-                      item.description
-                        ? item.description
-                        : `逐租户覆盖：${overrideSummary(item.tenantOverrides)}`
-                    }
-                  >
-                    <span className="vx-tenant-directory-row__index">
-                      {(page - 1) * PAGE_SIZE + index + 1}
-                    </span>
-                    <span className="vx-feature-flag-row__key">
-                      {item.flagKey}
-                      <small>
-                        {item.category}
-                        {item.isArchived ? " · 已归档" : ""}
-                      </small>
-                    </span>
-                    <span>{item.environment}</span>
-                    <span>
-                      <Badge
-                        className={
-                          item.isGloballyEnabled
-                            ? "vx-admin-role-status-pill--enabled"
-                            : "vx-admin-role-status-pill--disabled"
-                        }
-                      >
-                        {item.isGloballyEnabled ? "已启用" : "已停用"}
-                      </Badge>
-                    </span>
-                    <span>{item.rolloutPercentage}%</span>
-                    <span>{formatDate(item.updatedAt)}</span>
-                    <span className="vx-tenant-actions">
-                      <ActionMenu
-                        label="功能开关操作"
-                        disabled={submitting}
-                        items={[
-                          {
-                            id: "toggle",
-                            label: item.isGloballyEnabled ? "停用" : "启用",
-                            icon: item.isGloballyEnabled ? "x" : "check",
-                            disabled: submitting || item.isArchived,
-                            onSelect: () =>
-                              void runAction(
-                                item.isGloballyEnabled ? "已停用" : "已启用",
-                                () => toggleFeatureFlag(item.id),
-                              ),
-                          },
-                          {
-                            id: "edit",
-                            label: "编辑",
-                            icon: "edit",
-                            disabled: submitting || item.isArchived,
-                            onSelect: () => openEdit(item),
-                          },
-                          {
-                            id: "archive",
-                            label: item.isArchived ? "恢复" : "归档",
-                            icon: item.isArchived
-                              ? "clock-counter-clockwise"
-                              : "stop",
-                            disabled: submitting,
-                            onSelect: () =>
-                              void runAction(
-                                item.isArchived ? "已恢复" : "已归档",
-                                () =>
-                                  archiveFeatureFlag(item.id, !item.isArchived),
-                              ),
-                          },
-                        ]}
-                      />
-                    </span>
-                  </div>
-                ))}
-              </div>
-              {pageCount > 1 ? (
+          <DataTable
+            columns={COLUMNS}
+            rows={pageItems}
+            rowKey={(item) => item.id}
+            loading={loading}
+            indexStart={(page - 1) * PAGE_SIZE + 1}
+            selectedKeys={[...selectedIds]}
+            onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
+            rowActions={(item) => (
+              <ActionMenu
+                label="功能开关操作"
+                disabled={submitting}
+                items={[
+                  {
+                    id: "toggle",
+                    label: item.isGloballyEnabled ? "停用" : "启用",
+                    icon: item.isGloballyEnabled ? "x" : "check",
+                    disabled: submitting || item.isArchived,
+                    onSelect: () =>
+                      void runAction(
+                        item.isGloballyEnabled ? "已停用" : "已启用",
+                        () => toggleFeatureFlag(item.id),
+                      ),
+                  },
+                  {
+                    id: "edit",
+                    label: "编辑",
+                    icon: "edit",
+                    disabled: submitting || item.isArchived,
+                    onSelect: () => openEdit(item),
+                  },
+                  {
+                    id: "archive",
+                    label: item.isArchived ? "恢复" : "归档",
+                    icon: item.isArchived ? "clock-counter-clockwise" : "stop",
+                    disabled: submitting,
+                    onSelect: () =>
+                      void runAction(
+                        item.isArchived ? "已恢复" : "已归档",
+                        () => archiveFeatureFlag(item.id, !item.isArchived),
+                      ),
+                  },
+                ]}
+              />
+            )}
+            emptyTitle="暂无功能开关"
+            emptyDescription={
+              search ||
+              categoryFilter !== "all" ||
+              environmentFilter !== "all" ||
+              archivedFilter !== "all"
+                ? "尝试调整筛选条件"
+                : "点击「新建开关」创建第一个功能开关"
+            }
+            footer={
+              pageCount > 1 ? (
                 <Pagination
                   page={page}
                   pageCount={pageCount}
                   onPageChange={setPage}
                 />
-              ) : null}
-            </>
-          )
+              ) : null
+            }
+          />
         }
       />
 
