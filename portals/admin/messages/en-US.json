@@ -176,7 +176,7 @@
         "description": "Core operating metrics, key trends across business domains, and platform health."
       },
       "opsTodos": {
-        "label": "Ops Todos",
+        "label": "Tasks",
         "description": "Reviews, alerts, and operating tasks that need manual handling."
       },
       "tenants": {

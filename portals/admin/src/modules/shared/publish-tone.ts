@@ -82,11 +82,11 @@ export const ACCESS_STATUS_TONE: Record<
 };
 
 /**
- * 产品类目（能力类型、供给来源）。**一律中性**——见文件头第 2 条。
+ * ~~categoryTone~~ 已删。类目标改用朴素 `Badge`，不再经语气档。
  *
- * 保留成一个函数而不是散在各页写 `tone="neutral"`：类目标将来若要换表达方式
- * （比如改成带图标的描边标），这里是唯一的落点。
+ * 走 `StatusBadge tone="neutral"` 那一版在登录态实测下露馅（2026-08-06）：
+ * `StatusBadge` 会按语气自动配图标，`neutral` 配的是 ⓘ，于是产品列表里每个
+ * 「服务」「自建」「数据」前面都顶着一个信息图标——那个图标不表达任何东西，
+ * 只是语气档的默认值漏了出来。**类目本来就不是状态**，`Badge` 的描边中性标
+ * 才是它该有的样子。
  */
-export function categoryTone(): StatusTone {
-  return "neutral";
-}

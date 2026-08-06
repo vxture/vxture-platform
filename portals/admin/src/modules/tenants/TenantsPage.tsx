@@ -6,6 +6,7 @@ import {
   ActionButton,
   ActionMenu,
   Banner,
+  Badge,
   DataTable,
   EmptyState,
   FilterBar,
@@ -20,9 +21,7 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
-import type { IconName } from "@vxture/design-system";
 import {
   fetchTenantOperationsStrict,
   resumeTenant,
@@ -54,32 +53,6 @@ type StatusFilter = "all" | TenantOperationRecord["status"];
 type TypeFilter = "all" | TenantOperationRecord["tenantType"];
 type RiskFilter = "all" | TenantOperationRecord["riskLevel"];
 type VerificationFilter = "all" | TenantOperationRecord["verifiedStatus"];
-
-type TenantStatusIndicatorTone = "normal" | "progress" | "attention" | "closed";
-
-function tenantStatusIndicator(tenant: TenantOperationRecord): {
-  tone: TenantStatusIndicatorTone;
-  label: string;
-  icon: IconName;
-} {
-  if (tenant.status === "cancelled") {
-    return { tone: "closed", label: "已结束", icon: "x" };
-  }
-
-  if (tenant.status === "suspended" || tenant.verifiedStatus === "rejected") {
-    return { tone: "attention", label: "需关注", icon: "warning" };
-  }
-
-  if (
-    tenant.status === "trial" ||
-    tenant.verifiedStatus === "pending" ||
-    tenant.verifiedStatus === "unverified"
-  ) {
-    return { tone: "progress", label: "进行中", icon: "clock" };
-  }
-
-  return { tone: "normal", label: "正常", icon: "check" };
-}
 
 function TenantActionsMenu({
   tenant,
@@ -166,23 +139,21 @@ function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
       id: "status",
       header: "状态",
       align: "center",
-      cell: (tenant) => {
-        const indicator = tenantStatusIndicator(tenant);
-        return (
-          <span className="inline-flex flex-wrap items-center justify-center gap-2xs">
-            <StatusBadge
-              tone={TENANT_STATUS_TONE[tenant.status]}
-              icon={indicator.icon}
-              title={indicator.label}
-            >
-              {statusLabel(tenant.status)}
-            </StatusBadge>
-            <StatusBadge tone={VERIFICATION_TONE[tenant.verifiedStatus]}>
-              {verifiedLabel(tenant.verifiedStatus)}
-            </StatusBadge>
-          </span>
-        );
-      },
+      /* 两枚标各说各的一件事：租户态、认证态。图标交给各自的语气自动配——
+         此前这里借了 `tenantStatusIndicator` 的图标，而那是个**复合**信号
+         （状态与认证一起判），于是一枚标里语气来自 status、文字来自 status、
+         图标却在替认证说话：绿底「正常」配一个时钟，读起来像"正常但在等"
+         （2026-08-06 登录态走查抓到）。认证态就在旁边，不必让它挤进来。 */
+      cell: (tenant) => (
+        <span className="inline-flex flex-wrap items-center justify-center gap-2xs">
+          <StatusBadge tone={TENANT_STATUS_TONE[tenant.status]}>
+            {statusLabel(tenant.status)}
+          </StatusBadge>
+          <StatusBadge tone={VERIFICATION_TONE[tenant.verifiedStatus]}>
+            {verifiedLabel(tenant.verifiedStatus)}
+          </StatusBadge>
+        </span>
+      ),
     },
     {
       id: "subscription",
@@ -191,12 +162,12 @@ function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
       cell: (tenant) => (
         <TableTitleCell
           title={
-            <StatusBadge tone={categoryTone()}>
+            <Badge>
               {formatNumber(
                 tenant.subscriptions.length || tenant.subscriptionCount,
               )}{" "}
               产品
-            </StatusBadge>
+            </Badge>
           }
           description={`本月：¥ ${formatNumber(tenant.monthlyRevenue)} 元`}
         />

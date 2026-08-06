@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
+  Badge,
   EmptyState,
   FilterBar,
   Icon,
@@ -25,7 +26,6 @@ import type {
 import {
   PUBLISH_STATUS_TONE,
   VISIBILITY_TONE,
-  categoryTone,
 } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
@@ -263,18 +263,12 @@ function ServicePlanTier({
         <p title={item.tier.summary}>{item.tier.summary}</p>
         <span className="vx-service-plan-product-tags">
           {products.map((product) => (
-            <StatusBadge
-              key={product.id}
-              tone={categoryTone()}
-              title={product.role}
-            >
+            <Badge key={product.id} title={product.role}>
               {product.productName}
-            </StatusBadge>
+            </Badge>
           ))}
           {hiddenProductCount ? (
-            <StatusBadge tone={categoryTone()}>
-              +{formatNumber(hiddenProductCount)}
-            </StatusBadge>
+            <Badge>+{formatNumber(hiddenProductCount)}</Badge>
           ) : null}
         </span>
       </div>

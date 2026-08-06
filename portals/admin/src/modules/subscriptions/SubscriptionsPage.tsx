@@ -263,7 +263,7 @@ function useSubscriptionColumns(): DataTableColumn<SubscriptionOperationRecord>[
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <Badge className={tierBadgeClass(subscription.tierName)}>
+              <Badge className={tierBadgeClass(subscription.tierCode)}>
                 {subscription.tierName}
               </Badge>
               <Badge className="vx-tenant-pill vx-subscription-pill--cycle">
@@ -381,7 +381,7 @@ function SubscriptionCards({
             >
               {subscriptionStatusLabel(subscription.status)}
             </StatusBadge>
-            <Badge className={tierBadgeClass(subscription.tierName)}>
+            <Badge className={tierBadgeClass(subscription.tierCode)}>
               {subscription.tierName}
             </Badge>
             <StatusBadge tone={QUOTA_RISK_TONE[subscription.quota.risk]}>

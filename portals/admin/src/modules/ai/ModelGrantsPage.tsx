@@ -38,7 +38,6 @@ import type {
   ProductModelPolicyRecord,
 } from "@/entities/console";
 import { useConsoleTranslations } from "@/lib/ConsoleIntl";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 
 type ViewMode = "list" | "cards";
@@ -749,16 +748,14 @@ export function ModelGrantsPage() {
                       </StatusBadge>
                     </header>
                     <div className="vx-tenant-directory-card__badges">
-                      <StatusBadge tone={categoryTone()}>
-                        {modelName}
-                      </StatusBadge>
-                      <StatusBadge tone={categoryTone()}>
+                      <Badge>{modelName}</Badge>
+                      <Badge>
                         {formatTokens(
                           policy.quotaTokens,
                           policy.isUnlimited,
                           t("policyTable.unlimited"),
                         )}
-                      </StatusBadge>
+                      </Badge>
                     </div>
                     <div className="vx-tenant-directory-card__metrics">
                       <span>

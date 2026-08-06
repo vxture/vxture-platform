@@ -33,7 +33,6 @@ import type {
 import {
   PUBLISH_STATUS_TONE,
   VISIBILITY_TONE,
-  categoryTone,
 } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
@@ -162,19 +161,14 @@ function CapabilityTags({
   return (
     <span className="vx-product-solution-capability-tags">
       {visibleProducts.map((product) => (
-        <StatusBadge
+        <Badge
           key={product.id}
-          tone={categoryTone()}
           title={`${capabilityTypeLabel(product.productType)} | ${capabilitySourceLabel(product.source)} | ${product.role}`}
         >
           {product.productName}
-        </StatusBadge>
+        </Badge>
       ))}
-      {hiddenCount ? (
-        <StatusBadge tone={categoryTone()}>
-          +{formatNumber(hiddenCount)}
-        </StatusBadge>
-      ) : null}
+      {hiddenCount ? <Badge>+{formatNumber(hiddenCount)}</Badge> : null}
     </span>
   );
 }

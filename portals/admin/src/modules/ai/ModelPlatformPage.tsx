@@ -23,7 +23,6 @@ import {
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { activeTone } from "@/modules/shared/tenant-tone";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   activateModelPriceRule,
@@ -1475,9 +1474,7 @@ export function ModelPlatformPage() {
                     />
                   </header>
                   <div className="vx-tenant-directory-card__badges">
-                    <StatusBadge tone={categoryTone()}>
-                      {provider.providerType}
-                    </StatusBadge>
+                    <Badge>{provider.providerType}</Badge>
                     <StatusBadge tone={activeTone(provider.isActive)}>
                       {provider.isActive
                         ? t("status.active")
@@ -1559,9 +1556,7 @@ export function ModelPlatformPage() {
                       />
                     </header>
                     <div className="vx-tenant-directory-card__badges">
-                      <StatusBadge tone={categoryTone()}>
-                        {rule.currency}
-                      </StatusBadge>
+                      <Badge>{rule.currency}</Badge>
                       <StatusBadge tone={activeTone(rule.isActive)}>
                         {rule.isActive
                           ? t("status.active")

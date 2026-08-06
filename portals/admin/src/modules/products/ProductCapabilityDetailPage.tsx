@@ -24,10 +24,7 @@ import type {
   ProductCapabilityStatus,
   ProductCapabilityType,
 } from "@/entities/console";
-import {
-  PUBLISH_STATUS_TONE,
-  categoryTone,
-} from "@/modules/shared/publish-tone";
+import { PUBLISH_STATUS_TONE } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
@@ -99,12 +96,8 @@ function ProductCapabilitySummary({
           <h2>{product.productName}</h2>
           <p>{product.productCode}</p>
           <div className="vx-product-capability-summary__badges">
-            <StatusBadge tone={categoryTone()}>
-              {capabilityTypeLabel(product.productType)}
-            </StatusBadge>
-            <StatusBadge tone={categoryTone()}>
-              {sourceLabel(product.source)}
-            </StatusBadge>
+            <Badge>{capabilityTypeLabel(product.productType)}</Badge>
+            <Badge>{sourceLabel(product.source)}</Badge>
             <StatusBadge tone={PUBLISH_STATUS_TONE[product.status]}>
               {statusLabel(product.status)}
             </StatusBadge>

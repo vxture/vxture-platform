@@ -28,7 +28,6 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -455,9 +454,7 @@ function PermissionAuthorizationNode({
                   ? "按钮"
                   : "接口"}
             </Badge>
-            <StatusBadge tone={categoryTone()}>
-              {node.depth === 0 ? "根权限" : `L${node.depth}`}
-            </StatusBadge>
+            <Badge>{node.depth === 0 ? "根权限" : `L${node.depth}`}</Badge>
             {!node.permission.status ? (
               <StatusBadge tone="neutral">停用</StatusBadge>
             ) : null}
@@ -619,9 +616,7 @@ function AdminRoleAuthorizationDialog({
           <Badge className="vx-tenant-pill vx-admin-role-pill--api">
             接口 {formatNumber(selectedApiCount)}
           </Badge>
-          <StatusBadge tone={categoryTone()}>
-            合计 {formatNumber(selectedIds.size)}
-          </StatusBadge>
+          <Badge>合计 {formatNumber(selectedIds.size)}</Badge>
         </div>
         <section
           className="vx-admin-role-auth-dialog__toolbar"
@@ -723,11 +718,7 @@ function useAdminRoleColumns(
             : {})}
           icon="role"
           title={labelOf(role)}
-          titleSuffix={
-            role.isSystem ? (
-              <StatusBadge tone={categoryTone()}>系统</StatusBadge>
-            ) : null
-          }
+          titleSuffix={role.isSystem ? <Badge>系统</Badge> : null}
           description={role.roleCode}
         />
       ),
@@ -842,9 +833,7 @@ function AdminRoleCards({
             <StatusBadge tone={roleStatusTone(role)}>
               {roleStatusIndicator(role).label}
             </StatusBadge>
-            {role.isSystem ? (
-              <StatusBadge tone={categoryTone()}>系统</StatusBadge>
-            ) : null}
+            {role.isSystem ? <Badge>系统</Badge> : null}
           </div>
           <p
             className="vx-admin-role-card__description"

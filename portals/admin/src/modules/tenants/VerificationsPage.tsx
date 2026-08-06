@@ -12,6 +12,7 @@ import {
   ActionButton,
   ActionMenu,
   Banner,
+  Badge,
   DataTable,
   DialogForm,
   EmptyState,
@@ -27,7 +28,6 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -295,8 +295,8 @@ function useVerificationColumns(): DataTableColumn<VerificationRow>[] {
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <StatusBadge tone={categoryTone()}>{tenant.industry}</StatusBadge>
-              <StatusBadge tone={categoryTone()}>{tenant.scale}</StatusBadge>
+              <Badge>{tenant.industry}</Badge>
+              <Badge>{tenant.scale}</Badge>
             </span>
           }
           description={tenant.tenantName}

@@ -479,6 +479,7 @@ function mapSubscriptionRow(row: SubscriptionRow): SubscriptionOperationRecord {
     solutionName: planName,
     servicePlanCode: row.plan_code ?? "",
     servicePlanName: planName,
+    tierCode,
     tierName: tierName(tierCode),
     status,
     rawStatus: row.raw_status,

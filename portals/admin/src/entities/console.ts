@@ -1032,6 +1032,8 @@ export interface SubscriptionOperationRecord {
   solutionName: string;
   servicePlanCode: string;
   servicePlanName: string;
+  /** 机器可读的等级码。`tierName` 是展示名（已本地化），做不了映射。 */
+  tierCode: ProductSolutionTierCode;
   tierName: string;
   status: SubscriptionOperationStatus;
   rawStatus: string;

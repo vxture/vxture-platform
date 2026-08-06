@@ -22,7 +22,6 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -351,11 +350,7 @@ function useAccountColumns(
       align: "center",
       cell: (account) => (
         <TableTitleCell
-          title={
-            <StatusBadge tone={categoryTone()}>
-              {accountHighestRoleLabel(account)}
-            </StatusBadge>
-          }
+          title={<Badge>{accountHighestRoleLabel(account)}</Badge>}
           description={
             showTenantContext
               ? `${formatNumber(account.tenantCount)} 个租户`
@@ -370,11 +365,7 @@ function useAccountColumns(
       align: "center",
       cell: (account) => (
         <TableTitleCell
-          title={
-            <StatusBadge tone={categoryTone()}>
-              {account.lastActiveLocation}
-            </StatusBadge>
-          }
+          title={<Badge>{account.lastActiveLocation}</Badge>}
           description={`${formatDate(account.lastActiveAt)} · ${formatNumber(account.loginCount30d)} 次`}
         />
       ),
@@ -424,9 +415,7 @@ function AccountCards({
                   </Badge>
                 ))
               : null}
-            <StatusBadge tone={categoryTone()}>
-              {accountHighestRoleLabel(account)}
-            </StatusBadge>
+            <Badge>{accountHighestRoleLabel(account)}</Badge>
           </div>
           <div className="vx-tenant-directory-card__metrics">
             {showTenantContext ? (

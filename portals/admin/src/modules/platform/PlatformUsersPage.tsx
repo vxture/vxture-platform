@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ActionButton,
   ActionMenu,
+  Badge,
   Button,
   DataTable,
   Dialog,
@@ -27,7 +28,6 @@ import {
   useToast,
 } from "@vxture/design-system";
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   changePlatformAdminRole,
@@ -248,11 +248,7 @@ function usePlatformUserColumns(
         <TableTitleCell
           icon="user"
           title={admin.displayName || admin.username}
-          titleSuffix={
-            admin.isSystem ? (
-              <StatusBadge tone={categoryTone()}>系统</StatusBadge>
-            ) : null
-          }
+          titleSuffix={admin.isSystem ? <Badge>系统</Badge> : null}
           description={admin.username ? `@${admin.username}` : EMPTY_MARK}
         />
       ),
@@ -338,15 +334,11 @@ function PlatformUsersCards({
             </StatusBadge>
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <StatusBadge tone={categoryTone()}>
-              {platformRoleDisplayName(admin, t)}
-            </StatusBadge>
+            <Badge>{platformRoleDisplayName(admin, t)}</Badge>
             <StatusBadge tone={platformRoleStatusTone(admin)}>
               {platformRoleStatusLabel(admin)}
             </StatusBadge>
-            {admin.isSystem ? (
-              <StatusBadge tone={categoryTone()}>系统</StatusBadge>
-            ) : null}
+            {admin.isSystem ? <Badge>系统</Badge> : null}
           </div>
           <div className="vx-tenant-directory-card__metrics">
             <span>

@@ -68,14 +68,20 @@ export const TIER_CLASS: Record<Tier, string> = {
 };
 
 /**
- * 把展示用的套餐名归一到类名。
+ * 把等级码归一到类名。
  *
- * 读的是 `tierName` 这类自由文本（BFF 给的是展示名，大小写不定），认不出来时退回
- * 最轻的那档——**不猜**：认不出的套餐名着上品牌底会谎报它是付费客户。
+ * **传 code 不要传 `tierName`**：BFF 的 `tierName` 是**已本地化的展示名**
+ * （企业版 / 专业版 / 基础版 / 自定义），拿它去比 `TIERS` 的英文码永远不命中，
+ * 结果是整列退成最轻的一档——2026-08-06 登录态走查抓到的就是这个，四行套餐标
+ * 全是灰的。订阅记录为此补发了 `tierCode`。
+ *
+ * `custom` 不在 `TIERS` 里（它是谈出来的方案，不是价目表上的一档），但它**是付费
+ * 客户**，按主力档给。认不出的才退回最轻档——不猜。
  */
-export function tierBadgeClass(tierName: string | null | undefined): string {
-  if (!tierName) return FREE_CLASS;
-  const key = tierName.trim().toLowerCase();
+export function tierBadgeClass(tierCode: string | null | undefined): string {
+  if (!tierCode) return FREE_CLASS;
+  const key = tierCode.trim().toLowerCase();
+  if (key === "custom") return PAID_CLASS;
   const tier = TIERS.find((value) => value === key);
   return tier ? TIER_CLASS[tier] : FREE_CLASS;
 }

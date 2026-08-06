@@ -5,6 +5,7 @@ import type { FormEvent, ReactNode } from "react";
 import Link from "next/link";
 import {
   ActionMenu,
+  Badge,
   Button,
   DetailPageTemplate,
   DialogForm,
@@ -42,7 +43,6 @@ import {
   TENANT_SUBSCRIPTION_TONE,
   TICKET_STATUS_TONE,
 } from "@/modules/shared/tenant-tone";
-import { categoryTone } from "@/modules/shared/publish-tone";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import { resolveIpLocation } from "@/shared/ip-location";
 import {
@@ -418,13 +418,13 @@ function TenantInfoTab({
                   ))}
                 </NativeSelect>
               ) : (
-                <StatusBadge tone={categoryTone()}>
+                <Badge>
                   {
                     tenantTypeOptions.find(
                       (option) => option.value === draft.tenantType,
                     )?.label
                   }
-                </StatusBadge>
+                </Badge>
               )}
             </TenantConfigItem>
             <TenantConfigItem label="租户状态">
@@ -480,9 +480,7 @@ function TenantInfoTab({
           <TenantConfigItem label="姓名">
             <TenantConfigValue>
               {tenant.ownerName}
-              {tenant.tenantType === "individual" ? (
-                <StatusBadge tone={categoryTone()}>owner</StatusBadge>
-              ) : null}
+              {tenant.tenantType === "individual" ? <Badge>owner</Badge> : null}
             </TenantConfigValue>
           </TenantConfigItem>
           <TenantConfigItem label="Mail">
@@ -657,7 +655,7 @@ function TenantMemberList({
           </span>
           <TenantMemberIdentity member={member} />
           <span className="vx-tenant-member-row__permission">
-            <StatusBadge tone={categoryTone()}>{member.role}</StatusBadge>
+            <Badge>{member.role}</Badge>
           </span>
           <TenantMemberStatus member={member} />
           <TenantMemberActiveAt member={member} />
@@ -707,7 +705,7 @@ function TenantMemberCards({
               <MemberActionsMenu member={member} actions={actions} />
             </header>
             <div className="vx-tenant-member-card__badges">
-              <StatusBadge tone={categoryTone()}>{member.role}</StatusBadge>
+              <Badge>{member.role}</Badge>
               <StatusBadge tone={MEMBER_STATUS_TONE[member.status]}>
                 {memberStatusLabel(member.status)}
               </StatusBadge>

@@ -176,7 +176,7 @@
         "description": "核心运营指标、各业务域关键趋势和平台健康快照。"
       },
       "opsTodos": {
-        "label": "运营待办",
+        "label": "待办任务",
         "description": "聚合待审核、异常告警和需要人工介入的运营任务。"
       },
       "tenants": {

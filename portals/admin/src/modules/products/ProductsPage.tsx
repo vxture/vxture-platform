@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
+  Badge,
   DataTable,
   EmptyState,
   FilterBar,
@@ -30,7 +31,6 @@ import type {
 import {
   ACCESS_STATUS_TONE,
   PUBLISH_STATUS_TONE,
-  categoryTone,
 } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
@@ -179,12 +179,8 @@ function useProductColumns(
       align: "center",
       cell: (product) => (
         <span className="inline-flex flex-wrap justify-center gap-2xs">
-          <StatusBadge tone={categoryTone()}>
-            {productTypeLabel(product.productType)}
-          </StatusBadge>
-          <StatusBadge tone={categoryTone()}>
-            {productSourceLabel(product.source)}
-          </StatusBadge>
+          <Badge>{productTypeLabel(product.productType)}</Badge>
+          <Badge>{productSourceLabel(product.source)}</Badge>
         </span>
       ),
     },
@@ -289,12 +285,8 @@ function ProductCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <StatusBadge tone={categoryTone()}>
-              {productTypeLabel(product.productType)}
-            </StatusBadge>
-            <StatusBadge tone={categoryTone()}>
-              {productSourceLabel(product.source)}
-            </StatusBadge>
+            <Badge>{productTypeLabel(product.productType)}</Badge>
+            <Badge>{productSourceLabel(product.source)}</Badge>
             <StatusBadge tone={PUBLISH_STATUS_TONE[product.status]}>
               {productStatusLabel(product.status)}
             </StatusBadge>
