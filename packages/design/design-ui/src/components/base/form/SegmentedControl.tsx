@@ -42,6 +42,8 @@ export interface SegmentedControlItem<TValue extends string | number> {
   readonly icon?: IconName;
   /** 只有图标时必须给，否则读屏没有可念的名字。 */
   readonly ariaLabel?: string;
+  /** 该档的条数，渲染成标签后的小徽标。 */
+  readonly count?: number;
   readonly disabled?: boolean;
 }
 
@@ -82,13 +84,11 @@ function SegmentedControl<TValue extends string | number>({
         // 两者都走 rounded-full 胶囊：槽和滑块的圆角必须同族，槽用大圆角而
         // 滑块用方角的话，滑到两端时滑块的直角会戳出槽的弧线。
         //
-        // 描边取 border（而非 input）：input 档是给输入框用的实边，放在这里
-        // 显得比同栏其他无边控件重得多；槽只需要一条能界定范围的淡线。
         // 槽底走 surface-3（浅色档 neutral-50）而不是 muted（neutral-200）：
         // 槽只需要"这里是个凹处"的一点点暗示，muted 那一档在白卡片上已经是
         // 一块明确的灰色面，比它承载的滑块还抢眼。暗色档 surface-3 比 card
         // 亮一级，凹陷感在两个模式下都成立。
-        "flex items-stretch rounded-full border border-border bg-surface-3 p-2xs",
+        "flex items-stretch rounded-full border border-input bg-surface-3 p-2xs",
         fill ? "w-full" : "inline-flex",
         BY_SIZE[size].root,
         className,
@@ -119,6 +119,18 @@ function SegmentedControl<TValue extends string | number>({
               <Icon name={item.icon} size={16} aria-hidden="true" />
             ) : null}
             {item.label}
+            {item.count !== undefined ? (
+              <span
+                className={cn(
+                  "rounded-full px-2xs text-label-sm tabular-nums",
+                  active
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-surface-2 text-muted-foreground",
+                )}
+              >
+                {item.count}
+              </span>
+            ) : null}
           </button>
         );
       })}

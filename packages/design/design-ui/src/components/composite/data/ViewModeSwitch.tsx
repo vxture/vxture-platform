@@ -25,6 +25,14 @@ import { ToggleGroup, ToggleGroupItem } from "../../base/form/ToggleGroup";
 
 export type ViewModeSwitchValue = "list" | "cards";
 
+/* 选中态用品牌淡底而非实底：实底会压过同行的搜索框与主按钮（owner 2026-08-06）。 */
+const ITEM = [
+  "text-muted-foreground",
+  "data-[state=on]:bg-primary-muted",
+  "data-[state=on]:text-primary-muted-foreground",
+  "data-[state=on]:hover:bg-primary-muted-hover",
+].join(" ");
+
 export interface ViewModeSwitchProps {
   readonly value: ViewModeSwitchValue;
   readonly onChange: (value: ViewModeSwitchValue) => void;
@@ -55,11 +63,19 @@ export function ViewModeSwitch({
       }}
       {...(className ? { className } : {})}
     >
-      <ToggleGroupItem value="list" aria-label={labels?.list ?? "列表视图"}>
-        <Icon name="list" size="sm" />
+      <ToggleGroupItem
+        value="list"
+        aria-label={labels?.list ?? "列表视图"}
+        className={ITEM}
+      >
+        <Icon name="list" size="lg" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="cards" aria-label={labels?.cards ?? "卡片视图"}>
-        <Icon name="squares-four" size="sm" />
+      <ToggleGroupItem
+        value="cards"
+        aria-label={labels?.cards ?? "卡片视图"}
+        className={ITEM}
+      >
+        <Icon name="squares-four" size="lg" />
       </ToggleGroupItem>
     </ToggleGroup>
   );

@@ -121,7 +121,10 @@ function SectionHeader({
         ) : null}
       </div>
       {action ? (
-        <div className="flex shrink-0 items-center gap-sm">{action}</div>
+        /* self-end：与标题块下沿对齐，不跟标题首行齐平。 */
+        <div className="flex shrink-0 items-center gap-sm self-end">
+          {action}
+        </div>
       ) : null}
     </div>
   );

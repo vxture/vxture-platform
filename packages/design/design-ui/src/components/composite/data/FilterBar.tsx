@@ -95,7 +95,7 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
           {search}
           {onReset ? (
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon-md"
               onClick={onReset}
               aria-label={resetLabel}
