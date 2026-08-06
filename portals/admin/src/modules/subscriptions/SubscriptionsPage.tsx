@@ -728,6 +728,7 @@ export function SubscriptionsPage() {
               items={[
                 {
                   id: "instances",
+                  help: "当前筛选条件下的订阅实例数。",
                   icon: "star",
                   label: "订阅实例",
                   value: formatNumber(subscriptions.length),
@@ -735,6 +736,7 @@ export function SubscriptionsPage() {
                 },
                 {
                   id: "follow-up",
+                  help: "需跟进的订阅：试用、即将到期、欠费，或配额风险非正常。",
                   icon: "warning",
                   label: "待跟进",
                   value: formatNumber(followUpCount),
@@ -745,6 +747,7 @@ export function SubscriptionsPage() {
                 },
                 {
                   id: "monthly-revenue",
+                  help: "这些订阅的月收入之和；年付按 12 个月折算，一次性买断计 0。",
                   icon: "chart-bar",
                   label: "月收入",
                   value: formatMoney(monthlyRevenue),
@@ -753,6 +756,7 @@ export function SubscriptionsPage() {
                 },
                 {
                   id: "quota-risk",
+                  help: "配额风险为危险或警告的订阅数。",
                   icon: "shield-check",
                   label: "配额风险",
                   value: formatNumber(dangerQuotaCount + warningQuotaCount),

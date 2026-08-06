@@ -887,6 +887,7 @@ export function PaymentsPage() {
               items={[
                 {
                   id: "records",
+                  help: "当前筛选条件下的收款记录条数。",
                   icon: "check",
                   label: "收款记录",
                   value: formatNumber(payments.length),
@@ -894,6 +895,7 @@ export function PaymentsPage() {
                 },
                 {
                   id: "paid-amount",
+                  help: "已收款记录的金额合计。",
                   icon: "chart-bar",
                   label: "已收金额",
                   value: formatCurrency(paidAmount, "CNY"),
@@ -902,6 +904,7 @@ export function PaymentsPage() {
                 },
                 {
                   id: "pending-verify",
+                  help: "状态为待复核的收款记录。",
                   icon: "clock",
                   label: "待复核",
                   value: formatNumber(pendingVerifyCount),
@@ -911,6 +914,7 @@ export function PaymentsPage() {
                 },
                 {
                   id: "attention",
+                  help: "对账状态非正常的收款记录。",
                   icon: "warning",
                   label: "需关注",
                   value: formatNumber(attentionCount),

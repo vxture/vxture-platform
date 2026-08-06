@@ -523,6 +523,7 @@ export function PromotionsPage() {
               items={[
                 {
                   id: "promotions",
+                  help: "当前筛选条件下的优惠活动数。",
                   icon: "sparkles",
                   label: "优惠活动",
                   value: formatNumber(records.length),
@@ -530,6 +531,7 @@ export function PromotionsPage() {
                 },
                 {
                   id: "redemptions",
+                  help: "这些活动的核销次数合计。",
                   icon: "check",
                   label: "核销次数",
                   value: formatNumber(redemptionCount),
@@ -538,6 +540,7 @@ export function PromotionsPage() {
                 },
                 {
                   id: "tenant-reach",
+                  help: "这些活动覆盖的租户数合计（按活动累加，非去重）。",
                   icon: "chart-bar",
                   label: "覆盖租户",
                   value: formatNumber(tenantReach),
@@ -546,6 +549,7 @@ export function PromotionsPage() {
                 },
                 {
                   id: "pending-config",
+                  help: "券类活动数（promotionType = coupon）。",
                   icon: "clock",
                   label: "待配置",
                   value: formatNumber(

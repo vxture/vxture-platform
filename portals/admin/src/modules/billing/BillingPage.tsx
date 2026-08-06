@@ -831,6 +831,7 @@ export function BillingPage() {
               items={[
                 {
                   id: "total",
+                  help: "当前筛选条件下的账单条数。",
                   icon: "key",
                   label: "账单总数",
                   value: formatNumber(bills.length),
@@ -841,6 +842,7 @@ export function BillingPage() {
                 },
                 {
                   id: "pending",
+                  help: "未结清账单：未支付、支付中、部分支付、已逾期。",
                   icon: "clock",
                   label: "待收款",
                   value: formatNumber(pendingCount),
@@ -851,6 +853,7 @@ export function BillingPage() {
                 },
                 {
                   id: "receivable",
+                  help: "全部账单应收金额合计。",
                   icon: "chart-bar",
                   label: "应收金额",
                   value: formatCurrency(receivableAmount, "CNY"),
@@ -862,6 +865,7 @@ export function BillingPage() {
                 },
                 {
                   id: "invoiced",
+                  help: "全部账单已开票金额合计，与应收的差额即待开票部分。",
                   icon: "table",
                   label: "开票进度",
                   value: formatCurrency(invoicedAmount, "CNY"),

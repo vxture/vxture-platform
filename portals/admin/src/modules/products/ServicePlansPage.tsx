@@ -511,6 +511,7 @@ export function ServicePlansPage() {
               items={[
                 {
                   id: "solutions",
+                  help: "提供服务套餐的业务方案数。",
                   icon: "workflow",
                   label: "业务方案",
                   value: formatNumber(solutionCount),
@@ -518,6 +519,7 @@ export function ServicePlansPage() {
                 },
                 {
                   id: "active-tiers",
+                  help: "状态为启用、可被订阅的套餐数。",
                   icon: "star",
                   label: "启用套餐",
                   value: formatNumber(activeTierCount),
@@ -526,6 +528,7 @@ export function ServicePlansPage() {
                 },
                 {
                   id: "subscriptions",
+                  help: "各方案的订阅数之和。",
                   icon: "user",
                   label: "订阅使用",
                   value: formatNumber(subscriptionCount),
@@ -534,6 +537,7 @@ export function ServicePlansPage() {
                 },
                 {
                   id: "revenue",
+                  help: "各方案月度收入之和。",
                   icon: "chart-bar",
                   label: "月度收入",
                   value: formatMoney(monthlyRevenue),

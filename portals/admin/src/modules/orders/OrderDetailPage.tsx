@@ -156,28 +156,31 @@ function OrderSummary({ order }: { order: OrderOperationDetailRecord }) {
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "amount",
+            help: "订单成交金额，按订单币种展示。",
             label: "订单金额",
             value: formatCurrency(order.amount, order.currency),
             tags: [cycleLabel(order.cycleType)],
           },
           {
             id: "paid",
+            help: "已核销到本订单的回款金额。",
             label: "已收金额",
             value: formatCurrency(order.paidAmount, order.currency),
             tags: [paySourceLabel(order.paySource)],
           },
           {
             id: "solution",
+            help: "本订单开通的业务方案。",
             label: "业务方案",
             value: order.solutionName,
             tags: [order.servicePlanName],
           },
           {
             id: "operation",
+            help: "按当前订单状态给出的建议处理动作。",
             label: "运营动作",
             value: order.operationHint,
             tags: [order.operatorName],

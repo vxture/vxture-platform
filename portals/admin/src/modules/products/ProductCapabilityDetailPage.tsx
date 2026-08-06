@@ -113,16 +113,17 @@ function ProductCapabilitySummary({
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "solutions",
+            help: "引用了本产品能力的业务方案数。",
             label: "业务方案",
             value: formatNumber(product.solutionCount),
             tags: [`${formatNumber(product.planCount)} 套餐`],
           },
           {
             id: "integration",
+            help: "本能力对接平台的进度：无需接入 / 待配置 / 联调中 / 已接入。",
             label: "接入状态",
             value: integrationStatusLabel(product.integration.status),
             tags: [product.integration.providerName],
@@ -135,6 +136,7 @@ function ProductCapabilitySummary({
           },
           {
             id: "health",
+            help: "本能力当前可用状态：正常 / 需关注 / 不可用。",
             label: "可用状态",
             value: healthLabel(product.healthStatus),
             tags: [`${formatNumber(product.modelPolicyCount)} 模型授权`],

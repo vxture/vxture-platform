@@ -829,6 +829,7 @@ export function TicketsPage() {
         items={[
           {
             id: "open",
+            help: "状态不为已关闭的工单。",
             icon: "chat-circle",
             label: "未关闭工单",
             value: formatNumber(openTickets.length),
@@ -837,6 +838,7 @@ export function TicketsPage() {
           },
           {
             id: "urgent",
+            help: "优先级为 P0 或 P1 的工单。",
             icon: "warning",
             label: "P0/P1 工单",
             value: formatNumber(urgentTickets.length),
@@ -845,6 +847,7 @@ export function TicketsPage() {
           },
           {
             id: "blocked",
+            help: "状态为阻塞中、等待外部条件的工单。",
             icon: "clock",
             label: "阻塞中",
             value: formatNumber(blockedTickets.length),
@@ -853,6 +856,7 @@ export function TicketsPage() {
           },
           {
             id: "total",
+            help: "当前筛选条件下的工单条数。",
             icon: "table",
             label: "工单总数",
             value: formatNumber(tickets.length),

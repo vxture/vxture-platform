@@ -87,10 +87,10 @@ function ProductSolutionSummary({
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "products",
+            help: "本方案关联的产品能力条目数。",
             label: "产品能力",
             value: formatNumber(solution.products.length),
             tags: [
@@ -99,12 +99,14 @@ function ProductSolutionSummary({
           },
           {
             id: "tiers",
+            help: "本方案下的服务套餐数。",
             label: "服务套餐",
             value: formatNumber(solution.tiers.length),
             tags: [solution.tiers.map((tier) => tier.tierName).join(" | ")],
           },
           {
             id: "subscriptions",
+            help: "订阅了本方案的订阅实例数。",
             label: "订阅使用",
             value: formatNumber(solution.subscriptionCount),
             tags: [`活跃 ${formatNumber(solution.activeTenantCount)}`],

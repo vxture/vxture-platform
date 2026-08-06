@@ -546,6 +546,7 @@ export function ProductsPage() {
               items={[
                 {
                   id: "total",
+                  help: "产品能力总数。",
                   icon: "database",
                   label: "能力总数",
                   value: formatNumber(products.length),
@@ -553,6 +554,7 @@ export function ProductsPage() {
                 },
                 {
                   id: "types",
+                  help: "归属 agent 与 platform 两类的能力数之和。",
                   icon: "agent",
                   label: "能力类型",
                   value: formatNumber(agentProducts + platformProducts),
@@ -564,6 +566,7 @@ export function ProductsPage() {
                 },
                 {
                   id: "partner",
+                  help: "来源为三方接入的能力数。",
                   icon: "cloud",
                   label: "三方接入",
                   value: formatNumber(partnerProducts),
@@ -572,6 +575,7 @@ export function ProductsPage() {
                 },
                 {
                   id: "solutions",
+                  help: "这些能力被引用到的业务方案数，按方案编码去重。",
                   icon: "workflow",
                   label: "方案复用",
                   value: formatNumber(solutionCount),

@@ -68,12 +68,14 @@ function SkillSummary({ skills }: { skills: SkillRecord[] }) {
       items={[
         {
           id: "active",
+          help: "状态为已上线、可被调用的技能。",
           icon: "cube",
           label: "已上线技能",
           value: String(activeCount),
         },
         {
           id: "disabled",
+          help: "已停用、不再对外提供的技能。",
           icon: "x",
           label: "已停用技能",
           value: String(disabledCount),
@@ -81,6 +83,7 @@ function SkillSummary({ skills }: { skills: SkillRecord[] }) {
         },
         {
           id: "invocations",
+          help: "全部技能的历史调用次数之和。",
           icon: "sparkles",
           label: "总调用次数",
           value: formatNumber(totalInvocations),

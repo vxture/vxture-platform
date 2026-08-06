@@ -532,6 +532,7 @@ export function UsageMeteringPage() {
               items={[
                 {
                   id: "records",
+                  help: "当前筛选条件下的用量计量记录条数。",
                   icon: "graph",
                   label: "计量记录",
                   value: formatNumber(records.length),
@@ -539,6 +540,7 @@ export function UsageMeteringPage() {
                 },
                 {
                   id: "total-used",
+                  help: "这些记录的用量合计，单位随计量项。",
                   icon: "chart-bar",
                   label: "总消耗",
                   value: formatNumber(totalUsed),
@@ -547,6 +549,7 @@ export function UsageMeteringPage() {
                 },
                 {
                   id: "near-limit",
+                  help: "用量风险为警告的记录，接近配额上限。",
                   icon: "clock",
                   label: "接近上限",
                   value: formatNumber(warningCount),
@@ -555,6 +558,7 @@ export function UsageMeteringPage() {
                 },
                 {
                   id: "over-limit",
+                  help: "用量风险为危险或异常的记录，含已超额。",
                   icon: "warning",
                   label: "超额异常",
                   value: formatNumber(dangerCount),

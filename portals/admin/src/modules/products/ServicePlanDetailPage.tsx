@@ -82,7 +82,6 @@ function ServicePlanSummary({
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "price",
@@ -94,18 +93,21 @@ function ServicePlanSummary({
           },
           {
             id: "included",
+            help: "本套餐包含的产品能力数。",
             label: "包含产品",
             value: formatNumber(plan.includedProductCount),
             tags: [`不含 ${formatNumber(plan.excludedProductCount)}`],
           },
           {
             id: "subscriptions",
+            help: "使用本套餐的订阅实例数。",
             label: "订阅使用",
             value: formatNumber(plan.subscriptionCount),
             tags: [`活跃 ${formatNumber(plan.activeTenantCount)}`],
           },
           {
             id: "scope",
+            help: "本套餐适用范围条目数。",
             label: "适用范围",
             value: formatNumber(plan.applicableScope.length),
             tags: [plan.industry],

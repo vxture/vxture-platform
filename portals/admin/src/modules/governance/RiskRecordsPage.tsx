@@ -311,12 +311,14 @@ export function RiskRecordsPage() {
             items={[
               {
                 id: "待处置（需跟进/高风险）",
+                help: "风险等级非正常且尚无审阅人的记录。",
                 icon: "warning",
                 label: "待处置（需跟进/高风险）",
                 value: String(pendingCount),
               },
               {
                 id: "已审阅",
+                help: "已指定审阅人的记录，不论结论。",
                 icon: "check",
                 label: "已审阅",
                 value: String(
@@ -325,6 +327,7 @@ export function RiskRecordsPage() {
               },
               {
                 id: "记录总数",
+                help: "当前筛选条件下的风险记录条数。",
                 icon: "table",
                 label: "记录总数",
                 value: String(items.length),

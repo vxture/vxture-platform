@@ -198,13 +198,21 @@ function AnnouncementSummary({ items }: { items: AnnouncementRecord[] }) {
       items={[
         {
           id: "published",
+          help: "状态为已发布的公告，含历史发布。",
           icon: "bell",
           label: "已发布公告",
           value: String(published),
         },
-        { id: "drafts", icon: "edit", label: "草稿中", value: String(drafts) },
+        {
+          id: "drafts",
+          help: "尚未发布的草稿。",
+          icon: "edit",
+          label: "草稿中",
+          value: String(drafts),
+        },
         {
           id: "month",
+          help: "发布时间落在本自然月内的公告。",
           icon: "calendar",
           label: "本月已发送",
           value: String(thisMonth),

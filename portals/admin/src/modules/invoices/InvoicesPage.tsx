@@ -777,6 +777,7 @@ export function InvoicesPage() {
               items={[
                 {
                   id: "total",
+                  help: "当前筛选条件下的发票条数。",
                   icon: "key",
                   label: "发票总数",
                   value: formatNumber(invoices.length),
@@ -784,6 +785,7 @@ export function InvoicesPage() {
                 },
                 {
                   id: "amount",
+                  help: "有效发票（排除红冲与驳回）的开票金额合计。",
                   icon: "chart-bar",
                   label: "有效开票",
                   value: formatCurrency(invoiceAmount, "CNY"),
@@ -792,6 +794,7 @@ export function InvoicesPage() {
                 },
                 {
                   id: "delivery-pending",
+                  help: "已开具或发送中、尚未确认交付的发票。",
                   icon: "table",
                   label: "待交付",
                   value: formatNumber(deliveryPendingCount),
@@ -800,6 +803,7 @@ export function InvoicesPage() {
                 },
                 {
                   id: "exception",
+                  help: "红冲与被驳回的发票。",
                   icon: "warning",
                   label: "发票异常",
                   value: formatNumber(exceptionCount),

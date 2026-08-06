@@ -119,10 +119,10 @@ function SubscriptionSummary({
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "solution",
+            help: "本订阅关联的业务方案。",
             label: "业务方案",
             value: subscription.solutionAssociation.solutionName,
             tags: [
@@ -131,18 +131,21 @@ function SubscriptionSummary({
           },
           {
             id: "revenue",
+            help: "年付按 12 个月折算，一次性买断计 0，其余取周期金额。",
             label: "月收入",
             value: formatMoney(subscription.monthlyRevenue),
             tags: [cycleLabel(subscription.cycleType)],
           },
           {
             id: "quota",
+            help: "本周期已用配额占额度的百分比。",
             label: "配额消耗",
             value: `${formatNumber(subscription.quota.usageRate)}%`,
             tags: [`${formatNumber(subscription.quota.maxUsers)} 席位`],
           },
           {
             id: "operation",
+            help: "按订阅状态与自动续订设置给出的建议处理动作。",
             label: "运营动作",
             value: subscription.operationHint,
             tags: [subscription.autoRenew ? "自动续期" : "人工跟进"],

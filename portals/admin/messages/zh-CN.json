@@ -1321,7 +1321,10 @@
       "models": "模型注册",
       "modelsValue": "{active} / {total} 启用",
       "privateModels": "自建模型",
-      "onlineModels": "在线模型"
+      "onlineModels": "在线模型",
+      "modelsHelp": "已注册的模型总数，含停用的。",
+      "activeHelp": "标记为启用、可被策略引用的模型。",
+      "inactiveHelp": "注册总数减去启用数，即当前停用的模型。"
     },
     "providers": {
       "doubao": "doubao",
@@ -1424,7 +1427,10 @@
       "policies": "产品策略",
       "policiesValue": "{usable} / {total} 可用",
       "products": "覆盖产品",
-      "undefinedPolicies": "未定义策略"
+      "undefinedPolicies": "未定义策略",
+      "policiesHelp": "已登记的产品级模型策略条数，含停用与未定义的。",
+      "overridesHelp": "租户级覆盖授权条数；覆盖优先于产品策略生效。",
+      "undefinedPoliciesHelp": "尚未定义可用模型的策略：该产品当前无模型可调用。"
     },
     "filters": {
       "all": "全部策略",

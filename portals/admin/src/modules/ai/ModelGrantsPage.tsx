@@ -525,6 +525,7 @@ export function ModelGrantsPage() {
         items={[
           {
             id: "policies",
+            help: t("summary.policiesHelp"),
             icon: "shield-check",
             label: t("summary.policies"),
             value: formatNumber(policies.length),
@@ -532,6 +533,7 @@ export function ModelGrantsPage() {
           },
           {
             id: "overrides",
+            help: t("summary.overridesHelp"),
             icon: "play",
             label: t("overrides.title"),
             value: formatNumber(grants.length),
@@ -543,6 +545,7 @@ export function ModelGrantsPage() {
           },
           {
             id: "undefined",
+            help: t("summary.undefinedPoliciesHelp"),
             icon: "clock-counter-clockwise",
             label: t("summary.undefinedPolicies"),
             value: formatNumber(undefinedPolicies),

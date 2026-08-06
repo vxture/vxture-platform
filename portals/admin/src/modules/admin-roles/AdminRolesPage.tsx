@@ -1555,6 +1555,7 @@ export function AdminRolesPage() {
               items={[
                 {
                   id: "total",
+                  help: "角色总数，含停用与归档的。",
                   icon: "role",
                   label: "角色总数",
                   value: formatNumber(roles.length),
@@ -1562,6 +1563,7 @@ export function AdminRolesPage() {
                 },
                 {
                   id: "enabled",
+                  help: "状态为启用、可被授予的角色。",
                   icon: "check",
                   label: "启用角色",
                   value: formatNumber(enabledRoles),
@@ -1570,6 +1572,7 @@ export function AdminRolesPage() {
                 },
                 {
                   id: "other",
+                  help: "停用与归档角色之和。",
                   icon: "x",
                   label: "其他角色",
                   value: formatNumber(otherRoleCount),

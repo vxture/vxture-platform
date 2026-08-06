@@ -15,7 +15,7 @@ import {
   PanelList,
   Section,
   SectionHeader,
-  StatCard,
+  MetricCard,
   StatusBadge,
   TableTitleCell,
   ViewHeader,
@@ -696,12 +696,12 @@ function OverviewHeading({
 
 function OverviewPulseCard({ metric }: { metric: OverviewPulseMetric }) {
   /* 带标签的是补充口径（"新增 +12"），语气跟随整卡；不带标签的是纯涨跌值，
-   * 自带涨绿跌红的语气——正好对上 StatCard 的 tags / trend 两个槽。 */
+   * 自带涨绿跌红的语气——正好对上 MetricCard 的 tags / trend 两个槽。 */
   const delta = metric.tags.find((tag) => !tag.label);
   const captions = metric.tags.filter((tag) => tag.label);
 
   return (
-    <StatCard
+    <MetricCard
       label={metric.title}
       help={metric.detail}
       tone={toStatusTone(metric.tone)}

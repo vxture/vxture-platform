@@ -377,6 +377,7 @@ export function PlatformGovernanceListPage({
             items={[
               {
                 id: "total",
+                help: `当前${config.objectLabel}记录总数，不区分状态。`,
                 icon: config.icon,
                 label: config.summary.total.label,
                 value: formatNumber(summary.total),
@@ -384,6 +385,7 @@ export function PlatformGovernanceListPage({
               },
               {
                 id: "normal",
+                help: "状态为正常、无需干预的记录。",
                 icon: "check",
                 label: config.summary.normal.label,
                 value: formatNumber(summary.normal),
@@ -392,6 +394,7 @@ export function PlatformGovernanceListPage({
               },
               {
                 id: "risk",
+                help: "状态为关注或阻断，加上待处理的记录合计。",
                 icon: "info",
                 label: config.summary.risk.label,
                 value: formatNumber(summary.risk + summary.pending),

@@ -1321,7 +1321,10 @@
       "models": "Registered models",
       "modelsValue": "{active} / {total} active",
       "privateModels": "Private models",
-      "onlineModels": "Online models"
+      "onlineModels": "Online models",
+      "modelsHelp": "Total registered models, including inactive ones.",
+      "activeHelp": "Models marked active and available to policies.",
+      "inactiveHelp": "Registered total minus active — models currently disabled."
     },
     "providers": {
       "doubao": "Doubao",
@@ -1424,7 +1427,10 @@
       "policies": "Product policies",
       "policiesValue": "{usable} / {total} usable",
       "products": "Covered products",
-      "undefinedPolicies": "Undefined policies"
+      "undefinedPolicies": "Undefined policies",
+      "policiesHelp": "Registered product-level model policies, including inactive and undefined ones.",
+      "overridesHelp": "Tenant-level override grants; overrides take precedence over product policies.",
+      "undefinedPoliciesHelp": "Policies with no model defined yet — the product currently has no model to call."
     },
     "filters": {
       "all": "All policies",

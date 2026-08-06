@@ -183,12 +183,14 @@ export function NotificationLogsPage() {
           items={[
             {
               id: "total",
+              help: "当前筛选条件下的投递记录条数。",
               icon: "bell",
               label: "投递总数",
               value: String(items.length),
             },
             {
               id: "failed",
+              help: "投递失败与被退回的记录合计。",
               icon: "warning",
               label: "失败 / 退回",
               value: String(failedCount),

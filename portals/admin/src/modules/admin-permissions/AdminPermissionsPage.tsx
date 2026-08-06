@@ -832,6 +832,7 @@ function PermissionDomainStats({ group }: { group: PermissionDomainGroup }) {
       items={[
         {
           id: "total",
+          help: "权限点总数，含未启用的。",
           icon: "shield-check",
           label: "权限总数",
           value: formatNumber(group.totalCount),
@@ -843,6 +844,7 @@ function PermissionDomainStats({ group }: { group: PermissionDomainGroup }) {
         },
         {
           id: "active",
+          help: "处于启用状态的权限点。",
           icon: "check",
           label: "启用权限",
           value: formatNumber(group.activeCount),
@@ -851,6 +853,7 @@ function PermissionDomainStats({ group }: { group: PermissionDomainGroup }) {
         },
         {
           id: "assigned",
+          help: "至少被一个角色引用的权限点；未绑定的权限点不会对任何人生效。",
           icon: "key",
           label: "绑定权限",
           value: formatNumber(group.assignedCount),
@@ -1574,6 +1577,7 @@ export function AdminPermissionsPage() {
         items={[
           {
             id: "total",
+            help: "权限点总数，含未启用的。",
             icon: "shield-check",
             label: "权限总数",
             value: formatNumber(permissions.length),
@@ -1585,6 +1589,7 @@ export function AdminPermissionsPage() {
           },
           {
             id: "active",
+            help: "处于启用状态的权限点。",
             icon: "check",
             label: "启用权限",
             value: formatNumber(activeCount),
@@ -1593,6 +1598,7 @@ export function AdminPermissionsPage() {
           },
           {
             id: "assigned",
+            help: "至少被一个角色引用的权限点；未绑定的权限点不会对任何人生效。",
             icon: "key",
             label: "绑定权限",
             value: formatNumber(assignedCount),

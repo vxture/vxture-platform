@@ -297,12 +297,14 @@ export function FeatureTogglesPage() {
             items={[
               {
                 id: "total",
+                help: "未归档的开关数。",
                 icon: "list",
                 label: "开关总数",
                 value: String(items.filter((i) => !i.isArchived).length),
               },
               {
                 id: "enabled",
+                help: "未归档且全局已启用的开关；按租户灰度的不计入。",
                 icon: "check",
                 label: "已启用",
                 value: String(
@@ -312,6 +314,7 @@ export function FeatureTogglesPage() {
               },
               {
                 id: "archived",
+                help: "已归档、不再参与发布的开关。",
                 icon: "clock-counter-clockwise",
                 label: "已归档",
                 value: String(items.filter((i) => i.isArchived).length),

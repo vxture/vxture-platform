@@ -517,6 +517,7 @@ export function PromotionRedemptionsPage() {
               items={[
                 {
                   id: "records",
+                  help: "当前筛选条件下的优惠核销记录条数。",
                   icon: "check",
                   label: "核销记录",
                   value: formatNumber(records.length),
@@ -524,6 +525,7 @@ export function PromotionRedemptionsPage() {
                 },
                 {
                   id: "discount",
+                  help: "这些核销记录带来的减免金额合计。",
                   icon: "chart-bar",
                   label: "减免金额",
                   value: formatCurrency(discountAmount, "CNY"),
@@ -532,6 +534,7 @@ export function PromotionRedemptionsPage() {
                 },
                 {
                   id: "tenant-reach",
+                  help: "核销记录去重后涉及的租户数。",
                   icon: "buildings",
                   label: "覆盖租户",
                   value: formatNumber(tenantReach),
@@ -540,6 +543,7 @@ export function PromotionRedemptionsPage() {
                 },
                 {
                   id: "paid-bills",
+                  help: "关联账单已结清的核销记录数。",
                   icon: "sparkles",
                   label: "账单已结清",
                   value: formatNumber(paidBillCount),

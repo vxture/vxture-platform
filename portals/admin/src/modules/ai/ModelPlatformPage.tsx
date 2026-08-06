@@ -1047,6 +1047,7 @@ export function ModelPlatformPage() {
               items={[
                 {
                   id: "models",
+                  help: t("summary.modelsHelp"),
                   icon: "plug",
                   label: t("summary.models"),
                   value: formatNumber(models.length),
@@ -1057,6 +1058,7 @@ export function ModelPlatformPage() {
                 },
                 {
                   id: "active",
+                  help: t("summary.activeHelp"),
                   icon: "play",
                   label: t("filters.active"),
                   value: formatNumber(activeModels),
@@ -1065,6 +1067,7 @@ export function ModelPlatformPage() {
                 },
                 {
                   id: "inactive",
+                  help: t("summary.inactiveHelp"),
                   icon: "code",
                   label: t("status.inactive"),
                   value: formatNumber(inactiveModels),
@@ -1073,6 +1076,7 @@ export function ModelPlatformPage() {
                 },
                 {
                   id: "providers",
+                  help: "已接入的模型供应商数量。",
                   icon: "settings",
                   label: "Provider",
                   value: formatNumber(providers.length),
@@ -1081,6 +1085,7 @@ export function ModelPlatformPage() {
                 },
                 {
                   id: "policies-cost",
+                  help: "启用中的模型策略数 / 启用中的价格规则数。",
                   icon: "database",
                   label: "策略 / 成本",
                   value: `${formatNumber(activePolicies.length)} / ${formatNumber(activePriceRules.length)}`,
@@ -1092,6 +1097,7 @@ export function ModelPlatformPage() {
                 },
                 {
                   id: "quota-usage",
+                  help: "启用中的配额条数 / 统计期内累计消耗 token。",
                   icon: "chart-bar",
                   label: "配额 / 用量",
                   value: `${formatNumber(activeQuotas.length)} / ${formatNumber(totalUsageTokens)}`,

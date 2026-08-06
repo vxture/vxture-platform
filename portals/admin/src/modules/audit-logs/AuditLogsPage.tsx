@@ -62,6 +62,7 @@ function AuditSummary({ logs }: { logs: AuditLogRecord[] }) {
       items={[
         {
           id: "total",
+          help: "当前筛选条件下加载到的审计日志条数。",
           icon: "list",
           label: "日志总数",
           value: logs.length,
@@ -69,6 +70,7 @@ function AuditSummary({ logs }: { logs: AuditLogRecord[] }) {
         },
         {
           id: "today",
+          help: "发生时间为今天（本地时区）的操作。",
           icon: "check",
           label: "今日操作",
           value: todayLogs.length,
@@ -77,6 +79,7 @@ function AuditSummary({ logs }: { logs: AuditLogRecord[] }) {
         },
         {
           id: "failures",
+          help: "执行结果为失败的操作，含被拒绝与异常中断。",
           icon: "x",
           label: "失败操作",
           value: failureCount,

@@ -159,28 +159,31 @@ function BillingSummary({ bill }: { bill: BillingDetailRecord }) {
         </div>
       </div>
       <MetricGrid
-        variant="compact"
         items={[
           {
             id: "payable",
+            help: "本期账单应收总额，按账单币种展示。",
             label: "账单应收",
             value: formatCurrency(bill.payableAmount, bill.currency),
             tags: [billTypeLabel(bill.billType)],
           },
           {
             id: "paid",
+            help: "已核销到本账单的回款金额。",
             label: "已收金额",
             value: formatCurrency(bill.paidAmount, bill.currency),
             tags: [bill.paymentMethod ?? "未收款"],
           },
           {
             id: "invoiced",
+            help: "本账单已开具发票的金额，不等于已回款。",
             label: "已开票",
             value: formatCurrency(bill.invoicedAmount, bill.currency),
             tags: [bill.invoiceNo ?? invoiceStatusLabel(bill.invoiceStatus)],
           },
           {
             id: "cycle",
+            help: "账单所属计费周期的起止日期。",
             label: "账期",
             value: `${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`,
             tags: [cycleLabel(bill.billCycle)],

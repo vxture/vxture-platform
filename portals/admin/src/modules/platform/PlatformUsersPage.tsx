@@ -1188,6 +1188,7 @@ export function PlatformUsersPage() {
               items={[
                 {
                   id: "total",
+                  help: "平台管理员账号总数，含停用与锁定的。",
                   icon: "user",
                   label: "用户总数",
                   value: formatNumber(admins.length),
@@ -1197,6 +1198,7 @@ export function PlatformUsersPage() {
                 },
                 {
                   id: "enabled",
+                  help: "状态为启用、可登录的管理员。",
                   icon: "check",
                   label: "启用用户",
                   value: formatNumber(enabledCount),
@@ -1205,6 +1207,7 @@ export function PlatformUsersPage() {
                 },
                 {
                   id: "other",
+                  help: "停用、锁定、待激活、暂停之和。",
                   icon: "x",
                   label: "其他用户",
                   value: formatNumber(otherUserCount),

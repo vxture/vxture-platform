@@ -602,6 +602,7 @@ export function TenantsPage() {
               items={[
                 {
                   id: "total",
+                  help: "当前筛选条件下的租户数。",
                   icon: "buildings",
                   label: "租户总数",
                   value: formatNumber(tenants.length),
@@ -612,6 +613,7 @@ export function TenantsPage() {
                 },
                 {
                   id: "pending-verification",
+                  help: "提交了组织认证、尚未审核的租户。",
                   icon: "medal",
                   label: "认证待审",
                   value: formatNumber(pendingVerifications),
@@ -623,6 +625,7 @@ export function TenantsPage() {
                 },
                 {
                   id: "trial",
+                  help: "有订阅但月收入为零的租户。",
                   icon: "star",
                   label: "试用租户",
                   value: formatNumber(trialProductTenants),
@@ -631,6 +634,7 @@ export function TenantsPage() {
                 },
                 {
                   id: "risk",
+                  help: "风险等级非正常的租户。",
                   icon: "warning",
                   label: "风险租户",
                   value: formatNumber(riskTenants),

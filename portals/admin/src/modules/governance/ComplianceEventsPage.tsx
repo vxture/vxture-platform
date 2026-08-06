@@ -334,12 +334,14 @@ export function ComplianceEventsPage() {
             items={[
               {
                 id: "open",
+                help: "状态为待处理、尚未有人受理的合规事件。",
                 icon: "warning",
                 label: "待处理",
                 value: String(items.filter((i) => i.status === "open").length),
               },
               {
                 id: "in_review",
+                help: "已受理、处理中的合规事件。",
                 icon: "clock",
                 label: "处理中",
                 value: String(
@@ -348,6 +350,7 @@ export function ComplianceEventsPage() {
               },
               {
                 id: "resolved",
+                help: "已办结的合规事件。",
                 icon: "check",
                 label: "已办结",
                 value: String(

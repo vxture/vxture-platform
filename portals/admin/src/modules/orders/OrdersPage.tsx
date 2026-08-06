@@ -697,6 +697,7 @@ export function OrdersPage() {
               items={[
                 {
                   id: "total",
+                  help: "当前筛选条件下的订单条数。",
                   icon: "table",
                   label: "订单总数",
                   value: formatNumber(orders.length),
@@ -704,6 +705,7 @@ export function OrdersPage() {
                 },
                 {
                   id: "pending",
+                  help: "待处理订单：待确认与待核验。",
                   icon: "clock",
                   label: "待处理",
                   value: formatNumber(pendingCount),
@@ -714,6 +716,7 @@ export function OrdersPage() {
                 },
                 {
                   id: "confirmed-amount",
+                  help: "已确认订单的已收金额合计。",
                   icon: "chart-bar",
                   label: "已确认金额",
                   value: formatCurrency(confirmedAmount, "CNY"),
@@ -722,6 +725,7 @@ export function OrdersPage() {
                 },
                 {
                   id: "abnormal",
+                  help: "需要干预的订单合计：逾期、异常、已付未开通、部分待处理。",
                   icon: "warning",
                   label: "异常逾期",
                   value: formatNumber(

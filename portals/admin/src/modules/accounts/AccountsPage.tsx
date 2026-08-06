@@ -764,6 +764,7 @@ export function AccountsPage({
               items={[
                 {
                   id: "total",
+                  help: "当前列表加载到的全部账号数，不区分状态。",
                   icon: "user",
                   label: "账号总数",
                   value: formatNumber(accounts.length),
@@ -774,6 +775,7 @@ export function AccountsPage({
                 },
                 {
                   id: "invited",
+                  help: "已发出邀请但本人尚未激活的账号（状态 invited）。",
                   icon: "clock",
                   label: "待激活",
                   value: formatNumber(invitedAccounts),
@@ -782,6 +784,7 @@ export function AccountsPage({
                 },
                 {
                   id: "locked",
+                  help: "因风控或连续登录失败被锁定的账号（状态 locked）。",
                   icon: "warning",
                   label: "已锁定",
                   value: formatNumber(lockedAccounts),
@@ -790,6 +793,7 @@ export function AccountsPage({
                 },
                 {
                   id: "disabled",
+                  help: "被管理员停用、无法登录的账号（状态 disabled）。",
                   icon: "x",
                   label: "已停用",
                   value: formatNumber(disabledAccounts),

@@ -763,6 +763,7 @@ export function VerificationsPage() {
               items={[
                 {
                   id: "organizations",
+                  help: "组织类型的租户数，个人租户不计入。",
                   icon: "buildings",
                   label: "组织总数",
                   value: formatNumber(organizationTenants.length),
@@ -770,6 +771,7 @@ export function VerificationsPage() {
                 },
                 {
                   id: "pending",
+                  help: "已提交认证材料、待审核的组织。",
                   icon: "clock",
                   label: "待审核",
                   value: formatNumber(pendingCount),
@@ -778,6 +780,7 @@ export function VerificationsPage() {
                 },
                 {
                   id: "verified",
+                  help: "认证已通过的组织。",
                   icon: "check",
                   label: "已认证",
                   value: formatNumber(verifiedCount),
@@ -786,6 +789,7 @@ export function VerificationsPage() {
                 },
                 {
                   id: "needs-supplement",
+                  help: "被驳回与尚未提交认证的组织之和。",
                   icon: "warning",
                   label: "需补充",
                   value: formatNumber(rejectedCount + unverifiedCount),

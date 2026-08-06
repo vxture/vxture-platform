@@ -608,6 +608,7 @@ export function ProductSolutionsPage() {
               items={[
                 {
                   id: "total",
+                  help: "业务方案总数。",
                   icon: "workflow",
                   label: "方案总数",
                   value: formatNumber(solutions.length),
@@ -615,6 +616,7 @@ export function ProductSolutionsPage() {
                 },
                 {
                   id: "products",
+                  help: "各方案关联的产品能力条目之和（跨方案不去重）。",
                   icon: "cube",
                   label: "产品能力",
                   value: formatNumber(productCount),
@@ -623,6 +625,7 @@ export function ProductSolutionsPage() {
                 },
                 {
                   id: "tiers",
+                  help: "各方案下服务套餐数之和。",
                   icon: "star",
                   label: "服务套餐",
                   value: formatNumber(tierCount),
@@ -631,6 +634,7 @@ export function ProductSolutionsPage() {
                 },
                 {
                   id: "revenue",
+                  help: "各方案月度收入之和。",
                   icon: "chart-bar",
                   label: "月度收入",
                   value: formatMoney(monthlyRevenue),

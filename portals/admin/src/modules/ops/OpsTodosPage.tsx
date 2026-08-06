@@ -405,6 +405,7 @@ export function OpsTodosPage() {
         items={[
           {
             id: "urgent",
+            help: "严重程度为最高档的待办。",
             icon: "warning",
             label: "紧急事项",
             value: formatNumber(urgentTodos.length),
@@ -413,6 +414,7 @@ export function OpsTodosPage() {
           },
           {
             id: "verification",
+            help: "来源为租户认证审核的待办。",
             icon: "medal",
             label: "认证待审",
             value: formatNumber(verificationTodos.length),
@@ -421,6 +423,7 @@ export function OpsTodosPage() {
           },
           {
             id: "tickets",
+            help: "来源为工单的待办。",
             icon: "chat-circle",
             label: "未关闭工单",
             value: formatNumber(ticketTodos.length),
@@ -431,6 +434,7 @@ export function OpsTodosPage() {
           },
           {
             id: "all",
+            help: "全部待办条数，不分来源与紧急度。",
             icon: "table",
             label: "全部待办",
             value: formatNumber(todos.length),
