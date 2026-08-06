@@ -13,12 +13,12 @@ import {
   DialogForm,
   Drawer,
   EmptyState,
-  Icon,
   Input,
   Label,
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
 } from "@vxture/design-system";
@@ -39,6 +39,10 @@ import type {
   TicketCommentRecord,
 } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
+import {
+  TICKET_PRIORITY_TONE,
+  TICKET_STATUS_TONE,
+} from "@/modules/shared/tenant-tone";
 import {
   formatNumber,
   ticketStatusLabel,
@@ -128,13 +132,6 @@ function ticketStatusIcon(status: TenantOperationTicket["status"]): IconName {
   return "check";
 }
 
-function ticketTone(ticket: TenantOperationTicket) {
-  if (ticket.priority === "p0" || ticket.status === "blocked") return "danger";
-  if (ticket.priority === "p1" || ticket.status === "open") return "warning";
-  if (ticket.status === "closed") return "muted";
-  return "normal";
-}
-
 function ticketSearchText(ticket: SupportTicketRecord) {
   return [
     ticket.id,
@@ -199,8 +196,21 @@ function ticketKey(ticket: SupportTicketRecord) {
 }
 
 /**
- * 行内的状态/优先级标仍是 pill（`vx-commercial-pill--*`）而非 `StatusBadge`：
- * 那一族与商业域各页共用，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ * 三枚标是三件不同的事，各自取色，不共用一个 `ticketTone()`。
+ *
+ * 原先它们全走 `vx-commercial-pill--*`，而那族色调**一个都没生效**——实测三种
+ * 状态计算出来是同一个蓝灰（2026-08-06 登录态走查）。两条独立的原因叠在一起：
+ *
+ * 1. **文字色**：`Badge variant="outline"` 带 `text-foreground`，Tailwind 的
+ *    utilities 层压过 admin CSS 的 `layer(components)`，于是**每一枚 pill 的
+ *    文字色都失效**，无论哪个修饰符都是近黑。
+ * 2. **背景色**：outline 不设背景，背景归 pill CSS 管；但基类 `.vx-tenant-pill`
+ *    自带背景，且在 `globals.css` 里排第 34 行，而本族色调随
+ *    `admin-management.css` 在第 32 行——**同层同特异度，后写的赢**，基类把它
+ *    前面定义的所有修饰符背景压死。排在基类之后的族（admin-roles 等）反而正常。
+ *
+ * 这类"看着还活着的死类"搜不出来：类名有引用、文件有导入、选择器也匹配得上，
+ * 只有量计算样式才知道它被压掉了。判死码不能只看引用（同 §十三 的模板拼接那条）。
  */
 function useTicketColumns(): DataTableColumn<SupportTicketRecord>[] {
   const router = useRouter();
@@ -235,16 +245,12 @@ function useTicketColumns(): DataTableColumn<SupportTicketRecord>[] {
       header: "状态",
       align: "center",
       cell: (ticket) => (
-        <Badge
-          className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${ticketTone(ticket)}`}
+        <StatusBadge
+          tone={TICKET_STATUS_TONE[ticket.status]}
+          icon={ticketStatusIcon(ticket.status)}
         >
-          <Icon
-            name={ticketStatusIcon(ticket.status)}
-            size="xs"
-            fallback="placeholder"
-          />
           {ticketStatusLabel(ticket.status)}
-        </Badge>
+        </StatusBadge>
       ),
     },
     {
@@ -253,14 +259,11 @@ function useTicketColumns(): DataTableColumn<SupportTicketRecord>[] {
       align: "center",
       cell: (ticket) => (
         <span className="inline-flex flex-wrap justify-center gap-2xs">
-          <Badge
-            className={`vx-tenant-pill vx-commercial-pill vx-commercial-pill--${ticketTone(ticket)}`}
-          >
+          <StatusBadge tone={TICKET_PRIORITY_TONE[ticket.priority]}>
             {priorityLabels[ticket.priority]}
-          </Badge>
-          <Badge className="vx-tenant-pill vx-commercial-pill vx-commercial-pill--muted">
-            {ticket.industry}
-          </Badge>
+          </StatusBadge>
+          {/* 行业是类目，没有严重度，用朴素 Badge——理由同 publish-tone.ts 文件尾。 */}
+          <Badge variant="outline">{ticket.industry}</Badge>
         </span>
       ),
     },

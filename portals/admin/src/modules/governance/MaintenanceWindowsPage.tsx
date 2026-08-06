@@ -72,12 +72,19 @@ function statusTone(status: MaintenanceWindowItem["status"]): StatusBadgeTone {
   return "neutral";
 }
 
+/**
+ * 严重度阶梯：灰 / 琥珀 / 红。
+ *
+ * `minor` 走中性而不是绿（owner 2026-08-06 判）：六档里 `success` 的语义是
+ * **达成了一件事**，而低严重度不是一项达成，是"不用担心"。同一页的状态列已经用
+ * 绿表示「已完成」，若严重度也用绿，一列里的绿就有两种含义。
+ */
 function severityTone(
   severity: MaintenanceWindowItem["severity"],
 ): StatusBadgeTone {
   if (severity === "critical") return "danger";
   if (severity === "major") return "warning";
-  return "success";
+  return "neutral";
 }
 
 function toLocalInputValue(date: Date) {

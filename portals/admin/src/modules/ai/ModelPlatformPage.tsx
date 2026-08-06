@@ -1332,9 +1332,10 @@ export function ModelPlatformPage() {
                       />
                     </header>
                     <div className="vx-tenant-directory-card__badges">
-                      <Badge
-                        className={`vx-tenant-pill vx-model-provider-pill--${isPrivateProvider(model.provider) ? "private" : "online"}`}
-                      >
+                      {/* 厂商是类目（在线 / 私有部署），没有严重度——不给语气色。
+                          原先的蓝/绿两档背景实测从未生效：那族 CSS 排在
+                          `.vx-tenant-pill` 基类之前，同层同特异度被基类压死。 */}
+                      <Badge variant="outline">
                         {providerLabel(model.provider)}
                       </Badge>
                       <StatusBadge tone={activeTone(model.isActive)}>

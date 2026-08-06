@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
+  Badge,
   Banner,
   BulkActionBar,
   DataTable,
@@ -19,7 +20,6 @@ import {
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
-import type { IconName } from "@vxture/design-system";
 import { fetchUsageMeteringRecords } from "@/api/admin-bff";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 import { isListTruncated } from "@/lib/list-truncation";
@@ -56,12 +56,6 @@ function riskLabel(risk: UsageMeteringRisk) {
   if (risk === "warning") return "接近上限";
   if (risk === "anomaly") return "计量异常";
   return "正常";
-}
-
-function riskIcon(risk: UsageMeteringRisk): IconName {
-  if (risk === "normal") return "check";
-  if (risk === "warning") return "clock";
-  return "warning";
 }
 
 function riskTone(risk: UsageMeteringRisk) {
@@ -194,7 +188,13 @@ function useUsageColumns(): DataTableColumn<UsageMeteringRecord>[] {
       header: "计量项",
       cell: (record) => (
         <TableTitleCell
-          title={<Tag tone="muted">{record.metricUnit}</Tag>}
+          // 单位可缺（BFF 对没有单位的计量项回空串）。空标会渲染成一个什么都
+          // 不写的小圆圈，比不画更难读，所以缺就不画。
+          title={
+            record.metricUnit ? (
+              <Badge variant="outline">{record.metricUnit}</Badge>
+            ) : null
+          }
           description={record.metricName}
         />
       ),
@@ -214,12 +214,10 @@ function useUsageColumns(): DataTableColumn<UsageMeteringRecord>[] {
       id: "risk",
       header: "风险",
       align: "center",
-      // Tag 只收文字，图标并排放在它外面。
+      // 图标由 `Tag` 内的 `StatusBadge` 按语气自带。此前 `Tag` 只出朴素 Badge，
+      // 图标才并排挂在外面；`Tag` 改出 StatusBadge 之后那个外挂图标就成了第二个勾。
       cell: (record) => (
-        <span className="inline-flex items-center gap-2xs">
-          <Icon name={riskIcon(record.risk)} size="xs" fallback="placeholder" />
-          <Tag tone={riskTone(record.risk)}>{riskLabel(record.risk)}</Tag>
-        </span>
+        <Tag tone={riskTone(record.risk)}>{riskLabel(record.risk)}</Tag>
       ),
     },
     {
@@ -269,7 +267,7 @@ function UsageCards({ records }: { records: UsageMeteringRecord[] }) {
           </header>
           <div className="vx-tenant-directory-card__badges">
             <Tag tone={riskTone(record.risk)}>{riskLabel(record.risk)}</Tag>
-            <Tag tone="muted">{record.productType}</Tag>
+            <Badge variant="outline">{record.productType}</Badge>
           </div>
           <p className="vx-commercial-card__description">
             {record.servicePlanName ?? record.orderNo ?? "未关联订阅"}

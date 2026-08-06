@@ -80,15 +80,6 @@
   padding: 0;
 }
 
-.vx-model-provider-pill--online {
-  background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
-  color: var(--tenant-blue);
-}
-
-.vx-model-provider-pill--private {
-  background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
-  color: var(--tenant-green);
-}
 .vx-product-plan-row__status small,
 .vx-product-plan-row__price small,
 .vx-product-plan-row__features small,

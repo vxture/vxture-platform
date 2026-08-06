@@ -731,7 +731,6 @@ function useAdminRoleColumns(
         const indicator = roleStatusIndicator(role);
         return (
           <StatusBadge tone={roleStatusTone(role)} icon={indicator.icon}>
-            <Icon name={indicator.icon} size="xs" fallback="placeholder" />
             {indicator.label}
           </StatusBadge>
         );

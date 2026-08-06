@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
+  Badge,
   Banner,
   BulkActionBar,
   DataTable,
@@ -155,7 +156,7 @@ function usePromotionColumns(): DataTableColumn<PromotionOperationRecord>[] {
       header: "适用范围",
       cell: (record) => (
         <TableTitleCell
-          title={<Tag tone="muted">{record.scopeLabel}</Tag>}
+          title={<Badge variant="outline">{record.scopeLabel}</Badge>}
           description={record.description}
         />
       ),
@@ -239,7 +240,7 @@ function PromotionCards({ records }: { records: PromotionOperationRecord[] }) {
             <Tag tone={statusTone(record.status)}>
               {statusLabel(record.status)}
             </Tag>
-            <Tag tone="muted">{typeLabel(record.promotionType)}</Tag>
+            <Badge variant="outline">{typeLabel(record.promotionType)}</Badge>
           </div>
           <p className="vx-commercial-card__description">
             {record.description}

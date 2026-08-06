@@ -338,7 +338,6 @@ function useAccountColumns(
             tone={ACCOUNT_STATUS_TONE[account.status]}
             icon={indicator.icon}
           >
-            <Icon name={indicator.icon} size="xs" fallback="placeholder" />
             {accountStatusLabel(account.status)}
           </StatusBadge>
         );

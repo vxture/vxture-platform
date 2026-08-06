@@ -83,6 +83,26 @@ export const TICKET_STATUS_TONE = {
 } as const satisfies Record<string, StatusTone>;
 
 /**
+ * 工单优先级。
+ *
+ * 优先级是**紧急度**，不是等级阶梯——这一点与套餐档不同（见 `tier-level.ts`：
+ * 那里五档表达的是商业分类，硬塞进语气会说错话）。紧急度恰好就是语气表达的东西，
+ * 所以它该走语气而不是自建色阶。
+ *
+ * p2/p3 都给中性：常规与低优先级之间的差别由文字承担，不值得再占一档颜色。
+ *
+ * **与状态分开取色**是这次修的重点。原先一个 `ticketTone()` 同时看 priority 和
+ * status，于是「待处理」这枚标被 p0 染成红色——一枚标同时说两件事，读者无从
+ * 判断红的是"这单很急"还是"这单出事了"。表格里优先级本就另有一列。
+ */
+export const TICKET_PRIORITY_TONE = {
+  p0: "danger",
+  p1: "warning",
+  p2: "neutral",
+  p3: "neutral",
+} as const satisfies Record<string, StatusTone>;
+
+/**
  * 模型授权策略的生效态。
  *
  * `disabled` 是第二个被 `Record` 逼出来的缺口：值域四个值，CSS 只画了三个。
