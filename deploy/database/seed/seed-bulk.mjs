@@ -566,11 +566,14 @@ async function seedBulk(client) {
       const ws = at(workspaces, i);
       await client.query(
         `insert into promotion.voucher_redemptions
-           (id, voucher_id, tenant_id, workspace_id, user_id, kind, effect_snapshot, redeemed_at)
-         values ($1, $2, $3, $4, $5, $6, $7, ${daysFromNow(-spread(i, 150))})
+           (id, redemption_no, voucher_id, tenant_id, workspace_id, user_id,
+            kind, effect_snapshot, redeemed_at)
+         values ($1, $2, $3, $4, $5, $6, $7, $8, ${daysFromNow(-spread(i, 150))})
          on conflict (id) do nothing`,
         [
           ID.redemption(i),
+          // 对外编号：UUID 只走内部（DDL 56 表头）。序号取自 i，重跑同 i 得同号。
+          `RDBULK${String(i).padStart(6, "0")}`,
           ID.voucher(i),
           ws.tenant_id,
           ws.id,
@@ -585,6 +588,35 @@ async function seedBulk(client) {
       bump("promotion.voucher_redemptions");
     }
   }
+
+  // 把核销行挂到同租户的账单明细与订阅上。
+  //
+  // 不挂的话整条链断在第一环：台账页的「优惠金额」走
+  // `redemption.invoice_item_id → invoice_items.bill_id → invoices.discount_amount`，
+  // 「关联订单」走 `subscription_id`，两列留空则整列 ¥0.00 + 「未关联订单」，
+  // 而这正是这张台账要看的东西（2026-08-07 走查）。
+  //
+  // 按 tenant_id 关联而不是按序号：核销行由工作区推出租户，与主干种子的编号
+  // 不一定同序，用 id 算术去猜会错配到别人的账单。
+  await client.query(`
+    update promotion.voucher_redemptions rd
+       set invoice_item_id = pick.item_id,
+           subscription_id = pick.sub_id
+      from (
+        -- distinct on 而不是 min()：Postgres 没有 min(uuid)。
+        -- 排序里把 discount 明细排在前面，好让带折扣的账单优先被选中——
+        -- 台账页的「优惠金额」读的正是该明细所属账单的 discount_amount。
+        select distinct on (ii.tenant_id)
+               ii.tenant_id,
+               ii.id  as item_id,
+               s.id   as sub_id
+          from billing.invoice_items ii
+          join metering.subscriptions s on s.tenant_id = ii.tenant_id
+         order by ii.tenant_id, (ii.item_type <> 'discount'), ii.id
+      ) pick
+     where rd.tenant_id = pick.tenant_id
+       and rd.invoice_item_id is null
+       and rd.id::text like '00000000-0000-4000-c000-%'`);
 
   // ── 10. 用量月汇总 ─────────────────────────────────────────────────────────
   // 用量计费页读 `metering.usage_summary_months`；此前为空，页面无行可列。

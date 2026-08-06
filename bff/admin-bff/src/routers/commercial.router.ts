@@ -731,7 +731,9 @@ function mapPromotionRedemptionRow(
 ): PromotionRedemptionRecord {
   return {
     id: row.id,
-    redemptionNo: row.id,
+    // 取真列。此前是拿 `row.id` 冒充的，于是核销台账主列摆着一张 UUID——
+    // UUID 只走内部，对外一律 *_no（DDL 56 表头，2026-08-07 补列）。
+    redemptionNo: row.redemption_no,
     promotionCode: row.voucher_code,
     promotionName: row.batch_name,
     tenantId: row.tenant_id,
@@ -759,6 +761,7 @@ function mapPromotionRedemptionRow(
 const PROMOTION_REDEMPTIONS_SQL = `
 select
   rd.id,
+  rd.redemption_no,
   v.code                           as voucher_code,
   b.name                           as batch_name,
   rd.tenant_id,
@@ -789,6 +792,7 @@ limit 500
 
 interface PromotionRedemptionRow {
   id: string;
+  redemption_no: string;
   voucher_code: string;
   batch_name: string;
   tenant_id: string;

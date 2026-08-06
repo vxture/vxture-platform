@@ -83,6 +83,7 @@ function redemptionSearchText(record: PromotionRedemptionRecord) {
 
 const REDEMPTION_CSV_COLUMNS: CsvColumn<PromotionRedemptionRecord>[] = [
   { label: "核销编号", value: (record) => record.redemptionNo },
+  { label: "券码", value: (record) => record.promotionCode },
   { label: "优惠编号", value: (record) => record.promotionCode },
   { label: "优惠名称", value: (record) => record.promotionName },
   { label: "租户编号", value: (record) => record.tenantCode },
