@@ -52,6 +52,9 @@ const ID = {
   notification: (i) => uid(17000 + i),
   voucherBatch: (i) => uid(18000 + i),
   voucher: (i) => uid(18100 + i),
+  // 枚举覆盖行另开段，不与"每租户一条"的段位重叠
+  coverInvoice: (i) => uid(19000 + i),
+  coverPayment: (i) => uid(19100 + i),
 };
 
 /**
@@ -491,6 +494,74 @@ export async function seedDemo(client) {
       );
       bump('billing.payments');
     }
+  }
+
+
+  // ── 5b. 枚举覆盖：把 per-tenant 那一轮铺不到的状态补齐 ──────────────────────
+  //
+  // 上面每个租户只产出一张账单、一条收款，能落到的状态就那么几个
+  // （paid / overdue / cancelled，收款 paid / pending_verify）。而列表页的状态色、
+  // 筛选、语气分档要验，得**每一档都有行**——2026-08-06 的登录态走查就卡在这里：
+  // 刚把发票的"申请中/审核中/寄送中"从黄改成蓝、账单"支付中"改成蓝，库里一行都没有，
+  // 改完看不见。
+  //
+  // 这些行不挂新租户（新租户要连带 workspace / membership / 认证，成本高且会让上面
+  // 那张"四种典型组合"的表失真），而是复用既有租户，只补账单与收款本身。
+  const COVER_BILLS = [
+    { n: 1, t: 1, status: 'unpaid',  amount: '1200.00', paid: '0.00',    remark: '账期内待付（demo 枚举覆盖）' },
+    { n: 2, t: 1, status: 'paying',  amount: '860.00',  paid: '0.00',    remark: '在线支付进行中（demo 枚举覆盖）' },
+    { n: 3, t: 2, status: 'partial', amount: '2400.00', paid: '900.00',  remark: '部分收款，余额待补（demo 枚举覆盖）' },
+  ];
+  for (const b of COVER_BILLS) {
+    await client.query(
+      `insert into billing.invoices
+         (id, tenant_id, bill_no, subscription_id, bill_cycle, cycle_start_date, cycle_end_date,
+          total_amount, discount_amount, payable_amount, paid_amount, currency,
+          bill_status, bill_type, payment_method, created_by_type, created_by_id,
+          operate_remark, created_at, updated_at)
+       values ($1, $2, $3, $4, 'monthly', ${monthsFromNow(-1)}::date, ${monthsFromNow(0)}::date,
+               $5, '0.00', $5, $6, 'CNY', $7, 'normal', null, 'system', null, $8, ${monthsFromNow(-1)}, now())
+       on conflict (bill_no) do nothing`,
+      [
+        ID.coverInvoice(b.n), ID.tenant(b.t), `DEMO-BILL-C${String(b.n).padStart(3, '0')}`,
+        ID.subscription(b.t), b.amount, b.paid, b.status, b.remark,
+      ],
+    );
+    bump('billing.invoices');
+  }
+
+  // 收款态：`chk_payments_pay_status` 只认 6 档
+  //   pending · pending_verify · paid · failed · closed · refunding
+  // per-tenant 那轮出了 paid 与 pending_verify，这里补齐剩下四档。
+  //
+  // **admin 的 `OrderPaymentStatus` 比这多三个**——`not_required` / `unpaid` /
+  // `partial`。那三个进不了收款表（DB 直接 CHECK 拒绝，2026-08-06 造数据时撞到）。
+  // 原因是那个类型被两个域共用：**订单**的支付状态可以是"无需支付/未支付/部分支付"，
+  // **收款流水**只有六种。它们不是一回事，共用一个类型迟早出岔子——记在 TD #33
+  // 的值域对齐里，本文件不替它决定。
+  const COVER_PAYMENTS = [
+    { n: 1, t: 1, bill: 1, status: 'pending',   amount: '1200.00', paid: '0.00',   remark: '支付中，等待渠道回调（demo）' },
+    { n: 3, t: 1, bill: 2, status: 'failed',    amount: '860.00',  paid: '0.00',   remark: '渠道返回失败（demo）' },
+    { n: 4, t: 1, bill: 2, status: 'refunding', amount: '860.00',  paid: '860.00', remark: '客户申请退款，处理中（demo）' },
+    { n: 5, t: 2, bill: 3, status: 'closed',    amount: '2400.00', paid: '0.00',   remark: '超时未支付自动关闭（demo）' },
+  ];
+  for (const p of COVER_PAYMENTS) {
+    await client.query(
+      `insert into billing.payments
+         (id, tenant_id, bill_id, pay_order_no, pay_source, pay_channel, pay_method,
+          total_amount, paid_amount, currency, pay_status, paid_at,
+          actor_type, actor_id, operate_remark, created_at, updated_at)
+       values ($1, $2, $3, $4, 'online', 'alipay', 'alipay', $5, $6, 'CNY', $7,
+               ${p.status === 'refunding' ? monthsFromNow(-1) : 'null'},
+               'customer', null, $8, ${monthsFromNow(-1)}, now())
+       on conflict (pay_order_no) do nothing`,
+      [
+        ID.coverPayment(p.n), ID.tenant(p.t), ID.coverInvoice(p.bill),
+        `DEMO-PAY-C${String(p.n).padStart(3, '0')}`,
+        p.amount, p.paid, p.status, p.remark,
+      ],
+    );
+    bump('billing.payments');
   }
 
   // ── 6. 风控 / 合规事件 ────────────────────────────────────────────────────
