@@ -7,7 +7,7 @@ import {
   ActionMenu,
   Badge,
   Banner,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -21,6 +21,7 @@ import {
   TableTitleCell,
   useToast,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -39,7 +40,6 @@ import {
   VERIFICATION_TONE,
   formatDate,
   formatNumber,
-  joinClasses,
   normalizeTenantRiskLevel,
   riskLabel,
   statusLabel,
@@ -135,178 +135,103 @@ function TenantActionsMenu({
   );
 }
 
-function TenantListRows({
-  tenants,
-  startIndex,
-  selectedTenantIds,
-  isPageSelected,
-  actionBusy,
-  onToggleTenant,
-  onTogglePage,
-  onToggleStatus,
-}: {
-  tenants: TenantOperationRecord[];
-  startIndex: number;
-  selectedTenantIds: Set<string>;
-  isPageSelected: boolean;
-  actionBusy: boolean;
-  onToggleTenant: (tenantId: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-  onToggleStatus: (tenant: TenantOperationRecord) => void;
-}) {
+/**
+ * 行内的状态标仍是 pill（`vx-tenant-pill--*`）而非 `StatusBadge`：那一族是业务
+ * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ */
+function useTenantColumns(): DataTableColumn<TenantOperationRecord>[] {
   const router = useRouter();
-  const selectedOnPage = tenants.filter((tenant) =>
-    selectedTenantIds.has(tenant.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < tenants.length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-tenant-operation-directory-list"
-      role="region"
-      aria-label="租户清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : isPagePartiallySelected
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页租户"
-          />
-        </span>
-        <span>#</span>
-        <span>租户</span>
-        <span>成员</span>
-        <span>状态</span>
-        <span>订阅</span>
-        <span>服务</span>
-        <span>操作</span>
-      </div>
-      {tenants.map((tenant, index) => {
+  return [
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (tenant) => (
+        <TableTitleCell
+          icon={tenant.tenantType === "company" ? "buildings" : "user"}
+          title={tenant.displayName}
+          description={`${tenant.tenantCode} · ${tenant.region}`}
+          onTitleClick={() =>
+            router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "member",
+      header: "成员",
+      align: "right",
+      cell: (tenant) => formatNumber(tenant.memberCount),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (tenant) => {
+        const indicator = tenantStatusIndicator(tenant);
+        return (
+          <span className="inline-flex flex-wrap items-center justify-center gap-2xs">
+            {/* 记号图标放在标**内**：它靠标的文字色着色，摆在标外面会退成表格
+                的正文灰，一列状态里只有它没有语气。 */}
+            <Badge
+              className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
+              title={indicator.label}
+            >
+              <Icon name={indicator.icon} size="xs" fallback="placeholder" />
+              {statusLabel(tenant.status)}
+            </Badge>
+            <Badge
+              className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
+            >
+              {verifiedLabel(tenant.verifiedStatus)}
+            </Badge>
+          </span>
+        );
+      },
+    },
+    {
+      id: "subscription",
+      header: "订阅",
+      align: "center",
+      cell: (tenant) => (
+        <TableTitleCell
+          title={
+            <Badge className="vx-tenant-pill vx-tenant-pill--product">
+              {formatNumber(
+                tenant.subscriptions.length || tenant.subscriptionCount,
+              )}{" "}
+              产品
+            </Badge>
+          }
+          description={`本月：¥ ${formatNumber(tenant.monthlyRevenue)} 元`}
+        />
+      ),
+    },
+    {
+      id: "service",
+      header: "服务",
+      align: "center",
+      cell: (tenant) => {
         const riskLevel = normalizeTenantRiskLevel(tenant.riskLevel);
         const ticketTotal = Math.max(
           tenant.tickets.length,
           tenant.ticketOpenCount,
         );
-        const subscribedProductCount =
-          tenant.subscriptions.length || tenant.subscriptionCount;
-        const statusIndicator = tenantStatusIndicator(tenant);
-
         return (
-          <div
-            key={tenant.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-tenant-operation-row",
-              `vx-tenant-directory-row--${riskLevel}`,
-              selectedTenantIds.has(tenant.id)
-                ? "vx-tenant-operation-row--selected"
-                : "",
-            )}
-            onClick={(event) => {
-              if (
-                event.target instanceof HTMLElement &&
-                event.target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleTenant(tenant.id, !selectedTenantIds.has(tenant.id));
-            }}
-          >
-            <span className="vx-tenant-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selectedTenantIds.has(tenant.id)}
-                onClick={(event) => event.stopPropagation()}
-                onCheckedChange={(value) =>
-                  onToggleTenant(tenant.id, value === true)
-                }
-                aria-label={`选择 ${tenant.displayName}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-tenant-directory-row__tenant"
-              icon={tenant.tenantType === "company" ? "buildings" : "user"}
-              title={tenant.displayName}
-              description={`${tenant.tenantCode} · ${tenant.region}`}
-              onTitleClick={() =>
-                router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
-              }
-            />
-            <span className="vx-tenant-directory-row__member">
-              <strong>{formatNumber(tenant.memberCount)}</strong>
-            </span>
-            <span className="vx-tenant-directory-row__status">
-              <span className="vx-tenant-directory-row__status-line">
-                <span
-                  className={`vx-tenant-status-dot vx-tenant-status-dot--${statusIndicator.tone}`}
-                  role="img"
-                  aria-label={statusIndicator.label}
-                  title={statusIndicator.label}
-                >
-                  <Icon
-                    name={statusIndicator.icon}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <span className="vx-tenant-directory-row__badges">
-                  <Badge
-                    className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
-                  >
-                    {statusLabel(tenant.status)}
-                  </Badge>
-                  <Badge
-                    className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
-                  >
-                    {verifiedLabel(tenant.verifiedStatus)}
-                  </Badge>
-                </span>
-              </span>
-            </span>
-            <span className="vx-tenant-directory-row__subscription">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge className="vx-tenant-pill vx-tenant-pill--product">
-                  {formatNumber(subscribedProductCount)} 产品
-                </Badge>
-              </span>
-              <small>本月：¥ {formatNumber(tenant.monthlyRevenue)} 元</small>
-            </span>
-            <span className="vx-tenant-directory-row__service">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--risk-${riskLevel}`}
-                >
-                  {riskLabel(riskLevel)}
-                </Badge>
-              </span>
-              <small>
-                总工单 {formatNumber(ticketTotal)} | 待处理{" "}
-                {formatNumber(tenant.ticketOpenCount)}
-              </small>
-            </span>
-            <TenantActionsMenu
-              tenant={tenant}
-              busy={actionBusy}
-              onToggleStatus={onToggleStatus}
-            />
-          </div>
+          <TableTitleCell
+            title={
+              <Badge
+                className={`vx-tenant-pill vx-tenant-pill--risk-${riskLevel}`}
+              >
+                {riskLabel(riskLevel)}
+              </Badge>
+            }
+            description={`总工单 ${formatNumber(ticketTotal)} | 待处理 ${formatNumber(tenant.ticketOpenCount)}`}
+          />
         );
-      })}
-    </div>
-  );
+      },
+    },
+  ];
 }
 
 function TenantCards({
@@ -470,6 +395,8 @@ export function TenantsPage() {
     }
   }
 
+  const tenantColumns = useTenantColumns();
+
   const filteredTenants = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -505,13 +432,6 @@ export function TenantsPage() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
-  const visibleTenantIds = visibleTenants.map((tenant) => tenant.id);
-  const selectedVisibleTenantCount = visibleTenantIds.filter((tenantId) =>
-    selectedTenantIds.has(tenantId),
-  ).length;
-  const isTenantPageSelected =
-    visibleTenantIds.length > 0 &&
-    selectedVisibleTenantCount === visibleTenantIds.length;
   const individualTenants = tenants.filter(
     (tenant) => tenant.tenantType === "individual",
   ).length;
@@ -554,32 +474,6 @@ export function TenantsPage() {
     setTypeFilter("all");
     setRiskFilter("all");
     setVerificationFilter("all");
-  }
-
-  function toggleTenantSelection(tenantId: string, checked: boolean) {
-    setSelectedTenantIds((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(tenantId);
-      } else {
-        next.delete(tenantId);
-      }
-      return next;
-    });
-  }
-
-  function toggleTenantPageSelection(checked: boolean) {
-    setSelectedTenantIds((current) => {
-      const next = new Set(current);
-      for (const tenantId of visibleTenantIds) {
-        if (checked) {
-          next.add(tenantId);
-        } else {
-          next.delete(tenantId);
-        }
-      }
-      return next;
-    });
   }
 
   return (
@@ -739,41 +633,55 @@ export function TenantsPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="租户清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleTenants.length ? (
-              viewMode === "list" ? (
-                <TenantListRows
-                  tenants={visibleTenants}
-                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                  selectedTenantIds={selectedTenantIds}
-                  isPageSelected={isTenantPageSelected}
-                  actionBusy={actionBusy}
-                  onToggleTenant={toggleTenantSelection}
-                  onTogglePage={toggleTenantPageSelection}
-                  onToggleStatus={handleToggleTenantStatus}
-                />
-              ) : (
-                <TenantCards
-                  tenants={visibleTenants}
-                  actionBusy={actionBusy}
-                  onToggleStatus={handleToggleTenantStatus}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={tenantColumns}
+                rows={visibleTenants}
+                rowKey={(tenant) => tenant.id}
+                loading={loading}
+                indexStart={
+                  (Math.min(currentPage, pageCount) - 1) * pageSize + 1
+                }
+                selectedKeys={[...selectedTenantIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedTenantIds(new Set(keys))
+                }
+                rowActions={(tenant) => (
+                  <TenantActionsMenu
+                    tenant={tenant}
+                    busy={actionBusy}
+                    onToggleStatus={handleToggleTenantStatus}
+                  />
+                )}
+                emptyTitle={loadError ? "租户数据读取失败" : "没有匹配的租户"}
+                emptyDescription={loadError ?? "清空筛选条件后可查看全部租户。"}
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleTenants.length ? (
+              <TenantCards
+                tenants={visibleTenants}
+                actionBusy={actionBusy}
+                onToggleStatus={handleToggleTenantStatus}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
-                  title={
-                    loading
-                      ? "正在加载租户"
-                      : loadError
-                        ? "租户数据读取失败"
-                        : "没有匹配的租户"
-                  }
+                  title={loading ? "正在加载租户" : "没有匹配的租户"}
                   description={
                     loading
                       ? "正在读取平台租户运营数据。"

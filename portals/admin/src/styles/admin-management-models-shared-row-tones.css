@@ -12,13 +12,9 @@
 .vx-tenant-directory-card--high {
   --tenant-row-tone: var(--tenant-rose);
 }
-
-.vx-admin-role-row--active,
 .vx-admin-role-card--active {
   --tenant-row-tone: var(--tenant-blue);
 }
-
-.vx-admin-role-row--disabled,
 .vx-admin-role-card--disabled {
   --tenant-row-tone: var(--vx-color-gray-400);
 }

@@ -6,7 +6,7 @@ import {
   ActionMenu,
   Badge,
   Banner,
-  Checkbox,
+  DataTable,
   DialogForm,
   EmptyState,
   FilterBar,
@@ -20,6 +20,7 @@ import {
   Textarea,
   useToast,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -32,11 +33,7 @@ import type { AccountOperationRecord } from "@/entities/console";
 import { isListTruncated } from "@/lib/list-truncation";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
-import {
-  formatDate,
-  formatNumber,
-  joinClasses,
-} from "@/modules/tenants/tenant-utils";
+import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
 
 type ViewMode = "list" | "cards";
 type StatusFilter = "all" | AccountOperationRecord["status"];
@@ -274,178 +271,107 @@ interface AccountRowActions {
   onForceLogout: (account: AccountOperationRecord) => void;
 }
 
-function AccountListRows({
-  accounts,
-  startIndex,
-  selectedAccountIds,
-  isPageSelected,
-  showTenantContext,
-  onToggleAccount,
-  onTogglePage,
-  actions,
-}: {
-  accounts: AccountOperationRecord[];
-  startIndex: number;
-  selectedAccountIds: Set<string>;
-  isPageSelected: boolean;
-  showTenantContext: boolean;
-  onToggleAccount: (accountId: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-  actions: AccountRowActions;
-}) {
-  const selectedOnPage = accounts.filter((account) =>
-    selectedAccountIds.has(account.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < accounts.length;
-
-  return (
-    <div
-      className={joinClasses(
-        "vx-tenant-directory-list vx-account-directory-list",
-        !showTenantContext ? "vx-account-directory-list--platform" : "",
-      )}
-      role="region"
-      aria-label="账号清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : isPagePartiallySelected
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页账号"
-          />
-        </span>
-        <span>#</span>
-        <span>账号</span>
-        {showTenantContext ? <span>租户</span> : null}
-        <span>状态</span>
-        <span>权限</span>
-        <span>登录</span>
-        <span>操作</span>
-      </div>
-      {accounts.map((account, index) => {
+/**
+ * 行内的状态标仍是 pill（`accountStatusPillClass` 一族）而非 `StatusBadge`：那是
+ * 业务值域着色表，整族改 Badge 归批 4。
+ *
+ * 租户列随 `showTenantContext` 出没——平台账号视图没有租户归属这回事。
+ */
+function useAccountColumns(
+  showTenantContext: boolean,
+): DataTableColumn<AccountOperationRecord>[] {
+  return [
+    {
+      id: "account",
+      header: "账号",
+      cell: (account) => (
+        <TableTitleCell
+          icon="user"
+          title={account.displayName}
+          description={`${account.accountCode} · ${account.email}`}
+        />
+      ),
+    },
+    ...(showTenantContext
+      ? [
+          {
+            id: "tenant",
+            header: "租户",
+            cell: (account: AccountOperationRecord) => {
+              const summary = accountTenantSummary(account);
+              return (
+                <TableTitleCell
+                  title={
+                    <span className="inline-flex flex-wrap gap-2xs">
+                      {summary.tags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          className="vx-tenant-pill vx-account-muted-pill"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </span>
+                  }
+                  description={summary.primaryName}
+                />
+              );
+            },
+          },
+        ]
+      : []),
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (account) => {
         const indicator = accountStatusIndicator(account);
-        const tenantSummary = accountTenantSummary(account);
-
         return (
-          <div
-            key={account.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-account-operation-row",
-              selectedAccountIds.has(account.id)
-                ? "vx-account-operation-row--selected"
-                : "",
-            )}
-            onClick={(event) => {
-              if (
-                event.target instanceof HTMLElement &&
-                event.target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleAccount(account.id, !selectedAccountIds.has(account.id));
-            }}
+          <Badge
+            className={accountStatusPillClass(account.status)}
+            title={indicator.label}
           >
-            <span className="vx-account-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selectedAccountIds.has(account.id)}
-                onClick={(event) => event.stopPropagation()}
-                onCheckedChange={(value) =>
-                  onToggleAccount(account.id, value === true)
-                }
-                aria-label={`选择 ${account.displayName}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-tenant-directory-row__tenant"
-              icon="user"
-              title={account.displayName}
-              description={`${account.accountCode} · ${account.email}`}
-            />
-            {showTenantContext ? (
-              <span className="vx-tenant-directory-row__subscription">
-                <span className="vx-tenant-directory-row__tag-line">
-                  {tenantSummary.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      className="vx-tenant-pill vx-account-muted-pill"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </span>
-                <small>{tenantSummary.primaryName}</small>
-              </span>
-            ) : null}
-            <span className="vx-tenant-directory-row__status">
-              <span className="vx-tenant-directory-row__status-line">
-                <span
-                  className={`vx-tenant-status-dot vx-tenant-status-dot--${indicator.tone}`}
-                  role="img"
-                  aria-label={indicator.label}
-                  title={indicator.label}
-                >
-                  <Icon
-                    name={indicator.icon}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <span className="vx-tenant-directory-row__badges">
-                  <Badge className={accountStatusPillClass(account.status)}>
-                    {accountStatusLabel(account.status)}
-                  </Badge>
-                </span>
-              </span>
-            </span>
-            <span className="vx-tenant-directory-row__subscription">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--permission">
-                  {accountHighestRoleLabel(account)}
-                </Badge>
-              </span>
-              <small>
-                {showTenantContext
-                  ? `${formatNumber(account.tenantCount)} 个租户`
-                  : "平台角色"}
-              </small>
-            </span>
-            <span className="vx-tenant-directory-row__service">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--product">
-                  {account.lastActiveLocation}
-                </Badge>
-              </span>
-              <small>
-                {formatDate(account.lastActiveAt)} ·{" "}
-                {formatNumber(account.loginCount30d)} 次
-              </small>
-            </span>
-            <AccountActionsMenu
-              account={account}
-              busy={actions.actionBusy}
-              onToggleStatus={actions.onToggleStatus}
-              onForceLogout={actions.onForceLogout}
-            />
-          </div>
+            <Icon name={indicator.icon} size="xs" fallback="placeholder" />
+            {accountStatusLabel(account.status)}
+          </Badge>
         );
-      })}
-    </div>
-  );
+      },
+    },
+    {
+      id: "permission",
+      header: "权限",
+      align: "center",
+      cell: (account) => (
+        <TableTitleCell
+          title={
+            <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--permission">
+              {accountHighestRoleLabel(account)}
+            </Badge>
+          }
+          description={
+            showTenantContext
+              ? `${formatNumber(account.tenantCount)} 个租户`
+              : "平台角色"
+          }
+        />
+      ),
+    },
+    {
+      id: "login",
+      header: "登录",
+      align: "center",
+      cell: (account) => (
+        <TableTitleCell
+          title={
+            <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--product">
+              {account.lastActiveLocation}
+            </Badge>
+          }
+          description={`${formatDate(account.lastActiveAt)} · ${formatNumber(account.loginCount30d)} 次`}
+        />
+      ),
+    },
+  ];
 }
 
 function AccountCards({
@@ -653,6 +579,8 @@ export function AccountsPage({
     onForceLogout: requestForceLogout,
   };
 
+  const accountColumns = useAccountColumns(showTenantContext);
+
   const filteredAccounts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -687,13 +615,6 @@ export function AccountsPage({
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
-  const visibleAccountIds = visibleAccounts.map((account) => account.id);
-  const selectedVisibleAccountCount = visibleAccountIds.filter((accountId) =>
-    selectedAccountIds.has(accountId),
-  ).length;
-  const isAccountPageSelected =
-    visibleAccountIds.length > 0 &&
-    selectedVisibleAccountCount === visibleAccountIds.length;
   const activeAccounts = accounts.filter(
     (account) => account.status === "active",
   ).length;
@@ -716,32 +637,6 @@ export function AccountsPage({
     setStatusFilter("all");
     setTenantTypeFilter("all");
     setRoleFilter("all");
-  }
-
-  function toggleAccountSelection(accountId: string, checked: boolean) {
-    setSelectedAccountIds((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(accountId);
-      } else {
-        next.delete(accountId);
-      }
-      return next;
-    });
-  }
-
-  function toggleAccountPageSelection(checked: boolean) {
-    setSelectedAccountIds((current) => {
-      const next = new Set(current);
-      for (const accountId of visibleAccountIds) {
-        if (checked) {
-          next.add(accountId);
-        } else {
-          next.delete(accountId);
-        }
-      }
-      return next;
-    });
   }
 
   return (
@@ -885,41 +780,58 @@ export function AccountsPage({
             className="vx-tenant-directory"
             aria-label={pageCopy.directoryAriaLabel}
           >
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleAccounts.length ? (
-              viewMode === "list" ? (
-                <AccountListRows
-                  accounts={visibleAccounts}
-                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                  selectedAccountIds={selectedAccountIds}
-                  isPageSelected={isAccountPageSelected}
-                  showTenantContext={showTenantContext}
-                  onToggleAccount={toggleAccountSelection}
-                  onTogglePage={toggleAccountPageSelection}
-                  actions={accountActions}
-                />
-              ) : (
-                <AccountCards
-                  accounts={visibleAccounts}
-                  showTenantContext={showTenantContext}
-                  actions={accountActions}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={accountColumns}
+                rows={visibleAccounts}
+                rowKey={(account) => account.id}
+                loading={loading}
+                indexStart={
+                  (Math.min(currentPage, pageCount) - 1) * pageSize + 1
+                }
+                selectedKeys={[...selectedAccountIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedAccountIds(new Set(keys))
+                }
+                rowActions={(account) => (
+                  <AccountActionsMenu
+                    account={account}
+                    busy={accountActions.actionBusy}
+                    onToggleStatus={accountActions.onToggleStatus}
+                    onForceLogout={accountActions.onForceLogout}
+                  />
+                )}
+                emptyTitle={
+                  loadError ? "账号数据读取失败" : pageCopy.emptyTitle
+                }
+                emptyDescription={loadError ?? pageCopy.emptyDescription}
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleAccounts.length ? (
+              <AccountCards
+                accounts={visibleAccounts}
+                showTenantContext={showTenantContext}
+                actions={accountActions}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
-                  title={
-                    loading
-                      ? pageCopy.loadingTitle
-                      : loadError
-                        ? "账号数据读取失败"
-                        : pageCopy.emptyTitle
-                  }
+                  title={loading ? pageCopy.loadingTitle : pageCopy.emptyTitle}
                   description={
                     loading
                       ? pageCopy.loadingDescription

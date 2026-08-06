@@ -8,6 +8,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  DataTable,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -25,6 +26,7 @@ import {
   Textarea,
   useToast,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -700,175 +702,84 @@ function PermissionTags({ role }: { role: PlatformRoleRecord }) {
   );
 }
 
-function AdminRoleListRows({
-  roles,
-  startIndex,
-  selectedRoleIds,
-  isPageSelected,
-  onToggleRole,
-  onTogglePage,
-  roleLabels,
-  t,
-  onOpenPermissions,
-  onOpenAuthorization,
-  onEdit,
-  onCopy,
-  onToggle,
-  onDelete,
-}: {
-  roles: PlatformRoleRecord[];
-  startIndex: number;
-  selectedRoleIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleRole: (roleId: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-  roleLabels: Map<string, string>;
-  t: ReturnType<typeof useConsoleTranslations>;
-  onOpenPermissions: (role: PlatformRoleRecord) => void;
-  onOpenAuthorization: (role: PlatformRoleRecord) => void;
-  onEdit: (role: PlatformRoleRecord) => void;
-  onCopy: (role: PlatformRoleRecord) => void;
-  onToggle: (role: PlatformRoleRecord) => void;
-  onDelete: (role: PlatformRoleRecord) => void;
-}) {
-  const selectedOnPage = roles.filter((role) =>
-    selectedRoleIds.has(role.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < roles.length;
+/**
+ * 行内的状态标仍是 pill（`roleStatusPillClass`）而非 `StatusBadge`：那是业务值域
+ * 着色表，整族改 Badge 归批 4。记号图标放在标**内**——它靠标的文字色着色，摆在
+ * 标外面会退成表格的正文灰。
+ */
+function useAdminRoleColumns(
+  roleLabels: Map<string, string>,
+  t: ReturnType<typeof useConsoleTranslations>,
+): DataTableColumn<PlatformRoleRecord>[] {
+  const labelOf = (role: PlatformRoleRecord) =>
+    roleLabels.get(role.id) ?? role.nameEn ?? role.roleCode ?? EMPTY_MARK;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-admin-role-directory-list"
-      role="region"
-      aria-label="平台角色清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={isPagePartiallySelected ? "indeterminate" : isPageSelected}
-            onCheckedChange={(checked) => onTogglePage(checked === true)}
-            aria-label="选择当前页角色"
-          />
-        </span>
-        <span>#</span>
-        <span>角色</span>
-        <span>状态</span>
-        <span>成员</span>
-        <span>权限</span>
-        <span>创建人</span>
-        <span>操作</span>
-      </div>
-      {roles.map((role, index) => {
+  return [
+    {
+      id: "role",
+      header: "角色",
+      cell: (role) => (
+        <TableTitleCell
+          {...(roleDescription(role, t)
+            ? { tooltip: roleDescription(role, t) }
+            : {})}
+          icon="role"
+          title={labelOf(role)}
+          titleSuffix={
+            role.isSystem ? (
+              <Badge className="vx-tenant-pill vx-tenant-pill--system">
+                系统
+              </Badge>
+            ) : null
+          }
+          description={role.roleCode}
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (role) => {
         const indicator = roleStatusIndicator(role);
-        const roleLabel =
-          roleLabels.get(role.id) ?? role.nameEn ?? role.roleCode ?? EMPTY_MARK;
-
         return (
-          <div
-            key={role.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-admin-role-operation-row",
-              roleStatusCode(role) === "active"
-                ? "vx-admin-role-row--active"
-                : "vx-admin-role-row--disabled",
-              selectedRoleIds.has(role.id)
-                ? "vx-admin-role-operation-row--selected"
-                : "",
-            )}
-            onClick={(event) => {
-              if (
-                event.target instanceof HTMLElement &&
-                event.target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleRole(role.id, !selectedRoleIds.has(role.id));
-            }}
+          <Badge
+            className={`vx-tenant-pill ${roleStatusPillClass(role)}`}
+            title={indicator.label}
           >
-            <span className="vx-admin-role-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selectedRoleIds.has(role.id)}
-                onClick={(event) => event.stopPropagation()}
-                onCheckedChange={(checked) =>
-                  onToggleRole(role.id, checked === true)
-                }
-                aria-label={`选择 ${roleLabel}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-tenant-directory-row__tenant vx-admin-role-row__identity"
-              {...(roleDescription(role, t)
-                ? { tooltip: roleDescription(role, t) }
-                : {})}
-              icon="role"
-              title={roleLabel}
-              titleSuffix={
-                role.isSystem ? (
-                  <Badge className="vx-tenant-pill vx-tenant-pill--system">
-                    系统
-                  </Badge>
-                ) : null
-              }
-              description={role.roleCode}
-            />
-            <span className="vx-admin-role-row__status">
-              <span className="vx-tenant-directory-row__status-line">
-                <span
-                  className={`vx-tenant-status-dot vx-tenant-status-dot--${indicator.tone}`}
-                  role="img"
-                  aria-label={indicator.label}
-                  title={indicator.label}
-                >
-                  <Icon
-                    name={indicator.icon}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <Badge
-                  className={`vx-tenant-pill ${roleStatusPillClass(role)}`}
-                >
-                  {indicator.label}
-                </Badge>
-              </span>
-            </span>
-            <span className="vx-admin-role-row__admins">
-              <strong>
-                {formatNumber(role.activeAdminCount)} /{" "}
-                {formatNumber(role.adminCount)}
-              </strong>
-              <small>启用 / 全部</small>
-            </span>
-            <span className="vx-admin-role-row__permissions">
-              <PermissionTags role={role} />
-            </span>
-            <span className="vx-admin-role-row__updated">
-              <strong>{role.createdByName || EMPTY_MARK}</strong>
-              <small>{formatDate(role.createdAt)}</small>
-            </span>
-            <AdminRoleActionsMenu
-              role={role}
-              roleLabel={roleLabel}
-              onOpenPermissions={onOpenPermissions}
-              onOpenAuthorization={onOpenAuthorization}
-              onEdit={onEdit}
-              onCopy={onCopy}
-              onToggle={onToggle}
-              onDelete={onDelete}
-            />
-          </div>
+            <Icon name={indicator.icon} size="xs" fallback="placeholder" />
+            {indicator.label}
+          </Badge>
         );
-      })}
-    </div>
-  );
+      },
+    },
+    {
+      id: "admins",
+      header: "成员",
+      align: "center",
+      cell: (role) => (
+        <TableTitleCell
+          title={`${formatNumber(role.activeAdminCount)} / ${formatNumber(role.adminCount)}`}
+          description="启用 / 全部"
+        />
+      ),
+    },
+    {
+      id: "permissions",
+      header: "权限",
+      cell: (role) => <PermissionTags role={role} />,
+    },
+    {
+      id: "createdBy",
+      header: "创建人",
+      cell: (role) => (
+        <TableTitleCell
+          title={role.createdByName || EMPTY_MARK}
+          description={formatDate(role.createdAt)}
+        />
+      ),
+    },
+  ];
 }
 
 function AdminRoleCards({
@@ -1230,6 +1141,8 @@ export function AdminRolesPage() {
     return new Map(roles.map((role) => [role.id, roleDisplayName(role, t)]));
   }, [roles, t]);
 
+  const adminRoleColumns = useAdminRoleColumns(roleLabels, t);
+
   const filteredRoles = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -1268,13 +1181,6 @@ export function AdminRolesPage() {
   const authorizationRole = authorizationRoleId
     ? (roles.find((role) => role.id === authorizationRoleId) ?? null)
     : null;
-  const visibleRoleIds = visibleRoles.map((role) => role.id);
-  const selectedVisibleRoleCount = visibleRoleIds.filter((roleId) =>
-    selectedRoleIds.has(roleId),
-  ).length;
-  const isRolePageSelected =
-    visibleRoleIds.length > 0 &&
-    selectedVisibleRoleCount === visibleRoleIds.length;
   const enabledRoles = roles.filter(
     (role) => roleStatusCode(role) === "active",
   ).length;
@@ -1303,32 +1209,6 @@ export function AdminRolesPage() {
     setStatusFilter("all");
     setRoleKindFilter("all");
     setPermissionFilter("all");
-  }
-
-  function toggleRoleSelection(roleId: string, checked: boolean) {
-    setSelectedRoleIds((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(roleId);
-      } else {
-        next.delete(roleId);
-      }
-      return next;
-    });
-  }
-
-  function toggleRolePageSelection(checked: boolean) {
-    setSelectedRoleIds((current) => {
-      const next = new Set(current);
-      for (const roleId of visibleRoleIds) {
-        if (checked) {
-          next.add(roleId);
-        } else {
-          next.delete(roleId);
-        }
-      }
-      return next;
-    });
   }
 
   async function saveRoleAuthorization(permissionIds: string[]) {
@@ -1663,63 +1543,81 @@ export function AdminRolesPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="平台角色清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleRoles.length ? (
-              viewMode === "list" ? (
-                <AdminRoleListRows
-                  roles={visibleRoles}
-                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                  selectedRoleIds={selectedRoleIds}
-                  isPageSelected={isRolePageSelected}
-                  onToggleRole={toggleRoleSelection}
-                  onTogglePage={toggleRolePageSelection}
-                  roleLabels={roleLabels}
-                  t={t}
-                  onOpenPermissions={(role) =>
-                    setPermissionDialogRoleId(role.id)
-                  }
-                  onOpenAuthorization={(role) => {
-                    setAuthorizationError(null);
-                    setAuthorizationRoleId(role.id);
-                  }}
-                  onEdit={openEditRole}
-                  onCopy={openCopyRole}
-                  onToggle={(role) => void handleToggleRole(role)}
-                  onDelete={(role) => setPendingDeleteRoleId(role.id)}
-                />
-              ) : (
-                <AdminRoleCards
-                  roles={visibleRoles}
-                  roleLabels={roleLabels}
-                  t={t}
-                  onOpenPermissions={(role) =>
-                    setPermissionDialogRoleId(role.id)
-                  }
-                  onOpenAuthorization={(role) => {
-                    setAuthorizationError(null);
-                    setAuthorizationRoleId(role.id);
-                  }}
-                  onEdit={openEditRole}
-                  onCopy={openCopyRole}
-                  onToggle={(role) => void handleToggleRole(role)}
-                  onDelete={(role) => setPendingDeleteRoleId(role.id)}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={adminRoleColumns}
+                rows={visibleRoles}
+                rowKey={(role) => role.id}
+                loading={loading}
+                indexStart={
+                  (Math.min(currentPage, pageCount) - 1) * pageSize + 1
+                }
+                selectedKeys={[...selectedRoleIds]}
+                onSelectionChange={(keys) => setSelectedRoleIds(new Set(keys))}
+                rowActions={(role) => (
+                  <AdminRoleActionsMenu
+                    role={role}
+                    roleLabel={
+                      roleLabels.get(role.id) ??
+                      role.nameEn ??
+                      role.roleCode ??
+                      EMPTY_MARK
+                    }
+                    onOpenPermissions={(target) =>
+                      setPermissionDialogRoleId(target.id)
+                    }
+                    onOpenAuthorization={(target) => {
+                      setAuthorizationError(null);
+                      setAuthorizationRoleId(target.id);
+                    }}
+                    onEdit={openEditRole}
+                    onCopy={openCopyRole}
+                    onToggle={(target) => void handleToggleRole(target)}
+                    onDelete={(target) => setPendingDeleteRoleId(target.id)}
+                  />
+                )}
+                emptyTitle={
+                  loadError ? "平台角色读取失败" : "没有匹配的平台角色"
+                }
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部平台角色。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleRoles.length ? (
+              <AdminRoleCards
+                roles={visibleRoles}
+                roleLabels={roleLabels}
+                t={t}
+                onOpenPermissions={(role) => setPermissionDialogRoleId(role.id)}
+                onOpenAuthorization={(role) => {
+                  setAuthorizationError(null);
+                  setAuthorizationRoleId(role.id);
+                }}
+                onEdit={openEditRole}
+                onCopy={openCopyRole}
+                onToggle={(role) => void handleToggleRole(role)}
+                onDelete={(role) => setPendingDeleteRoleId(role.id)}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
-                  title={
-                    loading
-                      ? "正在加载平台角色"
-                      : loadError
-                        ? "平台角色读取失败"
-                        : "没有匹配的平台角色"
-                  }
+                  title={loading ? "正在加载平台角色" : "没有匹配的平台角色"}
                   description={
                     loading
                       ? "正在从 platform.platform_role 读取平台角色。"

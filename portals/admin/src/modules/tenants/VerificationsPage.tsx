@@ -13,7 +13,7 @@ import {
   ActionMenu,
   Badge,
   Banner,
-  Checkbox,
+  DataTable,
   DialogForm,
   EmptyState,
   FilterBar,
@@ -26,6 +26,7 @@ import {
   Textarea,
   useToast,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -233,168 +234,94 @@ function VerificationActionsMenu({
   );
 }
 
-function VerificationListRows({
-  tenants,
-  startIndex,
-  selectedTenantIds,
-  isPageSelected,
-  actionBusy,
-  onToggleTenant,
-  onTogglePage,
-  onApprove,
-  onReject,
-}: {
-  tenants: VerificationRow[];
-  startIndex: number;
-  selectedTenantIds: Set<string>;
-  isPageSelected: boolean;
-  actionBusy: boolean;
-  onToggleTenant: (tenantId: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-  onApprove: (row: VerificationRow) => void;
-  onReject: (row: VerificationRow) => void;
-}) {
+/**
+ * 行内的状态标仍是 pill（`vx-verification-pill--*` / `vx-tenant-pill--*`）而非
+ * `StatusBadge`：那一族是业务值域着色表，整族改 Badge 归批 4。
+ */
+function useVerificationColumns(): DataTableColumn<VerificationRow>[] {
   const router = useRouter();
-  const selectedOnPage = tenants.filter((tenant) =>
-    selectedTenantIds.has(tenant.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < tenants.length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-verification-directory-list"
-      role="region"
-      aria-label="实名认证清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : isPagePartiallySelected
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页实名认证"
-          />
-        </span>
-        <span>#</span>
-        <span>组织</span>
-        <span>认证状态</span>
-        <span>主体信息</span>
-        <span>运营联系</span>
-        <span>时间</span>
-        <span>操作</span>
-      </div>
-      {tenants.map((tenant, index) => {
-        const riskLevel = normalizeTenantRiskLevel(tenant.riskLevel);
+  return [
+    {
+      id: "org",
+      header: "组织",
+      cell: (tenant) => (
+        <TableTitleCell
+          icon="buildings"
+          title={tenant.displayName}
+          description={`${tenant.tenantCode} · ${tenant.region}`}
+          onTitleClick={() =>
+            router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: "认证状态",
+      align: "center",
+      cell: (tenant) => {
         const indicator = verificationStatusIndicator(tenant.verifiedStatus);
-
         return (
-          <div
-            key={tenant.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-verification-operation-row",
-              `vx-tenant-directory-row--${riskLevel}`,
-              selectedTenantIds.has(tenant.id)
-                ? "vx-verification-operation-row--selected"
-                : "",
-            )}
-            onClick={(event) => {
-              if (
-                event.target instanceof HTMLElement &&
-                event.target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleTenant(tenant.id, !selectedTenantIds.has(tenant.id));
-            }}
-          >
-            <span className="vx-verification-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selectedTenantIds.has(tenant.id)}
-                onClick={(event) => event.stopPropagation()}
-                onCheckedChange={(value) =>
-                  onToggleTenant(tenant.id, value === true)
-                }
-                aria-label={`选择 ${tenant.displayName}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-tenant-directory-row__tenant"
-              icon="buildings"
-              title={tenant.displayName}
-              description={`${tenant.tenantCode} · ${tenant.region}`}
-              onTitleClick={() =>
-                router.push(`/tenants/${encodeURIComponent(tenant.id)}`)
-              }
-            />
-            <span className="vx-verification-row__status">
-              <span className="vx-tenant-directory-row__status-line">
-                <span
-                  className={`vx-tenant-status-dot vx-tenant-status-dot--${indicator.tone}`}
-                  role="img"
-                  aria-label={indicator.label}
-                  title={indicator.label}
-                >
-                  <Icon
-                    name={indicator.icon}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <Badge
-                  className={`vx-tenant-pill vx-verification-pill--${tenant.verifiedStatus}`}
-                >
-                  {verifiedLabel(tenant.verifiedStatus)}
-                </Badge>
-              </span>
-              <small>{riskLabel(riskLevel)}</small>
-            </span>
-            <span className="vx-verification-row__subject">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge className="vx-tenant-pill vx-tenant-pill--company">
-                  {tenant.industry}
-                </Badge>
-                <Badge className="vx-tenant-pill vx-verification-muted-pill">
-                  {tenant.scale}
-                </Badge>
-              </span>
-              <small>{tenant.tenantName}</small>
-            </span>
-            <span className="vx-verification-row__contact">
-              <strong>{tenant.contactName}</strong>
-              <small>{tenant.contactPhone || tenant.ownerEmail}</small>
-            </span>
-            <span className="vx-verification-row__time">
-              <strong>
-                {tenant.verificationSubmittedAt
-                  ? formatDate(tenant.verificationSubmittedAt)
-                  : "未提交"}
-              </strong>
-              <small>{verificationTimeText(tenant)}</small>
-            </span>
-            <VerificationActionsMenu
-              tenant={tenant}
-              busy={actionBusy}
-              onApprove={onApprove}
-              onReject={onReject}
-            />
-          </div>
+          <TableTitleCell
+            title={
+              <Badge
+                className={`vx-tenant-pill vx-verification-pill--${tenant.verifiedStatus}`}
+                title={indicator.label}
+              >
+                <Icon name={indicator.icon} size="xs" fallback="placeholder" />
+                {verifiedLabel(tenant.verifiedStatus)}
+              </Badge>
+            }
+            description={riskLabel(normalizeTenantRiskLevel(tenant.riskLevel))}
+          />
         );
-      })}
-    </div>
-  );
+      },
+    },
+    {
+      id: "subject",
+      header: "主体信息",
+      cell: (tenant) => (
+        <TableTitleCell
+          title={
+            <span className="inline-flex flex-wrap gap-2xs">
+              <Badge className="vx-tenant-pill vx-tenant-pill--company">
+                {tenant.industry}
+              </Badge>
+              <Badge className="vx-tenant-pill vx-verification-muted-pill">
+                {tenant.scale}
+              </Badge>
+            </span>
+          }
+          description={tenant.tenantName}
+        />
+      ),
+    },
+    {
+      id: "contact",
+      header: "运营联系",
+      cell: (tenant) => (
+        <TableTitleCell
+          title={tenant.contactName}
+          description={tenant.contactPhone || tenant.ownerEmail}
+        />
+      ),
+    },
+    {
+      id: "time",
+      header: "时间",
+      cell: (tenant) => (
+        <TableTitleCell
+          title={
+            tenant.verificationSubmittedAt
+              ? formatDate(tenant.verificationSubmittedAt)
+              : "未提交"
+          }
+          description={verificationTimeText(tenant)}
+        />
+      ),
+    },
+  ];
 }
 
 function VerificationCards({
@@ -578,6 +505,8 @@ export function VerificationsPage() {
     [organizationTenants],
   );
 
+  const verificationColumns = useVerificationColumns();
+
   const filteredTenants = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -612,13 +541,6 @@ export function VerificationsPage() {
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
-  const visibleTenantIds = visibleTenants.map((tenant) => tenant.id);
-  const selectedVisibleTenantCount = visibleTenantIds.filter((tenantId) =>
-    selectedTenantIds.has(tenantId),
-  ).length;
-  const isTenantPageSelected =
-    visibleTenantIds.length > 0 &&
-    selectedVisibleTenantCount === visibleTenantIds.length;
   const pendingCount = organizationTenants.filter(
     (tenant) => tenant.verifiedStatus === "pending",
   ).length;
@@ -716,32 +638,6 @@ export function VerificationsPage() {
     } finally {
       setActionBusy(false);
     }
-  }
-
-  function toggleTenantSelection(tenantId: string, checked: boolean) {
-    setSelectedTenantIds((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(tenantId);
-      } else {
-        next.delete(tenantId);
-      }
-      return next;
-    });
-  }
-
-  function toggleTenantPageSelection(checked: boolean) {
-    setSelectedTenantIds((current) => {
-      const next = new Set(current);
-      for (const tenantId of visibleTenantIds) {
-        if (checked) {
-          next.add(tenantId);
-        } else {
-          next.delete(tenantId);
-        }
-      }
-      return next;
-    });
   }
 
   return (
@@ -884,33 +780,53 @@ export function VerificationsPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="实名认证清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleTenants.length ? (
-              viewMode === "list" ? (
-                <VerificationListRows
-                  tenants={visibleTenants}
-                  startIndex={(Math.min(currentPage, pageCount) - 1) * pageSize}
-                  selectedTenantIds={selectedTenantIds}
-                  isPageSelected={isTenantPageSelected}
-                  actionBusy={actionBusy}
-                  onToggleTenant={toggleTenantSelection}
-                  onTogglePage={toggleTenantPageSelection}
-                  onApprove={handleApprove}
-                  onReject={openReject}
-                />
-              ) : (
-                <VerificationCards
-                  tenants={visibleTenants}
-                  actionBusy={actionBusy}
-                  onApprove={handleApprove}
-                  onReject={openReject}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={verificationColumns}
+                rows={visibleTenants}
+                rowKey={(tenant) => tenant.id}
+                loading={loading}
+                indexStart={
+                  (Math.min(currentPage, pageCount) - 1) * pageSize + 1
+                }
+                selectedKeys={[...selectedTenantIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedTenantIds(new Set(keys))
+                }
+                rowActions={(tenant) => (
+                  <VerificationActionsMenu
+                    tenant={tenant}
+                    busy={actionBusy}
+                    onApprove={handleApprove}
+                    onReject={openReject}
+                  />
+                )}
+                emptyTitle="没有匹配的实名认证"
+                emptyDescription="清空筛选条件后可查看全部实名认证记录。"
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleTenants.length ? (
+              <VerificationCards
+                tenants={visibleTenants}
+                actionBusy={actionBusy}
+                onApprove={handleApprove}
+                onReject={openReject}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
