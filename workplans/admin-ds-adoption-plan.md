@@ -489,10 +489,24 @@ pill 引用 266 → 210 处，选择器 239 → 146 个，admin CSS 6484 → 627
 ### 第五刀：等级标归 L1–L5（2026-08-06，批 4 收尾）
 
 `tier-*` 是这一族里最后一类。**等级不走六档语气**：语气说严重度（好/要留意/坏），
-等级说序（低→高）。把 enterprise 映射成 `danger` 或 `brand` 都不对——前者说它出事了，
-后者说它是新的。DS 备了一条独立的品牌深浅阶梯 `--level-1..5`（brand-200 → brand-600，
-前景色随档从深字翻成白字），新文件 `modules/shared/tier-level.ts` + `styles/admin-level-badge.css`
-把商业等级挂上去。
+等级说的是别的东西。把 enterprise 映射成 `danger` 或 `brand` 都不对——前者说它出事了，
+后者说它是新的。
+
+**第一版做错了，owner 实测后改。** 我先把五档挂在 DS 的 `--level-1..5` 上
+（brand-200 → brand-600 逐级加深），结果**文字看不清**：那条阶梯是给色块用的，中间
+几档底色已经压下来、前景却还是深字。更要紧的是**五级深浅并没有对应五件事**。
+
+真正要一眼分出来的是**三类客户**：
+
+| 档                       | 是什么       | 表现            |
+| ------------------------ | ------------ | --------------- |
+| free                     | 还没付费     | 中性描边        |
+| starter / pro / business | 云端付费客户 | 品牌淡底        |
+| enterprise               | 私有化大客户 | 品牌实底 + 白字 |
+
+三档正好落在 DS `Badge` 已有的三个 variant 上（`outline` / `secondary` / `default`），
+配色与对比度由 DS 自己保证——`styles/admin-level-badge.css` 因此不必存在，建了又删。
+判据：**先问要分出几件事，再挑表现**；反过来"有一条五级阶梯所以用五级"是拿手段找问题。
 
 **§十一 的缺色一并补齐。** `@vxture/shared` 的 `TIERS` 是五档（free / starter / pro /
 business / enterprise，product_220 §1），admin 此前只认三档，starter 与 business 一起

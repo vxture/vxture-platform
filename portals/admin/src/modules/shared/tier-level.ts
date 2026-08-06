@@ -1,58 +1,59 @@
 /**
- * tier-level.ts —— 套餐等级 → L1–L5 刻度。
+ * tier-level.ts —— 套餐等级 → 商业分档。
  *
  * @package @vxture/admin
  * @layer Presentation
  * @category Shared
  *
  * ── 为什么等级不走六档语气 ────────────────────────────────────────────────
- * 语气表达的是**严重度**（好 / 要留意 / 坏），等级表达的是**序**（低 → 高）。
- * 把 enterprise 映射成 `danger` 或 `brand` 都不对：前者说它出事了，后者说它是新的。
- * DS 为此备了一条独立的品牌深浅阶梯 `--level-1..5`（brand-200 → brand-600，
- * 前景色随之从深字翻成白字），本文件就是把商业等级挂上那条阶梯。
+ * 语气表达的是**严重度**（好 / 要留意 / 坏），等级表达的是别的东西。把 enterprise
+ * 映射成 `danger` 或 `brand` 都不对：前者说它出事了，后者说它是新的。
+ *
+ * ── 为什么不是五级深浅阶梯（owner 2026-08-06 实测后改）────────────────────
+ * 第一版把五档挂在 DS 的 `--level-1..5` 上（brand-200 → brand-600 逐级加深）。
+ * 实测**文字看不清**：那条阶梯是给色块用的，中间几档底色已经压下来、前景却还是
+ * 深字，对比度不够。
+ *
+ * 更要紧的是**五级深浅并没有对应五件事**。真正要一眼分出来的是三类客户：
+ *
+ * | 档                       | 是什么       | 表现            |
+ * | ------------------------ | ------------ | --------------- |
+ * | free                     | 还没付费     | 中性描边        |
+ * | starter / pro / business | 云端付费客户 | 品牌淡底        |
+ * | enterprise               | 私有化大客户 | 品牌实底 + 白字 |
+ *
+ * 三档正好落在 DS `Badge` 已有的三个 variant 上（`outline` / `secondary` /
+ * `default`），配色与对比度由 DS 自己保证，admin 不再自备任何等级 CSS。
  *
  * ── 补齐 admin 缺的两档 ───────────────────────────────────────────────────
- * `@vxture/shared` 的 `TIERS` 是**五档**（free / starter / pro / business /
- * enterprise，product_220 §1），admin 此前只认 free / pro / enterprise 三档，
- * starter 与 business 一起掉进 `other` 的灰色——五档里有两档在视觉上根本不存在
- * （盘点 §十一 记的缺色）。这里按 `TIERS` 的顺序全覆盖，`Record` 保证不再漏。
+ * `@vxture/shared` 的 `TIERS` 是**五档**（product_220 §1），admin 此前只认
+ * free / pro / enterprise，starter 与 business 一起掉进 `other` 的灰（盘点 §十一
+ * 记的缺色）。`Record<Tier, …>` 保证不再漏。
  */
 
+import type { BadgeVariant } from "@vxture/design-system";
 import { TIERS, type Tier } from "@vxture/shared";
 
-export type TierLevel = 1 | 2 | 3 | 4 | 5;
-
-/** 等级 → 刻度。顺序即 `TIERS` 本身的顺序，低 → 高。 */
-export const TIER_LEVEL: Record<Tier, TierLevel> = {
-  free: 1,
-  starter: 2,
-  pro: 3,
-  business: 4,
-  enterprise: 5,
+/** 等级 → `Badge` 变体。三档的判据见文件头。 */
+export const TIER_VARIANT: Record<Tier, BadgeVariant> = {
+  free: "outline",
+  starter: "secondary",
+  pro: "secondary",
+  business: "secondary",
+  enterprise: "default",
 };
 
 /**
- * 把展示用的套餐名归一到刻度。
+ * 把展示用的套餐名归一到变体。
  *
- * 读的是 `tierName` 这类自由文本（BFF 给的是展示名，大小写不定），认不出来时返回
- * `null`——**不猜**：一个认不出的套餐名标成 L1 会谎报它是最低档，宁可不着色。
+ * 读的是 `tierName` 这类自由文本（BFF 给的是展示名，大小写不定），认不出来时退回
+ * `outline`——**不猜**：认不出的套餐名标成实底会谎报它是私有化大客户。
  */
-export function tierLevelOf(
-  tierName: string | null | undefined,
-): TierLevel | null {
-  if (!tierName) return null;
+export function tierVariant(tierName: string | null | undefined): BadgeVariant {
+  if (!tierName) return "outline";
   const key = tierName.trim().toLowerCase();
   const tier = TIERS.find((value) => value === key);
-  return tier ? TIER_LEVEL[tier] : null;
-}
-
-/**
- * 等级标的类名。认不出的档返回中性标——与 `categoryTone()` 的中性同一个观感，
- * 但走 `Badge` 而不是 `StatusBadge`：它不是状态，不该带语气图标。
- */
-export function tierBadgeClass(tierName: string | null | undefined): string {
-  const level = tierLevelOf(tierName);
-  return level ? `vx-level-badge vx-level-badge--${level}` : "vx-level-badge";
+  return tier ? TIER_VARIANT[tier] : "outline";
 }
 
 /**
