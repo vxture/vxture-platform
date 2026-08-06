@@ -1307,10 +1307,13 @@ export interface PromotionRedemptionRecord {
 export interface CommerceOverviewMetric {
   key: string;
   label: string;
+  /** 笔数。给了 `amount` 时它是"多少笔"，卡面把金额当读数、笔数当标。 */
   value: number;
+  /** 金额型指标的金额。给了它，`value` 必须是对应的笔数。 */
   amount?: number;
   currency?: string;
   tone: "blue" | "green" | "amber" | "rose";
+  /** 口径说明（表名 + 条件），落到 `MetricCard.help` 的 `?`，不进标。 */
   hint: string;
 }
 

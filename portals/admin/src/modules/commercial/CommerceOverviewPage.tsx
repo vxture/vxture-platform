@@ -84,10 +84,16 @@ function metricValue(metric: CommerceOverviewMetric) {
   return formatNumber(metric.value);
 }
 
+/**
+ * 金额型指标的读数是金额，笔数退成标；计数型指标读数本身就是笔数，不再重复。
+ *
+ * `hint` 不在这里——它是口径说明（"metering.subscriptions 中 status=active 的订阅数"
+ * 这类），归 `MetricCard.help` 的 `?`。当成标挂出来，一整句表名条件会顶掉读数的位置。
+ */
 function metricTags(metric: CommerceOverviewMetric) {
-  if (typeof metric.amount === "number")
-    return [`${formatNumber(metric.value)} 笔`, metric.hint];
-  return [metric.hint];
+  return typeof metric.amount === "number"
+    ? [`${formatNumber(metric.value)} 笔`]
+    : [];
 }
 
 function riskIcon(
@@ -106,11 +112,13 @@ function OverviewMetricSummary({
   return (
     <MetricGrid
       aria-label="商业总览统计"
+      columns={5}
       items={metrics.map((metric) => ({
         id: metric.key,
         icon: metricIcon(metric),
         label: metric.label,
         value: metricValue(metric),
+        help: metric.hint,
         tags: metricTags(metric),
         tone: toStatusTone(metric.tone),
       }))}

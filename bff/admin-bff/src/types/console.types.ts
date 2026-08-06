@@ -1226,10 +1226,17 @@ export interface PromotionRedemptionRecord {
 export interface CommerceOverviewMetric {
   key: string;
   label: string;
+  /**
+   * 笔数。给了 `amount` 时它是"多少笔"，卡面把金额当读数、笔数当标；没有 `amount`
+   * 的纯计数指标它本身就是读数。**不要把金额重复塞进来**——卡面会把它当笔数印成
+   * "10778 笔"（2026-08-06 owner 实测抓到）。
+   */
   value: number;
+  /** 金额型指标的金额。给了它，`value` 必须是对应的笔数。 */
   amount?: number;
   currency?: string;
   tone: "blue" | "green" | "amber" | "rose";
+  /** 口径说明（表名 + 条件），落到卡片标签旁的 `?`，不进标。 */
   hint: string;
 }
 
