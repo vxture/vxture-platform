@@ -500,6 +500,7 @@ export function PromotionsPage() {
           <FilterBar
             view={viewMode}
             onViewChange={setViewMode}
+            cardsDisabledReason="卡片视图已停用：列表视图提供选择、排序、分页与跨页批量，运营台的清单是拿来扫读和对比的。"
             count={formatNumber(filteredRecords.length)}
             aria-label="营销优惠筛选"
             search={

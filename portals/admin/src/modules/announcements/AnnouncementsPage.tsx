@@ -264,6 +264,7 @@ function AnnouncementToolbar({
     <FilterBar
       view={viewMode}
       onViewChange={onViewModeChange}
+      cardsDisabledReason="卡片视图已停用：列表视图提供选择、排序、分页与跨页批量，运营台的清单是拿来扫读和对比的。"
       count={`${total} 条`}
       aria-label="公告筛选"
       search={

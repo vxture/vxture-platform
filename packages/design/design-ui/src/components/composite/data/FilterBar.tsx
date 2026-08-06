@@ -47,6 +47,8 @@ export interface FilterBarProps extends React.HTMLAttributes<HTMLDivElement> {
   /** 给了才出 list/cards 视图切换（工具行最左）。 */
   readonly view?: FilterBarView;
   readonly onViewChange?: (view: FilterBarView) => void;
+  /** 停用卡片档并说明原因。透传给 `ViewModeSwitch`，判据见那里。 */
+  readonly cardsDisabledReason?: string;
   /** 计数：总数或"筛选后 N 条"，由调用方给成品文案或数字。 */
   readonly count?: React.ReactNode;
 }
@@ -61,6 +63,7 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
       actions,
       view,
       onViewChange,
+      cardsDisabledReason,
       count,
       children,
       ...props
@@ -82,7 +85,11 @@ const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(
               admin 的列表页有二十多处不经 FilterBar 直接摆一个。原先这里内联
               了一份同样的 ToggleGroup，两处各改各的就会分叉。 */}
           {view && onViewChange ? (
-            <ViewModeSwitch value={view} onChange={onViewChange} />
+            <ViewModeSwitch
+              value={view}
+              onChange={onViewChange}
+              {...(cardsDisabledReason ? { cardsDisabledReason } : {})}
+            />
           ) : null}
           {count !== undefined ? (
             <span className="whitespace-nowrap text-label-md text-muted-foreground">

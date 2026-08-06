@@ -40,6 +40,14 @@ export interface ViewModeSwitchProps {
   readonly ariaLabel?: string;
   /** 两个选项各自的无障碍名。默认中文，做 i18n 的消费方传入。 */
   readonly labels?: { list?: string; cards?: string };
+  /**
+   * 停用卡片档，并说明原因。
+   *
+   * 入口保留、但不假装它还会响应——**一个永远按不动又不说为什么的按钮，比没有
+   * 这个按钮更糟**。原因会挂在 `title` 与 `aria-description` 上，鼠标停留和读屏
+   * 器都拿得到（owner 2026-08-07 判：卡片视图退役，切换按钮保留禁用）。
+   */
+  readonly cardsDisabledReason?: string;
   readonly className?: string;
 }
 
@@ -48,6 +56,7 @@ export function ViewModeSwitch({
   onChange,
   ariaLabel = "展示方式",
   labels,
+  cardsDisabledReason,
   className,
 }: ViewModeSwitchProps) {
   return (
@@ -74,6 +83,13 @@ export function ViewModeSwitch({
         value="cards"
         aria-label={labels?.cards ?? "卡片视图"}
         className={ITEM}
+        {...(cardsDisabledReason
+          ? {
+              disabled: true,
+              title: cardsDisabledReason,
+              "aria-description": cardsDisabledReason,
+            }
+          : {})}
       >
         <Icon name="squares-four" size="lg" />
       </ToggleGroupItem>
