@@ -47,8 +47,6 @@ export interface MetricGridItem {
 export interface MetricGridProps {
   readonly items: readonly MetricGridItem[];
   readonly columns?: MetricGridColumns;
-  /** 整排统一形态：一行 4 张以内用默认松散款，超过 4 张用无 icon 紧凑款。 */
-  readonly variant?: "default" | "compact";
   /**
    * 这一排指标是什么（"订单管理统计"一类）。给了就连同 `role="group"` 一起挂上——
    * 一排读数对读屏器是一堆无名数字，没有组名就只能逐张听过去。
@@ -60,7 +58,6 @@ export interface MetricGridProps {
 function MetricGrid({
   items,
   columns = 4,
-  variant = "default",
   "aria-label": ariaLabel,
   className,
 }: MetricGridProps) {
@@ -91,7 +88,6 @@ function MetricGrid({
             : {})}
           {...(item.tags !== undefined ? { tags: item.tags } : {})}
           {...(item.tone !== undefined ? { tone: item.tone } : {})}
-          variant={variant}
         />
       ))}
     </div>

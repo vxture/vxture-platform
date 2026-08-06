@@ -4,8 +4,26 @@
  * @layer Presentation
  * @category Components - Pattern
  *
- * 读数 20px（title-xl）而非展示体大字——admin KPI 卡的密度（workplan §1）：
- * 指标卡成排出现，36px 的读数会让四张卡各自都在喊。读数不是标题，落在 `<span>` 上。
+ * 读数 20px（title-xl）而非展示体大字——指标卡成排出现，36px 的读数会让四张卡
+ * 各自都在喊。读数不是标题，落在 `<span>` 上。
+ *
+ * **尺寸按头部统计定**（owner 2026-08-06，取自 service-monitor 的既有实现）：
+ * 内边距 16/24 而非 32/32。这类卡永远是"页头下面那一排"，占地小才排得开；
+ * 此前的大内边距没有任何调用点真正需要，留着只会让一排卡把首屏吃掉。
+ *
+ * **图标纵向居中**，不是顶对齐。卡是两行且两行不等高（标签 14 / 读数 20），
+ * 顶对齐时图标咬住第一行、重心压在上半部；居中之后图标中线与两行整体的中线
+ * 重合。**这个平衡只在两行时成立**——再加第三行就要重新判断。
+ *
+ * 右侧一枚极浅的柱状图底纹，说明"这里是统计数字"。装饰而已：`aria-hidden`、
+ * 不接指针事件。带图标的卡用静图，不带图标的卡用动图——底纹与图标是同一个
+ * 位置上的视觉符号，两个都动就会互相抢（见 statWatermark）。
+ *
+ * 底纹四边留白相等：上下由 `inset-y` 的内缩给出，右侧由同值的 `right` 给出。
+ * 靠 `bg-contain` 居中撑满剩余高度，图本身是方的，于是四边看起来一样宽。
+ *
+ * 没有 `variant`。曾有 default / compact 两档，差别是"松/紧 + 有无图标"；
+ * 尺寸统一收小之后，剩下的差别只是图标传不传，那是一个参数不是一个档位。
  *
  * 顶缘色条 2px（border-t-medium）——V3 的原文即"语义色只走顶部 2px 描边"；
  * 4px 那一档是侧栏指示条这类结构件的宽度，放在卡顶像贴了胶带。
@@ -18,6 +36,7 @@ import { Icon, type IconName } from "../../../icons";
 import { cn } from "../../../utils/cn";
 import { Button } from "../../base/form/Button";
 import { Card, CardContent } from "../../base/display/Card";
+import { STAT_WATERMARK_ANIMATED, STAT_WATERMARK_STILL } from "./statWatermark";
 import {
   StatusBadge,
   type StatusBadgeTone,
@@ -58,21 +77,15 @@ export interface MetricCardProps {
    */
   readonly tags?: readonly React.ReactNode[];
   /**
-   * 整块的语气：染顶缘色条、图标与读数，不染底。
-   * 一排指标卡靠色条区分归属——底色染满会盖过读数本身。
+   * 整块的语气：顶缘色条、图标、读数同色，不染底。一排指标卡靠色条区分归属，
+   * 底色染满会盖过读数本身。
    *
-   * 默认 `brand` 而非 `neutral`：admin KPI 卡的既有视觉是"默认即品牌蓝"
-   * （顶缘 + 读数 + 图标同色），neutral 档整卡发灰，只在刻意去色时才选它
-   * （2026-08-03 opera 对照 admin 实测）。
+   * 默认 `brand`。`neutral` 有专门的含义——**数据缺失的占位卡**（读数是"—"）：
+   * 它不是一种语气，是"这里还没有值"，所以整卡退到灰而不是挑一个颜色来假装
+   * 有状态（owner 2026-08-06）。日常用的是 brand / info / success / warning /
+   * danger 五档。
    */
   readonly tone?: StatusBadgeTone;
-  /**
-   * 两种形态（admin 统计卡的既有分工，2026-08-03）：
-   * - `default`：带 icon 的松散款，一行不超过 4 张；
-   * - `compact`：无 icon 的紧凑款，一行 4 张以上用它——只收内边距与行距，
-   *   读数尺寸不缩（admin 紧凑款读数同为大号），icon 传了也不渲染。
-   */
-  readonly variant?: "default" | "compact";
   readonly className?: string;
 }
 
@@ -86,28 +99,31 @@ function MetricCard({
   trendTone = "neutral",
   tags,
   tone = "brand",
-  variant = "default",
   className,
 }: MetricCardProps) {
-  const compact = variant === "compact";
-
   return (
     <Card
       className={cn(
-        "border-t-medium",
+        "relative overflow-hidden border-t-medium py-md",
         toneEdgeClasses[tone],
-        // 竖向节奏在 Card 本体上（py + gap），紧凑款在此收档。
-        compact && "py-lg",
         className,
       )}
     >
-      <CardContent
-        className={cn("flex flex-col", compact ? "gap-xs px-lg" : "gap-md")}
-      >
-        <div className="flex items-start gap-md">
+      <span
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url("${icon ? STAT_WATERMARK_STILL : STAT_WATERMARK_ANIMATED}")`,
+        }}
+        className={cn(
+          "pointer-events-none absolute inset-y-md right-md w-media-xs",
+          "bg-contain bg-center bg-no-repeat opacity-40",
+        )}
+      />
+      <CardContent className="relative flex flex-col px-lg">
+        <div className="flex items-center gap-md">
           {/* 图标在左、不套填充块：右侧的填充图标块会和读数抢视觉重心，
               而一排卡片并列时，左侧对齐的图标本身就是分组线索。 */}
-          {icon && !compact ? (
+          {icon ? (
             <Icon
               name={icon}
               size="lg"

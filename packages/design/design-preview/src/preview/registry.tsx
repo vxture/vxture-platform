@@ -1541,7 +1541,6 @@ export const ENTRIES: readonly Entry[] = [
       { name: "columns", values: ["2", "3", "4", "5", "6"] },
       // MetricCard 的 tone——六张示例卡各占一档，columns=6 那排一次看全。
       { name: "tone", values: [...TONES] },
-      { name: "variant", values: ["default", "compact"] },
     ],
     deviation:
       "卡片按语气染顶缘色条不染底：一排卡片靠色条分组，整块染色会盖过读数本身。趋势徽章挨着数字，它修饰的是数字不是卡片",
@@ -2986,13 +2985,12 @@ function MetricGridDemo() {
   ];
   return (
     <div className="flex w-full flex-col gap-lg">
-      {/* 紧凑款：无 icon、收间距，一行超过 4 张时用（admin 统计卡的第二形态）。 */}
-      <Row label="variant=compact columns=6" stack>
+      {/* 无图标：不传 icon 即可，不再是一个 variant 档位。 */}
+      <Row label="无图标 columns=6" stack>
         <MetricGrid
           className="w-full"
           columns={6}
-          variant="compact"
-          items={items}
+          items={items.map(({ icon: _icon, ...rest }) => rest)}
         />
       </Row>
       {([2, 3, 4, 5, 6] as const).map((columns) => (
