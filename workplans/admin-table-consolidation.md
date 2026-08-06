@@ -63,7 +63,7 @@
 
 | 批  | 页数 | 已迁 | 说明                                   |
 | --- | ---- | ---- | -------------------------------------- |
-| T1  | 6    | 0    | 未开始                                 |
+| T1  | 6    | 6    | ✅ **整批清零**（2026-08-06）          |
 | T2  | 5    | 0    | 未开始                                 |
 | T3  | 4    | 0    | 未开始                                 |
 | T4  | 5    | 2    | `AuditLogsPage` / `OpsTodosPage` 已迁  |
@@ -80,6 +80,22 @@
 状态→语气映射已在 `status-tone.ts` 就位（`BILL_STATUS_TONE` / `ORDER_STATUS_TONE` /
 `INVOICE_STATUS_TONE` / `RECONCILIATION_TONE` / `SUBSCRIPTION_OPERATION_TONE` /
 `USAGE_RISK_TONE`），本批不需要新建映射。
+
+**已完成（2026-08-06）。** 六页的行渲染各自封在一个 `*ListRows` 组件里（143–192 行，
+合计 1051 行），一对一换成 `use*Columns()` 后 tsx 合计 5949 → 5451，CSS 90 条规则退役
+（8617 → 7866 行，`admin-management-directory-commerce-transactions.css` 整个清空后删除）。
+
+**前置的 DS 缺口**：`DataTable` 的表头复选框原本把整个选中集替换成本页 key（或清成
+空集），而这六页加 `PromotionsPage` / `PromotionRedemptionsPage` 共 8 页正用
+`BulkActionBar` 消费跨页选中集——第 1 页全选 20 条、翻页再全选会得到 20 而不是 40，
+"取消全选"还会连别页选的一起清掉。`toggleAll` 已改为只对本页 key 做并集/差集，
+页外选中项不动，这正是这些页面手写时的行为。T5 那三页没人消费选中集，所以没暴露。
+
+**行内状态标保持 pill 不动**（`vx-billing-pill--*` 一族）。与 T5 相反：T5 那三页的状态
+类是页面自己的四五档语气、跟着行网格一起死，就地换 `StatusBadge` 更省事；T1 这些属于
+批 4 的业务值域着色表，整族一起改才不会出现半迁状态。
+
+`Tag` 只收字符串，图标要并排放在它外面（`UsageMeteringPage` 的风险列）。
 
 ### 批 T2 · 身份与租户（5 页 / 约 894 行）
 

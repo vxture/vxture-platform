@@ -10,7 +10,7 @@ import {
   Banner,
   BulkActionBar,
   Button,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -22,6 +22,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { INVOICE_STATUS_TONE } from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
@@ -50,7 +51,6 @@ import {
 import {
   formatDate,
   formatNumber,
-  joinClasses,
   typeLabel,
 } from "@/modules/tenants/tenant-utils";
 
@@ -264,185 +264,115 @@ function InvoiceActionsMenu({
   );
 }
 
-function InvoiceListRows({
-  invoices,
-  startIndex,
-  onReceiptAction,
-  selectedInvoiceIds,
-  isPageSelected,
-  onToggleInvoice,
-  onTogglePage,
-}: {
-  invoices: BillingInvoiceLedgerRecord[];
-  startIndex: number;
-  onReceiptAction: (
-    invoice: BillingInvoiceLedgerRecord,
-    action: BillingInvoiceReceiptAction,
-  ) => void;
-  selectedInvoiceIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleInvoice: (id: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
+/**
+ * 行内的状态标仍是 pill（`vx-invoice-pill--*`）而非 `StatusBadge`：那一族是业务
+ * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ */
+function useInvoiceColumns(): DataTableColumn<BillingInvoiceLedgerRecord>[] {
   const router = useRouter();
-  const selectedOnPage = invoices.filter((invoice) =>
-    selectedInvoiceIds.has(invoice.id),
-  ).length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-invoice-directory-list"
-      role="region"
-      aria-label="线下发票台账"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : selectedOnPage > 0
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页发票"
-          />
-        </span>
-        <span>#</span>
-        <span>发票</span>
-        <span>租户</span>
-        <span>账单</span>
-        <span>金额</span>
-        <span>状态</span>
-        <span>寄送</span>
-        <span>操作</span>
-      </div>
-      {invoices.map((invoice, index) => {
-        const selected = selectedInvoiceIds.has(invoice.id);
-
-        return (
-          <div
-            key={invoice.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-invoice-operation-row",
-              `vx-invoice-row--${invoice.invoiceStatus}`,
-              selected ? "vx-invoice-operation-row--selected" : undefined,
-            )}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (
-                target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleInvoice(invoice.id, !selected);
-            }}
-          >
-            <span className="vx-invoice-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selected}
-                onCheckedChange={(value) =>
-                  onToggleInvoice(invoice.id, value === true)
-                }
-                aria-label={`选择发票 ${invoice.invoiceNo}`}
-              />
+  return [
+    {
+      id: "invoice",
+      header: "发票",
+      cell: (invoice) => (
+        <TableTitleCell
+          title={invoice.invoiceNo}
+          description={`${invoice.invoiceTitle} · ${taxTypeLabel(invoice.invoiceTaxType)}`}
+          onTitleClick={() =>
+            router.push(`/billing/${encodeURIComponent(invoice.billId)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (invoice) => (
+        <TableTitleCell
+          icon={invoice.tenantType === "company" ? "buildings" : "user"}
+          title={invoice.tenantName}
+          description={`${invoice.tenantCode} · ${typeLabel(invoice.tenantType)}`}
+        />
+      ),
+    },
+    {
+      id: "bill",
+      header: "账单",
+      cell: (invoice) => (
+        <TableTitleCell
+          title={
+            <span className="inline-flex flex-wrap gap-2xs">
+              <Badge
+                className={`vx-tenant-pill vx-invoice-pill--bill-${invoice.billStatus}`}
+              >
+                {billStatusLabel(invoice.billStatus)}
+              </Badge>
+              <Badge
+                className={`vx-tenant-pill vx-invoice-pill--type-${invoice.billType}`}
+              >
+                {billTypeLabel(invoice.billType)}
+              </Badge>
             </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-invoice-row__invoice"
-              title={invoice.invoiceNo}
-              description={`${invoice.invoiceTitle} · ${taxTypeLabel(invoice.invoiceTaxType)}`}
-              onTitleClick={() =>
-                router.push(`/billing/${encodeURIComponent(invoice.billId)}`)
-              }
-            />
-            <span className="vx-invoice-row__tenant">
+          }
+          description={invoice.billNo}
+        />
+      ),
+    },
+    {
+      id: "amount",
+      header: "金额",
+      align: "right",
+      cell: (invoice) => (
+        <TableTitleCell
+          title={formatCurrency(invoice.invoiceAmount, invoice.currency)}
+          description={`税额 ${formatCurrency(invoice.taxAmount, invoice.currency)}`}
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (invoice) => (
+        <TableTitleCell
+          title={
+            <Badge
+              className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
+            >
               <Icon
-                name={invoice.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
+                name={invoiceStatusIcon(invoice.invoiceStatus)}
+                size="xs"
                 fallback="placeholder"
               />
-              <span>
-                <strong>{invoice.tenantName}</strong>
-                <small>
-                  {invoice.tenantCode} · {typeLabel(invoice.tenantType)}
-                </small>
-              </span>
-            </span>
-            <span className="vx-invoice-row__bill">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge
-                  className={`vx-tenant-pill vx-invoice-pill--bill-${invoice.billStatus}`}
-                >
-                  {billStatusLabel(invoice.billStatus)}
-                </Badge>
-                <Badge
-                  className={`vx-tenant-pill vx-invoice-pill--type-${invoice.billType}`}
-                >
-                  {billTypeLabel(invoice.billType)}
-                </Badge>
-              </span>
-              <small>{invoice.billNo}</small>
-            </span>
-            <span className="vx-invoice-row__amount">
-              <strong>
-                {formatCurrency(invoice.invoiceAmount, invoice.currency)}
-              </strong>
-              <small>
-                税额 {formatCurrency(invoice.taxAmount, invoice.currency)}
-              </small>
-            </span>
-            <span className="vx-invoice-row__status">
-              <span className="vx-invoice-status-line">
-                <span
-                  className={`vx-invoice-status-dot vx-invoice-status-dot--${invoice.invoiceStatus}`}
-                  role="img"
-                  aria-label={invoiceStatusLabel(invoice.invoiceStatus)}
-                >
-                  <Icon
-                    name={invoiceStatusIcon(invoice.invoiceStatus)}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <Badge
-                  className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
-                >
-                  {invoiceStatusLabel(invoice.invoiceStatus)}
-                </Badge>
-              </span>
-              <small>{invoiceTypeLabel(invoice.invoiceType)}</small>
-            </span>
-            <span className="vx-invoice-row__delivery">
-              <strong>
-                {invoice.expressNo
-                  ? (invoice.expressCompany ?? "线下寄送")
-                  : invoice.invoiceFileUrl
-                    ? "电子文件"
-                    : "未寄送"}
-              </strong>
-              <small>
-                {invoice.expressNo ??
-                  invoice.invoiceFileUrl ??
-                  formatDate(invoice.sendAt)}
-              </small>
-            </span>
-            <InvoiceActionsMenu
-              invoice={invoice}
-              onReceiptAction={onReceiptAction}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
+              {invoiceStatusLabel(invoice.invoiceStatus)}
+            </Badge>
+          }
+          description={invoiceTypeLabel(invoice.invoiceType)}
+        />
+      ),
+    },
+    {
+      id: "delivery",
+      header: "寄送",
+      cell: (invoice) => (
+        <TableTitleCell
+          title={
+            invoice.expressNo
+              ? (invoice.expressCompany ?? "线下寄送")
+              : invoice.invoiceFileUrl
+                ? "电子文件"
+                : "未寄送"
+          }
+          description={
+            invoice.expressNo ??
+            invoice.invoiceFileUrl ??
+            formatDate(invoice.sendAt)
+          }
+        />
+      ),
+    },
+  ];
 }
 
 function InvoiceCards({
@@ -594,6 +524,8 @@ export function InvoicesPage() {
     };
   }, []);
 
+  const invoiceColumns = useInvoiceColumns();
+
   const filteredInvoices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -629,16 +561,6 @@ export function InvoicesPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleInvoiceIds = useMemo(
-    () => visibleInvoices.map((invoice) => invoice.id),
-    [visibleInvoices],
-  );
-  const selectedVisibleInvoiceCount = visibleInvoiceIds.filter((id) =>
-    selectedInvoiceIds.has(id),
-  ).length;
-  const isInvoicePageSelected =
-    visibleInvoiceIds.length > 0 &&
-    selectedVisibleInvoiceCount === visibleInvoiceIds.length;
   const validInvoices = invoices.filter(
     (item) => item.invoiceStatus !== "red" && item.invoiceStatus !== "rejected",
   );
@@ -675,26 +597,6 @@ export function InvoicesPage() {
     setInvoiceTypeFilter("all");
     setTaxFilter("all");
     setDeliveryFilter("all");
-  }
-
-  function toggleInvoiceSelection(id: string, checked: boolean) {
-    setSelectedInvoiceIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleInvoicePageSelection(checked: boolean) {
-    setSelectedInvoiceIds((current) => {
-      const next = new Set(current);
-      visibleInvoiceIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   function handleExportSelected() {
@@ -936,39 +838,53 @@ export function InvoicesPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="发票清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleInvoices.length ? (
-              viewMode === "list" ? (
-                <InvoiceListRows
-                  invoices={visibleInvoices}
-                  startIndex={(activePage - 1) * pageSize}
-                  onReceiptAction={requestReceiptAction}
-                  selectedInvoiceIds={selectedInvoiceIds}
-                  isPageSelected={isInvoicePageSelected}
-                  onToggleInvoice={toggleInvoiceSelection}
-                  onTogglePage={toggleInvoicePageSelection}
-                />
-              ) : (
-                <InvoiceCards
-                  invoices={visibleInvoices}
-                  onReceiptAction={requestReceiptAction}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={invoiceColumns}
+                rows={visibleInvoices}
+                rowKey={(invoice) => invoice.id}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedInvoiceIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedInvoiceIds(new Set(keys))
+                }
+                rowActions={(invoice) => (
+                  <InvoiceActionsMenu
+                    invoice={invoice}
+                    onReceiptAction={requestReceiptAction}
+                  />
+                )}
+                emptyTitle={loadError ? "发票数据读取失败" : "没有匹配的发票"}
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部线下发票记录。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleInvoices.length ? (
+              <InvoiceCards
+                invoices={visibleInvoices}
+                onReceiptAction={requestReceiptAction}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
-                  title={
-                    loading
-                      ? "正在加载发票"
-                      : loadError
-                        ? "发票数据读取失败"
-                        : "没有匹配的发票"
-                  }
+                  title={loading ? "正在加载发票" : "没有匹配的发票"}
                   description={
                     loading
                       ? "正在读取线下发票台账。"

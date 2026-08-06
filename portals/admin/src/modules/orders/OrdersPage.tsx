@@ -8,7 +8,7 @@ import {
   Badge,
   Banner,
   BulkActionBar,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -20,6 +20,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
 import { isUnset, UNSET_LABEL } from "@/modules/shared/display";
@@ -47,7 +48,6 @@ import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
   formatDate,
   formatNumber,
-  joinClasses,
   typeLabel,
 } from "@/modules/tenants/tenant-utils";
 
@@ -225,183 +225,118 @@ function OrderActionsMenu({
   );
 }
 
-function OrderListRows({
-  orders,
-  startIndex,
-  onConfirmPayment,
-  selectedOrderIds,
-  isPageSelected,
-  onToggleOrder,
-  onTogglePage,
-}: {
-  orders: OrderOperationRecord[];
-  startIndex: number;
-  onConfirmPayment: (order: OrderOperationRecord) => void;
-  selectedOrderIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleOrder: (id: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
+/**
+ * 行内的状态标仍是 pill（`vx-order-pill--*`）而非 `StatusBadge`：那一族是业务
+ * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ */
+function useOrderColumns(): DataTableColumn<OrderOperationRecord>[] {
   const router = useRouter();
-  const selectedOnPage = orders.filter((order) =>
-    selectedOrderIds.has(order.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < orders.length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-order-directory-list"
-      role="region"
-      aria-label="订单管理清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={isPagePartiallySelected ? "indeterminate" : isPageSelected}
-            onCheckedChange={(checked) => onTogglePage(checked === true)}
-            aria-label="选择当前页订单"
-          />
-        </span>
-        <span>#</span>
-        <span>订单</span>
-        <span>租户</span>
-        <span>业务方案</span>
-        <span>套餐</span>
-        <span>金额</span>
-        <span>状态</span>
-        <span>操作</span>
-      </div>
-      {orders.map((order, index) => {
-        const selected = selectedOrderIds.has(order.id);
-
-        return (
-          <div
-            key={order.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-order-operation-row",
-              `vx-order-row--${order.orderStatus}`,
-              selected ? "vx-order-operation-row--selected" : undefined,
-            )}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (
-                target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleOrder(order.id, !selected);
-            }}
-          >
-            <span className="vx-order-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selected}
-                onCheckedChange={(checked) =>
-                  onToggleOrder(order.id, checked === true)
-                }
-                aria-label={`选择订单 ${order.orderNo}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-order-row__order"
-              title={order.orderNo}
-              description={`${order.billNo ?? "未生成账单"} · ${formatDate(order.createdAt)}`}
-              onTitleClick={() =>
-                router.push(`/orders/${encodeURIComponent(order.id)}`)
-              }
-            />
-            <span className="vx-order-row__tenant">
-              <Icon
-                name={order.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
-                fallback="placeholder"
-              />
-              <span>
-                <strong>{order.tenantName}</strong>
-                <small>
-                  {order.tenantCode} · {typeLabel(order.tenantType)}
-                </small>
+  return [
+    {
+      id: "order",
+      header: "订单",
+      cell: (order) => (
+        <TableTitleCell
+          title={order.orderNo}
+          description={`${order.billNo ?? "未生成账单"} · ${formatDate(order.createdAt)}`}
+          onTitleClick={() =>
+            router.push(`/orders/${encodeURIComponent(order.id)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (order) => (
+        <TableTitleCell
+          icon={order.tenantType === "company" ? "buildings" : "user"}
+          title={order.tenantName}
+          description={`${order.tenantCode} · ${typeLabel(order.tenantType)}`}
+        />
+      ),
+    },
+    {
+      id: "solution",
+      header: "业务方案",
+      cell: (order) => (
+        <TableTitleCell
+          /* 缺失值弱化：深色粗体会让"未设置"读起来跟真的方案名一样重。 */
+          title={
+            isUnset(order.solutionName) ? (
+              <span className="vx-tenant-directory-row__unset">
+                {UNSET_LABEL}
               </span>
-            </span>
-            <span className="vx-order-row__solution">
-              {/* 缺失值弱化：深色粗体会让"未设置"读起来跟真的方案名一样重，
-                  而它右边一列的"未设置"当时还长成一枚彩色标——同一个空值两种画法。 */}
-              {isUnset(order.solutionName) ? (
+            ) : (
+              order.solutionName
+            )
+          }
+          description={`${order.industry} · ${order.region}`}
+        />
+      ),
+    },
+    {
+      id: "plan",
+      header: "套餐",
+      cell: (order) => (
+        <TableTitleCell
+          title={
+            <span className="inline-flex flex-wrap gap-2xs">
+              {isUnset(order.tierName) ? (
                 <span className="vx-tenant-directory-row__unset">
                   {UNSET_LABEL}
                 </span>
               ) : (
-                <strong>{order.solutionName}</strong>
-              )}
-              <small>
-                {order.industry} · {order.region}
-              </small>
-            </span>
-            <span className="vx-order-row__plan">
-              <span className="vx-tenant-directory-row__tag-line">
-                {isUnset(order.tierName) ? (
-                  <span className="vx-tenant-directory-row__unset">
-                    {UNSET_LABEL}
-                  </span>
-                ) : (
-                  <Badge
-                    className={`vx-tenant-pill vx-order-pill--tier-${tierFilterValue(order)}`}
-                  >
-                    {order.tierName}
-                  </Badge>
-                )}
-                <Badge className="vx-tenant-pill vx-order-pill--source">
-                  {cycleLabel(order.cycleType)}
-                </Badge>
-              </span>
-              <small>{order.servicePlanName}</small>
-            </span>
-            <span className="vx-order-row__amount">
-              <strong>{formatCurrency(order.amount, order.currency)}</strong>
-              <small>
-                已收 {formatCurrency(order.paidAmount, order.currency)}
-              </small>
-            </span>
-            <span className="vx-order-row__status">
-              <span className="vx-order-status-line">
-                <span
-                  className={`vx-order-status-dot vx-order-status-dot--${order.orderStatus}`}
-                  role="img"
-                  aria-label={orderStatusLabel(order.orderStatus)}
-                >
-                  <Icon
-                    name={orderStatusIcon(order.orderStatus)}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
                 <Badge
-                  className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
+                  className={`vx-tenant-pill vx-order-pill--tier-${tierFilterValue(order)}`}
                 >
-                  {orderStatusLabel(order.orderStatus)}
+                  {order.tierName}
                 </Badge>
-              </span>
-              <small>
-                {paymentStatusLabel(order.paymentStatus)} ·{" "}
-                {paySourceLabel(order.paySource)}
-              </small>
+              )}
+              <Badge className="vx-tenant-pill vx-order-pill--source">
+                {cycleLabel(order.cycleType)}
+              </Badge>
             </span>
-            <OrderActionsMenu
-              order={order}
-              onConfirmPayment={onConfirmPayment}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
+          }
+          description={order.servicePlanName}
+        />
+      ),
+    },
+    {
+      id: "amount",
+      header: "金额",
+      align: "right",
+      cell: (order) => (
+        <TableTitleCell
+          title={formatCurrency(order.amount, order.currency)}
+          description={`已收 ${formatCurrency(order.paidAmount, order.currency)}`}
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (order) => (
+        <TableTitleCell
+          title={
+            <Badge
+              className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
+            >
+              <Icon
+                name={orderStatusIcon(order.orderStatus)}
+                size="xs"
+                fallback="placeholder"
+              />
+              {orderStatusLabel(order.orderStatus)}
+            </Badge>
+          }
+          description={`${paymentStatusLabel(order.paymentStatus)} · ${paySourceLabel(order.paySource)}`}
+        />
+      ),
+    },
+  ];
 }
 
 function OrderCards({
@@ -537,6 +472,8 @@ export function OrdersPage() {
     };
   }, []);
 
+  const orderColumns = useOrderColumns();
+
   const filteredOrders = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -568,16 +505,6 @@ export function OrdersPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleOrderIds = useMemo(
-    () => visibleOrders.map((order) => order.id),
-    [visibleOrders],
-  );
-  const selectedVisibleOrderCount = visibleOrderIds.filter((id) =>
-    selectedOrderIds.has(id),
-  ).length;
-  const isOrderPageSelected =
-    visibleOrderIds.length > 0 &&
-    selectedVisibleOrderCount === visibleOrderIds.length;
   const pendingCount = orders.filter(
     (item) =>
       item.orderStatus === "pending" || item.orderStatus === "pending_verify",
@@ -624,26 +551,6 @@ export function OrdersPage() {
 
   function clearOrderSelection() {
     setSelectedOrderIds(new Set());
-  }
-
-  function toggleOrderSelection(id: string, checked: boolean) {
-    setSelectedOrderIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleOrderPageSelection(checked: boolean) {
-    setSelectedOrderIds((current) => {
-      const next = new Set(current);
-      visibleOrderIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   function requestConfirmPayment(order: OrderOperationRecord) {
@@ -886,39 +793,51 @@ export function OrdersPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="订单清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleOrders.length ? (
-              viewMode === "list" ? (
-                <OrderListRows
-                  orders={visibleOrders}
-                  startIndex={(activePage - 1) * pageSize}
-                  onConfirmPayment={requestConfirmPayment}
-                  selectedOrderIds={selectedOrderIds}
-                  isPageSelected={isOrderPageSelected}
-                  onToggleOrder={toggleOrderSelection}
-                  onTogglePage={toggleOrderPageSelection}
-                />
-              ) : (
-                <OrderCards
-                  orders={visibleOrders}
-                  onConfirmPayment={requestConfirmPayment}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={orderColumns}
+                rows={visibleOrders}
+                rowKey={(order) => order.id}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedOrderIds]}
+                onSelectionChange={(keys) => setSelectedOrderIds(new Set(keys))}
+                rowActions={(order) => (
+                  <OrderActionsMenu
+                    order={order}
+                    onConfirmPayment={requestConfirmPayment}
+                  />
+                )}
+                emptyTitle={loadError ? "订单数据读取失败" : "没有匹配的订单"}
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部订单记录。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleOrders.length ? (
+              <OrderCards
+                orders={visibleOrders}
+                onConfirmPayment={requestConfirmPayment}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
-                  title={
-                    loading
-                      ? "正在加载订单"
-                      : loadError
-                        ? "订单数据读取失败"
-                        : "没有匹配的订单"
-                  }
+                  title={loading ? "正在加载订单" : "没有匹配的订单"}
                   description={
                     loading
                       ? "正在读取订单、账单和支付状态。"

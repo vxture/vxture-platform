@@ -8,7 +8,7 @@ import {
   Badge,
   Banner,
   BulkActionBar,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -20,6 +20,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
 import { BILL_STATUS_TONE } from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
@@ -43,7 +44,6 @@ import {
 import {
   formatDate,
   formatNumber,
-  joinClasses,
   typeLabel,
 } from "@/modules/tenants/tenant-utils";
 
@@ -322,138 +322,81 @@ function BillingActionsMenu({
   );
 }
 
-function BillingListRows({
-  bills,
-  startIndex,
-  onSyncInvoice,
-  selectedBillIds,
-  isPageSelected,
-  onToggleBill,
-  onTogglePage,
-}: {
-  bills: BillingRecord[];
-  startIndex: number;
-  onSyncInvoice: (bill: BillingRecord) => void;
-  selectedBillIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleBill: (id: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
+/**
+ * 行内的状态标仍是 pill（`vx-billing-pill--*`）而非 `StatusBadge`：那一族是业务
+ * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ */
+function useBillingColumns(): DataTableColumn<BillingRecord>[] {
   const router = useRouter();
-  const selectedOnPage = bills.filter((bill) =>
-    selectedBillIds.has(bill.id),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < bills.length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-billing-directory-list"
-      role="region"
-      aria-label="账单中心清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={isPagePartiallySelected ? "indeterminate" : isPageSelected}
-            onCheckedChange={(checked) => onTogglePage(checked === true)}
-            aria-label="选择当前页账单"
-          />
-        </span>
-        <span>#</span>
-        <span>账单</span>
-        <span>租户</span>
-        <span>订阅套餐</span>
-        <span>金额</span>
-        <span>处理</span>
-        <span>收款</span>
-        <span>发票</span>
-        <span>操作</span>
-      </div>
-      {bills.map((bill, index) => {
-        const selected = selectedBillIds.has(bill.id);
-
+  return [
+    {
+      id: "bill",
+      header: "账单",
+      cell: (bill) => (
+        <TableTitleCell
+          title={bill.billNo}
+          description={`${cycleLabel(bill.billCycle)} · ${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`}
+          onTitleClick={() =>
+            router.push(`/billing/${encodeURIComponent(bill.id)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (bill) => (
+        <TableTitleCell
+          icon={bill.tenantType === "company" ? "buildings" : "user"}
+          title={bill.tenantName}
+          description={`${bill.tenantCode} · ${typeLabel(bill.tenantType)}`}
+        />
+      ),
+    },
+    {
+      id: "plan",
+      header: "订阅套餐",
+      cell: (bill) => (
+        <TableTitleCell
+          title={
+            <Badge
+              className={`vx-tenant-pill vx-billing-pill--tier-${tierFilterValue(bill)}`}
+            >
+              {bill.tierName ?? "未关联"}
+            </Badge>
+          }
+          description={bill.servicePlanName ?? bill.orderNo ?? "未关联订阅"}
+        />
+      ),
+    },
+    {
+      id: "amount",
+      header: "金额",
+      align: "right",
+      cell: (bill) => (
+        <TableTitleCell
+          title={formatCurrency(bill.payableAmount, bill.currency)}
+          description={
+            bill.discountAmount > 0
+              ? `原价 ${formatCurrency(bill.totalAmount, bill.currency)} · 减免 ${formatCurrency(bill.discountAmount, bill.currency)}`
+              : `原价 ${formatCurrency(bill.totalAmount, bill.currency)}`
+          }
+        />
+      ),
+    },
+    {
+      id: "exception",
+      header: "处理",
+      align: "center",
+      cell: (bill) => {
+        const tags = billingExceptionTags(bill);
         return (
-          <div
-            key={bill.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-billing-operation-row",
-              `vx-billing-row--${bill.billStatus}`,
-              selected ? "vx-billing-operation-row--selected" : undefined,
-            )}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (
-                target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleBill(bill.id, !selected);
-            }}
-          >
-            <span className="vx-billing-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selected}
-                onCheckedChange={(checked) =>
-                  onToggleBill(bill.id, checked === true)
-                }
-                aria-label={`选择账单 ${bill.billNo}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-billing-row__bill"
-              title={bill.billNo}
-              description={`${cycleLabel(bill.billCycle)} · ${formatDate(bill.cycleStartDate)} - ${formatDate(bill.cycleEndDate)}`}
-              onTitleClick={() =>
-                router.push(`/billing/${encodeURIComponent(bill.id)}`)
-              }
-            />
-            <span className="vx-billing-row__tenant">
-              <Icon
-                name={bill.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
-                fallback="placeholder"
-              />
-              <span>
-                <strong>{bill.tenantName}</strong>
-                <small>
-                  {bill.tenantCode} · {typeLabel(bill.tenantType)}
-                </small>
-              </span>
-            </span>
-            <span className="vx-billing-row__plan">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Badge
-                  className={`vx-tenant-pill vx-billing-pill--tier-${tierFilterValue(bill)}`}
-                >
-                  {bill.tierName ?? "未关联"}
-                </Badge>
-              </span>
-              <small>
-                {bill.servicePlanName ?? bill.orderNo ?? "未关联订阅"}
-              </small>
-            </span>
-            <span className="vx-billing-row__amount">
-              <strong>
-                {formatCurrency(bill.payableAmount, bill.currency)}
-              </strong>
-              <small>
-                {bill.discountAmount > 0
-                  ? `原价 ${formatCurrency(bill.totalAmount, bill.currency)} · 减免 ${formatCurrency(bill.discountAmount, bill.currency)}`
-                  : `原价 ${formatCurrency(bill.totalAmount, bill.currency)}`}
-              </small>
-            </span>
-            <span className="vx-billing-row__exception">
-              {billingExceptionTags(bill).length ? (
-                <span className="vx-billing-exception-tags">
-                  {billingExceptionTags(bill).map((tag) => (
+          <TableTitleCell
+            title={
+              tags.length ? (
+                <span className="inline-flex flex-wrap gap-2xs">
+                  {tags.map((tag) => (
                     <Badge
                       key={tag.key}
                       className={`vx-tenant-pill vx-billing-exception-pill vx-billing-exception-pill--${tag.tone}`}
@@ -464,54 +407,59 @@ function BillingListRows({
                   ))}
                 </span>
               ) : (
-                <small className="vx-billing-exception-empty">-</small>
-              )}
-              {bill.operationRemark ? (
-                <small title={bill.operationRemark}>
-                  {bill.operationRemark}
-                </small>
-              ) : null}
-            </span>
-            <span className="vx-billing-row__payment">
-              <span className="vx-billing-status-line">
-                <span
-                  className={`vx-billing-status-dot vx-billing-status-dot--${bill.billStatus}`}
-                  role="img"
-                  aria-label={billStatusLabel(bill.billStatus)}
-                >
-                  <Icon
-                    name={billStatusIcon(bill.billStatus)}
-                    size="xs"
-                    fallback="placeholder"
-                  />
-                </span>
-                <Badge
-                  className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
-                >
-                  {billStatusLabel(bill.billStatus)}
-                </Badge>
-              </span>
-              <small>
-                已收 {formatCurrency(bill.paidAmount, bill.currency)}
-              </small>
-            </span>
-            <span className="vx-billing-row__invoice">
-              <Badge
-                className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
-              >
-                {invoiceStatusLabel(bill.invoiceStatus)}
-              </Badge>
-              <small>
-                {bill.invoiceNo ??
-                  `已登记 ${formatCurrency(bill.invoicedAmount, bill.currency)}`}
-              </small>
-            </span>
-            <BillingActionsMenu bill={bill} onSyncInvoice={onSyncInvoice} />
-          </div>
+                "-"
+              )
+            }
+            {...(bill.operationRemark
+              ? { description: bill.operationRemark }
+              : {})}
+          />
         );
-      })}
-    </div>
-  );
+      },
+    },
+    {
+      id: "payment",
+      header: "收款",
+      align: "center",
+      cell: (bill) => (
+        <TableTitleCell
+          title={
+            <Badge
+              className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
+            >
+              <Icon
+                name={billStatusIcon(bill.billStatus)}
+                size="xs"
+                fallback="placeholder"
+              />
+              {billStatusLabel(bill.billStatus)}
+            </Badge>
+          }
+          description={`已收 ${formatCurrency(bill.paidAmount, bill.currency)}`}
+        />
+      ),
+    },
+    {
+      id: "invoice",
+      header: "发票",
+      align: "center",
+      cell: (bill) => (
+        <TableTitleCell
+          title={
+            <Badge
+              className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
+            >
+              {invoiceStatusLabel(bill.invoiceStatus)}
+            </Badge>
+          }
+          description={
+            bill.invoiceNo ??
+            `已登记 ${formatCurrency(bill.invoicedAmount, bill.currency)}`
+          }
+        />
+      ),
+    },
+  ];
 }
 
 function BillingCards({
@@ -651,6 +599,8 @@ export function BillingPage() {
     };
   }, []);
 
+  const billingColumns = useBillingColumns();
+
   const filteredBills = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -687,16 +637,6 @@ export function BillingPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleBillIds = useMemo(
-    () => visibleBills.map((bill) => bill.id),
-    [visibleBills],
-  );
-  const selectedVisibleBillCount = visibleBillIds.filter((id) =>
-    selectedBillIds.has(id),
-  ).length;
-  const isBillPageSelected =
-    visibleBillIds.length > 0 &&
-    selectedVisibleBillCount === visibleBillIds.length;
   const receivableAmount = bills.reduce(
     (sum, item) => sum + item.payableAmount,
     0,
@@ -748,26 +688,6 @@ export function BillingPage() {
     setBillTypeFilter("all");
     setTierFilter("all");
     setExceptionFilter("all");
-  }
-
-  function toggleBillSelection(id: string, checked: boolean) {
-    setSelectedBillIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleBillPageSelection(checked: boolean) {
-    setSelectedBillIds((current) => {
-      const next = new Set(current);
-      visibleBillIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   function handleExportSelected() {
@@ -1027,29 +947,47 @@ export function BillingPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="账单清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleBills.length ? (
-              viewMode === "list" ? (
-                <BillingListRows
-                  bills={visibleBills}
-                  startIndex={(activePage - 1) * pageSize}
-                  onSyncInvoice={requestInvoiceSync}
-                  selectedBillIds={selectedBillIds}
-                  isPageSelected={isBillPageSelected}
-                  onToggleBill={toggleBillSelection}
-                  onTogglePage={toggleBillPageSelection}
-                />
-              ) : (
-                <BillingCards
-                  bills={visibleBills}
-                  onSyncInvoice={requestInvoiceSync}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={billingColumns}
+                rows={visibleBills}
+                rowKey={(bill) => bill.id}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedBillIds]}
+                onSelectionChange={(keys) => setSelectedBillIds(new Set(keys))}
+                rowActions={(bill) => (
+                  <BillingActionsMenu
+                    bill={bill}
+                    onSyncInvoice={requestInvoiceSync}
+                  />
+                )}
+                emptyTitle={loadError ? "账单数据读取失败" : "没有匹配的账单"}
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部账单记录。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleBills.length ? (
+              <BillingCards
+                bills={visibleBills}
+                onSyncInvoice={requestInvoiceSync}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState
