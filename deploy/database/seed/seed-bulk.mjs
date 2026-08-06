@@ -306,7 +306,11 @@ async function seedBulk(client) {
   }
 
   // ── 3. 公告 ────────────────────────────────────────────────────────────────
-  const ANN_TYPE = ["release", "maintenance", "security", "policy"];
+  // 值域取自 BFF 的 `ANNOUNCEMENT_TYPES`，不是随手编的四个词——
+  // `mapAnnouncementRow` 对认不出的类型会**静默退回 `system`**，于是造错的值
+  // 在界面上看起来一切正常，只是全都显示成"系统"（2026-08-06 第一版就是这么
+  // 造的，50 行 release/policy 全被吞成 system）。造数据必须对着值域造。
+  const ANN_TYPE = ["system", "maintenance", "marketing", "security"];
   const ANN_SEV = ["info", "warning", "critical"];
   const ANN_STATUS = ["draft", "published", "archived"];
   for (let i = 1; i <= BULK; i += 1) {
@@ -322,7 +326,7 @@ async function seedBulk(client) {
         pick(ANN_TYPE, i),
         pick(ANN_SEV, i, 1),
         pick(ANN_STATUS, i, 2),
-        `平台公告 #${i}：${pick(["版本发布", "计划维护", "安全提醒", "计费政策调整"], i)}`,
+        `平台公告 #${i}：${pick(["版本发布", "计划维护", "活动推广", "安全提醒"], i)}`,
         `这是第 ${i} 条 bulk 造数据公告，用于验证列表分页与筛选。`,
         operatorId,
       ],
