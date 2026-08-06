@@ -31,7 +31,10 @@ import {
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import type { RiskRecordItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate } from "@/modules/tenants/tenant-utils";
+import {
+  TENANT_RISK_TONE,
+  formatDate,
+} from "@/modules/tenants/tenant-utils";
 
 // TD-021 风险记录页。设计权威 = governance-write-paths.md §3.1/§5。
 // 「审阅」= 后端写 reviewer_id；risk_level 变更后端自动清空 reviewer_id。
@@ -58,10 +61,16 @@ const LEVEL_LABELS: Record<RiskRecordItem["riskLevel"], string> = {
 };
 
 /** 风险等级 -> DS 语气。业务状态到语气的映射留产品侧。 */
+/**
+ * 风险档：灰 / 琥珀 / 红。
+ *
+ * `normal` 走中性不走绿——判据同维护窗口的严重度（owner 2026-08-07）：六档里
+ * `success` 是"达成了一件事"，而"无风险"不是一项达成。`tenant-utils.ts` 的
+ * `TENANT_RISK_TONE` 早就是这么定的，本页当初另起了一份、给了绿，两处对同一个
+ * 值域说了两种话。**同一值域只该有一张表**。
+ */
 function levelTone(level: RiskRecordItem["riskLevel"]): StatusBadgeTone {
-  if (level === "high") return "danger";
-  if (level === "follow_up") return "warning";
-  return "success";
+  return TENANT_RISK_TONE[level];
 }
 
 function createDefaultForm(): RiskForm {

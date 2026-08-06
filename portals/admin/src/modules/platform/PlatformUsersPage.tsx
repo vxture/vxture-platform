@@ -262,11 +262,6 @@ function usePlatformUserColumns(
           tone={platformAdminStatusTone(admin)}
           icon={platformAdminStatusIcon(admin)}
         >
-          <Icon
-            name={platformAdminStatusIcon(admin)}
-            size="xs"
-            fallback="placeholder"
-          />
           {platformAdminStatusLabel(admin)}
         </StatusBadge>
       ),

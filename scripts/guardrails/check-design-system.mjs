@@ -475,6 +475,44 @@ const rules = [
     },
   },
   {
+    id: "ds/no-duplicate-status-badge-icon",
+    description:
+      "StatusBadge 自带语气图标；children 里不要再手写同一个 <Icon>，否则一枚标画两个。",
+    checkFile(file) {
+      if (!file.endsWith(".tsx")) return [];
+      let source;
+      try {
+        source = readFileSync(file, "utf8");
+      } catch {
+        return [];
+      }
+      if (!source.includes("<StatusBadge")) return [];
+
+      // 走查里同一个错犯了四次（accounts / admin-roles / usage-metering /
+      // platform-admins）：迁移到自带图标的组件时，调用点原来自己画的那个图标忘了删。
+      const violations = [];
+      const opening = /<StatusBadge\b[^>]*\bicon=\{[^}]*\}[^>]*>/g;
+      let match;
+      while ((match = opening.exec(source)) !== null) {
+        const start = match.index + match[0].length;
+        const rest = source.slice(start, start + 240);
+        const close = rest.indexOf("</StatusBadge>");
+        const children = close === -1 ? rest : rest.slice(0, close);
+        if (/<Icon\b/.test(children)) {
+          const lineNumber = source.slice(0, match.index).split("\n").length;
+          violations.push(
+            violation(
+              file,
+              lineNumber,
+              "删掉 children 里的 <Icon>：图标由 StatusBadge 的 icon 属性出。",
+            ),
+          );
+        }
+      }
+      return violations;
+    },
+  },
+  {
     id: "ds/no-raw-color",
     description:
       "颜色只能在 DS token 层定义；应用层和普通包不能写 hex/rgb/hsl 硬编码颜色。",
