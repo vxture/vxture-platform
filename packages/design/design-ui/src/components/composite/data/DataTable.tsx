@@ -11,7 +11,8 @@
  *
  * 选择态由本件出复选框，`selectedKeys` 受控——`BulkActionBar` 要的就是这个集合，
  * 两件对得上才不会各自实现一遍全选/半选。表头那个复选框的半选态必须走
- * `indeterminate`，不能靠给它换个图标。
+ * `indeterminate`，不能靠给它换个图标。表头复选框只加减**本页**的 key，
+ * 页外选中项不动（见 `toggleAll`）。
  *
  * 相对原实现：删 `className` / `headerClassName` / `cellClassName` 三个列级逃生口
  * （列的对齐由 `align` 表达，其余交给单元格内容）与 `getRowClassName`——按行改样式
@@ -177,8 +178,18 @@ function DataTable<TRow>({
     (indexed ? 1 : 0) +
     (rowActions ? 1 : 0);
 
+  /**
+   * 只加减本页的 key，页外的选中项原样留着——本件拿到的 `rows` 只有当前页，
+   * 把整个集合替换成 `keys`（或清成 `[]`）会把用户在别页选的一并抹掉，而
+   * `BulkActionBar` 消费的正是这个跨页集合。
+   */
   const toggleAll = () => {
-    onSelectionChange?.(allSelected ? [] : keys);
+    const next = new Set(selected);
+    for (const key of keys) {
+      if (allSelected) next.delete(key);
+      else next.add(key);
+    }
+    onSelectionChange?.([...next]);
   };
 
   const toggleRow = (key: string) => {
@@ -207,7 +218,7 @@ function DataTable<TRow>({
                     <Checkbox
                       checked={allSelected || (someSelected && "indeterminate")}
                       onCheckedChange={toggleAll}
-                      aria-label={allSelected ? "取消全选" : "全选本页"}
+                      aria-label={allSelected ? "取消本页全选" : "全选本页"}
                     />
                   </div>
                 </th>
