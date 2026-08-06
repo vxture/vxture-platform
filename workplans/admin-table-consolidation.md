@@ -16,12 +16,12 @@
 | 序号列     | 25/29 | `indexStart` ✅                         |
 | 整行点击   | 20/29 | `onRowClick` ✅                         |
 | 选择框     | 19/29 | `selectedKeys` + `onSelectionChange` ✅ |
-| **行语气** | 15/29 | **本轮新增 `rowTone`**（`9dda0129`）    |
+| **行语气** | 15/29 | `rowTone` 曾补、后退役，见 §三          |
 | 卡片视图   | 6/29  | 与 list 是两段独立渲染，互不阻塞        |
 
 ## 二、结论：参数多不是障碍
 
-`DataTable` 有 20 个 props，**必填只有 3 个**（`columns` / `rows` / `rowKey`）。唯一在用它的
+`DataTable` 有 25 个 props（写这一节时是 20），**必填只有 3 个**（`columns` / `rows` / `rowKey`）。唯一在用它的
 `ServiceHealthPage` 实际只传了 4 个：
 
 ```tsx
@@ -36,7 +36,15 @@
 其余是**可选能力目录**，用不到就不写。因此**不拆分组件**——拆开会把"这张表长什么样"
 变成必须逐件去推，`MetricListCard` 当初没做成 `ListCard` 可选槽正是同一判断。
 
-## 三、唯一的真缺口已补上
+> **2026-08-06 修订。** 上面这条只对**与表体同生共死**的部分成立（选择列、序号列、
+> 操作列——它们必须和表格一起画）。owner 当日定下 DS 的两条规矩：只提升必要的、
+> 宁可多建件也不要把一件做复杂。按这条重看，25 props 里有两组站不住：排序三件
+> （`sort` / `onSortChange` / `column.sortable`）**全仓 0 处在用**，是预备役；三态四件
+> （`emptyTitle` / `emptyDescription` / `emptyAction` / `loadingRows`）只是在描述"没数据时
+> 长什么样"，本该是一个 `empty` 槽，与既有的 `footer` 槽同理——迁移这 29 页时我每页都在
+> 重复拼那三个参数。收敛计划见任务 #36，等调用点全部到位后一次做。
+
+## 三、唯一的真缺口：补了又退役
 
 15/29 的页面给行挂业务语气（`vx-billing-row--${status}` 一族），DataTable 原先没有对外的口子
 ——而且它的文件头记着当初**刻意删掉过** `getRowClassName`。
@@ -50,8 +58,12 @@
 | 能画出几种行 | 无限                      | 六种，全站一致          |
 
 渲染为行首 2px 色缘，**不铺整行**（一屏几十行会读成色块；且 DataTable 已在每个单元格画了
-半透明底，再叠一层就是它自己文件头记的两层半透明合成）。行内状态标与行缘共读同一张
-业务状态→语气映射表（`modules/shared/status-tone.ts`），天然同源。
+半透明底，再叠一层就是它自己文件头记的两层半透明合成）。
+
+**`rowTone` 已于 2026-08-05 owner 实测后退役**（`950ac3ae`），全仓 0 处引用：一屏几十行时
+左缘的彩色短线读成一列断续的碎点，既不成列也不成块。行的业务语气改由**状态列**表达
+（`StatusBadge`，见 `DataTable` 文件头），行只表达交互态。业务状态→语气映射表
+（`modules/shared/status-tone.ts`）仍然有效，只是消费方从行缘换成了状态列。
 
 ---
 
@@ -65,7 +77,7 @@
 | --- | ---- | ---- | -------------------------------------- |
 | T1  | 6    | 6    | ✅ **整批清零**（2026-08-06）          |
 | T2  | 5    | 5    | ✅ **整批清零**（2026-08-06）          |
-| T3  | 4    | 0    | 未开始                                 |
+| T3  | 4    | 4    | ✅ **整批清零**（2026-08-06）          |
 | T4  | 5    | 5    | ✅ **整批清零**（2026-08-06 收尾三页） |
 | T5  | 9    | 9    | ✅ **整批清零**（2026-08-06 收尾三页） |
 
@@ -127,6 +139,21 @@
 `ProductsPage` · `ProductSolutionsPage` · `PromotionsPage` · `PromotionRedemptionsPage`
 
 产品发布态用 `CAPABILITY_STATUS_TONE`；促销两页无 tone。
+
+**已完成（2026-08-06）。这一批把整条线收口了**——29 个手搓列表页全部迁完，
+`grep vx-tenant-directory-list__header` 归零，`DataTable` 覆盖 31 个文件。
+四页 tsx 2977 → 2679，CSS 103 组选择器退役、7140 → 6484 行。
+
+**行网格框架层随之整体退役。** `vx-tenant-directory-list` / `vx-tenant-directory-row`
+是 22 个页面共用的栅格骨架，最后一个消费方走掉后 `admin-directory-list.css` 从 178 行
+缩到 17 行，只剩两个跟卡片有关的规则和 `__unset`（缺失值弱化，OrdersPage 仍在用）。
+`admin-directory-status.css` 与 `admin-management-directory-commerce-{growth,subscriptions}.css`
+清空后删除。
+
+**守卫抓到一个我没想到的连带问题**：删到最后 `admin-management-directory.css` 只剩一条
+`@import`，撞上 `ds/no-redundant-style-wrapper`——「非 globals 直连的 import-only wrapper
+不能只转发一个子模块」。这条规则平时没存在感，正好在清理把中间层掏空时报警。折叠掉那层，
+让 `admin-management.css` 直接 import 唯一剩下的子模块。**清 CSS 到文件级别时要留意这条**。
 
 ### 批 T4 · 运营与治理（5 页 / 约 500 行）
 

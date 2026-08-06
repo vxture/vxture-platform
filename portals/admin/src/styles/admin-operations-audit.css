@@ -1,8 +1,6 @@
 .vx-audit-directory-list {
   grid-template-columns: var(--vx-admin-operations-audit-grid);
 }
-
-.vx-audit-directory-list .vx-tenant-directory-list__header,
 .vx-audit-row {
   min-width: var(--vx-admin-operations-audit-row-min-width);
   grid-template-columns: var(--vx-admin-operations-audit-grid);
@@ -10,7 +8,8 @@
 
 .vx-audit-row {
   min-height: var(--vx-admin-operations-audit-row-min-height);
-}.vx-audit-row__result {
+}
+.vx-audit-row__result {
   min-width: 0;
   display: inline-flex;
   align-items: center;

@@ -7,7 +7,7 @@ import {
   ActionMenu,
   Banner,
   BulkActionBar,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -17,6 +17,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import { fetchPromotionRedemptionRecords } from "@/api/admin-bff";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -147,146 +148,80 @@ function RedemptionActionsMenu({
   );
 }
 
-function RedemptionRows({
-  records,
-  startIndex,
-  selectedRecordIds,
-  isPageSelected,
-  onToggleRecord,
-  onTogglePage,
-}: {
-  records: PromotionRedemptionRecord[];
-  startIndex: number;
-  selectedRecordIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleRecord: (id: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
+/** 这一页的标已经是 DS `Tag`，不带业务色类，与批 4 无关。 */
+function useRedemptionColumns(): DataTableColumn<PromotionRedemptionRecord>[] {
   const router = useRouter();
-  const selectedOnPage = records.filter((record) =>
-    selectedRecordIds.has(record.id),
-  ).length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-redemption-directory-list"
-      role="region"
-      aria-label="优惠核销清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : selectedOnPage > 0
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页核销记录"
-          />
-        </span>
-        <span>#</span>
-        <span>核销记录</span>
-        <span>租户</span>
-        <span>账单</span>
-        <span>优惠金额</span>
-        <span>核销方</span>
-        <span>时间</span>
-        <span>操作</span>
-      </div>
-      {records.map((record, index) => {
-        const selected = selectedRecordIds.has(record.id);
-
-        return (
-          <div
-            key={record.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-redemption-operation-row",
-              "vx-commercial-row--normal",
-              selected ? "vx-redemption-operation-row--selected" : undefined,
-            )}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (
-                target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleRecord(record.id, !selected);
-            }}
-          >
-            <span className="vx-redemption-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selected}
-                onCheckedChange={(value) =>
-                  onToggleRecord(record.id, value === true)
-                }
-                aria-label={`选择核销记录 ${record.redemptionNo}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-commercial-row__main"
-              title={record.redemptionNo}
-              description={`${record.promotionCode} · ${record.promotionName}`}
-              onTitleClick={() =>
-                router.push(`/billing/${encodeURIComponent(record.billId)}`)
-              }
-            />
-            <span className="vx-commercial-row__tenant">
-              <Icon
-                name={record.tenantType === "company" ? "buildings" : "user"}
-                size="sm"
-                fallback="placeholder"
-              />
-              <span>
-                <strong>{record.tenantName}</strong>
-                <small>
-                  {record.tenantCode} · {typeLabel(record.tenantType)}
-                </small>
-              </span>
-            </span>
-            <span className="vx-commercial-row__main">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Tag tone={billStatusTone(record.billStatus)}>
-                  {billStatusLabel(record.billStatus)}
-                </Tag>
-              </span>
-              <small>
-                {record.billNo} · {record.orderNo ?? "未关联订单"}
-              </small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>
-                {formatCurrency(record.discountAmount, record.currency)}
-              </strong>
-              <small>
-                应付 {formatCurrency(record.payableAmount, record.currency)} /
-                原价 {formatCurrency(record.orderAmount, record.currency)}
-              </small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>{record.operatorName}</strong>
-              <small>已核销</small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>{formatDate(record.redeemedAt)}</strong>
-              <small>{record.remark ?? "系统记录"}</small>
-            </span>
-            <RedemptionActionsMenu record={record} />
-          </div>
-        );
-      })}
-    </div>
-  );
+  return [
+    {
+      id: "redemption",
+      header: "核销记录",
+      cell: (record) => (
+        <TableTitleCell
+          title={record.redemptionNo}
+          description={`${record.promotionCode} · ${record.promotionName}`}
+          onTitleClick={() =>
+            router.push(`/billing/${encodeURIComponent(record.billId)}`)
+          }
+        />
+      ),
+    },
+    {
+      id: "tenant",
+      header: "租户",
+      cell: (record) => (
+        <TableTitleCell
+          icon={record.tenantType === "company" ? "buildings" : "user"}
+          title={record.tenantName}
+          description={`${record.tenantCode} · ${typeLabel(record.tenantType)}`}
+        />
+      ),
+    },
+    {
+      id: "bill",
+      header: "账单",
+      cell: (record) => (
+        <TableTitleCell
+          title={
+            <Tag tone={billStatusTone(record.billStatus)}>
+              {billStatusLabel(record.billStatus)}
+            </Tag>
+          }
+          description={`${record.billNo} · ${record.orderNo ?? "未关联订单"}`}
+        />
+      ),
+    },
+    {
+      id: "discount",
+      header: "优惠金额",
+      align: "right",
+      cell: (record) => (
+        <TableTitleCell
+          title={formatCurrency(record.discountAmount, record.currency)}
+          description={`应付 ${formatCurrency(record.payableAmount, record.currency)} / 原价 ${formatCurrency(record.orderAmount, record.currency)}`}
+        />
+      ),
+    },
+    {
+      id: "operator",
+      header: "核销方",
+      align: "center",
+      cell: (record) => (
+        <TableTitleCell title={record.operatorName} description="已核销" />
+      ),
+    },
+    {
+      id: "time",
+      header: "时间",
+      align: "center",
+      cell: (record) => (
+        <TableTitleCell
+          title={formatDate(record.redeemedAt)}
+          description={record.remark ?? "系统记录"}
+        />
+      ),
+    },
+  ];
 }
 
 function RedemptionCards({
@@ -405,6 +340,8 @@ export function PromotionRedemptionsPage() {
     };
   }, []);
 
+  const redemptionColumns = useRedemptionColumns();
+
   const filteredRecords = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return records.filter((record) => {
@@ -425,16 +362,6 @@ export function PromotionRedemptionsPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleRecordIds = useMemo(
-    () => visibleRecords.map((record) => record.id),
-    [visibleRecords],
-  );
-  const selectedVisibleRecordCount = visibleRecordIds.filter((id) =>
-    selectedRecordIds.has(id),
-  ).length;
-  const isRecordPageSelected =
-    visibleRecordIds.length > 0 &&
-    selectedVisibleRecordCount === visibleRecordIds.length;
   const discountAmount = records.reduce(
     (sum, record) => sum + record.discountAmount,
     0,
@@ -451,26 +378,6 @@ export function PromotionRedemptionsPage() {
   function handleReset() {
     setQuery("");
     setBillStatusFilter("all");
-  }
-
-  function toggleRecordSelection(id: string, checked: boolean) {
-    setSelectedRecordIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleRecordPageSelection(checked: boolean) {
-    setSelectedRecordIds((current) => {
-      const next = new Set(current);
-      visibleRecordIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   const selectedRecords = records.filter((record) =>
@@ -628,24 +535,44 @@ export function PromotionRedemptionsPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="优惠核销清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
-            {visibleRecords.length ? (
-              viewMode === "list" ? (
-                <RedemptionRows
-                  records={visibleRecords}
-                  startIndex={(activePage - 1) * pageSize}
-                  selectedRecordIds={selectedRecordIds}
-                  isPageSelected={isRecordPageSelected}
-                  onToggleRecord={toggleRecordSelection}
-                  onTogglePage={toggleRecordPageSelection}
-                />
-              ) : (
-                <RedemptionCards records={visibleRecords} />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={redemptionColumns}
+                rows={visibleRecords}
+                rowKey={(record) => record.id}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedRecordIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedRecordIds(new Set(keys))
+                }
+                rowActions={(record) => (
+                  <RedemptionActionsMenu record={record} />
+                )}
+                emptyTitle={
+                  loadError ? "核销数据读取失败" : "没有匹配的核销记录"
+                }
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部核销记录。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleRecords.length ? (
+              <RedemptionCards records={visibleRecords} />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState

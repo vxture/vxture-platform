@@ -1,6 +1,4 @@
 /* Product capability directory interactive affordance styles. */
-
-.vx-tenant-directory-row[role="button"],
 .vx-tenant-directory-card[role="button"] {
   cursor: pointer;
 }
@@ -11,8 +9,16 @@
 }
 
 .vx-service-plan-search {
-  width: clamp(var(--vx-admin-management-size-13r), 16vw, var(--vx-admin-management-size-20r));
-  flex-basis: clamp(var(--vx-admin-management-size-13r), 16vw, var(--vx-admin-management-size-20r));
+  width: clamp(
+    var(--vx-admin-management-size-13r),
+    16vw,
+    var(--vx-admin-management-size-20r)
+  );
+  flex-basis: clamp(
+    var(--vx-admin-management-size-13r),
+    16vw,
+    var(--vx-admin-management-size-20r)
+  );
 }
 
 .vx-service-plan-select--industry {
@@ -30,7 +36,8 @@
   display: grid;
   gap: var(--vx-admin-management-space-15r);
   padding-top: var(--vx-admin-management-space-025r);
-  border-top: var(--vx-admin-management-line-width-1p) solid color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
+  border-top: var(--vx-admin-management-line-width-1p) solid
+    color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
 }
 
 .vx-service-plan-group {
@@ -38,7 +45,8 @@
   display: grid;
   gap: var(--vx-admin-management-space-1r);
   padding: var(--vx-admin-management-space-125r) 0 0;
-  border-bottom: var(--vx-admin-management-line-width-1p) dashed var(--vx-color-auth-border);
+  border-bottom: var(--vx-admin-management-line-width-1p) dashed
+    var(--vx-color-auth-border);
 }
 
 .vx-service-plan-group:last-child {
@@ -106,7 +114,8 @@
 }
 
 .vx-service-plan-group__meta {
-  gap: var(--vx-admin-management-space-075r) var(--vx-admin-management-space-125r);
+  gap: var(--vx-admin-management-space-075r)
+    var(--vx-admin-management-space-125r);
   color: var(--tenant-muted);
   font-size: var(--vx-admin-caption-size);
   font-weight: 400;
@@ -127,12 +136,18 @@
   min-width: 0;
   display: grid;
   grid-template-columns:
-    minmax(var(--vx-admin-management-track-12r-large), 1.1fr) minmax(var(--vx-admin-management-track-85r), 0.75fr) minmax(var(--vx-admin-management-track-18r-large), 1.5fr)
-    minmax(var(--vx-admin-management-track-8r), 0.7fr) var(--vx-admin-management-track-3r);
+    minmax(var(--vx-admin-management-track-12r-large), 1.1fr) minmax(
+      var(--vx-admin-management-track-85r),
+      0.75fr
+    ) minmax(var(--vx-admin-management-track-18r-large), 1.5fr)
+    minmax(var(--vx-admin-management-track-8r), 0.7fr) var(
+      --vx-admin-management-track-3r
+    );
   align-items: center;
   gap: var(--vx-admin-management-space-1r);
   padding: var(--vx-admin-management-space-1r) 0;
-  border-top: var(--vx-admin-management-line-width-1p) dashed color-mix(in srgb, var(--vx-color-auth-accent) 10%, transparent);
+  border-top: var(--vx-admin-management-line-width-1p) dashed
+    color-mix(in srgb, var(--vx-color-auth-accent) 10%, transparent);
 }
 
 .vx-service-plan-tier-row:hover {
@@ -159,7 +174,8 @@
   gap: var(--vx-admin-management-space-1r);
   align-content: start;
   padding: var(--vx-admin-management-space-1r) 0;
-  border-top: var(--vx-admin-management-line-width-2p) solid var(--service-plan-tone);
+  border-top: var(--vx-admin-management-line-width-2p) solid
+    var(--service-plan-tone);
 }
 
 .vx-service-plan-tier--active {

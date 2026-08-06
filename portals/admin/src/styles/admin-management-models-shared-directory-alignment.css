@@ -1,27 +1,14 @@
-.vx-product-row__type,
-.vx-product-row__status,
-.vx-product-row__supply,
-.vx-product-row__access,
-.vx-product-row__updated,
 .vx-product-plan-row__status,
 .vx-product-plan-row__price,
 .vx-product-plan-row__features,
 .vx-product-plan-row__agents,
-.vx-product-plan-row__subscriptions,
-.vx-product-solution-row__scenario,
-.vx-product-solution-row__products,
-.vx-product-solution-row__tiers,
-.vx-product-solution-row__subscriptions,
-.vx-product-solution-row__updated {
+.vx-product-plan-row__subscriptions {
   min-width: 0;
   display: grid;
   gap: var(--vx-admin-management-space-05r);
   justify-items: start;
   text-align: left;
 }
-.vx-admin-role-permission-tags,
-.vx-product-row__type .vx-tenant-directory-row__tag-line,
-.vx-product-plan-row__status .vx-tenant-directory-row__tag-line,
-.vx-product-solution-row__scenario .vx-tenant-directory-row__tag-line {
+.vx-admin-role-permission-tags {
   justify-content: flex-start;
 }

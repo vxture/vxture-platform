@@ -68,7 +68,6 @@
 
 @media (max-width: 1200px) {
   .vx-audit-directory-list,
-  .vx-audit-directory-list .vx-tenant-directory-list__header,
   .vx-audit-row {
     grid-template-columns: var(--vx-admin-operations-audit-grid-compact);
   }

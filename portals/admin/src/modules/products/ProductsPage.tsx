@@ -6,7 +6,7 @@ import {
   ActionButton,
   ActionMenu,
   Badge,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -16,6 +16,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { fetchProductCapabilities } from "@/api/admin-bff";
@@ -147,157 +148,104 @@ function ProductActionsMenu({
   );
 }
 
-function ProductListRows({
-  products,
-  startIndex,
-  selectedProductCodes,
-  isPageSelected,
-  onOpenDetails,
-  onToggleProduct,
-  onTogglePage,
-}: {
-  products: ProductCapabilityRecord[];
-  startIndex: number;
-  selectedProductCodes: Set<string>;
-  isPageSelected: boolean;
-  onOpenDetails: (productCode: string) => void;
-  onToggleProduct: (productCode: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
-  const selectedOnPage = products.filter((product) =>
-    selectedProductCodes.has(product.productCode),
-  ).length;
-  const isPagePartiallySelected =
-    selectedOnPage > 0 && selectedOnPage < products.length;
-
-  return (
-    <div
-      className="vx-tenant-directory-list vx-product-directory-list"
-      role="region"
-      aria-label="产品能力清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : isPagePartiallySelected
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页产品能力"
-          />
+/**
+ * 行内的标仍是 pill（`vx-product-pill--*`）而非 `StatusBadge`：那一族是业务值域
+ * 着色表，整族改 Badge 归批 4。
+ */
+function useProductColumns(
+  onOpenDetails: (productCode: string) => void,
+): DataTableColumn<ProductCapabilityRecord>[] {
+  return [
+    {
+      id: "product",
+      header: "产品能力",
+      cell: (product) => (
+        <TableTitleCell
+          icon={productTypeIcon(product.productType)}
+          title={product.productName}
+          description={`${product.productCode} · ${productRegionLabel(product.region)}`}
+          onTitleClick={() => onOpenDetails(product.productCode)}
+        />
+      ),
+    },
+    {
+      id: "type",
+      header: "类型",
+      align: "center",
+      cell: (product) => (
+        <span className="inline-flex flex-wrap justify-center gap-2xs">
+          <Badge
+            className={`vx-tenant-pill vx-product-pill--${product.productType}`}
+          >
+            {productTypeLabel(product.productType)}
+          </Badge>
+          <Badge
+            className={`vx-tenant-pill vx-product-pill--${product.source}`}
+          >
+            {productSourceLabel(product.source)}
+          </Badge>
         </span>
-        <span>#</span>
-        <span>产品能力</span>
-        <span>类型</span>
-        <span>状态</span>
-        <span>方案</span>
-        <span>接入</span>
-        <span>计量</span>
-        <span>操作</span>
-      </div>
-      {products.map((product, index) => (
-        <div
-          key={product.productCode}
-          className={joinClasses(
-            "vx-tenant-directory-row",
-            "vx-product-operation-row",
-            `vx-product-row--${product.status}`,
-            selectedProductCodes.has(product.productCode)
-              ? "vx-product-operation-row--selected"
-              : "",
-          )}
-          onClick={(event) => {
-            if (
-              event.target instanceof HTMLElement &&
-              event.target.closest(
-                'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-              )
-            )
-              return;
-            onToggleProduct(
-              product.productCode,
-              !selectedProductCodes.has(product.productCode),
-            );
-          }}
-        >
-          <span className="vx-product-operation-row__select">
-            <Checkbox
-              className="vx-model-select-checkbox"
-              checked={selectedProductCodes.has(product.productCode)}
-              onClick={(event) => event.stopPropagation()}
-              onCheckedChange={(value) =>
-                onToggleProduct(product.productCode, value === true)
-              }
-              aria-label={`选择 ${product.productName}`}
-            />
-          </span>
-          <span className="vx-tenant-directory-row__index">
-            {formatNumber(startIndex + index + 1)}
-          </span>
-          <TableTitleCell
-            className="vx-tenant-directory-row__tenant vx-product-row__identity"
-            icon={productTypeIcon(product.productType)}
-            title={product.productName}
-            description={`${product.productCode} · ${productRegionLabel(product.region)}`}
-            onTitleClick={() => onOpenDetails(product.productCode)}
-          />
-          <span className="vx-product-row__type">
-            <span className="vx-tenant-directory-row__tag-line">
-              <Badge
-                className={`vx-tenant-pill vx-product-pill--${product.productType}`}
-              >
-                {productTypeLabel(product.productType)}
-              </Badge>
-              <Badge
-                className={`vx-tenant-pill vx-product-pill--${product.source}`}
-              >
-                {productSourceLabel(product.source)}
-              </Badge>
-            </span>
-          </span>
-          <span className="vx-product-row__status">
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (product) => (
+        <TableTitleCell
+          title={
             <Badge
               className={`vx-tenant-pill vx-product-pill--${product.status}`}
             >
               {productStatusLabel(product.status)}
             </Badge>
-            <small>
-              {product.visibility === "public" ? "公开" : "内部"} |{" "}
-              {product.healthStatus === "normal" ? "健康" : "关注"}
-            </small>
-          </span>
-          <span className="vx-product-row__supply">
-            <strong>{formatNumber(product.solutionCount)} 方案</strong>
-            <small>
-              {formatNumber(product.planCount)} 套餐 |{" "}
-              {formatNumber(product.releaseCount)} 发布
-            </small>
-          </span>
-          <span className="vx-product-row__access">
+          }
+          description={`${product.visibility === "public" ? "公开" : "内部"} | ${
+            product.healthStatus === "normal" ? "健康" : "关注"
+          }`}
+        />
+      ),
+    },
+    {
+      id: "supply",
+      header: "方案",
+      align: "center",
+      cell: (product) => (
+        <TableTitleCell
+          title={`${formatNumber(product.solutionCount)} 方案`}
+          description={`${formatNumber(product.planCount)} 套餐 | ${formatNumber(product.releaseCount)} 发布`}
+        />
+      ),
+    },
+    {
+      id: "access",
+      header: "接入",
+      align: "center",
+      cell: (product) => (
+        <TableTitleCell
+          title={
             <Badge
               className={`vx-tenant-pill vx-product-pill--access-${product.integration.status}`}
             >
               {productAccessLabel(product.integration.status)}
             </Badge>
-            <small>{formatNumber(product.modelPolicyCount)} 模型授权</small>
-          </span>
-          <span className="vx-product-row__updated">
-            <strong>{product.meteringUnit}</strong>
-            <small>{product.billingMode}</small>
-          </span>
-          <ProductActionsMenu
-            product={product}
-            onViewDetails={() => onOpenDetails(product.productCode)}
-          />
-        </div>
-      ))}
-    </div>
-  );
+          }
+          description={`${formatNumber(product.modelPolicyCount)} 模型授权`}
+        />
+      ),
+    },
+    {
+      id: "metering",
+      header: "计量",
+      align: "center",
+      cell: (product) => (
+        <TableTitleCell
+          title={product.meteringUnit}
+          description={product.billingMode}
+        />
+      ),
+    },
+  ];
 }
 
 function ProductCards({
@@ -418,6 +366,8 @@ export function ProductsPage() {
     };
   }, []);
 
+  const productColumns = useProductColumns(handleOpenDetails);
+
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -445,15 +395,6 @@ export function ProductsPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleProductCodes = visibleProducts.map(
-    (product) => product.productCode,
-  );
-  const selectedVisibleProductCount = visibleProductCodes.filter(
-    (productCode) => selectedProductCodes.has(productCode),
-  ).length;
-  const isProductPageSelected =
-    visibleProductCodes.length > 0 &&
-    selectedVisibleProductCount === visibleProductCodes.length;
   const activeProducts = products.filter(
     (product) => product.status === "active",
   ).length;
@@ -499,32 +440,6 @@ export function ProductsPage() {
 
   function handleOpenDetails(productCode: string) {
     router.push(`/products/${encodeURIComponent(productCode)}`);
-  }
-
-  function toggleProductSelection(productCode: string, checked: boolean) {
-    setSelectedProductCodes((current) => {
-      const next = new Set(current);
-      if (checked) {
-        next.add(productCode);
-      } else {
-        next.delete(productCode);
-      }
-      return next;
-    });
-  }
-
-  function toggleProductPageSelection(checked: boolean) {
-    setSelectedProductCodes((current) => {
-      const next = new Set(current);
-      for (const productCode of visibleProductCodes) {
-        if (checked) {
-          next.add(productCode);
-        } else {
-          next.delete(productCode);
-        }
-      }
-      return next;
-    });
   }
 
   return (
@@ -670,29 +585,47 @@ export function ProductsPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="产品能力清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
 
-            {visibleProducts.length ? (
-              viewMode === "list" ? (
-                <ProductListRows
-                  products={visibleProducts}
-                  startIndex={(activePage - 1) * pageSize}
-                  selectedProductCodes={selectedProductCodes}
-                  isPageSelected={isProductPageSelected}
-                  onOpenDetails={handleOpenDetails}
-                  onToggleProduct={toggleProductSelection}
-                  onTogglePage={toggleProductPageSelection}
-                />
-              ) : (
-                <ProductCards
-                  products={visibleProducts}
-                  onOpenDetails={handleOpenDetails}
-                />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={productColumns}
+                rows={visibleProducts}
+                rowKey={(product) => product.productCode}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedProductCodes]}
+                onSelectionChange={(keys) =>
+                  setSelectedProductCodes(new Set(keys))
+                }
+                rowActions={(product) => (
+                  <ProductActionsMenu
+                    product={product}
+                    onViewDetails={() => handleOpenDetails(product.productCode)}
+                  />
+                )}
+                emptyTitle="没有匹配的产品能力"
+                emptyDescription="清空筛选条件后可查看全部产品能力。"
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleProducts.length ? (
+              <ProductCards
+                products={visibleProducts}
+                onOpenDetails={handleOpenDetails}
+              />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState

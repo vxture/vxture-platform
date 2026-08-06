@@ -7,7 +7,7 @@ import {
   ActionMenu,
   Banner,
   BulkActionBar,
-  Checkbox,
+  DataTable,
   EmptyState,
   FilterBar,
   Icon,
@@ -17,6 +17,7 @@ import {
   NativeSelect,
   TableTitleCell,
 } from "@vxture/design-system";
+import type { DataTableColumn } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   assignVouchers,
@@ -133,130 +134,81 @@ function PromotionActionsMenu({
   );
 }
 
-function PromotionRows({
-  records,
-  startIndex,
-  selectedRecordIds,
-  isPageSelected,
-  onToggleRecord,
-  onTogglePage,
-}: {
-  records: PromotionOperationRecord[];
-  startIndex: number;
-  selectedRecordIds: Set<string>;
-  isPageSelected: boolean;
-  onToggleRecord: (id: string, checked: boolean) => void;
-  onTogglePage: (checked: boolean) => void;
-}) {
+/** 这一页的标已经是 DS `Tag`，不带业务色类，与批 4 无关。 */
+function usePromotionColumns(): DataTableColumn<PromotionOperationRecord>[] {
   const router = useRouter();
-  const selectedOnPage = records.filter((record) =>
-    selectedRecordIds.has(record.id),
-  ).length;
 
-  return (
-    <div
-      className="vx-tenant-directory-list vx-promotion-directory-list"
-      role="region"
-      aria-label="营销优惠清单"
-    >
-      <div className="vx-tenant-directory-list__header">
-        <span>
-          <Checkbox
-            className="vx-model-select-checkbox"
-            checked={
-              isPageSelected
-                ? true
-                : selectedOnPage > 0
-                  ? "indeterminate"
-                  : false
-            }
-            onCheckedChange={(value) => onTogglePage(value === true)}
-            aria-label="选择当前页优惠活动"
-          />
-        </span>
-        <span>#</span>
-        <span>优惠活动</span>
-        <span>适用范围</span>
-        <span>优惠</span>
-        <span>核销</span>
-        <span>状态</span>
-        <span>时间</span>
-        <span>操作</span>
-      </div>
-      {records.map((record, index) => {
-        const selected = selectedRecordIds.has(record.id);
-
-        return (
-          <div
-            key={record.id}
-            className={joinClasses(
-              "vx-tenant-directory-row",
-              "vx-promotion-operation-row",
-              `vx-commercial-row--${statusTone(record.status)}`,
-              selected ? "vx-promotion-operation-row--selected" : undefined,
-            )}
-            onClick={(event) => {
-              const target = event.target as HTMLElement;
-              if (
-                target.closest(
-                  'button, input, select, textarea, a, [role="button"], [role="menu"], [role="menuitem"]',
-                )
-              )
-                return;
-              onToggleRecord(record.id, !selected);
-            }}
-          >
-            <span className="vx-promotion-operation-row__select">
-              <Checkbox
-                className="vx-model-select-checkbox"
-                checked={selected}
-                onCheckedChange={(value) =>
-                  onToggleRecord(record.id, value === true)
-                }
-                aria-label={`选择优惠活动 ${record.promotionName}`}
-              />
-            </span>
-            <span className="vx-tenant-directory-row__index">
-              {formatNumber(startIndex + index + 1)}
-            </span>
-            <TableTitleCell
-              className="vx-commercial-row__main"
-              title={record.promotionName}
-              description={`${record.promotionCode} · ${typeLabel(record.promotionType)}`}
-              onTitleClick={() => router.push("/promotion-redemptions")}
-            />
-            <span className="vx-commercial-row__main">
-              <span className="vx-tenant-directory-row__tag-line">
-                <Tag tone="muted">{record.scopeLabel}</Tag>
-              </span>
-              <small>{record.description}</small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>{record.discountLabel}</strong>
-              <small>{typeLabel(record.promotionType)}</small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>{formatNumber(record.redemptionCount)}</strong>
-              <small>{formatNumber(record.tenantCount)} 租户</small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <Tag tone={statusTone(record.status)}>
-                {statusLabel(record.status)}
-              </Tag>
-              <small>{record.ownerName}</small>
-            </span>
-            <span className="vx-commercial-row__center">
-              <strong>{formatDate(record.startsAt)}</strong>
-              <small>
-                {record.endsAt ? formatDate(record.endsAt) : "长期"}
-              </small>
-            </span>
-            <PromotionActionsMenu record={record} />
-          </div>
-        );
-      })}
-    </div>
-  );
+  return [
+    {
+      id: "promotion",
+      header: "优惠活动",
+      cell: (record) => (
+        <TableTitleCell
+          title={record.promotionName}
+          description={`${record.promotionCode} · ${typeLabel(record.promotionType)}`}
+          onTitleClick={() => router.push("/promotion-redemptions")}
+        />
+      ),
+    },
+    {
+      id: "scope",
+      header: "适用范围",
+      cell: (record) => (
+        <TableTitleCell
+          title={<Tag tone="muted">{record.scopeLabel}</Tag>}
+          description={record.description}
+        />
+      ),
+    },
+    {
+      id: "discount",
+      header: "优惠",
+      align: "center",
+      cell: (record) => (
+        <TableTitleCell
+          title={record.discountLabel}
+          description={typeLabel(record.promotionType)}
+        />
+      ),
+    },
+    {
+      id: "redemption",
+      header: "核销",
+      align: "right",
+      cell: (record) => (
+        <TableTitleCell
+          title={formatNumber(record.redemptionCount)}
+          description={`${formatNumber(record.tenantCount)} 租户`}
+        />
+      ),
+    },
+    {
+      id: "status",
+      header: "状态",
+      align: "center",
+      cell: (record) => (
+        <TableTitleCell
+          title={
+            <Tag tone={statusTone(record.status)}>
+              {statusLabel(record.status)}
+            </Tag>
+          }
+          description={record.ownerName}
+        />
+      ),
+    },
+    {
+      id: "time",
+      header: "时间",
+      align: "center",
+      cell: (record) => (
+        <TableTitleCell
+          title={formatDate(record.startsAt)}
+          description={record.endsAt ? formatDate(record.endsAt) : "长期"}
+        />
+      ),
+    },
+  ];
 }
 
 function PromotionCards({ records }: { records: PromotionOperationRecord[] }) {
@@ -406,6 +358,8 @@ export function PromotionsPage() {
     }
   }
 
+  const promotionColumns = usePromotionColumns();
+
   const filteredRecords = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return records.filter((record) => {
@@ -427,16 +381,6 @@ export function PromotionsPage() {
     (activePage - 1) * pageSize,
     activePage * pageSize,
   );
-  const visibleRecordIds = useMemo(
-    () => visibleRecords.map((record) => record.id),
-    [visibleRecords],
-  );
-  const selectedVisibleRecordCount = visibleRecordIds.filter((id) =>
-    selectedRecordIds.has(id),
-  ).length;
-  const isRecordPageSelected =
-    visibleRecordIds.length > 0 &&
-    selectedVisibleRecordCount === visibleRecordIds.length;
   const activeCount = records.filter(
     (record) => record.status === "active",
   ).length;
@@ -457,26 +401,6 @@ export function PromotionsPage() {
     setQuery("");
     setStatusFilter("all");
     setTypeFilter("all");
-  }
-
-  function toggleRecordSelection(id: string, checked: boolean) {
-    setSelectedRecordIds((current) => {
-      const next = new Set(current);
-      if (checked) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
-
-  function toggleRecordPageSelection(checked: boolean) {
-    setSelectedRecordIds((current) => {
-      const next = new Set(current);
-      visibleRecordIds.forEach((id) => {
-        if (checked) next.add(id);
-        else next.delete(id);
-      });
-      return next;
-    });
   }
 
   const selectedRecords = records.filter((record) =>
@@ -678,24 +602,42 @@ export function PromotionsPage() {
         }
         table={
           <section className="vx-tenant-directory" aria-label="营销优惠清单">
-            {loading ? (
+            {/* 列表态的加载由 DataTable 出骨架行，卡片态没有骨架，仍留这行提示。 */}
+            {loading && viewMode === "cards" ? (
               <header className="vx-tenant-directory__header">
                 <span>读取中</span>
               </header>
             ) : null}
-            {visibleRecords.length ? (
-              viewMode === "list" ? (
-                <PromotionRows
-                  records={visibleRecords}
-                  startIndex={(activePage - 1) * pageSize}
-                  selectedRecordIds={selectedRecordIds}
-                  isPageSelected={isRecordPageSelected}
-                  onToggleRecord={toggleRecordSelection}
-                  onTogglePage={toggleRecordPageSelection}
-                />
-              ) : (
-                <PromotionCards records={visibleRecords} />
-              )
+            {viewMode === "list" ? (
+              <DataTable
+                columns={promotionColumns}
+                rows={visibleRecords}
+                rowKey={(record) => record.id}
+                loading={loading}
+                indexStart={(activePage - 1) * pageSize + 1}
+                selectedKeys={[...selectedRecordIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedRecordIds(new Set(keys))
+                }
+                rowActions={(record) => (
+                  <PromotionActionsMenu record={record} />
+                )}
+                emptyTitle={loadError ? "优惠数据读取失败" : "没有匹配的优惠"}
+                emptyDescription={
+                  loadError ?? "清空筛选条件后可查看全部优惠活动。"
+                }
+                emptyAction={
+                  <ActionButton
+                    variant="outline"
+                    icon="x"
+                    onClick={handleReset}
+                  >
+                    清空筛选
+                  </ActionButton>
+                }
+              />
+            ) : visibleRecords.length ? (
+              <PromotionCards records={visibleRecords} />
             ) : (
               <section className="vx-tenant-empty">
                 <EmptyState

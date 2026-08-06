@@ -24,55 +24,6 @@
   );
 }
 
-.vx-promotions-page .vx-tenant-directory-row {
-  cursor: default;
-}
-
-.vx-commercial-row__tenant,
-.vx-commercial-row__main,
-.vx-commercial-row__center {
-  min-width: 0;
-  display: grid;
-  gap: var(--vx-admin-management-space-05r);
-}
-
-.vx-commercial-row__tenant {
-  justify-self: start;
-  grid-template-columns: var(--vx-admin-management-track-2r) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--vx-admin-management-space-1r);
-  text-align: left;
-}
-
-.vx-commercial-row__tenant svg {
-  color: var(--tenant-row-tone);
-}
-
-.vx-commercial-row__main {
-  justify-self: start;
-  justify-items: start;
-  text-align: left;
-}
-
-.vx-commercial-row__center {
-  justify-self: center;
-  justify-items: center;
-  text-align: center;
-}
-
-.vx-commercial-row__tenant small,
-.vx-commercial-row__main small,
-.vx-commercial-row__center small {
-  margin-top: 0;
-  max-width: 100%;
-  color: var(--tenant-muted);
-  font-weight: 400;
-}
-
-.vx-commercial-row__center small {
-  max-width: var(--vx-admin-management-size-13r);
-}
-
 .vx-commercial-card__description {
   margin: 0;
   overflow: hidden;

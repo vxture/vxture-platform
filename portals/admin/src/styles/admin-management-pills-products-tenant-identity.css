@@ -38,9 +38,7 @@
   box-shadow: inset 0 0 0 var(--vx-admin-management-effect-1p)
     var(--vx-color-neutral-surface);
 }
-.vx-account-management-page .vx-tenant-directory-row__tenant svg,
 .vx-account-management-page .vx-tenant-directory-card header > svg,
-.vx-platform-users-page .vx-tenant-directory-row__tenant svg,
 .vx-platform-users-page .vx-tenant-directory-card header > svg,
 .vx-admin-roles-page .vx-tenant-directory-card header > svg {
   color: var(--vx-color-gray-400);

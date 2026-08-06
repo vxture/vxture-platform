@@ -89,29 +89,18 @@
   background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
   color: var(--tenant-green);
 }
-.vx-product-row__status small,
-.vx-product-row__supply small,
-.vx-product-row__access small,
-.vx-product-row__updated small,
 .vx-product-plan-row__status small,
 .vx-product-plan-row__price small,
 .vx-product-plan-row__features small,
 .vx-product-plan-row__agents small,
-.vx-product-plan-row__subscriptions small,
-.vx-product-solution-row__scenario small,
-.vx-product-solution-row__products small,
-.vx-product-solution-row__tiers small,
-.vx-product-solution-row__subscriptions small,
-.vx-product-solution-row__updated small {
+.vx-product-plan-row__subscriptions small {
   margin-top: 0;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.vx-product-row__identity svg,
-.vx-product-plan-row__identity svg,
-.vx-product-solution-row__identity svg {
+.vx-product-plan-row__identity svg {
   color: var(--tenant-row-tone);
 }
 
