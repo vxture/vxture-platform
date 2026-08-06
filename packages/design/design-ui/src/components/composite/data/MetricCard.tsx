@@ -19,9 +19,9 @@
  * 不接指针事件。带图标的卡用静图，不带图标的卡用动图——底纹与图标是同一个
  * 位置上的视觉符号，两个都动就会互相抢（见 statWatermark）。
  *
- * 底纹三边留白相等（上/下/右各 8px），图随卡高撑到 64–72px 见方。它是**背景层**，
- * 文字在其上层，两者不共享横向空间——所以把图收小来"给文字让位"是没有必要的
- * （owner 2026-08-06）。图收小反而让这枚浅色装饰看起来像个误放的小图标。
+ * 底纹 48px 见方、纵向居中、距右 16px（owner 2026-08-06 定尺）。它是**背景层**，
+ * 文字在其上层，两者不共享横向空间——不必为"给文字让位"而收小，尺寸纯按视觉分量定。
+ * 定值而非跟随卡高：跟随会让同一屏上高矮不一的卡各配一枚大小不同的底纹。
  *
  * 没有 `variant`。曾有 default / compact 两档，差别是"松/紧 + 有无图标"；
  * 尺寸统一收小之后，剩下的差别只是图标传不传，那是一个参数不是一个档位。
@@ -116,8 +116,10 @@ function MetricCard({
           backgroundImage: `url("${icon ? STAT_WATERMARK_STILL : STAT_WATERMARK_ANIMATED}")`,
         }}
         className={cn(
-          "pointer-events-none absolute inset-y-sm right-sm aspect-square",
-          "bg-contain bg-center bg-no-repeat opacity-40",
+          "pointer-events-none absolute right-md top-1/2 size-media-sm -translate-y-1/2",
+          // 素材本身已是极浅色（画到的像素均值 rgb(237,241,255)），不透明度只
+          // 再压一档；40% 会把它压到几乎看不见。
+          "bg-contain bg-center bg-no-repeat opacity-70",
         )}
       />
       <CardContent className="relative flex flex-col px-lg">
