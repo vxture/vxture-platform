@@ -523,3 +523,251 @@ business 无法单独筛。改成由 `TIER_FILTER_OPTIONS` 数据驱动，五档
 admin CSS 6484 → 5953 行，期间删掉 6 个清空的 CSS 文件。剩下的 35 处全是分类标
 （`--source` / `--cycle` / 权限层 L1–L3 / 产品能力 mode·tag / 角色 api·menu·button），
 按「分类不给语气色、留 admin」的规矩，它们本就该在。
+
+---
+
+## §十六 测试数据：从"9 张叶子表"到"主干整图"
+
+### 起因
+
+批 4 的语气改动改的是**状态**的颜色，而 admin 本地库里几乎所有状态都只有一两个取值
+——没有数据就无从验证。第一版补数据（`seed-bulk.mjs`）灌了 9 张表各 100 行，看起来
+交差了，但那 9 张全是**叶子表**：公告、特性开关、维护窗口、流水、券核销、用量月表、
+续费、邀请、发票回执。它们不被任何表按外键引用，随手灌就能满。
+
+主干原样没动：**租户 5 / 用户 5 / 订阅 4 / 工单 4 / 技能 0**。owner 当场点破。
+
+偷懒的真实原因是主干表**互相引用**：用户 → 租户 → 工作区 → 成员 → 订阅 → 账单 →
+支付 → 工单，必须按依赖顺序生成一整张一致的图，比灌叶子表贵得多。
+
+### 系统性盘点方法
+
+不靠肉眼翻页，用两步机检定位"哪些页面没数据"：
+
+1. 正则扫 `bff/admin-bff/src/routers/*.ts` 里所有 `from|join|into|update <schema>.<table>`
+   → 得到 **BFF 实际触及的 48 张表**；
+2. 对活库逐表 `count(*)`，与第 1 步做 join。
+
+只有这个交集才是"页面没数据"的准确集合——全库 138 张表里 69 张是空的，但其中大部分
+根本没有页面在读，为它们造数据是白费。
+
+### 结果
+
+新增 `deploy/database/seed/seed-bulk-core.mjs`（⑤ 主干批量种子，`pnpm db:seed:bulk-core`），
+UUID 段 `d000`（catalog=a000、demo=b000、bulk=c000）。执行顺序：
+
+    catalog → sample → demo → **bulk-core** → bulk
+
+bulk-core 排在 bulk 之前是有原因的：bulk 里的模型授权受
+`uq_model_policies_model_tenant` 约束，租户与模型各只有 5、6 个时天花板是 30 行，
+主干铺开后重跑才到 100。
+
+BFF 触及的 48 张表中,**41 张 ≥20 行**。剩 7 张逐张有判据,不是漏掉的：
+
+| 表                           | 行数   | 判据                                          |
+| ---------------------------- | ------ | --------------------------------------------- |
+| `admin.governance_record`    | 不存在 | **BFF 在查一张没有 DDL 的表**，缺陷不是缺数据 |
+| `admin.settings`             | 1      | 单例配置表                                    |
+| `access.roles`               | 10     | 角色目录，属治理数据不批量造                  |
+| `admin.operator_role`        | 8      | 同上                                          |
+| `product.products`           | 18     | owner 定的口径（从 website appcenter 取）     |
+| `product.product_webhooks`   | 16     | 主键即 product_id，**上限等于产品数**         |
+| `product.product_categories` | 100    | 已补（三层树，id 占 500 段）                  |
+
+技能市场 0 条是**另一类问题**：`skills.router.ts` 通篇 32 行，`listSkills()` 直接
+`return []`，注释写着"数据层待接入"。没有表，也就没有数据可造——归 #35 占位路由。
+
+### 造数据的两条硬规矩（都是踩出来的）
+
+**① 值域必须对着库里的 CHECK 抄，不能照页面猜。** 第一版公告类型编了
+`release`/`policy`，而 BFF 的 `ANNOUNCEMENT_TYPES` 只认 system/maintenance/marketing/
+security。`mapAnnouncementRow` 对认不出的值**静默退回 `system`**，于是 50 行错数据在
+界面上毫无异样、全都好端端显示成"系统"，是去查 API 才发现的。
+
+这个兜底模式在 BFF 里有 13 处（`admin-roles` / `commercial` / `payments` / `tickets` …）。
+它防的是崩溃，代价是**把错数据显示成一条看起来正确的信息**。而 `announcement_type`
+列上并没有 CHECK 约束，数据库那道闸也是开的。两个收口方向待 owner 判：兜底改成显示
+原值（错就露出来），或给列补 CHECK（错数据写不进去）。倾向后者，归 #33。
+
+**② 有默认值 ≠ 可以传 null。** `model_price_rules.request_unit_price` 有默认值但仍是
+NOT NULL，显式传 `null` 会顶掉默认值直接违约。批量插入时"不关心的列"要么整列不写，
+要么给真实值，不能传 null 占位。
+
+### 顺带记下的展示层缺陷
+
+**工单状态是有损映射**：库里 7 个状态（open/pending/in_progress/resolved/closed/
+reopened/cancelled），`normalizeTicketStatus` 只映到 4 个，`resolved`/`reopened`/
+`cancelled` 全被最后那句 `return "closed"` 兜成"已关闭"。**重开的工单显示为已关闭**，
+这是错误信息不是降级显示。种子按库里的 7 个值造，不迁就展示层。
+
+---
+
+## §十七 会话为什么会过期（走查中断的原因）
+
+走查走到一半 admin 跳回登录页。两套会话寿命差两个数量级：
+
+| 会话                       | Redis key            | 寿命                                         |
+| -------------------------- | -------------------- | -------------------------------------------- |
+| RP 会话（admin-bff 自己）  | `vx:rp:admin:sess:*` | **30 天固定**（`RP_SESSION_TTL ?? 2592000`） |
+| OP 会话（auth-bff 登录态） | `vx:sess:*`          | **空闲 30 分钟** + 绝对 8 小时（见下）       |
+
+    OPERATOR_SESSION_IDLE_TTL = 1800    # 30 分钟无活动即失效
+    OPERATOR_SESSION_ABS_TTL  = 28800   # 8 小时绝对上限，续不动
+
+实测证据：Redis 连续运行 3 天没重启，10 个 admin RP 会话 TTL 全在 240 万秒以上、
+**一个都没过期**；同期 OP 侧只剩 2 个 `vx:sess`。断的不是 RP 会话，是上游 OP 会话。
+
+**"空闲 + 绝对"双闸这个设计本身是对的**，问题不在参数值，在于**谁来 touch 它**：
+
+`touchOidcSession` 只在 admin-bff 回 OP 换票时才被调到，而 admin-bff 有自己的 30 天
+RP 会话，**日常请求根本不回 OP**。于是 OP 的空闲计时器看不见用户正在 admin 里连续
+操作——人一直在用，OP 却按"闲置 30 分钟"把会话掐了，下一次换票时 302 回登录页。
+
+即"空闲"判据取自错误的观测点：它观测的是 RP↔OP 之间的换票频率，不是用户活跃度。
+
+三件事可做，均待 owner 判：
+
+- RP 侧在用户活跃时主动 touch OP 会话（心跳或随换票节奏前移），让空闲判据看见真实活跃；
+- RP 会话 TTL 别比它代表的登录态活得久——30 天 cookie 对 8 小时上限的会话是摆设；
+- 静默 302 改成可感知：续期提示或到期前静默刷新，现在是操作到一半整页跳走。
+
+本地走查期间在 `.env.local`（已 gitignore）临时置 `OPERATOR_SESSION_IDLE_TTL=28800`
+与绝对上限齐平，只为不让走查每半小时中断一次；生产不受影响。
+
+### 补：数据到位后仍然为空的，是另外两类问题
+
+主干灌满后复测，各主列表端点均返回 100+ 行（tenants 105 / accounts 105 /
+subscriptions 104 / tickets 104 / orders 104 / payments 107 / invoices 100 /
+platform-admins 101 / risk-records 103 / compliance-events 103 /
+notification-logs 106）。但**租户页的 4 张 KPI 卡与 3 个表格列依然是 0**。查了才知道
+和数据无关——`tenants.router.ts:698` 起把它们**写死**了：
+
+```ts
+// 以下跨域聚合（billing/metering/product/support）此读路径不覆盖，按契约占位。
+adminCount: 0, subscriptionCount: 0, productCount: 0, monthlyRevenue: 0,
+monthlyCost: 0, grossMarginRate: 0, tokenUsed: 0, tokenQuota: 0,
+ticketOpenCount: 0, satisfaction: 0, sla: "未设置",
+riskLevel: "normal",   // 退役 tenant_setting 无后继（tickets 同口径）
+```
+
+"试用租户 0" 是同一类但更彻底：`tenancy.tenants.status` 的 CHECK 只有
+active/suspended/deleted，**库里根本不存在 trial 这个态**，`normalizeStatus` 的注释也
+写着"无 trial 来源"。这张卡片统计的是一个不存在的值域成员，永远是 0。
+
+所以"页面没数据"实际是三类，混在一起看就会误判：
+
+| 类别           | 症状                     | 归属             | 本轮处置              |
+| -------------- | ------------------------ | ---------------- | --------------------- |
+| ① 数据缺失     | 列表只有个位数行         | seed             | **已修**（bulk-core） |
+| ② 字段写死占位 | 列表有行，某几列恒为 0/— | BFF 读路径未实现 | 待办，见下            |
+| ③ 整个路由是桩 | 页面全空                 | 无表 / mock 常量 | 归 #35                |
+
+③ 的完整清单：`skills.router.ts`（`return []`，无表）、products 的
+solutions / service-plans / releases / model-policies（三个 mock 常量数组，
+`products.router.ts:54/315/502`，去 mock 被产品目录设计阻塞）、
+`admin.governance_record`（**BFF 在查一张没有 DDL 的表**）。
+
+② 需要 owner 判的是口径而不是工时：租户列表要不要为了几个统计数字去 join
+billing/metering/support 三个域（列表页 N+1 的代价），还是把这些数字从列表挪到详情页。
+现在的状态是最差的一种——**位置留着、永远显示 0**，看起来像数据错了。
+
+---
+
+## §十八 登录态视觉走查（#23）
+
+数据铺满之后才做得动——此前每页只有个位数行，状态色根本铺不开，看不出对错。
+
+### 已走过的页与所见
+
+| 页       | 行数 | 结果                                                           |
+| -------- | ---- | -------------------------------------------------------------- |
+| 消息公告 | 100  | 类型/状态色对；**造错 50 行类型被静默吞成"系统"**（见 §十六）  |
+| 租户信息 | 105  | 状态/认证铺开；**4 张 KPI 卡 + 3 列恒为 0**（BFF 写死，#38）   |
+| 账号体系 | 105  | **状态标出现双勾**（已修）；加载态谎报 0（#41）                |
+| 工单中心 | 104  | **状态列整列失效、全灰**（已修，见下）                         |
+| 收款管理 | 107  | 批 4 的语气改动在这页最全：支付中=蓝 / 线下待核=琥珀 / 失败=红 |
+| 订单管理 | 104  | 状态按档分组正常；「业务方案」整列未设置（方案仍是 mock，#35） |
+| 实名认证 | 70   | 四态铺开，通过率 40%                                           |
+| 功能开关 | 91   | 正常（默认过滤已归档 9 条）                                    |
+| 维护窗口 | 100  | 正常；**严重度「一般」原为绿，owner 判改中性**（已改）         |
+| 平台角色 | —    | **状态标双勾**（已修）                                         |
+
+### 修掉的三类缺陷
+
+**① 图标渲染两次。** `accounts` 与 `admin-roles` 的状态标同时传了 `icon` 属性又在
+children 里手写了一遍 `<Icon>`，于是"✓✓ 正常"。迁移时加了属性没删旧标记。
+
+**② 工单三枚标共用一个 `ticketTone()`。** 那个函数同时看 priority 和 status，
+于是「待处理」被 p0 染成红——**一枚标同时说两件事**，读者无从判断红的是"很急"
+还是"出事了"。拆成状态 / 优先级 / 行业三路取色，优先级新建 `TICKET_PRIORITY_TONE`
+（紧急度恰好就是语气表达的东西，与套餐档不同——那里五档是商业分类，见
+`tier-level.ts`）；行业是类目，走朴素 `Badge`。
+
+**③ 严重度的绿与状态的绿撞义。** 同一页里「一般严重度」和「已完成」都是绿，而
+六档里 `success` 的语义是**达成**。低严重度不是一项达成，改中性（owner 判）。
+
+### 顺带定的一条 DS 规矩
+
+`toneIcons.neutral` 从 ⓘ 改为短横（owner 判）。ⓘ 说的是"这里有信息"，`neutral`
+说的是"没有状态"，两者对不上——「已停用」「已作废」「未认证」顶着一个不表达任何
+东西的信息图标。短横占住图标位保持横向对齐，但不再声称有信息可读。顺带解掉一处
+撞车：改之前 `neutral` 与 `info` 用的是同一张图，两档只靠颜色区分。
+
+### 最有价值的一条：**pill 遗留类大面积失效**（#42）
+
+工单页三种状态实测计算出来是同一个蓝灰。查下来是两条独立机制叠加：
+
+1. **文字色全失效**：`Badge variant="outline"` 带 `text-foreground`，Tailwind 的
+   utilities 层压过 admin CSS 的 `layer(components)`。**每一枚 pill 的文字色都
+   没生效**，无论哪个修饰符都是近黑。
+2. **一半背景色被基类压死**：outline 不设背景，背景归 pill CSS 管；但基类
+   `.vx-tenant-pill` 自带背景，在 `globals.css` 排第 34 行，而 `admin-management.css`
+   （含 commercial / invoice / order / payment / subscription / billing 全部色调）
+   在第 32 行——**同层、同特异度，后写的赢**。排在基类之后的族（admin-roles /
+   permissions / directory / governance / operations，37–40 行）反而正常。
+
+这直接推翻了批 4 收尾时的一个结论：当时判定"剩下 35 处全是分类标，本就该留"。
+其中排在基类之前的那些**根本没在显示**，是死类不是保留项。
+
+**方法论**：判死码不能只看引用。此前踩过模板拼接那条（`--${status}` 搜不到字面量，
+§十三），这次是反面——类名有引用、文件有导入、选择器也匹配得上，**只有量计算样式
+才知道它被压掉了**。两条合起来：静态搜索既会漏报也会误报，视觉走查不可省。
+
+### 批 4 补漏：把真坏的两族收掉（#42 第一步）
+
+`globals.css` 的 `layer(components)` 导入序共 12 位，基类 `admin-management-pills.css`
+在第 6 位。**第 1–5 位定义的色调修饰符全被基类的背景压死**，第 7–12 位的正常。
+逐文件核下来只有两族在死区：
+
+| 族                          | 修饰符 | 调用点                                |
+| --------------------------- | ------ | ------------------------------------- |
+| `vx-commercial-pill--*`     | 8      | `CommercialUtils.Tag`（商业三页共用） |
+| `vx-model-provider-pill--*` | 2      | `ModelPlatformPage` 厂商标            |
+
+其余 25 个修饰符背景是活的——但**文字色六族全死**（`Badge` 的 `text-foreground`
+在 utilities 层，压过 `layer(components)`），所以它们实际只剩背景在起作用。
+
+处置：两族退役。`Tag` 改出 `StatusBadge`（`normal`→success / `warning` / `danger` /
+其余→neutral），厂商标是类目改朴素 `Badge`。删掉
+`admin-management-commerce-commercial-pill-tones.css` 整个文件与它的 `@import`，
+以及 model-provider 两条规则。顺带删了零调用点的 `tierTone()`（`tier-level.ts` 的残留）。
+
+**中途踩的一个坑值得记**：第一版让 `Tag` 自己按 `tone === "muted"` 判"这是类目"
+走朴素 Badge。当场就错了——`statusTone` 的 `paused`、`billStatusTone` 的 `cancelled`
+返回的也是 `muted`，于是「已暂停」「已作废」被当成类目画。**语气名不携带"是状态
+还是类目"这个信息，只有调用点知道**，组件不该猜。改成 `Tag` 一律出状态标，四个
+真类目（投放范围 / 优惠类型 / 计量单位 / 产品类型）在调用点直接用 `Badge`。
+
+**连带炸出两个**（用量计费页）：
+
+1. **第三处双勾**。风险列的图标当年因为"`Tag` 只收文字"而并排挂在标外面；`Tag` 改出
+   `StatusBadge` 后自带语气图标，外挂那个就成了第二个勾。删外挂，`riskIcon()` 一并退役。
+   这与 accounts / admin-roles 两处同源：**迁移到自带图标的组件时，要回头删调用点
+   原来自己画的那个**。
+2. **空徽章**。计量单位缺失时渲染出一个什么都不写的小圆圈（BFF 对无单位计量项回空串）。
+   缺就不画。
+
+剩下的 25 个修饰符（发票三族 / 订单来源 / 收款来源 / 订阅周期 / 产品能力 mode·tag /
+角色 api·menu·button / 权限层 L1–L3）背景仍在生效、文字色不在，**整族退役是更大的
+视觉改动，另议**。方向倾向退役：它们按分类学都是类目，本就该是朴素描边标，退役后
+这套"顺序决定生死"的脆弱性也一并消失。
