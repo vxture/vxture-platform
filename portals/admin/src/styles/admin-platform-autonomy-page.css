@@ -1,0 +1,6 @@
+/* 平台自治域总览页仅剩的本地样式：页面最大宽度。
+   指标排、自治域卡、资源表、风险清单已迁 DS（MetricGrid / PanelCard / DataTable）。 */
+
+.platform-autonomy-page {
+  max-width: var(--vx-admin-platform-autonomy-page-max-width);
+}
