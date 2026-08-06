@@ -4,6 +4,25 @@ import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
+/** admin token 桥里定义过的全部 `--vx-admin-*`。读一次，供 ds/no-undefined-admin-token 用。 */
+let ADMIN_TOKEN_CACHE = null;
+function adminTokenDefinitions() {
+  if (ADMIN_TOKEN_CACHE) return ADMIN_TOKEN_CACHE;
+  const dir = "packages/design/design-system/assets/admin-tokens";
+  const names = new Set();
+  try {
+    for (const entry of readdirSync(dir)) {
+      if (!entry.endsWith(".css")) continue;
+      const text = readFileSync(`${dir}/${entry}`, "utf8");
+      for (const m of text.matchAll(/(--vx-admin-[a-z0-9-]+)\s*:/g)) names.add(m[1]);
+    }
+  } catch {
+    // 目录不在（子集检出）→ 规则自动噤声，不误报。
+  }
+  ADMIN_TOKEN_CACHE = names;
+  return names;
+}
+
 const ROOT = process.cwd();
 const SCAN_ROOTS = ["portals", "packages", "agent-studio", "business"];
 const SOURCE_EXTENSIONS = new Set([
@@ -472,6 +491,49 @@ const rules = [
         "改用 <ViewLayout>：这个类没有规则，挂着它页级块之间没有任何间距。",
         line,
       );
+    },
+  },
+  {
+    id: "ds/no-undefined-admin-token",
+    description:
+      "admin 样式引用的 --vx-admin-* 必须在 token 桥里有定义；归档样式表同样算数。",
+    checkFile(file) {
+      const normalized = normalize(file);
+      // 只查**在构建里**的样式表。styles-absorbed/ 不查——那 13 份的 token 早在
+      // 上一次清理时就没了（79 个），现在补回来等于把已退役的设计意图复活，
+      // 而不查它们也不会漏掉事故：样式表一旦被接回 src/styles/，本规则立刻就报
+      // （2026-08-07 就是这么抓到 admin-roles-auth-dialog 少 5 个 token 的）。
+      if (!/^portals\/admin\/src\/styles\/.*\.css$/.test(normalized)) {
+        return [];
+      }
+      let source;
+      try {
+        source = readFileSync(file, "utf8");
+      } catch {
+        return [];
+      }
+
+      const defined = adminTokenDefinitions();
+      const violations = [];
+      const seen = new Set();
+      const re = /var\(\s*(--vx-admin-[a-z0-9-]+)/g;
+      let match;
+      while ((match = re.exec(source)) !== null) {
+        const name = match[1];
+        if (defined.has(name) || seen.has(name)) continue;
+        seen.add(name);
+        violations.push(
+          violation(
+            file,
+            source.slice(0, match.index).split("\n").length,
+            `${name} 在 token 桥里没有定义。补定义，或连同引用它的规则一起退役——` +
+              `**不要只删一边**：样式表离开构建后它引用的 token 会显得无人使用，` +
+              `随后被当成死 token 清掉，等有人把样式表接回来时栅格就塌了` +
+              `（2026-08-05/08-07 两次事故，见 workplans §十九）。`,
+          ),
+        );
+      }
+      return violations;
     },
   },
   {
