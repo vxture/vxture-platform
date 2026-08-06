@@ -22,11 +22,12 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
-import type { DataTableColumn } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -123,12 +124,12 @@ function roleStatusIndicator(role: PlatformRoleRecord): {
   return { tone: "closed", label: "停用", icon: "x" };
 }
 
-function roleStatusPillClass(role: PlatformRoleRecord) {
+/** 角色态 → 语气。archived 借的是"关注"黄，不是灰：归档角色仍可能挂着人。 */
+function roleStatusTone(role: PlatformRoleRecord): StatusBadgeTone {
   const statusCode = roleStatusCode(role);
-  if (statusCode === "active") return "vx-admin-role-status-pill--enabled";
-  if (statusCode === "archived")
-    return "vx-platform-user-status-pill--attention";
-  return "vx-admin-role-status-pill--disabled";
+  if (statusCode === "active") return "success";
+  if (statusCode === "archived") return "warning";
+  return "neutral";
 }
 
 function roleSearchText(role: PlatformRoleRecord) {
@@ -457,9 +458,7 @@ function PermissionAuthorizationNode({
               {node.depth === 0 ? "根权限" : `L${node.depth}`}
             </Badge>
             {!node.permission.status ? (
-              <Badge className="vx-tenant-pill vx-admin-role-status-pill--disabled">
-                停用
-              </Badge>
+              <StatusBadge tone="neutral">停用</StatusBadge>
             ) : null}
           </span>
           <small>
@@ -703,9 +702,7 @@ function PermissionTags({ role }: { role: PlatformRoleRecord }) {
 }
 
 /**
- * 行内的状态标仍是 pill（`roleStatusPillClass`）而非 `StatusBadge`：那是业务值域
- * 着色表，整族改 Badge 归批 4。记号图标放在标**内**——它靠标的文字色着色，摆在
- * 标外面会退成表格的正文灰。
+ * 状态标走 `StatusBadge`，语气由 `roleStatusTone` 给。
  */
 function useAdminRoleColumns(
   roleLabels: Map<string, string>,
@@ -743,13 +740,10 @@ function useAdminRoleColumns(
       cell: (role) => {
         const indicator = roleStatusIndicator(role);
         return (
-          <Badge
-            className={`vx-tenant-pill ${roleStatusPillClass(role)}`}
-            title={indicator.label}
-          >
+          <StatusBadge tone={roleStatusTone(role)} icon={indicator.icon}>
             <Icon name={indicator.icon} size="xs" fallback="placeholder" />
             {indicator.label}
-          </Badge>
+          </StatusBadge>
         );
       },
     },
@@ -846,9 +840,9 @@ function AdminRoleCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge className={`vx-tenant-pill ${roleStatusPillClass(role)}`}>
+            <StatusBadge tone={roleStatusTone(role)}>
               {roleStatusIndicator(role).label}
-            </Badge>
+            </StatusBadge>
             {role.isSystem ? (
               <Badge className="vx-tenant-pill vx-tenant-pill--system">
                 系统

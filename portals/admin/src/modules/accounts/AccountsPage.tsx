@@ -16,11 +16,12 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
-import type { DataTableColumn } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -167,9 +168,16 @@ function accountStatusLabel(status: AccountOperationRecord["status"]) {
   return "已停用";
 }
 
-function accountStatusPillClass(status: AccountOperationRecord["status"]) {
-  return `vx-tenant-pill vx-tenant-pill--${status} vx-account-status-pill--${status}`;
-}
+/** 账号态 → 语气。取自 `.vx-account-status-pill--*`：invited 是蓝（brand）。 */
+const ACCOUNT_STATUS_TONE: Record<
+  AccountOperationRecord["status"],
+  StatusBadgeTone
+> = {
+  active: "success",
+  invited: "brand",
+  locked: "warning",
+  disabled: "neutral",
+};
 
 function accountStatusIndicator(account: AccountOperationRecord): {
   tone: AccountStatusIndicatorTone;
@@ -272,8 +280,7 @@ interface AccountRowActions {
 }
 
 /**
- * 行内的状态标仍是 pill（`accountStatusPillClass` 一族）而非 `StatusBadge`：那是
- * 业务值域着色表，整族改 Badge 归批 4。
+ * 状态标走 `StatusBadge`，语气由 `ACCOUNT_STATUS_TONE` 给。
  *
  * 租户列随 `showTenantContext` 出没——平台账号视图没有租户归属这回事。
  */
@@ -327,13 +334,13 @@ function useAccountColumns(
       cell: (account) => {
         const indicator = accountStatusIndicator(account);
         return (
-          <Badge
-            className={accountStatusPillClass(account.status)}
-            title={indicator.label}
+          <StatusBadge
+            tone={ACCOUNT_STATUS_TONE[account.status]}
+            icon={indicator.icon}
           >
             <Icon name={indicator.icon} size="xs" fallback="placeholder" />
             {accountStatusLabel(account.status)}
-          </Badge>
+          </StatusBadge>
         );
       },
     },
@@ -403,9 +410,9 @@ function AccountCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge className={accountStatusPillClass(account.status)}>
+            <StatusBadge tone={ACCOUNT_STATUS_TONE[account.status]}>
               {accountStatusLabel(account.status)}
-            </Badge>
+            </StatusBadge>
             {showTenantContext
               ? accountTenantSummary(account).tags.map((tag) => (
                   <Badge

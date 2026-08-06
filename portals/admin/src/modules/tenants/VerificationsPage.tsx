@@ -22,11 +22,12 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
-import type { DataTableColumn } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import {
@@ -234,10 +235,18 @@ function VerificationActionsMenu({
   );
 }
 
-/**
- * 行内的状态标仍是 pill（`vx-verification-pill--*` / `vx-tenant-pill--*`）而非
- * `StatusBadge`：那一族是业务值域着色表，整族改 Badge 归批 4。
- */
+/** 认证态 → 语气。取自 `.vx-verification-pill--*`：unverified 是灰不是红，
+ * "还没提交"不是"审核不过"。 */
+const VERIFIED_TONE: Record<
+  VerificationRow["verifiedStatus"],
+  StatusBadgeTone
+> = {
+  verified: "success",
+  pending: "warning",
+  rejected: "danger",
+  unverified: "neutral",
+};
+
 function useVerificationColumns(): DataTableColumn<VerificationRow>[] {
   const router = useRouter();
 
@@ -265,13 +274,13 @@ function useVerificationColumns(): DataTableColumn<VerificationRow>[] {
         return (
           <TableTitleCell
             title={
-              <Badge
-                className={`vx-tenant-pill vx-verification-pill--${tenant.verifiedStatus}`}
+              <StatusBadge
+                tone={VERIFIED_TONE[tenant.verifiedStatus]}
+                icon={indicator.icon}
                 title={indicator.label}
               >
-                <Icon name={indicator.icon} size="xs" fallback="placeholder" />
                 {verifiedLabel(tenant.verifiedStatus)}
-              </Badge>
+              </StatusBadge>
             }
             description={riskLabel(normalizeTenantRiskLevel(tenant.riskLevel))}
           />
@@ -378,11 +387,9 @@ function VerificationCards({
               />
             </header>
             <div className="vx-tenant-directory-card__badges">
-              <Badge
-                className={`vx-tenant-pill vx-verification-pill--${tenant.verifiedStatus}`}
-              >
+              <StatusBadge tone={VERIFIED_TONE[tenant.verifiedStatus]}>
                 {verifiedLabel(tenant.verifiedStatus)}
-              </Badge>
+              </StatusBadge>
               <Badge
                 className={`vx-tenant-pill vx-tenant-pill--risk-${riskLevel}`}
               >

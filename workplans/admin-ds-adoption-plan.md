@@ -381,7 +381,36 @@ special_vat/other）两个值域共用，`normal` 在两边都出现——今天
 **账单异常标的紫色没了**：调整单（蓝）与补录单（紫）原是两色，DS 无紫档，两者同归
 `brand`。判据是它们本来就有"调整单""补录单"两个词，区别不必靠记颜色。
 
+### 第二刀：纯状态族（2026-08-06）
+
+四个族**整族都是状态**，页面里各有一个 `*PillClass()` 函数在拼类名，改动收敛在函数上：
+
+| 族                          | 页面                                      | 改成                                                     |
+| --------------------------- | ----------------------------------------- | -------------------------------------------------------- |
+| `account-status-pill`       | `AccountsPage`                            | `ACCOUNT_STATUS_TONE` 表                                 |
+| `admin-role-status-pill`    | `AdminRolesPage` / `AdminPermissionsPage` | `roleStatusTone()`                                       |
+| `platform-user-status-pill` | `PlatformUsersPage`                       | `platformAdminStatusTone()` / `platformRoleStatusTone()` |
+| `verification-pill`         | `VerificationsPage`                       | `VERIFIED_TONE` 表                                       |
+
+换之前逐档查了原色，几处**不能想当然**的：`invited` 是蓝不是黄（邀请中不是异常）、
+`pending`（平台用户）同理、`archived` 角色是黄不是灰（归档角色仍可能挂着人）、
+`unverified` 是灰不是红（还没提交 ≠ 审核不过）。
+
 ### 复测
 
-pill 引用 266 → 226 处，选择器 239 → 158 个，admin CSS 6484 → 6325 行。
-剩下的 19 族按同一把尺子做：先聚色，再分状态/等级/分类三堆。
+pill 引用 266 → 210 处，选择器 239 → 146 个，admin CSS 6484 → 6273 行。
+
+### 还剩
+
+**五个混合族**——状态、等级、分类挤在同一个前缀下，得逐档拆：
+
+| 族                      | 档数 | 混了什么                                                                                                     |
+| ----------------------- | ---- | ------------------------------------------------------------------------------------------------------------ |
+| `tenant-pill`           | 39   | 状态 + 类目（company/individual/member/owner/permission/product/quota/ticket）+ risk-\*/ticket-\* 两套子刻度 |
+| `product-pill`          | 18   | 状态（active/draft/archived、access-\*）+ 类目（agent/model/platform/self/partner/data/service）             |
+| `product-solution-pill` | 15   | 同上 + tier-\*                                                                                               |
+| `service-plan-pill`     | 14   | 同上 + solution-\*                                                                                           |
+| `product-plan-pill`     | 10   | 状态（active/inactive、public/private）+ 类目（agent/free/paid/function/quota）                              |
+
+外加**等级标归 `--level-1..5`** 一项（`billing`/`order`/`subscription`/`product-solution`
+四族的 `tier-*`，以及 §十一 的缺色 starter/business）。

@@ -19,6 +19,7 @@ import {
   MetricGrid,
   NativeSelect,
   SectionHeader,
+  StatusBadge,
   Textarea,
   useToast,
   ViewLayout,
@@ -760,16 +761,14 @@ function PermissionDetailDialog({
           <Badge className="vx-tenant-pill vx-tenant-pill--system">
             {permissionTypeMetaOf(permission.permType).label}
           </Badge>
-          <Badge
-            className={`vx-tenant-pill ${permission.status ? "vx-admin-role-status-pill--enabled" : "vx-admin-role-status-pill--disabled"}`}
-          >
+          <StatusBadge tone={permission.status ? "success" : "neutral"}>
             <Icon
               name={statusIndicator.icon}
               size="xs"
               fallback="placeholder"
             />
             {statusIndicator.label}
-          </Badge>
+          </StatusBadge>
           <Badge className="vx-tenant-pill vx-tenant-pill--system">
             {permissionSourceLabel(permission)}
           </Badge>
@@ -1050,16 +1049,14 @@ function PermissionTreeNodeView({
           </span>
         </span>
         <span className="vx-admin-permission-tree-node__status">
-          <Badge
-            className={`vx-tenant-pill ${permission.status ? "vx-admin-role-status-pill--enabled" : "vx-admin-role-status-pill--disabled"}`}
-          >
+          <StatusBadge tone={permission.status ? "success" : "neutral"}>
             <Icon
               name={statusIndicator.icon}
               size="xs"
               fallback="placeholder"
             />
             {statusIndicator.label}
-          </Badge>
+          </StatusBadge>
         </span>
         <span className="vx-admin-permission-tree-node__type">
           <Badge className="vx-tenant-pill vx-tenant-pill--system">

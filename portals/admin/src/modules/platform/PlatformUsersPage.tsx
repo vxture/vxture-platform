@@ -22,11 +22,12 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
   useToast,
 } from "@vxture/design-system";
-import type { DataTableColumn } from "@vxture/design-system";
+import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import {
   changePlatformAdminRole,
@@ -72,12 +73,10 @@ function platformRoleStatusLabel(admin: PlatformAdminRecord) {
   return "停用";
 }
 
-function platformRoleStatusPillClass(admin: PlatformAdminRecord) {
-  if (admin.roleStatusCode === "active")
-    return "vx-admin-role-status-pill--enabled";
-  if (admin.roleStatusCode === "archived")
-    return "vx-platform-user-status-pill--attention";
-  return "vx-admin-role-status-pill--disabled";
+function platformRoleStatusTone(admin: PlatformAdminRecord): StatusBadgeTone {
+  if (admin.roleStatusCode === "active") return "success";
+  if (admin.roleStatusCode === "archived") return "warning";
+  return "neutral";
 }
 
 function platformAdminStatusCode(
@@ -135,13 +134,13 @@ function platformAdminStatusIcon(admin: PlatformAdminRecord) {
   return "x";
 }
 
-function platformAdminStatusPillClass(admin: PlatformAdminRecord) {
+/** 平台用户态 → 语气。pending 是蓝（brand）：待激活不是异常，只是还没开始。 */
+function platformAdminStatusTone(admin: PlatformAdminRecord): StatusBadgeTone {
   const statusCode = platformAdminStatusCode(admin);
-  if (statusCode === "active") return "vx-admin-role-status-pill--enabled";
-  if (statusCode === "pending") return "vx-platform-user-status-pill--pending";
-  if (statusCode === "locked" || statusCode === "suspended")
-    return "vx-platform-user-status-pill--attention";
-  return "vx-admin-role-status-pill--disabled";
+  if (statusCode === "active") return "success";
+  if (statusCode === "pending") return "brand";
+  if (statusCode === "locked" || statusCode === "suspended") return "warning";
+  return "neutral";
 }
 
 function PlatformUserActionsMenu({
@@ -236,8 +235,7 @@ function PlatformUserActionsMenu({
 }
 
 /**
- * 行内的状态标仍是 pill（`platformAdminStatusPillClass` 一族）而非 `StatusBadge`：
- * 那是业务值域着色表，整族改 Badge 归批 4。
+ * 状态标走 `StatusBadge`，语气由 `platformAdminStatusTone` / `platformRoleStatusTone` 给。
  */
 function usePlatformUserColumns(
   t: ReturnType<typeof useConsoleTranslations>,
@@ -266,8 +264,9 @@ function usePlatformUserColumns(
       header: "状态",
       align: "center",
       cell: (admin) => (
-        <Badge
-          className={`vx-tenant-pill ${platformAdminStatusPillClass(admin)}`}
+        <StatusBadge
+          tone={platformAdminStatusTone(admin)}
+          icon={platformAdminStatusIcon(admin)}
         >
           <Icon
             name={platformAdminStatusIcon(admin)}
@@ -275,7 +274,7 @@ function usePlatformUserColumns(
             fallback="placeholder"
           />
           {platformAdminStatusLabel(admin)}
-        </Badge>
+        </StatusBadge>
       ),
     },
     {
@@ -286,11 +285,9 @@ function usePlatformUserColumns(
         <TableTitleCell
           title={platformRoleDisplayName(admin, t)}
           titleSuffix={
-            <Badge
-              className={`vx-tenant-pill ${platformRoleStatusPillClass(admin)}`}
-            >
+            <StatusBadge tone={platformRoleStatusTone(admin)}>
               {platformRoleStatusLabel(admin)}
-            </Badge>
+            </StatusBadge>
           }
         />
       ),
@@ -335,21 +332,20 @@ function PlatformUsersCards({
               <strong>{admin.displayName || admin.username}</strong>
               <span>{admin.username ? `@${admin.username}` : EMPTY_MARK}</span>
             </div>
-            <Badge
-              className={`vx-tenant-pill ${platformAdminStatusPillClass(admin)}`}
+            <StatusBadge
+              tone={platformAdminStatusTone(admin)}
+              icon={platformAdminStatusIcon(admin)}
             >
               {platformAdminStatusLabel(admin)}
-            </Badge>
+            </StatusBadge>
           </header>
           <div className="vx-tenant-directory-card__badges">
             <Badge className="vx-tenant-pill vx-account-muted-pill vx-tenant-pill--permission">
               {platformRoleDisplayName(admin, t)}
             </Badge>
-            <Badge
-              className={`vx-tenant-pill ${platformRoleStatusPillClass(admin)}`}
-            >
+            <StatusBadge tone={platformRoleStatusTone(admin)}>
               {platformRoleStatusLabel(admin)}
-            </Badge>
+            </StatusBadge>
             {admin.isSystem ? (
               <Badge className="vx-tenant-pill vx-tenant-pill--system">
                 系统
