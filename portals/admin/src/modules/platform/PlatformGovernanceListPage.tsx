@@ -213,6 +213,16 @@ export function PlatformGovernanceListPage({
   const [statusFilter, setStatusFilter] = useState<
     PlatformGovernanceStatus | "all"
   >("all");
+  /**
+   * 当前是否真的有筛选在生效。
+   *
+   * 没有它就只能说一句话，而空表有两种原因：**被筛没了**和**本来就没有**。
+   * 审批中心、任务调度、密钥管理三页在零条时都写着"调整关键词或筛选条件后再查看"
+   * 并给一个重置按钮，可当时根本没有筛选——把用户支去做一件无济于事的操作
+   * （2026-08-07 走查）。
+   */
+  const hasActiveFilters = query.trim() !== "" || statusFilter !== "all";
+
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
 
@@ -340,7 +350,7 @@ export function PlatformGovernanceListPage({
       summary={
         <>
           {" "}
-          <MetricGrid
+          <MetricGrid loading={loading}
             aria-label={`${config.title}统计`}
             columns={3}
             items={[
@@ -467,6 +477,7 @@ export function PlatformGovernanceListPage({
                 />
               )}
               empty={
+                hasActiveFilters ? (
                 <EmptyState
                   title="暂无匹配记录"
                   description="调整关键词或筛选条件后再查看。"
@@ -480,6 +491,13 @@ export function PlatformGovernanceListPage({
                     </ActionButton>
                   }
                 />
+                ) : (
+                  <EmptyState
+                    icon="list"
+                    title={`还没有${config.objectLabel}`}
+                    description={`新增后会出现在这里。`}
+                  />
+                )
               }
             />
           ) : loading ? (
@@ -532,6 +550,7 @@ export function PlatformGovernanceListPage({
             </div>
           ) : (
             <section className="vx-tenant-empty">
+              {hasActiveFilters ? (
               <EmptyState
                 title="暂无匹配记录"
                 description="调整关键词或筛选条件后再查看。"
@@ -545,6 +564,13 @@ export function PlatformGovernanceListPage({
                   </ActionButton>
                 }
               />
+              ) : (
+                <EmptyState
+                  icon="list"
+                  title={`还没有${config.objectLabel}`}
+                  description={`新增后会出现在这里。`}
+                />
+              )}
             </section>
           )}
         </section>
