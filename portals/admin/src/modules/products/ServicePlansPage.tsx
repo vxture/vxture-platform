@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
-  Badge,
   EmptyState,
   FilterBar,
   Icon,
   Input,
   ListPageTemplate,
   MetricGrid,
+  StatusBadge,
   NativeSelect,
 } from "@vxture/design-system";
 import { ListPagination } from "@/modules/shared/ListPagination";
@@ -22,6 +22,11 @@ import type {
   ProductSolutionStatus,
   ProductSolutionTier,
 } from "@/entities/console";
+import {
+  PUBLISH_STATUS_TONE,
+  VISIBILITY_TONE,
+  categoryTone,
+} from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
@@ -244,16 +249,12 @@ function ServicePlanTier({
 
       <div className="vx-service-plan-tier__status">
         <span className="vx-service-plan-tag-line">
-          <Badge
-            className={`vx-tenant-pill vx-service-plan-pill--${item.tier.status}`}
-          >
+          <StatusBadge tone={PUBLISH_STATUS_TONE[item.tier.status]}>
             {tierStatusLabel(item.tier.status)}
-          </Badge>
-          <Badge
-            className={`vx-tenant-pill vx-service-plan-pill--${item.tier.isPublic ? "public" : "internal"}`}
-          >
+          </StatusBadge>
+          <StatusBadge tone={item.tier.isPublic ? "success" : "neutral"}>
             {item.tier.isPublic ? "公开" : "内部"}
-          </Badge>
+          </StatusBadge>
         </span>
         <small>{item.basePlan?.planName ?? "独立配置"}</small>
       </div>
@@ -262,18 +263,18 @@ function ServicePlanTier({
         <p title={item.tier.summary}>{item.tier.summary}</p>
         <span className="vx-service-plan-product-tags">
           {products.map((product) => (
-            <Badge
+            <StatusBadge
               key={product.id}
-              className={`vx-tenant-pill vx-service-plan-pill--product-${product.productType}`}
+              tone={categoryTone()}
               title={product.role}
             >
               {product.productName}
-            </Badge>
+            </StatusBadge>
           ))}
           {hiddenProductCount ? (
-            <Badge className="vx-tenant-pill vx-service-plan-pill--more">
+            <StatusBadge tone={categoryTone()}>
               +{formatNumber(hiddenProductCount)}
-            </Badge>
+            </StatusBadge>
           ) : null}
         </span>
       </div>
@@ -323,16 +324,12 @@ function ServicePlanGroupBlock({
           </div>
         </div>
         <div className="vx-service-plan-group__badges">
-          <Badge
-            className={`vx-tenant-pill vx-service-plan-pill--solution-${group.solution.status}`}
-          >
+          <StatusBadge tone={PUBLISH_STATUS_TONE[group.solution.status]}>
             {tierStatusLabel(group.solution.status)}
-          </Badge>
-          <Badge
-            className={`vx-tenant-pill vx-service-plan-pill--${group.solution.visibility}`}
-          >
+          </StatusBadge>
+          <StatusBadge tone={VISIBILITY_TONE[group.solution.visibility]}>
             {solutionVisibilityLabel(group.solution.visibility)}
-          </Badge>
+          </StatusBadge>
         </div>
       </header>
 

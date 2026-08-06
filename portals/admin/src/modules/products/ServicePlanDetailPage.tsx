@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  Badge,
   Button,
   DetailList,
   DetailPageTemplate,
@@ -11,6 +10,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  StatusBadge,
 } from "@vxture/design-system";
 import type { IconName } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
@@ -20,6 +20,7 @@ import type {
   ProductSolutionCapabilityType,
   ProductSolutionStatus,
 } from "@/entities/console";
+import { PUBLISH_STATUS_TONE } from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
@@ -68,16 +69,12 @@ function ServicePlanSummary({
             {plan.solutionCode} · {plan.tierCode}
           </p>
           <div className="vx-product-capability-summary__badges">
-            <Badge
-              className={`vx-tenant-pill vx-service-plan-pill--${plan.status}`}
-            >
+            <StatusBadge tone={PUBLISH_STATUS_TONE[plan.status]}>
               {statusLabel(plan.status)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-service-plan-pill--${plan.isPublic ? "public" : "internal"}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={plan.isPublic ? "success" : "neutral"}>
               {plan.isPublic ? "公开" : "内部"}
-            </Badge>
+            </StatusBadge>
           </div>
         </div>
       </div>

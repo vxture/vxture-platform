@@ -11,6 +11,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  StatusBadge,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -21,6 +22,10 @@ import type {
   ProductSolutionDetailRecord,
   ProductSolutionStatus,
 } from "@/entities/console";
+import {
+  PUBLISH_STATUS_TONE,
+  VISIBILITY_TONE,
+} from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import {
@@ -73,16 +78,12 @@ function ProductSolutionSummary({
           <h2>{solution.solutionName}</h2>
           <p>{solution.solutionCode}</p>
           <div className="vx-product-capability-summary__badges">
-            <Badge
-              className={`vx-tenant-pill vx-product-solution-pill--${solution.status}`}
-            >
+            <StatusBadge tone={PUBLISH_STATUS_TONE[solution.status]}>
               {solutionStatusLabel(solution.status)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-solution-pill--${solution.visibility}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={VISIBILITY_TONE[solution.visibility]}>
               {solution.visibility === "public" ? "公开" : "内部"}
-            </Badge>
+            </StatusBadge>
           </div>
         </div>
       </div>

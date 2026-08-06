@@ -414,3 +414,43 @@ pill 引用 266 → 210 处，选择器 239 → 146 个，admin CSS 6484 → 627
 
 外加**等级标归 `--level-1..5`** 一项（`billing`/`order`/`subscription`/`product-solution`
 四族的 `tier-*`，以及 §十一 的缺色 starter/business）。
+
+### 第三刀：六档对应关系 + 产品四族（2026-08-06，owner 全部认可）
+
+**先把六档的语义定死**（写在 `status-tone.ts` 头部，参照 Atlassian Lozenge——业界把
+状态标切成六档的现成参照，与我们一一对得上；Ant Design 只有五档、缺 new 那一档）：
+
+| 档      | 语义                         | 典型值                              |
+| ------- | ---------------------------- | ----------------------------------- |
+| neutral | 没有状态：未开始/归档/不适用 | archived, unverified, not_required  |
+| brand   | 新来的，等人接手             | invited, 待激活                     |
+| info    | **正在走流程的中间态**       | applying, auditing, sending, paying |
+| success | 达成、正常、闭环             | active, paid, verified              |
+| warning | 要留意，但还没坏             | trial, expiring, partial, 待审      |
+| danger  | 坏了、被拒、被阻断           | failed, rejected, overdue           |
+
+**`info` 此前一直空着**：前两刀的映射表是照 CSS 逐条抄的，而 CSS 里蓝只有一个，
+于是所有蓝都写成了 `brand`。按上表回头改了 7 处——发票的四个"…中"（申请中/审核中/
+寄送中/已开票）原先全是黄，等于告诉运营有四件事要处理，实际它们是流程在走；
+账单 `paying`、支付 `pending`/`refunding` 同理。
+
+**产品四族合成一张表**（新文件 `modules/shared/publish-tone.ts`）。逐档比色后发现
+`product` / `product-solution` / `service-plan` / `product-plan` 的状态档**一字不差**
+——active 全绿、draft 全黄、archived 全灰、public 全绿、internal 全灰。四个前缀装的是
+同一张表，分开写不是在区分什么，是抄了四遍。
+
+同时收敛两处原设计的不一致：
+
+- **「不公开」两个词两个色**：套餐版本 `private` 标黄，方案与服务套餐 `internal` 标灰。
+  统一到 `internal`/灰——不对外可见是一种归属，不是需要留意的信号。
+- **类目色里有一个红**：产品类型原是 platform=蓝 / model=紫 / agent=青 / data=绿 /
+  service=**红** / self=灰 / partner=黄。「服务类产品」的红会和「订单逾期」的红在同一屏
+  抢读。**类目一律 `neutral`**（`categoryTone()`）：并列的类目没有严重度，靠文字与图标分。
+
+顺带查出**接入态 CSS 定义了 8 档、值域只有 4 个**——`ready`/`draft`/`partner_config`/
+`policy_missing` 是更早一版值域的残留，退役。新表里另纠两处：`testing`（测试中）→ `info`，
+`not_required`（无需接入）→ `neutral`，它不是一项达成。
+
+`admin-management-pills-products-service-plans.css` 清空后删除。
+
+**复测**：pill 引用 266 → 173 处，选择器 239 → 93 个，admin CSS 6484 → 6087 行。

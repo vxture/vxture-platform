@@ -19,6 +19,30 @@
  * `SubscriptionOperationStatus`（trial / expiring…）不是同一个值集，直接套会错配。
  * 这里给的是运营视角那一份，等两边值域合并再谈复用。
  *
+ * ── 六档语气的对应关系（owner 2026-08-06 定，参照 Atlassian Lozenge）────────
+ *
+ * DS 的六档只表达严重度。业界把状态标切成六档的现成参照是 Atlassian 的 Lozenge
+ * （default / inprogress / new / moved / removed / success），与我们一一对得上；
+ * Ant Design 的 Badge status 只有五档（缺 new 那一档），GitHub Primer 则把
+ * "已合并"单独给了紫色，同样是 new/强调那一档的用法。据此定：
+ *
+ * | 档       | 语义                     | 典型值                                   |
+ * | -------- | ------------------------ | ---------------------------------------- |
+ * | neutral  | 没有状态：未开始/归档/不适用 | archived, unverified, not_required, none |
+ * | brand    | 新来的，等人接手         | invited, pending（待激活）, 待认领       |
+ * | info     | **正在走流程的中间态**   | processing, applying, auditing, sending  |
+ * | success  | 达成、正常、闭环         | active, paid, verified, closed（工单）   |
+ * | warning  | 要留意，但还没坏         | trial, expiring, partial, 待审           |
+ * | danger   | 坏了、被拒、被阻断       | failed, rejected, overdue, blocked       |
+ *
+ * **`info` 此前一直空着**：下面早期几张表把所有蓝都写成了 `brand`，因为它们是照
+ * CSS 的 `--tenant-blue` 逐条抄的，而 CSS 里蓝只有一个。按上表，走流程的中间态
+ * （申请中/审核中/寄送中/检测中）该落 `info`，`brand` 只留给"新来的"。
+ *
+ * **分类不给语气色。** 产品类型、主体类型、权限层这类**并列的类目**没有严重度，
+ * 一律 `neutral`，靠文字与图标区分——给类目套状态色，会让"服务类产品"的红与
+ * "订单逾期"的红在同一屏里抢读（admin 原设计正是如此，见 §十三 G）。
+ *
  * ── 取值来源 ──────────────────────────────────────────────────────────────
  * 逐条抄自 `styles/admin-management-models-shared-row-tones.css` 的
  * `--tenant-row-tone` 声明——那是这套映射此前的唯一记录处：
@@ -57,23 +81,27 @@ export const ORDER_STATUS_TONE: Record<OrderOperationStatus, StatusTone> = {
   partial_pending: "warning",
 };
 
-/** 账单态。 */
+/** 账单态。`paying`（支付中）是流程在走，不需要人动手，落 `info` 不落 `warning`。 */
 export const BILL_STATUS_TONE: Record<BillingBillStatus, StatusTone> = {
   paid: "success",
   unpaid: "warning",
-  paying: "warning",
+  paying: "info",
   partial: "warning",
   overdue: "danger",
   cancelled: "neutral",
 };
 
-/** 发票态。 */
+/**
+ * 发票态。四个"…中"原先全是黄，等于告诉运营有四件事要处理——实际它们是流程在走：
+ * 申请中 / 审核中 / 寄送中 都不需要人动手，已开票也只是流程还没完，一律 `info`。
+ * 真需要人处理的只有驳回与红冲。
+ */
 export const INVOICE_STATUS_TONE: Record<BillingInvoiceStatus, StatusTone> = {
   finished: "success",
-  issued: "warning",
-  sending: "warning",
-  applying: "warning",
-  auditing: "warning",
+  issued: "info",
+  sending: "info",
+  applying: "info",
+  auditing: "info",
   red: "danger",
   rejected: "danger",
   // CSS 无规则。"未开票"是尚未开始，不是异常，取中性。
@@ -139,11 +167,12 @@ export const CAPABILITY_STATUS_TONE: Record<
  */
 export const PAYMENT_STATUS_TONE: Record<OrderPaymentStatus, StatusTone> = {
   paid: "success",
-  pending: "warning",
+  // "支付中"与"退款中"都是流程在走，`info`；"线下待核"要人去核，`warning`。
+  pending: "info",
+  refunding: "info",
   pending_verify: "warning",
   partial: "warning",
   failed: "danger",
-  refunding: "danger",
   not_required: "neutral",
   unpaid: "neutral",
   closed: "neutral",

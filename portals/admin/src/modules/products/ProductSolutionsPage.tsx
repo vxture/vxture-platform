@@ -14,6 +14,7 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
@@ -28,6 +29,11 @@ import type {
   ProductSolutionStatus,
   ProductSolutionVisibility,
 } from "@/entities/console";
+import {
+  PUBLISH_STATUS_TONE,
+  VISIBILITY_TONE,
+  categoryTone,
+} from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
@@ -155,26 +161,26 @@ function CapabilityTags({
   return (
     <span className="vx-product-solution-capability-tags">
       {visibleProducts.map((product) => (
-        <Badge
+        <StatusBadge
           key={product.id}
-          className={`vx-tenant-pill vx-product-solution-pill--${product.productType}`}
+          tone={categoryTone()}
           title={`${capabilityTypeLabel(product.productType)} | ${capabilitySourceLabel(product.source)} | ${product.role}`}
         >
           {product.productName}
-        </Badge>
+        </StatusBadge>
       ))}
       {hiddenCount ? (
-        <Badge className="vx-tenant-pill vx-product-solution-pill--more">
+        <StatusBadge tone={categoryTone()}>
           +{formatNumber(hiddenCount)}
-        </Badge>
+        </StatusBadge>
       ) : null}
     </span>
   );
 }
 
 /**
- * 行内的标仍是 pill（`vx-product-solution-pill--*`）而非 `StatusBadge`：那一族是
- * 业务值域着色表，整族改 Badge 归批 4。
+ * 发布态与可见性走 `StatusBadge`，语气由 `publish-tone.ts` 给；套餐等级仍是 pill
+ * （等级是序不是语气，另算）。
  */
 function useProductSolutionColumns(
   onOpenDetails: (solutionCode: string) => void,
@@ -200,16 +206,12 @@ function useProductSolutionColumns(
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap justify-center gap-2xs">
-              <Badge
-                className={`vx-tenant-pill vx-product-solution-pill--${solution.status}`}
-              >
+              <StatusBadge tone={PUBLISH_STATUS_TONE[solution.status]}>
                 {solutionStatusLabel(solution.status)}
-              </Badge>
-              <Badge
-                className={`vx-tenant-pill vx-product-solution-pill--${solution.visibility}`}
-              >
+              </StatusBadge>
+              <StatusBadge tone={VISIBILITY_TONE[solution.visibility]}>
                 {solutionVisibilityLabel(solution.visibility)}
-              </Badge>
+              </StatusBadge>
             </span>
           }
           description={`${solution.industry} | ${solution.scenario}`}
@@ -306,16 +308,12 @@ function ProductSolutionCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-product-solution-pill--${solution.status}`}
-            >
+            <StatusBadge tone={PUBLISH_STATUS_TONE[solution.status]}>
               {solutionStatusLabel(solution.status)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-solution-pill--${solution.visibility}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={VISIBILITY_TONE[solution.visibility]}>
               {solutionVisibilityLabel(solution.visibility)}
-            </Badge>
+            </StatusBadge>
           </div>
           <p className="vx-product-solution-card__description">
             {solution.description}

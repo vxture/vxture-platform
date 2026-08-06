@@ -11,6 +11,7 @@ import {
   EmptyState,
   Icon,
   MetricGrid,
+  StatusBadge,
 } from "@vxture/design-system";
 import { orUnset } from "@/modules/shared/display";
 import type { IconName } from "@vxture/design-system";
@@ -23,6 +24,10 @@ import type {
   ProductCapabilityStatus,
   ProductCapabilityType,
 } from "@/entities/console";
+import {
+  PUBLISH_STATUS_TONE,
+  categoryTone,
+} from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { DetailSectionHeading } from "@/modules/shared/DetailSectionHeading";
 import { formatDate, formatNumber } from "@/modules/tenants/tenant-utils";
@@ -94,21 +99,15 @@ function ProductCapabilitySummary({
           <h2>{product.productName}</h2>
           <p>{product.productCode}</p>
           <div className="vx-product-capability-summary__badges">
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.productType}`}
-            >
+            <StatusBadge tone={categoryTone()}>
               {capabilityTypeLabel(product.productType)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.source}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={categoryTone()}>
               {sourceLabel(product.source)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.status}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={PUBLISH_STATUS_TONE[product.status]}>
               {statusLabel(product.status)}
-            </Badge>
+            </StatusBadge>
           </div>
         </div>
       </div>

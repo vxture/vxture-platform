@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   ActionButton,
   ActionMenu,
-  Badge,
   DataTable,
   EmptyState,
   FilterBar,
@@ -14,6 +13,7 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
@@ -27,6 +27,11 @@ import type {
   ProductCapabilityStatus,
   ProductCapabilityType,
 } from "@/entities/console";
+import {
+  ACCESS_STATUS_TONE,
+  PUBLISH_STATUS_TONE,
+  categoryTone,
+} from "@/modules/shared/publish-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
 import { formatNumber, joinClasses } from "@/modules/tenants/tenant-utils";
@@ -149,8 +154,8 @@ function ProductActionsMenu({
 }
 
 /**
- * 行内的标仍是 pill（`vx-product-pill--*`）而非 `StatusBadge`：那一族是业务值域
- * 着色表，整族改 Badge 归批 4。
+ * 发布态、接入态走 `StatusBadge`；产品类型与供给来源是**类目**，一律中性
+ * （`categoryTone`）——判据见 `publish-tone.ts` 文件头。
  */
 function useProductColumns(
   onOpenDetails: (productCode: string) => void,
@@ -174,16 +179,12 @@ function useProductColumns(
       align: "center",
       cell: (product) => (
         <span className="inline-flex flex-wrap justify-center gap-2xs">
-          <Badge
-            className={`vx-tenant-pill vx-product-pill--${product.productType}`}
-          >
+          <StatusBadge tone={categoryTone()}>
             {productTypeLabel(product.productType)}
-          </Badge>
-          <Badge
-            className={`vx-tenant-pill vx-product-pill--${product.source}`}
-          >
+          </StatusBadge>
+          <StatusBadge tone={categoryTone()}>
             {productSourceLabel(product.source)}
-          </Badge>
+          </StatusBadge>
         </span>
       ),
     },
@@ -194,11 +195,9 @@ function useProductColumns(
       cell: (product) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.status}`}
-            >
+            <StatusBadge tone={PUBLISH_STATUS_TONE[product.status]}>
               {productStatusLabel(product.status)}
-            </Badge>
+            </StatusBadge>
           }
           description={`${product.visibility === "public" ? "公开" : "内部"} | ${
             product.healthStatus === "normal" ? "健康" : "关注"
@@ -224,11 +223,9 @@ function useProductColumns(
       cell: (product) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--access-${product.integration.status}`}
-            >
+            <StatusBadge tone={ACCESS_STATUS_TONE[product.integration.status]}>
               {productAccessLabel(product.integration.status)}
-            </Badge>
+            </StatusBadge>
           }
           description={`${formatNumber(product.modelPolicyCount)} 模型授权`}
         />
@@ -292,21 +289,15 @@ function ProductCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.productType}`}
-            >
+            <StatusBadge tone={categoryTone()}>
               {productTypeLabel(product.productType)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.source}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={categoryTone()}>
               {productSourceLabel(product.source)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-product-pill--${product.status}`}
-            >
+            </StatusBadge>
+            <StatusBadge tone={PUBLISH_STATUS_TONE[product.status]}>
               {productStatusLabel(product.status)}
-            </Badge>
+            </StatusBadge>
           </div>
           <div className="vx-tenant-directory-card__metrics">
             <span>
