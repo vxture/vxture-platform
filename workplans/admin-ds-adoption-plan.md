@@ -137,7 +137,7 @@ B4 是盘点里的 A2，收益最大（170 处，几乎每个域）也最危险�
 | ----- | -------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | **1** | A 类重复定义 → DS 组件（实际 60+ 份，非 32）       | ✅ `ad33f26a` `11dd3d37` `394cfad4` `862207b7` + 页头修正 `9c7f815a`                   |
 | **2** | B1 列表卡                                          | 部分：4 页已迁 + DS `note` 槽 + tone 映射表（`5886d0da`）；**剩 15 页 owner 决定不迁** |
-| **3** | 页面骨架换 `ListPageTemplate`/`DetailPageTemplate` | 未开始                                                                                 |
+| **3** | 页面骨架换 `ListPageTemplate`/`DetailPageTemplate` | ✅ 30 列表页 + 7 详情页；`ModelGrantsPage` 判定不适用，见 §十二                        |
 | **4** | pill 色调族 → `Badge`                              | 未开始；拍板②已由 shared 既有文件回答；**须一并处理 §十一 的缺色与前缀撞车**           |
 | **5** | B3/B4（卡片选中态、卡表同源）                      | 未评估                                                                                 |
 | **6** | 登录态视觉走查                                     | 未开始                                                                                 |
@@ -319,3 +319,26 @@ vx-invoice-pill--type-${invoice.invoiceType}  // electronic / paper / normal_vat
   桥收敛（任务 #34）一并清。T5 收尾自己产生的 14 个 `--vx-admin-governance-*`
   孤儿已随改动删除。
 - 无人 import 的模块只有 `src/modules/shared/index.ts`（5 行空壳桶），已删。
+
+## 十二、批 3 收尾（2026-08-06）—— 两页判定为不适用
+
+`ListPageTemplate` 覆盖 30 个列表页、`DetailPageTemplate` 覆盖 7 个详情页。本轮补的四页：
+
+| 页面                | 槽位映射                                                                      |
+| ------------------- | ----------------------------------------------------------------------------- |
+| `OpsTodosPage`      | header / summary / table（table 里是那个带 SegmentedControl 的 `Section`）    |
+| `TicketsPage`       | header / summary / filters / table；抽屉与批量对话框留在模板外，用 `<>` 包    |
+| `ServiceHealthPage` | header / summary（feedback + 自建的四张概览卡）/ filters（自建工具行）/ table |
+| `TenantDetailPage`  | header（返回链接 + 可折叠概要，用 `<>` 包成一段）/ children（分页签主体）     |
+
+**两页判定为不适用，不强套模板**：
+
+- `PlatformAutonomyPage` 已经在用 `DashboardTemplate`——它是仪表盘不是列表页。此前把它
+  列进待办，是因为那次扫描的口径是"有 `DataTable` 却没 `ListPageTemplate`"，口径本身错了。
+- `ModelGrantsPage` 是**两张互相独立的表**（模型策略 + 覆盖授权），各自带工具行与分页。
+  `ListPageTemplate` 只有一个 `table` 槽，把两张塞进去等于取消这个槽的语义，只包第一张
+  则更糟。多列表页需要的是另一种模板，不是把这件撑大（owner 2026-08-06「宁可多建件」）。
+
+**踩到的坑**：`TenantDetailPage` 有两个 `ViewLayout`——主体一个，`!tenant` 早退分支一个，
+两处 className 完全相同。按"第一个 ViewLayout"定位会把文件从早退分支处截断。改动这类文件
+前先数一遍同名根节点。早退分支保持 `ViewLayout` 不动：它是"未找到"占位，没有详情页结构。

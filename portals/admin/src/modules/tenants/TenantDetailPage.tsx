@@ -7,6 +7,7 @@ import {
   ActionMenu,
   Badge,
   Button,
+  DetailPageTemplate,
   DialogForm,
   EmptyState,
   Icon,
@@ -1452,133 +1453,143 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page">
-      <Link className="vx-tenant-back-link" href="/tenants">
-        <Icon name="arrow-left" size="xs" fallback="placeholder" />
-        返回租户列表
-      </Link>
+    <DetailPageTemplate
+      className="vx-tenant-management-page"
+      header={
+        <>
+          <Link className="vx-tenant-back-link" href="/tenants">
+            <Icon name="arrow-left" size="xs" fallback="placeholder" />
+            返回租户列表
+          </Link>
 
-      <section
-        className={
-          summaryExpanded
-            ? "vx-tenant-detail-summary"
-            : "vx-tenant-detail-summary vx-tenant-detail-summary--collapsed"
-        }
-        aria-label={`${tenant.displayName} 标题概要`}
-      >
-        <Button
-          className="vx-tenant-detail-summary__toggle"
-          variant="ghost"
-          size="icon-md"
-          aria-expanded={summaryExpanded}
-          aria-label={summaryExpanded ? "收起标题概要" : "展开标题概要"}
-          title={summaryExpanded ? "收起标题概要" : "展开标题概要"}
-          onClick={() => setSummaryExpanded((expanded) => !expanded)}
-        >
-          <Icon
-            name={summaryExpanded ? "chevron-up" : "chevron-down"}
-            size="xs"
-            fallback="chevron-down"
-          />
-        </Button>
-
-        <header className="vx-tenant-detail__header">
-          <section className="vx-tenant-detail__identity" aria-label="租户概要">
-            <span className="vx-tenant-detail__icon" aria-hidden="true">
+          <section
+            className={
+              summaryExpanded
+                ? "vx-tenant-detail-summary"
+                : "vx-tenant-detail-summary vx-tenant-detail-summary--collapsed"
+            }
+            aria-label={`${tenant.displayName} 标题概要`}
+          >
+            <Button
+              className="vx-tenant-detail-summary__toggle"
+              variant="ghost"
+              size="icon-md"
+              aria-expanded={summaryExpanded}
+              aria-label={summaryExpanded ? "收起标题概要" : "展开标题概要"}
+              title={summaryExpanded ? "收起标题概要" : "展开标题概要"}
+              onClick={() => setSummaryExpanded((expanded) => !expanded)}
+            >
               <Icon
-                name={tenant.tenantType === "company" ? "buildings" : "user"}
-                size="lg"
-                fallback="placeholder"
+                name={summaryExpanded ? "chevron-up" : "chevron-down"}
+                size="xs"
+                fallback="chevron-down"
               />
-            </span>
-            <div className="vx-tenant-detail__title">
-              <div className="vx-tenant-title-line vx-tenant-title-line--name">
-                <h2>{tenant.displayName}</h2>
-                <Button
-                  variant="ghost"
-                  size="icon-md"
-                  className="vx-tenant-title-copy"
-                  aria-label="复制租户名称"
-                  title="复制租户名称"
-                  onClick={() => void handleCopyText(tenant.displayName)}
-                >
-                  <Icon name="copy" size="xs" fallback="placeholder" />
-                </Button>
-              </div>
-              <div className="vx-tenant-title-line vx-tenant-title-line--code">
-                <p>{tenant.tenantCode}</p>
-                <Button
-                  variant="ghost"
-                  size="icon-md"
-                  className="vx-tenant-title-copy"
-                  aria-label="复制租户代码"
-                  title="复制租户代码"
-                  onClick={() => void handleCopyText(tenant.tenantCode)}
-                >
-                  <Icon name="copy" size="xs" fallback="placeholder" />
-                </Button>
-              </div>
-              <div>
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
-                >
-                  {statusLabel(tenant.status)}
-                </Badge>
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
-                >
-                  {verifiedLabel(tenant.verifiedStatus)}
-                </Badge>
-                <Badge
-                  className={`vx-tenant-pill vx-tenant-pill--risk-${tenant.riskLevel}`}
-                >
-                  {riskLabel(tenant.riskLevel)}
-                </Badge>
-              </div>
-            </div>
+            </Button>
+
+            <header className="vx-tenant-detail__header">
+              <section
+                className="vx-tenant-detail__identity"
+                aria-label="租户概要"
+              >
+                <span className="vx-tenant-detail__icon" aria-hidden="true">
+                  <Icon
+                    name={
+                      tenant.tenantType === "company" ? "buildings" : "user"
+                    }
+                    size="lg"
+                    fallback="placeholder"
+                  />
+                </span>
+                <div className="vx-tenant-detail__title">
+                  <div className="vx-tenant-title-line vx-tenant-title-line--name">
+                    <h2>{tenant.displayName}</h2>
+                    <Button
+                      variant="ghost"
+                      size="icon-md"
+                      className="vx-tenant-title-copy"
+                      aria-label="复制租户名称"
+                      title="复制租户名称"
+                      onClick={() => void handleCopyText(tenant.displayName)}
+                    >
+                      <Icon name="copy" size="xs" fallback="placeholder" />
+                    </Button>
+                  </div>
+                  <div className="vx-tenant-title-line vx-tenant-title-line--code">
+                    <p>{tenant.tenantCode}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon-md"
+                      className="vx-tenant-title-copy"
+                      aria-label="复制租户代码"
+                      title="复制租户代码"
+                      onClick={() => void handleCopyText(tenant.tenantCode)}
+                    >
+                      <Icon name="copy" size="xs" fallback="placeholder" />
+                    </Button>
+                  </div>
+                  <div>
+                    <Badge
+                      className={`vx-tenant-pill vx-tenant-pill--${tenant.status}`}
+                    >
+                      {statusLabel(tenant.status)}
+                    </Badge>
+                    <Badge
+                      className={`vx-tenant-pill vx-tenant-pill--${tenant.verifiedStatus}`}
+                    >
+                      {verifiedLabel(tenant.verifiedStatus)}
+                    </Badge>
+                    <Badge
+                      className={`vx-tenant-pill vx-tenant-pill--risk-${tenant.riskLevel}`}
+                    >
+                      {riskLabel(tenant.riskLevel)}
+                    </Badge>
+                  </div>
+                </div>
+              </section>
+
+              {summaryExpanded ? (
+                <>
+                  <section
+                    className="vx-tenant-detail__metric-column"
+                    aria-label="成员和订阅概要"
+                  >
+                    <TenantKeyMetric
+                      label="用户数量"
+                      value={formatNumber(tenant.memberCount)}
+                      tag={`活跃 ${formatNumber(tenant.activeMemberCount)}`}
+                    />
+                    <TenantKeyMetric
+                      label="订阅产品"
+                      value={formatNumber(tenant.subscriptionCount)}
+                      tags={[
+                        `智能体${formatNumber(subscriptionSummary.agentCount)}个`,
+                        `平台${formatNumber(subscriptionSummary.platformCount)}个`,
+                      ]}
+                    />
+                  </section>
+
+                  <section
+                    className="vx-tenant-detail__metric-column"
+                    aria-label="用量和收入概要"
+                  >
+                    <TenantKeyMetric
+                      label="配额消耗"
+                      value={formatNumber(tenant.tokenUsed)}
+                      tag="token"
+                    />
+                    <TenantKeyMetric
+                      label="本月收入"
+                      value={formatMoney(tenant.monthlyRevenue)}
+                      tag={`累计 ${formatMoney(cumulativeRevenue)}`}
+                    />
+                  </section>
+                </>
+              ) : null}
+            </header>
           </section>
-
-          {summaryExpanded ? (
-            <>
-              <section
-                className="vx-tenant-detail__metric-column"
-                aria-label="成员和订阅概要"
-              >
-                <TenantKeyMetric
-                  label="用户数量"
-                  value={formatNumber(tenant.memberCount)}
-                  tag={`活跃 ${formatNumber(tenant.activeMemberCount)}`}
-                />
-                <TenantKeyMetric
-                  label="订阅产品"
-                  value={formatNumber(tenant.subscriptionCount)}
-                  tags={[
-                    `智能体${formatNumber(subscriptionSummary.agentCount)}个`,
-                    `平台${formatNumber(subscriptionSummary.platformCount)}个`,
-                  ]}
-                />
-              </section>
-
-              <section
-                className="vx-tenant-detail__metric-column"
-                aria-label="用量和收入概要"
-              >
-                <TenantKeyMetric
-                  label="配额消耗"
-                  value={formatNumber(tenant.tokenUsed)}
-                  tag="token"
-                />
-                <TenantKeyMetric
-                  label="本月收入"
-                  value={formatMoney(tenant.monthlyRevenue)}
-                  tag={`累计 ${formatMoney(cumulativeRevenue)}`}
-                />
-              </section>
-            </>
-          ) : null}
-        </header>
-      </section>
-
+        </>
+      }
+    >
       <section
         className="vx-tenant-detail"
         aria-label={`${tenant.displayName} 管理详情`}
@@ -1642,6 +1653,6 @@ export function TenantDetailPage({ tenantId }: { tenantId: string }) {
           </section>
         </div>
       </section>
-    </ViewLayout>
+    </DetailPageTemplate>
   );
 }

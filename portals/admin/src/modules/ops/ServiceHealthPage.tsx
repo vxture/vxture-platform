@@ -8,9 +8,9 @@ import {
   EmptyState,
   Icon,
   Input,
+  ListPageTemplate,
   NativeSelect,
   StatusBadge,
-  ViewLayout,
   ViewModeSwitch,
 } from "@vxture/design-system";
 import type { IconName, StatusBadgeTone } from "@vxture/design-system";
@@ -521,167 +521,189 @@ export function ServiceHealthPage({
   }
 
   return (
-    <ViewLayout className="vx-service-health-page">
-      <PageHeader
-        icon="server"
-        eyebrow={eyebrow}
-        title={title}
-        description={description}
-        secondary={<Badge>{formatUpdatedAt(lastUpdatedAt)}</Badge>}
-      />
-
-      {feedback ? <p className="vx-profile-message">{feedback}</p> : null}
-
-      <section className="vx-service-health-summary" aria-label="服务健康概览">
-        <ServiceHealthSummary
-          label="服务总数"
-          value={String(stats.total)}
-          tag=""
+    <ListPageTemplate
+      className="vx-service-health-page"
+      header={
+        <PageHeader
           icon="server"
-          status="healthy"
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
+          secondary={<Badge>{formatUpdatedAt(lastUpdatedAt)}</Badge>}
         />
-        <ServiceHealthSummary
-          label="服务正常"
-          value={String(stats.healthy)}
-          tag=""
-          icon="success"
-          status="healthy"
-        />
-        <ServiceHealthSummary
-          label="服务启动，探针异常"
-          value={String(stats.degraded)}
-          tag=""
-          icon="warning"
-          status="degraded"
-        />
-        <ServiceHealthSummary
-          label="服务未启动"
-          value={String(stats.offline)}
-          tag=""
-          icon="error"
-          status="offline"
-        />
-      </section>
+      }
+      summary={
+        <>
+          {feedback ? <p className="vx-profile-message">{feedback}</p> : null}
 
-      <section className="vx-service-health-toolbar" aria-label="服务健康筛选">
-        <ViewModeSwitch
-          value={viewMode}
-          onChange={setViewMode}
-          ariaLabel="服务健康展示方式"
-        />
-        <div className="vx-service-health-toolbar__spacer" aria-hidden="true" />
-        <Input
-          className="vx-service-health-search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="搜索服务、端口、探针、URL"
-          aria-label="搜索服务健康"
-        />
-        <Button variant="outline" size="md" onClick={resetFilters}>
-          重置
-        </Button>
-
-        <div className="vx-service-health-filters">
-          <label aria-label="状态筛选">
-            <NativeSelect
-              value={filters.status}
-              onChange={(event) =>
-                updateFilter("status", event.target.value as StatusFilter)
-              }
-            >
-              <option value="all">全部状态</option>
-              <option value="healthy">健康</option>
-              <option value="degraded">未就绪</option>
-              <option value="offline">离线</option>
-              <option value="stopping">停止中</option>
-            </NativeSelect>
-          </label>
-          <label aria-label="分层筛选">
-            <NativeSelect
-              value={filters.layer}
-              onChange={(event) =>
-                updateFilter("layer", event.target.value as LayerFilter)
-              }
-            >
-              <option value="all">全部分层</option>
-              <option value="tooling">开发工具</option>
-              <option value="ai">AI 服务</option>
-              <option value="agent">智能体</option>
-              <option value="gateway">网关</option>
-              <option value="bff">BFF</option>
-              <option value="portal">门户</option>
-              <option value="other">其他</option>
-            </NativeSelect>
-          </label>
-          <label aria-label="优先级筛选">
-            <NativeSelect
-              value={filters.priority}
-              onChange={(event) =>
-                updateFilter("priority", event.target.value as PriorityFilter)
-              }
-            >
-              <option value="all">全部优先级</option>
-              <option value="p0">P0</option>
-              <option value="p1">P1</option>
-              <option value="p2">P2</option>
-              <option value="p3">P3</option>
-            </NativeSelect>
-          </label>
-          <label aria-label="探针筛选">
-            <NativeSelect
-              value={filters.probe}
-              onChange={(event) =>
-                updateFilter("probe", event.target.value as ProbeFilter)
-              }
-            >
-              <option value="all">全部探针</option>
-              <option value="http">HTTP</option>
-              <option value="tcp">TCP</option>
-              <option value="mixed">混合</option>
-            </NativeSelect>
-          </label>
-          <label aria-label="来源筛选">
-            <NativeSelect
-              value={filters.source}
-              onChange={(event) =>
-                updateFilter("source", event.target.value as SourceFilter)
-              }
-            >
-              <option value="all">全部来源</option>
-              <option value="dev-tools">Dev Tools</option>
-              <option value="dev-panel">Dev Panel</option>
-            </NativeSelect>
-          </label>
-        </div>
-      </section>
-
-      {visibleServices.length ? (
-        viewMode === "cards" ? (
-          <section className="vx-service-health-grid" aria-label="服务健康卡片">
-            {visibleServices.map((service) => (
-              <ServiceHealthCard key={service.id} service={service} />
-            ))}
+          <section
+            className="vx-service-health-summary"
+            aria-label="服务健康概览"
+          >
+            <ServiceHealthSummary
+              label="服务总数"
+              value={String(stats.total)}
+              tag=""
+              icon="server"
+              status="healthy"
+            />
+            <ServiceHealthSummary
+              label="服务正常"
+              value={String(stats.healthy)}
+              tag=""
+              icon="success"
+              status="healthy"
+            />
+            <ServiceHealthSummary
+              label="服务启动，探针异常"
+              value={String(stats.degraded)}
+              tag=""
+              icon="warning"
+              status="degraded"
+            />
+            <ServiceHealthSummary
+              label="服务未启动"
+              value={String(stats.offline)}
+              tag=""
+              icon="error"
+              status="offline"
+            />
           </section>
-        ) : (
-          <ServiceHealthList services={visibleServices} />
-        )
-      ) : (
-        <section className="vx-service-health-empty">
-          <EmptyState
-            title={loading ? "正在同步服务健康" : "没有匹配的服务"}
-            description={
-              loading
-                ? "正在读取 dev-tools 只读监测结果。"
-                : "调整筛选条件，或重置后查看全部服务。"
-            }
-            action={
-              <Button variant="outline" onClick={resetFilters}>
-                重置
-              </Button>
-            }
+        </>
+      }
+      filters={
+        <section
+          className="vx-service-health-toolbar"
+          aria-label="服务健康筛选"
+        >
+          <ViewModeSwitch
+            value={viewMode}
+            onChange={setViewMode}
+            ariaLabel="服务健康展示方式"
           />
+          <div
+            className="vx-service-health-toolbar__spacer"
+            aria-hidden="true"
+          />
+          <Input
+            className="vx-service-health-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="搜索服务、端口、探针、URL"
+            aria-label="搜索服务健康"
+          />
+          <Button variant="outline" size="md" onClick={resetFilters}>
+            重置
+          </Button>
+
+          <div className="vx-service-health-filters">
+            <label aria-label="状态筛选">
+              <NativeSelect
+                value={filters.status}
+                onChange={(event) =>
+                  updateFilter("status", event.target.value as StatusFilter)
+                }
+              >
+                <option value="all">全部状态</option>
+                <option value="healthy">健康</option>
+                <option value="degraded">未就绪</option>
+                <option value="offline">离线</option>
+                <option value="stopping">停止中</option>
+              </NativeSelect>
+            </label>
+            <label aria-label="分层筛选">
+              <NativeSelect
+                value={filters.layer}
+                onChange={(event) =>
+                  updateFilter("layer", event.target.value as LayerFilter)
+                }
+              >
+                <option value="all">全部分层</option>
+                <option value="tooling">开发工具</option>
+                <option value="ai">AI 服务</option>
+                <option value="agent">智能体</option>
+                <option value="gateway">网关</option>
+                <option value="bff">BFF</option>
+                <option value="portal">门户</option>
+                <option value="other">其他</option>
+              </NativeSelect>
+            </label>
+            <label aria-label="优先级筛选">
+              <NativeSelect
+                value={filters.priority}
+                onChange={(event) =>
+                  updateFilter("priority", event.target.value as PriorityFilter)
+                }
+              >
+                <option value="all">全部优先级</option>
+                <option value="p0">P0</option>
+                <option value="p1">P1</option>
+                <option value="p2">P2</option>
+                <option value="p3">P3</option>
+              </NativeSelect>
+            </label>
+            <label aria-label="探针筛选">
+              <NativeSelect
+                value={filters.probe}
+                onChange={(event) =>
+                  updateFilter("probe", event.target.value as ProbeFilter)
+                }
+              >
+                <option value="all">全部探针</option>
+                <option value="http">HTTP</option>
+                <option value="tcp">TCP</option>
+                <option value="mixed">混合</option>
+              </NativeSelect>
+            </label>
+            <label aria-label="来源筛选">
+              <NativeSelect
+                value={filters.source}
+                onChange={(event) =>
+                  updateFilter("source", event.target.value as SourceFilter)
+                }
+              >
+                <option value="all">全部来源</option>
+                <option value="dev-tools">Dev Tools</option>
+                <option value="dev-panel">Dev Panel</option>
+              </NativeSelect>
+            </label>
+          </div>
         </section>
-      )}
-    </ViewLayout>
+      }
+      table={
+        <>
+          {visibleServices.length ? (
+            viewMode === "cards" ? (
+              <section
+                className="vx-service-health-grid"
+                aria-label="服务健康卡片"
+              >
+                {visibleServices.map((service) => (
+                  <ServiceHealthCard key={service.id} service={service} />
+                ))}
+              </section>
+            ) : (
+              <ServiceHealthList services={visibleServices} />
+            )
+          ) : (
+            <section className="vx-service-health-empty">
+              <EmptyState
+                title={loading ? "正在同步服务健康" : "没有匹配的服务"}
+                description={
+                  loading
+                    ? "正在读取 dev-tools 只读监测结果。"
+                    : "调整筛选条件，或重置后查看全部服务。"
+                }
+                action={
+                  <Button variant="outline" onClick={resetFilters}>
+                    重置
+                  </Button>
+                }
+              />
+            </section>
+          )}
+        </>
+      }
+    />
   );
 }

@@ -16,11 +16,11 @@ import {
   Icon,
   Input,
   Label,
+  ListPageTemplate,
   MetricGrid,
   NativeSelect,
   TableTitleCell,
   Textarea,
-  ViewLayout,
 } from "@vxture/design-system";
 import type { DataTableColumn, IconName } from "@vxture/design-system";
 import {
@@ -774,165 +774,175 @@ export function TicketsPage() {
   }
 
   return (
-    <ViewLayout className="vx-tenant-management-page vx-tickets-page">
-      <PageHeader
-        icon="chat-circle"
-        eyebrow="客户服务"
-        title="工单中心"
-        description="聚合租户侧待处理工单，按优先级、阻塞状态和更新时间推进支持闭环。"
-        secondary={<Badge>只读聚合</Badge>}
-      />
-
-      <MetricGrid
-        aria-label="工单统计"
-        items={[
-          {
-            id: "open",
-            help: "状态不为已关闭的工单。",
-            icon: "chat-circle",
-            label: "未关闭工单",
-            value: formatNumber(openTickets.length),
-            tags: [`影响租户 ${formatNumber(affectedTenants)}`],
-            tone: openTickets.length ? "warning" : "success",
-          },
-          {
-            id: "urgent",
-            help: "优先级为 P0 或 P1 的工单。",
-            icon: "warning",
-            label: "P0/P1 工单",
-            value: formatNumber(urgentTickets.length),
-            tags: ["优先处理"],
-            tone: urgentTickets.length ? "danger" : "success",
-          },
-          {
-            id: "blocked",
-            help: "状态为阻塞中、等待外部条件的工单。",
-            icon: "clock",
-            label: "阻塞中",
-            value: formatNumber(blockedTickets.length),
-            tags: ["需要协同"],
-            tone: blockedTickets.length ? "danger" : "success",
-          },
-          {
-            id: "total",
-            help: "当前筛选条件下的工单条数。",
-            icon: "table",
-            label: "工单总数",
-            value: formatNumber(tickets.length),
-            tags: ["来自工单数据库"],
-          },
-        ]}
-      />
-
-      <section className="vx-tenant-toolbar" aria-label="工单筛选">
-        <Input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="搜索工单、租户、行业、负责人"
-          className="vx-tenant-search vx-commercial-search"
-          aria-label="搜索工单"
-        />
-        <div className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-        <label aria-label="状态筛选">
-          <NativeSelect
-            value={status}
-            onChange={(event) =>
-              setStatus(event.target.value as TicketStatusFilter)
-            }
-          >
-            <option value="all">全部状态</option>
-            <option value="open">待处理</option>
-            <option value="processing">处理中</option>
-            <option value="blocked">搁置</option>
-            <option value="closed">完成</option>
-          </NativeSelect>
-        </label>
-        <label aria-label="优先级筛选">
-          <NativeSelect
-            value={priority}
-            onChange={(event) =>
-              setPriority(event.target.value as TicketPriorityFilter)
-            }
-          >
-            <option value="all">全部优先级</option>
-            <option value="p0">P0</option>
-            <option value="p1">P1</option>
-            <option value="p2">P2</option>
-            <option value="p3">P3</option>
-          </NativeSelect>
-        </label>
-        <Button variant="outline" size="md" onClick={resetFilters}>
-          重置
-        </Button>
-      </section>
-
-      <section
-        className="vx-tenant-directory vx-ticket-directory"
-        aria-label="工单列表"
-      >
-        <header className="vx-tenant-directory__header">
-          <strong>工单队列</strong>
-          <span>{formatNumber(visibleTickets.length)} 条匹配</span>
-        </header>
-        {selectedTickets.length ? (
-          <div className="vx-tenant-toolbar" aria-label="工单批量操作">
-            <span>已选 {formatNumber(selectedTickets.length)} 条</span>
+    <>
+      <ListPageTemplate
+        className="vx-tenant-management-page vx-tickets-page"
+        header={
+          <PageHeader
+            icon="chat-circle"
+            eyebrow="客户服务"
+            title="工单中心"
+            description="聚合租户侧待处理工单，按优先级、阻塞状态和更新时间推进支持闭环。"
+            secondary={<Badge>只读聚合</Badge>}
+          />
+        }
+        summary={
+          <MetricGrid
+            aria-label="工单统计"
+            items={[
+              {
+                id: "open",
+                help: "状态不为已关闭的工单。",
+                icon: "chat-circle",
+                label: "未关闭工单",
+                value: formatNumber(openTickets.length),
+                tags: [`影响租户 ${formatNumber(affectedTenants)}`],
+                tone: openTickets.length ? "warning" : "success",
+              },
+              {
+                id: "urgent",
+                help: "优先级为 P0 或 P1 的工单。",
+                icon: "warning",
+                label: "P0/P1 工单",
+                value: formatNumber(urgentTickets.length),
+                tags: ["优先处理"],
+                tone: urgentTickets.length ? "danger" : "success",
+              },
+              {
+                id: "blocked",
+                help: "状态为阻塞中、等待外部条件的工单。",
+                icon: "clock",
+                label: "阻塞中",
+                value: formatNumber(blockedTickets.length),
+                tags: ["需要协同"],
+                tone: blockedTickets.length ? "danger" : "success",
+              },
+              {
+                id: "total",
+                help: "当前筛选条件下的工单条数。",
+                icon: "table",
+                label: "工单总数",
+                value: formatNumber(tickets.length),
+                tags: ["来自工单数据库"],
+              },
+            ]}
+          />
+        }
+        filters={
+          <section className="vx-tenant-toolbar" aria-label="工单筛选">
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="搜索工单、租户、行业、负责人"
+              className="vx-tenant-search vx-commercial-search"
+              aria-label="搜索工单"
+            />
             <div className="vx-tenant-toolbar__spacer" aria-hidden="true" />
-            <Button
-              variant="outline"
-              size="md"
-              onClick={() => {
-                setBatchError(null);
-                setBatchStatusOpen(true);
-              }}
-            >
-              批量改状态
+            <label aria-label="状态筛选">
+              <NativeSelect
+                value={status}
+                onChange={(event) =>
+                  setStatus(event.target.value as TicketStatusFilter)
+                }
+              >
+                <option value="all">全部状态</option>
+                <option value="open">待处理</option>
+                <option value="processing">处理中</option>
+                <option value="blocked">搁置</option>
+                <option value="closed">完成</option>
+              </NativeSelect>
+            </label>
+            <label aria-label="优先级筛选">
+              <NativeSelect
+                value={priority}
+                onChange={(event) =>
+                  setPriority(event.target.value as TicketPriorityFilter)
+                }
+              >
+                <option value="all">全部优先级</option>
+                <option value="p0">P0</option>
+                <option value="p1">P1</option>
+                <option value="p2">P2</option>
+                <option value="p3">P3</option>
+              </NativeSelect>
+            </label>
+            <Button variant="outline" size="md" onClick={resetFilters}>
+              重置
             </Button>
-            <Button
-              variant="ghost"
-              size="md"
-              onClick={() => setSelectedTicketIds(new Set())}
-            >
-              清空选择
-            </Button>
-          </div>
-        ) : null}
-        {/* 读取失败是第三态，DataTable 只认加载/空/有数据，故留在外层。 */}
-        {loadError ? (
-          <div className="vx-service-health-empty">
-            <EmptyState title="工单数据读取失败" description={loadError} />
-          </div>
-        ) : (
-          <DataTable
-            columns={ticketColumns}
-            rows={visibleTickets}
-            rowKey={ticketKey}
-            loading={isLoading}
-            indexStart={1}
-            selectedKeys={[...selectedTicketIds]}
-            onSelectionChange={(keys) => setSelectedTicketIds(new Set(keys))}
-            rowActions={(ticket) => (
-              <TicketActionsMenu
-                ticket={ticket}
-                onOpenDetail={(selectedTicket) =>
-                  setDetailTicketId(selectedTicket.id)
+          </section>
+        }
+        table={
+          <section
+            className="vx-tenant-directory vx-ticket-directory"
+            aria-label="工单列表"
+          >
+            <header className="vx-tenant-directory__header">
+              <strong>工单队列</strong>
+              <span>{formatNumber(visibleTickets.length)} 条匹配</span>
+            </header>
+            {selectedTickets.length ? (
+              <div className="vx-tenant-toolbar" aria-label="工单批量操作">
+                <span>已选 {formatNumber(selectedTickets.length)} 条</span>
+                <div className="vx-tenant-toolbar__spacer" aria-hidden="true" />
+                <Button
+                  variant="outline"
+                  size="md"
+                  onClick={() => {
+                    setBatchError(null);
+                    setBatchStatusOpen(true);
+                  }}
+                >
+                  批量改状态
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="md"
+                  onClick={() => setSelectedTicketIds(new Set())}
+                >
+                  清空选择
+                </Button>
+              </div>
+            ) : null}
+            {/* 读取失败是第三态，DataTable 只认加载/空/有数据，故留在外层。 */}
+            {loadError ? (
+              <div className="vx-service-health-empty">
+                <EmptyState title="工单数据读取失败" description={loadError} />
+              </div>
+            ) : (
+              <DataTable
+                columns={ticketColumns}
+                rows={visibleTickets}
+                rowKey={ticketKey}
+                loading={isLoading}
+                indexStart={1}
+                selectedKeys={[...selectedTicketIds]}
+                onSelectionChange={(keys) =>
+                  setSelectedTicketIds(new Set(keys))
+                }
+                rowActions={(ticket) => (
+                  <TicketActionsMenu
+                    ticket={ticket}
+                    onOpenDetail={(selectedTicket) =>
+                      setDetailTicketId(selectedTicket.id)
+                    }
+                  />
+                )}
+                empty={
+                  <EmptyState
+                    title="没有匹配的工单"
+                    description="调整筛选条件，或重置后查看全部工单。"
+                    action={
+                      <Button variant="outline" onClick={resetFilters}>
+                        重置
+                      </Button>
+                    }
+                  />
                 }
               />
             )}
-            empty={
-              <EmptyState
-                title="没有匹配的工单"
-                description="调整筛选条件，或重置后查看全部工单。"
-                action={
-                  <Button variant="outline" onClick={resetFilters}>
-                    重置
-                  </Button>
-                }
-              />
-            }
-          />
-        )}
-      </section>
+          </section>
+        }
+      />
 
       {detailTicketId ? (
         <TicketDetailDrawer
@@ -978,6 +988,6 @@ export function TicketsPage() {
           ) : null}
         </DialogForm>
       ) : null}
-    </ViewLayout>
+    </>
   );
 }
