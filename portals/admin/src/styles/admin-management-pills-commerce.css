@@ -1,56 +1,10 @@
-.vx-subscription-pill--tier-free {
-  background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
-  color: var(--tenant-green);
-}
-.vx-subscription-pill--tier-pro {
-  background: color-mix(in srgb, var(--vx-color-warning-600) 10%, transparent);
-  color: var(--tenant-amber);
-}
-.vx-subscription-pill--cycle,
-.vx-subscription-pill--tier-other {
+.vx-subscription-pill--cycle {
   background: var(--vx-color-neutral-surface);
   color: var(--vx-color-gray-500);
 }
-
-.vx-subscription-pill--tier-enterprise {
-  background: color-mix(in srgb, var(--vx-color-purple-600) 8%, transparent);
-  color: var(--vx-color-purple-600);
-}
-.vx-order-pill--tier-free {
-  background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
-  color: var(--tenant-green);
-}
-.vx-order-pill--tier-pro {
-  background: color-mix(in srgb, var(--vx-color-warning-600) 10%, transparent);
-  color: var(--tenant-amber);
-}
-.vx-order-pill--source,
-.vx-order-pill--tier-other {
+.vx-order-pill--source {
   background: var(--vx-color-neutral-surface);
   color: var(--vx-color-gray-500);
-}
-
-.vx-order-pill--tier-enterprise {
-  background: color-mix(in srgb, var(--vx-color-purple-600) 8%, transparent);
-  color: var(--vx-color-purple-600);
-}
-
-.vx-billing-pill--tier-free {
-  background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);
-  color: var(--tenant-green);
-}
-
-.vx-billing-pill--tier-pro {
-  background: color-mix(in srgb, var(--vx-color-warning-600) 10%, transparent);
-  color: var(--tenant-amber);
-}.vx-billing-pill--tier-other {
-  background: var(--vx-color-neutral-surface);
-  color: var(--vx-color-gray-500);
-}
-
-.vx-billing-pill--tier-enterprise {
-  background: color-mix(in srgb, var(--vx-color-purple-600) 8%, transparent);
-  color: var(--vx-color-purple-600);
 }
 .vx-invoice-pill--tax-enterprise {
   background: color-mix(in srgb, var(--vx-color-success) 8%, transparent);

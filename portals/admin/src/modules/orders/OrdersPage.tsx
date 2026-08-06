@@ -26,6 +26,12 @@ import {
   ORDER_STATUS_TONE,
   PAYMENT_STATUS_TONE,
 } from "@/modules/shared/status-tone";
+import {
+  TIER_FILTER_OPTIONS,
+  tierBadgeClass,
+  tierFilterOf,
+  type TierFilterValue,
+} from "@/modules/shared/tier-level";
 import { isUnset, UNSET_LABEL } from "@/modules/shared/display";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -58,7 +64,7 @@ type ViewMode = "list" | "cards";
 type OrderStatusFilter = "all" | OrderOperationStatus;
 type PaymentStatusFilter = "all" | OrderPaymentStatus;
 type PaySourceFilter = "all" | OrderPaySource;
-type TierFilter = "all" | "free" | "pro" | "enterprise" | "other";
+type TierFilter = "all" | TierFilterValue;
 
 function formatCurrency(value: number, currency: string) {
   return new Intl.NumberFormat("zh-CN", {
@@ -121,16 +127,6 @@ function paySourceLabel(source: OrderPaySource) {
   if (source === "online") return "线上";
   if (source === "offline") return "线下";
   return "无";
-}
-
-function tierFilterValue(record: OrderOperationRecord): TierFilter {
-  const tierName = record.tierName.toLowerCase();
-  if (tierName === "free" || record.servicePlanCode === "starter")
-    return "free";
-  if (tierName === "pro" || record.servicePlanCode === "growth") return "pro";
-  if (tierName === "enterprise" || record.servicePlanCode === "enterprise")
-    return "enterprise";
-  return "other";
 }
 
 const ORDER_CSV_COLUMNS: readonly CsvColumn<OrderOperationRecord>[] = [
@@ -291,9 +287,7 @@ function useOrderColumns(): DataTableColumn<OrderOperationRecord>[] {
                   {UNSET_LABEL}
                 </span>
               ) : (
-                <Badge
-                  className={`vx-tenant-pill vx-order-pill--tier-${tierFilterValue(order)}`}
-                >
+                <Badge className={tierBadgeClass(order.tierName)}>
                   {order.tierName}
                 </Badge>
               )}
@@ -480,7 +474,7 @@ export function OrdersPage() {
           return false;
         if (paySourceFilter !== "all" && order.paySource !== paySourceFilter)
           return false;
-        if (tierFilter !== "all" && tierFilterValue(order) !== tierFilter)
+        if (tierFilter !== "all" && tierFilterOf(order.tierName) !== tierFilter)
           return false;
         if (
           normalizedQuery &&
@@ -758,10 +752,11 @@ export function OrdersPage() {
                 aria-label="套餐版本"
               >
                 <option value="all">全部套餐</option>
-                <option value="free">Free</option>
-                <option value="pro">Pro</option>
-                <option value="enterprise">Enterprise</option>
-                <option value="other">其他</option>
+                {TIER_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
           </FilterBar>

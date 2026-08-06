@@ -485,3 +485,27 @@ pill 引用 266 → 210 处，选择器 239 → 146 个，admin CSS 6484 → 627
 `admin-management-pills-directory.css` 清空后删除。剩下的 40 处全是**分类标与等级标**
 （`--source` / `--cycle` / `--tier-*` / 权限层 L1–L3 / 产品能力 mode·tag / 角色 api·menu·button），
 按定好的规矩它们本就留在 admin。
+
+### 第五刀：等级标归 L1–L5（2026-08-06，批 4 收尾）
+
+`tier-*` 是这一族里最后一类。**等级不走六档语气**：语气说严重度（好/要留意/坏），
+等级说序（低→高）。把 enterprise 映射成 `danger` 或 `brand` 都不对——前者说它出事了，
+后者说它是新的。DS 备了一条独立的品牌深浅阶梯 `--level-1..5`（brand-200 → brand-600，
+前景色随档从深字翻成白字），新文件 `modules/shared/tier-level.ts` + `styles/admin-level-badge.css`
+把商业等级挂上去。
+
+**§十一 的缺色一并补齐。** `@vxture/shared` 的 `TIERS` 是五档（free / starter / pro /
+business / enterprise，product_220 §1），admin 此前只认三档，starter 与 business 一起
+掉进 `other` 的灰——五档里有两档在视觉上根本不存在。现在 `Record<Tier, TierLevel>` 全覆盖。
+
+**筛选下拉是同一个根因，一起收**：此前只有 free/pro/enterprise/其他 四项，starter 与
+business 无法单独筛。改成由 `TIER_FILTER_OPTIONS` 数据驱动，五档各自成项；「其他」保留
+但含义变窄——只兜不在 `TIERS` 里的自定义套餐名。三页（账单/订单/订阅）各自那份
+`tierFilterValue()` 一并退役，收敛成 `tierFilterOf()`。
+
+认不出的套餐名返回中性标而不是 L1：标成最低档等于谎报它的位置，宁可不着色。
+
+**批 4 收官复测**：className 用法 266 → 35 处，选择器 239 → 34 个，
+admin CSS 6484 → 5953 行，期间删掉 6 个清空的 CSS 文件。剩下的 35 处全是分类标
+（`--source` / `--cycle` / 权限层 L1–L3 / 产品能力 mode·tag / 角色 api·menu·button），
+按「分类不给语气色、留 admin」的规矩，它们本就该在。

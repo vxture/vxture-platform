@@ -20,6 +20,12 @@ import {
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
+import {
+  TIER_FILTER_OPTIONS,
+  tierBadgeClass,
+  tierFilterOf,
+  type TierFilterValue,
+} from "@/modules/shared/tier-level";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -58,7 +64,7 @@ import {
 
 type ViewMode = "list" | "cards";
 type StatusFilter = "all" | SubscriptionOperationStatus;
-type TierFilter = "all" | "free" | "pro" | "enterprise" | "other";
+type TierFilter = "all" | TierFilterValue;
 type RiskFilter = "all" | SubscriptionOperationQuotaRisk;
 type RenewFilter = "all" | "auto" | "manual";
 
@@ -88,16 +94,6 @@ function quotaRiskLabel(risk: SubscriptionOperationQuotaRisk) {
   if (risk === "danger") return "高风险";
   if (risk === "warning") return "需关注";
   return "正常";
-}
-
-function tierFilterValue(record: SubscriptionOperationRecord): TierFilter {
-  const tierName = record.tierName.toLowerCase();
-  if (tierName === "free" || record.servicePlanCode === "starter")
-    return "free";
-  if (tierName === "pro" || record.servicePlanCode === "growth") return "pro";
-  if (tierName === "enterprise" || record.servicePlanCode === "enterprise")
-    return "enterprise";
-  return "other";
 }
 
 function subscriptionSearchText(record: SubscriptionOperationRecord) {
@@ -267,9 +263,7 @@ function useSubscriptionColumns(): DataTableColumn<SubscriptionOperationRecord>[
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <Badge
-                className={`vx-tenant-pill vx-subscription-pill--tier-${tierFilterValue(subscription)}`}
-              >
+              <Badge className={tierBadgeClass(subscription.tierName)}>
                 {subscription.tierName}
               </Badge>
               <Badge className="vx-tenant-pill vx-subscription-pill--cycle">
@@ -387,9 +381,7 @@ function SubscriptionCards({
             >
               {subscriptionStatusLabel(subscription.status)}
             </StatusBadge>
-            <Badge
-              className={`vx-tenant-pill vx-subscription-pill--tier-${tierFilterValue(subscription)}`}
-            >
+            <Badge className={tierBadgeClass(subscription.tierName)}>
               {subscription.tierName}
             </Badge>
             <StatusBadge tone={QUOTA_RISK_TONE[subscription.quota.risk]}>
@@ -492,7 +484,10 @@ export function SubscriptionsPage() {
     return subscriptions.filter((subscription) => {
       if (statusFilter !== "all" && subscription.status !== statusFilter)
         return false;
-      if (tierFilter !== "all" && tierFilterValue(subscription) !== tierFilter)
+      if (
+        tierFilter !== "all" &&
+        tierFilterOf(subscription.tierName) !== tierFilter
+      )
         return false;
       if (riskFilter !== "all" && subscription.quota.risk !== riskFilter)
         return false;
@@ -744,10 +739,11 @@ export function SubscriptionsPage() {
                 aria-label="套餐版本"
               >
                 <option value="all">全部套餐</option>
-                <option value="free">Free</option>
-                <option value="pro">Pro</option>
-                <option value="enterprise">Enterprise</option>
-                <option value="other">其他</option>
+                {TIER_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </NativeSelect>
               <NativeSelect
                 className="vx-tenant-select"

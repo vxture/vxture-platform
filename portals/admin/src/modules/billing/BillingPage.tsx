@@ -26,6 +26,12 @@ import {
   BILL_STATUS_TONE,
   INVOICE_STATUS_TONE,
 } from "@/modules/shared/status-tone";
+import {
+  TIER_FILTER_OPTIONS,
+  tierBadgeClass,
+  tierFilterOf,
+  type TierFilterValue,
+} from "@/modules/shared/tier-level";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -54,7 +60,7 @@ type ViewMode = "list" | "cards";
 type BillStatusFilter = "all" | BillingBillStatus;
 type InvoiceStatusFilter = "all" | BillingInvoiceStatus;
 type BillTypeFilter = "all" | BillingBillType;
-type TierFilter = "all" | "free" | "pro" | "enterprise" | "other";
+type TierFilter = "all" | TierFilterValue;
 type BillingExceptionFilter =
   | "all"
   | "attention"
@@ -204,15 +210,6 @@ function cycleLabel(cycle: string) {
   if (cycle === "monthly") return "月度";
   if (cycle === "once") return "一次性";
   return cycle || "未设置";
-}
-
-function tierFilterValue(record: BillingRecord): TierFilter {
-  const tierName = (record.tierName ?? "").toLowerCase();
-  if (tierName === "free" || record.tierName === "Free") return "free";
-  if (tierName === "pro" || record.tierName === "Pro") return "pro";
-  if (tierName === "enterprise" || record.tierName === "Enterprise")
-    return "enterprise";
-  return record.tierName ? "other" : "other";
 }
 
 function billingSearchText(record: BillingRecord) {
@@ -371,9 +368,7 @@ function useBillingColumns(): DataTableColumn<BillingRecord>[] {
       cell: (bill) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-billing-pill--tier-${tierFilterValue(bill)}`}
-            >
+            <Badge className={tierBadgeClass(bill.tierName)}>
               {bill.tierName ?? "未关联"}
             </Badge>
           }
@@ -615,7 +610,7 @@ export function BillingPage() {
         return false;
       if (billTypeFilter !== "all" && bill.billType !== billTypeFilter)
         return false;
-      if (tierFilter !== "all" && tierFilterValue(bill) !== tierFilter)
+      if (tierFilter !== "all" && tierFilterOf(bill.tierName) !== tierFilter)
         return false;
       if (!matchesBillingExceptionFilter(bill, exceptionFilter)) return false;
       if (normalizedQuery && !billingSearchText(bill).includes(normalizedQuery))
@@ -920,10 +915,11 @@ export function BillingPage() {
                 aria-label="套餐版本"
               >
                 <option value="all">全部套餐</option>
-                <option value="free">Free</option>
-                <option value="pro">Pro</option>
-                <option value="enterprise">Enterprise</option>
-                <option value="other">其他</option>
+                {TIER_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </NativeSelect>
             </div>
           </FilterBar>

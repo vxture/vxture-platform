@@ -18,6 +18,7 @@ import {
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
+import { tierBadgeClass } from "@/modules/shared/tier-level";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { fetchProductSolutions } from "@/api/admin-bff";
@@ -242,7 +243,7 @@ function useProductSolutionColumns(
               {solution.tiers.map((tier) => (
                 <Badge
                   key={tier.tierCode}
-                  className={`vx-tenant-pill vx-product-solution-pill--tier-${tier.tierCode}`}
+                  className={tierBadgeClass(tier.tierCode)}
                   title={tier.summary}
                 >
                   {tier.tierName}
