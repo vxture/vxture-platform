@@ -50,6 +50,26 @@ export function formatDate(value: string | null) {
   });
 }
 
+/**
+ * 日期 + 时刻，到秒。
+ *
+ * `formatDate` 只到日，对多数列是对的（到期日、认证日）；**台账类不行**：审计日志
+ * 同一天可能几百条，只显示日期等于没有时间戳，排序也无从验证（2026-08-07 走查
+ * 看到 500 条全是 2026/08/07）。秒不是装饰——同一分钟内的先后要能分辨。
+ */
+export function formatDateTime(value: string | null) {
+  if (!value) return "未设置";
+  return new Date(value).toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
 export function statusLabel(status: TenantOperationRecord["status"]) {
   if (status === "active") return "正常";
   if (status === "trial") return "试用";

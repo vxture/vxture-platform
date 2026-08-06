@@ -1527,7 +1527,9 @@
       "policyDescription": "可以放宽筛选范围，或检查产品级模型授权。",
       "overrideTitle": "暂无租户覆盖授权。",
       "overrideDescription": "当前仅使用产品模型授权；需要灰度或定制时再新增覆盖。",
-      "resetFilters": "重置筛选"
+      "resetFilters": "重置筛选",
+      "loadFailedTitle": "策略数据读取失败。",
+      "loadFailedDescription": "未能连到 Admin BFF 或 Model Platform，确认服务已启动后重新加载页面。"
     },
     "feedback": {
       "loadError": "策略数据读取失败，请确认 Admin BFF 和 Model Platform 是否已启动。",

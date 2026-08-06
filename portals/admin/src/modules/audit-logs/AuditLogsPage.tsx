@@ -18,7 +18,7 @@ import { fetchAuditLogs, type AuditLogFilters } from "@/api/admin-bff";
 import type { DataTableColumn } from "@vxture/design-system";
 import type { AuditLogRecord } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import { formatDate, joinClasses } from "@/modules/tenants/tenant-utils";
+import { formatDateTime, joinClasses } from "@/modules/tenants/tenant-utils";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
 
 // ─── 辅助函数 ──────────────────────────────────────────────────────────────────
@@ -35,7 +35,6 @@ function auditLogSearchText(log: AuditLogRecord) {
     log.operatorName,
     log.operatorEmail,
     log.action,
-    log.actionLabel,
     log.targetType,
     log.targetLabel,
     log.ip,
@@ -214,9 +213,9 @@ const AUDIT_COLUMNS: readonly DataTableColumn<AuditLogRecord>[] = [
   {
     id: "action",
     header: "操作",
-    cell: (log) => (
-      <TableTitleCell title={log.actionLabel} description={log.action} />
-    ),
+    // 只写一次。`actionLabel` 曾是 BFF 拿 `row.action` 原样起的别名，标题与描述
+    // 因此逐字相同（`oidc.token_exchange.issued` 上下各一行）。没有译名就不装作有。
+    cell: (log) => <TableTitleCell title={log.action} />,
   },
   {
     id: "target",
@@ -243,7 +242,7 @@ const AUDIT_COLUMNS: readonly DataTableColumn<AuditLogRecord>[] = [
     ),
   },
   { id: "ip", header: "IP", cell: (log) => log.ip ?? EMPTY_MARK },
-  { id: "time", header: "时间", cell: (log) => formatDate(log.createdAt) },
+  { id: "time", header: "时间", cell: (log) => formatDateTime(log.createdAt) },
 ];
 
 // ─── 主组件 ───────────────────────────────────────────────────────────────────

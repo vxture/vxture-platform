@@ -1360,6 +1360,11 @@ export default function AdminOverviewPage() {
   >([]);
   const [agents, setAgents] = useState<ProductAgentRecord[]>([]);
   const [services, setServices] = useState<DevServiceSnapshot[]>([]);
+  /**
+   * 有上游读取失败。用于把"读不到"与"本来就没有"分开——两者在界面上都是空表，
+   * 但只有前者需要运营去看服务是否还活着。
+   */
+  const [dataDegraded, setDataDegraded] = useState(false);
   const [releases, setReleases] = useState<ProductReleaseRecord[]>([]);
   const [solutions, setSolutions] = useState<ProductSolutionRecord[]>([]);
   const [globalPeriod, setGlobalPeriod] = useState<PeriodKey>("recent30");
@@ -1424,14 +1429,31 @@ export default function AdminOverviewPage() {
   useEffect(() => {
     let active = true;
 
+    /**
+     * 七路各自兜底，而不是 `Promise.all` 一荣俱荣。
+     *
+     * 原先是裸 `Promise.all().then()`，**没有 `.catch()`**：Atlas 一挂
+     * （`AdminBffError: Atlas is unavailable`），整条链 reject，七个 setter
+     * 一个都不执行，六份数据全停在初始空值，界面于是显示成"这些数据本来就是
+     * 空的"，同时抛出未处理拒绝（2026-08-07 走查在控制台看到两条）。
+     *
+     * 只有 `fetchDevServices` 当初单独挂了 `.catch`——有人知道它会失败，却没
+     * 管别的。一个上游挂掉不该让另外六份跟着消失。
+     */
+    const settle = <T,>(promise: Promise<T>, fallback: T): Promise<T> =>
+      promise.catch(() => {
+        if (active) setDataDegraded(true);
+        return fallback;
+      });
+
     Promise.all([
-      fetchAiModels(true),
-      fetchAiModelGrants(),
-      fetchProductModelPolicies(),
-      fetchProductAgents(),
-      fetchDevServices().catch(() => [] as DevServiceSnapshot[]),
-      fetchProductReleases(),
-      fetchProductSolutions(),
+      settle(fetchAiModels(true), []),
+      settle(fetchAiModelGrants(), []),
+      settle(fetchProductModelPolicies(), []),
+      settle(fetchProductAgents(), []),
+      settle(fetchDevServices(), [] as DevServiceSnapshot[]),
+      settle(fetchProductReleases(), []),
+      settle(fetchProductSolutions(), []),
     ]).then(
       ([
         modelRecords,
@@ -1760,6 +1782,18 @@ export default function AdminOverviewPage() {
           level="page"
         />
       </header>
+
+      {/*
+        读取降级提示。**不能省**：上游挂掉时下面每张卡都会照常渲染出一个数字，
+        只是那个数字建立在空数组上——看起来像"平台确实没有模型/方案/发布"，
+        而不是"读不到"。空表与读不到必须能分辨（2026-08-07 走查）。
+      */}
+      {dataDegraded ? (
+        <StatusBadge tone="warning">
+          部分数据读取失败，下方模型、方案与发布相关指标可能不完整；请确认
+          Admin BFF 与上游服务已启动。
+        </StatusBadge>
+      ) : null}
 
       {/* 四张一行，窄屏折两列。间距与其余卡组同为 16px。 */}
       <section

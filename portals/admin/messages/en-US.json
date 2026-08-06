@@ -1527,7 +1527,9 @@
       "policyDescription": "Try widening the filters or checking product-level model authorization.",
       "overrideTitle": "No tenant overrides yet.",
       "overrideDescription": "Product model authorization is currently used directly. Add overrides for gray release or customization.",
-      "resetFilters": "Reset filters"
+      "resetFilters": "Reset filters",
+      "loadFailedTitle": "Could not load policies.",
+      "loadFailedDescription": "Admin BFF or Model Platform did not respond. Start the services and reload."
     },
     "feedback": {
       "loadError": "Failed to load policy data. Check whether Admin BFF and Model Platform are running.",

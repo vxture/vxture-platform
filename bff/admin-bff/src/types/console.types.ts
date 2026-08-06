@@ -160,7 +160,6 @@ export interface AuditLogRecord {
   operatorName: string;
   operatorEmail: string;
   action: string;
-  actionLabel: string;
   targetType: string;
   targetId: string | null;
   targetLabel: string | null;

@@ -180,6 +180,11 @@ export function ModelGrantsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  /**
+   * 读取是否失败。**不能复用 `feedback`**：它会被后续的保存/启停操作覆盖，
+   * 而"这张表为什么是空的"这个事实必须一直可查。
+   */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<PolicyFilter>("all");
@@ -213,9 +218,11 @@ export function ModelGrantsPage() {
         setSelectedGrantId(null);
         setSelectedPolicyIds(new Set());
         setSelectedGrantIds(new Set());
+        setLoadFailed(false);
       })
       .catch(() => {
         if (active) {
+          setLoadFailed(true);
           setFeedback({ tone: "error", key: "feedback.loadError" });
         }
       })
@@ -690,6 +697,16 @@ export function ModelGrantsPage() {
                 />
               )}
               empty={
+                loadFailed ? (
+                  /* 读取失败与"筛选没匹配上"是两回事。混成一种，界面就会在数据
+                     源挂掉时说"没有符合条件的策略"，还引导去重置一个与此无关的
+                     筛选器（2026-08-07 走查：Model Platform 未启动时所见）。 */
+                  <EmptyState
+                    icon="warning"
+                    title={t("empty.loadFailedTitle")}
+                    description={t("empty.loadFailedDescription")}
+                  />
+                ) : (
                 <EmptyState
                   title={t("empty.policyTitle")}
                   description={t("empty.policyDescription")}
@@ -706,6 +723,7 @@ export function ModelGrantsPage() {
                     </ActionButton>
                   }
                 />
+                )
               }
             />
           ) : pagedPolicies.length ? (
