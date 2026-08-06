@@ -62,9 +62,18 @@ export const toneEdgeClasses: Record<Tone, string> = {
  * **状态列**表达（`StatusBadge` + `toneSurfaceClasses`），见 `DataTable` 文件头。
  */
 
-/** 语气对应的图标。调用方不传图标名，避免同一语气在各处配不同的图。 */
+/**
+ * 语气对应的图标。调用方不传图标名，避免同一语气在各处配不同的图。
+ *
+ * `neutral` 配短横而不是 ⓘ（owner 2026-08-06 判）：ⓘ 说的是"这里有信息"，而
+ * `neutral` 说的是"没有状态"，两者对不上——「已停用」「已作废」「未认证」这些
+ * 标顶着一个信息图标，图标本身不表达任何东西。短横占住图标位以便各档横向对齐，
+ * 但不再声称有信息可读。
+ *
+ * 顺带解掉一处撞车：改之前 `neutral` 与 `info` 用的是同一张图，两档只靠颜色区分。
+ */
 export const toneIcons: Record<Tone, IconName> = {
-  neutral: "info",
+  neutral: "minus",
   brand: "sparkles",
   info: "info",
   success: "success",
