@@ -421,6 +421,11 @@ export function ModelPlatformPage() {
   const [selectedModelIds, setSelectedModelIds] = useState<Set<string>>(
     () => new Set(),
   );
+  /**
+   * 上游读取是否失败。**不复用 `feedback`**：那条横幅会被后续的保存、启停操作
+   * 覆盖，而"这张表为什么是空的"必须一直可查。
+   */
+  const [loadFailed, setLoadFailed] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
   const [dialogMode, setDialogMode] = useState<DialogMode>(null);
   const [modelForm, setModelForm] = useState(defaultModelForm);
@@ -471,10 +476,14 @@ export function ModelPlatformPage() {
             ),
           );
           setSelectedModelId(null);
+          setLoadFailed(false);
         },
       )
       .catch(() => {
-        if (active) setFeedback({ tone: "error", key: "feedback.loadError" });
+        if (active) {
+          setLoadFailed(true);
+          setFeedback({ tone: "error", key: "feedback.loadError" });
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -1281,6 +1290,16 @@ export function ModelPlatformPage() {
                   />
                 )}
                 empty={
+                  loadFailed ? (
+                  /* 读取失败与"筛选没匹配上"是两回事。混成一种，本页就会在顶部
+                     横幅已经报出「模型数据读取失败」的同时，两行之下劝人去放宽
+                     筛选——同一屏自相矛盾（2026-08-07 走查）。 */
+                  <EmptyState
+                    icon="warning"
+                    title={t("empty.loadFailedTitle")}
+                    description={t("empty.loadFailedDescription")}
+                  />
+                  ) : (
                   <EmptyState
                     title={t("empty.title")}
                     description={t("empty.description")}
@@ -1294,6 +1313,7 @@ export function ModelPlatformPage() {
                       </ActionButton>
                     }
                   />
+                  )
                 }
               />
             ) : pagedModels.length ? (

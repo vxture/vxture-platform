@@ -1398,7 +1398,9 @@
       "loadingDescription": "正在从 Model Platform 读取模型平台配置。",
       "title": "没有符合当前筛选条件的模型。",
       "description": "可以放宽筛选范围，或新增一个在线/自建模型。",
-      "resetFilters": "重置筛选"
+      "resetFilters": "重置筛选",
+      "loadFailedTitle": "模型数据读取失败。",
+      "loadFailedDescription": "未能连到 Model Platform，确认服务已启动后重新加载页面。"
     },
     "feedback": {
       "loadError": "模型数据读取失败，请确认 Model Platform 是否已启动。",

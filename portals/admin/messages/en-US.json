@@ -1398,7 +1398,9 @@
       "loadingDescription": "Reading model access configuration from Model Platform.",
       "title": "No models match the current filters.",
       "description": "Try widening the filters or adding an online/private model.",
-      "resetFilters": "Reset filters"
+      "resetFilters": "Reset filters",
+      "loadFailedTitle": "Could not load models.",
+      "loadFailedDescription": "Model Platform did not respond. Start the service and reload."
     },
     "feedback": {
       "loadError": "Failed to load model data. Check whether Model Platform is running.",
