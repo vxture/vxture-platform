@@ -117,9 +117,9 @@ function MetricCard({
         }}
         className={cn(
           "pointer-events-none absolute right-md top-1/2 size-media-sm -translate-y-1/2",
-          // 素材本身已是极浅色（画到的像素均值 rgb(237,241,255)），不透明度只
-          // 再压一档；40% 会把它压到几乎看不见。
-          "bg-contain bg-center bg-no-repeat opacity-70",
+          // 不再压不透明度：浓淡由素材本身定，一处调（换图）胜过两处调
+          // （换图 + 改 opacity 档）。
+          "bg-contain bg-center bg-no-repeat",
         )}
       />
       <CardContent className="relative flex flex-col px-lg">
