@@ -8,8 +8,8 @@ import {
   Button,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
-  type FilterBarView,
   Icon,
   Input,
   InputGroup,
@@ -22,10 +22,11 @@ import {
   NativeSelect,
   Pagination,
   StatusBadge,
+  type FilterBarView,
   type StatusBadgeTone,
+  useListPagination,
   UserAvatar,
   ViewHeader,
-  useListPagination,
 } from "@vxture/design-system";
 import {
   createMember,
@@ -728,15 +729,17 @@ export function MembersPage() {
                 onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
                 indexStart={pager.indexStart}
                 rowActions={(member: MemberRecord) => memberMenu(member)}
-                emptyTitle={
-                  loading ? t("empty.loadingTitle") : t("empty.title")
+                empty={
+                  <EmptyState
+                    title={loading ? t("empty.loadingTitle") : t("empty.title")}
+                    description={
+                      loading
+                        ? t("empty.loadingDescription")
+                        : t("empty.description")
+                    }
+                    action={resetFiltersAction}
+                  />
                 }
-                emptyDescription={
-                  loading
-                    ? t("empty.loadingDescription")
-                    : t("empty.description")
-                }
-                emptyAction={resetFiltersAction}
                 footer={pagination}
               />
             ) : (

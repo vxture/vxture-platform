@@ -2585,9 +2585,13 @@ function DataTableDemo() {
         rows={rows}
         rowKey={(row) => row.id}
         loading={state === "loading"}
-        emptyTitle="还没有任何通道"
-        emptyDescription="创建第一条通道后，这里会显示它的调用量与状态。"
-        emptyAction={<Button>新建通道</Button>}
+        empty={
+          <EmptyState
+            title="还没有任何通道"
+            description="创建第一条通道后，这里会显示它的调用量与状态。"
+            action={<Button>新建通道</Button>}
+          />
+        }
         sort={sort}
         onSortChange={setSort}
         selectedKeys={selected}

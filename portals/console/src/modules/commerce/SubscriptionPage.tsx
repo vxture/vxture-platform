@@ -522,7 +522,7 @@ export function SubscriptionPage() {
               rows={entitlements}
               rowKey={(e) => e.productCode}
               loading={loading}
-              emptyTitle="No product entitlements yet."
+              empty={<EmptyState title="No product entitlements yet." />}
             />
           </PageSection>
 
@@ -558,7 +558,7 @@ export function SubscriptionPage() {
               rows={invoiceRows}
               rowKey={(row) => row[0] ?? ""}
               loading={loading}
-              emptyTitle="No invoices found."
+              empty={<EmptyState title="No invoices found." />}
             />
           </PageSection>
         </TabsContent>
@@ -576,7 +576,7 @@ export function SubscriptionPage() {
               rows={orders}
               rowKey={(order) => order.orderId}
               loading={loading}
-              emptyTitle="No orders yet."
+              empty={<EmptyState title="No orders yet." />}
             />
           </PageSection>
         </TabsContent>

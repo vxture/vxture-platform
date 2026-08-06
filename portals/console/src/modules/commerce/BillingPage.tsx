@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Button,
   DataTable,
+  EmptyState,
   Icon,
   MetricGrid,
   ViewHeader,
@@ -198,7 +199,7 @@ export function BillingPage() {
           rows={invoiceRows}
           rowKey={(row, index) => row[0] ?? String(index)}
           loading={loading}
-          emptyTitle="No invoices found."
+          empty={<EmptyState title="No invoices found." />}
         />
       </PageSection>
     </ViewLayout>

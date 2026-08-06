@@ -815,18 +815,22 @@ export function OrdersPage() {
                     onConfirmPayment={requestConfirmPayment}
                   />
                 )}
-                emptyTitle={loadError ? "订单数据读取失败" : "没有匹配的订单"}
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部订单记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "订单数据读取失败" : "没有匹配的订单"}
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部订单记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleOrders.length ? (

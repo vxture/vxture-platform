@@ -5,6 +5,7 @@ import {
   ActionMenu,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
   Input,
   Label,
@@ -225,11 +226,15 @@ export function SystemParametersPage() {
                 ]}
               />
             )}
-            emptyTitle="暂无配置"
-            emptyDescription={
-              search || groupFilter !== "all"
-                ? "尝试调整筛选条件"
-                : "数据库中没有平台配置项"
+            empty={
+              <EmptyState
+                title="暂无配置"
+                description={
+                  search || groupFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : "数据库中没有平台配置项"
+                }
+              />
             }
             footer={
               pageCount > 1 ? (

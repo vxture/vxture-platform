@@ -622,18 +622,22 @@ export function PromotionsPage() {
                 rowActions={(record) => (
                   <PromotionActionsMenu record={record} />
                 )}
-                emptyTitle={loadError ? "优惠数据读取失败" : "没有匹配的优惠"}
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部优惠活动。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "优惠数据读取失败" : "没有匹配的优惠"}
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部优惠活动。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleRecords.length ? (

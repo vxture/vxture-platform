@@ -919,12 +919,16 @@ export function TicketsPage() {
                 }
               />
             )}
-            emptyTitle="没有匹配的工单"
-            emptyDescription="调整筛选条件，或重置后查看全部工单。"
-            emptyAction={
-              <Button variant="outline" onClick={resetFilters}>
-                重置
-              </Button>
+            empty={
+              <EmptyState
+                title="没有匹配的工单"
+                description="调整筛选条件，或重置后查看全部工单。"
+                action={
+                  <Button variant="outline" onClick={resetFilters}>
+                    重置
+                  </Button>
+                }
+              />
             }
           />
         )}

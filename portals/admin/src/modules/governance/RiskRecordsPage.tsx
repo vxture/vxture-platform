@@ -6,6 +6,7 @@ import {
   Button,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -444,12 +445,16 @@ export function RiskRecordsPage() {
                 ]}
               />
             )}
-            emptyTitle={loadError ? "风险记录读取失败" : "暂无风险记录"}
-            emptyDescription={
-              loadError ??
-              (search || levelFilter !== "all" || reviewFilter !== "all"
-                ? "尝试调整筛选条件"
-                : "点击「新建记录」录入第一条租户风险评估")
+            empty={
+              <EmptyState
+                title={loadError ? "风险记录读取失败" : "暂无风险记录"}
+                description={
+                  loadError ??
+                  (search || levelFilter !== "all" || reviewFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : "点击「新建记录」录入第一条租户风险评估")
+                }
+              />
             }
             footer={
               pageCount > 1 ? (

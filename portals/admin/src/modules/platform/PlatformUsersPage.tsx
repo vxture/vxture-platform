@@ -1205,20 +1205,24 @@ export function PlatformUsersPage() {
                     onResetPassword={handleResetPassword}
                   />
                 )}
-                emptyTitle={
-                  loadError ? "平台用户读取失败" : "没有匹配的平台用户"
-                }
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部平台用户。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={resetFilters}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={
+                      loadError ? "平台用户读取失败" : "没有匹配的平台用户"
+                    }
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部平台用户。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={resetFilters}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : filteredAdmins.length ? (

@@ -819,18 +819,22 @@ export function SubscriptionsPage() {
                     onAction={requestSubscriptionAction}
                   />
                 )}
-                emptyTitle={loadError ? "订阅数据读取失败" : "没有匹配的订阅"}
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部订阅实例。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "订阅数据读取失败" : "没有匹配的订阅"}
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部订阅实例。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleSubscriptions.length ? (

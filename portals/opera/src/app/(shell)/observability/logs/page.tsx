@@ -9,8 +9,8 @@
 import { useMemo, useState } from "react";
 import {
   DataTable,
+  EmptyState,
   FilterBar,
-  type FilterBarView,
   Icon,
   InputGroup,
   InputGroupAddon,
@@ -22,9 +22,10 @@ import {
   NativeSelect,
   Pagination,
   StatusBadge,
-  ViewHeader,
   type DataTableSort,
+  type FilterBarView,
   useListPagination,
+  ViewHeader,
 } from "@vxture/design-system";
 import { logs } from "@/mocks/atlas";
 import { LOG_LEVEL_META, type LogLevel } from "@/lib/status";
@@ -178,11 +179,15 @@ export default function LogsPage() {
             sort={sort}
             onSortChange={setSort}
             footer={pagination}
-            emptyTitle={filtered ? "没有匹配的日志" : "窗口内没有日志"}
-            emptyDescription={
-              filtered
-                ? "放宽级别或来源，或换个关键词。"
-                : "该时间窗口内没有产生任何运行日志。"
+            empty={
+              <EmptyState
+                title={filtered ? "没有匹配的日志" : "窗口内没有日志"}
+                description={
+                  filtered
+                    ? "放宽级别或来源，或换个关键词。"
+                    : "该时间窗口内没有产生任何运行日志。"
+                }
+              />
             }
           />
         ) : (

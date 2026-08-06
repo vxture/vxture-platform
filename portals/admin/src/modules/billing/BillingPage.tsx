@@ -969,18 +969,22 @@ export function BillingPage() {
                     onSyncInvoice={requestInvoiceSync}
                   />
                 )}
-                emptyTitle={loadError ? "账单数据读取失败" : "没有匹配的账单"}
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部账单记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "账单数据读取失败" : "没有匹配的账单"}
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部账单记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleBills.length ? (

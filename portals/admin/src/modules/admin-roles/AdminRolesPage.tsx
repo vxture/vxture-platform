@@ -1583,20 +1583,24 @@ export function AdminRolesPage() {
                     onDelete={(target) => setPendingDeleteRoleId(target.id)}
                   />
                 )}
-                emptyTitle={
-                  loadError ? "平台角色读取失败" : "没有匹配的平台角色"
-                }
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部平台角色。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={
+                      loadError ? "平台角色读取失败" : "没有匹配的平台角色"
+                    }
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部平台角色。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleRoles.length ? (

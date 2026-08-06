@@ -9,9 +9,9 @@ import {
   Checkbox,
   DataTable,
   DialogForm,
+  EmptyState,
   FieldLabel,
   FilterBar,
-  type FilterBarView,
   Icon,
   Input,
   InputGroup,
@@ -25,8 +25,9 @@ import {
   Pagination,
   StatusBadge,
   TableTitleCell,
-  ViewHeader,
+  type FilterBarView,
   useListPagination,
+  ViewHeader,
 } from "@vxture/design-system";
 import {
   createTenantRole,
@@ -653,11 +654,17 @@ export function RolesPage() {
               rows={pagedRoles}
               rowKey={(role) => role.id}
               loading={loading}
-              emptyTitle={loading ? t("empty.loadingTitle") : t("empty.title")}
-              emptyDescription={
-                loading ? t("empty.loadingDescription") : t("empty.description")
+              empty={
+                <EmptyState
+                  title={loading ? t("empty.loadingTitle") : t("empty.title")}
+                  description={
+                    loading
+                      ? t("empty.loadingDescription")
+                      : t("empty.description")
+                  }
+                  action={resetFiltersAction}
+                />
               }
-              emptyAction={resetFiltersAction}
               selectedKeys={selectedKeys}
               onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
               indexStart={pager.indexStart}

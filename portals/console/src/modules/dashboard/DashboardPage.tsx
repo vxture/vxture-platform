@@ -233,7 +233,7 @@ export function DashboardPage() {
           rows={invoiceRows}
           rowKey={(row, index) => row[0] ?? String(index)}
           loading={invoicesLoading}
-          emptyTitle="No invoices found."
+          empty={<EmptyState title="No invoices found." />}
         />
       </PageSection>
 

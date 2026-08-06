@@ -988,20 +988,24 @@ export function PaymentsPage() {
                     onReject={handleOpenReject}
                   />
                 )}
-                emptyTitle={
-                  loadError ? "收款记录读取失败" : "没有匹配的收款记录"
-                }
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部收款记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={
+                      loadError ? "收款记录读取失败" : "没有匹配的收款记录"
+                    }
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部收款记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visiblePayments.length ? (

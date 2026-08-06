@@ -689,19 +689,23 @@ export function ModelGrantsPage() {
                   ]}
                 />
               )}
-              emptyTitle={t("empty.policyTitle")}
-              emptyDescription={t("empty.policyDescription")}
-              emptyAction={
-                <ActionButton
-                  variant="outline"
-                  icon="x"
-                  onClick={() => {
-                    setQuery("");
-                    setFilter("all");
-                  }}
-                >
-                  {t("empty.resetFilters")}
-                </ActionButton>
+              empty={
+                <EmptyState
+                  title={t("empty.policyTitle")}
+                  description={t("empty.policyDescription")}
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={() => {
+                        setQuery("");
+                        setFilter("all");
+                      }}
+                    >
+                      {t("empty.resetFilters")}
+                    </ActionButton>
+                  }
+                />
               }
             />
           ) : pagedPolicies.length ? (
@@ -855,8 +859,12 @@ export function ModelGrantsPage() {
               ]}
             />
           )}
-          emptyTitle={t("empty.overrideTitle")}
-          emptyDescription={t("empty.overrideDescription")}
+          empty={
+            <EmptyState
+              title={t("empty.overrideTitle")}
+              description={t("empty.overrideDescription")}
+            />
+          }
         />
       </section>
 

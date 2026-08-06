@@ -733,11 +733,15 @@ export function AnnouncementsPage() {
                   onDelete: setPendingDelete,
                 })
               }
-              emptyTitle="暂无公告"
-              emptyDescription={
-                search || typeFilter !== "all" || statusFilter !== "all"
-                  ? "尝试调整筛选条件"
-                  : "点击「新建公告」发布第一条平台通知"
+              empty={
+                <EmptyState
+                  title="暂无公告"
+                  description={
+                    search || typeFilter !== "all" || statusFilter !== "all"
+                      ? "尝试调整筛选条件"
+                      : "点击「新建公告」发布第一条平台通知"
+                  }
+                />
               }
               footer={
                 pageCount > 1 ? (

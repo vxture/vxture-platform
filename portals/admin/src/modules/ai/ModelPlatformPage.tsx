@@ -1279,16 +1279,20 @@ export function ModelPlatformPage() {
                     ]}
                   />
                 )}
-                emptyTitle={t("empty.title")}
-                emptyDescription={t("empty.description")}
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    {t("empty.resetFilters")}
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={t("empty.title")}
+                    description={t("empty.description")}
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        {t("empty.resetFilters")}
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : pagedModels.length ? (

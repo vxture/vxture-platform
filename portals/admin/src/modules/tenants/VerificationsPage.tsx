@@ -808,16 +808,20 @@ export function VerificationsPage() {
                     onReject={openReject}
                   />
                 )}
-                emptyTitle="没有匹配的实名认证"
-                emptyDescription="清空筛选条件后可查看全部实名认证记录。"
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title="没有匹配的实名认证"
+                    description="清空筛选条件后可查看全部实名认证记录。"
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleTenants.length ? (

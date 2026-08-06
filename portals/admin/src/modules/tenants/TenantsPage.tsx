@@ -660,16 +660,20 @@ export function TenantsPage() {
                     onToggleStatus={handleToggleTenantStatus}
                   />
                 )}
-                emptyTitle={loadError ? "租户数据读取失败" : "没有匹配的租户"}
-                emptyDescription={loadError ?? "清空筛选条件后可查看全部租户。"}
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "租户数据读取失败" : "没有匹配的租户"}
+                    description={loadError ?? "清空筛选条件后可查看全部租户。"}
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleTenants.length ? (

@@ -7,8 +7,8 @@ import { useMemo, useState } from "react";
 import {
   Badge,
   DataTable,
+  EmptyState,
   FilterBar,
-  type FilterBarView,
   Icon,
   InputGroup,
   InputGroupAddon,
@@ -18,9 +18,10 @@ import {
   ListPageTemplate,
   NativeSelect,
   Pagination,
-  ViewHeader,
   type DataTableSort,
+  type FilterBarView,
   useListPagination,
+  ViewHeader,
 } from "@vxture/design-system";
 import { auditTrail } from "@/mocks/atlas";
 
@@ -160,11 +161,15 @@ export default function AuditPage() {
             sort={sort}
             onSortChange={setSort}
             footer={pagination}
-            emptyTitle={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
-            emptyDescription={
-              filtered
-                ? "换个动作或关键词再看。"
-                : "配置尚未发生过变更。审计只记录写操作，读操作不留痕。"
+            empty={
+              <EmptyState
+                title={filtered ? "没有匹配的留痕" : "暂无变更留痕"}
+                description={
+                  filtered
+                    ? "换个动作或关键词再看。"
+                    : "配置尚未发生过变更。审计只记录写操作，读操作不留痕。"
+                }
+              />
             }
           />
         ) : (

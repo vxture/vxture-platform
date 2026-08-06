@@ -14,12 +14,12 @@ import {
   Checkbox,
   DataTable,
   DialogForm,
+  EmptyState,
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FilterBar,
-  type FilterBarView,
   Icon,
   Input,
   Label,
@@ -28,8 +28,9 @@ import {
   ListPageTemplate,
   NativeSelect,
   TableTitleCell,
-  ViewHeader,
+  type FilterBarView,
   useToast,
+  ViewHeader,
 } from "@vxture/design-system";
 import {
   OPERA_DOMAINS,
@@ -309,8 +310,12 @@ export default function RbacPage() {
           ]}
           rows={dialog?.kind === "members" ? membersOf(dialog.row.id) : []}
           rowKey={(m) => m.id}
-          emptyTitle="该角色暂无成员"
-          emptyDescription="从「添加成员」加入，或把其他角色的成员移过来。"
+          empty={
+            <EmptyState
+              title="该角色暂无成员"
+              description="从「添加成员」加入，或把其他角色的成员移过来。"
+            />
+          }
         />
       </DialogForm>
 

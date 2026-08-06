@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Banner,
   DataTable,
+  EmptyState,
   MetricGrid,
   ViewHeader,
   ViewLayout,
@@ -236,7 +237,7 @@ export default function Page() {
             rows={modelRows}
             rowKey={(row, index) => row[0] ?? String(index)}
             loading={loading}
-            emptyTitle="No available models."
+            empty={<EmptyState title="No available models." />}
           />
         </PageSection>
 
@@ -251,7 +252,7 @@ export default function Page() {
             rows={grantRows}
             rowKey={(row, index) => `${row[0]}-${row[1]}-${index}`}
             loading={loading}
-            emptyTitle="No active model grants."
+            empty={<EmptyState title="No active model grants." />}
           />
         </PageSection>
       </DashboardSplit>
@@ -268,7 +269,7 @@ export default function Page() {
             rows={quotaRows}
             rowKey={(row, index) => `${row[0]}-${index}`}
             loading={loading}
-            emptyTitle={quotaEmptyMessage}
+            empty={<EmptyState title={quotaEmptyMessage} />}
           />
         </PageSection>
 
@@ -283,7 +284,7 @@ export default function Page() {
             rows={usageRows}
             rowKey={(row, index) => `${row[0]}-${row[1]}-${index}`}
             loading={loading}
-            emptyTitle="No model usage recorded."
+            empty={<EmptyState title="No model usage recorded." />}
           />
         </PageSection>
       </DashboardSplit>

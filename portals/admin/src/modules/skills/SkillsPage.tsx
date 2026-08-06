@@ -360,11 +360,15 @@ export function SkillsPage() {
                   <Icon name="more-vertical" size="lg" fallback="placeholder" />
                 </Button>
               )}
-              emptyTitle="暂无技能"
-              emptyDescription={
-                search || statusFilter !== "all" || categoryFilter
-                  ? "尝试调整筛选条件"
-                  : "尚未接入任何 AI 技能，请通过 API 注册技能"
+              empty={
+                <EmptyState
+                  title="暂无技能"
+                  description={
+                    search || statusFilter !== "all" || categoryFilter
+                      ? "尝试调整筛选条件"
+                      : "尚未接入任何 AI 技能，请通过 API 注册技能"
+                  }
+                />
               }
               footer={
                 pageCount > 1 ? (

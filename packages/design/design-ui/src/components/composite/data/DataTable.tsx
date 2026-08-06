@@ -107,9 +107,14 @@ export interface DataTableProps<TRow> {
   readonly loading?: boolean;
   /** 加载态渲染多少条骨架行。取列表常用页长的一半即可，只为撑住高度。 */
   readonly loadingRows?: number;
-  readonly emptyTitle?: React.ReactNode;
-  readonly emptyDescription?: React.ReactNode;
-  readonly emptyAction?: React.ReactNode;
+  /**
+   * 无数据时铺在表体里的内容，通常是一个 `EmptyState`。不传出 DS 默认空态。
+   *
+   * 是一个槽而不是 `emptyTitle` / `emptyDescription` / `emptyAction` 三件：本件管
+   * 空态**摆在哪**，不管它长什么样——与 `footer` 同一个道理。三件式那版让本件替
+   * `EmptyState` 转发参数，`EmptyState` 每加一个能力这里就要跟着加一个 props。
+   */
+  readonly empty?: React.ReactNode;
   readonly sort?: DataTableSort;
   readonly onSortChange?: (sort: DataTableSort) => void;
   /** 给了才出复选框列。 */
@@ -123,11 +128,8 @@ export interface DataTableProps<TRow> {
   /**
    * 给了才出行操作列：固定 64px、钉在最右、横向滚动时锁定不动（admin 列锁定
    * 惯例），内容居中——放的是单个图标触发器（`ActionMenu`），不是一排按钮。
-   * 单元格点击不冒泡到 `onRowClick`——行点击是选择/进详情，操作是操作。
    */
   readonly rowActions?: (row: TRow, rowIndex: number) => React.ReactNode;
-  readonly rowActionsHeader?: React.ReactNode;
-  readonly onRowClick?: (row: TRow, rowIndex: number) => void;
   /* 没有 rowTone / getRowClassName：行不表达业务语气，见文件头。 */
   /** 表尾：分页、总数一类。渲染在虚线上边框之下，左右两端由调用方内容自摆。 */
   readonly footer?: React.ReactNode;
@@ -149,17 +151,13 @@ function DataTable<TRow>({
   rowKey,
   loading = false,
   loadingRows = 5,
-  emptyTitle = "暂无数据",
-  emptyDescription,
-  emptyAction,
+  empty,
   sort,
   onSortChange,
   selectedKeys,
   onSelectionChange,
   indexStart,
   rowActions,
-  rowActionsHeader = "操作",
-  onRowClick,
   footer,
   className,
 }: DataTableProps<TRow>) {
@@ -295,7 +293,7 @@ function DataTable<TRow>({
                     "sticky right-0 whitespace-nowrap bg-background py-sm font-normal",
                   )}
                 >
-                  {rowActionsHeader}
+                  操作
                 </th>
               ) : null}
             </tr>
@@ -317,16 +315,7 @@ function DataTable<TRow>({
             ) : rows.length === 0 ? (
               <tr>
                 <td colSpan={colSpan} className="p-lg">
-                  <EmptyState
-                    icon="list"
-                    title={emptyTitle}
-                    {...(emptyDescription !== undefined
-                      ? { description: emptyDescription }
-                      : {})}
-                    {...(emptyAction !== undefined
-                      ? { action: emptyAction }
-                      : {})}
-                  />
+                  {empty ?? <EmptyState icon="list" title="暂无数据" />}
                 </td>
               </tr>
             ) : (
@@ -342,13 +331,9 @@ function DataTable<TRow>({
                   <tr
                     key={key}
                     {...(selectable ? { "aria-selected": isSelected } : {})}
-                    onClick={
-                      onRowClick ? () => onRowClick(row, rowIndex) : undefined
-                    }
                     className={cn(
                       "group border-b last:border-b-0",
                       hairline.field,
-                      onRowClick && "cursor-pointer",
                     )}
                   >
                     {selectable ? (
@@ -358,7 +343,6 @@ function DataTable<TRow>({
                           "py-md align-middle",
                           cellSurface,
                         )}
-                        onClick={(e) => e.stopPropagation()}
                       >
                         <div className="flex items-center justify-center">
                           <Checkbox
@@ -417,7 +401,6 @@ function DataTable<TRow>({
                           !isSelected && "bg-background",
                           cellSurface,
                         )}
-                        onClick={(e) => e.stopPropagation()}
                       >
                         {rowActions(row, rowIndex)}
                       </td>

@@ -6,6 +6,7 @@ import {
   Button,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -453,14 +454,18 @@ export function FeatureTogglesPage() {
                 ]}
               />
             )}
-            emptyTitle="暂无功能开关"
-            emptyDescription={
-              search ||
-              categoryFilter !== "all" ||
-              environmentFilter !== "all" ||
-              archivedFilter !== "all"
-                ? "尝试调整筛选条件"
-                : "点击「新建开关」创建第一个功能开关"
+            empty={
+              <EmptyState
+                title="暂无功能开关"
+                description={
+                  search ||
+                  categoryFilter !== "all" ||
+                  environmentFilter !== "all" ||
+                  archivedFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : "点击「新建开关」创建第一个功能开关"
+                }
+              />
             }
             footer={
               pageCount > 1 ? (

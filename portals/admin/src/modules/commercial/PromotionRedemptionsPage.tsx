@@ -555,20 +555,24 @@ export function PromotionRedemptionsPage() {
                 rowActions={(record) => (
                   <RedemptionActionsMenu record={record} />
                 )}
-                emptyTitle={
-                  loadError ? "核销数据读取失败" : "没有匹配的核销记录"
-                }
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部核销记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={
+                      loadError ? "核销数据读取失败" : "没有匹配的核销记录"
+                    }
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部核销记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleRecords.length ? (

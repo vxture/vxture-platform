@@ -808,18 +808,20 @@ export function AccountsPage({
                     onForceLogout={accountActions.onForceLogout}
                   />
                 )}
-                emptyTitle={
-                  loadError ? "账号数据读取失败" : pageCopy.emptyTitle
-                }
-                emptyDescription={loadError ?? pageCopy.emptyDescription}
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "账号数据读取失败" : pageCopy.emptyTitle}
+                    description={loadError ?? pageCopy.emptyDescription}
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleAccounts.length ? (

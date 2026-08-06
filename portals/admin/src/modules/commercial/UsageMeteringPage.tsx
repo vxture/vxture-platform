@@ -592,20 +592,24 @@ export function UsageMeteringPage() {
                   setSelectedRecordIds(new Set(keys))
                 }
                 rowActions={(record) => <UsageActionsMenu record={record} />}
-                emptyTitle={
-                  loadError ? "用量数据读取失败" : "没有匹配的用量记录"
-                }
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部计量记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={
+                      loadError ? "用量数据读取失败" : "没有匹配的用量记录"
+                    }
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部计量记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleRecords.length ? (

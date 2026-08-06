@@ -6,6 +6,7 @@ import {
   Button,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -429,12 +430,16 @@ export function MaintenanceWindowsPage() {
                 ]}
               />
             )}
-            emptyTitle={loadError ? "维护窗口读取失败" : "暂无维护窗口"}
-            emptyDescription={
-              loadError ??
-              (search || statusFilter !== "all"
-                ? "尝试调整筛选条件"
-                : "点击「新建窗口」安排第一个维护窗口")
+            empty={
+              <EmptyState
+                title={loadError ? "维护窗口读取失败" : "暂无维护窗口"}
+                description={
+                  loadError ??
+                  (search || statusFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : "点击「新建窗口」安排第一个维护窗口")
+                }
+              />
             }
             footer={
               pageCount > 1 ? (

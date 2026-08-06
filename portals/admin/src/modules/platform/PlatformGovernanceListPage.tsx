@@ -466,12 +466,20 @@ export function PlatformGovernanceListPage({
                   labels={config.actions}
                 />
               )}
-              emptyTitle="暂无匹配记录"
-              emptyDescription="调整关键词或筛选条件后再查看。"
-              emptyAction={
-                <ActionButton variant="outline" icon="x" onClick={resetFilters}>
-                  重置筛选
-                </ActionButton>
+              empty={
+                <EmptyState
+                  title="暂无匹配记录"
+                  description="调整关键词或筛选条件后再查看。"
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={resetFilters}
+                    >
+                      重置筛选
+                    </ActionButton>
+                  }
+                />
               }
             />
           ) : loading ? (

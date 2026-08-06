@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataTable, ViewHeader, ViewLayout } from "@vxture/design-system";
+import {
+  DataTable,
+  EmptyState,
+  ViewHeader,
+  ViewLayout,
+} from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
 import { DashboardSplit, PageSection } from "@/layout/shell";
 import {
@@ -127,8 +132,12 @@ export function QuotasPage() {
           rows={poolRows}
           rowKey={(row) => row.id}
           loading={loading}
-          emptyTitle="Quota pool data is not yet available."
-          emptyDescription="Usage metering is activated once your subscription is provisioned and your first workload runs."
+          empty={
+            <EmptyState
+              title="Quota pool data is not yet available."
+              description="Usage metering is activated once your subscription is provisioned and your first workload runs."
+            />
+          }
         />
       </PageSection>
     </ViewLayout>

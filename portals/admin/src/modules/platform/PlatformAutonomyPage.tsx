@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   DashboardTemplate,
   DataTable,
+  EmptyState,
   Icon,
   MetricGrid,
   PanelCard,
@@ -375,8 +376,12 @@ export function PlatformAutonomyPage() {
             rowKey={(row) => `${row.key}-${row.model}`}
             loading={loadingResources}
             loadingRows={3}
-            emptyTitle={resourceError ? "模型资源读取失败" : "暂无模型"}
-            emptyDescription={resourceError ?? "尚未接入模型资源。"}
+            empty={
+              <EmptyState
+                title={resourceError ? "模型资源读取失败" : "暂无模型"}
+                description={resourceError ?? "尚未接入模型资源。"}
+              />
+            }
           />
         </PanelCard>
 

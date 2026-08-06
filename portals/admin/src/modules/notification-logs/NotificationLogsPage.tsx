@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ActionButton,
   DataTable,
+  EmptyState,
   FilterBar,
   Input,
   ListPageTemplate,
@@ -283,11 +284,15 @@ export function NotificationLogsPage() {
           indexStart={(page - 1) * PAGE_SIZE + 1}
           selectedKeys={[...selectedIds]}
           onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
-          emptyTitle="暂无通知记录"
-          emptyDescription={
-            search || channelFilter !== "all" || statusFilter !== "all"
-              ? "尝试调整筛选条件"
-              : "数据库中没有通知投递记录"
+          empty={
+            <EmptyState
+              title="暂无通知记录"
+              description={
+                search || channelFilter !== "all" || statusFilter !== "all"
+                  ? "尝试调整筛选条件"
+                  : "数据库中没有通知投递记录"
+              }
+            />
           }
           footer={
             pageCount > 1 ? (

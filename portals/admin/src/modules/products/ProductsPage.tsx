@@ -609,16 +609,20 @@ export function ProductsPage() {
                     onViewDetails={() => handleOpenDetails(product.productCode)}
                   />
                 )}
-                emptyTitle="没有匹配的产品能力"
-                emptyDescription="清空筛选条件后可查看全部产品能力。"
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title="没有匹配的产品能力"
+                    description="清空筛选条件后可查看全部产品能力。"
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleProducts.length ? (

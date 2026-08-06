@@ -862,18 +862,22 @@ export function InvoicesPage() {
                     onReceiptAction={requestReceiptAction}
                   />
                 )}
-                emptyTitle={loadError ? "发票数据读取失败" : "没有匹配的发票"}
-                emptyDescription={
-                  loadError ?? "清空筛选条件后可查看全部线下发票记录。"
-                }
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title={loadError ? "发票数据读取失败" : "没有匹配的发票"}
+                    description={
+                      loadError ?? "清空筛选条件后可查看全部线下发票记录。"
+                    }
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleInvoices.length ? (

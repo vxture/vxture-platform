@@ -653,16 +653,20 @@ export function ProductSolutionsPage() {
                     }
                   />
                 )}
-                emptyTitle="没有匹配的解决方案"
-                emptyDescription="清空筛选条件后可查看全部解决方案。"
-                emptyAction={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={handleReset}
-                  >
-                    清空筛选
-                  </ActionButton>
+                empty={
+                  <EmptyState
+                    title="没有匹配的解决方案"
+                    description="清空筛选条件后可查看全部解决方案。"
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={handleReset}
+                      >
+                        清空筛选
+                      </ActionButton>
+                    }
+                  />
                 }
               />
             ) : visibleSolutions.length ? (

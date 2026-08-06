@@ -651,12 +651,16 @@ export function OpsTodosPage() {
             selectedKeys={selectedKeys}
             onSelectionChange={setSelectedKeys}
             loading={isLoading}
-            emptyTitle={tenantLoadError ? "待办数据读取失败" : "当前没有待办"}
-            emptyDescription={
-              tenantLoadError ??
-              (query || typeFilter !== "all" || severityFilter !== "all"
-                ? "尝试调整筛选条件"
-                : (ticketLoadError ?? "数据库中没有匹配的待办任务。"))
+            empty={
+              <EmptyState
+                title={tenantLoadError ? "待办数据读取失败" : "当前没有待办"}
+                description={
+                  tenantLoadError ??
+                  (query || typeFilter !== "all" || severityFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : (ticketLoadError ?? "数据库中没有匹配的待办任务。"))
+                }
+              />
             }
             footer={pagination}
             rowActions={todoActions}

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ActionButton,
   DataTable,
+  EmptyState,
   FilterBar,
   Input,
   ListPageTemplate,
@@ -374,17 +375,25 @@ export function AuditLogsPage() {
           indexStart={(page - 1) * PAGE_SIZE + 1}
           selectedKeys={[...selectedIds]}
           onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
-          emptyTitle={loadError ? "审计日志读取失败" : "暂无审计记录"}
-          emptyDescription={
-            loadError ??
-            (search || resultFilter !== "all" || dateFrom || dateTo
-              ? "尝试调整筛选条件或时间范围"
-              : "后台操作记录将在此处显示")
-          }
-          emptyAction={
-            <ActionButton variant="outline" icon="undo" onClick={handleReset}>
-              重置筛选
-            </ActionButton>
+          empty={
+            <EmptyState
+              title={loadError ? "审计日志读取失败" : "暂无审计记录"}
+              description={
+                loadError ??
+                (search || resultFilter !== "all" || dateFrom || dateTo
+                  ? "尝试调整筛选条件或时间范围"
+                  : "后台操作记录将在此处显示")
+              }
+              action={
+                <ActionButton
+                  variant="outline"
+                  icon="undo"
+                  onClick={handleReset}
+                >
+                  重置筛选
+                </ActionButton>
+              }
+            />
           }
           footer={
             pageCount > 1 ? (

@@ -6,6 +6,7 @@ import {
   Button,
   DataTable,
   DialogForm,
+  EmptyState,
   FilterBar,
   Icon,
   Input,
@@ -476,12 +477,16 @@ export function ComplianceEventsPage() {
                 ]}
               />
             )}
-            emptyTitle={loadError ? "合规事件读取失败" : "暂无合规事件"}
-            emptyDescription={
-              loadError ??
-              (search || statusFilter !== "all"
-                ? "尝试调整筛选条件"
-                : "点击「新建事件」录入第一条合规事件")
+            empty={
+              <EmptyState
+                title={loadError ? "合规事件读取失败" : "暂无合规事件"}
+                description={
+                  loadError ??
+                  (search || statusFilter !== "all"
+                    ? "尝试调整筛选条件"
+                    : "点击「新建事件」录入第一条合规事件")
+                }
+              />
             }
             footer={
               pageCount > 1 ? (
