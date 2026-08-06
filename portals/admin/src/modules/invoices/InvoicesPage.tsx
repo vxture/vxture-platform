@@ -20,11 +20,15 @@ import {
   MetricGrid,
   MetricListCard,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
-import { INVOICE_STATUS_TONE } from "@/modules/shared/status-tone";
+import {
+  BILL_STATUS_TONE,
+  INVOICE_STATUS_TONE,
+} from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { ActionMenuItem, IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -303,13 +307,11 @@ function useInvoiceColumns(): DataTableColumn<BillingInvoiceLedgerRecord>[] {
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <Badge
-                className={`vx-tenant-pill vx-invoice-pill--bill-${invoice.billStatus}`}
-              >
+              <StatusBadge tone={BILL_STATUS_TONE[invoice.billStatus]}>
                 {billStatusLabel(invoice.billStatus)}
-              </Badge>
+              </StatusBadge>
               <Badge
-                className={`vx-tenant-pill vx-invoice-pill--type-${invoice.billType}`}
+                className={`vx-tenant-pill vx-invoice-pill--bill-type-${invoice.billType}`}
               >
                 {billTypeLabel(invoice.billType)}
               </Badge>
@@ -337,16 +339,12 @@ function useInvoiceColumns(): DataTableColumn<BillingInvoiceLedgerRecord>[] {
       cell: (invoice) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
+            <StatusBadge
+              tone={INVOICE_STATUS_TONE[invoice.invoiceStatus]}
+              icon={invoiceStatusIcon(invoice.invoiceStatus)}
             >
-              <Icon
-                name={invoiceStatusIcon(invoice.invoiceStatus)}
-                size="xs"
-                fallback="placeholder"
-              />
               {invoiceStatusLabel(invoice.invoiceStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={invoiceTypeLabel(invoice.invoiceType)}
         />
@@ -407,18 +405,16 @@ function InvoiceCards({
           }
           badges={
             <>
-              <Badge
-                className={`vx-tenant-pill vx-invoice-pill--${invoice.invoiceStatus}`}
-              >
+              <StatusBadge tone={INVOICE_STATUS_TONE[invoice.invoiceStatus]}>
                 {invoiceStatusLabel(invoice.invoiceStatus)}
-              </Badge>
+              </StatusBadge>
               <Badge
                 className={`vx-tenant-pill vx-invoice-pill--tax-${invoice.invoiceTaxType}`}
               >
                 {taxTypeLabel(invoice.invoiceTaxType)}
               </Badge>
               <Badge
-                className={`vx-tenant-pill vx-invoice-pill--type-${invoice.invoiceType}`}
+                className={`vx-tenant-pill vx-invoice-pill--doc-type-${invoice.invoiceType}`}
               >
                 {invoiceTypeLabel(invoice.invoiceType)}
               </Badge>

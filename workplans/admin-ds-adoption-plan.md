@@ -138,7 +138,7 @@ B4 是盘点里的 A2，收益最大（170 处，几乎每个域）也最危险�
 | **1** | A 类重复定义 → DS 组件（实际 60+ 份，非 32）       | ✅ `ad33f26a` `11dd3d37` `394cfad4` `862207b7` + 页头修正 `9c7f815a`                   |
 | **2** | B1 列表卡                                          | 部分：4 页已迁 + DS `note` 槽 + tone 映射表（`5886d0da`）；**剩 15 页 owner 决定不迁** |
 | **3** | 页面骨架换 `ListPageTemplate`/`DetailPageTemplate` | ✅ 30 列表页 + 7 详情页；`ModelGrantsPage` 判定不适用，见 §十二                        |
-| **4** | pill 色调族 → `Badge`                              | 未开始；拍板②已由 shared 既有文件回答；**须一并处理 §十一 的缺色与前缀撞车**           |
+| **4** | pill 色调族 → `Badge`                              | 进行中：商业域 5 页已收（见 §十三）；剩 ~19 族                                         |
 | **5** | B3/B4（卡片选中态、卡表同源）                      | 未评估                                                                                 |
 | **6** | 登录态视觉走查                                     | 未开始                                                                                 |
 
@@ -342,3 +342,46 @@ vx-invoice-pill--type-${invoice.invoiceType}  // electronic / paper / normal_vat
 **踩到的坑**：`TenantDetailPage` 有两个 `ViewLayout`——主体一个，`!tenant` 早退分支一个，
 两处 className 完全相同。按"第一个 ViewLayout"定位会把文件从早退分支处截断。改动这类文件
 前先数一遍同名根节点。早退分支保持 `ViewLayout` 不动：它是"未找到"占位，没有详情页结构。
+
+## 十三、批 4 第一刀：状态标与分类标要分开算（2026-08-06）
+
+动手前把 247 个 pill 选择器按**实际色值**聚了一次类，结论比"239 个选择器"这个数字有用得多：
+
+| 色                        | 选择器数 | 是什么                                               |
+| ------------------------- | -------- | ---------------------------------------------------- |
+| `--tenant-amber`          | 61       | 状态 → `warning`                                     |
+| `--vx-color-gray-500/600` | 62       | 状态 → `neutral`                                     |
+| `--tenant-green`          | 44       | 状态 → `success`                                     |
+| `--tenant-rose`           | 37       | 状态 → `danger`                                      |
+| `--tenant-blue`           | 19       | 状态 → `brand`（沿用 `status-tone.ts` 的既定对应）   |
+| `--vx-color-purple-600`   | 10       | **不是状态**：tier-enterprise ×4、product--model ×3… |
+| `--tenant-cyan`           | 8        | **不是状态**：product--agent ×4、tenant--individual… |
+
+**所以这一族其实是三样东西**，处置必须分开：
+
+1. **状态标**（~217）→ `StatusBadge tone=`。语气表 `modules/shared/status-tone.ts` 早就有，
+   本轮只补了 `PAYMENT_STATUS_TONE` 与 `QUOTA_RISK_TONE` 两张。
+2. **等级标**（tier free/pro/enterprise，紫是 enterprise）→ 归 `--level-1..5` 阶梯。
+   **等级是序不是语气**：DS 六档语气里没有"高一级"，套上去只会被读成状态。未做。
+3. **分类标**（产品类型 platform/model/agent、主体类型、权限层 L1–L3）→ **留 admin**。
+   业务分类不是语气，DS 零业务语义（§四D 早已这么写）。紫、青两色的存在理由就在这里。
+
+### 本轮完成：商业域 5 页
+
+`BillingPage` / `PaymentsPage` / `InvoicesPage` / `OrdersPage` / `SubscriptionsPage`
+的账单态、发票态、订单态、支付态、对账态、订阅态、配额风险全部换 `StatusBadge`；
+`admin-management-pills-commerce.css` 253 → 83 行。剩在页面里的 pill 只有分类标
+（tier / type / tax / source / cycle），这是有意的。
+
+**顺带修掉 §十一 的前缀撞车**：`vx-invoice-pill--type-` 原先被 `billType`
+（adjust/normal/prepaid/supplement）与 `invoiceType`（electronic/paper/normal_vat/
+special_vat/other）两个值域共用，`normal` 在两边都出现——今天没炸是因为恰好同色。
+拆成 `--bill-type-` 与 `--doc-type-`。同时删掉 `.vx-billing-pill--type-*`：全仓无人引用。
+
+**账单异常标的紫色没了**：调整单（蓝）与补录单（紫）原是两色，DS 无紫档，两者同归
+`brand`。判据是它们本来就有"调整单""补录单"两个词，区别不必靠记颜色。
+
+### 复测
+
+pill 引用 266 → 226 处，选择器 239 → 158 个，admin CSS 6484 → 6325 行。
+剩下的 19 族按同一把尺子做：先聚色，再分状态/等级/分类三堆。

@@ -11,18 +11,21 @@ import {
   DataTable,
   EmptyState,
   FilterBar,
-  Icon,
   Input,
   ListCardGrid,
   ListPageTemplate,
   MetricGrid,
   MetricListCard,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
-import { resolveStatusTone } from "@vxture/shared";
-import { BILL_STATUS_TONE } from "@/modules/shared/status-tone";
+import { resolveStatusTone, type StatusTone } from "@vxture/shared";
+import {
+  BILL_STATUS_TONE,
+  INVOICE_STATUS_TONE,
+} from "@/modules/shared/status-tone";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
 import { exportRowsToCsv, type CsvColumn } from "@/lib/exportCsv";
@@ -109,11 +112,16 @@ function invoiceStatusLabel(status: BillingInvoiceStatus) {
   return "未开票";
 }
 
+/**
+ * 账单上的异常标。`tone` 直接给 DS 语气档，不再走 `vx-billing-exception-pill--*`
+ * 那套色名——调整单与补录单原先分蓝、紫两色，DS 没有紫档，两者同归 `brand`：
+ * 它们的区别由"调整单"/"补录单"这两个词说，不该靠记颜色。
+ */
 function billingExceptionTags(bill: BillingRecord) {
   const tags: Array<{
     key: string;
     label: string;
-    tone: string;
+    tone: StatusTone;
     title?: string;
   }> = [];
 
@@ -122,7 +130,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "adjust",
       label: "调整单",
-      tone: "adjust",
+      tone: "brand",
       ...(title ? { title } : {}),
     });
   }
@@ -131,7 +139,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "supplement",
       label: "补录单",
-      tone: "supplement",
+      tone: "brand",
       ...(title ? { title } : {}),
     });
   }
@@ -139,7 +147,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "discounted",
       label: "已减免",
-      tone: "discount",
+      tone: "warning",
       title: `减免 ${formatCurrency(bill.discountAmount, bill.currency)}`,
     });
   }
@@ -147,7 +155,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "overdue_followup",
       label: bill.operationRemark ? "逾期跟进" : "逾期待跟进",
-      tone: "overdue",
+      tone: "danger",
       title: bill.operationRemark ?? "当前账单已逾期，尚未登记跟进原因。",
     });
   }
@@ -156,7 +164,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "cancelled",
       label: "已作废",
-      tone: "cancelled",
+      tone: "neutral",
       ...(title ? { title } : {}),
     });
   }
@@ -165,7 +173,7 @@ function billingExceptionTags(bill: BillingRecord) {
     tags.push({
       key: "invoice_exception",
       label: bill.invoiceStatus === "red" ? "发票红冲" : "发票驳回",
-      tone: "invoice",
+      tone: "danger",
       ...(title ? { title } : {}),
     });
   }
@@ -323,8 +331,11 @@ function BillingActionsMenu({
 }
 
 /**
- * 行内的状态标仍是 pill（`vx-billing-pill--*`）而非 `StatusBadge`：那一族是业务
- * 值域着色表，整族改 Badge 归批 4，一次改动不跨两个语义面。
+ * 状态标（账单态、发票态、异常标）走 `StatusBadge`，语气由 `status-tone.ts` 给。
+ *
+ * 套餐等级仍是 pill：等级是**序**不是语气（free < pro < enterprise），DS 的六档
+ * 语气里没有"高一级"这回事，套上去只会把它读成状态。它归 `--level-1..5` 阶梯，
+ * 与缺色（starter / business）一起另算。
  */
 function useBillingColumns(): DataTableColumn<BillingRecord>[] {
   const router = useRouter();
@@ -397,13 +408,13 @@ function useBillingColumns(): DataTableColumn<BillingRecord>[] {
               tags.length ? (
                 <span className="inline-flex flex-wrap gap-2xs">
                   {tags.map((tag) => (
-                    <Badge
+                    <StatusBadge
                       key={tag.key}
-                      className={`vx-tenant-pill vx-billing-exception-pill vx-billing-exception-pill--${tag.tone}`}
-                      title={tag.title}
+                      tone={tag.tone}
+                      {...(tag.title ? { title: tag.title } : {})}
                     >
                       {tag.label}
-                    </Badge>
+                    </StatusBadge>
                   ))}
                 </span>
               ) : (
@@ -424,16 +435,12 @@ function useBillingColumns(): DataTableColumn<BillingRecord>[] {
       cell: (bill) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
+            <StatusBadge
+              tone={BILL_STATUS_TONE[bill.billStatus]}
+              icon={billStatusIcon(bill.billStatus)}
             >
-              <Icon
-                name={billStatusIcon(bill.billStatus)}
-                size="xs"
-                fallback="placeholder"
-              />
               {billStatusLabel(bill.billStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={`已收 ${formatCurrency(bill.paidAmount, bill.currency)}`}
         />
@@ -446,11 +453,9 @@ function useBillingColumns(): DataTableColumn<BillingRecord>[] {
       cell: (bill) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
-            >
+            <StatusBadge tone={INVOICE_STATUS_TONE[bill.invoiceStatus]}>
               {invoiceStatusLabel(bill.invoiceStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={
             bill.invoiceNo ??
@@ -486,24 +491,20 @@ function BillingCards({
           }
           badges={
             <>
-              <Badge
-                className={`vx-tenant-pill vx-billing-pill--${bill.billStatus}`}
-              >
+              <StatusBadge tone={BILL_STATUS_TONE[bill.billStatus]}>
                 {billStatusLabel(bill.billStatus)}
-              </Badge>
-              <Badge
-                className={`vx-tenant-pill vx-billing-pill--invoice-${bill.invoiceStatus}`}
-              >
+              </StatusBadge>
+              <StatusBadge tone={INVOICE_STATUS_TONE[bill.invoiceStatus]}>
                 {invoiceStatusLabel(bill.invoiceStatus)}
-              </Badge>
+              </StatusBadge>
               {billingExceptionTags(bill).map((tag) => (
-                <Badge
+                <StatusBadge
                   key={tag.key}
-                  className={`vx-tenant-pill vx-billing-exception-pill vx-billing-exception-pill--${tag.tone}`}
-                  title={tag.title}
+                  tone={tag.tone}
+                  {...(tag.title ? { title: tag.title } : {})}
                 >
                   {tag.label}
-                </Badge>
+                </StatusBadge>
               ))}
             </>
           }

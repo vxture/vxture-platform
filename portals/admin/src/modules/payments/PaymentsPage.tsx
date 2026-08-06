@@ -20,6 +20,7 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
   Textarea,
 } from "@vxture/design-system";
@@ -41,6 +42,11 @@ import type {
   PaymentOperationRecord,
   PaymentReconciliationStatus,
 } from "@/entities/console";
+import {
+  BILL_STATUS_TONE,
+  PAYMENT_STATUS_TONE,
+  RECONCILIATION_TONE,
+} from "@/modules/shared/status-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
@@ -397,11 +403,15 @@ function usePaymentColumns(): DataTableColumn<PaymentOperationRecord>[] {
         <TableTitleCell
           title={
             <span className="inline-flex flex-wrap gap-2xs">
-              <Badge
-                className={`vx-tenant-pill vx-payment-pill--bill-${payment.billStatus ?? "none"}`}
+              <StatusBadge
+                tone={
+                  payment.billStatus
+                    ? BILL_STATUS_TONE[payment.billStatus]
+                    : "neutral"
+                }
               >
                 {billStatusLabel(payment.billStatus)}
-              </Badge>
+              </StatusBadge>
               <Badge className="vx-tenant-pill vx-payment-pill--source">
                 {payment.orderNo ?? "未关联订单"}
               </Badge>
@@ -432,16 +442,12 @@ function usePaymentColumns(): DataTableColumn<PaymentOperationRecord>[] {
       cell: (payment) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-payment-pill--${payment.paymentStatus}`}
+            <StatusBadge
+              tone={PAYMENT_STATUS_TONE[payment.paymentStatus]}
+              icon={paymentStatusIcon(payment.paymentStatus)}
             >
-              <Icon
-                name={paymentStatusIcon(payment.paymentStatus)}
-                size="xs"
-                fallback="placeholder"
-              />
               {paymentStatusLabel(payment.paymentStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={formatDate(payment.paidAt ?? payment.createdAt)}
         />
@@ -454,16 +460,12 @@ function usePaymentColumns(): DataTableColumn<PaymentOperationRecord>[] {
       cell: (payment) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-payment-pill--reconcile-${payment.reconciliationStatus}`}
+            <StatusBadge
+              tone={RECONCILIATION_TONE[payment.reconciliationStatus]}
+              icon={reconciliationIcon(payment.reconciliationStatus)}
             >
-              <Icon
-                name={reconciliationIcon(payment.reconciliationStatus)}
-                size="xs"
-                fallback="placeholder"
-              />
               {reconciliationLabel(payment.reconciliationStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={payment.remark ?? payment.operatorName}
         />
@@ -518,16 +520,14 @@ function PaymentCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-payment-pill--${payment.paymentStatus}`}
-            >
+            <StatusBadge tone={PAYMENT_STATUS_TONE[payment.paymentStatus]}>
               {paymentStatusLabel(payment.paymentStatus)}
-            </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-payment-pill--reconcile-${payment.reconciliationStatus}`}
+            </StatusBadge>
+            <StatusBadge
+              tone={RECONCILIATION_TONE[payment.reconciliationStatus]}
             >
               {reconciliationLabel(payment.reconciliationStatus)}
-            </Badge>
+            </StatusBadge>
             <Badge className="vx-tenant-pill vx-payment-pill--source">
               {paySourceLabel(payment.paySource)}
             </Badge>

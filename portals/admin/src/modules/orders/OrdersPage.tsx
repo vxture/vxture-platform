@@ -11,18 +11,21 @@ import {
   DataTable,
   EmptyState,
   FilterBar,
-  Icon,
   Input,
   ListPageTemplate,
   ListCardGrid,
   MetricGrid,
   MetricListCard,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
 import { resolveStatusTone } from "@vxture/shared";
-import { ORDER_STATUS_TONE } from "@/modules/shared/status-tone";
+import {
+  ORDER_STATUS_TONE,
+  PAYMENT_STATUS_TONE,
+} from "@/modules/shared/status-tone";
 import { isUnset, UNSET_LABEL } from "@/modules/shared/display";
 import { ListPagination } from "@/modules/shared/ListPagination";
 import type { IconName } from "@vxture/design-system";
@@ -321,16 +324,12 @@ function useOrderColumns(): DataTableColumn<OrderOperationRecord>[] {
       cell: (order) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
+            <StatusBadge
+              tone={ORDER_STATUS_TONE[order.orderStatus]}
+              icon={orderStatusIcon(order.orderStatus)}
             >
-              <Icon
-                name={orderStatusIcon(order.orderStatus)}
-                size="xs"
-                fallback="placeholder"
-              />
               {orderStatusLabel(order.orderStatus)}
-            </Badge>
+            </StatusBadge>
           }
           description={`${paymentStatusLabel(order.paymentStatus)} · ${paySourceLabel(order.paySource)}`}
         />
@@ -369,16 +368,12 @@ function OrderCards({
           }
           badges={
             <>
-              <Badge
-                className={`vx-tenant-pill vx-order-pill--${order.orderStatus}`}
-              >
+              <StatusBadge tone={ORDER_STATUS_TONE[order.orderStatus]}>
                 {orderStatusLabel(order.orderStatus)}
-              </Badge>
-              <Badge
-                className={`vx-tenant-pill vx-order-pill--payment-${order.paymentStatus}`}
-              >
+              </StatusBadge>
+              <StatusBadge tone={PAYMENT_STATUS_TONE[order.paymentStatus]}>
                 {paymentStatusLabel(order.paymentStatus)}
-              </Badge>
+              </StatusBadge>
               <Badge className="vx-tenant-pill vx-order-pill--source">
                 {paySourceLabel(order.paySource)}
               </Badge>

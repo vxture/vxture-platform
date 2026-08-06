@@ -16,6 +16,7 @@ import {
   ListPageTemplate,
   MetricGrid,
   NativeSelect,
+  StatusBadge,
   TableTitleCell,
 } from "@vxture/design-system";
 import type { DataTableColumn } from "@vxture/design-system";
@@ -33,6 +34,10 @@ import type {
   SubscriptionOperationRecord,
   SubscriptionOperationStatus,
 } from "@/entities/console";
+import {
+  QUOTA_RISK_TONE,
+  SUBSCRIPTION_OPERATION_TONE,
+} from "@/modules/shared/status-tone";
 import { PageHeader } from "@/modules/shared/PageHeader";
 import { type PageSize } from "@/modules/shared/PageSizePicker";
 import {
@@ -283,16 +288,12 @@ function useSubscriptionColumns(): DataTableColumn<SubscriptionOperationRecord>[
       cell: (subscription) => (
         <TableTitleCell
           title={
-            <Badge
-              className={`vx-tenant-pill vx-subscription-pill--${subscription.status}`}
+            <StatusBadge
+              tone={SUBSCRIPTION_OPERATION_TONE[subscription.status]}
+              icon={subscriptionStatusIcon(subscription.status)}
             >
-              <Icon
-                name={subscriptionStatusIcon(subscription.status)}
-                size="xs"
-                fallback="placeholder"
-              />
               {subscriptionStatusLabel(subscription.status)}
-            </Badge>
+            </StatusBadge>
           }
           description={`${formatDate(subscription.startAt)} - ${formatDate(subscription.endAt)}`}
         />
@@ -381,21 +382,19 @@ function SubscriptionCards({
             />
           </header>
           <div className="vx-tenant-directory-card__badges">
-            <Badge
-              className={`vx-tenant-pill vx-subscription-pill--${subscription.status}`}
+            <StatusBadge
+              tone={SUBSCRIPTION_OPERATION_TONE[subscription.status]}
             >
               {subscriptionStatusLabel(subscription.status)}
-            </Badge>
+            </StatusBadge>
             <Badge
               className={`vx-tenant-pill vx-subscription-pill--tier-${tierFilterValue(subscription)}`}
             >
               {subscription.tierName}
             </Badge>
-            <Badge
-              className={`vx-tenant-pill vx-subscription-pill--quota-${subscription.quota.risk}`}
-            >
+            <StatusBadge tone={QUOTA_RISK_TONE[subscription.quota.risk]}>
               {quotaRiskLabel(subscription.quota.risk)}
-            </Badge>
+            </StatusBadge>
           </div>
           <p className="vx-subscription-card__solution">
             {subscription.solutionName} · {subscription.servicePlanName}

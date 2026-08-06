@@ -35,8 +35,10 @@ import type {
   BillingBillStatus,
   BillingInvoiceStatus,
   OrderOperationStatus,
+  OrderPaymentStatus,
   PaymentReconciliationStatus,
   ProductCapabilityStatus,
+  SubscriptionOperationQuotaRisk,
   SubscriptionOperationStatus,
   UsageMeteringRisk,
 } from "@/entities/console";
@@ -126,4 +128,33 @@ export const CAPABILITY_STATUS_TONE: Record<
   active: "brand",
   draft: "warning",
   archived: "neutral",
+};
+
+/**
+ * 支付态。订单与收款两页共用一个值域（`OrderPaymentStatus`）。
+ *
+ * 取自 `.vx-payment-pill--*`：paid 绿；pending / pending_verify / partial 黄；
+ * failed / refunding 红；not_required / unpaid / closed 灰。`unpaid` 是灰不是黄
+ * ——"还没开始付"与"付了一半"不是同一件事，前者不需要催。
+ */
+export const PAYMENT_STATUS_TONE: Record<OrderPaymentStatus, StatusTone> = {
+  paid: "success",
+  pending: "warning",
+  pending_verify: "warning",
+  partial: "warning",
+  failed: "danger",
+  refunding: "danger",
+  not_required: "neutral",
+  unpaid: "neutral",
+  closed: "neutral",
+};
+
+/** 订阅配额风险。三档与 `.vx-subscription-pill--quota-*` 一一对应。 */
+export const QUOTA_RISK_TONE: Record<
+  SubscriptionOperationQuotaRisk,
+  StatusTone
+> = {
+  normal: "success",
+  warning: "warning",
+  danger: "danger",
 };
