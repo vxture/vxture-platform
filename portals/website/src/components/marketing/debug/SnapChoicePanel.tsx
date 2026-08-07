@@ -210,7 +210,7 @@ export default function SnapChoicePanel(
           <Button
             key={id}
             variant={isActive ? "default" : "secondary"}
-            size="sm"
+            size="md"
             onClick={() => handleButtonClick(id)}
             className={`min-w-20 px-2 py-2 rounded transition text-left ${
               isActive
