@@ -58,9 +58,7 @@ export class OperatorAuthzService {
   constructor(@Inject(OPERA_BFF_RO_POOL) private readonly pool: Pool) {}
 
   /** 解析主体 + 能力码；账号不存在 / 停用 / 角色停用一律返回 null（调用方转 401）。 */
-  async resolve(
-    operatorId: string,
-  ): Promise<{
+  async resolve(operatorId: string): Promise<{
     operator: OperatorPrincipal;
     capabilities: Capability[];
   } | null> {
