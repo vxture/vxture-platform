@@ -67,10 +67,10 @@ const IDENTITY_WIDTH = "w-media-sm";
 function RowLead({
   icon,
   width,
-}: {
+}: Readonly<{
   icon?: IconName | undefined;
   width?: "row" | "identity" | undefined;
-}) {
+}>) {
   return (
     <span
       className={cn(
@@ -105,7 +105,7 @@ export interface ShellPanelContentProps extends React.ComponentPropsWithoutRef<
  */
 export const ShellPanelContent = React.forwardRef<
   React.ComponentRef<typeof PopoverContent>,
-  ShellPanelContentProps
+  Readonly<ShellPanelContentProps>
 >(function ShellPanelContent(
   { className, sideOffset = 8, onOpenAutoFocus, ...props },
   ref,
@@ -145,7 +145,7 @@ export function ShellPanelSection({
   divided = true,
   children,
   className,
-}: ShellPanelSectionProps) {
+}: Readonly<ShellPanelSectionProps>) {
   return (
     <div
       className={cn(
@@ -168,7 +168,9 @@ export function ShellPanelSection({
  * （`ShellPreferencePanel` 自己就是一段），标题样式仍需同源——左内距与行的
  * 左内距同档，标题左缘对齐各行图标左缘。
  */
-export function ShellPanelSectionTitle({ children }: { children: ReactNode }) {
+export function ShellPanelSectionTitle({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   return (
     <p className={cn(ROW_INSET, "text-label-sm text-muted-foreground")}>
       {children}
@@ -209,7 +211,7 @@ export function ShellPanelHeader({
   titleAside,
   metaRows = [],
   className,
-}: ShellPanelHeaderProps) {
+}: Readonly<ShellPanelHeaderProps>) {
   return (
     // items-center：标识块 48px 比它右侧的两三行文字高，items-start 会让头像
     // 顶着第一行、下方留一截空白，看起来像掉了一行内容。
@@ -300,7 +302,7 @@ export function ShellPanelRow({
   linkComponent,
   onClick,
   className,
-}: ShellPanelRowProps) {
+}: Readonly<ShellPanelRowProps>) {
   const interactive = Boolean(onClick || href) && !disabled;
   const trailing =
     trailingIcon ??
@@ -411,7 +413,7 @@ export function ShellPanelControlRow({
   label,
   children,
   className,
-}: ShellPanelControlRowProps) {
+}: Readonly<ShellPanelControlRowProps>) {
   return (
     <div
       className={cn(
@@ -450,7 +452,7 @@ export function ShellPanelMeterRow({
   valueLabel,
   percent,
   className,
-}: ShellPanelMeterRowProps) {
+}: Readonly<ShellPanelMeterRowProps>) {
   const safe = Number.isFinite(percent)
     ? Math.max(0, Math.min(100, percent))
     : 0;
@@ -515,7 +517,7 @@ export function ShellPanelSlots({
   lead = "row",
   slots,
   className,
-}: ShellPanelSlotsProps) {
+}: Readonly<ShellPanelSlotsProps>) {
   return (
     <div
       role="group"
@@ -576,7 +578,7 @@ export interface ShellScopeButtonProps {
  */
 export const ShellScopeButton = React.forwardRef<
   HTMLButtonElement,
-  ShellScopeButtonProps
+  Readonly<ShellScopeButtonProps>
 >(function ShellScopeButton(
   { icon, label, ariaLabel, active = false, caret = true, onClick, ...rest },
   ref,
