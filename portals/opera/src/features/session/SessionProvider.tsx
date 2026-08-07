@@ -96,7 +96,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         void signOut();
       },
     });
-     
   }, []);
 
   async function signOut() {
