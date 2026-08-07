@@ -140,6 +140,20 @@ export const STANDALONE_COLORS = [
   ["surface-active", "brand-600-alpha-15", "brand-600-alpha-22"],
   ["surface-selected", "brand-600-alpha-10", "brand-600-alpha-15"],
   ["surface-selected-hover", "brand-600-alpha-15", "brand-600-alpha-22"],
+  /*
+   * 常态的品牌淡底与弱描边（a22e8db8 为档位徽章加的，2026-08-07 补录进 policy）。
+   *
+   * 名字带 `primary-` 却不走 `INTENT_SLOTS`：那张表是**六个意图族共用**的槽位，
+   * 加一个槽就要给 success / warning / danger / info / neutral 各生一份，
+   * 而这两档只有 primary 有需求，凭空多出十个没人用的 token。
+   *
+   * muted-strong：此前只有 hover/active 两个**交互**档比 muted 深，需要"同为常态、
+   * 但比 muted 重一档"时只能去借 hover——借了之后调 hover 会把静态样式一起改掉。
+   * border-soft：`--primary-border` 是 brand-600，给的是"要被看见"的边（聚焦环、
+   * 强调块）；一枚安静的标用它会显得比它承载的文字还重。
+   */
+  ["primary-muted-strong", "brand-100", "brand-900"],
+  ["primary-border-soft", "brand-200", "brand-800"],
   // 中性弱化填充（owner 拍板 2026-08-03）：占位、键位标示、组内非交互成员。
   // 与 accent 的分工：accent 是品牌微染的交互反馈（hover/展开），muted 是静态
   // 中性底——上游 muted/muted-foreground 本是一对，此前只建了后者，

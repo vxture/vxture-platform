@@ -57,17 +57,10 @@
   --primary-active: var(--vx-color-brand-800);
   --primary-foreground: var(--vx-color-white);
   --primary-muted: var(--vx-color-brand-50);
-  /* 常态的第二级淡底。此前只有 hover/active 两个**交互**档比 muted 深，需要
-     "同为常态、但比 muted 重一档"时只能去借 hover——借了之后调 hover 就会把
-     静态样式一起改掉。这一档专供常态分级（admin 的套餐档就是这么分的）。 */
-  --primary-muted-strong: var(--vx-color-brand-100);
   --primary-muted-hover: var(--vx-color-brand-100);
   --primary-muted-active: var(--vx-color-brand-200);
   --primary-muted-foreground: var(--vx-color-brand-800);
   --primary-border: var(--vx-color-brand-600);
-  /* 常态的弱描边。`--primary-border` 是 brand-600，给的是"要被看见"的边（聚焦环、
-     强调块）；一枚安静的标用它会显得比它承载的文字还重。这一档专供常态标记。 */
-  --primary-border-soft: var(--vx-color-brand-200);
   --primary-text: var(--vx-color-brand-700);
   --destructive: var(--vx-color-red-600);
   --destructive-hover: var(--vx-color-red-700);
@@ -160,6 +153,8 @@
   --chart-div-5: var(--vx-color-red-700);
 
   /* gradient */
+  --primary-muted-strong: var(--vx-color-brand-100);
+  --primary-border-soft: var(--vx-color-brand-200);
   --muted: var(--vx-color-neutral-200);
   --gradient-brand-from: var(--vx-color-brand-600);
   --gradient-brand-to: var(--vx-color-brand-800);
@@ -211,12 +206,10 @@
   --primary-active: var(--vx-color-brand-800);
   --primary-foreground: var(--vx-color-white);
   --primary-muted: var(--vx-color-brand-950);
-  --primary-muted-strong: var(--vx-color-brand-900);
   --primary-muted-hover: var(--vx-color-brand-900);
   --primary-muted-active: var(--vx-color-brand-800);
   --primary-muted-foreground: var(--vx-color-brand-300);
   --primary-border: var(--vx-color-brand-500);
-  --primary-border-soft: var(--vx-color-brand-800);
   --primary-text: var(--vx-color-brand-400);
   --destructive: var(--vx-color-red-600);
   --destructive-hover: var(--vx-color-red-700);
@@ -309,6 +302,8 @@
   --chart-div-5: var(--vx-color-red-300);
 
   /* gradient */
+  --primary-muted-strong: var(--vx-color-brand-900);
+  --primary-border-soft: var(--vx-color-brand-800);
   --muted: var(--vx-color-neutral-800);
   --gradient-brand-from: var(--vx-color-brand-500);
   --gradient-brand-to: var(--vx-color-brand-800);
