@@ -11,6 +11,7 @@ import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { cn } from "../../../utils/cn";
 import { overlayMotion, panel } from "../../../styles/recipes";
+import { overlayWidthClass, type OverlayWidth } from "../../overlayWidth";
 
 export interface PopoverProps extends React.ComponentPropsWithoutRef<
   typeof PopoverPrimitive.Root
@@ -22,7 +23,13 @@ export interface PopoverTriggerProps extends React.ComponentPropsWithoutRef<
 
 export interface PopoverContentProps extends React.ComponentPropsWithoutRef<
   typeof PopoverPrimitive.Content
-> {}
+> {
+  /**
+   * 气泡宽度挡位。这里是**定宽**而非下限：气泡里是排版好的一段内容，
+   * 宽度由设计决定，不该随内容浮动（菜单类相反，见 [overlayWidth.ts]）。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface PopoverCloseProps extends React.ComponentPropsWithoutRef<
   typeof PopoverPrimitive.Close
@@ -40,7 +47,7 @@ const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
   function PopoverContent(
-    { className, align = "center", sideOffset = 4, ...props },
+    { className, align = "center", sideOffset = 4, width = "lg", ...props },
     ref,
   ) {
     return (
@@ -50,9 +57,13 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
           align={align}
           sideOffset={sideOffset}
           className={cn(
-            // w-72 是这一枚浮层的默认宽度，属组件尺寸而非刻度——按 design-system/docs/01-usage.md §3，
-            // 组件尺寸归 cva / 组件自身，不进 T2。
-            "z-popover w-72 p-lg outline-none",
+            // 默认档 lg = 18rem。挡位是按设计定的（见 semantic-policy 的 OVERLAY_WIDTHS），
+            // 与原先写死的 w-72 同值属巧合——不是拿那个手调值倒推出来的。
+            // 原注说"属组件尺寸而非刻度、不进 T2"是把 01-usage.md §3 读反了：§3 说
+            // **上下文尺寸由 cva variant 承载**，而它给的例子恰是 h-control-md——
+            // 变体归组件，取值仍来自 T2。现在 T2 有了 --container-overlay-*，这里照 §3 办。
+            overlayWidthClass[width],
+            "z-popover p-lg outline-none",
             panel.base,
             panel.popover,
             overlayMotion,

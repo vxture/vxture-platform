@@ -12,6 +12,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "../../../utils/cn";
 import { Icon } from "../../../icons";
 import { expandable, interactive, invalid } from "../../../styles/recipes";
+import { overlayMinWidthClass, type OverlayWidth } from "../../overlayWidth";
 
 export interface SelectProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Root
@@ -27,7 +28,13 @@ export interface SelectTriggerProps extends React.ComponentPropsWithoutRef<
 
 export interface SelectContentProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Content
-> {}
+> {
+  /**
+   * 下拉面板的**最小**宽度挡位。选项文字长度不可预知，故是下限不是定宽；
+   * `position="popper"` 时还会被触发器宽度顶起来，取两者较大的。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface SelectLabelProps extends React.ComponentPropsWithoutRef<
   typeof SelectPrimitive.Label
@@ -80,7 +87,7 @@ const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
 
 const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
   function SelectContent(
-    { className, children, position = "popper", ...props },
+    { className, children, position = "popper", width = "xs", ...props },
     ref,
   ) {
     return (
@@ -88,7 +95,8 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         <SelectPrimitive.Content
           ref={ref}
           className={cn(
-            "relative z-dropdown max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-border bg-card text-foreground shadow-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+            overlayMinWidthClass[width],
+            "relative z-dropdown max-h-96 overflow-hidden rounded-md border border-border bg-card text-foreground shadow-overlay data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
             position === "popper" &&
               "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
             className,

@@ -47,6 +47,7 @@ import {
   HEADER_HEIGHTS,
   CONTENT_WIDTHS,
   PANEL_WIDTHS,
+  OVERLAY_WIDTHS,
   SPACING_SCALE,
   SPACING_KINDS,
   FLUID_SPACING,
@@ -410,6 +411,16 @@ function buildLayout() {
   for (const [name, value, why] of PANEL_WIDTHS) {
     rows.push([`--container-panel-${name}`, value, "panel", why]);
   }
+  /* 控件与浮层宽：取 T1 基本单位的整数倍——container 刻度从 16rem 起步，这一段在它底下。
+     可以引 var()（不同于 page / content）：控件宽不进容器查询。 */
+  for (const [name, mult, why] of OVERLAY_WIDTHS) {
+    rows.push([
+      `--container-overlay-${name}`,
+      `calc(${t1("--vx-spacing", `layout/overlay/${name}`)} * ${mult})`,
+      "control",
+      why,
+    ]);
+  }
   /* 侧栏宽 / header 高：版面结构归本族，但命名空间留 spacing——
      w-* / h-* 只从 --spacing-* 派生。 */
   for (const [kind, list] of [
@@ -525,13 +536,18 @@ const outputs = [
   ],
   staticFile(
     "layout-semantic.css",
-    "版面宽度：页面 / 内容 / 面板（max-w-*）与侧栏（w-sidebar-*）",
+    "版面宽度：页面 / 内容 / 面板 / 控件（max-w-* / min-w-*）与侧栏（w-sidebar-*）",
     "scripts/design-tokens/semantic-policy.mjs",
     buildLayout(),
     `
  *
- * ⚠ container 族落字面量而非 var()：容器查询里 var() 不参与求值，写成引用会静默失效。
- *   sidebar 族例外地留在 spacing 命名空间——w-* 工具类只从 --spacing-* 派生。`,
+ * ⚠ page / content / panel 三族落字面量而非 var()：它们会进 @container (width >= …)，
+ *   而容器查询里 var() 不参与求值，写成引用不报错、只是整档静默失效。
+ *   control 族不受此限（控件宽不进容器查询），故按分层原则引 T1。
+ *
+ * ⚠ 本族在 @theme 里，而 v4 只吐**被工具类用到**的 theme 变量（实测 2026-08-07：
+ *   --container-page-3xl / -5xl 因无人用而未产出）。纯 var() 消费的挡位会静默消失，
+ *   所以每一档都要有组件以 min-w-* / max-w-* / w-* 消费它。`,
   ),
   staticFile("radius-semantic.css", "圆角（工具类族 rounded-*）", "scripts/design-tokens/semantic-policy.mjs", buildRadius()),
   staticFile(

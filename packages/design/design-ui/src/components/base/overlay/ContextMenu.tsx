@@ -17,6 +17,7 @@ import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 import { cn } from "../../../utils/cn";
 import { overlayMotion, panel } from "../../../styles/recipes";
 import { Icon } from "../../../icons";
+import { overlayMinWidthClass, type OverlayWidth } from "../../overlayWidth";
 
 export interface ContextMenuProps extends React.ComponentPropsWithoutRef<
   typeof ContextMenuPrimitive.Root
@@ -28,7 +29,12 @@ export interface ContextMenuTriggerProps extends React.ComponentPropsWithoutRef<
 
 export interface ContextMenuContentProps extends React.ComponentPropsWithoutRef<
   typeof ContextMenuPrimitive.Content
-> {}
+> {
+  /**
+   * 菜单面板的**最小**宽度挡位。菜单项文字长度不可预知，故是下限不是定宽。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface ContextMenuItemProps extends React.ComponentPropsWithoutRef<
   typeof ContextMenuPrimitive.Item
@@ -74,7 +80,12 @@ export interface ContextMenuSubTriggerProps extends React.ComponentPropsWithoutR
 
 export interface ContextMenuSubContentProps extends React.ComponentPropsWithoutRef<
   typeof ContextMenuPrimitive.SubContent
-> {}
+> {
+  /**
+   * 菜单面板的**最小**宽度挡位。菜单项文字长度不可预知，故是下限不是定宽。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface ContextMenuRadioGroupProps extends React.ComponentPropsWithoutRef<
   typeof ContextMenuPrimitive.RadioGroup
@@ -118,13 +129,14 @@ const ContextMenuSubTrigger = React.forwardRef<
 const ContextMenuSubContent = React.forwardRef<
   HTMLDivElement,
   ContextMenuSubContentProps
->(function ContextMenuSubContent({ className, ...props }, ref) {
+>(function ContextMenuSubContent({ className, width = "xs", ...props }, ref) {
   return (
     <ContextMenuPrimitive.SubContent
       ref={ref}
       className={cn(
         cn(
-          "z-dropdown min-w-32 overflow-hidden p-2xs",
+          overlayMinWidthClass[width],
+          "z-dropdown overflow-hidden p-2xs",
           panel.base,
           panel.popover,
           overlayMotion,
@@ -139,14 +151,15 @@ const ContextMenuSubContent = React.forwardRef<
 const ContextMenuContent = React.forwardRef<
   HTMLDivElement,
   ContextMenuContentProps
->(function ContextMenuContent({ className, ...props }, ref) {
+>(function ContextMenuContent({ className, width = "xs", ...props }, ref) {
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
         ref={ref}
         className={cn(
           cn(
-            "z-dropdown min-w-32 overflow-hidden p-2xs",
+            overlayMinWidthClass[width],
+            "z-dropdown overflow-hidden p-2xs",
             panel.base,
             panel.popover,
             overlayMotion,

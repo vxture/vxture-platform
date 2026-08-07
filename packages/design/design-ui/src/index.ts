@@ -22,6 +22,7 @@ export * from "./components/composite";
 export * from "./components/templates";
 export * from "./components/layout";
 export * from "./components/tone";
+export * from "./components/overlayWidth";
 export * from "./components/ai-elements";
 export * from "./icons";
 export * from "./hooks";

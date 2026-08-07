@@ -12,6 +12,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "../../../utils/cn";
 import { overlayMotion, panel } from "../../../styles/recipes";
 import { Icon } from "../../../icons";
+import { overlayMinWidthClass, type OverlayWidth } from "../../overlayWidth";
 
 export interface DropdownMenuProps extends React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.Root
@@ -23,7 +24,12 @@ export interface DropdownMenuTriggerProps extends React.ComponentPropsWithoutRef
 
 export interface DropdownMenuContentProps extends React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.Content
-> {}
+> {
+  /**
+   * 菜单面板的**最小**宽度挡位。菜单项文字长度不可预知，故是下限不是定宽。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface DropdownMenuItemProps extends React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.Item
@@ -69,7 +75,12 @@ export interface DropdownMenuSubTriggerProps extends React.ComponentPropsWithout
 
 export interface DropdownMenuSubContentProps extends React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.SubContent
-> {}
+> {
+  /**
+   * 菜单面板的**最小**宽度挡位。菜单项文字长度不可预知，故是下限不是定宽。
+   */
+  readonly width?: OverlayWidth;
+}
 
 export interface DropdownMenuRadioGroupProps extends React.ComponentPropsWithoutRef<
   typeof DropdownMenuPrimitive.RadioGroup
@@ -113,13 +124,14 @@ const DropdownMenuSubTrigger = React.forwardRef<
 const DropdownMenuSubContent = React.forwardRef<
   HTMLDivElement,
   DropdownMenuSubContentProps
->(function DropdownMenuSubContent({ className, ...props }, ref) {
+>(function DropdownMenuSubContent({ className, width = "xs", ...props }, ref) {
   return (
     <DropdownMenuPrimitive.SubContent
       ref={ref}
       className={cn(
         cn(
-          "z-dropdown min-w-32 overflow-hidden p-2xs",
+          overlayMinWidthClass[width],
+          "z-dropdown overflow-hidden p-2xs",
           panel.base,
           panel.popover,
           overlayMotion,
@@ -134,7 +146,10 @@ const DropdownMenuSubContent = React.forwardRef<
 const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
   DropdownMenuContentProps
->(function DropdownMenuContent({ className, sideOffset = 4, ...props }, ref) {
+>(function DropdownMenuContent(
+  { className, sideOffset = 4, width = "xs", ...props },
+  ref,
+) {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -142,7 +157,8 @@ const DropdownMenuContent = React.forwardRef<
         sideOffset={sideOffset}
         className={cn(
           cn(
-            "z-dropdown min-w-32 overflow-hidden p-2xs",
+            overlayMinWidthClass[width],
+            "z-dropdown overflow-hidden p-2xs",
             panel.base,
             panel.popover,
             overlayMotion,
