@@ -5,6 +5,37 @@
 
 ---
 
+## 5.0.0-alpha.0 — 未发布
+
+admin → DS 收敛批次。major 号在批次开启时已定（删除公开导出属破坏性），按 050 §2.1
+批次内不重复决策；本条尚未发布到任何 dist-tag。
+
+### 💥 Breaking
+
+- **`navCollapsedCookieName` / `readNavCollapsed` / `writeNavCollapsed` 迁出**至
+  `@vxture/shared`。侧栏收起状态是 cookie 契约不是视觉件，服务端 layout 要在渲染前
+  读到它，留在 DS 会把纯服务端组件拖进 DS 的客户端依赖。仓内三个门户的调用点已全部
+  改从 `@vxture/shared` 引入；外部消费方需同样改引入源，行为不变。
+
+### ✨ 新增
+
+- **公开入口** `./styles/admin-tokens.css`（admin 遗留 token 桥，收敛期间的过渡资产）
+  与 `./styles/workbench.css`。
+- **组件** `MetricListCard`、`PanelCard` / `PanelItem` / `PanelList`、`FactList` /
+  `LabeledValue`、`LevelMarker`——均从 admin 的重复实现里提炼。
+- **浮层宽度梯** `OVERLAY_WIDTHS` 与 `overlayWidthClass` / `overlayMinWidthClass`。
+  取名 overlay 而非 control：`--spacing-control-*` 已占用同名命名空间，Tailwind v4 的
+  `w-*` 解析顺序会让 `--container-control-*` 被高度档影响掉（实测 `min-w-control-xs`
+  解析成 1.5rem 的高度值）。
+
+### 🔧 内部
+
+- `@vxture/design-ui` 新增 `./styles` 子入口，只导出配方层（`interactive` 等纯字符串
+  常量）。刻意不并进主入口：伞包用 `export *` 转发主入口，配方进主入口就会成为产品
+  可见的公开面，产品侧便能拿它手搓控件——那正是配方层要杜绝的。
+
+---
+
 ## 4.0.0 — 2026-08-01
 
 设计系统重构收口。`3.0.0` 是本次重构分支内的中间态，从未发布，其变更并入本条。

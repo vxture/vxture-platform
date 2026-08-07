@@ -219,6 +219,32 @@ import {
   Spinner,
   SPINNER_SIZES,
 } from "@vxture/design-system";
+/* 批 R 补登记：这一批件在 admin → DS 的收敛里建起来，一直没进预览面。 */
+import {
+  ActionButton,
+  FactList,
+  LabeledValue,
+  LevelMarker,
+  MetricListCard,
+  PanelCard,
+  PanelItem,
+  PanelList,
+  ShellBootScreen,
+  ShellHeader,
+  ShellLauncher,
+  ShellPageContainer,
+  ShellPanelControlRow,
+  ShellPanelHeader,
+  ShellPanelMeterRow,
+  ShellPanelRow,
+  ShellPanelSection,
+  ShellPanelSectionTitle,
+  ShellSearchBox,
+  ShellSidebarFrame,
+  ShellSidebarNav,
+  ShellViewport,
+  ViewModeSwitch,
+} from "@vxture/design-system";
 import { Row } from "./kit";
 
 export type Provenance =
@@ -2235,6 +2261,119 @@ export const ENTRIES: readonly Entry[] = [
       </div>
     ),
   },
+  /* ── 批 R 补登记 ─────────────────────────────────────────────
+   * 以下各件在 admin → DS 的收敛过程里建起来，当时只顾着让产品页面跑通，
+   * 没回来登记，于是"改了也没人看得见"。这一批一次补齐。 */
+  {
+    name: "ActionButton",
+    layer: "atom",
+    group: "表单",
+    tags: ["vxture", "component"],
+    deviation:
+      "Button 的固定形状之一：图标 + 文字。单独成件是因为表格行动作区几十处都在重复同一串 <Icon/> + 文案，抄漏一次就少个图标；iconFallback 兜住图标名拼错的情况，不至于渲染出一个空格",
+    render: () => <ActionButtonDemo />,
+  },
+  {
+    name: "LevelMarker",
+    layer: "atom",
+    group: "展示",
+    tags: ["vxture", "component"],
+    deviation:
+      "等级是 1–5 的定序刻度，不是状态，所以不复用 StatusBadge 的色调族——五档各有自己的深浅，靠色阶读出高低。方形而非胶囊：与同排的 StatusBadge 形状区分，一眼分得清哪个是等级哪个是状态",
+    render: () => <LevelMarkerDemo />,
+  },
+  {
+    name: "FactList",
+    layer: "pattern",
+    group: "展示",
+    tags: ["vxture", "patterns"],
+    covers: ["LabeledValue"],
+    deviation:
+      "LabeledValue 是一条「标签 + 值」，FactList 是若干条排成一列。值可带色调，但色调取自 StatusBadgeTone 这一套语义色，不另开一份——同一个「危险」在徽章和事实行里必须是同一个红",
+    render: () => <FactListDemo />,
+  },
+  {
+    name: "MetricListCard",
+    layer: "pattern",
+    group: "展示",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "从 admin 四处重复的「标题 + 若干指标 + 底部动作」卡片里提炼。metrics 是数组不是固定三格，卡与卡之间指标数不同也能对齐；note 槽单独留出来，避免调用方把说明文字塞进 description 后与标题挤在一行",
+    render: () => <MetricListCardDemo />,
+  },
+  {
+    name: "PanelCard",
+    layer: "pattern",
+    group: "展示",
+    tags: ["vxture", "patterns"],
+    covers: ["PanelItem", "PanelList"],
+    deviation:
+      "三件一族，拆开看不出层级：PanelCard 是带标题的容器，PanelList 是里面的列，PanelItem 是列中一行（lead / main / trail 三槽）。PanelList 自带 empty 槽——列为空时该显示什么是列的事，不该由每个调用方在外面写三元",
+    render: () => <PanelCardDemo />,
+  },
+  {
+    name: "ViewModeSwitch",
+    layer: "atom",
+    group: "导航",
+    tags: ["vxture", "component"],
+    deviation:
+      "列表/卡片切换。cardsDisabledReason 传了就把卡片档禁用并给出理由——卡片视图退役期间入口要保留可见（否则用户以为功能没了），但点不动且说得出为什么",
+    render: () => <ViewModeSwitchDemo />,
+  },
+  {
+    name: "ShellLayout",
+    layer: "pattern",
+    group: "布局",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "外壳的四件骨架：ShellViewport（整体三分）、ShellHeader（三槽定高）、ShellSidebarFrame（宽度状态机，hidden 是真卸载不是宽度归零）、ShellPageContainer（内容区封顶行宽 + clamp 留白）。单独成件是因为迁移前 console 与 opera 各写各的内容区宽度，两个门户对不上",
+    render: () => <ShellLayoutDemo />,
+  },
+  {
+    name: "ShellBootScreen",
+    layer: "pattern",
+    group: "外壳与登录",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "会话未定时的过渡屏。delayMs 默认 250ms 延迟出现——会话在这之前返回的话用户全程看不到本屏，也就没有「闪一下」。预览面里把延迟调到 0 才看得见",
+    render: () => <ShellBootScreenDemo />,
+  },
+  {
+    name: "ShellLauncher",
+    layer: "pattern",
+    group: "外壳与登录",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "header 最左的九宫格：业务域切换面板。items 是数据，组件不知道有哪些域——多一个域就是数组里多一项，不改组件",
+    render: () => <ShellLauncherDemo />,
+  },
+  {
+    name: "ShellPanel",
+    layer: "pattern",
+    group: "外壳与登录",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "header 各类浮层面板的公共骨架：Content（定宽/留白/打开时不抢焦点）+ Header + Section + 四种行（信息行 / 控件行 / 计量行 / 可进入行）。四种行共用同一套列与行高，所以图标严格同列——这件事由组件保证，不靠调用方拼 flex 时自觉对齐",
+    render: () => <ShellPanelDemo />,
+  },
+  {
+    name: "ShellSearchBox",
+    layer: "pattern",
+    group: "外壳与登录",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "header 中槽的全局搜索。受控 query + 分组结果，过滤与检索全在调用方——DS 不知道搜的是什么。快捷键标示在 effect 里判平台，不在首帧读 navigator（服务端与客户端会渲染出不同键位，触发 hydration 不匹配）",
+    render: () => <ShellSearchBoxDemo />,
+  },
+  {
+    name: "ShellSidebarNav",
+    layer: "pattern",
+    group: "外壳与登录",
+    tags: ["vxture", "patterns"],
+    deviation:
+      "分组可折叠的侧栏导航，收起态只剩图标轨。linkComponent 让组件不依赖任何路由实现（opera 传 next/link，console 传 next-intl 的 locale 感知 Link）；分组展开状态按 storageKeyPrefix 各自持久化，两个门户互不覆盖",
+    render: () => <ShellSidebarNavDemo />,
+  },
 ];
 
 /* 需要局部状态的几件单独成组件——registry 本身保持成数据。 */
@@ -3036,6 +3175,358 @@ function PromptInputDemo() {
           切换 busy（当前 {String(busy)}）
         </Button>
       </Row>
+    </div>
+  );
+}
+
+/* ── 批 R 补登记的样例 ───────────────────────────────────────── */
+
+function ActionButtonDemo() {
+  return (
+    <div className="flex flex-col gap-md">
+      <Row label="ghost / outline / 危险">
+        <ActionButton icon="edit" variant="ghost" size="sm">
+          编辑
+        </ActionButton>
+        <ActionButton icon="download" variant="outline" size="sm">
+          导出
+        </ActionButton>
+        <ActionButton icon="trash" variant="destructive" size="sm">
+          删除
+        </ActionButton>
+      </Row>
+      <Row label="禁用">
+        <ActionButton icon="edit" variant="ghost" size="sm" disabled>
+          编辑
+        </ActionButton>
+      </Row>
+    </div>
+  );
+}
+
+function LevelMarkerDemo() {
+  return (
+    <div className="flex flex-col gap-md">
+      <Row label="五档（md）">
+        {([1, 2, 3, 4, 5] as const).map((level) => (
+          <LevelMarker key={level} level={level} />
+        ))}
+      </Row>
+      <Row label="sm 档 / 自带内容">
+        {([1, 3, 5] as const).map((level) => (
+          <LevelMarker key={level} level={level} size="sm" />
+        ))}
+        <LevelMarker level={4} aria-label="第 4 级">
+          IV
+        </LevelMarker>
+      </Row>
+    </div>
+  );
+}
+
+function FactListDemo() {
+  return (
+    <div className="flex flex-col gap-md">
+      <Row label="FactList（若干条，值可带色调）" stack>
+        <div className="w-overlay-lg">
+          <FactList
+            facts={[
+              { label: "订阅套餐", value: "专业版" },
+              { label: "本期用量", value: "82%", tone: "warning" },
+              { label: "欠费金额", value: "¥1,240.00", tone: "danger" },
+              { label: "下次续费", value: "2026-09-01" },
+            ]}
+          />
+        </div>
+      </Row>
+      <Row label="LabeledValue（单条）" stack>
+        <LabeledValue label="工作区" value="平台运维" />
+        <LabeledValue
+          label="合规状态"
+          value="已通过"
+          tone="success"
+          valueTag="2026-07"
+        />
+      </Row>
+    </div>
+  );
+}
+
+function MetricListCardDemo() {
+  return (
+    <div className="grid gap-md sm:grid-cols-2">
+      <MetricListCard
+        title="服务可用性"
+        description="过去 30 天，按分钟采样"
+        icon="waveform"
+        tone="success"
+        metrics={[
+          { key: "uptime", value: "99.98%", label: "可用率" },
+          { key: "incidents", value: "2", label: "事件" },
+          { key: "mttr", value: "18m", label: "平均恢复" },
+        ]}
+        footer={
+          <Button variant="ghost" size="sm">
+            查看明细
+          </Button>
+        }
+      />
+      <MetricListCard
+        title="计量与结算"
+        icon="receipt"
+        tone="warning"
+        note="本期有 1 张发票逾期未付，续费前需结清。"
+        metrics={[
+          { key: "usage", value: "1.2M", label: "调用次数" },
+          { key: "amount", value: "¥8,430", label: "本期应付" },
+        ]}
+      />
+    </div>
+  );
+}
+
+function PanelCardDemo() {
+  return (
+    <div className="grid gap-md sm:grid-cols-2">
+      <PanelCard
+        title="最近变更"
+        description="仅显示影响生产的条目"
+        icon="clock-counter-clockwise"
+        action={
+          <Button variant="ghost" size="sm">
+            全部
+          </Button>
+        }
+      >
+        <PanelList>
+          <PanelItem
+            lead={<LevelMarker level={2} size="sm" />}
+            main="调整网关限流阈值"
+            trail={
+              <span className="text-body-sm text-muted-foreground">08-05</span>
+            }
+          />
+          <PanelItem
+            lead={<LevelMarker level={4} size="sm" />}
+            main="主库只读演练"
+            trail={
+              <span className="text-body-sm text-muted-foreground">08-03</span>
+            }
+          />
+        </PanelList>
+      </PanelCard>
+      <PanelCard title="待处理" icon="warning" tone="warning">
+        <PanelList empty="没有待处理事项。">{null}</PanelList>
+      </PanelCard>
+    </div>
+  );
+}
+
+function ViewModeSwitchDemo() {
+  const [mode, setMode] = React.useState<"list" | "cards">("list");
+  return (
+    <div className="flex flex-col gap-md">
+      <Row label={"可切换（当前 " + mode + "）"}>
+        <ViewModeSwitch value={mode} onChange={setMode} />
+      </Row>
+      <Row label="卡片档禁用并说明原因">
+        <ViewModeSwitch
+          value="list"
+          onChange={() => {}}
+          cardsDisabledReason="卡片视图正在退役，仅保留入口"
+        />
+      </Row>
+    </div>
+  );
+}
+
+function ShellLayoutDemo() {
+  return (
+    <div className="h-96 overflow-hidden rounded-md border border-border">
+      <ShellViewport
+        sidebarMode="expanded"
+        header={
+          <ShellHeader
+            height="xl"
+            leading={<span className="text-label-md">标识区</span>}
+            center={
+              <span className="text-body-sm text-muted-foreground">中槽</span>
+            }
+            trailing={<span className="text-label-md">工具区</span>}
+          />
+        }
+        sidebar={
+          <ShellSidebarFrame mode="expanded">
+            <div className="p-md text-body-sm text-muted-foreground">侧栏</div>
+          </ShellSidebarFrame>
+        }
+      >
+        <ShellPageContainer width="wide-2xl">
+          <div className="rounded-md border border-dashed border-border p-lg text-body-sm text-muted-foreground">
+            内容区：封顶行宽 + clamp 留白
+          </div>
+        </ShellPageContainer>
+      </ShellViewport>
+    </div>
+  );
+}
+
+function ShellBootScreenDemo() {
+  return (
+    <div className="relative h-64 overflow-hidden rounded-md border border-border">
+      {/* 延迟调到 0，否则预览面里看不到这一屏（真实默认 250ms）。 */}
+      <ShellBootScreen
+        label="Brand"
+        description="正在确认登录状态"
+        delayMs={0}
+      />
+    </div>
+  );
+}
+
+function ShellLauncherDemo() {
+  const [current, setCurrent] = React.useState("ops");
+  return (
+    <Row label={"点开切换业务域（当前 " + current + "）"}>
+      <ShellLauncher
+        items={[
+          {
+            key: "ops",
+            icon: "squares-four",
+            label: "运营业务域",
+            description: "租户、订阅、工单",
+            active: current === "ops",
+          },
+          {
+            key: "platform",
+            icon: "cpu",
+            label: "平台自治域",
+            description: "服务监控、作业、维护窗口",
+            active: current === "platform",
+          },
+        ]}
+        onSelect={setCurrent}
+      />
+    </Row>
+  );
+}
+
+function ShellPanelDemo() {
+  return (
+    <div className="w-fit rounded-md border border-border bg-popover">
+      <div className="flex w-80 flex-col gap-md p-md">
+        <ShellPanelHeader
+          icon="user"
+          title="示例用户"
+          titleAside={<StatusBadge tone="success">已认证</StatusBadge>}
+          metaRows={[
+            { key: "org", icon: "buildings", content: "平台运维" },
+            { key: "mail", icon: "mail", content: "ops@example.test" },
+          ]}
+        />
+        <ShellPanelSection divided={false}>
+          <ShellPanelRow icon="gauge" label="配额" value="82%" />
+          <ShellPanelMeterRow
+            icon="database"
+            label="存储"
+            valueLabel="41.2 GB / 50 GB"
+            percent={82}
+          />
+        </ShellPanelSection>
+        <ShellPanelSection title="偏好">
+          <ShellPanelControlRow icon="translate" label="语言">
+            <NativeSelect defaultValue="zh-CN" aria-label="语言">
+              <option value="zh-CN">简体中文</option>
+            </NativeSelect>
+          </ShellPanelControlRow>
+        </ShellPanelSection>
+        <ShellPanelSection>
+          <ShellPanelSectionTitle>入口</ShellPanelSectionTitle>
+          <ShellPanelRow icon="settings" label="设置" onClick={() => {}} />
+          <ShellPanelRow icon="lock" label="安全中心" disabled />
+        </ShellPanelSection>
+      </div>
+    </div>
+  );
+}
+
+function ShellSearchBoxDemo() {
+  const [query, setQuery] = React.useState("");
+  return (
+    <Row label="输入任意字符展开结果面板（⌘/Ctrl + K 聚焦）" stack>
+      <div className="w-overlay-xl">
+        <ShellSearchBox
+          query={query}
+          onQueryChange={setQuery}
+          groups={[
+            {
+              key: "tenants",
+              heading: "租户",
+              items: [
+                {
+                  key: "t1",
+                  label: "示例科技",
+                  description: "TEN-000123",
+                  icon: "buildings",
+                  onSelect: () => {},
+                },
+              ],
+            },
+            {
+              key: "orders",
+              heading: "订单",
+              items: [
+                {
+                  key: "o1",
+                  label: "专业版年付",
+                  description: "ORD-000481",
+                  meta: "¥12,000",
+                  onSelect: () => {},
+                },
+              ],
+            },
+          ]}
+        />
+      </div>
+    </Row>
+  );
+}
+
+function ShellSidebarNavDemo() {
+  const [collapsed, setCollapsed] = React.useState(false);
+  return (
+    <div className="h-96 overflow-hidden rounded-md border border-border">
+      <ShellSidebarFrame mode={collapsed ? "collapsed" : "expanded"}>
+        <ShellSidebarNav
+          domainName="平台自治域"
+          collapsed={collapsed}
+          onToggleCollapsed={() => setCollapsed((v) => !v)}
+          isActive={(href) => href === "/service-monitor"}
+          storageKeyPrefix="preview"
+          sections={[
+            {
+              title: "运行保障",
+              items: [
+                {
+                  href: "/service-monitor",
+                  label: "服务监控",
+                  icon: "waveform",
+                },
+                { href: "/platform-jobs", label: "平台作业", icon: "stack" },
+                {
+                  href: "/maintenance-windows",
+                  label: "维护窗口",
+                  icon: "timer",
+                },
+              ],
+            },
+            {
+              title: "能力模块",
+              items: [{ href: "/atlas", label: "模型平台", icon: "cpu" }],
+            },
+          ]}
+        />
+      </ShellSidebarFrame>
     </div>
   );
 }
