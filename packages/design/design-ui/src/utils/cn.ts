@@ -81,12 +81,32 @@ const isSpacingStep = (value: string) =>
     value,
   );
 
+/**
+ * T2 `--container-*` 下的语义族。与上面同一类病，只是换了个命名空间：`w-*` /
+ * `min-w-*` / `max-w-*` 在 v4 里按 `--width|--min-width|--max-width → --spacing
+ * → --container` 依次取值，而 tailwind-merge 的内置刻度表里没有 `panel-*` /
+ * `overlay-*` 这些档名，于是同组两条类一起留在 DOM 上，谁生效由生成 CSS 的先后
+ * 顺序决定——调用方传的那条未必赢。
+ *
+ * 实测（2026-08-07）：
+ *   `max-w-panel-sm` + `max-w-panel-lg` → 两条都在（**本来就漏，不是这次引入的**）
+ *   `min-w-overlay-xs` + `min-w-overlay-md` → 两条都在，于是给
+ *   `DropdownMenuContent` 传 `className="min-w-overlay-md"` 覆盖不掉默认档
+ *
+ * 判据同上一条，只是把"`--spacing-<族>`"扩到"T2 里带族名的档，无论它落在哪个
+ * 命名空间"。新增 `--container-<族>-<档>` 记得回来加进这条正则。
+ */
+const isContainerStep = (value: string) =>
+  /^(panel|overlay)-(2xs|xs|sm|md|lg|[2-6]?xl)$/.test(value);
+
 const twMergeConfigured = extendTailwindMerge<"vx-type">({
   extend: {
     theme: {
       // Tailwind v4 的 --spacing-* 供 p/m/gap/inset 等所有间距组共用，
       // 在 theme 层登记一次即可全组生效。
       spacing: [isSpacingStep],
+      // 同理，--container-* 供 w / min-w / max-w 三组共用。
+      container: [isContainerStep],
     },
     classGroups: {
       // 自成一组，与内置 `text-color` 互不相干，故二者可以共存。
