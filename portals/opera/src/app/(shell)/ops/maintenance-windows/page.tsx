@@ -12,29 +12,47 @@
  * scheduled|in_progress →(cancel) cancelled，终态只读。前端只按当前状态决定
  * 哪些动作可见，不自己判合法性——真正的裁决在条件 UPDATE 那一层。 */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
+import {
+  ActionMenu,
   Button,
   DataTable,
+  DialogForm,
   EmptyState,
   FilterBar,
   Icon,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
+  Field,
+  FieldDescription,
+  FieldLabel,
   ListCard,
   ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
   StatusBadge,
+  Textarea,
   ViewHeader,
   useListPagination,
+  useToast,
   type DataTableSort,
   type FilterBarView,
   type StatusBadgeTone,
 } from "@vxture/design-system";
+import { useOperatorSession } from "@/features/session/SessionProvider";
 import { api, OperaApiError } from "@/lib/api";
+
+/** 写操作的能力码，与 BFF 的能力门同名（release:maintenance.manage）。 */
+const MANAGE = "release:maintenance.manage";
 
 interface MaintenanceWindowItem {
   id: string;
@@ -106,6 +124,87 @@ type LoadState =
   | { kind: "error"; message: string }
   | { kind: "ready" };
 
+type DialogMode = "create" | "edit" | null;
+
+interface WindowForm {
+  severity: MaintenanceWindowItem["severity"];
+  title: string;
+  description: string;
+  impactDescription: string;
+  affectedServices: string;
+  startAt: string;
+  endAt: string;
+}
+
+/** `datetime-local` 要的是本地时间字面量，不是 ISO——直接塞 ISO 会差一个时区。 */
+function toLocalInputValue(date: Date): string {
+  const offset = date.getTimezoneOffset() * 60_000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+}
+
+function isoToLocalInput(value: string | null): string {
+  if (!value) return "";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "" : toLocalInputValue(d);
+}
+
+function createDefaultForm(): WindowForm {
+  const start = new Date(Date.now() + 60 * 60 * 1000);
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  return {
+    severity: "minor",
+    title: "",
+    description: "",
+    impactDescription: "",
+    affectedServices: "",
+    startAt: toLocalInputValue(start),
+    endAt: toLocalInputValue(end),
+  };
+}
+
+function formFromRecord(item: MaintenanceWindowItem): WindowForm {
+  return {
+    severity: item.severity,
+    title: item.title,
+    description: item.description ?? "",
+    impactDescription: item.impactDescription ?? "",
+    affectedServices: item.affectedServices.join(", "),
+    startAt: isoToLocalInput(item.startAt),
+    endAt: isoToLocalInput(item.endAt),
+  };
+}
+
+function buildPayload(form: WindowForm) {
+  return {
+    severity: form.severity,
+    title: form.title.trim(),
+    description: form.description.trim() || null,
+    impactDescription: form.impactDescription.trim() || null,
+    affectedServices: form.affectedServices
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    startAt: new Date(form.startAt).toISOString(),
+    endAt: new Date(form.endAt).toISOString(),
+  };
+}
+
+function formIsValid(form: WindowForm): boolean {
+  return (
+    form.title.trim().length > 0 &&
+    form.startAt.trim().length > 0 &&
+    form.endAt.trim().length > 0 &&
+    new Date(form.endAt) > new Date(form.startAt)
+  );
+}
+
+/** 后端的报错文案本身就是给人看的（"endAt must be after startAt" 一类），照原样带出。 */
+function describeError(error: unknown): { description?: string } {
+  return error instanceof Error && error.message
+    ? { description: error.message }
+    : {};
+}
+
 export default function MaintenanceWindowsPage() {
   const [rows, setRows] = useState<MaintenanceWindowItem[]>([]);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
@@ -117,6 +216,16 @@ export default function MaintenanceWindowsPage() {
     columnId: "startAt",
     direction: "desc",
   });
+  const [dialogMode, setDialogMode] = useState<DialogMode>(null);
+  const [editing, setEditing] = useState<MaintenanceWindowItem | null>(null);
+  const [form, setForm] = useState<WindowForm>(createDefaultForm);
+  const [pendingCancel, setPendingCancel] =
+    useState<MaintenanceWindowItem | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { can } = useOperatorSession();
+  const { toast } = useToast();
+  const canManage = can(MANAGE);
 
   const reload = useCallback(async () => {
     setLoad({ kind: "loading" });
@@ -158,6 +267,62 @@ export default function MaintenanceWindowsPage() {
   const filtered = keyword.trim() !== "" || status !== "all";
   const pager = useListPagination(visible);
 
+  const editingStatus = editing?.status;
+  /** 进行中的窗口只允许顺延结束时间与追记描述，其余字段锁死（同 BFF 的分支）。 */
+  const liveEditOnly = dialogMode === "edit" && editingStatus === "in_progress";
+
+  function openCreate() {
+    setEditing(null);
+    setForm(createDefaultForm());
+    setDialogMode("create");
+  }
+
+  function openEdit(item: MaintenanceWindowItem) {
+    setEditing(item);
+    setForm(formFromRecord(item));
+    setDialogMode("edit");
+  }
+
+  function closeDialog() {
+    setDialogMode(null);
+    setEditing(null);
+  }
+
+  /** 写操作统一走这里：成功提示 + 重新拉取，失败把后端文案原样带给用户。 */
+  async function runAction(label: string, action: () => Promise<unknown>) {
+    setSubmitting(true);
+    try {
+      await action();
+      toast({ tone: "success", title: label });
+      await reload();
+    } catch (error) {
+      toast({ tone: "danger", title: `${label}失败`, ...describeError(error) });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function submitForm(event: FormEvent) {
+    event.preventDefault();
+    const payload = buildPayload(form);
+    setSubmitting(true);
+    try {
+      if (dialogMode === "edit" && editing) {
+        await api.put(`/api/maintenance-windows/${editing.id}`, payload);
+        toast({ tone: "success", title: "维护窗口已更新" });
+      } else {
+        await api.post("/api/maintenance-windows", payload);
+        toast({ tone: "success", title: "维护窗口已创建" });
+      }
+      closeDialog();
+      await reload();
+    } catch (error) {
+      toast({ tone: "danger", title: "保存失败", ...describeError(error) });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   const pagination = (
     <Pagination
       className="w-full"
@@ -197,170 +362,390 @@ export default function MaintenanceWindowsPage() {
     );
 
   return (
-    <ListPageTemplate
-      header={
-        <ViewHeader
-          icon="clock"
-          title="维护窗口"
-          description="声明与管理平台维护窗口：计划、执行、完成与取消，实际结束时间对账。"
-        />
-      }
-      filters={
-        <FilterBar
-          view={view}
-          onViewChange={setView}
-          count={
-            visible.length === rows.length
-              ? rows.length
-              : `${visible.length} / ${rows.length}`
-          }
-        >
-          <InputGroup className="grow basis-media-3xl max-w-panel-sm">
-            <InputGroupAddon>
-              <Icon name="search" size="sm" aria-hidden="true" />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="搜索标题 / 影响服务…"
-              aria-label="搜索维护窗口"
-              value={keyword}
+    <>
+      <ListPageTemplate
+        header={
+          <ViewHeader
+            icon="clock"
+            title="维护窗口"
+            description="声明与管理平台维护窗口：计划、执行、完成与取消，实际结束时间对账。"
+            action={
+              // 没有 manage 能力就不渲染写入口。这是界面取舍不是安全边界——
+              // 接口那边照样 403（见 BFF 的 assertCanManageMaintenanceWindows）。
+              canManage ? (
+                <Button onClick={openCreate} disabled={submitting}>
+                  <Icon name="plus" size="sm" aria-hidden="true" />
+                  新建窗口
+                </Button>
+              ) : null
+            }
+          />
+        }
+        filters={
+          <FilterBar
+            view={view}
+            onViewChange={setView}
+            count={
+              visible.length === rows.length
+                ? rows.length
+                : `${visible.length} / ${rows.length}`
+            }
+          >
+            <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+              <InputGroupAddon>
+                <Icon name="search" size="sm" aria-hidden="true" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="搜索标题 / 影响服务…"
+                aria-label="搜索维护窗口"
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                  pager.resetPage();
+                }}
+              />
+            </InputGroup>
+            <NativeSelect
+              wrapperClassName="w-fit"
+              value={status}
               onChange={(e) => {
-                setKeyword(e.target.value);
+                setStatus(e.target.value);
                 pager.resetPage();
               }}
-            />
-          </InputGroup>
-          <NativeSelect
-            wrapperClassName="w-fit"
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-              pager.resetPage();
-            }}
-            aria-label="状态筛选"
-          >
-            <option value="all">全部状态</option>
-            {(
-              Object.keys(STATUS_LABELS) as MaintenanceWindowItem["status"][]
-            ).map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
-          </NativeSelect>
-        </FilterBar>
-      }
-      table={
-        view === "list" ? (
-          <DataTable
-            columns={[
-              {
-                id: "title",
-                header: "窗口",
-                cell: (r) => (
-                  <div className="flex flex-col gap-2xs">
-                    <span className="text-label-md text-foreground">
-                      {r.title}
-                    </span>
-                    {r.affectedServices.length > 0 ? (
-                      <span className="text-body-sm text-muted-foreground">
-                        {r.affectedServices.join(" · ")}
+              aria-label="状态筛选"
+            >
+              <option value="all">全部状态</option>
+              {(
+                Object.keys(STATUS_LABELS) as MaintenanceWindowItem["status"][]
+              ).map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABELS[s]}
+                </option>
+              ))}
+            </NativeSelect>
+          </FilterBar>
+        }
+        table={
+          view === "list" ? (
+            <DataTable
+              columns={[
+                {
+                  id: "title",
+                  header: "窗口",
+                  cell: (r) => (
+                    <div className="flex flex-col gap-2xs">
+                      <span className="text-label-md text-foreground">
+                        {r.title}
                       </span>
-                    ) : null}
-                  </div>
-                ),
-              },
-              {
-                id: "severity",
-                header: "严重度",
-                align: "center",
-                cell: (r) => (
-                  <StatusBadge tone={severityTone(r.severity)}>
-                    {SEVERITY_LABELS[r.severity]}
-                  </StatusBadge>
-                ),
-              },
-              {
-                id: "status",
-                header: "状态",
-                align: "center",
-                cell: (r) => (
-                  <StatusBadge tone={statusTone(r.status)}>
-                    {STATUS_LABELS[r.status]}
-                  </StatusBadge>
-                ),
-              },
-              {
-                id: "startAt",
-                header: "开始",
-                sortable: true,
-                cell: (r) => formatMoment(r.startAt),
-              },
-              {
-                id: "endAt",
-                header: "结束（计划）",
-                cell: (r) => formatMoment(r.endAt),
-              },
-              {
-                id: "actualEndAt",
-                header: "实际结束",
-                cell: (r) => (
-                  <span className="text-body-sm text-muted-foreground">
-                    {formatMoment(r.actualEndAt)}
-                  </span>
-                ),
-              },
-              {
-                id: "createdByName",
-                header: "创建人",
-                cell: (r) => (
-                  <span className="text-body-sm text-muted-foreground">
-                    {r.createdByName ?? "—"}
-                  </span>
-                ),
-              },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r) => r.id}
-            selectedKeys={selected}
-            onSelectionChange={setSelected}
-            indexStart={pager.indexStart}
-            sort={sort}
-            onSortChange={setSort}
-            footer={pagination}
-            empty={emptyState}
-          />
-        ) : (
-          <div className="flex flex-col gap-sm">
-            <ListCardGrid>
-              {pager.pageRows.map((r) => (
-                <ListCard
-                  key={r.id}
-                  title={r.title}
-                  description={`${formatMoment(r.startAt)} → ${formatMoment(r.endAt)}`}
-                  status={
+                      {r.affectedServices.length > 0 ? (
+                        <span className="text-body-sm text-muted-foreground">
+                          {r.affectedServices.join(" · ")}
+                        </span>
+                      ) : null}
+                    </div>
+                  ),
+                },
+                {
+                  id: "severity",
+                  header: "严重度",
+                  align: "center",
+                  cell: (r) => (
+                    <StatusBadge tone={severityTone(r.severity)}>
+                      {SEVERITY_LABELS[r.severity]}
+                    </StatusBadge>
+                  ),
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  align: "center",
+                  cell: (r) => (
                     <StatusBadge tone={statusTone(r.status)}>
                       {STATUS_LABELS[r.status]}
                     </StatusBadge>
-                  }
-                  meta={
-                    // 严重度在列表视图里是有色阶的，卡片视图必须同一套语气——
-                    // 同一个数据在一页的两个视图里给出两种编码，读者会以为是两件事。
-                    <span className="inline-flex items-center gap-2xs">
-                      <StatusBadge tone={severityTone(r.severity)}>
-                        {SEVERITY_LABELS[r.severity]}
-                      </StatusBadge>
-                      {r.affectedServices.length > 0 ? (
-                        <span>· {r.affectedServices.join(" · ")}</span>
-                      ) : null}
+                  ),
+                },
+                {
+                  id: "startAt",
+                  header: "开始",
+                  sortable: true,
+                  cell: (r) => formatMoment(r.startAt),
+                },
+                {
+                  id: "endAt",
+                  header: "结束（计划）",
+                  cell: (r) => formatMoment(r.endAt),
+                },
+                {
+                  id: "actualEndAt",
+                  header: "实际结束",
+                  cell: (r) => (
+                    <span className="text-body-sm text-muted-foreground">
+                      {formatMoment(r.actualEndAt)}
                     </span>
+                  ),
+                },
+                {
+                  id: "createdByName",
+                  header: "创建人",
+                  cell: (r) => (
+                    <span className="text-body-sm text-muted-foreground">
+                      {r.createdByName ?? "—"}
+                    </span>
+                  ),
+                },
+              ]}
+              rows={pager.pageRows}
+              rowKey={(r) => r.id}
+              selectedKeys={selected}
+              onSelectionChange={setSelected}
+              indexStart={pager.indexStart}
+              sort={sort}
+              onSortChange={setSort}
+              {...(canManage
+                ? {
+                    rowActions: (item: MaintenanceWindowItem) => (
+                      <ActionMenu
+                        label="维护窗口操作"
+                        disabled={submitting}
+                        items={[
+                          {
+                            id: "start",
+                            label: "开始维护",
+                            icon: "play",
+                            disabled: submitting || item.status !== "scheduled",
+                            onSelect: () =>
+                              void runAction("维护已开始", () =>
+                                api.post(
+                                  `/api/maintenance-windows/${item.id}/start`,
+                                ),
+                              ),
+                          },
+                          {
+                            id: "complete",
+                            label: "完成维护",
+                            icon: "check",
+                            disabled:
+                              submitting || item.status !== "in_progress",
+                            onSelect: () =>
+                              void runAction("维护已完成", () =>
+                                api.post(
+                                  `/api/maintenance-windows/${item.id}/complete`,
+                                  {},
+                                ),
+                              ),
+                          },
+                          {
+                            id: "edit",
+                            label: "编辑",
+                            icon: "edit",
+                            disabled:
+                              submitting ||
+                              (item.status !== "scheduled" &&
+                                item.status !== "in_progress"),
+                            onSelect: () => openEdit(item),
+                          },
+                          {
+                            id: "cancel",
+                            label: "取消窗口",
+                            icon: "stop",
+                            danger: true,
+                            separatorBefore: true,
+                            disabled:
+                              submitting ||
+                              (item.status !== "scheduled" &&
+                                item.status !== "in_progress"),
+                            onSelect: () => setPendingCancel(item),
+                          },
+                        ]}
+                      />
+                    ),
                   }
-                />
-              ))}
-            </ListCardGrid>
-            {pagination}
+                : {})}
+              footer={pagination}
+              empty={emptyState}
+            />
+          ) : (
+            <div className="flex flex-col gap-sm">
+              <ListCardGrid>
+                {pager.pageRows.map((r) => (
+                  <ListCard
+                    key={r.id}
+                    title={r.title}
+                    description={`${formatMoment(r.startAt)} → ${formatMoment(r.endAt)}`}
+                    status={
+                      <StatusBadge tone={statusTone(r.status)}>
+                        {STATUS_LABELS[r.status]}
+                      </StatusBadge>
+                    }
+                    meta={
+                      // 严重度在列表视图里是有色阶的，卡片视图必须同一套语气——
+                      // 同一个数据在一页的两个视图里给出两种编码，读者会以为是两件事。
+                      <span className="inline-flex items-center gap-2xs">
+                        <StatusBadge tone={severityTone(r.severity)}>
+                          {SEVERITY_LABELS[r.severity]}
+                        </StatusBadge>
+                        {r.affectedServices.length > 0 ? (
+                          <span>· {r.affectedServices.join(" · ")}</span>
+                        ) : null}
+                      </span>
+                    }
+                  />
+                ))}
+              </ListCardGrid>
+              {pagination}
+            </div>
+          )
+        }
+      />
+
+      {dialogMode ? (
+        <DialogForm
+          open
+          title={dialogMode === "create" ? "新建维护窗口" : "编辑维护窗口"}
+          description={
+            liveEditOnly
+              ? "进行中的窗口仅允许顺延结束时间与更新描述。"
+              : "声明计划维护窗口；到点后手动「开始维护」。"
+          }
+          submitLabel={dialogMode === "create" ? "创建" : "保存修改"}
+          submitting={submitting}
+          submitDisabled={!formIsValid(form)}
+          onOpenChange={(open) => {
+            if (!open) closeDialog();
+          }}
+          onSubmit={(event) => void submitForm(event)}
+        >
+          <Field>
+            <FieldLabel htmlFor="mw-title">标题</FieldLabel>
+            <Input
+              id="mw-title"
+              value={form.title}
+              maxLength={256}
+              disabled={liveEditOnly}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, title: e.target.value }))
+              }
+              placeholder="如 数据库版本升级"
+              required
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-md">
+            <Field>
+              <FieldLabel htmlFor="mw-severity">严重度</FieldLabel>
+              <NativeSelect
+                id="mw-severity"
+                value={form.severity}
+                disabled={liveEditOnly}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    severity: e.target
+                      .value as MaintenanceWindowItem["severity"],
+                  }))
+                }
+              >
+                <option value="minor">一般</option>
+                <option value="major">重要</option>
+                <option value="critical">严重</option>
+              </NativeSelect>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="mw-services">受影响服务</FieldLabel>
+              <Input
+                id="mw-services"
+                value={form.affectedServices}
+                disabled={liveEditOnly}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, affectedServices: e.target.value }))
+                }
+                placeholder="如 auth-bff, admin-bff"
+              />
+              <FieldDescription>逗号分隔，可选</FieldDescription>
+            </Field>
           </div>
-        )
-      }
-    />
+          <div className="grid grid-cols-2 gap-md">
+            <Field>
+              <FieldLabel htmlFor="mw-start">计划开始</FieldLabel>
+              <Input
+                id="mw-start"
+                type="datetime-local"
+                value={form.startAt}
+                disabled={liveEditOnly}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, startAt: e.target.value }))
+                }
+                required
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="mw-end">计划结束</FieldLabel>
+              <Input
+                id="mw-end"
+                type="datetime-local"
+                value={form.endAt}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, endAt: e.target.value }))
+                }
+                required
+              />
+              {liveEditOnly ? (
+                <FieldDescription>
+                  进行中的窗口只能顺延，不能提前
+                </FieldDescription>
+              ) : null}
+            </Field>
+          </div>
+          <Field>
+            <FieldLabel htmlFor="mw-desc">描述</FieldLabel>
+            <Textarea
+              id="mw-desc"
+              value={form.description}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, description: e.target.value }))
+              }
+              rows={3}
+              placeholder="维护内容说明"
+            />
+            <FieldDescription>可选</FieldDescription>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="mw-impact">影响说明</FieldLabel>
+            <Textarea
+              id="mw-impact"
+              value={form.impactDescription}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, impactDescription: e.target.value }))
+              }
+              rows={3}
+              placeholder="对用户/租户的影响范围与降级预期"
+            />
+            <FieldDescription>可选</FieldDescription>
+          </Field>
+        </DialogForm>
+      ) : null}
+
+      {pendingCancel ? (
+        <DialogForm
+          open
+          title="取消维护窗口"
+          description={`确认取消「${pendingCancel.title}」？取消后窗口进入终态，保留历史记录。`}
+          submitLabel="取消窗口"
+          danger
+          submitting={submitting}
+          onOpenChange={(open) => {
+            if (!open) setPendingCancel(null);
+          }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            const target = pendingCancel;
+            setPendingCancel(null);
+            void runAction("维护窗口已取消", () =>
+              api.post(`/api/maintenance-windows/${target.id}/cancel`),
+            );
+          }}
+        />
+      ) : null}
+    </>
   );
 }

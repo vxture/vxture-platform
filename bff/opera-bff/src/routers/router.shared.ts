@@ -10,8 +10,23 @@ import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import type { Request } from "express";
 import type { RequestContext } from "../types/request-context";
 
+/**
+ * 只校验**格式良好**，不校验 RFC 4122 的 version / variant 位。
+ *
+ * 这条护栏的用途是"这串东西能不能安全当 uuid 参数用"，而不是"它是不是一个
+ * 规范的 v1–v5 UUID"。Postgres 的 `uuid` 类型本身接受任意 128 位值，两者口径
+ * 必须一致——否则库里存得下的行，接口反而不认。
+ *
+ * admin-bff 的同名正则要求 version ∈ [1-5] 且 variant ∈ [89ab]，实测把活库的
+ * 数据挡在门外（2026-08-07）：
+ *   admin.maintenance_windows  variant=c ×100  → 全部写操作 400
+ *   admin.risk_records         variant=d ×100（另 3 行 b 正常）
+ *   admin.compliance_events    variant=d ×100（另 3 行 b 正常）
+ * 种子为了幂等用固定 UUID 段（见 seed-bulk*），拼出来的变体位本就不受控。
+ * 迁移时照抄了那条正则，第一次真正点"开始维护"就撞上——admin 侧同一缺陷仍在。
+ */
 export const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** 列表上限。分页由前端做，这里只挡"一次拉全表"。 */
 export const LIST_LIMIT = 500;

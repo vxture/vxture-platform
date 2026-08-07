@@ -9,10 +9,11 @@ import { OidcRpModule } from "./oidc/oidc-rp.module";
 import { OperaBffPoolsModule } from "./providers/pools.module";
 import { HealthRouter } from "./routers/health.router";
 import { MaintenanceWindowsRouter } from "./routers/maintenance-windows.router";
+import { SessionRouter } from "./routers/session.router";
 
 @Module({
   imports: [OidcRpModule, OperaBffPoolsModule],
-  controllers: [HealthRouter, MaintenanceWindowsRouter],
+  controllers: [HealthRouter, SessionRouter, MaintenanceWindowsRouter],
   providers: [OperatorAuthzService, OperatorAuthMiddleware],
 })
 export class AppModule implements NestModule {
