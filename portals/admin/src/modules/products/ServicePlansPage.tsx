@@ -497,7 +497,8 @@ export function ServicePlansPage() {
         summary={
           <>
             {" "}
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label="服务套餐管理统计"
               items={[
                 {

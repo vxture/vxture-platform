@@ -455,7 +455,8 @@ export function TenantsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label="租户运营统计"
               items={[
                 {

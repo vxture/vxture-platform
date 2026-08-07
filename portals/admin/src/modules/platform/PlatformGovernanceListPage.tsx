@@ -350,7 +350,8 @@ export function PlatformGovernanceListPage({
       summary={
         <>
           {" "}
-          <MetricGrid loading={loading}
+          <MetricGrid
+            loading={loading}
             aria-label={`${config.title}统计`}
             columns={3}
             items={[
@@ -479,19 +480,19 @@ export function PlatformGovernanceListPage({
               )}
               empty={
                 hasActiveFilters ? (
-                <EmptyState
-                  title="暂无匹配记录"
-                  description="调整关键词或筛选条件后再查看。"
-                  action={
-                    <ActionButton
-                      variant="outline"
-                      icon="x"
-                      onClick={resetFilters}
-                    >
-                      重置筛选
-                    </ActionButton>
-                  }
-                />
+                  <EmptyState
+                    title="暂无匹配记录"
+                    description="调整关键词或筛选条件后再查看。"
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={resetFilters}
+                      >
+                        重置筛选
+                      </ActionButton>
+                    }
+                  />
                 ) : (
                   <EmptyState
                     icon="list"
@@ -552,19 +553,19 @@ export function PlatformGovernanceListPage({
           ) : (
             <section className="vx-tenant-empty">
               {hasActiveFilters ? (
-              <EmptyState
-                title="暂无匹配记录"
-                description="调整关键词或筛选条件后再查看。"
-                action={
-                  <ActionButton
-                    variant="outline"
-                    icon="x"
-                    onClick={resetFilters}
-                  >
-                    重置筛选
-                  </ActionButton>
-                }
-              />
+                <EmptyState
+                  title="暂无匹配记录"
+                  description="调整关键词或筛选条件后再查看。"
+                  action={
+                    <ActionButton
+                      variant="outline"
+                      icon="x"
+                      onClick={resetFilters}
+                    >
+                      重置筛选
+                    </ActionButton>
+                  }
+                />
               ) : (
                 <EmptyState
                   icon="list"

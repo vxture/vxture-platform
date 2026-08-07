@@ -256,7 +256,6 @@ export function ConsoleSessionProvider({
     window.location.assign(buildLogoutUrl());
   }, []);
 
-
   /**
    * 闲置钟。到点**直接登出，不弹窗询问**——"要不要继续"是消费级网银的 UX 惯例
    * 而非安全要求（NIST 800-63B 未要求），对正在操作的人定期打断是荒谬的

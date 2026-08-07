@@ -783,7 +783,8 @@ export function PaymentsPage() {
         summary={
           <>
             {" "}
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label="收款统计"
               items={[
                 {

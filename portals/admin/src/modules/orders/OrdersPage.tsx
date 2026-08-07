@@ -588,7 +588,8 @@ export function OrdersPage() {
         }
         summary={
           <>
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label="订单管理统计"
               items={[
                 {

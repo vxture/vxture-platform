@@ -33,7 +33,15 @@ const useClientPlugin = {
 };
 
 export default defineConfig({
-  entry: { index: "src/index.ts", server: "src/server.ts" },
+  // styles 子入口只导出配方层（纯字符串常量，无 React）。刻意不并进 index：
+  // design-system 用 `export * from "@vxture/design-ui"` 转发主入口，配方一旦
+  // 进主入口就会连带成为伞包的公开面，产品侧就能拿它手搓控件——那正是配方层
+  // 要杜绝的。走子入口，只有 DS 内部按路径引得到。
+  entry: {
+    index: "src/index.ts",
+    server: "src/server.ts",
+    styles: "src/styles/recipes.ts",
+  },
   format: ["esm", "cjs"],
   outExtension({ format }) {
     return { js: format === "esm" ? ".mjs" : ".cjs" };

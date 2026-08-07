@@ -1408,7 +1408,8 @@ export function AdminRolesPage() {
         summary={
           <>
             {" "}
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label="平台角色统计"
               columns={3}
               items={[

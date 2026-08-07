@@ -42,6 +42,7 @@ import {
   useFullscreen,
 } from "@vxture/design-ui";
 import type { FullscreenMode, IconName } from "@vxture/design-ui";
+import { interactive } from "@vxture/design-ui/styles";
 import type { Density } from "../../density";
 import {
   SHELL_PANEL_HAIRLINE,
@@ -503,7 +504,8 @@ export function ShellAgentButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "inline-grid shrink-0 place-items-center overflow-hidden rounded-full transition-colors duration-fast hover:bg-accent disabled:pointer-events-none disabled:opacity-disabled",
+        interactive,
+        "inline-grid shrink-0 place-items-center overflow-hidden rounded-full hover:bg-accent",
         AGENT_BUTTON_SIZE_CLASS[size],
         active && "bg-accent",
         className,

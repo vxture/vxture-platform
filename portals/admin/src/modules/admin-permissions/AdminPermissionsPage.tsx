@@ -1550,7 +1550,8 @@ export function AdminPermissionsPage() {
         description="统一维护平台菜单、按钮和接口权限，用于角色授权、访问控制和平台自治治理。"
       />
 
-      <MetricGrid loading={loading}
+      <MetricGrid
+        loading={loading}
         aria-label="平台权限统计"
         columns={3}
         items={[

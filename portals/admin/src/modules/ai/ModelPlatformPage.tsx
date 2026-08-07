@@ -1088,7 +1088,8 @@ export function ModelPlatformPage() {
                 {t(feedback.key, feedback.values)}
               </p>
             ) : null}
-            <MetricGrid loading={loading}
+            <MetricGrid
+              loading={loading}
               aria-label={t("summary.ariaLabel")}
               columns={3}
               items={[
@@ -1292,28 +1293,28 @@ export function ModelPlatformPage() {
                 )}
                 empty={
                   loadFailed ? (
-                  /* 读取失败与"筛选没匹配上"是两回事。混成一种，本页就会在顶部
+                    /* 读取失败与"筛选没匹配上"是两回事。混成一种，本页就会在顶部
                      横幅已经报出「模型数据读取失败」的同时，两行之下劝人去放宽
                      筛选——同一屏自相矛盾（2026-08-07 走查）。 */
-                  <EmptyState
-                    icon="warning"
-                    title={t("empty.loadFailedTitle")}
-                    description={t("empty.loadFailedDescription")}
-                  />
+                    <EmptyState
+                      icon="warning"
+                      title={t("empty.loadFailedTitle")}
+                      description={t("empty.loadFailedDescription")}
+                    />
                   ) : (
-                  <EmptyState
-                    title={t("empty.title")}
-                    description={t("empty.description")}
-                    action={
-                      <ActionButton
-                        variant="outline"
-                        icon="x"
-                        onClick={handleReset}
-                      >
-                        {t("empty.resetFilters")}
-                      </ActionButton>
-                    }
-                  />
+                    <EmptyState
+                      title={t("empty.title")}
+                      description={t("empty.description")}
+                      action={
+                        <ActionButton
+                          variant="outline"
+                          icon="x"
+                          onClick={handleReset}
+                        >
+                          {t("empty.resetFilters")}
+                        </ActionButton>
+                      }
+                    />
                   )
                 }
               />

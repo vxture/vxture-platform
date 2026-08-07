@@ -105,6 +105,7 @@ import {
   cn,
 } from "@vxture/design-ui";
 import type { IconName } from "@vxture/design-ui";
+import { interactive } from "@vxture/design-ui/styles";
 import { ShellIconButton } from "./ShellChrome";
 
 export interface ShellNavItem {
@@ -232,9 +233,9 @@ function NavItemRow({
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
+        interactive,
         "flex h-control-xl items-center gap-xs rounded-md",
-        "text-label-md outline-none transition-colors duration-fast ease-standard",
-        "focus-visible:ring-3 focus-visible:ring-ring/50",
+        "text-label-md transition-colors duration-fast ease-standard",
         active
           ? "bg-surface-selected text-primary-text"
           : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -310,11 +311,11 @@ function NavGroupHeader({
       onClick={onToggle}
       aria-expanded={open}
       className={cn(
+        // 焦点环与 outline-none 不在此重复：Button 基类已含配方 `interactive`。
         "flex h-control-md w-full items-center justify-start gap-xs px-none border-none",
-        "text-overline outline-none transition-colors duration-fast ease-standard",
+        "text-overline transition-colors duration-fast ease-standard",
         "text-muted-foreground hover:bg-accent hover:text-foreground",
         "aria-expanded:bg-transparent aria-expanded:text-muted-foreground",
-        "focus-visible:ring-3 focus-visible:ring-ring/50",
       )}
     >
       {!collapsed && (

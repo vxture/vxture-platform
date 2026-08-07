@@ -581,7 +581,8 @@ export function ModelGrantsPage() {
         </p>
       ) : null}
 
-      <MetricGrid loading={loading}
+      <MetricGrid
+        loading={loading}
         aria-label={t("summary.ariaLabel")}
         columns={3}
         items={[
@@ -707,22 +708,22 @@ export function ModelGrantsPage() {
                     description={t("empty.loadFailedDescription")}
                   />
                 ) : (
-                <EmptyState
-                  title={t("empty.policyTitle")}
-                  description={t("empty.policyDescription")}
-                  action={
-                    <ActionButton
-                      variant="outline"
-                      icon="x"
-                      onClick={() => {
-                        setQuery("");
-                        setFilter("all");
-                      }}
-                    >
-                      {t("empty.resetFilters")}
-                    </ActionButton>
-                  }
-                />
+                  <EmptyState
+                    title={t("empty.policyTitle")}
+                    description={t("empty.policyDescription")}
+                    action={
+                      <ActionButton
+                        variant="outline"
+                        icon="x"
+                        onClick={() => {
+                          setQuery("");
+                          setFilter("all");
+                        }}
+                      >
+                        {t("empty.resetFilters")}
+                      </ActionButton>
+                    }
+                  />
                 )
               }
             />

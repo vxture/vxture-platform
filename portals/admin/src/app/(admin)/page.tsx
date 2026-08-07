@@ -1790,8 +1790,8 @@ export default function AdminOverviewPage() {
       */}
       {dataDegraded ? (
         <StatusBadge tone="warning">
-          部分数据读取失败，下方模型、方案与发布相关指标可能不完整；请确认
-          Admin BFF 与上游服务已启动。
+          部分数据读取失败，下方模型、方案与发布相关指标可能不完整；请确认 Admin
+          BFF 与上游服务已启动。
         </StatusBadge>
       ) : null}
 

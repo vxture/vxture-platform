@@ -25,12 +25,7 @@
  */
 
 /** 人做出来的事件。滚动不在内——惯性滚动与程序滚动都会触发，不是可靠的在场信号。 */
-const HUMAN_EVENTS = [
-  "keydown",
-  "pointerdown",
-  "wheel",
-  "touchstart",
-] as const;
+const HUMAN_EVENTS = ["keydown", "pointerdown", "wheel", "touchstart"] as const;
 
 /** 检查节拍。比阈值小得多即可，精度不重要——它决定的是"最晚多久发现已闲置"。 */
 const CHECK_INTERVAL_MS = 15_000;

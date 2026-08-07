@@ -178,7 +178,8 @@ export function NotificationLogsPage() {
         />
       }
       summary={
-        <MetricGrid loading={loading}
+        <MetricGrid
+          loading={loading}
           aria-label="通知投递统计"
           columns={2}
           items={[

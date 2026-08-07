@@ -31,10 +31,7 @@ import {
 import type { DataTableColumn, StatusBadgeTone } from "@vxture/design-system";
 import type { RiskRecordItem } from "@/entities/console";
 import { PageHeader } from "@/modules/shared/PageHeader";
-import {
-  TENANT_RISK_TONE,
-  formatDate,
-} from "@/modules/tenants/tenant-utils";
+import { TENANT_RISK_TONE, formatDate } from "@/modules/tenants/tenant-utils";
 
 // TD-021 风险记录页。设计权威 = governance-write-paths.md §3.1/§5。
 // 「审阅」= 后端写 reviewer_id；risk_level 变更后端自动清空 reviewer_id。
@@ -315,7 +312,8 @@ export function RiskRecordsPage() {
           />
         }
         summary={
-          <MetricGrid loading={loading}
+          <MetricGrid
+            loading={loading}
             aria-label="风险记录统计"
             columns={3}
             items={[

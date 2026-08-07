@@ -790,7 +790,8 @@ export function TicketsPage() {
           />
         }
         summary={
-          <MetricGrid loading={isLoading}
+          <MetricGrid
+            loading={isLoading}
             aria-label="工单统计"
             items={[
               {
