@@ -12,7 +12,7 @@
   height: var(--vx-admin-placeholder-size-3r);
   display: inline-grid;
   place-items: center;
-  border-radius: var(--vx-admin-placeholder-radius-1r);
+  border-radius: var(--radius-xl);
   background: var(--vx-console-brand-soft);
   color: var(--vx-console-brand-strong);
 }

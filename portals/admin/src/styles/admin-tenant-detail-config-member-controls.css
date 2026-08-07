@@ -11,7 +11,7 @@
 .vx-tenant-member-summary {
   display: flex;
   align-items: center;
-  gap: var(--vx-admin-management-space-05r);
+  gap: var(--space-xs);
   flex-wrap: wrap;
 }
 

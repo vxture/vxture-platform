@@ -23,7 +23,7 @@
 .vx-tenant-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--vx-admin-management-space-1r);
+  gap: var(--space-md);
 }
 
 .vx-platform-users-summary,
@@ -41,8 +41,8 @@
   display: grid;
   grid-template-columns: var(--vx-admin-management-track-25r) minmax(0, 1fr);
   align-items: center;
-  gap: var(--vx-admin-management-space-1r);
-  padding: var(--vx-admin-management-space-15r);
+  gap: var(--space-md);
+  padding: var(--space-lg);
   border: var(--vx-admin-management-line-width-1p) solid color-mix(in srgb, var(--vx-color-brand-400) 16%, transparent);
   border-top: var(--vx-admin-management-line-width-2p) solid var(--tenant-tone);
   border-radius: var(--tenant-card-radius);
@@ -60,7 +60,7 @@
 .vx-tenant-summary__item div {
   min-width: 0;
   display: grid;
-  gap: var(--vx-admin-management-space-05r);
+  gap: var(--space-xs);
 }
 
 .vx-tenant-summary__item span {
@@ -74,7 +74,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--vx-admin-management-space-05r);
+  gap: var(--space-xs);
 }
 
 .vx-tenant-summary__item strong {
@@ -88,7 +88,7 @@
   min-height: var(--vx-admin-management-size-15r);
   display: inline-flex;
   align-items: center;
-  padding: 0 var(--vx-admin-management-space-05r);
+  padding: 0 var(--space-xs);
   border-radius: var(--tenant-card-radius);
   background: color-mix(in srgb, var(--vx-color-auth-accent) 8%, transparent);
   color: var(--tenant-tone);
@@ -118,10 +118,10 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: var(--vx-admin-management-space-1r);
-  padding: var(--vx-admin-management-space-1r) 0 var(--vx-admin-management-space-085r);
+  gap: var(--space-md);
+  padding: var(--space-md) 0 var(--space-md);
   border: 0;
-  border-radius: var(--vx-admin-management-radius-05r) var(--vx-admin-management-radius-05r) 0 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   background: transparent;
 }
 /* 控件外观归 DS：这里原本把 Input 重画了一遍——40px 高、自己的描边与焦点环，
@@ -136,7 +136,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: var(--vx-admin-management-space-1r);
+  gap: var(--space-md);
   flex: 0 1 auto;
 }
 
@@ -155,7 +155,7 @@
   min-height: var(--vx-admin-management-size-225r);
   display: inline-flex;
   align-items: center;
-  padding-left: var(--vx-admin-management-space-05r);
+  padding-left: var(--space-xs);
   color: var(--tenant-ink);
   font-size: var(--vx-admin-body-size);
   font-weight: 800;

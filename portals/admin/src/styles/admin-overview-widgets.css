@@ -67,7 +67,7 @@
   grid-template-columns: repeat(var(--item-count), minmax(0, 1fr));
   align-items: center;
   flex: 0 0 auto;
-  padding: var(--vx-admin-overview-space-025r);
+  padding: var(--space-2xs);
   border: var(--vx-admin-overview-line-width-1p) solid color-mix(in srgb, var(--vx-color-auth-accent) 14%, transparent);
   border-radius: var(--admin-overview-card-radius);
   background: color-mix(in srgb, var(--vx-color-white) 72%, transparent);
@@ -76,9 +76,9 @@
 /* 滑块跟着选中项走，不给每个按钮各画一次底。 */
 .admin-overview-period::before {
   position: absolute;
-  top: var(--vx-admin-overview-space-025r);
-  bottom: var(--vx-admin-overview-space-025r);
-  left: var(--vx-admin-overview-space-025r);
+  top: var(--space-2xs);
+  bottom: var(--space-2xs);
+  left: var(--space-2xs);
   width: calc((100% - var(--vx-admin-overview-size-05r)) / var(--item-count));
   border-radius: var(--admin-overview-card-radius);
   background: color-mix(in srgb, var(--vx-color-auth-accent) 10%, transparent);
@@ -93,7 +93,7 @@
   z-index: 1;
   min-width: var(--vx-admin-overview-size-3r);
   min-height: var(--vx-admin-overview-size-15r);
-  padding: 0 var(--vx-admin-overview-space-05r);
+  padding: 0 var(--space-xs);
   border: 0;
   border-radius: var(--admin-overview-card-radius);
   background: transparent;
@@ -129,12 +129,12 @@
 
 .admin-overview-tip > span {
   position: absolute;
-  top: var(--vx-admin-overview-space-15r);
+  top: var(--space-lg);
   right: 0;
   z-index: 40;
   width: var(--vx-admin-overview-size-18r-large);
   display: block;
-  padding: var(--vx-admin-overview-space-1r);
+  padding: var(--space-md);
   border: var(--vx-admin-overview-line-width-1p) solid color-mix(in srgb, var(--vx-color-auth-accent) 16%, transparent);
   border-radius: var(--admin-overview-card-radius);
   background: color-mix(in srgb, var(--vx-color-white) 98%, transparent);
@@ -159,7 +159,7 @@
 
 .admin-overview-stars {
   display: inline-flex;
-  gap: var(--vx-admin-overview-space-05r);
+  gap: var(--space-xs);
   color: var(--vx-color-gray-300);
   font-size: var(--vx-admin-overview-text-size-1r);
   line-height: 1;

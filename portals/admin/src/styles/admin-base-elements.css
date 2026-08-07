@@ -17,7 +17,7 @@ select {
 
 .vx-eyebrow,
 .eyebrow {
-  margin: 0 0 var(--vx-admin-base-space-05r);
+  margin: 0 0 var(--space-xs);
   font-size: var(--vx-admin-base-text-size-072r);
   letter-spacing: var(--vx-admin-base-text-tracking-018e);
   text-transform: uppercase;

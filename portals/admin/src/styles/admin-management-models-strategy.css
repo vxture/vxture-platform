@@ -15,10 +15,10 @@
 }
 
 .vx-model-strategy-overrides {
-  gap: var(--vx-admin-management-space-05r);
+  gap: var(--space-xs);
 }
 
 .vx-model-strategy-overrides__header {
   justify-content: space-between;
-  padding: var(--vx-admin-management-space-075r) 0 0;
+  padding: var(--space-sm) 0 0;
 }
