@@ -54,3 +54,10 @@ export { VxConfigModule } from "./module";
 export { VxConfigService } from "./service";
 
 // object utils (deepMerge / deepClone / isPlainObject) → import from @vxture/shared
+
+// ============================================
+// Bootstrap helpers
+// ============================================
+
+export type { OpenApiOptions } from "./utils/openapi";
+export { setupOpenApi } from "./utils/openapi";
