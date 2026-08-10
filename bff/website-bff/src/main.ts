@@ -15,7 +15,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./filters/all-exceptions.filter";
 import cookieParser from "cookie-parser";
-import { setupOpenApi } from "@vxture/core-config";
+import { setupOpenApi } from "@vxture/core-config/openapi";
 
 async function bootstrap() {
   // TD-024 boot-smoke: build the REAL esbuild bundle and resolve the full DI graph

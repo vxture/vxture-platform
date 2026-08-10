@@ -3,7 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 import express from "express";
 import { AppModule } from "./app.module";
-import { setupOpenApi } from "@vxture/core-config";
+import { setupOpenApi } from "@vxture/core-config/openapi";
 
 async function bootstrap() {
   // TD-024 boot-smoke: build the REAL esbuild bundle and resolve the full DI graph

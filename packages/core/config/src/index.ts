@@ -55,9 +55,7 @@ export { VxConfigService } from "./service";
 
 // object utils (deepMerge / deepClone / isPlainObject) → import from @vxture/shared
 
-// ============================================
-// Bootstrap helpers
-// ============================================
-
-export type { OpenApiOptions } from "./utils/openapi";
-export { setupOpenApi } from "./utils/openapi";
+// Bootstrap helpers live behind subpaths, not the barrel: `setupOpenApi` imports
+// @nestjs/swagger at module scope, and this barrel is imported by every service —
+// exporting it here dragged swagger (and its class-transformer reach) into the
+// bundle of services that never asked for docs. See @vxture/core-config/openapi.

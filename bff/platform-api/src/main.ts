@@ -13,7 +13,7 @@ import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
-import { setupOpenApi } from "@vxture/core-config";
+import { setupOpenApi } from "@vxture/core-config/openapi";
 import { AllExceptionsFilter } from "./filters/all-exceptions.filter";
 
 async function bootstrap() {

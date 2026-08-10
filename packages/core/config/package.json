@@ -9,6 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./openapi": {
+      "types": "./dist/openapi.d.ts",
+      "import": "./dist/openapi.mjs",
+      "require": "./dist/openapi.cjs"
     }
   },
   "files": [

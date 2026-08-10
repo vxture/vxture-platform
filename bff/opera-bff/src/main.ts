@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
-import { setupOpenApi } from "@vxture/core-config";
+import { setupOpenApi } from "@vxture/core-config/openapi";
 
 async function bootstrap() {
   // TD-024 boot-smoke: resolve the full DI graph from the real esbuild bundle
