@@ -26,7 +26,9 @@ export const APP_SCOPE_CODES = [
   // umbra = the cross-domain RP at ruyin.ai (ex-ruyin, product_300 §2); the new
   // client-side `ruyin` product stays out of the entitlement engine.
   "umbra",
-  "runa",
+  // renamed from "runa" per runos ADR-004 / platform#205 — still the same legacy
+  // exemption, not a new entrant; this list only ever shrinks.
+  "runos",
   "nocus",
   "atlas",
   "ontos",
