@@ -22,6 +22,7 @@
     "db:local:reset": "node scripts/dev/db-local.mjs ddl --reset",
     "db:local:secrets": "node scripts/dev/db-local.mjs secrets",
     "db:local:signing-key": "node scripts/dev/db-local.mjs signing-key",
+    "db:local:sample-user": "node scripts/dev/db-local.mjs sample-user",
     "db:local:seed": "node scripts/dev/db-local.mjs seed",
     "db:local:verify": "node scripts/dev/db-local.mjs verify",
     "db:local:status": "node scripts/dev/db-local.mjs status",
