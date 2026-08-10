@@ -20,7 +20,10 @@
  *   secrets generate local OIDC client secrets + hashes into .env.local
  *   signing-key provision the IdP RS256 key (DB) + write the pair into .env.local
  *   sample-user  hash the local sample password into .env.local (else the seed skips the tenant)
- *   seed    catalog + sample seed
+ *   seed    catalog + sample seed (one identity, one workspace)
+ *
+ * Test data (demo matrix / bulk volume) is NOT here — it is a separate decision
+ * with its own script: scripts/dev/fixtures.mjs (pnpm fixtures:*).
  *   verify  run the baseline assertions
  *   all     up → ddl --reset → secrets → signing-key → sample-user → seed → verify
  *   status  containers + schema count
@@ -209,6 +212,7 @@ function secrets() {
   console.log(`✓ wrote ${CLIENTS.length} client secrets + hashes into .env.local (git-ignored)`);
   console.log("  next: pnpm db:local:seed  (hashes only reach the DB through a seed)");
 }
+
 
 /**
  * Argon2id hash for the local sample user, written into .env.local.
