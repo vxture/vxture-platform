@@ -883,8 +883,8 @@ export async function seedCatalog(client) {
     },
     {
       clientId: "runos",
-      name: "Runa",
-      displayName: "Runa",
+      name: "Runos",
+      displayName: "Runos",
       realm: "customer",
       redirectUris: appUris(B.runos, betaB.runos),
       scopes: ["openid", "profile", "email", "runos:subscription"],
@@ -1018,7 +1018,7 @@ export async function seedCatalog(client) {
     "✓  appoidc.oidc_clients — U-line legacy ruyin → umbra (guarded; no-op when done)",
   );
 
-  // runa → runos (platform#205, runos ADR-004). Same guarded shape as the umbra rename above,
+  // runa → runos (platform#205, ADR-004). Same guarded shape as the umbra rename above,
   // and it must run BEFORE the loop below: the loop's `on conflict (client_id) do update` keys
   // on the NEW id, so on a live database it would insert a second client and leave `runa`
   // standing — the split catalog the issue explicitly asked us to avoid. Renaming in place also
@@ -1165,13 +1165,11 @@ export async function seedCatalog(client) {
       desc: "Boundary VPN product (ruyin.ai).",
     },
     {
-      // 显示名 name/nick 仍是改名前的值 —— platform#205 只请求了 code 层面的改名，
-      // 没说中文名与 nick 是否一起换。留待 runos 明确后单独一批改（见该 issue 回复）。
       code: "runos",
       type: "agent",
       cat: 1,
-      name: "露娜",
-      nick: "Runa",
+      name: "Runos",
+      nick: "Runos",
       desc: "Multimodal assistant agent.",
     },
     {
@@ -1205,13 +1203,15 @@ export async function seedCatalog(client) {
   ];
   // runa → runos (platform#205). Must precede the loop: its `on conflict (product_code) do
   // nothing` keys on the NEW code, so on a live database it inserts a second product row and
-  // leaves `runa` behind — two catalog entries for one product, which is exactly what the issue
+  // leaves `runos` behind — two catalog entries for one product, which is exactly what the issue
   // asked us not to create. Renaming in place keeps the row's uuid, so plans, oidc_clients,
   // product_webhooks and product_metrics all keep pointing at it (they reference product_id,
   // never the code). Guarded and idempotent: a no-op once done, and a no-op if both exist.
   await client.query(`
     update product.products
-       set product_code = 'runos', updated_at = now()
+       set product_code = 'runos',
+           product_name = 'Runos', product_nick = 'Runos',
+           description_key = 'product.product.runos.desc', updated_at = now()
      where product_code = 'runa'
        and not exists (select 1 from product.products p2 where p2.product_code = 'runos')
   `);

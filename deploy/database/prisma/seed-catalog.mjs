@@ -256,7 +256,7 @@ export async function seedCatalog(client) {
       scopes: ['openid', 'profile', 'email', 'phone', 'ruyin', 'ruyin:subscription'],
       postLogoutUris: [`${B.ruyin}/`, postLogout] },
     // New saas apps — prod + beta redirect_uris; subscription scope per app.
-    { clientId: 'runos',    name: 'Runa',     displayName: 'Runa',     realm: 'customer',
+    { clientId: 'runos',    name: 'Runos',     displayName: 'Runos',     realm: 'customer',
       redirectUris: appUris(B.runos, betaB.runos),
       scopes: ['openid', 'profile', 'email', 'runos:subscription'] },
     { clientId: 'nocus',    name: 'Nocus',    displayName: 'Nocus',    realm: 'customer',
@@ -352,7 +352,7 @@ export async function seedCatalog(client) {
   `);
   const PRODUCTS = [
     { code: 'ruyin', type: 'agent',         cat: 1, zh: '如影', zhNick: '如影',     en: 'Ruyin', enNick: 'Ruyin' },
-    { code: 'runos', type: 'agent',         cat: 1, zh: '露娜', zhNick: '露娜之语', en: 'Runa',  enNick: 'Runa' },
+    { code: 'runos', type: 'agent',         cat: 1, zh: '露娜', zhNick: '露娜之语', en: 'Runos',  enNick: 'Runos' },
     { code: 'data',  type: 'data_platform', cat: 2, zh: '数据', zhNick: '数据平台', en: 'Data',  enNick: 'Data Platform' },
   ];
   for (const p of PRODUCTS) {
