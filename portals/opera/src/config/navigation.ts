@@ -66,6 +66,93 @@ export const operaNavSections: OperaNavSection[] = [
     ],
   },
   {
+    title: "Runos · 能力服务",
+    items: [
+      {
+        href: "/runos/plugins",
+        label: "Plugin",
+        icon: "package",
+        description: "套件注册与依赖声明",
+      },
+      {
+        href: "/runos/capabilities",
+        label: "Capability",
+        icon: "stack",
+        description: "四原语统一注册台账",
+      },
+      {
+        href: "/runos/endpoints",
+        label: "Endpoint",
+        icon: "plug",
+        description: "端点登记（在 Capability 详情内管理）",
+      },
+      {
+        href: "/runos/supply-catalogs",
+        label: "Supply Catalog",
+        icon: "list-checks",
+        description: "opera 技术供给目录（两段裁决第一段）",
+      },
+      {
+        href: "/runos/policies",
+        label: "Policy",
+        icon: "shield",
+        description: "风险策略：read / write / critical",
+      },
+      {
+        href: "/runos/credentials",
+        label: "Credential",
+        icon: "key",
+        description: "第三方系统凭证托管",
+      },
+      {
+        href: "/runos/quality-profiles",
+        label: "Quality Profile",
+        icon: "target",
+        description: "质量评分与回归门禁",
+      },
+      {
+        href: "/runos/audit",
+        label: "Audit",
+        icon: "clipboard",
+        description: "运行面 / 管理面双审计事件流",
+      },
+    ],
+  },
+  {
+    title: "ships · 产品发布",
+    items: [
+      {
+        href: "/products",
+        label: "产品目录",
+        icon: "package",
+        description: "产品基础设施登记（product.products）",
+      },
+    ],
+  },
+  {
+    title: "trace · 运行监控",
+    items: [
+      {
+        href: "/ops/maintenance-windows",
+        label: "维护窗口",
+        icon: "clock",
+        description: "计划内停机与影响范围",
+      },
+      {
+        href: "/ops/service-monitor",
+        label: "服务监控",
+        icon: "server",
+        description: "接入产品的 prod / beta 存活状态",
+      },
+      {
+        href: "/ops/job-scheduler",
+        label: "任务调度",
+        icon: "workflow",
+        description: "后台作业心跳与 webhook 投递队列",
+      },
+    ],
+  },
+  {
     title: "Observability",
     items: [
       {
@@ -74,17 +161,6 @@ export const operaNavSections: OperaNavSection[] = [
         icon: "chart-line-up",
       },
       { href: "/observability/logs", label: "Logs", icon: "terminal" },
-    ],
-  },
-  {
-    title: "运行保障",
-    items: [
-      {
-        href: "/ops/maintenance-windows",
-        label: "维护窗口",
-        icon: "clock",
-        description: "计划内停机与影响范围",
-      },
     ],
   },
   {
