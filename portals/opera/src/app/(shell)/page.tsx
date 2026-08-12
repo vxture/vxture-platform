@@ -14,6 +14,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
   Banner,
   Button,
   DashboardTemplate,
@@ -26,6 +27,7 @@ import {
   StatusBadge,
   TableTitleCell,
   ViewHeader,
+  useToast,
   type StatusBadgeTone,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
@@ -100,6 +102,7 @@ function formatTime(iso: string): string {
 }
 
 export default function DashboardPage() {
+  const { toast } = useToast();
   const [providers, setProviders] = useState<ModelProviderRecord[]>([]);
   const [models, setModels] = useState<AiModelRecord[]>([]);
   const [windows, setWindows] = useState<MaintenanceWindowItem[]>([]);
@@ -155,6 +158,26 @@ export default function DashboardPage() {
     }
     return map;
   }, [models]);
+
+  const copyEvent = async (r: AuditLogEntry) => {
+    const text = [
+      formatTime(r.time),
+      r.actor,
+      r.action,
+      `${r.resourceType} · ${r.resourceId}`,
+      r.result,
+    ].join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制该行到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
 
   const activeProviders = providers.filter((p) => p.isActive).length;
   const activeModels = models.filter((m) => m.isActive).length;
@@ -285,25 +308,30 @@ export default function DashboardPage() {
               ),
             },
             {
+              id: "models",
+              header: "模型数",
+              align: "right",
+              width: "xs",
+              cell: (r: ModelProviderRecord) =>
+                modelCountByProvider.get(r.id) ?? 0,
+            },
+            {
               id: "type",
               header: "类型",
+              align: "center",
+              width: "xs",
               cell: (r: ModelProviderRecord) => r.providerType,
             },
             {
               id: "status",
               header: "状态",
+              align: "center",
+              width: "xs",
               cell: (r: ModelProviderRecord) => (
                 <StatusBadge tone={providerTone(r.isActive)} dot>
                   {r.isActive ? "启用" : "停用"}
                 </StatusBadge>
               ),
-            },
-            {
-              id: "models",
-              header: "模型数",
-              align: "right",
-              cell: (r: ModelProviderRecord) =>
-                modelCountByProvider.get(r.id) ?? 0,
             },
           ]}
           rows={providers}
@@ -317,7 +345,8 @@ export default function DashboardPage() {
               asChild
               variant="ghost"
               size="md"
-              aria-label="前往 Provider"
+              aria-label="前往 Provider 详情"
+              title="前往 Provider 详情"
             >
               <Link href="/atlas/providers">
                 <Icon name="arrow-right" size="sm" aria-hidden="true" />
@@ -346,22 +375,26 @@ export default function DashboardPage() {
             {
               id: "time",
               header: "时间",
+              width: "sm",
               cell: (r: AuditLogEntry) => formatTime(r.time),
             },
             {
               id: "actor",
               header: "操作者",
+              width: "sm",
               cell: (r: AuditLogEntry) => r.actor,
-            },
-            {
-              id: "action",
-              header: "动作",
-              cell: (r: AuditLogEntry) => r.action,
             },
             {
               id: "target",
               header: "对象",
               cell: (r: AuditLogEntry) => `${r.resourceType} · ${r.resourceId}`,
+            },
+            {
+              id: "action",
+              header: "动作",
+              align: "center",
+              width: "xs",
+              cell: (r: AuditLogEntry) => r.action,
             },
           ]}
           rows={events}
@@ -369,6 +402,19 @@ export default function DashboardPage() {
           selectedKeys={eventSel}
           onSelectionChange={setEventSel}
           indexStart={1}
+          rowActions={(r: AuditLogEntry) => (
+            <ActionMenu
+              label="留痕操作"
+              items={[
+                {
+                  id: "copy",
+                  label: "复制该行",
+                  icon: "copy",
+                  onSelect: () => void copyEvent(r),
+                },
+              ]}
+            />
+          )}
           empty={
             load.kind === "ready" ? (
               <EmptyState
