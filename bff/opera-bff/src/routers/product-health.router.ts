@@ -335,6 +335,37 @@ interface PathAttempt {
   outcome: PathOutcome;
 }
 
+/**
+ * Node 的 fetch() 失败时，顶层 `error.message` 几乎永远是没有信息量的
+ * "fetch failed"（undici 的已知行为，跟失败原因无关，DNS/连接被拒/超时都是这句）
+ * ——真正原因在 `error.cause` 里，不挖出来就是把这句英文字面量原样糊给用户看
+ * （2026-08-12 opera 服务监控页实测抓到：不可达一律显示 "fetch failed"）。
+ * `AbortSignal.timeout` 触发时是 `DOMException(name="TimeoutError")`，不带
+ * cause，走单独分支。
+ */
+function describeNetworkError(error: unknown): string {
+  if (error instanceof DOMException && error.name === "TimeoutError") {
+    return "探测超时";
+  }
+  if (error instanceof Error) {
+    const cause = (error as { cause?: unknown }).cause;
+    const code =
+      cause && typeof cause === "object" && "code" in cause
+        ? String((cause as { code?: unknown }).code)
+        : undefined;
+    if (code === "ECONNREFUSED") return "连接被拒绝";
+    if (code === "ENOTFOUND" || code === "EAI_AGAIN") return "域名解析失败";
+    if (code === "ETIMEDOUT" || code === "UND_ERR_CONNECT_TIMEOUT")
+      return "连接超时";
+    if (code === "ECONNRESET") return "连接被重置";
+    if (cause instanceof Error && cause.message) return cause.message;
+    if (error.message && error.message !== "fetch failed") {
+      return error.message;
+    }
+  }
+  return "连接失败";
+}
+
 async function attemptPath(origin: string, path: string): Promise<PathAttempt> {
   const startedAt = Date.now();
   try {
@@ -358,7 +389,7 @@ async function attemptPath(origin: string, path: string): Promise<PathAttempt> {
       outcome: {
         kind: "network-error",
         durationMs: Date.now() - startedAt,
-        message: error instanceof Error ? error.message : "Probe failed",
+        message: describeNetworkError(error),
       },
     };
   }
@@ -479,7 +510,7 @@ async function probeLiveness(origin: string | null): Promise<LivenessProbe> {
     gitSha: null,
     stage: null,
     buildTime: null,
-    error: firstErrorMessage(attempts) ?? "Probe failed",
+    error: firstErrorMessage(attempts) ?? "探测失败",
     checkedAt,
   };
 }
@@ -545,7 +576,7 @@ async function probeReadiness(origin: string | null): Promise<ReadinessProbe> {
     httpStatus: null,
     durationMs: maxDuration(attempts),
     checks: null,
-    error: firstErrorMessage(attempts) ?? "Probe failed",
+    error: firstErrorMessage(attempts) ?? "探测失败",
     checkedAt,
   };
 }
