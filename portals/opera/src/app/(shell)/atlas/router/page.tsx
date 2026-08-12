@@ -19,13 +19,10 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  ListCard,
-  ListCardGrid,
   Pagination,
   Section,
   StatusBadge,
   TableTitleCell,
-  type FilterBarView,
   useListPagination,
   useToast,
   ViewHeader,
@@ -37,7 +34,6 @@ export default function RouterPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [keyword, setKeyword] = useState("");
-  const [view, setView] = useState<FilterBarView>("list");
   /* 选择列全站占位（owner 定）：路由行暂无批量动作，列先在。 */
   const [selected, setSelected] = useState<readonly string[]>([]);
 
@@ -53,7 +49,7 @@ export default function RouterPage() {
         );
   }, [keyword]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   const rowMenu = (e: EndpointRow) => (
     <ActionMenu
@@ -93,23 +89,6 @@ export default function RouterPage() {
     />
   );
 
-  const routeMeta = (e: EndpointRow) =>
-    e.fallbackModel ? (
-      <>
-        <Badge>Primary</Badge>
-        <span className="text-code-sm text-foreground">{e.primaryModel}</span>
-        <Badge variant="secondary">Fallback</Badge>
-        <span className="text-code-sm text-foreground">{e.fallbackModel}</span>
-        <span>超时 / 5xx 触发</span>
-      </>
-    ) : (
-      <>
-        <Badge>Primary</Badge>
-        <span className="text-code-sm text-foreground">{e.primaryModel}</span>
-        <span>未配置 fallback——单模型直路由</span>
-      </>
-    );
-
   return (
     <ViewLayout>
       <ViewHeader
@@ -140,8 +119,9 @@ export default function RouterPage() {
       >
         <div className="flex flex-col gap-sm">
           <FilterBar
-            view={view}
-            onViewChange={setView}
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               filtered.length === endpoints.length
                 ? endpoints.length
@@ -165,88 +145,70 @@ export default function RouterPage() {
             </InputGroup>
           </FilterBar>
 
-          {view === "list" ? (
-            <DataTable
-              columns={[
-                {
-                  id: "code",
-                  header: "Endpoint",
-                  cell: (e) => (
-                    <TableTitleCell
-                      icon="plug"
-                      title={<span className="font-mono">{e.code}</span>}
-                      description={e.category}
-                      onTitleClick={() => router.push("/atlas/endpoints")}
-                    />
-                  ),
-                },
-                {
-                  id: "primary",
-                  header: "Primary",
-                  cell: (e) => (
-                    <span className="text-code-sm">{e.primaryModel}</span>
-                  ),
-                },
-                {
-                  id: "fallback",
-                  header: "Fallback",
-                  cell: (e) =>
-                    e.fallbackModel ? (
-                      <span className="text-code-sm">{e.fallbackModel}</span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    ),
-                },
-                {
-                  id: "mode",
-                  header: "模式",
-                  cell: (e) => (
-                    <Badge variant={e.fallbackModel ? "default" : "secondary"}>
-                      {e.fallbackModel ? "Failover" : "Single"}
-                    </Badge>
-                  ),
-                },
-                {
-                  id: "enabled",
-                  header: "状态",
-                  cell: (e) => (
-                    <StatusBadge tone={e.enabled ? "success" : "neutral"} dot>
-                      {e.enabled ? "生效中" : "已停用"}
-                    </StatusBadge>
-                  ),
-                },
-              ]}
-              rows={pager.pageRows}
-              rowKey={(e) => e.id}
-              selectedKeys={selected}
-              onSelectionChange={setSelected}
-              indexStart={pager.indexStart}
-              rowActions={rowMenu}
-              footer={pagination}
-            />
-          ) : (
-            <div className="flex flex-col gap-sm">
-              <ListCardGrid>
-                {pager.pageRows.map((e) => (
-                  <ListCard
-                    key={e.id}
+          <DataTable
+            columns={[
+              {
+                id: "code",
+                header: "Endpoint",
+                cell: (e) => (
+                  <TableTitleCell
                     icon="plug"
                     title={<span className="font-mono">{e.code}</span>}
                     description={e.category}
                     onTitleClick={() => router.push("/atlas/endpoints")}
-                    status={
-                      <StatusBadge tone={e.enabled ? "success" : "neutral"} dot>
-                        {e.enabled ? "生效中" : "已停用"}
-                      </StatusBadge>
-                    }
-                    actions={rowMenu(e)}
-                    meta={routeMeta(e)}
                   />
-                ))}
-              </ListCardGrid>
-              {pagination}
-            </div>
-          )}
+                ),
+              },
+              {
+                id: "primary",
+                header: "Primary",
+                width: "sm",
+                cell: (e) => (
+                  <span className="text-code-sm">{e.primaryModel}</span>
+                ),
+              },
+              {
+                id: "fallback",
+                header: "Fallback",
+                width: "sm",
+                cell: (e) =>
+                  e.fallbackModel ? (
+                    <span className="text-code-sm">{e.fallbackModel}</span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  ),
+              },
+              {
+                id: "mode",
+                header: "模式",
+                align: "center",
+                width: "xs",
+                cell: (e) => (
+                  <Badge variant={e.fallbackModel ? "default" : "secondary"}>
+                    {e.fallbackModel ? "Failover" : "Single"}
+                  </Badge>
+                ),
+              },
+              {
+                id: "enabled",
+                header: "状态",
+                align: "center",
+                width: "xs",
+                cell: (e) => (
+                  <StatusBadge tone={e.enabled ? "success" : "neutral"} dot>
+                    {e.enabled ? "生效中" : "已停用"}
+                  </StatusBadge>
+                ),
+              },
+            ]}
+            rows={pager.pageRows}
+            rowKey={(e) => e.id}
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
+            indexStart={pager.indexStart}
+            rowActions={rowMenu}
+            footer={pagination}
+          />
         </div>
       </Section>
     </ViewLayout>

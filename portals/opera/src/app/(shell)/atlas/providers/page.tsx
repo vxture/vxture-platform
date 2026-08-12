@@ -222,7 +222,7 @@ export default function ProvidersPage() {
     );
   }, [rows, keyword, statusFilter]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   function openCreate() {
     setDraft(EMPTY_DRAFT);
@@ -463,6 +463,9 @@ export default function ProvidersPage() {
         }
         filters={
           <FilterBar
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -514,8 +517,19 @@ export default function ProvidersPage() {
                 ),
               },
               {
+                id: "description",
+                header: "简介",
+                cell: (r: ModelProviderRecord) => (
+                  <span className="text-body-sm text-muted-foreground">
+                    {r.description ?? "—"}
+                  </span>
+                ),
+              },
+              {
                 id: "type",
                 header: "类型",
+                align: "center",
+                width: "xs",
                 cell: (r: ModelProviderRecord) =>
                   PROVIDER_TYPES.find((t) => t.value === r.providerType)
                     ?.label ?? r.providerType,
@@ -524,19 +538,11 @@ export default function ProvidersPage() {
                 id: "status",
                 header: "状态",
                 align: "center",
+                width: "xs",
                 cell: (r: ModelProviderRecord) => (
                   <StatusBadge tone={providerTone(r.isActive)} dot>
                     {r.isActive ? "启用" : "停用"}
                   </StatusBadge>
-                ),
-              },
-              {
-                id: "description",
-                header: "简介",
-                cell: (r: ModelProviderRecord) => (
-                  <span className="text-body-sm text-muted-foreground truncate max-w-panel-sm">
-                    {r.description ?? "—"}
-                  </span>
                 ),
               },
             ]}

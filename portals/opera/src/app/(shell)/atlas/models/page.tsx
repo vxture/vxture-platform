@@ -195,7 +195,7 @@ export default function ModelsPage() {
     );
   }, [rows, keyword, capability]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   function openCreate() {
     setDraft(emptyDraft(providers[0]?.id ?? ""));
@@ -338,6 +338,9 @@ export default function ModelsPage() {
         }
         filters={
           <FilterBar
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -392,21 +395,9 @@ export default function ModelsPage() {
                 ),
               },
               {
-                id: "provider",
-                header: "Provider",
-                cell: (r: AiModelRecord) =>
-                  (r.providerId &&
-                    providerById.get(r.providerId)?.providerName) ??
-                  r.provider,
-              },
-              {
-                id: "protocol",
-                header: "协议",
-                cell: (r: AiModelRecord) => r.protocol,
-              },
-              {
                 id: "capabilities",
                 header: "能力",
+                width: "md",
                 cell: (r: AiModelRecord) => (
                   <span className="flex flex-wrap gap-2xs">
                     {r.capabilities.slice(0, 3).map((c) => (
@@ -423,9 +414,26 @@ export default function ModelsPage() {
                 ),
               },
               {
+                id: "provider",
+                header: "Provider",
+                width: "sm",
+                cell: (r: AiModelRecord) =>
+                  (r.providerId &&
+                    providerById.get(r.providerId)?.providerName) ??
+                  r.provider,
+              },
+              {
+                id: "protocol",
+                header: "协议",
+                align: "center",
+                width: "xs",
+                cell: (r: AiModelRecord) => r.protocol,
+              },
+              {
                 id: "status",
                 header: "状态",
                 align: "center",
+                width: "xs",
                 cell: (r: AiModelRecord) => (
                   <StatusBadge tone={modelTone(r.isActive)} dot>
                     {r.isActive ? "启用" : "停用"}

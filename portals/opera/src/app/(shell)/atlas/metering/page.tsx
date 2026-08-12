@@ -13,6 +13,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
+  BulkActionBar,
   Button,
   DataTable,
   EmptyState,
@@ -23,11 +25,28 @@ import {
   InputGroupInput,
   MetricGrid,
   NativeSelect,
+  Pagination,
   Section,
   ViewHeader,
   ViewLayout,
+  useListPagination,
+  useToast,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
+
+/** 触发一次浏览器下载；用完立即回收 URL，不留 blob 常驻内存。 */
+function downloadCsv(filename: string, rows: readonly string[][]) {
+  const csv = rows
+    .map((cols) => cols.map((c) => `"${c.replace(/"/g, '""')}"`).join(","))
+    .join("\r\n");
+  const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 interface TenantUsageSummaryRecord {
   id: string;
@@ -64,11 +83,39 @@ type LoadState =
   | { kind: "error"; message: string }
   | { kind: "ready" };
 
+const CSV_HEADER = [
+  "租户",
+  "周期",
+  "统计口径",
+  "总请求",
+  "失败请求",
+  "Input Token",
+  "Output Token",
+  "Raw Cost",
+  "币种",
+];
+
+function toCsvRow(r: TenantUsageSummaryRecord): string[] {
+  return [
+    r.tenantId,
+    r.cycleMonth,
+    r.statType,
+    r.totalRequests,
+    r.failedRequests,
+    r.totalInputTokens,
+    r.totalOutputTokens,
+    r.totalCostAmount,
+    r.currency,
+  ];
+}
+
 export default function MeteringPage() {
+  const { toast } = useToast();
   const [rows, setRows] = useState<TenantUsageSummaryRecord[]>([]);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [keyword, setKeyword] = useState("");
   const [cycleMonth, setCycleMonth] = useState("all");
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
 
   const reload = useCallback(async () => {
     setLoad({ kind: "loading" });
@@ -107,6 +154,33 @@ export default function MeteringPage() {
         (kw === "" || r.tenantId.toLowerCase().includes(kw)),
     );
   }, [rows, keyword, cycleMonth]);
+
+  const pager = useListPagination(filtered, 20);
+
+  const copyRow = async (r: TenantUsageSummaryRecord) => {
+    const text = toCsvRow(r).join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制该行到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
+
+  const exportSelected = () => {
+    const ids = new Set(selectedKeys);
+    const picked = filtered.filter((r) => ids.has(r.id));
+    downloadCsv(`atlas-usage-${Date.now()}.csv`, [
+      CSV_HEADER,
+      ...picked.map(toCsvRow),
+    ]);
+    toast({ tone: "success", title: `已导出 ${picked.length} 条记录` });
+    setSelectedKeys([]);
+  };
 
   const totals = useMemo(
     () =>
@@ -193,6 +267,9 @@ export default function MeteringPage() {
         description="Atlas 只按租户 × 结算周期回传用量事实；Provider / Model / Endpoint 细分暂无对应上游数据源。"
       >
         <FilterBar
+          view="list"
+          onViewChange={() => {}}
+          cardsDisabledReason="卡片视图已下线，改用列表"
           count={
             filtered.length === rows.length
               ? rows.length
@@ -207,13 +284,19 @@ export default function MeteringPage() {
               placeholder="搜索租户 ID…"
               aria-label="搜索租户"
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
             />
           </InputGroup>
           <NativeSelect
             wrapperClassName="w-fit"
             value={cycleMonth}
-            onChange={(e) => setCycleMonth(e.target.value)}
+            onChange={(e) => {
+              setCycleMonth(e.target.value);
+              pager.resetPage();
+            }}
             aria-label="结算周期"
           >
             <option value="all">全部周期</option>
@@ -224,6 +307,20 @@ export default function MeteringPage() {
             ))}
           </NativeSelect>
         </FilterBar>
+
+        <BulkActionBar
+          count={selectedKeys.length}
+          noun="条"
+          onClear={() => setSelectedKeys([])}
+          actions={[
+            {
+              id: "export",
+              label: "导出所选",
+              icon: "download",
+              onSelect: exportSelected,
+            },
+          ]}
+        />
 
         <DataTable
           columns={[
@@ -237,19 +334,10 @@ export default function MeteringPage() {
               ),
             },
             {
-              id: "cycle",
-              header: "周期",
-              cell: (r: TenantUsageSummaryRecord) => r.cycleMonth,
-            },
-            {
-              id: "statType",
-              header: "统计口径",
-              cell: (r: TenantUsageSummaryRecord) => r.statType,
-            },
-            {
               id: "requests",
               header: "请求数",
               align: "right",
+              width: "sm",
               cell: (r: TenantUsageSummaryRecord) =>
                 `${formatNumber(r.totalRequests)}（失败 ${formatNumber(r.failedRequests)}）`,
             },
@@ -257,6 +345,7 @@ export default function MeteringPage() {
               id: "tokens",
               header: "Token（入/出）",
               align: "right",
+              width: "sm",
               cell: (r: TenantUsageSummaryRecord) =>
                 `${formatNumber(r.totalInputTokens)} / ${formatNumber(r.totalOutputTokens)}`,
             },
@@ -264,13 +353,56 @@ export default function MeteringPage() {
               id: "cost",
               header: "Raw Cost",
               align: "right",
+              width: "sm",
               cell: (r: TenantUsageSummaryRecord) =>
                 formatCost(r.totalCostAmount, r.currency),
             },
+            {
+              id: "cycle",
+              header: "周期",
+              align: "center",
+              width: "xs",
+              cell: (r: TenantUsageSummaryRecord) => r.cycleMonth,
+            },
+            {
+              id: "statType",
+              header: "统计口径",
+              align: "center",
+              width: "xs",
+              cell: (r: TenantUsageSummaryRecord) => r.statType,
+            },
           ]}
-          rows={filtered}
+          rows={pager.pageRows}
           rowKey={(r: TenantUsageSummaryRecord) => r.id}
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          indexStart={pager.indexStart}
+          rowActions={(r) => (
+            <ActionMenu
+              label={`${r.tenantId} 操作`}
+              items={[
+                {
+                  id: "copy",
+                  label: "复制该行",
+                  icon: "copy",
+                  onSelect: () => void copyRow(r),
+                },
+              ]}
+            />
+          )}
           empty={emptyState}
+          footer={
+            <Pagination
+              className="w-full"
+              page={pager.page}
+              pageCount={pager.pageCount}
+              total={rows.length}
+              filteredTotal={filtered.length}
+              pageSize={pager.pageSize}
+              onPageSizeChange={pager.onPageSizeChange}
+              onPageChange={pager.onPageChange}
+            />
+          }
         />
       </Section>
     </ViewLayout>

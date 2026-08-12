@@ -21,14 +21,11 @@ import {
   FieldGroup,
   FieldLabel,
   FilterBar,
-  type FilterBarView,
   Icon,
   Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  ListCard,
-  ListCardGrid,
   ListPageTemplate,
   Pagination,
   StatusBadge,
@@ -78,7 +75,6 @@ export default function EndpointsPage() {
   const [rows, setRows] = useState<EndpointRow[]>(seed);
   const [keyword, setKeyword] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
-  const [view, setView] = useState<FilterBarView>("list");
   const [dialog, setDialog] = useState<DialogState>(null);
   const [draft, setDraft] = useState<EndpointDraft>(EMPTY_DRAFT);
 
@@ -89,7 +85,7 @@ export default function EndpointsPage() {
       : rows.filter((r) => r.code.toLowerCase().includes(kw));
   }, [rows, keyword]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   const setEnabledBulk = (enabled: boolean) => {
     const ids = new Set(selectedKeys);
@@ -267,8 +263,9 @@ export default function EndpointsPage() {
         summary={PLANNED_BANNER}
         filters={
           <FilterBar
-            view={view}
-            onViewChange={setView}
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             actions={
               <Button onClick={openCreate}>
                 <Icon name="plus" size="sm" />
@@ -320,91 +317,66 @@ export default function EndpointsPage() {
           />
         }
         table={
-          view === "list" ? (
-            <DataTable
-              columns={[
-                {
-                  id: "code",
-                  header: "Endpoint",
-                  cell: (r) => (
-                    <TableTitleCell
-                      icon="plug"
-                      title={<span className="font-mono">{r.code}</span>}
-                      description={r.category}
-                      onTitleClick={() => openFrom(r, "edit")}
-                    />
-                  ),
-                },
-                {
-                  id: "primary",
-                  header: "Primary",
-                  cell: (r) => (
-                    <span className="text-code-sm">{r.primaryModel}</span>
-                  ),
-                },
-                {
-                  id: "fallback",
-                  header: "Fallback",
-                  cell: (r) =>
-                    r.fallbackModel ? (
-                      <span className="text-code-sm">{r.fallbackModel}</span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    ),
-                },
-                {
-                  id: "qps",
-                  header: "QPS",
-                  align: "right",
-                  cell: (r) => r.qps,
-                },
-                {
-                  id: "enabled",
-                  header: "状态",
-                  cell: (r) => (
-                    <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
-                      {r.enabled ? "已启用" : "已停用"}
-                    </StatusBadge>
-                  ),
-                },
-              ]}
-              rows={pager.pageRows}
-              rowKey={(r) => r.id}
-              selectedKeys={selectedKeys}
-              onSelectionChange={setSelectedKeys}
-              indexStart={pager.indexStart}
-              rowActions={rowMenu}
-              footer={pagination}
-            />
-          ) : (
-            <div className="flex flex-col gap-sm">
-              <ListCardGrid>
-                {pager.pageRows.map((r) => (
-                  <ListCard
-                    key={r.id}
+          <DataTable
+            columns={[
+              {
+                id: "code",
+                header: "Endpoint",
+                cell: (r) => (
+                  <TableTitleCell
                     icon="plug"
                     title={<span className="font-mono">{r.code}</span>}
                     description={r.category}
                     onTitleClick={() => openFrom(r, "edit")}
-                    status={
-                      <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
-                        {r.enabled ? "已启用" : "已停用"}
-                      </StatusBadge>
-                    }
-                    actions={rowMenu(r)}
-                    meta={
-                      <span className="font-mono">
-                        {r.primaryModel}
-                        {r.fallbackModel ? ` → ${r.fallbackModel}` : ""} · QPS{" "}
-                        {r.qps}
-                      </span>
-                    }
                   />
-                ))}
-              </ListCardGrid>
-              {pagination}
-            </div>
-          )
+                ),
+              },
+              {
+                id: "primary",
+                header: "Primary",
+                width: "sm",
+                cell: (r) => (
+                  <span className="text-code-sm">{r.primaryModel}</span>
+                ),
+              },
+              {
+                id: "fallback",
+                header: "Fallback",
+                width: "sm",
+                cell: (r) =>
+                  r.fallbackModel ? (
+                    <span className="text-code-sm">{r.fallbackModel}</span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  ),
+              },
+              {
+                id: "qps",
+                header: "QPS",
+                align: "right",
+                width: "xs",
+                cell: (r) => r.qps,
+              },
+              {
+                id: "enabled",
+                header: "状态",
+                align: "center",
+                width: "xs",
+                cell: (r) => (
+                  <StatusBadge tone={r.enabled ? "success" : "neutral"} dot>
+                    {r.enabled ? "已启用" : "已停用"}
+                  </StatusBadge>
+                ),
+              },
+            ]}
+            rows={pager.pageRows}
+            rowKey={(r) => r.id}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
+            indexStart={pager.indexStart}
+            rowActions={rowMenu}
+            footer={pagination}
+          />
         }
       />
 
