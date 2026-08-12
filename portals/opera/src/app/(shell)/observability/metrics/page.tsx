@@ -12,21 +12,45 @@
  * 不再假装能看到 Provider/Model 维度的性能数据。 */
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
   Banner,
   Button,
   DataTable,
   EmptyState,
+  FilterBar,
   Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   MetricGrid,
+  Pagination,
   Section,
+  StatusBadge,
   ViewHeader,
   ViewLayout,
+  useListPagination,
+  useToast,
+  type StatusBadgeTone,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
 
 type JobStatus = "idle" | "running" | "success" | "failed";
+
+const JOB_STATUS_LABELS: Record<JobStatus, string> = {
+  idle: "空闲",
+  running: "运行中",
+  success: "正常",
+  failed: "异常",
+};
+
+function jobStatusTone(status: JobStatus): StatusBadgeTone {
+  if (status === "success") return "success";
+  if (status === "running") return "info";
+  if (status === "failed") return "danger";
+  return "neutral";
+}
 
 interface JobHeartbeatItem {
   jobName: string;
@@ -55,8 +79,11 @@ type LoadState =
   | { kind: "ready" };
 
 export default function MetricsPage() {
+  const { toast } = useToast();
   const [snapshot, setSnapshot] = useState<JobSchedulerSnapshot | null>(null);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
+  const [keyword, setKeyword] = useState("");
+  const [selected, setSelected] = useState<readonly string[]>([]);
 
   const reload = useCallback(async () => {
     setLoad({ kind: "loading" });
@@ -78,6 +105,33 @@ export default function MetricsPage() {
   }, [reload]);
 
   const counts = snapshot?.queue.counts;
+  const jobs = useMemo(() => snapshot?.jobs ?? [], [snapshot]);
+  const filteredJobs = useMemo(() => {
+    const kw = keyword.trim().toLowerCase();
+    return kw === ""
+      ? jobs
+      : jobs.filter((j) => j.jobName.toLowerCase().includes(kw));
+  }, [jobs, keyword]);
+  const pager = useListPagination(filteredJobs, 20);
+
+  const copyRow = async (r: JobHeartbeatItem) => {
+    const text = [
+      r.jobName,
+      JOB_STATUS_LABELS[r.status],
+      r.lastDurationMs != null ? `${r.lastDurationMs}ms` : "—",
+      `运行 ${r.runCount} / 失败 ${r.failureCount}`,
+    ].join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制该行到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
 
   return (
     <ViewLayout>
@@ -99,6 +153,31 @@ export default function MetricsPage() {
         level={2}
         description="opera-bff 自有的四个后台作业（provisioning-dispatch / sharing-expiry / trial-expiry / order-payment-expiry），真实心跳数据。"
       >
+        <FilterBar
+          view="list"
+          onViewChange={() => {}}
+          cardsDisabledReason="卡片视图已下线，改用列表"
+          count={
+            filteredJobs.length === jobs.length
+              ? jobs.length
+              : `${filteredJobs.length} / ${jobs.length}`
+          }
+        >
+          <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+            <InputGroupAddon>
+              <Icon name="search" size="sm" aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="搜索作业名…"
+              aria-label="搜索作业"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                pager.resetPage();
+              }}
+            />
+          </InputGroup>
+        </FilterBar>
         <DataTable
           columns={[
             {
@@ -107,14 +186,10 @@ export default function MetricsPage() {
               cell: (r: JobHeartbeatItem) => r.jobName,
             },
             {
-              id: "status",
-              header: "状态",
-              cell: (r: JobHeartbeatItem) => r.status,
-            },
-            {
               id: "duration",
               header: "最近耗时",
               align: "right",
+              width: "xs",
               cell: (r: JobHeartbeatItem) =>
                 r.lastDurationMs != null ? `${r.lastDurationMs}ms` : "—",
             },
@@ -122,17 +197,58 @@ export default function MetricsPage() {
               id: "runs",
               header: "累计运行",
               align: "right",
+              width: "xs",
               cell: (r: JobHeartbeatItem) => r.runCount,
             },
             {
               id: "failures",
               header: "累计失败",
               align: "right",
+              width: "xs",
               cell: (r: JobHeartbeatItem) => r.failureCount,
             },
+            {
+              id: "status",
+              header: "状态",
+              align: "center",
+              width: "xs",
+              cell: (r: JobHeartbeatItem) => (
+                <StatusBadge tone={jobStatusTone(r.status)}>
+                  {JOB_STATUS_LABELS[r.status]}
+                </StatusBadge>
+              ),
+            },
           ]}
-          rows={snapshot?.jobs ?? []}
+          rows={pager.pageRows}
           rowKey={(r) => r.jobName}
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+          indexStart={pager.indexStart}
+          rowActions={(r: JobHeartbeatItem) => (
+            <ActionMenu
+              label={`${r.jobName} 操作`}
+              items={[
+                {
+                  id: "copy",
+                  label: "复制该行",
+                  icon: "copy",
+                  onSelect: () => void copyRow(r),
+                },
+              ]}
+            />
+          )}
+          footer={
+            <Pagination
+              className="w-full"
+              page={pager.page}
+              pageCount={pager.pageCount}
+              total={jobs.length}
+              filteredTotal={filteredJobs.length}
+              pageSize={pager.pageSize}
+              onPageSizeChange={pager.onPageSizeChange}
+              onPageChange={pager.onPageChange}
+            />
+          }
           empty={
             load.kind === "loading" ? (
               <EmptyState title="读取中…" description="正在读取作业统计。" />

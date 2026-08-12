@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
   Button,
   DataTable,
   EmptyState,
@@ -19,16 +20,14 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  ListCard,
-  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
   StatusBadge,
   type DataTableSort,
-  type FilterBarView,
   type StatusBadgeTone,
   useListPagination,
+  useToast,
   ViewHeader,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
@@ -64,6 +63,7 @@ function formatTime(iso: string): string {
 }
 
 export default function AuditPage() {
+  const { toast } = useToast();
   const [rows, setRows] = useState<AuditLogEntry[]>([]);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [keyword, setKeyword] = useState("");
@@ -115,10 +115,29 @@ export default function AuditPage() {
   }, [rows, keyword, action, sort]);
 
   const filtered = keyword !== "" || action !== "all";
-  const pager = useListPagination(visible);
-  const [view, setView] = useState<FilterBarView>("list");
+  const pager = useListPagination(visible, 20);
   /* 选择列全站占位（owner 定）：留痕只读，列先在。 */
   const [selected, setSelected] = useState<readonly string[]>([]);
+
+  const copyRow = async (r: AuditLogEntry) => {
+    const text = [
+      formatTime(r.time),
+      r.actor,
+      r.action,
+      `${r.resourceType} · ${r.resourceId}`,
+      r.errorCode ? `${r.result} · ${r.errorCode}` : r.result,
+    ].join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制该行到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
 
   const pagination = (
     <Pagination
@@ -168,8 +187,9 @@ export default function AuditPage() {
       }
       filters={
         <FilterBar
-          view={view}
-          onViewChange={setView}
+          view="list"
+          onViewChange={() => {}}
+          cardsDisabledReason="卡片视图已下线，改用列表"
           count={
             visible.length === rows.length
               ? rows.length
@@ -209,78 +229,72 @@ export default function AuditPage() {
         </FilterBar>
       }
       table={
-        view === "list" ? (
-          <DataTable
-            columns={[
-              {
-                id: "time",
-                header: "时间",
-                cell: (r: AuditLogEntry) => formatTime(r.time),
-                sortable: true,
-              },
-              {
-                id: "actor",
-                header: "操作者",
-                cell: (r: AuditLogEntry) => r.actor,
-              },
-              {
-                id: "action",
-                header: "动作",
-                cell: (r: AuditLogEntry) => r.action,
-              },
-              {
-                id: "target",
-                header: "对象",
-                cell: (r: AuditLogEntry) => (
-                  <span className="text-label-md text-foreground">
-                    {r.resourceType} · {r.resourceId}
-                  </span>
-                ),
-              },
-              {
-                id: "result",
-                header: "结果",
-                cell: (r: AuditLogEntry) => (
-                  <StatusBadge tone={RESULT_TONE[r.result] ?? "neutral"} dot>
-                    {r.errorCode ? `${r.result} · ${r.errorCode}` : r.result}
-                  </StatusBadge>
-                ),
-              },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r: AuditLogEntry) => r.id}
-            selectedKeys={selected}
-            onSelectionChange={setSelected}
-            indexStart={pager.indexStart}
-            sort={sort}
-            onSortChange={setSort}
-            footer={pagination}
-            empty={emptyState}
-          />
-        ) : (
-          <div className="flex flex-col gap-sm">
-            <ListCardGrid>
-              {pager.pageRows.map((r) => (
-                <ListCard
-                  key={r.id}
-                  title={`${r.resourceType} · ${r.resourceId}`}
-                  description={`${formatTime(r.time)} · ${r.actor}`}
-                  status={
-                    <StatusBadge tone={RESULT_TONE[r.result] ?? "neutral"} dot>
-                      {r.action}
-                    </StatusBadge>
-                  }
-                  meta={
-                    <span>
-                      {r.errorCode ? `${r.result} · ${r.errorCode}` : r.result}
-                    </span>
-                  }
-                />
-              ))}
-            </ListCardGrid>
-            {pagination}
-          </div>
-        )
+        <DataTable
+          columns={[
+            {
+              id: "time",
+              header: "时间",
+              width: "sm",
+              cell: (r: AuditLogEntry) => formatTime(r.time),
+              sortable: true,
+            },
+            {
+              id: "actor",
+              header: "操作者",
+              width: "sm",
+              cell: (r: AuditLogEntry) => r.actor,
+            },
+            {
+              id: "target",
+              header: "对象",
+              cell: (r: AuditLogEntry) => (
+                <span className="text-label-md text-foreground">
+                  {r.resourceType} · {r.resourceId}
+                </span>
+              ),
+            },
+            {
+              id: "action",
+              header: "动作",
+              align: "center",
+              width: "xs",
+              cell: (r: AuditLogEntry) => r.action,
+            },
+            {
+              id: "result",
+              header: "结果",
+              align: "center",
+              width: "xs",
+              cell: (r: AuditLogEntry) => (
+                <StatusBadge tone={RESULT_TONE[r.result] ?? "neutral"} dot>
+                  {r.errorCode ? `${r.result} · ${r.errorCode}` : r.result}
+                </StatusBadge>
+              ),
+            },
+          ]}
+          rows={pager.pageRows}
+          rowKey={(r: AuditLogEntry) => r.id}
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+          indexStart={pager.indexStart}
+          sort={sort}
+          onSortChange={setSort}
+          rowActions={(r: AuditLogEntry) => (
+            <ActionMenu
+              label="留痕操作"
+              items={[
+                {
+                  id: "copy",
+                  label: "复制该行",
+                  icon: "copy",
+                  onSelect: () => void copyRow(r),
+                },
+              ]}
+            />
+          )}
+          footer={pagination}
+          empty={emptyState}
+        />
       }
     />
   );

@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
   Button,
   DataTable,
   EmptyState,
@@ -19,15 +20,13 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  ListCard,
-  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
   StatusBadge,
   type DataTableSort,
-  type FilterBarView,
   useListPagination,
+  useToast,
   ViewHeader,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
@@ -97,6 +96,7 @@ function toRows(snapshot: JobSchedulerSnapshot): LogRow[] {
 }
 
 export default function LogsPage() {
+  const { toast } = useToast();
   const [rows, setRows] = useState<LogRow[]>([]);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [keyword, setKeyword] = useState("");
@@ -106,7 +106,6 @@ export default function LogsPage() {
     columnId: "time",
     direction: "desc",
   });
-  const [view, setView] = useState<FilterBarView>("list");
   /* 选择列全站占位（owner 定）：日志暂无批量动作，列先在。 */
   const [selected, setSelected] = useState<readonly string[]>([]);
 
@@ -150,7 +149,26 @@ export default function LogsPage() {
   }, [rows, keyword, level, source, sort]);
 
   const filtered = keyword !== "" || level !== "all" || source !== "all";
-  const pager = useListPagination(visible);
+  const pager = useListPagination(visible, 20);
+
+  const copyRow = async (r: LogRow) => {
+    const text = [
+      r.time || "—",
+      LOG_LEVEL_META[r.level].label,
+      r.source,
+      r.message,
+    ].join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制该行到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
 
   const pagination = (
     <Pagination
@@ -200,8 +218,9 @@ export default function LogsPage() {
       }
       filters={
         <FilterBar
-          view={view}
-          onViewChange={setView}
+          view="list"
+          onViewChange={() => {}}
+          cardsDisabledReason="卡片视图已下线，改用列表"
           count={
             visible.length === rows.length
               ? rows.length
@@ -255,56 +274,57 @@ export default function LogsPage() {
         </FilterBar>
       }
       table={
-        view === "list" ? (
-          <DataTable
-            columns={[
-              {
-                id: "time",
-                header: "时间",
-                cell: (r: LogRow) => r.time || "—",
-                sortable: true,
-              },
-              {
-                id: "level",
-                header: "级别",
-                cell: (r: LogRow) => (
-                  <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
-                    {LOG_LEVEL_META[r.level].label}
-                  </StatusBadge>
-                ),
-              },
-              { id: "source", header: "来源", cell: (r: LogRow) => r.source },
-              { id: "message", header: "内容", cell: (r: LogRow) => r.message },
-            ]}
-            rows={pager.pageRows}
-            rowKey={(r) => r.id}
-            selectedKeys={selected}
-            onSelectionChange={setSelected}
-            indexStart={pager.indexStart}
-            sort={sort}
-            onSortChange={setSort}
-            footer={pagination}
-            empty={emptyState}
-          />
-        ) : (
-          <div className="flex flex-col gap-sm">
-            <ListCardGrid>
-              {pager.pageRows.map((r) => (
-                <ListCard
-                  key={r.id}
-                  title={r.message}
-                  description={`${r.time || "—"} · ${r.source}`}
-                  status={
-                    <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
-                      {LOG_LEVEL_META[r.level].label}
-                    </StatusBadge>
-                  }
-                />
-              ))}
-            </ListCardGrid>
-            {pagination}
-          </div>
-        )
+        <DataTable
+          columns={[
+            {
+              id: "time",
+              header: "时间",
+              width: "sm",
+              cell: (r: LogRow) => r.time || "—",
+              sortable: true,
+            },
+            {
+              id: "source",
+              header: "来源",
+              width: "xs",
+              cell: (r: LogRow) => r.source,
+            },
+            { id: "message", header: "内容", cell: (r: LogRow) => r.message },
+            {
+              id: "level",
+              header: "级别",
+              align: "center",
+              width: "xs",
+              cell: (r: LogRow) => (
+                <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
+                  {LOG_LEVEL_META[r.level].label}
+                </StatusBadge>
+              ),
+            },
+          ]}
+          rows={pager.pageRows}
+          rowKey={(r) => r.id}
+          selectedKeys={selected}
+          onSelectionChange={setSelected}
+          indexStart={pager.indexStart}
+          sort={sort}
+          onSortChange={setSort}
+          rowActions={(r: LogRow) => (
+            <ActionMenu
+              label="日志操作"
+              items={[
+                {
+                  id: "copy",
+                  label: "复制该行",
+                  icon: "copy",
+                  onSelect: () => void copyRow(r),
+                },
+              ]}
+            />
+          )}
+          footer={pagination}
+          empty={emptyState}
+        />
       }
     />
   );
