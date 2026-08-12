@@ -21,6 +21,7 @@ import {
   type FormEvent,
 } from "react";
 import {
+  ActionMenu,
   Badge,
   Banner,
   Button,
@@ -206,6 +207,7 @@ export default function CapabilitiesPage() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [keyword, setKeyword] = useState("");
   const [primitiveFilter, setPrimitiveFilter] = useState<string>("all");
+  const [selectedKeys, setSelectedKeys] = useState<readonly string[]>([]);
 
   const [detailId, setDetailId] = useState<string | null>(null);
   const [detail, setDetail] = useState<CapabilityDetailRecord | null>(null);
@@ -278,7 +280,7 @@ export default function CapabilitiesPage() {
     );
   }, [rows, keyword, primitiveFilter]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   function openRegister() {
     setDraft(EMPTY_DRAFT);
@@ -456,6 +458,9 @@ export default function CapabilitiesPage() {
         }
         filters={
           <FilterBar
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -509,17 +514,9 @@ export default function CapabilitiesPage() {
                 ),
               },
               {
-                id: "type",
-                header: "类型",
-                cell: (r: CapabilityRecord) => (
-                  <Badge variant="secondary">
-                    {PRIMITIVE_LABELS[r.primitiveType] ?? r.primitiveType}
-                  </Badge>
-                ),
-              },
-              {
                 id: "provider",
                 header: "Provider",
+                width: "sm",
                 cell: (r: CapabilityRecord) => (
                   <span className="text-code-sm">{r.providerId}</span>
                 ),
@@ -527,6 +524,7 @@ export default function CapabilitiesPage() {
               {
                 id: "owner",
                 header: "Owner",
+                width: "sm",
                 cell: (r: CapabilityRecord) => (
                   <span className="text-body-sm text-muted-foreground">
                     {r.ownerRef}
@@ -534,8 +532,21 @@ export default function CapabilitiesPage() {
                 ),
               },
               {
+                id: "type",
+                header: "类型",
+                align: "center",
+                width: "xs",
+                cell: (r: CapabilityRecord) => (
+                  <Badge variant="secondary">
+                    {PRIMITIVE_LABELS[r.primitiveType] ?? r.primitiveType}
+                  </Badge>
+                ),
+              },
+              {
                 id: "tier",
                 header: "准入等级",
+                align: "center",
+                width: "xs",
                 cell: (r: CapabilityRecord) => (
                   <StatusBadge
                     tone={ADMISSION_TONE[r.admissionTier] ?? "neutral"}
@@ -548,7 +559,22 @@ export default function CapabilitiesPage() {
             ]}
             rows={pager.pageRows}
             rowKey={(r: CapabilityRecord) => r.capabilityId}
+            selectedKeys={selectedKeys}
+            onSelectionChange={setSelectedKeys}
             indexStart={pager.indexStart}
+            rowActions={(r: CapabilityRecord) => (
+              <ActionMenu
+                label={`${r.capabilityId} 操作`}
+                items={[
+                  {
+                    id: "detail",
+                    label: "查看详情",
+                    icon: "eye",
+                    onSelect: () => openDetail(r.capabilityId),
+                  },
+                ]}
+              />
+            )}
             footer={pagination}
             empty={emptyState}
           />
