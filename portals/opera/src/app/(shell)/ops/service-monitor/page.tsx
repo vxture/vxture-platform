@@ -33,7 +33,9 @@ import {
   type ReactNode,
 } from "react";
 import {
+  ActionMenu,
   Badge,
+  BulkActionBar,
   Button,
   DataTable,
   EmptyState,
@@ -49,10 +51,25 @@ import {
   StatusBadge,
   ViewHeader,
   useListPagination,
+  useToast,
   type IconName,
   type StatusBadgeTone,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
+
+/** 触发一次浏览器下载；用完立即回收 URL，不留 blob 常驻内存。 */
+function downloadCsv(filename: string, rows: readonly string[][]) {
+  const csv = rows
+    .map((cols) => cols.map((c) => `"${c.replace(/"/g, '""')}"`).join(","))
+    .join("\r\n");
+  const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const REFRESH_INTERVAL_MS = 30_000;
 
@@ -224,8 +241,18 @@ function ChannelSplit({ prod, beta }: { prod: ReactNode; beta: ReactNode }) {
   );
 }
 
-/** prod 是主读数：深色前景 + 大一档字号；beta 是辅助参照：维持现在的浅色小字。 */
+/** prod 是主读数，beta 是辅助参照——用字重 + 颜色区分，不用字号：内容区（标题列
+ * 以外）统一 `text-body-sm`，一屏里两种字号会读成两套系统。prod 加粗
+ * （`font-semibold`）、深色前景；beta 常规字重、`text-muted-foreground` 淡化
+ * （2026-08-12，原先 prod 用 `text-label-md`/`text-body-sm`、beta 用
+ * `text-body-xs`，字号本身就在做强调，跟标题列的字号连成一片，分不出主次）。 */
 type ChannelEmphasis = "prod" | "beta";
+
+/** 两个 emphasis 共用同一套字号，只在字重/颜色上分叉。 */
+const EMPHASIS_TEXT: Record<ChannelEmphasis, string> = {
+  prod: "text-body-sm font-semibold text-foreground",
+  beta: "text-body-sm font-normal text-muted-foreground",
+};
 
 function LivenessLine({
   probe,
@@ -247,27 +274,16 @@ function LivenessLine({
           : null;
 
   return (
-    <span
-      className="inline-flex items-center gap-2xs min-w-0"
-      title={detail ?? undefined}
-    >
+    <span className="inline-flex items-center gap-2xs min-w-0">
       <StatusBadge
         tone={livenessTone(probe.status)}
         dot
-        {...(isProd ? { className: "text-label-md" } : {})}
+        {...(isProd ? { className: "font-semibold" } : {})}
       >
         {LIVENESS_LABELS[probe.status]}
       </StatusBadge>
       {detail ? (
-        <span
-          className={
-            isProd
-              ? "text-body-sm text-foreground truncate"
-              : "text-body-xs text-muted-foreground truncate"
-          }
-        >
-          {detail}
-        </span>
+        <span className={`${EMPHASIS_TEXT[emphasis]} truncate`}>{detail}</span>
       ) : null}
     </span>
   );
@@ -287,27 +303,16 @@ function ReadinessLine({
     (probe.status === "unreachable" ? (probe.error ?? "连接失败") : null);
 
   return (
-    <span
-      className="inline-flex items-center gap-2xs min-w-0"
-      title={detail ?? undefined}
-    >
+    <span className="inline-flex items-center gap-2xs min-w-0">
       <StatusBadge
         tone={readinessTone(probe.status)}
         dot
-        {...(isProd ? { className: "text-label-md" } : {})}
+        {...(isProd ? { className: "font-semibold" } : {})}
       >
         {READINESS_LABELS[probe.status]}
       </StatusBadge>
       {detail ? (
-        <span
-          className={
-            isProd
-              ? "text-body-sm text-foreground truncate"
-              : "text-body-xs text-muted-foreground truncate"
-          }
-        >
-          {detail}
-        </span>
+        <span className={`${EMPHASIS_TEXT[emphasis]} truncate`}>{detail}</span>
       ) : null}
     </span>
   );
@@ -320,7 +325,30 @@ type LoadState =
 
 type StatusFilter = "all" | "attention";
 
+const CSV_HEADER = [
+  "产品",
+  "代码",
+  "层级",
+  "Prod 存活",
+  "Prod 就绪",
+  "Beta 存活",
+  "Beta 就绪",
+];
+
+function toCsvRow(r: ProductHealthItem): string[] {
+  return [
+    r.productName,
+    r.productCode,
+    LAYER_LABEL[r.layer],
+    LIVENESS_LABELS[r.prod.health.status],
+    READINESS_LABELS[r.prod.status.status],
+    LIVENESS_LABELS[r.beta.health.status],
+    READINESS_LABELS[r.beta.status.status],
+  ];
+}
+
 export default function ServiceMonitorPage() {
+  const { toast } = useToast();
   const [items, setItems] = useState<ProductHealthItem[]>([]);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [refreshing, setRefreshing] = useState(false);
@@ -380,7 +408,32 @@ export default function ServiceMonitorPage() {
   }, [items, keyword, statusFilter]);
 
   const filtered = keyword.trim() !== "" || statusFilter !== "all";
-  const pager = useListPagination(visible);
+  const pager = useListPagination(visible, 20);
+
+  const copyRow = async (r: ProductHealthItem) => {
+    const text = toCsvRow(r).join(" · ");
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ tone: "success", title: "已复制诊断信息到剪贴板" });
+    } catch {
+      toast({
+        tone: "danger",
+        title: "复制失败",
+        description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+      });
+    }
+  };
+
+  const exportSelected = () => {
+    const ids = new Set(selected);
+    const picked = visible.filter((r) => ids.has(r.productId));
+    downloadCsv(`service-monitor-${Date.now()}.csv`, [
+      CSV_HEADER,
+      ...picked.map(toCsvRow),
+    ]);
+    toast({ tone: "success", title: `已导出 ${picked.length} 条记录` });
+    setSelected([]);
+  };
 
   const stats = useMemo(() => {
     const attention = items.filter(productNeedsAttention).length;
@@ -511,6 +564,9 @@ export default function ServiceMonitorPage() {
       }
       filters={
         <FilterBar
+          view="list"
+          onViewChange={() => {}}
+          cardsDisabledReason="卡片视图已下线，改用列表"
           count={
             visible.length === items.length
               ? items.length
@@ -548,6 +604,21 @@ export default function ServiceMonitorPage() {
           </Button>
         </FilterBar>
       }
+      bulkBar={
+        <BulkActionBar
+          count={selected.length}
+          noun="个"
+          onClear={() => setSelected([])}
+          actions={[
+            {
+              id: "export",
+              label: "导出所选",
+              icon: "download",
+              onSelect: exportSelected,
+            },
+          ]}
+        />
+      }
       table={
         <DataTable
           columns={[
@@ -576,24 +647,18 @@ export default function ServiceMonitorPage() {
             {
               id: "channel",
               header: "渠道",
+              width: "xs",
               cell: () => (
                 <ChannelSplit
-                  prod={
-                    <span className="text-label-md text-foreground font-medium">
-                      Prod
-                    </span>
-                  }
-                  beta={
-                    <span className="text-body-xs text-muted-foreground">
-                      Beta
-                    </span>
-                  }
+                  prod={<span className={EMPHASIS_TEXT.prod}>Prod</span>}
+                  beta={<span className={EMPHASIS_TEXT.beta}>Beta</span>}
                 />
               ),
             },
             {
               id: "health",
               header: "存活",
+              width: "sm",
               cell: (r: ProductHealthItem) => (
                 <ChannelSplit
                   prod={<LivenessLine probe={r.prod.health} emphasis="prod" />}
@@ -604,6 +669,7 @@ export default function ServiceMonitorPage() {
             {
               id: "status",
               header: "就绪",
+              width: "sm",
               cell: (r: ProductHealthItem) => (
                 <ChannelSplit
                   prod={<ReadinessLine probe={r.prod.status} emphasis="prod" />}
@@ -614,15 +680,16 @@ export default function ServiceMonitorPage() {
             {
               id: "version",
               header: "版本",
+              width: "sm",
               cell: (r: ProductHealthItem) => (
                 <ChannelSplit
                   prod={
-                    <span className="text-body-sm text-foreground truncate">
+                    <span className={`${EMPHASIS_TEXT.prod} truncate`}>
                       {r.prod.health.version ?? "—"}
                     </span>
                   }
                   beta={
-                    <span className="text-body-xs text-muted-foreground truncate">
+                    <span className={`${EMPHASIS_TEXT.beta} truncate`}>
                       {r.beta.health.version ?? "—"}
                     </span>
                   }
@@ -632,15 +699,16 @@ export default function ServiceMonitorPage() {
             {
               id: "buildTime",
               header: "发布时间",
+              width: "sm",
               cell: (r: ProductHealthItem) => (
                 <ChannelSplit
                   prod={
-                    <span className="text-body-sm text-foreground">
+                    <span className={EMPHASIS_TEXT.prod}>
                       {formatBuildTime(r.prod.health.buildTime)}
                     </span>
                   }
                   beta={
-                    <span className="text-body-xs text-muted-foreground">
+                    <span className={EMPHASIS_TEXT.beta}>
                       {formatBuildTime(r.beta.health.buildTime)}
                     </span>
                   }
@@ -650,15 +718,16 @@ export default function ServiceMonitorPage() {
             {
               id: "checkedAt",
               header: "最近探测",
+              width: "sm",
               cell: (r: ProductHealthItem) => (
                 <ChannelSplit
                   prod={
-                    <span className="text-body-sm text-foreground">
+                    <span className={EMPHASIS_TEXT.prod}>
                       {formatTime(r.prod.health.checkedAt)}
                     </span>
                   }
                   beta={
-                    <span className="text-body-xs text-muted-foreground">
+                    <span className={EMPHASIS_TEXT.beta}>
                       {formatTime(r.beta.health.checkedAt)}
                     </span>
                   }
@@ -671,6 +740,19 @@ export default function ServiceMonitorPage() {
           selectedKeys={selected}
           onSelectionChange={setSelected}
           indexStart={pager.indexStart}
+          rowActions={(r: ProductHealthItem) => (
+            <ActionMenu
+              label={`${r.productName} 操作`}
+              items={[
+                {
+                  id: "copy",
+                  label: "复制诊断信息",
+                  icon: "copy",
+                  onSelect: () => void copyRow(r),
+                },
+              ]}
+            />
+          )}
           footer={pagination}
           empty={emptyState}
         />

@@ -34,8 +34,6 @@ import {
   Field,
   FieldDescription,
   FieldLabel,
-  ListCard,
-  ListCardGrid,
   ListPageTemplate,
   NativeSelect,
   Pagination,
@@ -45,7 +43,6 @@ import {
   useListPagination,
   useToast,
   type DataTableSort,
-  type FilterBarView,
   type StatusBadgeTone,
 } from "@vxture/design-system";
 import { useOperatorSession } from "@/features/session/SessionProvider";
@@ -210,7 +207,6 @@ export default function MaintenanceWindowsPage() {
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("all");
-  const [view, setView] = useState<FilterBarView>("list");
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [sort, setSort] = useState<DataTableSort>({
     columnId: "startAt",
@@ -265,7 +261,7 @@ export default function MaintenanceWindowsPage() {
   }, [rows, keyword, status, sort]);
 
   const filtered = keyword.trim() !== "" || status !== "all";
-  const pager = useListPagination(visible);
+  const pager = useListPagination(visible, 20);
 
   const editingStatus = editing?.status;
   /** 进行中的窗口只允许顺延结束时间与追记描述，其余字段锁死（同 BFF 的分支）。 */
@@ -383,8 +379,9 @@ export default function MaintenanceWindowsPage() {
         }
         filters={
           <FilterBar
-            view={view}
-            onViewChange={setView}
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               visible.length === rows.length
                 ? rows.length
@@ -426,176 +423,149 @@ export default function MaintenanceWindowsPage() {
           </FilterBar>
         }
         table={
-          view === "list" ? (
-            <DataTable
-              columns={[
-                {
-                  id: "title",
-                  header: "窗口",
-                  cell: (r) => (
-                    <div className="flex flex-col gap-2xs">
-                      <span className="text-label-md text-foreground">
-                        {r.title}
-                      </span>
-                      {r.affectedServices.length > 0 ? (
-                        <span className="text-body-sm text-muted-foreground">
-                          {r.affectedServices.join(" · ")}
-                        </span>
-                      ) : null}
-                    </div>
-                  ),
-                },
-                {
-                  id: "severity",
-                  header: "严重度",
-                  align: "center",
-                  cell: (r) => (
-                    <StatusBadge tone={severityTone(r.severity)}>
-                      {SEVERITY_LABELS[r.severity]}
-                    </StatusBadge>
-                  ),
-                },
-                {
-                  id: "status",
-                  header: "状态",
-                  align: "center",
-                  cell: (r) => (
-                    <StatusBadge tone={statusTone(r.status)}>
-                      {STATUS_LABELS[r.status]}
-                    </StatusBadge>
-                  ),
-                },
-                {
-                  id: "startAt",
-                  header: "开始",
-                  sortable: true,
-                  cell: (r) => formatMoment(r.startAt),
-                },
-                {
-                  id: "endAt",
-                  header: "结束（计划）",
-                  cell: (r) => formatMoment(r.endAt),
-                },
-                {
-                  id: "actualEndAt",
-                  header: "实际结束",
-                  cell: (r) => (
-                    <span className="text-body-sm text-muted-foreground">
-                      {formatMoment(r.actualEndAt)}
+          <DataTable
+            columns={[
+              {
+                id: "title",
+                header: "窗口",
+                cell: (r) => (
+                  <div className="flex flex-col gap-2xs">
+                    <span className="text-label-md text-foreground">
+                      {r.title}
                     </span>
-                  ),
-                },
-                {
-                  id: "createdByName",
-                  header: "创建人",
-                  cell: (r) => (
-                    <span className="text-body-sm text-muted-foreground">
-                      {r.createdByName ?? "—"}
-                    </span>
-                  ),
-                },
-              ]}
-              rows={pager.pageRows}
-              rowKey={(r) => r.id}
-              selectedKeys={selected}
-              onSelectionChange={setSelected}
-              indexStart={pager.indexStart}
-              sort={sort}
-              onSortChange={setSort}
-              {...(canManage
-                ? {
-                    rowActions: (item: MaintenanceWindowItem) => (
-                      <ActionMenu
-                        label="维护窗口操作"
-                        disabled={submitting}
-                        items={[
-                          {
-                            id: "start",
-                            label: "开始维护",
-                            icon: "play",
-                            disabled: submitting || item.status !== "scheduled",
-                            onSelect: () =>
-                              void runAction("维护已开始", () =>
-                                api.post(
-                                  `/api/maintenance-windows/${item.id}/start`,
-                                ),
-                              ),
-                          },
-                          {
-                            id: "complete",
-                            label: "完成维护",
-                            icon: "check",
-                            disabled:
-                              submitting || item.status !== "in_progress",
-                            onSelect: () =>
-                              void runAction("维护已完成", () =>
-                                api.post(
-                                  `/api/maintenance-windows/${item.id}/complete`,
-                                  {},
-                                ),
-                              ),
-                          },
-                          {
-                            id: "edit",
-                            label: "编辑",
-                            icon: "edit",
-                            disabled:
-                              submitting ||
-                              (item.status !== "scheduled" &&
-                                item.status !== "in_progress"),
-                            onSelect: () => openEdit(item),
-                          },
-                          {
-                            id: "cancel",
-                            label: "取消窗口",
-                            icon: "stop",
-                            danger: true,
-                            separatorBefore: true,
-                            disabled:
-                              submitting ||
-                              (item.status !== "scheduled" &&
-                                item.status !== "in_progress"),
-                            onSelect: () => setPendingCancel(item),
-                          },
-                        ]}
-                      />
-                    ),
-                  }
-                : {})}
-              footer={pagination}
-              empty={emptyState}
-            />
-          ) : (
-            <div className="flex flex-col gap-sm">
-              <ListCardGrid>
-                {pager.pageRows.map((r) => (
-                  <ListCard
-                    key={r.id}
-                    title={r.title}
-                    description={`${formatMoment(r.startAt)} → ${formatMoment(r.endAt)}`}
-                    status={
-                      <StatusBadge tone={statusTone(r.status)}>
-                        {STATUS_LABELS[r.status]}
-                      </StatusBadge>
-                    }
-                    meta={
-                      // 严重度在列表视图里是有色阶的，卡片视图必须同一套语气——
-                      // 同一个数据在一页的两个视图里给出两种编码，读者会以为是两件事。
-                      <span className="inline-flex items-center gap-2xs">
-                        <StatusBadge tone={severityTone(r.severity)}>
-                          {SEVERITY_LABELS[r.severity]}
-                        </StatusBadge>
-                        {r.affectedServices.length > 0 ? (
-                          <span>· {r.affectedServices.join(" · ")}</span>
-                        ) : null}
+                    {r.affectedServices.length > 0 ? (
+                      <span className="text-body-sm text-muted-foreground">
+                        {r.affectedServices.join(" · ")}
                       </span>
-                    }
-                  />
-                ))}
-              </ListCardGrid>
-              {pagination}
-            </div>
-          )
+                    ) : null}
+                  </div>
+                ),
+              },
+              {
+                id: "startAt",
+                header: "开始",
+                sortable: true,
+                width: "sm",
+                cell: (r) => formatMoment(r.startAt),
+              },
+              {
+                id: "endAt",
+                header: "结束（计划）",
+                width: "sm",
+                cell: (r) => formatMoment(r.endAt),
+              },
+              {
+                id: "actualEndAt",
+                header: "实际结束",
+                width: "sm",
+                cell: (r) => (
+                  <span className="text-body-sm text-muted-foreground">
+                    {formatMoment(r.actualEndAt)}
+                  </span>
+                ),
+              },
+              {
+                id: "createdByName",
+                header: "创建人",
+                width: "sm",
+                cell: (r) => (
+                  <span className="text-body-sm text-muted-foreground">
+                    {r.createdByName ?? "—"}
+                  </span>
+                ),
+              },
+              {
+                id: "severity",
+                header: "严重度",
+                align: "center",
+                width: "xs",
+                cell: (r) => (
+                  <StatusBadge tone={severityTone(r.severity)}>
+                    {SEVERITY_LABELS[r.severity]}
+                  </StatusBadge>
+                ),
+              },
+              {
+                id: "status",
+                header: "状态",
+                align: "center",
+                width: "xs",
+                cell: (r) => (
+                  <StatusBadge tone={statusTone(r.status)}>
+                    {STATUS_LABELS[r.status]}
+                  </StatusBadge>
+                ),
+              },
+            ]}
+            rows={pager.pageRows}
+            rowKey={(r) => r.id}
+            selectedKeys={selected}
+            onSelectionChange={setSelected}
+            indexStart={pager.indexStart}
+            sort={sort}
+            onSortChange={setSort}
+            {...(canManage
+              ? {
+                  rowActions: (item: MaintenanceWindowItem) => (
+                    <ActionMenu
+                      label="维护窗口操作"
+                      disabled={submitting}
+                      items={[
+                        {
+                          id: "start",
+                          label: "开始维护",
+                          icon: "play",
+                          disabled: submitting || item.status !== "scheduled",
+                          onSelect: () =>
+                            void runAction("维护已开始", () =>
+                              api.post(
+                                `/api/maintenance-windows/${item.id}/start`,
+                              ),
+                            ),
+                        },
+                        {
+                          id: "complete",
+                          label: "完成维护",
+                          icon: "check",
+                          disabled: submitting || item.status !== "in_progress",
+                          onSelect: () =>
+                            void runAction("维护已完成", () =>
+                              api.post(
+                                `/api/maintenance-windows/${item.id}/complete`,
+                                {},
+                              ),
+                            ),
+                        },
+                        {
+                          id: "edit",
+                          label: "编辑",
+                          icon: "edit",
+                          disabled:
+                            submitting ||
+                            (item.status !== "scheduled" &&
+                              item.status !== "in_progress"),
+                          onSelect: () => openEdit(item),
+                        },
+                        {
+                          id: "cancel",
+                          label: "取消窗口",
+                          icon: "stop",
+                          danger: true,
+                          separatorBefore: true,
+                          disabled:
+                            submitting ||
+                            (item.status !== "scheduled" &&
+                              item.status !== "in_progress"),
+                          onSelect: () => setPendingCancel(item),
+                        },
+                      ]}
+                    />
+                  ),
+                }
+              : {})}
+            footer={pagination}
+            empty={emptyState}
+          />
         }
       />
 

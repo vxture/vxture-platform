@@ -474,7 +474,7 @@ export default function ProductsPage() {
     );
   }, [rows, keyword, originFilter, statusFilter]);
 
-  const pager = useListPagination(filtered);
+  const pager = useListPagination(filtered, 20);
 
   function openCreate() {
     setDraft(EMPTY_DRAFT);
@@ -601,6 +601,9 @@ export default function ProductsPage() {
         }
         filters={
           <FilterBar
+            view="list"
+            onViewChange={() => {}}
+            cardsDisabledReason="卡片视图已下线，改用列表"
             count={
               filtered.length === rows.length
                 ? rows.length
@@ -668,15 +671,9 @@ export default function ProductsPage() {
                 ),
               },
               {
-                id: "type",
-                header: "类型",
-                cell: (r: ProductRecord) => (
-                  <span className="text-code-sm">{r.productType}</span>
-                ),
-              },
-              {
                 id: "origin",
                 header: "来源",
+                width: "md",
                 cell: (r: ProductRecord) => (
                   <span className="text-body-sm">
                     {ORIGIN_LABELS[r.origin]}
@@ -687,18 +684,9 @@ export default function ProductsPage() {
                 ),
               },
               {
-                id: "status",
-                header: "状态",
-                align: "center",
-                cell: (r: ProductRecord) => (
-                  <StatusBadge tone={STATUS_TONE[r.status]} dot>
-                    {STATUS_LABELS[r.status]}
-                  </StatusBadge>
-                ),
-              },
-              {
                 id: "visibility",
                 header: "可见性",
+                width: "sm",
                 cell: (r: ProductRecord) => (
                   <span className="text-body-sm text-muted-foreground">
                     {r.isCustomerVisible ? "客户端" : ""}
@@ -706,6 +694,26 @@ export default function ProductsPage() {
                     {r.isWorkforceVisible ? "运营端" : ""}
                     {!r.isCustomerVisible && !r.isWorkforceVisible ? "—" : ""}
                   </span>
+                ),
+              },
+              {
+                id: "type",
+                header: "类型",
+                align: "center",
+                width: "xs",
+                cell: (r: ProductRecord) => (
+                  <span className="text-code-sm">{r.productType}</span>
+                ),
+              },
+              {
+                id: "status",
+                header: "状态",
+                align: "center",
+                width: "xs",
+                cell: (r: ProductRecord) => (
+                  <StatusBadge tone={STATUS_TONE[r.status]} dot>
+                    {STATUS_LABELS[r.status]}
+                  </StatusBadge>
                 ),
               },
             ]}

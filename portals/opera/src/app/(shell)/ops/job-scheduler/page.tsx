@@ -21,18 +21,26 @@
  * 加筛选。只读页面，无能力门（同 product-health.router.ts 的口径：没有专属能力码
  * 就不额外设卡）。刷新节奏 30s，另留手动刷新按钮。 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ActionMenu,
   Badge,
   Button,
   DataTable,
   EmptyState,
+  FilterBar,
   Icon,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   MetricGrid,
+  Pagination,
   Section,
   StatusBadge,
   ViewHeader,
   ViewLayout,
+  useListPagination,
+  useToast,
   type StatusBadgeTone,
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
@@ -160,12 +168,34 @@ const EMPTY_SNAPSHOT: JobSchedulerSnapshot = {
   },
 };
 
+async function copyRowText(
+  toast: ReturnType<typeof useToast>["toast"],
+  text: string,
+) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast({ tone: "success", title: "已复制到剪贴板" });
+  } catch {
+    toast({
+      tone: "danger",
+      title: "复制失败",
+      description: "浏览器拒绝了剪贴板访问，请手动选中复制。",
+    });
+  }
+}
+
 export default function JobSchedulerPage() {
+  const { toast } = useToast();
   const [snapshot, setSnapshot] =
     useState<JobSchedulerSnapshot>(EMPTY_SNAPSHOT);
   const [load, setLoad] = useState<LoadState>({ kind: "loading" });
   const [refreshing, setRefreshing] = useState(false);
   const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
+
+  const [jobKeyword, setJobKeyword] = useState("");
+  const [jobSelected, setJobSelected] = useState<readonly string[]>([]);
+  const [issueKeyword, setIssueKeyword] = useState("");
+  const [issueSelected, setIssueSelected] = useState<readonly string[]>([]);
 
   const reload = useCallback(async (opts?: { silent?: boolean }) => {
     if (opts?.silent) {
@@ -207,6 +237,27 @@ export default function JobSchedulerPage() {
   const { jobs, queue } = snapshot;
   const failedJobs = jobs.filter((j) => j.status === "failed").length;
   const queueDepth = queue.counts.pending + queue.counts.delivering;
+
+  const filteredJobs = useMemo(() => {
+    const kw = jobKeyword.trim().toLowerCase();
+    return kw === ""
+      ? jobs
+      : jobs.filter((j) => j.jobName.toLowerCase().includes(kw));
+  }, [jobs, jobKeyword]);
+  const jobPager = useListPagination(filteredJobs, 20);
+
+  const filteredIssues = useMemo(() => {
+    const kw = issueKeyword.trim().toLowerCase();
+    return kw === ""
+      ? queue.recentIssues
+      : queue.recentIssues.filter(
+          (i) =>
+            i.eventType.toLowerCase().includes(kw) ||
+            (i.productName ?? "").toLowerCase().includes(kw) ||
+            (i.tenantName ?? "").toLowerCase().includes(kw),
+        );
+  }, [queue.recentIssues, issueKeyword]);
+  const issuePager = useListPagination(filteredIssues, 20);
 
   return (
     <ViewLayout>
@@ -282,6 +333,31 @@ export default function JobSchedulerPage() {
                 },
               ]}
             />
+            <FilterBar
+              view="list"
+              onViewChange={() => {}}
+              cardsDisabledReason="卡片视图已下线，改用列表"
+              count={
+                filteredJobs.length === jobs.length
+                  ? jobs.length
+                  : `${filteredJobs.length} / ${jobs.length}`
+              }
+            >
+              <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+                <InputGroupAddon>
+                  <Icon name="search" size="sm" aria-hidden="true" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  placeholder="搜索作业名…"
+                  aria-label="搜索作业"
+                  value={jobKeyword}
+                  onChange={(e) => {
+                    setJobKeyword(e.target.value);
+                    jobPager.resetPage();
+                  }}
+                />
+              </InputGroup>
+            </FilterBar>
             <DataTable
               columns={[
                 {
@@ -294,24 +370,9 @@ export default function JobSchedulerPage() {
                   ),
                 },
                 {
-                  id: "status",
-                  header: "状态",
-                  align: "center",
-                  cell: (r: JobHeartbeatItem) => (
-                    <StatusBadge tone={jobStatusTone(r.status)}>
-                      {JOB_STATUS_LABELS[r.status]}
-                    </StatusBadge>
-                  ),
-                },
-                {
-                  id: "interval",
-                  header: "心跳间隔",
-                  align: "right",
-                  cell: (r: JobHeartbeatItem) => formatIntervalMs(r.intervalMs),
-                },
-                {
                   id: "lastStarted",
                   header: "上次开始",
+                  width: "sm",
                   cell: (r: JobHeartbeatItem) => (
                     <span className="text-body-sm text-muted-foreground">
                       {formatTime(r.lastStartedAt)}
@@ -319,32 +380,12 @@ export default function JobSchedulerPage() {
                   ),
                 },
                 {
-                  id: "duration",
-                  header: "耗时",
-                  align: "right",
-                  cell: (r: JobHeartbeatItem) =>
-                    formatDuration(r.lastDurationMs),
-                },
-                {
-                  id: "items",
-                  header: "处理项数",
-                  align: "right",
-                  cell: (r: JobHeartbeatItem) => r.lastItemsProcessed ?? "—",
-                },
-                {
-                  id: "counts",
-                  header: "运行 / 失败次数",
-                  align: "right",
-                  cell: (r: JobHeartbeatItem) =>
-                    `${r.runCount} / ${r.failureCount}`,
-                },
-                {
                   id: "lastError",
                   header: "最后报错",
                   cell: (r: JobHeartbeatItem) =>
                     r.lastError ? (
                       <span
-                        className="text-body-sm text-destructive-text truncate max-w-panel-sm block"
+                        className="text-body-sm text-destructive-text truncate block"
                         title={r.lastError}
                       >
                         {r.lastError}
@@ -355,9 +396,90 @@ export default function JobSchedulerPage() {
                       </span>
                     ),
                 },
+                {
+                  id: "interval",
+                  header: "心跳间隔",
+                  align: "right",
+                  width: "xs",
+                  cell: (r: JobHeartbeatItem) => formatIntervalMs(r.intervalMs),
+                },
+                {
+                  id: "duration",
+                  header: "耗时",
+                  align: "right",
+                  width: "xs",
+                  cell: (r: JobHeartbeatItem) =>
+                    formatDuration(r.lastDurationMs),
+                },
+                {
+                  id: "items",
+                  header: "处理项数",
+                  align: "right",
+                  width: "xs",
+                  cell: (r: JobHeartbeatItem) => r.lastItemsProcessed ?? "—",
+                },
+                {
+                  id: "counts",
+                  header: "运行 / 失败次数",
+                  align: "right",
+                  width: "sm",
+                  cell: (r: JobHeartbeatItem) =>
+                    `${r.runCount} / ${r.failureCount}`,
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  align: "center",
+                  width: "xs",
+                  cell: (r: JobHeartbeatItem) => (
+                    <StatusBadge tone={jobStatusTone(r.status)}>
+                      {JOB_STATUS_LABELS[r.status]}
+                    </StatusBadge>
+                  ),
+                },
               ]}
-              rows={jobs}
+              rows={jobPager.pageRows}
               rowKey={(r: JobHeartbeatItem) => r.jobName}
+              selectedKeys={jobSelected}
+              onSelectionChange={setJobSelected}
+              indexStart={jobPager.indexStart}
+              rowActions={(r: JobHeartbeatItem) => (
+                <ActionMenu
+                  label={`${r.jobName} 操作`}
+                  items={[
+                    {
+                      id: "copy",
+                      label: "复制该行",
+                      icon: "copy",
+                      onSelect: () =>
+                        void copyRowText(
+                          toast,
+                          [
+                            r.jobName,
+                            JOB_STATUS_LABELS[r.status],
+                            formatIntervalMs(r.intervalMs),
+                            formatTime(r.lastStartedAt),
+                            formatDuration(r.lastDurationMs),
+                            `运行 ${r.runCount} / 失败 ${r.failureCount}`,
+                            r.lastError ?? "",
+                          ].join(" · "),
+                        ),
+                    },
+                  ]}
+                />
+              )}
+              footer={
+                <Pagination
+                  className="w-full"
+                  page={jobPager.page}
+                  pageCount={jobPager.pageCount}
+                  total={jobs.length}
+                  filteredTotal={filteredJobs.length}
+                  pageSize={jobPager.pageSize}
+                  onPageSizeChange={jobPager.onPageSizeChange}
+                  onPageChange={jobPager.onPageChange}
+                />
+              }
               empty={
                 <EmptyState
                   title={load.kind === "loading" ? "读取中…" : "暂无作业心跳"}
@@ -419,6 +541,31 @@ export default function JobSchedulerPage() {
                 },
               ]}
             />
+            <FilterBar
+              view="list"
+              onViewChange={() => {}}
+              cardsDisabledReason="卡片视图已下线，改用列表"
+              count={
+                filteredIssues.length === queue.recentIssues.length
+                  ? queue.recentIssues.length
+                  : `${filteredIssues.length} / ${queue.recentIssues.length}`
+              }
+            >
+              <InputGroup className="grow basis-media-3xl max-w-panel-sm">
+                <InputGroupAddon>
+                  <Icon name="search" size="sm" aria-hidden="true" />
+                </InputGroupAddon>
+                <InputGroupInput
+                  placeholder="搜索事件 / 租户 / 产品…"
+                  aria-label="搜索投递记录"
+                  value={issueKeyword}
+                  onChange={(e) => {
+                    setIssueKeyword(e.target.value);
+                    issuePager.resetPage();
+                  }}
+                />
+              </InputGroup>
+            </FilterBar>
             <DataTable
               columns={[
                 {
@@ -436,29 +583,12 @@ export default function JobSchedulerPage() {
                   ),
                 },
                 {
-                  id: "status",
-                  header: "状态",
-                  align: "center",
-                  cell: (r: WebhookDeliveryIssue) => (
-                    <StatusBadge tone={queueStatusTone(r.status)}>
-                      {QUEUE_STATUS_LABELS[r.status]}
-                    </StatusBadge>
-                  ),
-                },
-                {
-                  id: "attempts",
-                  header: "尝试次数",
-                  align: "right",
-                  cell: (r: WebhookDeliveryIssue) =>
-                    `${r.attempts} / ${r.maxAttempts}`,
-                },
-                {
                   id: "lastError",
                   header: "最后报错",
                   cell: (r: WebhookDeliveryIssue) =>
                     r.lastError ? (
                       <span
-                        className="text-body-sm text-destructive-text truncate max-w-panel-sm block"
+                        className="text-body-sm text-destructive-text truncate block"
                         title={r.lastError}
                       >
                         {r.lastError}
@@ -472,6 +602,7 @@ export default function JobSchedulerPage() {
                 {
                   id: "nextRetry",
                   header: "下次重试",
+                  width: "sm",
                   cell: (r: WebhookDeliveryIssue) => (
                     <span className="text-body-sm text-muted-foreground">
                       {formatTime(r.nextRetryAt)}
@@ -481,15 +612,74 @@ export default function JobSchedulerPage() {
                 {
                   id: "lastAttempt",
                   header: "最后尝试",
+                  width: "sm",
                   cell: (r: WebhookDeliveryIssue) => (
                     <span className="text-body-sm text-muted-foreground">
                       {formatTime(r.lastAttemptAt)}
                     </span>
                   ),
                 },
+                {
+                  id: "attempts",
+                  header: "尝试次数",
+                  align: "right",
+                  width: "xs",
+                  cell: (r: WebhookDeliveryIssue) =>
+                    `${r.attempts} / ${r.maxAttempts}`,
+                },
+                {
+                  id: "status",
+                  header: "状态",
+                  align: "center",
+                  width: "xs",
+                  cell: (r: WebhookDeliveryIssue) => (
+                    <StatusBadge tone={queueStatusTone(r.status)}>
+                      {QUEUE_STATUS_LABELS[r.status]}
+                    </StatusBadge>
+                  ),
+                },
               ]}
-              rows={queue.recentIssues}
+              rows={issuePager.pageRows}
               rowKey={(r: WebhookDeliveryIssue) => r.id}
+              selectedKeys={issueSelected}
+              onSelectionChange={setIssueSelected}
+              indexStart={issuePager.indexStart}
+              rowActions={(r: WebhookDeliveryIssue) => (
+                <ActionMenu
+                  label={`${r.eventType} 操作`}
+                  items={[
+                    {
+                      id: "copy",
+                      label: "复制该行",
+                      icon: "copy",
+                      onSelect: () =>
+                        void copyRowText(
+                          toast,
+                          [
+                            r.eventType,
+                            r.tenantName ?? "—",
+                            r.productName ?? "—",
+                            QUEUE_STATUS_LABELS[r.status],
+                            `尝试 ${r.attempts}/${r.maxAttempts}`,
+                            r.lastError ?? "",
+                          ].join(" · "),
+                        ),
+                    },
+                  ]}
+                />
+              )}
+              footer={
+                <Pagination
+                  className="w-full"
+                  page={issuePager.page}
+                  pageCount={issuePager.pageCount}
+                  total={queue.recentIssues.length}
+                  filteredTotal={filteredIssues.length}
+                  pageSize={issuePager.pageSize}
+                  onPageSizeChange={issuePager.onPageSizeChange}
+                  onPageChange={issuePager.onPageChange}
+                />
+              }
               empty={
                 <EmptyState
                   title={
