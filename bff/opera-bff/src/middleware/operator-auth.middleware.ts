@@ -73,6 +73,7 @@ export class OperatorAuthMiddleware implements NestMiddleware {
     const context = req as Request & RequestContext;
     context.operator = resolved.operator;
     context.capabilities = resolved.capabilities;
+    context.operatorAccessToken = outcome.accessToken;
     next();
   }
 }

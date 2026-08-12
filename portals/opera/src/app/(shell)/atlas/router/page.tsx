@@ -124,6 +124,14 @@ export default function RouterPage() {
         description="Weight 与 Canary 路由在 Atlas 2.0 排期；本期变更仅 Primary / Fallback，所有变更进入 Audit。"
       />
 
+      {/* Atlas 真实 API 目前没有路由配置的落地端点（仓内检索确认，2026-08-11）；
+          这里展示的是界面设计态。不删这页也不假装它是真的。 */}
+      <Banner
+        tone="info"
+        title="规划中：暂未接入真实数据"
+        description="Atlas 尚未提供 Router 的管理接口；这里展示的是界面设计态，不是生产数据。Provider / Model Registry / Metering 已接入真实数据。"
+      />
+
       <Section
         title="Endpoint 路由表"
         icon="plug"

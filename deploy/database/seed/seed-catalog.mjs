@@ -185,12 +185,16 @@ const OPERATOR_PERMISSIONS = [
   ["model:provider.manage", "Manage model providers"],
   ["model:model.read", "View models"],
   ["model:model.manage", "Manage models"],
+  ["capability:runos.read", "View runos capabilities and endpoints"],
+  ["capability:runos.manage", "Register / promote runos capabilities and endpoints"],
   ["release:feature_flag.read", "View feature flags"],
   ["release:feature_flag.manage", "Manage feature flags"],
   ["release:maintenance.read", "View maintenance windows"],
   ["release:maintenance.manage", "Manage maintenance windows"],
   ["platform:setting.read", "View platform settings (sensitive masked)"],
   ["platform:setting.manage", "Manage platform settings (system config)"],
+  ["platform:product.read", "View the product catalog"],
+  ["platform:product.manage", "Register / edit products, manage OIDC clients"],
   ["content:announcement.read", "View announcements"],
   ["content:announcement.manage", "Manage announcements"],
   ["notification:log.read", "View notification delivery logs"],
@@ -332,11 +336,15 @@ const OPERATOR_ROLE_PERMS = {
     "model:provider.manage",
     "model:model.read",
     "model:model.manage",
+    "capability:runos.read",
+    "capability:runos.manage",
     "release:feature_flag.read",
     "release:feature_flag.manage",
     "release:maintenance.read",
     "release:maintenance.manage",
     "platform:setting.read",
+    "platform:product.read",
+    "platform:product.manage",
     "content:announcement.read",
     "content:announcement.manage",
     "notification:log.read",
@@ -363,6 +371,8 @@ const OPERATOR_ROLE_PERMS = {
     "product:price.manage",
     "model:provider.read",
     "model:model.read",
+    "capability:runos.read",
+    "platform:product.read",
     "release:feature_flag.read",
     "release:maintenance.read",
     "content:announcement.read",
@@ -400,12 +410,16 @@ const OPERATOR_ROLE_PERMS = {
     "model:provider.manage",
     "model:model.read",
     "model:model.manage",
+    "capability:runos.read",
+    "capability:runos.manage",
     "release:feature_flag.read",
     "release:feature_flag.manage",
     "release:maintenance.read",
     "release:maintenance.manage",
     "platform:setting.read",
     "platform:setting.manage",
+    "platform:product.read",
+    "platform:product.manage",
     "content:announcement.read",
     "notification:log.read",
   ],
@@ -433,6 +447,8 @@ const OPERATOR_ROLE_PERMS = {
     "product:price.read",
     "model:provider.read",
     "model:model.read",
+    "capability:runos.read",
+    "platform:product.read",
     "release:feature_flag.read",
     "release:maintenance.read",
     "platform:setting.read",
@@ -1353,6 +1369,28 @@ export async function seedCatalog(client) {
        'A verification policy is configured for the product.', 'product.checklist.verification_policy.desc', true, 10),
       ('pricing_set', '定价已配置', 'product.checklist.pricing_set',
        'Pricing is configured for the product.', 'product.checklist.pricing_set.desc', true, 20)
+    on conflict (item_code) do nothing
+  `);
+
+  // product_200 §7 新产品接入 checklist（六步，technical onboarding；2026-08-12
+  // 产品发布管理阶段三引入）——复用同一张字典表，不另开一套：一个产品"能不能
+  // 上线"本来就是技术接入 + 商业配置合起来的一张单子，opera 只消费/勾选这六
+  // 项，商业那两项（verification_policy/pricing_set）继续留给 admin。
+  await client.query(`
+    insert into product.launch_checklist_items
+      (item_code, item_name, item_name_key, description, description_key, is_required, sort) values
+      ('catalog_registered', '目录已登记', 'product.checklist.catalog_registered',
+       'Product code/layer/type registered in product.products; checklist + plan structure scaffolded.', 'product.checklist.catalog_registered.desc', true, 30),
+      ('c1_identity', 'C1 身份接入', 'product.checklist.c1_identity',
+       'OIDC client registered; RP implementation (login/callback/session) completed.', 'product.checklist.c1_identity.desc', true, 40),
+      ('c3_metering', 'C3 计量上报', 'product.checklist.c3_metering',
+       'Webhook endpoint + provisioning consumption + local_usage buffer + consume job wired.', 'product.checklist.c3_metering.desc', true, 50),
+      ('c2_entitlement', 'C2 权益接入', 'product.checklist.c2_entitlement',
+       'Entitlement fetch/cache invalidation wired; gating renders correctly.', 'product.checklist.c2_entitlement.desc', true, 60),
+      ('data_plane', '数据面就绪', 'product.checklist.data_plane',
+       'Agent-db provisioned per product_240 §2.4 template (vx_provision/local_authz/local_usage schemas).', 'product.checklist.data_plane.desc', true, 70),
+      ('acceptance', '端到端验收', 'product.checklist.acceptance',
+       'Full e2e verified: login → provision → gate → consume → invalidate; launch checklist reviewed.', 'product.checklist.acceptance.desc', true, 80)
     on conflict (item_code) do nothing
   `);
 

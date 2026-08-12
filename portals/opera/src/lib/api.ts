@@ -50,12 +50,29 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
-/** BFF 的 Nest 异常体是 `{ message }`；拿不到就退回状态文本。 */
+/**
+ * BFF 的 Nest 异常体通常是 `{ message }`；但上游产品（如 runos 的注册校验）
+ * 直接把 `{ code, errors: [{path, message}] }` 当异常体抛出，Nest 不做二次
+ * 包装，`message` 字段根本不存在——不认 `errors[]` 就会把校验详情吞成一句
+ * "Request failed (400)"，等于白抛。两种形状都认。
+ */
 async function readErrorMessage(response: Response): Promise<string> {
   try {
-    const body = (await response.json()) as { message?: unknown };
+    const body = (await response.json()) as {
+      message?: unknown;
+      errors?: unknown;
+    };
     if (typeof body.message === "string") return body.message;
     if (Array.isArray(body.message)) return body.message.join("; ");
+    if (Array.isArray(body.errors)) {
+      return body.errors
+        .map((e) =>
+          e && typeof e === "object" && "message" in e
+            ? String((e as { message: unknown }).message)
+            : JSON.stringify(e),
+        )
+        .join("; ");
+    }
   } catch {
     /* 非 JSON 响应，走下面的兜底 */
   }
@@ -71,4 +88,7 @@ export const api = {
     }),
   put: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PUT", body: JSON.stringify(body) }),
+  patch: <T>(path: string, body: unknown) =>
+    request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
 };

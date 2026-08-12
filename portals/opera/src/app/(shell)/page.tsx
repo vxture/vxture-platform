@@ -1,15 +1,24 @@
 "use client";
 
 /* Dashboard — opera-top-level-design.md §10：平台状态 / Atlas 状态 / 请求统计。
- * 阅读顺序由 DashboardTemplate 焊死：先看数、再选路、最后处理事项。 */
+ * 阅读顺序由 DashboardTemplate 焊死：先看数、再选路、最后处理事项。
+ *
+ * 2026-08-12 接真实数据：此前顶部四格（24h 请求/Token/TTFT/事实成本）与
+ * Provider 状态列（延迟/成功率）全部来自 mocks/atlas.ts 的虚构字段——Atlas
+ * 真实的 `/capability/providers` 不回传健康/延迟数据，网关请求量/Token/延迟
+ * 也没有任何遥测导出（见 liaison issue，待 Atlas 侧交付）。这里换成当前真实
+ * 能拿到的运营信号：Provider/Model 启用数（真实 CRUD 已接）、待处理维护窗口
+ * （真实）、后台任务失败数（真实 job-scheduler）；"最近事件"从虚构日志换成
+ * 真实审计留痕（与 Security/Audit 同源）。网关吞吐类指标暂缺，不接假数字。 */
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Banner,
   Button,
   DashboardTemplate,
   DataTable,
+  EmptyState,
   EntryCard,
   Icon,
   MetricGrid,
@@ -17,50 +26,186 @@ import {
   StatusBadge,
   TableTitleCell,
   ViewHeader,
+  type StatusBadgeTone,
 } from "@vxture/design-system";
-import { providers, logs } from "@/mocks/atlas";
-import { LOG_LEVEL_META, RESOURCE_STATUS_META } from "@/lib/status";
+import { api, OperaApiError } from "@/lib/api";
 
-const metrics = [
-  {
-    id: "req",
-    label: "24h 请求",
-    value: "4.85M",
-    icon: "gauge",
-    trend: "+6.2%",
-    trendTone: "success",
-  },
-  {
-    id: "token",
-    label: "24h Token",
-    value: "9.1B",
-    icon: "stack",
-    trend: "+3.8%",
-    trendTone: "success",
-  },
-  {
-    id: "latency",
-    label: "TTFT P95",
-    value: "412ms",
-    icon: "timer",
-    trend: "+38ms",
-    trendTone: "warning",
-  },
-  {
-    id: "cost",
-    label: "24h 事实成本",
-    value: "$1,208",
-    icon: "coins",
-    trend: "-2.1%",
-    trendTone: "success",
-  },
-] as const;
+interface ModelProviderRecord {
+  id: string;
+  providerCode: string;
+  providerType: string;
+  providerName: string;
+  isActive: boolean;
+}
+
+interface AiModelRecord {
+  id: string;
+  providerId: string | null;
+  modelCode: string;
+  modelName: string;
+  isActive: boolean;
+}
+
+interface MaintenanceWindowItem {
+  id: string;
+  status: "scheduled" | "in_progress" | "completed" | "cancelled";
+}
+
+type JobStatus = "idle" | "running" | "success" | "failed";
+
+interface JobHeartbeatItem {
+  jobName: string;
+  status: JobStatus;
+  lastError: string | null;
+}
+
+interface JobSchedulerSnapshot {
+  jobs: JobHeartbeatItem[];
+  queue: {
+    counts: {
+      pending: number;
+      delivering: number;
+      delivered: number;
+      failed: number;
+      dead: number;
+    };
+    recentIssues: unknown[];
+  };
+}
+
+interface AuditLogEntry {
+  id: string;
+  time: string;
+  actor: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  result: string;
+}
+
+type LoadState =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready" };
+
+function providerTone(isActive: boolean): StatusBadgeTone {
+  return isActive ? "success" : "neutral";
+}
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleString("zh-CN", { hour12: false });
+}
 
 export default function DashboardPage() {
-  const degraded = providers.filter((p) => p.status === "degraded");
+  const [providers, setProviders] = useState<ModelProviderRecord[]>([]);
+  const [models, setModels] = useState<AiModelRecord[]>([]);
+  const [windows, setWindows] = useState<MaintenanceWindowItem[]>([]);
+  const [jobSnapshot, setJobSnapshot] = useState<JobSchedulerSnapshot | null>(
+    null,
+  );
+  const [events, setEvents] = useState<AuditLogEntry[]>([]);
+  const [load, setLoad] = useState<LoadState>({ kind: "loading" });
+
   /* 选择列全站占位（owner 定）：摘要表暂无批量动作，列先在。 */
   const [providerSel, setProviderSel] = useState<readonly string[]>([]);
   const [eventSel, setEventSel] = useState<readonly string[]>([]);
+
+  const reload = useCallback(async () => {
+    setLoad({ kind: "loading" });
+    try {
+      const [providersData, modelsData, windowsData, jobData, eventsData] =
+        await Promise.all([
+          api.get<ModelProviderRecord[]>("/api/atlas/providers"),
+          api.get<AiModelRecord[]>("/api/atlas/models"),
+          api.get<MaintenanceWindowItem[]>(
+            "/api/maintenance-windows?status=scheduled,in_progress",
+          ),
+          api.get<JobSchedulerSnapshot>("/api/job-scheduler"),
+          api.get<AuditLogEntry[]>("/api/audit-logs?limit=4"),
+        ]);
+      setProviders(providersData);
+      setModels(modelsData);
+      setWindows(windowsData);
+      setJobSnapshot(jobData);
+      setEvents(eventsData);
+      setLoad({ kind: "ready" });
+    } catch (error) {
+      setLoad({
+        kind: "error",
+        message:
+          error instanceof OperaApiError
+            ? error.message
+            : "读取 Dashboard 数据失败",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const modelCountByProvider = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const m of models) {
+      if (!m.providerId) continue;
+      map.set(m.providerId, (map.get(m.providerId) ?? 0) + 1);
+    }
+    return map;
+  }, [models]);
+
+  const activeProviders = providers.filter((p) => p.isActive).length;
+  const activeModels = models.filter((m) => m.isActive).length;
+  const failedJobs =
+    jobSnapshot?.jobs.filter((j) => j.status === "failed") ?? [];
+
+  const metrics = [
+    {
+      id: "providers",
+      label: "启用中的 Provider",
+      value: `${activeProviders} / ${providers.length}`,
+      icon: "plugs-connected",
+    },
+    {
+      id: "models",
+      label: "启用中的 Model",
+      value: `${activeModels} / ${models.length}`,
+      icon: "stack",
+    },
+    {
+      id: "maintenance",
+      label: "待处理维护窗口",
+      value: String(windows.length),
+      icon: "clock",
+      ...(windows.length > 0 ? { trendTone: "warning" as const } : {}),
+    },
+    {
+      id: "jobs",
+      label: "后台任务失败数",
+      value: String(failedJobs.length),
+      icon: "warning",
+      trendTone: failedJobs.length > 0 ? "warning" : "success",
+    },
+  ] as const;
+
+  const emptyState =
+    load.kind === "loading" ? (
+      <EmptyState title="读取中…" description="正在读取 Dashboard 数据。" />
+    ) : load.kind === "error" ? (
+      <EmptyState
+        title="读取失败"
+        description={load.message}
+        action={
+          <Button variant="secondary" onClick={() => void reload()}>
+            重试
+          </Button>
+        }
+      />
+    ) : (
+      <EmptyState title="暂无数据" description="尚未接入任何 Provider。" />
+    );
 
   return (
     <DashboardTemplate
@@ -68,41 +213,47 @@ export default function DashboardPage() {
         <ViewHeader
           icon="squares-four"
           title="Dashboard"
-          description="平台状态、Atlas 状态与请求统计。Opera 记录事实成本，销售价格归 Admin。"
+          description="平台状态、Atlas 状态与运营待办。Opera 记录事实成本，销售价格归 Admin。"
         />
       }
-      metrics={<MetricGrid items={[...metrics]} columns={4} />}
+      metrics={
+        <MetricGrid
+          items={[...metrics]}
+          columns={4}
+          loading={load.kind === "loading"}
+        />
+      }
       entries={
         <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-3">
           <EntryCard
             href="/atlas/providers"
             icon="plugs-connected"
             title="Provider"
-            meta={`${providers.filter((p) => p.status !== "disabled").length} 家在线`}
+            meta={`${activeProviders} 家启用`}
             description="模型供应商接入、健康检查与代理出口"
           />
           <EntryCard
             href="/atlas/router"
             icon="tree-structure"
             title="Router"
-            meta="5 个 Endpoint"
-            description="Primary / Failover 路由策略"
+            meta="规划中"
+            description="Primary / Failover 路由策略（待 Atlas 交付管理面 API）"
           />
           <EntryCard
             href="/observability/logs"
             icon="terminal"
             title="Logs"
-            meta="1 条 ERROR / 1h"
-            description="网关、路由与计量的运行日志"
+            meta={jobSnapshot ? `${failedJobs.length} 个失败任务` : "—"}
+            description="后台任务心跳与 webhook 投递运行日志"
           />
         </div>
       }
     >
-      {degraded.length > 0 ? (
+      {failedJobs.length > 0 ? (
         <Banner
           tone="warning"
-          title="Provider 降级"
-          description={`${degraded.map((p) => p.name).join("、")} 延迟越限，Router 已自动切换 fallback；详见 Provider 健康页。`}
+          title="后台任务失败"
+          description={`${failedJobs.map((j) => j.jobName).join("、")} 当前失败；详见 Logs 页。`}
         />
       ) : null}
 
@@ -110,7 +261,7 @@ export default function DashboardPage() {
         title="Provider 状态"
         icon="plugs-connected"
         level={2}
-        description="各供应商的健康画像摘要；接入与启停到 Provider 页操作。"
+        description="接入的模型供应商与启停状态；健康检查/延迟数据待 Atlas 交付遥测接口。"
         action={
           <Button asChild variant="ghost" size="md">
             <Link href="/atlas/providers">
@@ -125,20 +276,25 @@ export default function DashboardPage() {
             {
               id: "name",
               header: "Provider",
-              cell: (r) => (
+              cell: (r: ModelProviderRecord) => (
                 <TableTitleCell
                   icon="plugs-connected"
-                  title={r.name}
-                  description={r.code}
+                  title={r.providerName}
+                  description={r.providerCode}
                 />
               ),
             },
             {
+              id: "type",
+              header: "类型",
+              cell: (r: ModelProviderRecord) => r.providerType,
+            },
+            {
               id: "status",
               header: "状态",
-              cell: (r) => (
-                <StatusBadge tone={RESOURCE_STATUS_META[r.status].tone} dot>
-                  {RESOURCE_STATUS_META[r.status].label}
+              cell: (r: ModelProviderRecord) => (
+                <StatusBadge tone={providerTone(r.isActive)} dot>
+                  {r.isActive ? "启用" : "停用"}
                 </StatusBadge>
               ),
             },
@@ -146,19 +302,8 @@ export default function DashboardPage() {
               id: "models",
               header: "模型数",
               align: "right",
-              cell: (r) => r.models,
-            },
-            {
-              id: "latency",
-              header: "P95 延迟",
-              align: "right",
-              cell: (r) => (r.latencyMs ? `${r.latencyMs}ms` : "—"),
-            },
-            {
-              id: "success",
-              header: "成功率",
-              align: "right",
-              cell: (r) => r.successRate,
+              cell: (r: ModelProviderRecord) =>
+                modelCountByProvider.get(r.id) ?? 0,
             },
           ]}
           rows={providers}
@@ -166,8 +311,8 @@ export default function DashboardPage() {
           selectedKeys={providerSel}
           onSelectionChange={setProviderSel}
           indexStart={1}
+          empty={emptyState}
           rowActions={() => (
-            /* 摘要行的操作从简：一键进 Provider 页处理。 */
             <Button
               asChild
               variant="ghost"
@@ -186,10 +331,10 @@ export default function DashboardPage() {
         title="最近事件"
         icon="clock-counter-clockwise"
         level={2}
-        description="近一小时的关键运行事件；完整检索与筛选进 Logs。"
+        description="最近的运营操作审计留痕；完整检索进 Audit。"
         action={
           <Button asChild variant="ghost" size="md">
-            <Link href="/observability/logs">
+            <Link href="/security/audit">
               查看全部
               <Icon name="chevron-right" size="sm" aria-hidden="true" />
             </Link>
@@ -198,24 +343,42 @@ export default function DashboardPage() {
       >
         <DataTable
           columns={[
-            { id: "time", header: "时间", cell: (r) => r.time },
             {
-              id: "level",
-              header: "级别",
-              cell: (r) => (
-                <StatusBadge tone={LOG_LEVEL_META[r.level].tone}>
-                  {LOG_LEVEL_META[r.level].label}
-                </StatusBadge>
-              ),
+              id: "time",
+              header: "时间",
+              cell: (r: AuditLogEntry) => formatTime(r.time),
             },
-            { id: "source", header: "来源", cell: (r) => r.source },
-            { id: "message", header: "内容", cell: (r) => r.message },
+            {
+              id: "actor",
+              header: "操作者",
+              cell: (r: AuditLogEntry) => r.actor,
+            },
+            {
+              id: "action",
+              header: "动作",
+              cell: (r: AuditLogEntry) => r.action,
+            },
+            {
+              id: "target",
+              header: "对象",
+              cell: (r: AuditLogEntry) => `${r.resourceType} · ${r.resourceId}`,
+            },
           ]}
-          rows={logs.slice(0, 4)}
+          rows={events}
           rowKey={(r) => r.id}
           selectedKeys={eventSel}
           onSelectionChange={setEventSel}
           indexStart={1}
+          empty={
+            load.kind === "ready" ? (
+              <EmptyState
+                title="暂无事件"
+                description="近期没有运营操作留痕。"
+              />
+            ) : (
+              emptyState
+            )
+          }
         />
       </Section>
     </DashboardTemplate>

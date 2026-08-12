@@ -63,8 +63,10 @@
  * 背景一亮就很难看。
  *
  * 复合标题（"<品牌> · <子域>"）按 " · " 分隔符拆出品牌前缀单独染
- * text-primary-text（品牌主色），不含分隔符的标题原样渲染——见
- * splitBrandTitle，认分隔符不认具体品牌名，不把业务名称写死进组件。
+ * text-primary-text（品牌主色）+ font-mono（等宽——品牌名长短不一，比例字体
+ * 下几个分组标题的对齐基线参差不齐，等宽消除这个视觉噪音），不含分隔符的
+ * 标题原样渲染——见 splitBrandTitle，认分隔符不认具体品牌名，不把业务名称
+ * 写死进组件。
  *
  * 颜色：图标维持 muted-foreground 不变；标签文字单独提一级到
  * foreground（NavLabel 上单独盖一层 text-foreground，不影响图标的颜色，
@@ -322,7 +324,9 @@ function NavGroupHeader({
         <NavLabel className="pl-xs text-foreground">
           {brandTitle ? (
             <>
-              <span className="text-primary-text">{brandTitle.brand}</span>
+              <span className="font-mono text-primary-text">
+                {brandTitle.brand}
+              </span>
               {brandTitle.rest}
             </>
           ) : (

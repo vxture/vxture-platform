@@ -10,6 +10,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   ActionMenu,
+  Banner,
   BulkActionBar,
   Button,
   Combobox,
@@ -37,6 +38,17 @@ import {
   useListPagination,
 } from "@vxture/design-system";
 import { endpoints as seed, models, type EndpointRow } from "@/mocks/atlas";
+
+/** Atlas 真实 API 目前没有 endpoint 概念的落地端点（仓内检索确认，2026-08-11）；
+ * 界面先按产品设计文档搭好，数据仍是本地演示态，接入待 Atlas 补上对应接口后
+ * 再换。不删这页也不假装它是真的——两者都不诚实。 */
+const PLANNED_BANNER = (
+  <Banner
+    tone="info"
+    title="规划中：暂未接入真实数据"
+    description="Atlas 尚未提供 Endpoint 的管理接口；这里展示的是界面设计态，不是生产数据。Provider / Model Registry / Metering 已接入真实数据。"
+  />
+);
 
 /** fallback 的"不设"档。空串在 Combobox 里选不中，需要一个显式值。 */
 const NO_FALLBACK = "__none__";
@@ -252,6 +264,7 @@ export default function EndpointsPage() {
             description="统一能力入口（chat/default、embedding/default…）。业务系统永远访问 Endpoint，不直接访问模型。"
           />
         }
+        summary={PLANNED_BANNER}
         filters={
           <FilterBar
             view={view}

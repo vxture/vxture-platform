@@ -42,6 +42,16 @@ import {
 import { apiKeys as seed, type ApiKeyRow } from "@/mocks/atlas";
 import { KEY_STATUS_META } from "@/lib/status";
 
+/** Atlas 真实 API 目前没有 API Key 管理的落地端点（仓内检索确认，2026-08-11）；
+ * 界面先按产品设计文档搭好，数据仍是本地演示态。不删这页也不假装它是真的。 */
+const PLANNED_BANNER = (
+  <Banner
+    tone="info"
+    title="规划中：暂未接入真实数据"
+    description="Atlas 尚未提供 API Key 的管理接口；这里展示的是界面设计态，不是生产数据。Provider / Model Registry / Metering 已接入真实数据。"
+  />
+);
+
 type KeyKind = ApiKeyRow["kind"];
 
 type DialogState =
@@ -240,6 +250,7 @@ export default function KeysPage() {
             description="服务间调用走 Internal Key，外部应用走 External Key；轮换与吊销全部留痕进 Audit。"
           />
         }
+        summary={PLANNED_BANNER}
         filters={
           <FilterBar
             view={view}

@@ -1,137 +1,229 @@
 "use client";
 
-/* Metrics — opera-top-level-design.md §7：Gateway / Provider / Endpoint
- * 三层服务指标。图表组件按 DS 判据归 domain-ui 排期，本期以指标卡呈现。 */
+/* Metrics — opera-top-level-design.md §7：请求量 / 延迟 / 错误率等运行指标。
+ *
+ * 2026-08-12 诚实化：此前 gateway/providerMetrics 是页面里手写的虚构数组
+ * （QPS/延迟/错误率），mocks/atlas.ts 的 meteringByProvider/Model/Endpoint 三个
+ * 维度同样是虚构——Atlas 真实的 `/capability/usage-summaries` 只回传
+ * tenant × cycleMonth 维度（Metering 页已接），没有 provider/model/endpoint
+ * 细分，也没有任何网关侧 QPS/延迟/错误率导出（已提 liaison issue 给
+ * vxture-atlas）。接假数据不如不接——这里换成两块真实存在的运行信号
+ * （后台任务执行统计、webhook 投递队列深度），并如实标注网关性能指标的缺口，
+ * 不再假装能看到 Provider/Model 维度的性能数据。 */
 
-import { useState } from "react";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import {
   Banner,
+  Button,
   DataTable,
+  EmptyState,
+  Icon,
   MetricGrid,
   Section,
   ViewHeader,
   ViewLayout,
 } from "@vxture/design-system";
-import { meteringByEndpoint } from "@/mocks/atlas";
+import { api, OperaApiError } from "@/lib/api";
 
-const gateway = [
-  {
-    id: "qps",
-    label: "Gateway QPS",
-    value: "142",
-    icon: "lightning",
-    trend: "+11%",
-    trendTone: "success",
-  },
-  { id: "tps", label: "Token TPS", value: "38.4K", icon: "stack" },
-  {
-    id: "lat",
-    label: "P95 延迟",
-    value: "412ms",
-    icon: "timer",
-    trend: "+38ms",
-    trendTone: "warning",
-  },
-  {
-    id: "err",
-    label: "错误率",
-    value: "0.42%",
-    icon: "warning",
-    trend: "+0.1pp",
-    trendTone: "warning",
-  },
-] as const;
+type JobStatus = "idle" | "running" | "success" | "failed";
 
-const providerMetrics = [
-  { id: "ok", label: "Provider 成功率", value: "99.2%", icon: "success" },
-  {
-    id: "fo",
-    label: "Failover 次数 / 24h",
-    value: "17",
-    icon: "arrows-down-up",
-  },
-  {
-    id: "deg",
-    label: "降级 Provider",
-    value: "1",
-    icon: "trend-down",
-    tone: "warning",
-  },
-  { id: "probe", label: "健康探测通过", value: "23/24", icon: "waveform" },
-] as const;
+interface JobHeartbeatItem {
+  jobName: string;
+  status: JobStatus;
+  lastDurationMs: number | null;
+  runCount: number;
+  failureCount: number;
+}
+
+interface WebhookQueueCounts {
+  pending: number;
+  delivering: number;
+  delivered: number;
+  failed: number;
+  dead: number;
+}
+
+interface JobSchedulerSnapshot {
+  jobs: JobHeartbeatItem[];
+  queue: { counts: WebhookQueueCounts };
+}
+
+type LoadState =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready" };
 
 export default function MetricsPage() {
-  /* 选择列全站占位（owner 定）：统计行暂无批量动作，列先在。 */
-  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [snapshot, setSnapshot] = useState<JobSchedulerSnapshot | null>(null);
+  const [load, setLoad] = useState<LoadState>({ kind: "loading" });
+
+  const reload = useCallback(async () => {
+    setLoad({ kind: "loading" });
+    try {
+      const data = await api.get<JobSchedulerSnapshot>("/api/job-scheduler");
+      setSnapshot(data);
+      setLoad({ kind: "ready" });
+    } catch (error) {
+      setLoad({
+        kind: "error",
+        message:
+          error instanceof OperaApiError ? error.message : "读取运行指标失败",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const counts = snapshot?.queue.counts;
 
   return (
     <ViewLayout>
       <ViewHeader
-        icon="chart-line-up"
+        icon="chart-line"
         title="Metrics"
-        description="所有请求必须可观测：Gateway、Provider、Endpoint 三层指标；链路追踪基于 OpenTelemetry。"
+        description="平台运行指标。网关请求量/延迟/错误率、Provider/Model 维度用量暂无上游数据源。"
       />
 
       <Banner
         tone="info"
-        title="趋势图排期"
-        description="时序趋势图依赖图表组件（DS 判据归 domain-ui），随功能期接入；本期先给指标事实。"
+        title="规划中：网关性能指标尚未接入"
+        description="Atlas 尚未导出网关侧 QPS / 延迟 / 错误率，也未提供按 Provider / Model 维度的用量拆分（已提 liaison issue 给 vxture-atlas）。这里不接虚构数字；按租户的成本/Token 用量是真实数据，见下方入口。"
       />
 
       <Section
-        title="Gateway"
-        icon="globe"
+        title="后台任务执行统计"
+        icon="gauge"
         level={2}
-        description="入口网关的吞吐、时延与错误率——平台健康的第一读数。"
-      >
-        <MetricGrid items={[...gateway]} columns={4} />
-      </Section>
-
-      <Section
-        title="Provider"
-        icon="plugs-connected"
-        level={2}
-        description="上游供应商的成功率与故障切换；降级判定依据健康探测。"
-      >
-        <MetricGrid items={[...providerMetrics]} columns={4} />
-      </Section>
-
-      {/* §11 的第三层：Endpoint 只看请求数与 Token 数——延迟与成本归 Metering，
-          同一个事实不在两个页面各给一份。 */}
-      <Section
-        title="Endpoint"
-        icon="plug"
-        level={2}
-        description="各能力入口的调用量与 Token 事实；延迟与成本归 Metering。"
+        description="opera-bff 自有的四个后台作业（provisioning-dispatch / sharing-expiry / trial-expiry / order-payment-expiry），真实心跳数据。"
       >
         <DataTable
           columns={[
-            { id: "code", header: "Endpoint", cell: (r) => r.dimension },
             {
-              id: "req",
-              header: "请求数",
-              align: "right",
-              cell: (r) => r.requests,
+              id: "job",
+              header: "作业",
+              cell: (r: JobHeartbeatItem) => r.jobName,
             },
             {
-              id: "in",
-              header: "Input Token",
-              align: "right",
-              cell: (r) => r.inputTokens,
+              id: "status",
+              header: "状态",
+              cell: (r: JobHeartbeatItem) => r.status,
             },
             {
-              id: "out",
-              header: "Output Token",
+              id: "duration",
+              header: "最近耗时",
               align: "right",
-              cell: (r) => r.outputTokens,
+              cell: (r: JobHeartbeatItem) =>
+                r.lastDurationMs != null ? `${r.lastDurationMs}ms` : "—",
+            },
+            {
+              id: "runs",
+              header: "累计运行",
+              align: "right",
+              cell: (r: JobHeartbeatItem) => r.runCount,
+            },
+            {
+              id: "failures",
+              header: "累计失败",
+              align: "right",
+              cell: (r: JobHeartbeatItem) => r.failureCount,
             },
           ]}
-          rows={meteringByEndpoint}
-          rowKey={(r) => r.id}
-          selectedKeys={selected}
-          onSelectionChange={setSelected}
-          indexStart={1}
+          rows={snapshot?.jobs ?? []}
+          rowKey={(r) => r.jobName}
+          empty={
+            load.kind === "loading" ? (
+              <EmptyState title="读取中…" description="正在读取作业统计。" />
+            ) : load.kind === "error" ? (
+              <EmptyState
+                title="读取失败"
+                description={load.message}
+                action={
+                  <Button variant="secondary" onClick={() => void reload()}>
+                    重试
+                  </Button>
+                }
+              />
+            ) : (
+              <EmptyState
+                title="暂无作业数据"
+                description="尚未采集到任何作业心跳。"
+              />
+            )
+          }
         />
+      </Section>
+
+      <Section
+        title="Webhook 投递队列深度"
+        icon="package"
+        level={2}
+        description="provisioning.webhook_deliveries 当前各状态计数，真实数据。"
+      >
+        <MetricGrid
+          loading={load.kind === "loading" && !snapshot}
+          columns={5}
+          items={[
+            {
+              id: "pending",
+              label: "待投递",
+              value: String(counts?.pending ?? 0),
+              icon: "clock",
+            },
+            {
+              id: "delivering",
+              label: "投递中",
+              value: String(counts?.delivering ?? 0),
+              icon: "arrow-up",
+            },
+            {
+              id: "delivered",
+              label: "已投递",
+              value: String(counts?.delivered ?? 0),
+              icon: "success",
+            },
+            {
+              id: "failed",
+              label: "失败（待重试）",
+              value: String(counts?.failed ?? 0),
+              icon: "warning",
+              ...((counts?.failed ?? 0) > 0
+                ? { trendTone: "warning" as const }
+                : {}),
+            },
+            {
+              id: "dead",
+              label: "死信",
+              value: String(counts?.dead ?? 0),
+              icon: "error",
+              ...((counts?.dead ?? 0) > 0
+                ? { trendTone: "danger" as const }
+                : {}),
+            },
+          ]}
+        />
+      </Section>
+
+      <Section
+        title="按租户成本 / Token 用量"
+        icon="coins"
+        level={2}
+        description="Atlas 真实用量汇总，已在 Metering 页展示，此处不重复维护同一份聚合逻辑。"
+        action={
+          <Button asChild variant="ghost" size="md">
+            <Link href="/atlas/metering">
+              前往 Metering
+              <Icon name="chevron-right" size="sm" aria-hidden="true" />
+            </Link>
+          </Button>
+        }
+      >
+        <p className="text-body-sm text-muted-foreground">
+          请求数、Token 用量与事实成本按租户 × 结算周期回传，完整视图见 Metering
+          页。
+        </p>
       </Section>
     </ViewLayout>
   );
