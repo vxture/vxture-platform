@@ -117,7 +117,7 @@ AUTH_COOKIE_DOMAIN=localhost
 
 库名 `platform_main` 与生产一致（`platform` 是 L0 stack 标识符，不是 product code，见 [`140-repo-governance-standard.md`](../../10-standards/140-repo-governance-standard.md) §4）。端口 5433 而非 5432：本机 atlas dev 栈的 forwarder 已经占了 127.0.0.1:5432。
 
-本地 RP 会话 cookie 必须用裸名（`RP_COOKIE_INSECURE=true`）——`__Host-` 前缀的 cookie 在明文 http 上会被浏览器静默丢弃，表现为"服务端登录成功、浏览器始终未登录"。dev-panel 已自动注入。
+本地 RP 会话 cookie 必须用裸名（`RP_COOKIE_INSECURE=true`）——`__Host-` 前缀的 cookie 在明文 http 上会被浏览器静默丢弃，表现为"服务端登录成功、浏览器始终未登录"。auth-bff 自己的中心会话 cookie 同理，用 `IDP_COOKIE_INSECURE=true`。dev-panel 已自动注入两者。
 
 第三方登录（钉钉 / 飞书）本地不必配。
 
