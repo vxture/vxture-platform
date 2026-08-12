@@ -73,14 +73,47 @@ export type DataTableAlign = "left" | "center" | "right";
 
 export type DataTableSortDirection = "asc" | "desc";
 
+/**
+ * 内容列的宽度分档——不是自由值。文件头"删 className 逃生口"针对的是任意 CSS，
+ * 不是受控词表：`align` 一直是词表，`width` 只是把"占多少横向空间"也收进同一种
+ * 形状，而不是任由浏览器的表格 auto 布局按单元格内容宽度乱分（2026-08-12，起因
+ * 是 atlas 六张表各自 auto 出不同比例，肉眼看不出"同一套表"）。省下来的空间由
+ * 浏览器自动分给没设 `width` 的列——约定上那应该是主列（标题/描述），所以只给
+ * 状态、类型、计数这类短内容列标宽度，主列永远留 `"auto"`（不设）。
+ *
+ * 是**最小宽度**，不是定宽（2026-08-12 由固定 `w-*` 改过来，runos 板块核对时
+ * 发现原先的固定宽度太窄，个别列内容比列宽本身还长）。同档的列对齐后视觉宽度
+ * 一致是常态，但某一行内容一旦超出这个下限，列跟着撑开，不强行截断——状态、
+ * 类型这类值域本就有限的列不会触发，真触发的多半是本该给更宽档位的列，撑开
+ * 是暴露问题而不是掩盖它。
+ */
+export type DataTableColumnWidth = "auto" | "xs" | "sm" | "md" | "lg";
+
 const ALIGN: Record<DataTableAlign, string> = {
   left: "text-left",
   center: "text-center",
   right: "text-right",
 };
 
+const WIDTH: Record<Exclude<DataTableColumnWidth, "auto">, string> = {
+  xs: "min-w-[120px]", // 短徽标：状态、类型这类二选几枚举
+  sm: "min-w-[140px]", // 数字、日期一类定长信息
+  md: "min-w-[160px]", // 中等信息列，多个短字段并排、或多枚徽标
+  lg: "min-w-[200px]", // 需要比 md 更宽、但仍希望与同档列对齐的列
+};
+
 /** 选择列 / 序号列 / 操作列共用：固定 64px、居中，不吃首末列零边距。 */
 const EDGE_COL = "w-control-3xl px-md text-center";
+
+/**
+ * `Checkbox` 自己的命中区外扩默认给的是 `after:-inset-x-lg`（表单场景够宽，
+ * 撑不出问题）。选择列只有 `EDGE_COL` 减去左右 `px-md` 那点内容宽——default
+ * 密度下量出来是 24px，checkbox 本体 16px 居中，两侧各只剩 4px 富余，`-lg`
+ * 要 24px 每侧，实测（2026-08-12 浏览器量的，不是算的）命中区两侧各溢出
+ * EDGE_COL 边界 4px，蹭进相邻的序号列/表格外沿。缩到 `-md`（16px）三档密度
+ * 下都有正富余（default 4px、compact 16px、comfortable 8px），仍比 16px 的框
+ * 本身宽得多，没有退回"点不中"的老问题。 */
+const EDGE_CHECKBOX_CLASS = "after:-inset-x-md";
 
 export interface DataTableColumn<TRow> {
   readonly id: string;
@@ -91,6 +124,11 @@ export interface DataTableColumn<TRow> {
    * 状态列一律 `center`；数值列 `right`；其余文本列留默认。
    */
   readonly align?: DataTableAlign;
+  /**
+   * 列宽分档，默认 `"auto"`（不设宽度，交给浏览器按内容分配）。主列（标题/
+   * 描述）留默认；状态、类型、计数这类短内容列标一档，把空间让给主列。
+   */
+  readonly width?: DataTableColumnWidth;
   /** 可排序。排序本身由调用方做，本件只出表头控件与方向指示。 */
   readonly sortable?: boolean;
 }
@@ -214,6 +252,7 @@ function DataTable<TRow>({
                 <th scope="col" className={cn(EDGE_COL, "py-sm font-normal")}>
                   <div className="flex items-center justify-center">
                     <Checkbox
+                      className={EDGE_CHECKBOX_CLASS}
                       checked={allSelected || (someSelected && "indeterminate")}
                       onCheckedChange={toggleAll}
                       aria-label={allSelected ? "取消本页全选" : "全选本页"}
@@ -250,6 +289,9 @@ function DataTable<TRow>({
                       "first:pl-none last:pr-none",
                       // 表头一律居中，与列的 align 无关——align 说的是数据。
                       "text-center",
+                      column.width && column.width !== "auto"
+                        ? WIDTH[column.width]
+                        : undefined,
                     )}
                   >
                     {column.sortable && onSortChange ? (
@@ -346,6 +388,7 @@ function DataTable<TRow>({
                       >
                         <div className="flex items-center justify-center">
                           <Checkbox
+                            className={EDGE_CHECKBOX_CLASS}
                             checked={isSelected}
                             onCheckedChange={() => toggleRow(key)}
                             aria-label="选择本行"
@@ -371,6 +414,9 @@ function DataTable<TRow>({
                           "px-md py-md align-middle text-foreground",
                           "first:pl-none last:pr-none",
                           ALIGN[column.align ?? "left"],
+                          column.width && column.width !== "auto"
+                            ? WIDTH[column.width]
+                            : undefined,
                           cellSurface,
                         )}
                       >
