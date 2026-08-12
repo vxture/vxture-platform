@@ -264,9 +264,17 @@ async function killProcessTree(pid) {
     );
     return r.code === 0;
   }
+  /* -pid targets the whole process GROUP, not just the shell itself — this only
+   * reaches grandchildren (the actual node dev server, its own workers, etc.)
+   * because startService spawns with detached:true, making pid its own group
+   * leader. Without that, -pid here would silently hit the panel's own group
+   * instead (spawn() does not create a new group by default on POSIX), and
+   * only the top `sh` would die while everything under it kept running. */
+  let groupTargetable = true;
   try {
     process.kill(-pid, "SIGTERM");
   } catch {
+    groupTargetable = false;
     try {
       process.kill(pid, "SIGTERM");
     } catch {
@@ -276,7 +284,10 @@ async function killProcessTree(pid) {
   await sleep(900);
   try {
     process.kill(pid, 0);
-    process.kill(pid, "SIGKILL");
+    // Still alive after SIGTERM's grace period — escalate on the same target
+    // (group if we could reach it, single pid otherwise) so stragglers under
+    // a signal-ignoring shell don't survive the "stop" click.
+    process.kill(groupTargetable ? -pid : pid, "SIGKILL");
   } catch {
     /* already exited */
   }
@@ -448,6 +459,15 @@ async function startService(service) {
       ...(service.env ?? {}),
     },
     windowsHide: true,
+    /* POSIX only: makes the shell its own process-group leader so
+     * killProcessTree's `process.kill(-pid, …)` actually reaches the real
+     * dev-server process (and its own child workers) under it instead of —
+     * absent this — landing on the panel's own process group, since spawn()
+     * does not create a new group by default. Windows has no equivalent
+     * concept; taskkill /t already walks the real parent-child tree there,
+     * and detached:true on Windows would instead pop the child into its own
+     * console window, which is not what we want. */
+    detached: process.platform !== "win32",
   });
 
   state.child = child;
