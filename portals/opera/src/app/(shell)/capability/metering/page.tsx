@@ -44,6 +44,7 @@ import {
   EmptyState,
   FilterBar,
   Icon,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -52,10 +53,10 @@ import {
   NativeSelect,
   Pagination,
   SegmentedControl,
-  ViewHeader,
+  type IconName,
   useListPagination,
   useToast,
-  type IconName,
+  ViewHeader,
 } from "@vxture/design-system";
 import { useTenancyDirectory } from "@/features/tenancy/directory";
 import { WorkspaceCell } from "@/features/tenancy/WorkspaceCell";
@@ -452,17 +453,17 @@ export default function CapabilityMeteringPage() {
               }}
             />
           </InputGroup>
-          <input
+          <Input
             type="date"
             aria-label="起始日期（UTC）"
-            className="h-control-md rounded-md border border-border bg-background px-sm text-body-sm"
+            className="w-fit"
             value={window_.from}
             onChange={(e) => setWindow({ ...window_, from: e.target.value })}
           />
-          <input
+          <Input
             type="date"
             aria-label="截止日期（UTC，不含）"
-            className="h-control-md rounded-md border border-border bg-background px-sm text-body-sm"
+            className="w-fit"
             value={window_.to}
             onChange={(e) => setWindow({ ...window_, to: e.target.value })}
           />

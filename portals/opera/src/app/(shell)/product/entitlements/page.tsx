@@ -920,7 +920,7 @@ function ProductEntitlements() {
                   }
                 />
               </InputGroup>
-              <div className="flex max-h-[32vh] flex-col gap-2xs overflow-y-auto rounded-md border border-border p-xs">
+              <div className="flex flex-col gap-2xs rounded-md border border-border p-xs">
                 {endpointRows(routePicker).map((ep) => {
                   const on = routePicker.picked.includes(ep.code);
                   const held = heldEndpointCodes.has(ep.code);
@@ -1017,7 +1017,7 @@ function ProductEntitlements() {
                     }
                   />
                 </InputGroup>
-                <div className="flex max-h-[32vh] flex-col gap-2xs overflow-y-auto rounded-md border border-border p-xs">
+                <div className="flex flex-col gap-2xs rounded-md border border-border p-xs">
                   {capabilityRows(capPicker).map((c) => {
                     const on = capPicker.picked.includes(c.capabilityId);
                     const held = heldCapabilityIds.has(c.capabilityId);
@@ -1181,11 +1181,14 @@ function ProductEntitlements() {
               .slice(0, 5);
 
             return (
-              <button
+              <Button
                 key={p.id}
                 type="button"
+                variant="ghost"
                 onClick={() => open(p.productCode)}
-                className="flex flex-col gap-sm rounded-md border border-border p-md text-left hover:border-primary hover:bg-accent"
+                /* 这是一张可点的卡片，不是一枚按钮：尺寸与内边距由本行的布局类给，
+                   Button 只提供按钮语义与聚焦环，所以 h-auto。 */
+                className="flex h-auto flex-col items-start gap-sm rounded-md border border-border p-md text-left hover:border-primary hover:bg-accent"
               >
                 <div className="flex items-center gap-sm">
                   <Icon
@@ -1240,7 +1243,7 @@ function ProductEntitlements() {
                     还没有能力授权
                   </span>
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>

@@ -1725,16 +1725,19 @@ function ModelServiceContent() {
                 {CAPABILITY_OPTIONS.map((c) => {
                   const active = modelDraft.capabilities.includes(c);
                   return (
-                    <button
+                    <Button
                       key={c}
                       type="button"
+                      variant="ghost"
                       onClick={() => toggleCapability(c)}
-                      className="inline-flex"
+                      /* 视觉全由里面的 Badge 给：这里只要一个可聚焦、可回车触发的
+                         按钮语义，所以把 Button 自己的尺寸与内边距归零。 */
+                      className="inline-flex h-auto w-auto p-0 hover:bg-transparent"
                     >
                       <Badge variant={active ? "default" : "outline"}>
                         {c}
                       </Badge>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

@@ -939,7 +939,7 @@ function RunosGrantsPageContent() {
               </InputGroup>
               {/* 固定高度的选择区：目录有几百条，让它撑开对话框等于把提交按钮推到
                   屏幕外。 */}
-              <div className="flex max-h-[32vh] flex-col gap-2xs overflow-y-auto rounded-md border border-border p-xs">
+              <div className="flex flex-col gap-2xs rounded-md border border-border p-xs">
                 {pickerRows(grantPicker).length === 0 ? (
                   <p className="p-sm text-body-sm text-muted-foreground">
                     没有匹配的能力。
