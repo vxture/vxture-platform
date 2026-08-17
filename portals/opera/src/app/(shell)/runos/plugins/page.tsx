@@ -1,15 +1,17 @@
 "use client";
 
-import { PlannedManagementPage } from "@/components/planned/PlannedManagementPage";
+/* 旧路径兜底 — /runos/plugins → /capability/registry
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-export default function RunosPluginsPage() {
+import { LegacyRedirect } from "@/components/LegacyRedirect";
+
+export default function RunosPluginsRedirect() {
   return (
-    <PlannedManagementPage
-      icon="package"
-      title="Plugin"
-      description="套件——供给侧的注册原子：一个 Skill 及其依赖的 Connector / Asset，同版本同生命周期打包提交（Agent Plugins 1.0.0 格式）。"
-      route="/capability/plugins"
-      carries="套件的摄入、依赖声明（required / optional）、准入扫描；套件不是授权单元，只是注册与版本化的原子——授权粒度仍在能力级。"
+    <LegacyRedirect
+      to="/capability/registry"
+      title="能力注册"
+      description="Plugin 不是资源，是将来提交 Capability 的另一种打包路径，因此不再单列。"
     />
   );
 }

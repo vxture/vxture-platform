@@ -1,15 +1,17 @@
 "use client";
 
-import { PlannedManagementPage } from "@/components/planned/PlannedManagementPage";
+/* 旧路径兜底 — /runos/credentials → /capability/credentials
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-export default function RunosCredentialsPage() {
+import { LegacyRedirect } from "@/components/LegacyRedirect";
+
+export default function RunosCredentialsRedirect() {
   return (
-    <PlannedManagementPage
-      icon="key"
-      title="Credential"
-      description="第三方系统凭证托管与代理注入（连接器调用外部系统时用）。"
-      route="/capability/credentials"
-      carries="凭证托管归属沿用 atlas M-3 同一原则——控制台零持有明文，创建 / 轮换写入时明文只过一次网，此后只见掩码元数据与轮换日志；变更路由要求 step-up。"
+    <LegacyRedirect
+      to="/capability/credentials"
+      title="凭证托管"
+      description="「能力管理」板块改按管理域命名，不再以产品代号 Runos 作路径前缀。"
     />
   );
 }

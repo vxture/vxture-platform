@@ -1,15 +1,17 @@
 "use client";
 
-import { PlannedManagementPage } from "@/components/planned/PlannedManagementPage";
+/* 旧路径兜底 — /runos/supply-catalogs → /capability/grants
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-export default function RunosSupplyCatalogsPage() {
+import { LegacyRedirect } from "@/components/LegacyRedirect";
+
+export default function RunosSupplyCatalogsRedirect() {
   return (
-    <PlannedManagementPage
-      icon="list-checks"
-      title="Supply Catalog"
-      description="两段裁决第一段——opera 的技术供给目录：按产品发布技术上限（并发上限、成本上限、允许的风险范围）。admin 的能力包只能从这份目录里选，选不到目录外的能力。"
-      route="/capability/supply-catalogs[/:id/publish|impact-report]"
-      carries="opera 侧发布 / 变更影响分析动作；这是 opera 在 runos 管理面里唯一的写入面，其余六个路由族多为只读治理视图。"
+    <LegacyRedirect
+      to="/capability/grants"
+      title="能力授权"
+      description="与「路由授权」成对命名；旧路径 supply-catalogs 是上游内部叫法，不是运营者的词。"
     />
   );
 }

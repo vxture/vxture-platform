@@ -1,32 +1,17 @@
 "use client";
 
-/* Endpoint — Runos 没有独立的 Endpoint 列表接口（2026-08-11 读
- * vxture-runos service/src/registry/registry.controller.ts 核对）：端点永远
- * 挂在某个 capability 的某个版本下，注册（POST /capability/endpoints）与状态
- * 切换（PATCH /capability/endpoints/:id/status）都是 capability 详情的一部分，
- * 不是独立集合——真实接口没有 `GET /capability/endpoints`，硬造一个"全局端点
- * 列表"页面等于在没有数据源的地方拼一份假列表。管理入口在 Capability 页的
- * 详情抽屉里。 */
+/* 旧路径兜底 — /runos/endpoints → /capability/endpoints
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-import { Banner, Button, ViewHeader, ViewLayout } from "@vxture/design-system";
-import Link from "next/link";
+import { LegacyRedirect } from "@/components/LegacyRedirect";
 
-export default function RunosEndpointsPage() {
+export default function RunosEndpointsRedirect() {
   return (
-    <ViewLayout>
-      <ViewHeader
-        icon="plug"
-        title="Endpoint"
-        description="按能力版本登记的物理端点。"
-      />
-      <Banner
-        tone="info"
-        title="没有独立列表——在 Capability 详情里管理"
-        description="Runos 真实接口里 Endpoint 永远挂在某个 Capability 的某个版本下，没有 GET /capability/endpoints 这种全局列表。注册端点、切换 active / draining / disabled 状态，都在 Capability 页点开对应能力的详情抽屉里做。"
-      />
-      <Link href="/runos/capabilities">
-        <Button variant="outline">前往 Capability</Button>
-      </Link>
-    </ViewLayout>
+    <LegacyRedirect
+      to="/capability/endpoints"
+      title="能力端点"
+      description="端点嵌在能力里面，没有独立的顶级列表；本页只解释这件事。"
+    />
   );
 }

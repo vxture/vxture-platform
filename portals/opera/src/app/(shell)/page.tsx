@@ -9,7 +9,15 @@
  * 也没有任何遥测导出（见 liaison issue，待 Atlas 侧交付）。这里换成当前真实
  * 能拿到的运营信号：Provider/Model 启用数（真实 CRUD 已接）、待处理维护窗口
  * （真实）、后台任务失败数（真实 job-scheduler）；"最近事件"从虚构日志换成
- * 真实审计留痕（与 Security/Audit 同源）。网关吞吐类指标暂缺，不接假数字。 */
+ * 真实审计留痕（与 Security/Audit 同源）。网关吞吐类指标暂缺，不接假数字。
+ *
+ * 2026-08-12 补 Provider 健康（liaison #245，vxture-atlas#147 已合并到 main，
+ * 但接口文档自己写明"最近部署 tag 落后 main 11 个 commit"——生产环境可能还
+ * 没有这个字段）。`health` 字段做成可选：没有时按 unknown 处理，不假设它
+ * 一定存在，避免线上 Atlas 还没升级到这个版本时整页崩掉。"unknown" 是
+ * "还没有流量"或"字段还没上线"，不是"故障"——刚接入或只服务
+ * embed/parse/rerank（还没有真实 provider 实现，TD-003）的 provider 也会
+ * 一直显示 unknown，这里不把它渲染成红色。 */
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -32,12 +40,15 @@ import {
 } from "@vxture/design-system";
 import { api, OperaApiError } from "@/lib/api";
 
+type ProviderHealthStatus = "healthy" | "degraded" | "down" | "unknown";
+
 interface ModelProviderRecord {
   id: string;
   providerCode: string;
   providerType: string;
   providerName: string;
   isActive: boolean;
+  health?: { status: ProviderHealthStatus };
 }
 
 interface AiModelRecord {
@@ -75,14 +86,15 @@ interface JobSchedulerSnapshot {
   };
 }
 
+/** 字段名对齐 product_251 X-3（见 opera-bff `audit-log-view.router.ts`）。 */
 interface AuditLogEntry {
-  id: string;
-  time: string;
-  actor: string;
+  eventId: string;
+  occurredAt: string;
+  actorName: string;
   action: string;
-  resourceType: string;
-  resourceId: string;
-  result: string;
+  objectType: string;
+  objectId: string;
+  outcome: string;
 }
 
 type LoadState =
@@ -93,6 +105,16 @@ type LoadState =
 function providerTone(isActive: boolean): StatusBadgeTone {
   return isActive ? "success" : "neutral";
 }
+
+const HEALTH_META: Record<
+  ProviderHealthStatus,
+  { label: string; tone: StatusBadgeTone }
+> = {
+  healthy: { label: "健康", tone: "success" },
+  degraded: { label: "降级", tone: "warning" },
+  down: { label: "故障", tone: "danger" },
+  unknown: { label: "无数据", tone: "neutral" },
+};
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
@@ -161,11 +183,11 @@ export default function DashboardPage() {
 
   const copyEvent = async (r: AuditLogEntry) => {
     const text = [
-      formatTime(r.time),
-      r.actor,
+      formatTime(r.occurredAt),
+      r.actorName,
       r.action,
-      `${r.resourceType} · ${r.resourceId}`,
-      r.result,
+      `${r.objectType} · ${r.objectId}`,
+      r.outcome,
     ].join(" · ");
     try {
       await navigator.clipboard.writeText(text);
@@ -235,7 +257,7 @@ export default function DashboardPage() {
       header={
         <ViewHeader
           icon="squares-four"
-          title="Dashboard"
+          title="总览"
           description="平台状态、Atlas 状态与运营待办。Opera 记录事实成本，销售价格归 Admin。"
         />
       }
@@ -249,21 +271,21 @@ export default function DashboardPage() {
       entries={
         <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-3">
           <EntryCard
-            href="/atlas/providers"
+            href="/model/services"
             icon="plugs-connected"
             title="Provider"
             meta={`${activeProviders} 家启用`}
             description="模型供应商接入、健康检查与代理出口"
           />
           <EntryCard
-            href="/atlas/router"
-            icon="tree-structure"
-            title="Router"
-            meta="规划中"
-            description="Primary / Failover 路由策略（待 Atlas 交付管理面 API）"
+            href="/model/routes"
+            icon="plug"
+            title="Endpoint"
+            meta="统一能力入口"
+            description="业务只依赖 Endpoint；Primary / Fallback 指派也在这里改"
           />
           <EntryCard
-            href="/observability/logs"
+            href="/ops/logs"
             icon="terminal"
             title="Logs"
             meta={jobSnapshot ? `${failedJobs.length} 个失败任务` : "—"}
@@ -284,10 +306,10 @@ export default function DashboardPage() {
         title="Provider 状态"
         icon="plugs-connected"
         level={2}
-        description="接入的模型供应商与启停状态；健康检查/延迟数据待 Atlas 交付遥测接口。"
+        description="接入的模型供应商与启停状态；健康状态从真实 chat/stream 流量派生，无数据不代表故障。"
         action={
           <Button asChild variant="ghost" size="md">
-            <Link href="/atlas/providers">
+            <Link href="/model/services">
               查看全部
               <Icon name="chevron-right" size="sm" aria-hidden="true" />
             </Link>
@@ -323,6 +345,20 @@ export default function DashboardPage() {
               cell: (r: ModelProviderRecord) => r.providerType,
             },
             {
+              id: "health",
+              header: "健康",
+              align: "center",
+              width: "xs",
+              cell: (r: ModelProviderRecord) => (
+                <StatusBadge
+                  tone={HEALTH_META[r.health?.status ?? "unknown"].tone}
+                  dot
+                >
+                  {HEALTH_META[r.health?.status ?? "unknown"].label}
+                </StatusBadge>
+              ),
+            },
+            {
               id: "status",
               header: "状态",
               align: "center",
@@ -348,7 +384,7 @@ export default function DashboardPage() {
               aria-label="前往 Provider 详情"
               title="前往 Provider 详情"
             >
-              <Link href="/atlas/providers">
+              <Link href="/model/services">
                 <Icon name="arrow-right" size="sm" aria-hidden="true" />
               </Link>
             </Button>
@@ -363,7 +399,7 @@ export default function DashboardPage() {
         description="最近的运营操作审计留痕；完整检索进 Audit。"
         action={
           <Button asChild variant="ghost" size="md">
-            <Link href="/security/audit">
+            <Link href="/audit/changes">
               查看全部
               <Icon name="chevron-right" size="sm" aria-hidden="true" />
             </Link>
@@ -373,21 +409,21 @@ export default function DashboardPage() {
         <DataTable
           columns={[
             {
-              id: "time",
+              id: "occurredAt",
               header: "时间",
               width: "sm",
-              cell: (r: AuditLogEntry) => formatTime(r.time),
+              cell: (r: AuditLogEntry) => formatTime(r.occurredAt),
             },
             {
               id: "actor",
               header: "操作者",
               width: "sm",
-              cell: (r: AuditLogEntry) => r.actor,
+              cell: (r: AuditLogEntry) => r.actorName,
             },
             {
               id: "target",
               header: "对象",
-              cell: (r: AuditLogEntry) => `${r.resourceType} · ${r.resourceId}`,
+              cell: (r: AuditLogEntry) => `${r.objectType} · ${r.objectId}`,
             },
             {
               id: "action",
@@ -398,7 +434,7 @@ export default function DashboardPage() {
             },
           ]}
           rows={events}
-          rowKey={(r) => r.id}
+          rowKey={(r) => r.eventId}
           selectedKeys={eventSel}
           onSelectionChange={setEventSel}
           indexStart={1}

@@ -1,15 +1,17 @@
 "use client";
 
-import { PlannedManagementPage } from "@/components/planned/PlannedManagementPage";
+/* 旧路径兜底 — /runos/audit → /audit/changes
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-export default function RunosAuditPage() {
+import { LegacyRedirect } from "@/components/LegacyRedirect";
+
+export default function RunosAuditRedirect() {
   return (
-    <PlannedManagementPage
-      icon="clipboard"
-      title="Audit"
-      description="运行面 / 管理面双审计事件流；error_class 是唯一归因轴，每个类别对应唯一责任方。"
-      route="/capability/audit"
-      carries="调用链路全量留痕（认证、凭证注入、配额裁决、策略命中）；management 面操作（供给目录发布、策略变更）也走这条流，operator sub 随 M-1 传入并落库。"
+    <LegacyRedirect
+      to="/audit/changes?source=runos"
+      title="变更审计"
+      description="三个审计面按性质合并：管理变更并入「能力面 · Runos」来源 tab；能力调用与任务反馈两条流是运行事实，去了「运行监控 · 调用日志」。"
     />
   );
 }

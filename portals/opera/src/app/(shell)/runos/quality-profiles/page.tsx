@@ -1,15 +1,17 @@
 "use client";
 
-import { PlannedManagementPage } from "@/components/planned/PlannedManagementPage";
+/* 旧路径兜底 — /runos/quality-profiles → /capability/registry
+ * 2026-08-14 目录重构（`docs/opera-navigation-design.md` §3）。整串查询参数原样带过去，
+ * 理由见 `@/components/LegacyRedirect` 文件头。 */
 
-export default function RunosQualityProfilesPage() {
+import { LegacyRedirect } from "@/components/LegacyRedirect";
+
+export default function RunosQualityProfilesRedirect() {
   return (
-    <PlannedManagementPage
-      icon="target"
-      title="Quality Profile"
-      description="能力的质量档案：持续观测评分 + golden-dataset 回归门禁。"
-      route="/capability/quality-profiles"
-      carries="评分对象是能力资产本身而非 agent；分数写回 Registry 并影响语义发现的排序（M3 范围，随 M2 之后到）。"
+    <LegacyRedirect
+      to="/capability/registry"
+      title="能力注册"
+      description="Quality Profile 要到 M3 才有对象，占位页已撤。"
     />
   );
 }
