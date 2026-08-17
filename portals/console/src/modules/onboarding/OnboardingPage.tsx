@@ -132,7 +132,14 @@ export function OnboardingPage() {
 
   return (
     <AuthLoginTemplate
-      header={<AuthChromeHeader brandLabel={t("brand")} brandHref="/" />}
+      // 页眉 = logo + 名称（与 accounts 认证面同规，缺省 Vxture Studio）。
+      header={
+        <AuthChromeHeader
+          brandLogoSrc="/brand/vxture-logo-icon.svg"
+          brandLabel={t("brand")}
+          brandHref="/"
+        />
+      }
       // 本地展示时抓到的漏网：页脚不传参会吃到 DS 的「© 2026 Brand.」占位——
       // 和 accounts 修掉的是同一处坑。法务链接同理指向门户站绝对地址
       //（console 自己没有 /legal 路由）。

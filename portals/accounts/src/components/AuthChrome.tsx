@@ -7,9 +7,9 @@
  * 于是三处缺省值一路默认到了生产：
  *
  * 1. **品牌标是碎图标。** `AuthChromeHeader` 原先默认 `/brand/vxture-logo-white.png`，
- *    accounts 的 `public/brand/` 下只有三方登录的图标，没有这个文件（website 有）。
- *    默认值已从 DS 撤掉，字标由 `brandLabel` 出——需要图形标时在这里补，
- *    并且要补的是**深色**那一版：这里的页眉是浅底。
+ *    accounts 的 `public/brand/` 下没有这个文件（website 有）。默认值已从 DS
+ *    撤掉；图形标在这里补（`/brand/vxture-logo-icon.svg`，织环标本身是彩色的，
+ *    文件名里的 "white" 骗人——浅底上完全可见）。
  * 2. **页脚署名写着「© 2026 Brand.」。** 那是 DS 的中性占位。
  * 3. **法务链接三条全 404。** 缺省是 `/legal/*` 相对路径，落在
  *    accounts.vxture.com 上，而法务页在门户站。必须写成绝对地址。
@@ -32,8 +32,11 @@ import {
   type AuthVisualConfig,
 } from "@vxture/design-system";
 
-export const AUTH_BRAND_LABEL = "Vxture";
-// 版权主体与页眉字标是两回事：字标是产品名，署名是权利人（owner 2026-08-18 判）。
+// 页眉字标缺省 Vxture Studio（owner 2026-08-18 判），调用方可传别的
+//（比如按 OIDC client 展示接入方名称）。
+export const AUTH_BRAND_LABEL = "Vxture Studio";
+export const AUTH_BRAND_LOGO = "/brand/vxture-logo-icon.svg";
+// 版权主体是权利人，与页眉字标各自独立（owner 2026-08-18 判）。
 export const AUTH_COPYRIGHT_OWNER = "Vxture Studio";
 
 // 门户站地址。构建期注入（见 next.config.js 的 env 直通）；缺失时退化成相对
@@ -47,11 +50,19 @@ function websiteHref(path: string) {
   return WEBSITE_URL ? `${WEBSITE_URL}${path}` : path;
 }
 
-export function AccountsAuthHeader() {
+/** 页眉 = logo + 名称。名称缺省 Vxture Studio，可传（接入方品牌一类）。 */
+export function AccountsAuthHeader({
+  brandLabel = AUTH_BRAND_LABEL,
+  brandLogoSrc = AUTH_BRAND_LOGO,
+}: {
+  readonly brandLabel?: ReactNode;
+  readonly brandLogoSrc?: string;
+} = {}) {
   return (
     <AuthChromeHeader
       brandHref={websiteHref("/")}
-      brandLabel={AUTH_BRAND_LABEL}
+      brandLogoSrc={brandLogoSrc}
+      brandLabel={brandLabel}
     />
   );
 }
