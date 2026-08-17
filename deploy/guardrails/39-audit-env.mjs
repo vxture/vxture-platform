@@ -48,6 +48,14 @@ const COMPOSE_ONLY_KEYS = new Set([
   "VX_IMAGE_REGISTRY",
   "VX_IMAGE_NAMESPACE",
   "VX_IMAGE_TAG",
+  // Tailnet addresses of the deployment hosts. They are values, not names, so
+  // they belong on the host rather than in a public repo — compose and the
+  // nginx templates will interpolate them instead of hardcoding the addresses.
+  // Allow-listed here first: this audit rejects unknown keys with an error, so
+  // adding them to the host's runtime .env before this landed would fail the
+  // next deploy's pre-flight rather than the deploy itself.
+  "VX_WORKER01_TAILNET_IP",
+  "VX_WORKER02_TAILNET_IP",
 ]);
 
 const TENANT_TURNSTILE_KEYS = new Set([
@@ -227,7 +235,11 @@ const ENV_FILE_RULES = [
       "OPERATOR_SUPERADMIN_PHONE",
       // beta base URLs (optional until beta deployment is live)
       "RUYIN_BETA_BASE_URL",
+      // RUNA 已更名为 RUNOS。主机的 .env.auth-bff 里已经是新名，而这条清单还是旧名，
+      // 于是新名落进「未登记为可占位」的分支被判 ERROR。只补新名、保留旧名：
+      // 这一支只搬解卡所需，旧名的清理留给 R3（那一批本来就带完整的更名）。
       "RUNA_BETA_BASE_URL",
+      "RUNOS_BETA_BASE_URL",
       "NOCUS_BETA_BASE_URL",
       "ATLAS_BETA_BASE_URL",
       "ONTOS_BETA_BASE_URL",
