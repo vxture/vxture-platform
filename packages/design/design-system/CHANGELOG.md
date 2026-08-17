@@ -40,6 +40,9 @@ admin → DS 收敛批次。major 号在批次开启时已定（删除公开导�
   success→emerald、warning→amber、info→sky），角色型挂 T2 语义槽，故这批第一次
   跟随暗色模式。与 admin 桥同样是过渡资产，逐族换成 T2 类名后即可缩小消失。
 - **公开入口** `./styles/fonts.css`（dd8eea5 自托管字体时引入，此前漏登记）。
+- **`FieldTier`**（经 design-ui 再导出）——表单字段的分层容器，把「主字段 / 次要字段」
+  的分层从各页手写的 `div` + 间距类收进一件组件，使同类表单在不同页上的疏密一致。
+  纯新增导出，不影响任何既有入口。
 - **组件** `MetricListCard`、`PanelCard` / `PanelItem` / `PanelList`、`FactList` /
   `LabeledValue`、`LevelMarker`——均从 admin 的重复实现里提炼。
 - **浮层宽度梯** `OVERLAY_WIDTHS` 与 `overlayWidthClass` / `overlayMinWidthClass`。

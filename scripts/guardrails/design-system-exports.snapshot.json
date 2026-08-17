@@ -192,6 +192,7 @@
       "FieldError",
       "FieldGroup",
       "FieldLabel",
+      "FieldTier",
       "FilterBar",
       "FormPageTemplate",
       "FullscreenContainer",
