@@ -250,7 +250,7 @@ export default function KeysPage() {
       await runWithStepUp(() =>
         Promise.all(
           targets.map((r) =>
-            api.put(
+            api.post(
               `/api/atlas/api-keys/${r.id}/${status === "active" ? "activate" : "deactivate"}`,
               {},
             ),
@@ -274,7 +274,7 @@ export default function KeysPage() {
     setSubmitting(true);
     try {
       await runWithStepUp(() =>
-        api.put(
+        api.post(
           `/api/atlas/api-keys/${row.id}/${status === "active" ? "activate" : status === "disabled" ? "deactivate" : "revoke"}`,
           {},
         ),

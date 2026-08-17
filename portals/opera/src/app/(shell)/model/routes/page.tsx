@@ -363,7 +363,7 @@ function EndpointsPageContent() {
             : `Single：${draft.primaryModelCode}`,
         });
       } else {
-        await api.put(`/api/atlas/endpoints/${dialog.row.id}`, {
+        await api.patch(`/api/atlas/endpoints/${dialog.row.id}`, {
           category: draft.category.trim() || "chat",
           primaryModelCode: draft.primaryModelCode,
           fallbackModelCode,

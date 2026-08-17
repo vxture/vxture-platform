@@ -552,7 +552,10 @@ function ModelServiceContent() {
           title: `${providerDraft.providerName} 已接入`,
         });
       } else {
-        await api.put(`/api/atlas/providers/${providerDialog.row.id}`, payload);
+        await api.patch(
+          `/api/atlas/providers/${providerDialog.row.id}`,
+          payload,
+        );
         toast({
           tone: "success",
           title: `${providerDraft.providerName} 已保存`,
@@ -644,7 +647,7 @@ function ModelServiceContent() {
           );
         }
       } else {
-        await api.put(`/api/atlas/models/${modelDialog.row.id}`, payload);
+        await api.patch(`/api/atlas/models/${modelDialog.row.id}`, payload);
         toast({ tone: "success", title: `${modelDraft.modelCode} 已保存` });
       }
       setModelDialog(null);
@@ -727,7 +730,7 @@ function ModelServiceContent() {
     setSubmitting(true);
     try {
       await runWithStepUp(() =>
-        api.put(
+        api.post(
           `/api/atlas/provider-keys/${key.id}/${key.isActive ? "deactivate" : "activate"}`,
           {},
         ),

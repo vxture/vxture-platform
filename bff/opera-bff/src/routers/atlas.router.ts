@@ -118,8 +118,8 @@ import {
   HttpException,
   Inject,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
 } from "@nestjs/common";
@@ -129,7 +129,7 @@ import type { Pool } from "pg";
 import { OperatorExchangeService } from "../auth/operator-exchange.service";
 import type { OperatorAuditEntry } from "../audit/audit-log";
 import { recordProxyWrite } from "../audit/proxy-audit";
-import { normalizeAtlasAuditRow, normalizeAtlasState } from "./atlas-compat";
+import { normalizeAtlasState } from "./atlas-compat";
 import {
   notEntitled,
   unauthenticated,
@@ -146,7 +146,7 @@ const PROVIDER_MANAGE_CAPABILITY = "model:provider.manage";
 const MODEL_MANAGE_CAPABILITY = "model:model.manage";
 
 type JsonObject = Record<string, unknown>;
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 interface AtlasErrorBody {
   code?: string;
@@ -624,7 +624,7 @@ export class AtlasRouter {
     /* atlas 已合并 B-3 与 X-3 但**尚未部署**（实测活着的容器仍回 `isActive`）。
        在这一处归一，两代形状对页面都是同一种——**不需要与他们的部署对表**。
        删除条件与「为什么不放在页面里」见 `atlas-compat.ts` 文件头。 */
-    return normalizeAtlasAuditRow(normalizeAtlasState(payload));
+    return normalizeAtlasState(payload);
   }
 
   // ── Protocols（静态词表，管理 UI 协议下拉的唯一数据源）──────────────────────
@@ -672,7 +672,7 @@ export class AtlasRouter {
     );
   }
 
-  @Put("providers/:providerId")
+  @Patch("providers/:providerId")
   updateProvider(
     @Req() req: Request & RequestContext,
     @Param("providerId") providerId: string,
@@ -682,7 +682,7 @@ export class AtlasRouter {
     return this.writeThrough<ModelProviderRecord>(
       req,
       `/capability/providers/${encodeURIComponent(providerId)}`,
-      { method: "PUT", body },
+      { method: "PATCH", body },
       (r) => ({
         action: "atlas.provider.update",
         resourceType: "atlas_provider",
@@ -850,7 +850,7 @@ export class AtlasRouter {
   }
 
   @RequireStepUp()
-  @Put("provider-keys/:providerKeyId/activate")
+  @Post("provider-keys/:providerKeyId/activate")
   activateProviderKey(
     @Req() req: Request & RequestContext,
     @Param("providerKeyId") providerKeyId: string,
@@ -859,7 +859,7 @@ export class AtlasRouter {
     return this.writeThrough<ProviderKeyRecord>(
       req,
       `/capability/provider-keys/${encodeURIComponent(providerKeyId)}/activate`,
-      { method: "PUT" },
+      { method: "POST" },
       () => ({
         action: "atlas.provider_key.activate",
         resourceType: "atlas_provider_key",
@@ -869,7 +869,7 @@ export class AtlasRouter {
   }
 
   @RequireStepUp()
-  @Put("provider-keys/:providerKeyId/deactivate")
+  @Post("provider-keys/:providerKeyId/deactivate")
   deactivateProviderKey(
     @Req() req: Request & RequestContext,
     @Param("providerKeyId") providerKeyId: string,
@@ -878,7 +878,7 @@ export class AtlasRouter {
     return this.writeThrough<ProviderKeyRecord>(
       req,
       `/capability/provider-keys/${encodeURIComponent(providerKeyId)}/deactivate`,
-      { method: "PUT" },
+      { method: "POST" },
       () => ({
         action: "atlas.provider_key.deactivate",
         resourceType: "atlas_provider_key",
@@ -928,7 +928,7 @@ export class AtlasRouter {
     );
   }
 
-  @Put("endpoints/:endpointId")
+  @Patch("endpoints/:endpointId")
   updateEndpoint(
     @Req() req: Request & RequestContext,
     @Param("endpointId") endpointId: string,
@@ -938,7 +938,7 @@ export class AtlasRouter {
     return this.writeThrough<ModelEndpointRecord>(
       req,
       `/capability/endpoints/${encodeURIComponent(endpointId)}`,
-      { method: "PUT", body },
+      { method: "PATCH", body },
       (r) => ({
         action: "atlas.endpoint.update",
         resourceType: "atlas_endpoint",
@@ -1058,7 +1058,7 @@ export class AtlasRouter {
   }
 
   @RequireStepUp()
-  @Put("api-keys/:apiKeyId/activate")
+  @Post("api-keys/:apiKeyId/activate")
   activateApiKey(
     @Req() req: Request & RequestContext,
     @Param("apiKeyId") apiKeyId: string,
@@ -1067,7 +1067,7 @@ export class AtlasRouter {
     return this.writeThrough<GatewayApiKeyRecord>(
       req,
       `/capability/api-keys/${encodeURIComponent(apiKeyId)}/activate`,
-      { method: "PUT" },
+      { method: "POST" },
       () => ({
         action: "atlas.gateway_api_key.activate",
         resourceType: "atlas_gateway_api_key",
@@ -1077,7 +1077,7 @@ export class AtlasRouter {
   }
 
   @RequireStepUp()
-  @Put("api-keys/:apiKeyId/deactivate")
+  @Post("api-keys/:apiKeyId/deactivate")
   deactivateApiKey(
     @Req() req: Request & RequestContext,
     @Param("apiKeyId") apiKeyId: string,
@@ -1086,7 +1086,7 @@ export class AtlasRouter {
     return this.writeThrough<GatewayApiKeyRecord>(
       req,
       `/capability/api-keys/${encodeURIComponent(apiKeyId)}/deactivate`,
-      { method: "PUT" },
+      { method: "POST" },
       () => ({
         action: "atlas.gateway_api_key.deactivate",
         resourceType: "atlas_gateway_api_key",
@@ -1096,7 +1096,7 @@ export class AtlasRouter {
   }
 
   @RequireStepUp()
-  @Put("api-keys/:apiKeyId/revoke")
+  @Post("api-keys/:apiKeyId/revoke")
   revokeApiKey(
     @Req() req: Request & RequestContext,
     @Param("apiKeyId") apiKeyId: string,
@@ -1105,7 +1105,7 @@ export class AtlasRouter {
     return this.writeThrough<GatewayApiKeyRecord>(
       req,
       `/capability/api-keys/${encodeURIComponent(apiKeyId)}/revoke`,
-      { method: "PUT" },
+      { method: "POST" },
       () => ({
         action: "atlas.gateway_api_key.revoke",
         resourceType: "atlas_gateway_api_key",
@@ -1187,7 +1187,7 @@ export class AtlasRouter {
     );
   }
 
-  @Put("models/:modelId")
+  @Patch("models/:modelId")
   updateModel(
     @Req() req: Request & RequestContext,
     @Param("modelId") modelId: string,
@@ -1197,7 +1197,7 @@ export class AtlasRouter {
     return this.writeThrough<AiModelRecord>(
       req,
       `/capability/models/${encodeURIComponent(modelId)}`,
-      { method: "PUT", body },
+      { method: "PATCH", body },
       (r) => ({
         action: "atlas.model.update",
         resourceType: "atlas_model",
@@ -1388,7 +1388,7 @@ export class AtlasRouter {
 
   /** `productCode`/`endpointCode` 不可变——改指向 = 撤销 + 新建，两个决定都要留在
    *  流水里。这里能改的只有应用范围、理由、到期与启停。 */
-  @Put("product-grants/:productGrantId")
+  @Patch("product-grants/:productGrantId")
   updateProductGrant(
     @Req() req: Request & RequestContext,
     @Param("productGrantId") productGrantId: string,
@@ -1398,7 +1398,7 @@ export class AtlasRouter {
     return this.writeThrough<ProductGrantRecord>(
       req,
       `/capability/product-grants/${encodeURIComponent(productGrantId)}`,
-      { method: "PUT", body },
+      { method: "PATCH", body },
       (r) => ({
         action: "atlas.product_grant.update",
         resourceType: "atlas_product_grant",
@@ -1536,9 +1536,9 @@ export class AtlasRouter {
   @Get("audit-logs")
   listAtlasAuditLogs(
     @Req() req: Request & RequestContext,
-    @Query("resourceType") resourceType?: string,
-    @Query("resourceId") resourceId?: string,
-    @Query("operatorSub") operatorSub?: string,
+    @Query("objectType") objectType?: string,
+    @Query("objectId") objectId?: string,
+    @Query("actorId") actorId?: string,
     @Query("action") action?: string,
     @Query("outcome") outcome?: string,
     @Query("from") from?: string,
@@ -1548,9 +1548,11 @@ export class AtlasRouter {
   ): Promise<AtlasChangeRecordPage> {
     assertCanManageModels(req);
     const params = new URLSearchParams();
-    if (resourceType) params.set("resourceType", resourceType);
-    if (resourceId) params.set("resourceId", resourceId);
-    if (operatorSub) params.set("operatorSub", operatorSub);
+    /* 参数名走 X-3 词表。Atlas 部署 #215 后**拒收**旧名（`operatorSub` 会被 400 并
+       在 message 里点名），所以这里不能留旧名兜底——留着只会把一次筛选变成一次报错。 */
+    if (objectType) params.set("objectType", objectType);
+    if (objectId) params.set("objectId", objectId);
+    if (actorId) params.set("actorId", actorId);
     if (action) params.set("action", action);
     if (outcome) params.set("outcome", outcome);
     if (from) params.set("from", from);

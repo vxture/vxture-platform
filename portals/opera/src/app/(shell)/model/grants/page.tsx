@@ -355,7 +355,7 @@ function ProductGrantsPageContent() {
     setSubmitting(true);
     try {
       /* productCode / endpointCode 不进 body：它们不可变，送过去也只会被忽略。 */
-      await api.put(`/api/atlas/product-grants/${dialog.row.id}`, scope);
+      await api.patch(`/api/atlas/product-grants/${dialog.row.id}`, scope);
       toast({ tone: "success", title: "授权已保存" });
       setDialog(null);
       await reload();

@@ -68,7 +68,7 @@ const MANAGE = "model:model.manage";
  * 字段名对齐 product_251 X-3（atlas#204 已合并 #215）。
  *
  * **上游两代都保证有这些名字**：新 atlas 直接返回，旧 atlas 由 opera-bff 的
- * `atlas-compat.ts` 从 `id`/`operatorSub`/`actorClientId`/`resourceType`/`resourceId`
+ * `atlas-compat.ts` 从 `id`/`operatorSub`/`actorClientId`/`objectType`/`resourceId`
  * 补出来——所以这里只读新名，不写 `??` 兜底。
  */
 interface AtlasChangeRecord {
@@ -138,7 +138,7 @@ export function AtlasChangeTable() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [outcome, setOutcome] = useState("all");
-  const [resourceType, setResourceType] = useState("all");
+  const [objectType, setObjectType] = useState("all");
   const [selected, setSelected] = useState<readonly string[]>([]);
 
   /* 结果与资源类型下推给上游，关键词在本地筛：上游没有全文检索入参，把关键词
@@ -147,11 +147,11 @@ export function AtlasChangeTable() {
     (next?: string) => {
       const p = new URLSearchParams({ limit: "100" });
       if (outcome !== "all") p.set("outcome", outcome);
-      if (resourceType !== "all") p.set("resourceType", resourceType);
+      if (objectType !== "all") p.set("objectType", objectType);
       if (next) p.set("cursor", next);
       return `/api/atlas/audit-logs?${p.toString()}`;
     },
-    [outcome, resourceType],
+    [outcome, objectType],
   );
 
   const reload = useCallback(async () => {
@@ -201,7 +201,7 @@ export function AtlasChangeTable() {
     }
   };
 
-  const resourceTypes = useMemo(
+  const objectTypes = useMemo(
     () => Array.from(new Set(rows.map((r) => r.objectType))).sort(),
     [rows],
   );
@@ -321,12 +321,12 @@ export function AtlasChangeTable() {
         </InputGroup>
         <NativeSelect
           wrapperClassName="w-fit"
-          value={resourceType}
-          onChange={(e) => setResourceType(e.target.value)}
+          value={objectType}
+          onChange={(e) => setObjectType(e.target.value)}
           aria-label="资源类型筛选"
         >
           <option value="all">全部资源</option>
-          {resourceTypes.map((t) => (
+          {objectTypes.map((t) => (
             <option key={t} value={t}>
               {t}
             </option>
