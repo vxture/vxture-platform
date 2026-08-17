@@ -19,7 +19,7 @@ import {
   AuthTabs,
   AuthTurnstile,
   type AuthLoginTab,
-} from "@vxture/design-system";
+} from "./auth/AuthLogin";
 import {
   ACCOUNTS_AUTH_VISUAL,
   AccountsAuthFooter,

@@ -10,14 +10,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Banner, Button } from "@vxture/design-system";
 import {
   AuthField,
   AuthLoginTemplate,
   AuthPrimaryButton,
   AuthResultPanel,
-  Banner,
-  Button,
-} from "@vxture/design-system";
+} from "./auth/AuthLogin";
 import { AccountsAuthFooter, AccountsAuthHeader } from "./AuthChrome";
 import { resetOperatorPassword } from "@/api/oidc";
 

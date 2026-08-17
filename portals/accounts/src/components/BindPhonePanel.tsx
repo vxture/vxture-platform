@@ -14,7 +14,7 @@ import {
   AuthLoginTemplate,
   AuthPhoneLoginPanel,
   AuthTurnstile,
-} from "@vxture/design-system";
+} from "./auth/AuthLogin";
 import { AccountsAuthFooter, AccountsAuthHeader } from "./AuthChrome";
 import { bindOAuthPhone, sendPhoneCode } from "@/api/oidc";
 

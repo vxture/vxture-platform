@@ -1,8 +1,19 @@
 /**
  * AuthLogin.tsx - 认证形态组件族（统一登录页、密码/验证码/找回面板、三方登录、chrome）。
- * @package @vxture/design-system
+ * @package @vxture/accounts
  * @layer Presentation
  * @category Components - Auth
+ *
+ * ── 为什么在 accounts 而不在 design-system（owner 2026-08-18 判）─────────────
+ * DS 只收**通用、无业务含义**的件。这一族说的全是登录 / 绑定 / 找回 / MFA——
+ * 认证业务的页面语汇，不是设计系统的原语；它由 DS 的原语（Card / Input /
+ * Button / Shell* / Banner）**组合**而成，组合的知识属于拥有认证面的应用，
+ * 即 accounts。原先放在 DS 里的代价已经付过一次：DS 被迫携带品牌资产路径、
+ * 杜撰的运营指标、Turnstile 依赖——全是业务作答，DS 不该替业务答。
+ *
+ * 其余门户不 import 这里（门户间禁互引）：console 首次补齐、website 的
+ * set-nickname 各自用 DS 通用件就地组装同款观感，重复的是几十行版式组合，
+ * 换来的是层的干净。
  *
  * T2 重写（批 O）：原实现整份挂 .vx-auth-* 遗留类名，随 155 个遗留样式文件退役后
  * 完全无样式。重写原则：
@@ -29,14 +40,6 @@ import {
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { DEFAULT_LOCALE, type Locale, type Theme } from "@vxture/shared";
 import {
-  ShellBrand,
-  ShellLegalFooter,
-  ShellLocaleSwitcher,
-  ShellThemeToggle,
-  type LocaleSelectOption,
-  type ShellLegalFooterLink,
-} from "../shell";
-import {
   Banner,
   Button,
   Card,
@@ -45,12 +48,18 @@ import {
   Input,
   Label,
   Separator,
+  ShellBrand,
+  ShellLegalFooter,
+  ShellLocaleSwitcher,
+  ShellThemeToggle,
   Tabs,
   TabsList,
   TabsTrigger,
   cn,
-} from "@vxture/design-ui";
-import type { IconName } from "@vxture/design-ui";
+  type IconName,
+  type LocaleSelectOption,
+  type ShellLegalFooterLink,
+} from "@vxture/design-system";
 
 export type AuthLoginScreen = "login" | "phone" | "forgot";
 export type AuthLoginTab = Exclude<AuthLoginScreen, "forgot">;
@@ -282,7 +291,7 @@ export interface AuthLoginTemplateProps extends Omit<
   children: ReactNode;
 }
 
-export interface AuthLoginOptionOverrides extends Pick<
+export type AuthLoginOptionOverrides = Pick<
   AuthLoginOptionsProps,
   | "rememberLabel"
   | "agreementPrefix"
@@ -296,7 +305,7 @@ export interface AuthLoginOptionOverrides extends Pick<
   | "forgetMeLabel"
   | "forgetMeTitle"
   | "showRemember"
-> {}
+>;
 
 export interface AuthPasswordLoginPanelProps {
   tabs?: ReactNode;
@@ -770,8 +779,11 @@ export function AuthTurnstile({
       return undefined;
     }
 
+    // 清理时要摘除的是**挂载这轮**的 widget 实例；直接在 cleanup 里读
+    // widgetRef.current，读到的可能已是下一轮的实例（react-hooks 规则）。
+    const widget = widgetRef;
     return () => {
-      widgetRef.current?.remove();
+      widget.current?.remove();
     };
   }, [siteKey]);
 
@@ -1627,6 +1639,9 @@ export function BrandProviderIcon({
   src?: string | undefined;
 }>) {
   return (
+    // 20px 的三方品牌小图标（本地 public 静态 SVG）——next/image 的优化管线
+    // 对它没有收益，只有开销。
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       className="size-icon-md shrink-0"
       src={src ?? DEFAULT_SOCIAL_ICON_SRC[provider]}

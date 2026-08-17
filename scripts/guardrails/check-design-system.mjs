@@ -157,10 +157,7 @@ const IMPORT_ONLY_STYLE_ENTRIES = new Map([
   [normalize("agent-studio/varda/src/app/globals.css"), "Varda globals.css"],
   [normalize("agent-studio/varda/src/styles/varda-chat.css"), "Varda chat.css"],
   [normalize("agent-studio/varda/src/styles/varda-tool.css"), "Varda tool.css"],
-  [
-    normalize("packages/design/design-system/src/styles/auth.css"),
-    "DS auth.css",
-  ],
+  // auth.css 已删（2026-08-18）：认证样式归业务层，DS 不收业务含义的入口。
   [
     normalize("packages/design/design-system/src/styles/globals.css"),
     "DS globals.css",

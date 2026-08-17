@@ -14,7 +14,7 @@ import { useState, type FormEvent } from "react";
 import {
   AuthForgotPasswordPanel,
   AuthLoginTemplate,
-} from "@vxture/design-system";
+} from "@/components/auth/AuthLogin";
 import {
   AccountsAuthFooter,
   AccountsAuthHeader,

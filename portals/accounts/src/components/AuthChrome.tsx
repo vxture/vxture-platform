@@ -30,7 +30,7 @@ import {
   AuthResultPanel,
   type AuthResultTone,
   type AuthVisualConfig,
-} from "@vxture/design-system";
+} from "./auth/AuthLogin";
 
 // 页眉字标缺省 Vxture Studio（owner 2026-08-18 判），调用方可传别的
 //（比如按 OIDC client 展示接入方名称）。

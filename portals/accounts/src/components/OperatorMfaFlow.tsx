@@ -14,14 +14,13 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { Banner, Button } from "@vxture/design-system";
 import {
   AuthField,
   AuthFlowForm,
   AuthLoginTemplate,
   AuthPrimaryButton,
-  Banner,
-  Button,
-} from "@vxture/design-system";
+} from "./auth/AuthLogin";
 import { AccountsAuthFooter, AccountsAuthHeader } from "./AuthChrome";
 import {
   beginOperatorTotpEnroll,

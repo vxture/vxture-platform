@@ -2,9 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import {
-  AuthChromeFooter,
-  AuthChromeHeader,
-  AuthLoginTemplate,
   Banner,
   Button,
   Field,
@@ -15,6 +12,7 @@ import {
   Icon,
   Input,
 } from "@vxture/design-system";
+import { OnboardingChrome } from "./OnboardingChrome";
 import { useTranslations } from "next-intl";
 import {
   ConsoleBffError,
@@ -69,7 +67,8 @@ interface FieldErrors {
  *    opera 的设置页做的明确取舍（与列表页同宽）。取舍本身不动，但四个字段的
  *    首跑表单不该跟着横跨整个控制台。
  * 3. **和上一屏两套观感。** 它紧接在 accounts 的登录卡之后出现，中间只隔一次
- *    跳转。现在共用同一个 `AuthLoginTemplate`（单栏档）。
+ *    跳转。现在用本地 `OnboardingChrome` 组装同款单栏卡（认证族归 accounts，
+ *    门户间禁互引，几十行版式组合就地重复）。
  *
  * 手机号改成**只读事实**而不是 `disabled` 的输入框：那一格没有东西可输入，
  * 它是上一步已经验过的结论。长得像输入框却点不动，只会让人以为坏了。
@@ -131,29 +130,16 @@ export function OnboardingPage() {
   }
 
   return (
-    <AuthLoginTemplate
-      // 页眉 = logo + 名称（与 accounts 认证面同规，缺省 Vxture Studio）。
-      header={
-        <AuthChromeHeader
-          brandLogoSrc="/brand/vxture-logo-icon.svg"
-          brandLabel={t("brand")}
-          brandHref="/"
-        />
-      }
-      // 本地展示时抓到的漏网：页脚不传参会吃到 DS 的「© 2026 Brand.」占位——
-      // 和 accounts 修掉的是同一处坑。法务链接同理指向门户站绝对地址
-      //（console 自己没有 /legal 路由）。
-      footer={
-        <AuthChromeFooter
-          // 版权主体是权利人 Vxture Studio，不是页眉字标（与 accounts 同规）。
-          copyright={`© ${new Date().getFullYear()} Vxture Studio. All rights reserved.`}
-          links={LEGAL_LINKS}
-        />
-      }
-      layout="single"
+    // 单栏认证版式由本地 OnboardingChrome 组装（认证族已随 owner 判迁出 DS，
+    // 归 accounts；门户间禁互引）。页眉 logo + 名称、页脚署 Vxture Studio +
+    // 门户站法务链接，均与 accounts 认证面同规。
+    <OnboardingChrome
+      brandLogoSrc="/brand/vxture-logo-icon.svg"
+      brandLabel={t("brand")}
+      copyright={`© ${new Date().getFullYear()} Vxture Studio. All rights reserved.`}
+      legalLinks={LEGAL_LINKS}
       title={t("title")}
       description={t("description")}
-      useLoginLayout
     >
       <form
         className="flex flex-col gap-lg"
@@ -248,6 +234,6 @@ export function OnboardingPage() {
           {submitting ? t("actions.submitting") : t("actions.submit")}
         </Button>
       </form>
-    </AuthLoginTemplate>
+    </OnboardingChrome>
   );
 }
