@@ -27,6 +27,17 @@ import { useRouter } from "@/lib/i18n/navigation";
 const ACCOUNT_RE = /^[A-Za-z][A-Za-z0-9_]{2,23}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// 法务页在门户站，console 自己没有 /legal 路由——相对路径在这里全是 404。
+const WEBSITE_URL = (process.env.NEXT_PUBLIC_WEBSITE_URL ?? "").replace(
+  /\/+$/,
+  "",
+);
+const LEGAL_LINKS = [
+  { href: `${WEBSITE_URL}/legal/terms`, label: "服务条款" },
+  { href: `${WEBSITE_URL}/legal/privacy`, label: "隐私政策" },
+  { href: `${WEBSITE_URL}/legal/cookies`, label: "Cookie 使用政策" },
+];
+
 function normalizeOptional(value: string) {
   const normalized = value.trim();
   return normalized || null;
@@ -122,7 +133,15 @@ export function OnboardingPage() {
   return (
     <AuthLoginTemplate
       header={<AuthChromeHeader brandLabel={t("brand")} brandHref="/" />}
-      footer={<AuthChromeFooter />}
+      // 本地展示时抓到的漏网：页脚不传参会吃到 DS 的「© 2026 Brand.」占位——
+      // 和 accounts 修掉的是同一处坑。法务链接同理指向门户站绝对地址
+      //（console 自己没有 /legal 路由）。
+      footer={
+        <AuthChromeFooter
+          copyright={`© ${new Date().getFullYear()} ${t("brand")}. All rights reserved.`}
+          links={LEGAL_LINKS}
+        />
+      }
       layout="single"
       title={t("title")}
       description={t("description")}
