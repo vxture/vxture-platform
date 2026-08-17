@@ -28,24 +28,26 @@
  */
 
 import {
-  BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Inject,
-  NotFoundException,
   Param,
-  Patch,
   Post,
   Query,
   Req,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { hash, genSalt } from "bcryptjs";
 import { randomBytes } from "node:crypto";
 import type { Request } from "express";
 import type { Pool } from "pg";
+import {
+  conflict,
+  invalidRequest,
+  notEntitled,
+  notFound,
+  unauthenticated,
+} from "../errors/api-error";
 import { OPERA_BFF_RW_POOL } from "../tokens";
 import type { RequestContext } from "../types/request-context";
 
@@ -54,8 +56,15 @@ const BCRYPT_COST = 10;
 
 const RELEASE_CHANNELS = ["stable", "beta", "canary"] as const;
 type ReleaseChannel = (typeof RELEASE_CHANNELS)[number];
-const CLIENT_STATUSES = ["active", "disabled"] as const;
-type ClientStatus = (typeof CLIENT_STATUSES)[number];
+/**
+ * product_251 B-3：「算不算数」统一叫 `state`，最小词表 `active` / `inactive`。
+ *
+ * 原来是 `status` + `disabled`——`disabled` 不是对最小词表的扩展，是同一个概念
+ * 的第三种拼法。这里连库里的值一起换（`22_appoidc.sql` 的 CHECK 与 seed 同步
+ * 改），不做接口层翻译：留一层 `inactive ⇄ disabled` 的映射，等于让每个读库的
+ * 人都要记住两套词。
+ */
+type ClientState = "active" | "inactive";
 
 const DEFAULT_SCOPES = ["openid", "profile", "email", "phone"];
 
@@ -71,7 +80,7 @@ export interface OidcClientRecord {
   redirectUris: string[];
   allowedScopes: string[];
   pkceRequired: boolean;
-  status: ClientStatus;
+  state: ClientState;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,7 +96,7 @@ interface ClientRow {
   redirect_uris: string[];
   allowed_scopes: string[];
   pkce_required: boolean;
-  status: ClientStatus;
+  status: ClientState;
   created_at: string;
   updated_at: string;
 }
@@ -112,7 +121,7 @@ function toRecord(row: ClientRow): OidcClientRecord {
     redirectUris: row.redirect_uris,
     allowedScopes: row.allowed_scopes,
     pkceRequired: row.pkce_required,
-    status: row.status,
+    state: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -196,7 +205,10 @@ export class OidcClientRouter {
       row = { ...result.rows[0]!, product_code: null };
     } catch (error) {
       if (isUniqueViolation(error)) {
-        throw new BadRequestException(
+        /* 唯一约束撞了——是"这个值被别人占了"，不是"这个值写得不对"。409 让
+           控制台可以直接提示改名，而不是让人去逐字检查格式。 */
+        throw conflict(
+          "OIDC_CLIENT_ID_TAKEN",
           `client_id "${body.clientId}" already exists`,
         );
       }
@@ -227,26 +239,40 @@ export class OidcClientRouter {
       [secretHash, clientId],
     );
     if (!result.rows[0]) {
-      throw new NotFoundException("Client not found");
+      throw notFound("OIDC_CLIENT_NOT_FOUND", "Client not found");
     }
     return { clientId, clientSecret: secret };
   }
 
-  @Patch(":clientId/status")
-  async setStatus(
+  /**
+   * 二元开关走动作端点，不走「把目标值 PATCH 进去」（product_251 B-3）。
+   *
+   * 两者的差别不是风格：`PATCH :id/state {state}` 要求调用方知道合法值有哪些、
+   * 并且自己拼对；而这是个只有两个位置的开关，能拼错的只有拼写本身。动作端点
+   * 让「停用一个客户端」在审计里也是一个动词，而不是一次通用更新。
+   */
+  @Post(":clientId/activate")
+  async activate(
     @Req() req: Request & RequestContext,
     @Param("clientId") clientId: string,
-    @Body() body: { status?: string },
+  ): Promise<OidcClientRecord> {
+    return this.setState(req, clientId, "active");
+  }
+
+  @Post(":clientId/deactivate")
+  async deactivate(
+    @Req() req: Request & RequestContext,
+    @Param("clientId") clientId: string,
+  ): Promise<OidcClientRecord> {
+    return this.setState(req, clientId, "inactive");
+  }
+
+  private async setState(
+    req: Request & RequestContext,
+    clientId: string,
+    next: ClientState,
   ): Promise<OidcClientRecord> {
     assertCanManage(req);
-    if (
-      !body.status ||
-      !(CLIENT_STATUSES as readonly string[]).includes(body.status)
-    ) {
-      throw new BadRequestException(
-        `status must be one of ${CLIENT_STATUSES.join(", ")}`,
-      );
-    }
     const result = await this.pool.query<ClientRow>(
       `UPDATE appoidc.oidc_clients c
           SET status = $1, updated_at = now()
@@ -254,10 +280,10 @@ export class OidcClientRouter {
         RETURNING c.id, c.client_id, c.product_id, c.release_channel, c.name,
                   c.display_name, c.redirect_uris, c.allowed_scopes,
                   c.pkce_required, c.status, c.created_at, c.updated_at`,
-      [body.status, clientId],
+      [next, clientId],
     );
     if (!result.rows[0]) {
-      throw new NotFoundException("Client not found");
+      throw notFound("OIDC_CLIENT_NOT_FOUND", "Client not found");
     }
     const productCode = await this.resolveProductCode(
       result.rows[0].product_id,
@@ -279,41 +305,61 @@ export class OidcClientRouter {
 
 function assertCanManage(req: Request & RequestContext): void {
   if (!req.operator) {
-    throw new UnauthorizedException("No active session");
+    throw unauthenticated("AUTH_NO_SESSION", "No active session");
   }
   if (!req.capabilities?.includes(PRODUCT_MANAGE)) {
-    throw new ForbiddenException(`Missing ${PRODUCT_MANAGE} capability`);
+    throw notEntitled(PRODUCT_MANAGE);
   }
 }
 
 function validateCreate(body: CreateClientBody): void {
   if (!body.productId?.trim()) {
-    throw new BadRequestException("productId is required");
+    throw invalidRequest(
+      "VALIDATION_REQUIRED",
+      "productId is required",
+      "productId",
+    );
   }
   if (!body.clientId?.trim()) {
-    throw new BadRequestException("clientId is required");
+    throw invalidRequest(
+      "VALIDATION_REQUIRED",
+      "clientId is required",
+      "clientId",
+    );
   }
   if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(body.clientId.trim())) {
-    throw new BadRequestException(
+    throw invalidRequest(
+      "VALIDATION_INVALID_VALUE",
       "clientId must be lowercase kebab (e.g. acme-agent, acme-agent-beta)",
+      "clientId",
     );
   }
   if (!body.redirectUris || body.redirectUris.length === 0) {
-    throw new BadRequestException("at least one redirectUri is required");
+    throw invalidRequest(
+      "VALIDATION_REQUIRED",
+      "at least one redirectUri is required",
+      "redirectUris",
+    );
   }
   for (const uri of body.redirectUris) {
     try {
       new URL(uri);
     } catch {
-      throw new BadRequestException(`invalid redirectUri: ${uri}`);
+      throw invalidRequest(
+        "VALIDATION_INVALID_URL",
+        `invalid redirectUri: ${uri}`,
+        "redirectUris",
+      );
     }
   }
   if (
     body.releaseChannel &&
     !(RELEASE_CHANNELS as readonly string[]).includes(body.releaseChannel)
   ) {
-    throw new BadRequestException(
+    throw invalidRequest(
+      "VALIDATION_INVALID_VALUE",
       `releaseChannel must be one of ${RELEASE_CHANNELS.join(", ")}`,
+      "releaseChannel",
     );
   }
 }

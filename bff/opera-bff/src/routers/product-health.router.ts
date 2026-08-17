@@ -10,7 +10,8 @@
  * P4「service-monitor 生产遥测源（Q6 维持 dev-only）」，之前两次迁移都刻意跳过它
  * （49d60f2 的原话："moving it would relocate emptiness"）。这次换了数据源和语义：
  * 探的不是平台自己的门户/BFF，是**接入平台的产品线**——每个产品的 prod 与 beta 是否
- * 存活，owner 口径（2026-08-11）定的范围。
+ * 存活（owner 口径 2026-08-11，已建档：
+ * `docs/20-specs/000-platform/opera/20-service-monitor.md` §2）。
  *
  * 数据源单一权威 = appoidc.oidc_clients LEFT JOIN product.products，不是另起一份
  * 硬编码清单：origin 就是各产品登记的 OIDC 回调地址去掉路径，与 seed 侧同一份数据
@@ -27,8 +28,9 @@
  *   arda/karda —— 两个独立 client_id（如 `arda` / `arda-beta`），后者
  *   release_channel='beta'。
  *
- * 每个 origin 探两类端点（025 标准 §2，owner 2026-08-11 口径"health、status"对应的
- * 就是这两个）：
+ * 每个 origin 探两类端点——**划分与路径约定归 025 标准 §2**，不在这里另立规矩；
+ * owner 口径说的"health、status"指的就是这两类（对应 UI 的存活/就绪两列，不是要求
+ * 产品必须用 /status 这个路径名）。详见 20-service-monitor.md §3：
  *   health＝liveness——只证明进程在听，不代表能否对外服务。
  *   status＝readiness——依赖项是否就绪，能否真正服务；返回 `checks` 明细。
  * 025 标准把 readiness 列为可选，目前全仓零产品真正接上，所以 status 列大概率显示
@@ -41,13 +43,8 @@
  * admin 原页面从未挂过权限码，迁移不新增门槛，只要求已登录 operator。
  */
 
-import {
-  Controller,
-  Get,
-  Inject,
-  Req,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Controller, Get, Inject, Req } from "@nestjs/common";
+import { unauthenticated } from "../errors/api-error";
 import type { Request } from "express";
 import type { Pool } from "pg";
 import { OPERA_BFF_RO_POOL } from "../tokens";
@@ -207,7 +204,7 @@ export class ProductHealthRouter {
     // 无独立能力码可挂（见文件头），只要求会话存在——中间件已经在 /api/* 上挡过
     // 一轮，这里是纵深防御而非唯一防线。
     if (!req.operator) {
-      throw new UnauthorizedException("No active session");
+      throw unauthenticated("AUTH_NO_SESSION", "No active session");
     }
 
     const { rows } = await this.pool.query<OidcClientRow>(

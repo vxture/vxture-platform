@@ -35,13 +35,8 @@
  * 三个一起补，而不是各自埋一个不一致的临时判断）。
  */
 
-import {
-  Controller,
-  Get,
-  Inject,
-  Req,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Controller, Get, Inject, Req } from "@nestjs/common";
+import { unauthenticated } from "../errors/api-error";
 import type { Request } from "express";
 import type { Pool } from "pg";
 import { OPERA_BFF_RO_POOL } from "../tokens";
@@ -151,7 +146,7 @@ export class JobSchedulerRouter {
     @Req() req: Request & RequestContext,
   ): Promise<JobSchedulerSnapshot> {
     if (!req.operator) {
-      throw new UnauthorizedException("No active session");
+      throw unauthenticated("AUTH_NO_SESSION", "No active session");
     }
 
     const [jobRows, countRows, issueRows] = await Promise.all([
