@@ -513,13 +513,19 @@ export function UnifiedAuthPage({
           )}
         >
           {single ? null : <AuthVisualPanel visual={visual} />}
-          {/* 表单列定宽，视觉面板吃掉剩下的。两列都 `flex-1` 时表单宽度会随卡
-              一起变，行长跟着屏幕走；登录表单的行长应当是个常数。窄屏下视觉
-              面板 `hidden`，这一列 `w-full` 吃满。 */}
+          {/* 两列等宽（owner 2026-08-18 判，推翻此前的"表单列定宽"）：两半都
+              锁 `w-1/2` 而不是各给 `flex-1`——理论上 1 1 0% 该平分，实测差了
+              16px（内容的自动最小尺寸参与了分配），百分比宽度没有这层歧义。
+              原先担心的"行长随屏幕走"不成立：卡自身有 max-w 封顶，lg 起两半
+              就是常数。表单列内边距同步放大（原 p-xl 的 32px 贴边，拥挤）：
+              竖向 2xl、两侧 3xl，内容行长约 415px，与定宽方案相当，但呼吸感
+              回来了。窄屏下视觉面板 `hidden`，这一列 `w-full` 吃满、退回 p-xl。 */}
           <div
             className={cn(
-              "flex min-w-0 flex-col justify-center gap-lg p-xl",
-              single ? "flex-1" : "w-full shrink-0 lg:w-panel-sm",
+              "flex min-w-0 flex-col justify-center gap-lg",
+              single
+                ? "flex-1 p-xl"
+                : "w-full p-xl lg:w-1/2 lg:shrink-0 lg:px-3xl lg:py-2xl",
             )}
           >
             {children}
@@ -1658,7 +1664,8 @@ function AuthVisualPanel({
         // `justify-between` 时它一旦缺席，剩下的那一块文案就会从底部弹到顶部，
         // 整个面板的重心跟着换一个位置。改成"文案永远压底、状态行用 mb-auto
         // 自己顶上去"，在有无状态行两种情况下版面是同一个。
-        "relative hidden flex-1 flex-col justify-end gap-xl overflow-hidden",
+        // `w-1/2 shrink-0`：与表单列各占一半（见表单列注释，owner 判等宽）。
+        "relative hidden w-1/2 shrink-0 flex-col justify-end gap-xl overflow-hidden",
         "bg-gradient-to-br from-primary to-primary-active bg-cover bg-center",
         "p-2xl text-primary-foreground lg:flex",
       )}
