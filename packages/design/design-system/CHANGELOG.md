@@ -19,6 +19,15 @@ admin → DS 收敛批次。major 号在批次开启时已定（删除公开导�
 
 ### ✨ 新增
 
+- **`ShellNavItem.subLabel?`**——导航项副名，渲染成主名下方一行小字（收起态两行都不
+  显）。为中文主名 + 英文代号的双语菜单而加：此前只有单行 `label`，双语要么挤在一行
+  括号里、要么只能二选一。**纯增量**——不传时行高与渲染与旧版逐像素一致（`NavItemRow`
+  由 `h-control-xl` 改成 `min-h-control-xl`，单行项不受影响），副名在选中态不跟随高亮。
+- **`ShellNavSection.brandPosition?`**（`"prefix" | "suffix" | "none"`，缺省
+  `"prefix"`）——分组标题里产品代号的染色位置。原 `splitBrandTitle` 只认前缀，
+  `模型管理 · Atlas` 这类后置写法会把中文主名当成代号染掉。**不做启发式判断**（"哪段
+  像代号"在 `安全审计 · RBAC` 上必然误判），由调用方显式声明；`"none"` 表示整条标题
+  不分段。类型同为可选，五个消费方门户不传即旧行为。
 - **公开入口** `./styles/admin-tokens.css`（admin 遗留 token 桥，收敛期间的过渡资产）
   与 `./styles/workbench.css`。
 - **组件** `MetricListCard`、`PanelCard` / `PanelItem` / `PanelList`、`FactList` /
