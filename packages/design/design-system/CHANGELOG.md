@@ -30,6 +30,16 @@ admin → DS 收敛批次。major 号在批次开启时已定（删除公开导�
   不分段。类型同为可选，五个消费方门户不传即旧行为。
 - **公开入口** `./styles/admin-tokens.css`（admin 遗留 token 桥，收敛期间的过渡资产）
   与 `./styles/workbench.css`。
+- **公开入口** `./styles/website-tokens.css`——website 的同类 token 桥。3d5ef7c 退役
+  legacy token 层时 admin 补了桥、website 没有，于是营销页两处同时失效：68 个
+  `--vx-website-*` 版面刻度随 `tokens-website.css` 一起删除（`min-height` /
+  `grid-template-columns` / `padding` 全部 invalid at computed-value time，栅格塌成
+  单列），且 `--color-vx-*` 命名空间的 `@theme` 注册被删，源码里 975 处 `text-vx-*` /
+  `bg-vx-*` 共 123 个类名一个都不再产出 CSS。两类失效都不报错。桥恢复这批取值，但
+  **不复刻 legacy 色值**：数值色阶挂 T1 对应色族（gray→neutral、error→red、
+  success→emerald、warning→amber、info→sky），角色型挂 T2 语义槽，故这批第一次
+  跟随暗色模式。与 admin 桥同样是过渡资产，逐族换成 T2 类名后即可缩小消失。
+- **公开入口** `./styles/fonts.css`（dd8eea5 自托管字体时引入，此前漏登记）。
 - **组件** `MetricListCard`、`PanelCard` / `PanelItem` / `PanelList`、`FactList` /
   `LabeledValue`、`LevelMarker`——均从 admin 的重复实现里提炼。
 - **浮层宽度梯** `OVERLAY_WIDTHS` 与 `overlayWidthClass` / `overlayMinWidthClass`。

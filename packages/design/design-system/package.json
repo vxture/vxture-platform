@@ -25,6 +25,7 @@
     "./styles/globals.css": "./src/styles/globals.css",
     "./styles/shell-template-user-panel.css": "./assets/shell-template-user-panel.css",
     "./styles/shell-template.css": "./assets/shell-template.css",
+    "./styles/website-tokens.css": "./assets/website-tokens.css",
     "./styles/workbench.css": "./src/styles/workbench.css",
     "./tokens": {
       "types": "./dist/tokens.d.ts",
