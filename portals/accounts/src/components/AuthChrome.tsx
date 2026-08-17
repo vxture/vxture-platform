@@ -33,6 +33,8 @@ import {
 } from "@vxture/design-system";
 
 export const AUTH_BRAND_LABEL = "Vxture";
+// 版权主体与页眉字标是两回事：字标是产品名，署名是权利人（owner 2026-08-18 判）。
+export const AUTH_COPYRIGHT_OWNER = "Vxture Studio";
 
 // 门户站地址。构建期注入（见 next.config.js 的 env 直通）；缺失时退化成相对
 // 路径——那是 404，但至少不会拼出一个 `undefined/legal/terms` 的坏链接。
@@ -57,7 +59,7 @@ export function AccountsAuthHeader() {
 export function AccountsAuthFooter() {
   return (
     <AuthChromeFooter
-      copyright={`© ${new Date().getFullYear()} ${AUTH_BRAND_LABEL}. All rights reserved.`}
+      copyright={`© ${new Date().getFullYear()} ${AUTH_COPYRIGHT_OWNER}. All rights reserved.`}
       links={[
         { href: websiteHref("/legal/terms"), label: "服务条款" },
         { href: websiteHref("/legal/privacy"), label: "隐私政策" },

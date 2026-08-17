@@ -138,7 +138,8 @@ export function OnboardingPage() {
       //（console 自己没有 /legal 路由）。
       footer={
         <AuthChromeFooter
-          copyright={`© ${new Date().getFullYear()} ${t("brand")}. All rights reserved.`}
+          // 版权主体是权利人 Vxture Studio，不是页眉字标（与 accounts 同规）。
+          copyright={`© ${new Date().getFullYear()} Vxture Studio. All rights reserved.`}
           links={LEGAL_LINKS}
         />
       }
