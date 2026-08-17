@@ -15,14 +15,8 @@
  * product-health.router.ts / job-scheduler.router.ts 同一口径（见后者文件头
  * "没有专属能力码就不额外设卡"）。
  */
-import {
-  Controller,
-  Get,
-  Inject,
-  Query,
-  Req,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Controller, Get, Inject, Query, Req } from "@nestjs/common";
+import { unauthenticated } from "../errors/api-error";
 import type { Request } from "express";
 import type { Pool } from "pg";
 import { OPERA_BFF_RO_POOL } from "../tokens";
@@ -32,15 +26,29 @@ import { toIso } from "./router.shared";
 const DEFAULT_LIMIT = 200;
 const MAX_LIMIT = 500;
 
+/**
+ * 字段名取自 product_251 X-3 的统一审计记录，**不是本仓自选的**：
+ * `eventId · occurredAt · actorId · actorConsole · objectType · objectId ·
+ * action · outcome`。
+ *
+ * 原来是 `id/time/actor/result/resourceType/resourceId`——审计页因此摆了三张互不
+ * 相干的表（Atlas/Runos/Platform），因为同一个概念在三家有三个名字。改名的收益不
+ * 在这一个接口好不好看，在于那三张表终于可以合成一张。
+ *
+ * `actorName` 与 `errorCode` 是 X-3 之外的附加字段——规范给的是**必须有**的下限，
+ * 不是上限；显示名让人不必拿 UUID 去查是谁。
+ */
 export interface AuditLogEntry {
-  id: string;
-  time: string;
+  eventId: string;
+  occurredAt: string;
   actorId: string;
-  actor: string;
+  /** 从哪个管理面发起。历史行没有这一列，回 null 而不是猜一个。 */
+  actorConsole: string | null;
+  actorName: string;
   action: string;
-  result: string;
-  resourceType: string;
-  resourceId: string;
+  outcome: string;
+  objectType: string;
+  objectId: string;
   errorCode: string | null;
 }
 
@@ -48,6 +56,7 @@ interface AuditLogRow {
   id: string;
   created_at: Date | string;
   actor_id: string;
+  actor_console: string | null;
   actor_name: string | null;
   action: string;
   result: string;
@@ -66,13 +75,13 @@ export class AuditLogViewRouter {
     @Query("limit") limitParam?: string,
   ): Promise<AuditLogEntry[]> {
     if (!req.operator) {
-      throw new UnauthorizedException("No active session");
+      throw unauthenticated("AUTH_NO_SESSION", "No active session");
     }
     const limit = clampLimit(limitParam);
 
     const { rows } = await this.pool.query<AuditLogRow>(
-      `select a.id, a.created_at, a.actor_id, a.action, a.result,
-              a.resource_type, a.resource_id, a.error_code,
+      `select a.id, a.created_at, a.actor_id, a.actor_console, a.action,
+              a.result, a.resource_type, a.resource_id, a.error_code,
               coalesce(o.display_name, o.username) as actor_name
        from support.audit_logs a
        left join admin.operator_account o on o.id = a.actor_id
@@ -94,17 +103,18 @@ function clampLimit(value: string | undefined): number {
 
 function mapRow(row: AuditLogRow): AuditLogEntry {
   return {
-    id: row.id,
-    time: toIso(row.created_at),
+    eventId: row.id,
+    occurredAt: toIso(row.created_at),
     actorId: row.actor_id,
-    actor:
+    actorConsole: row.actor_console,
+    actorName:
       row.actor_name && row.actor_name.trim() !== ""
         ? row.actor_name
         : row.actor_id,
     action: row.action,
-    result: row.result,
-    resourceType: row.resource_type,
-    resourceId: row.resource_id,
+    outcome: row.result,
+    objectType: row.resource_type,
+    objectId: row.resource_id,
     errorCode: row.error_code,
   };
 }
