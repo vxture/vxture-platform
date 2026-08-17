@@ -80,6 +80,7 @@
       "AuthPhoneLoginPanel",
       "AuthPrimaryButton",
       "AuthRegisterPrompt",
+      "AuthResultPanel",
       "AuthSocialButtons",
       "AuthTabs",
       "AuthTenantSocialButtons",
