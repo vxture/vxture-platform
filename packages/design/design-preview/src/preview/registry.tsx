@@ -184,8 +184,13 @@ import {
   useToast,
 } from "@vxture/design-system";
 import {
+  AuthField,
   AuthLoginTemplate,
   AuthPasswordLoginPanel,
+  AuthPhoneLoginPanel,
+  AuthPrimaryButton,
+  AuthTabs,
+  type AuthLoginTab,
   ShellBrand,
   ShellIconButton,
   ShellLegalFooter,
@@ -2064,7 +2069,7 @@ export const ENTRIES: readonly Entry[] = [
     group: "外壳与登录",
     tags: ["vxture", "patterns"],
     deviation:
-      "批 O 重写：字段复用 Input/Label/Checkbox（移动端 16px 防缩放、失效态在原子件里），tab 走 Radix Tabs，主按钮/三方登录复用 Button，分隔走 Separator + 发丝线；登录卡走 Card 的 veil 叠层（strong 档）无阴影；视觉面板底色改语义色 primary 渐变，NodeGraph 画布颜色从自身 computed color 读取，不再依赖已退役的 auth 专属 token。这里摆的是最常用的一条组合：AuthLoginTemplate + AuthPasswordLoginPanel",
+      "批 O 重写：字段复用 Input/Label/Checkbox（移动端 16px 防缩放、失效态在原子件里），tab 走 Radix Tabs，主按钮/三方登录复用 Button，表单级错误走 Banner；登录卡走 Card 的 veil 叠层（strong 档）无阴影，分栏出血（基座的 py/gap 在此清零）、表单列定宽 panel-sm、控件统一 control-xl；视觉面板底色改语义色 primary 渐变，NodeGraph 画布颜色从自身 computed color 读取。缺省文案是中性占位——不带任何可核实的数字，指标由调用方传并自己负责。这里摆两档：split（招徕面：登录）与 single（办事面：补齐 / 绑定 / 找回）",
     render: () => <AuthLoginDemo />,
   },
   /* ── 批 S：上游目录补齐 ─────────────────────────────────── */
@@ -2594,35 +2599,95 @@ function ShellChromeDemo() {
 }
 
 function AuthLoginDemo() {
+  const [tab, setTab] = React.useState<AuthLoginTab>("phone");
   const [identifier, setIdentifier] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [code, setCode] = React.useState("");
   const [agreed, setAgreed] = React.useState(false);
+  const [account, setAccount] = React.useState("");
+
+  const tabs = (
+    <AuthTabs active={tab} onChange={setTab} order={["phone", "login"]} />
+  );
+
   return (
-    <div className="flex w-full flex-col gap-md">
-      {/* 登录卡在窄容器里也要完整可见，给一个自适应外框即可。 */}
+    <div className="flex w-full flex-col gap-2xl">
+      {/* 分栏档（招徕面）。摆的是验证码 + 密码两个 tab 的真实切换，以及表单级
+          错误——那一条原先是居中的一行红字，现在走 Banner。 */}
       <div className="w-full">
         <AuthLoginTemplate
           title="欢迎回来"
+          description="登录后进入控制台，管理你的模型、凭据与配额。"
           visual={{
-            title: "Vxture 平台",
-            description: "一个账号，贯通全部工作台。",
-            statusText: "服务正常",
-            stats: [
-              { value: "99.9%", label: "可用性" },
-              { value: "12ms", label: "中位时延" },
-            ],
+            title: "把智能装进每一件事",
+            description: "在一个工作台里编排模型、管理凭据与配额。",
           }}
         >
-          <AuthPasswordLoginPanel
-            identifier={identifier}
-            password={password}
-            agreementChecked={agreed}
-            loading={false}
-            onChangeIdentifier={setIdentifier}
-            onChangePassword={setPassword}
-            onAgreementChange={setAgreed}
+          {tab === "phone" ? (
+            <AuthPhoneLoginPanel
+              tabs={tabs}
+              phone={phone}
+              code={code}
+              agreementChecked={agreed}
+              loading={false}
+              errors={{ form: "验证码不正确或已过期，请重新获取。" }}
+              submitLabel="登录 / 注册"
+              phoneLabel="手机号 / 邮箱"
+              phonePlaceholder="请输入手机号或邮箱"
+              phoneIcon="user"
+              showForgot={false}
+              options={{ showRemember: false }}
+              onChangePhone={setPhone}
+              onChangeCode={setCode}
+              onSendCode={() => {}}
+              onAgreementChange={setAgreed}
+              onSubmit={(e) => e.preventDefault()}
+            />
+          ) : (
+            <AuthPasswordLoginPanel
+              tabs={tabs}
+              identifier={identifier}
+              password={password}
+              agreementChecked={agreed}
+              loading={false}
+              options={{ showRemember: false }}
+              onChangeIdentifier={setIdentifier}
+              onChangePassword={setPassword}
+              onAgreementChange={setAgreed}
+              onSubmit={(e) => e.preventDefault()}
+            />
+          )}
+        </AuthLoginTemplate>
+      </div>
+
+      {/* 单栏档（办事面）：首次补齐、绑手机、找回密码走这一档——它们没有招徕
+          的任务，左边一块营销色块只会把要办的事往右推半屏。 */}
+      <div className="w-full">
+        <AuthLoginTemplate
+          layout="single"
+          title="完善你的账号"
+          description="还差几步就能开始。账号名用于登录，显示名称是别人看到的你。"
+        >
+          <form
+            className="flex flex-col gap-lg"
             onSubmit={(e) => e.preventDefault()}
-          />
+          >
+            <AuthField
+              label="账号"
+              name="preview-account"
+              type="text"
+              placeholder="字母、数字、下划线，字母开头"
+              icon="user"
+              value={account}
+              onChange={setAccount}
+            />
+            <AuthPrimaryButton
+              loading={false}
+              label="完成设置"
+              loadingLabel="提交中…"
+            />
+          </form>
         </AuthLoginTemplate>
       </div>
     </div>
