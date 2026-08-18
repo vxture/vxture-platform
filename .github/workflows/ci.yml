@@ -113,7 +113,11 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: backend-build
+          # ⚠ upload-artifact 的归档根=各 path 的最近公共祖先。此前清单里有
+          # agent/varda 的根级路径,祖先=仓根;它们随拆仓删除后祖先漂到 packages/,
+          # 下载解包全部错位(2026-08-18 实翻车)。用仓根文件作锚点钉死归档根。
           path: |
+            pnpm-workspace.yaml
             packages/shared/shared/dist
             packages/core/*/dist
           retention-days: 1
