@@ -235,6 +235,7 @@
       "ShellAgentButton",
       "ShellBootScreen",
       "ShellBrand",
+      "ShellDock",
       "ShellFullscreenToggle",
       "ShellHeader",
       "ShellIconButton",
