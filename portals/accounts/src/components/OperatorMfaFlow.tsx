@@ -185,7 +185,7 @@ export function OperatorMfaFlow({
                 hint={
                   useRecovery
                     ? "使用注册时保存的一次性恢复码"
-                    : "打开验证器 App（如 Google Authenticator）查看"
+                    : "打开你绑定的验证器 App 查看"
                 }
                 onChange={setCode}
               />
