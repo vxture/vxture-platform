@@ -38,7 +38,9 @@ export function PlanSummaryCard({
     const dictKey = key.replace(/\./g, "_");
     return tFeature.has(dictKey) ? tFeature(dictKey) : key;
   };
-  const chips = plan.features.slice(0, MAX_FEATURE_CHIPS);
+  // 部署偏斜防护：门户先于 BFF 发布时旧响应没有 features 字段。
+  const features = plan.features as string[] | undefined;
+  const chips = (features ?? []).slice(0, MAX_FEATURE_CHIPS);
 
   return (
     <div className="flex flex-col gap-md rounded-xl border border-primary-muted-hover bg-linear-to-b from-gradient-card-from to-gradient-card-to p-lg">

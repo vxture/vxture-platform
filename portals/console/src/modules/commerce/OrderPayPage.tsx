@@ -15,7 +15,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatCurrency, type Locale } from "@vxture/shared";
 import { useRouter } from "@/lib/i18n/navigation";
 import {
   Banner,
@@ -70,10 +71,13 @@ const STATE_TONE: Record<OrderState, StatusBadgeTone> = {
 
 type PayChannel = "alipay" | "bank_transfer";
 
-function fmt(amount: string, currency: string): string {
-  const n = Number(amount);
-  if (!Number.isFinite(n)) return "—";
-  return `${currency === "CNY" ? "¥" : currency} ${n.toFixed(2)}`;
+/** 货币展示统一走 shared formatCurrency（110-locale-layer 指定入口）。 */
+function fmtWith(locale: Locale) {
+  return (amount: string, currency: string): string => {
+    const n = Number(amount);
+    if (!Number.isFinite(n)) return "—";
+    return formatCurrency(n, locale, currency);
+  };
 }
 
 /** 倒计时：<1h 显示 mm:ss，否则 hh:mm:ss（团队租户 48h 窗口不至于溢出）。 */
@@ -98,6 +102,7 @@ function useCountdown(deadline: string | null): string | null {
 function voucherLabel(
   v: OrderVoucherOption,
   t: ReturnType<typeof useTranslations>,
+  fmt: (amount: string, currency: string) => string,
 ): string {
   if (v.kind === "discount") {
     const off =
@@ -109,11 +114,12 @@ function voucherLabel(
           });
     return `${v.batchName} · ${off}`;
   }
-  return `${v.batchName} · ¥${Number(v.amount ?? 0).toFixed(2)}`;
+  return `${v.batchName} · ${fmt(String(v.amount ?? 0), "CNY")}`;
 }
 
 export function OrderPayPage() {
   const t = useTranslations("orderPay");
+  const fmt = fmtWith(useLocale() as Locale);
   const router = useRouter();
   const params = useParams<{ orderId: string }>();
   const orderId = params?.orderId ?? "";
@@ -484,7 +490,7 @@ export function OrderPayPage() {
                         }
                       />
                       <FieldLabel htmlFor="order-pay-discount">
-                        {voucherLabel(bestDiscount, t)}
+                        {voucherLabel(bestDiscount, t, fmt)}
                       </FieldLabel>
                     </Field>
                   ) : (
@@ -518,7 +524,7 @@ export function OrderPayPage() {
                         }
                       />
                       <FieldLabel htmlFor="order-pay-credit">
-                        {voucherLabel(bestCredit, t)}
+                        {voucherLabel(bestCredit, t, fmt)}
                       </FieldLabel>
                     </Field>
                   ) : (

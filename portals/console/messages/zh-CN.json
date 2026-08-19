@@ -1740,7 +1740,8 @@
   "workspacePicker": {
     "personal": "个人租户",
     "organization": "团队租户",
-    "defaultWorkspace": "默认工作区"
+    "defaultWorkspace": "默认工作区",
+    "switchFailed": "切换租户失败，请重试；当前归属未变更"
   },
   "planFeatures": {
     "governance_quality": "数据质量治理",
@@ -1944,6 +1945,8 @@
       "whatUpgradeNote": "当前为 {plan}，升级立即生效，剩余周期按天折算。",
       "noFeatures": "权益明细以对比表为准。",
       "pickTier": "选择档位：",
+      "tierUnavailable": "链接指定的档位当前不可订购，请在下方选择档位",
+      "alreadyCurrent": "已是当前套餐，无需重复订阅；延长周期请使用续费",
       "howLong": "订阅时长",
       "howLongHint": "买多久——年付更省",
       "yearlySave": "年付省 {amount}",

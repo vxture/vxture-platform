@@ -16,6 +16,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
+  Banner,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -83,6 +84,7 @@ export function WorkspacePicker({ onSwitched }: WorkspacePickerProps) {
   const { session } = useConsoleSession();
   const { tenantList, switchTenantContext } = useTenant();
   const [busy, setBusy] = useState(false);
+  const [switchError, setSwitchError] = useState<string | null>(null);
 
   // TenantListItem 缺工作区/可视码，按 id 回查 session 里的完整上下文。
   const detailById = useMemo(() => {
@@ -121,49 +123,54 @@ export function WorkspacePicker({ onSwitched }: WorkspacePickerProps) {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={busy}
-          className="h-auto w-full justify-start gap-md px-md py-sm text-left font-normal"
+    <div className="flex flex-col gap-sm">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            disabled={busy}
+            className="h-auto w-full justify-start gap-md px-md py-sm text-left font-normal"
+          >
+            {triggerBody}
+            <span className="shrink-0 text-muted-foreground" aria-hidden="true">
+              <Icon name={busy ? "spinner" : "chevron-down"} size="sm" />
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="w-(--radix-dropdown-menu-trigger-width)"
         >
-          {triggerBody}
-          <span className="shrink-0 text-muted-foreground" aria-hidden="true">
-            <Icon name={busy ? "spinner" : "chevron-down"} size="sm" />
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="w-(--radix-dropdown-menu-trigger-width)"
-      >
-        {options.map((tenant) => {
-          const isCurrent = tenant.id === current.id;
-          return (
-            <DropdownMenuItem
-              key={tenant.id}
-              disabled={busy}
-              onSelect={() => {
-                if (isCurrent) return;
-                setBusy(true);
-                void switchTenantContext(tenant.id)
-                  .then(() => onSwitched?.())
-                  .finally(() => setBusy(false));
-              }}
-              className="gap-md py-sm"
-            >
-              <TenantGlyph type={tenant.tenantType ?? "organization"} />
-              <TenantLine tenant={tenant} labels={labels} />
-              {isCurrent ? (
-                <span className="shrink-0 text-primary" aria-hidden="true">
-                  <Icon name="check" size="sm" />
-                </span>
-              ) : null}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          {options.map((tenant) => {
+            const isCurrent = tenant.id === current.id;
+            return (
+              <DropdownMenuItem
+                key={tenant.id}
+                disabled={busy}
+                onSelect={() => {
+                  if (isCurrent) return;
+                  setBusy(true);
+                  setSwitchError(null);
+                  void switchTenantContext(tenant.id)
+                    .then(() => onSwitched?.())
+                    .catch(() => setSwitchError(t("switchFailed")))
+                    .finally(() => setBusy(false));
+                }}
+                className="gap-md py-sm"
+              >
+                <TenantGlyph type={tenant.tenantType ?? "organization"} />
+                <TenantLine tenant={tenant} labels={labels} />
+                {isCurrent ? (
+                  <span className="shrink-0 text-primary" aria-hidden="true">
+                    <Icon name="check" size="sm" />
+                  </span>
+                ) : null}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {switchError ? <Banner tone="danger" title={switchError} /> : null}
+    </div>
   );
 }

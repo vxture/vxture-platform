@@ -14,6 +14,7 @@
  */
 
 import { useLocale, useTranslations } from "next-intl";
+import type { Locale } from "@vxture/shared";
 import {
   Button,
   Card,
@@ -59,6 +60,8 @@ export function PricingPlanCard({
 }) {
   const t = useTranslations("products.subscription");
   const locale = useLocale();
+  // 站点 locale 值域即 Locale（zh-CN | en-US），供 shared formatCurrency 使用。
+  const appLocale = locale as Locale;
 
   const isContact = plan.monthly === null || plan.yearly === null;
   const isFree = plan.monthly === 0;
@@ -103,7 +106,7 @@ export function PricingPlanCard({
           ) : isFree ? (
             <>
               <span className="text-3xl font-semibold tabular-nums tracking-tight text-vx-text-primary">
-                ¥0
+                {formatCny(0, appLocale)}
               </span>
               <span className="text-xs text-vx-text-muted">
                 {t("price.freeForever")}
@@ -112,19 +115,19 @@ export function PricingPlanCard({
           ) : cycle === "yearly" ? (
             <>
               <span className="text-3xl font-semibold tabular-nums tracking-tight text-vx-text-primary">
-                {formatCny(Math.floor((plan.yearly as number) / 12))}
+                {formatCny(Math.floor((plan.yearly as number) / 12), appLocale)}
               </span>
               <span className="text-xs text-vx-text-muted">
                 {t("price.perMonth")} ·{" "}
                 {t("price.yearlyTotal", {
-                  amount: formatCny(plan.yearly as number),
+                  amount: formatCny(plan.yearly as number, appLocale),
                 })}
               </span>
             </>
           ) : (
             <>
               <span className="text-3xl font-semibold tabular-nums tracking-tight text-vx-text-primary">
-                {formatCny(plan.monthly as number)}
+                {formatCny(plan.monthly as number, appLocale)}
               </span>
               <span className="text-xs text-vx-text-muted">
                 {t("price.perMonth")}
@@ -144,7 +147,7 @@ export function PricingPlanCard({
                 return (
                   <StatusBadge tone="success">
                     {t("price.saveBadge", {
-                      amount: formatCny(save),
+                      amount: formatCny(save, appLocale),
                       percent,
                     })}
                   </StatusBadge>

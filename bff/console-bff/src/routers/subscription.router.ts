@@ -641,7 +641,11 @@ export class SubscriptionRouter {
     };
   }
 
-  /** Public active plans whose CURRENT version is locked, with their prices. */
+  /**
+   * Public active plans whose CURRENT version is locked, with their prices.
+   * TODO(shared-ladder): 本查询与 website-bff product-plans.router 是同一口径
+   * 的两份 SQL；若第三处出现，应抽到共享查询层（如 @vxture/service-catalog）。
+   */
   private async queryPlanLadder(
     productCode: string,
   ): Promise<SubscribePlanOption[]> {

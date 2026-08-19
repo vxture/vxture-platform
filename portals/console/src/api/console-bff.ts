@@ -826,10 +826,17 @@ export async function fetchSubscribeContext(params: {
   if (params.intent) qs.set("intent", params.intent);
   if (params.targetTier) qs.set("target_tier", params.targetTier);
   if (params.metric) qs.set("metric", params.metric);
-  return readJson<SubscribeContext | null>(
+  const ctx = await readJson<SubscribeContext | null>(
     `/api/subscription/subscribe-context?${qs.toString()}`,
     null,
   );
+  if (ctx) {
+    // 部署偏斜防护：门户先于 BFF 发布时旧响应没有 features 字段。
+    for (const plan of ctx.plans) {
+      plan.features = (plan as { features?: string[] }).features ?? [];
+    }
+  }
+  return ctx;
 }
 
 async function extractErrorMessage(

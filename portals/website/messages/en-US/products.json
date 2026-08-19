@@ -200,6 +200,8 @@
       "monthly": "Monthly",
       "yearly": "Yearly"
     },
+    "audienceGroupLabel": "Audience",
+    "cycleGroupLabel": "Billing cycle",
     "audienceToggle": {
       "person": "Individual",
       "all": "All plans"

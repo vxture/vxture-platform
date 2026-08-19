@@ -68,9 +68,23 @@ export default function ProductSubscribePage() {
 
   const personPlans = model?.plans.filter((p) => p.audience === "person") ?? [];
   const teamPlans = model?.plans.filter((p) => p.audience !== "person") ?? [];
+  // 任一受众分组为空时「个人/全部」切换没有意义：隐藏切换,
+  // 且个人档为空的产品强制走「全部」视角（避免空 repeat() 栅格）。
+  const showAudienceToggle = personPlans.length > 0 && teamPlans.length > 0;
+  const effectiveAudience: AudienceView =
+    personPlans.length === 0 ? "all" : audience;
   const visiblePlans =
-    audience === "person" ? personPlans : (model?.plans ?? []);
-  const showGhost = audience === "person" && teamPlans.length > 0;
+    effectiveAudience === "person" ? personPlans : (model?.plans ?? []);
+  const showGhost = effectiveAudience === "person" && teamPlans.length > 0;
+  // CSS repeat() 不接受 0：分段拼接，空段直接不出现。
+  const gridColumns = [
+    visiblePlans.length > 0
+      ? `repeat(${visiblePlans.length}, minmax(15rem, 1fr))`
+      : null,
+    showGhost ? "minmax(8.5rem, 10rem)" : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className="vx-page-surface">
@@ -174,27 +188,31 @@ export default function ProductSubscribePage() {
 
                 <div className="flex flex-wrap items-center gap-3">
                   {/* 个人 / 全部 */}
-                  <div
-                    role="group"
-                    aria-label={t("audienceToggle.person")}
-                    className="inline-flex items-center gap-1 rounded-full border border-vx-gray-200 bg-vx-white p-1 shadow-sm dark:border-vx-gray-700 dark:bg-vx-gray-900"
-                  >
-                    {(["person", "all"] as AudienceView[]).map((view) => (
-                      <Button
-                        key={view}
-                        variant={audience === view ? "default" : "ghost"}
-                        size="md"
-                        onClick={() => setAudience(view)}
-                        className="rounded-full px-5"
-                      >
-                        {t(`audienceToggle.${view}`)}
-                      </Button>
-                    ))}
-                  </div>
+                  {showAudienceToggle ? (
+                    <div
+                      role="group"
+                      aria-label={t("audienceGroupLabel")}
+                      className="inline-flex items-center gap-1 rounded-full border border-vx-gray-200 bg-vx-white p-1 shadow-sm dark:border-vx-gray-700 dark:bg-vx-gray-900"
+                    >
+                      {(["person", "all"] as AudienceView[]).map((view) => (
+                        <Button
+                          key={view}
+                          variant={
+                            effectiveAudience === view ? "default" : "ghost"
+                          }
+                          size="md"
+                          onClick={() => setAudience(view)}
+                          className="rounded-full px-5"
+                        >
+                          {t(`audienceToggle.${view}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  ) : null}
                   {/* 月付 / 年付 */}
                   <div
                     role="group"
-                    aria-label={t("cycle.monthly")}
+                    aria-label={t("cycleGroupLabel")}
                     className="inline-flex items-center gap-1 rounded-full border border-vx-gray-200 bg-vx-white p-1 shadow-sm dark:border-vx-gray-700 dark:bg-vx-gray-900"
                   >
                     {(["monthly", "yearly"] as BillingCycle[]).map((c) => (
@@ -216,11 +234,7 @@ export default function ProductSubscribePage() {
               <div className="mt-10 overflow-x-auto pb-2">
                 <div
                   className="grid items-stretch gap-5"
-                  style={{
-                    gridTemplateColumns: `repeat(${visiblePlans.length}, minmax(15rem, 1fr))${
-                      showGhost ? " minmax(8.5rem, 10rem)" : ""
-                    }`,
-                  }}
+                  style={{ gridTemplateColumns: gridColumns }}
                 >
                   {visiblePlans.map((plan) => (
                     <PricingPlanCard

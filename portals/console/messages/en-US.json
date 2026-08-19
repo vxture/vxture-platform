@@ -1740,7 +1740,8 @@
   "workspacePicker": {
     "personal": "Personal tenant",
     "organization": "Team tenant",
-    "defaultWorkspace": "Default workspace"
+    "defaultWorkspace": "Default workspace",
+    "switchFailed": "Tenant switch failed — please retry; the order owner is unchanged"
   },
   "planFeatures": {
     "governance_quality": "Data quality governance",
@@ -1944,6 +1945,8 @@
       "whatUpgradeNote": "Currently on {plan}. Upgrades take effect immediately; the remaining period is prorated by day.",
       "noFeatures": "See the comparison table for full entitlements.",
       "pickTier": "Pick a tier:",
+      "tierUnavailable": "The plan tier from the link isn't available right now — pick a tier below",
+      "alreadyCurrent": "You're already on this plan — renew to extend the period instead",
       "howLong": "Billing cycle",
       "howLongHint": "How long - yearly saves more",
       "yearlySave": "Save {amount} yearly",

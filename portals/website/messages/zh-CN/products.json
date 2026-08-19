@@ -184,6 +184,8 @@
       "monthly": "月付",
       "yearly": "年付"
     },
+    "audienceGroupLabel": "适用对象",
+    "cycleGroupLabel": "计费周期",
     "audienceToggle": {
       "person": "个人",
       "all": "全部"

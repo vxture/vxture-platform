@@ -16,7 +16,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatCurrency, type Locale } from "@vxture/shared";
 import {
   Banner,
   Button,
@@ -54,11 +55,18 @@ const STATUS_KEYS = new Set([
 type Cycle = "month" | "year";
 const CYCLES: Cycle[] = ["month", "year"];
 
-function formatMoney(amount: string | number, currency: string): string {
-  const n = typeof amount === "number" ? amount : Number.parseFloat(amount);
-  const value = Number.isFinite(n) ? n.toLocaleString() : String(amount);
-  const prefix = currency === "CNY" ? "¥" : `${currency} `;
-  return `${prefix}${value}`;
+/** 货币展示统一走 shared formatCurrency（110-locale-layer 指定入口）。 */
+function moneyFor(locale: Locale) {
+  return (
+    amount: string | number,
+    currency: string,
+    options?: Intl.NumberFormatOptions,
+  ): string => {
+    const n = typeof amount === "number" ? amount : Number.parseFloat(amount);
+    return Number.isFinite(n)
+      ? formatCurrency(n, locale, currency, options)
+      : String(amount);
+  };
 }
 
 function priceForCycle(
@@ -72,6 +80,7 @@ export function SubscribePage() {
   const t = useTranslations("subscribePage");
   const router = useRouter();
   const params = useSearchParams();
+  const formatMoney = moneyFor(useLocale() as Locale);
 
   const query = useMemo(
     () => ({
@@ -188,18 +197,36 @@ export function SubscribePage() {
 
   const isLive = current?.status === "active" || current?.status === "trialing";
 
-  // ── 套餐解析：target_tier 直达；缺席时兜底（当前档 → 首个套餐）──────────────
+  // ── 套餐解析：target_tier 直达；缺席/无匹配时兜底 ──────────────────────────
+  const currentLiveVersionId = isLive && current ? current.planVersionId : null;
+
+  // target_tier 在阶梯中无匹配（网站硬编码 tier 与后台发布不同步时会发生）：
+  // 视同未指定，进入档位选择态——绝不静默落到别的档（曾经落到 Free 一键开通）。
+  const tierMatched = targetTier
+    ? (plans.find((p) => p.tier === targetTier) ?? null)
+    : null;
+  const tierMissing = Boolean(targetTier) && tierMatched === null;
+
+  // 兜底预选不选当前套餐：同套餐"升级"是付费空操作（服务端同样拒绝）。
+  // 阶梯按 TIERS 升序，优先当前档之上的第一档；已是顶档则不预选。
+  const fallbackPlan = (() => {
+    if (!currentLiveVersionId) return plans[0] ?? null;
+    const idx = plans.findIndex(
+      (p) => p.planVersionId === currentLiveVersionId,
+    );
+    return plans[idx + 1] ?? null;
+  })();
+
   const plan: SubscribePlanOption | null =
     (pickedVersionId
-      ? plans.find((p) => p.planVersionId === pickedVersionId)
-      : undefined) ??
-    (targetTier ? plans.find((p) => p.tier === targetTier) : undefined) ??
-    (current
-      ? plans.find((p) => p.planVersionId === current.planVersionId)
-      : undefined) ??
-    plans[0] ??
-    null;
-  const showTierFallback = !targetTier && plans.length > 1;
+      ? (plans.find((p) => p.planVersionId === pickedVersionId) ?? null)
+      : null) ??
+    tierMatched ??
+    (tierMissing ? null : fallbackPlan);
+
+  const showTierFallback = (!targetTier || tierMissing) && plans.length > 1;
+  const isCurrentPlan =
+    plan !== null && plan.planVersionId === currentLiveVersionId;
 
   const isEnterprise = plan !== null && plan.prices.length === 0;
   const price = plan ? priceForCycle(plan, cycle) : undefined;
@@ -222,7 +249,7 @@ export function SubscribePage() {
       : "renew";
 
   const onSubmit = async () => {
-    if (!plan || isEnterprise || !price) return;
+    if (!plan || isEnterprise || !price || isCurrentPlan) return;
     setBusy(true);
     setError(null);
     try {
@@ -307,42 +334,42 @@ export function SubscribePage() {
             description={t("confirm.whatHint")}
           >
             {plan ? (
-              <>
-                <PlanSummaryCard
-                  productName={product.name}
-                  plan={plan}
-                  note={planNote}
-                />
-                {showTierFallback ? (
-                  <div className="flex flex-wrap items-center gap-sm">
-                    <span className="text-body-sm text-muted-foreground">
-                      {t("confirm.pickTier")}
-                    </span>
-                    {plans.map((option) => (
-                      <Button
-                        key={option.planVersionId}
-                        size="xs"
-                        variant={
-                          option.planVersionId === plan.planVersionId
-                            ? "secondary"
-                            : "outline"
-                        }
-                        onClick={() => setPickedVersionId(option.planVersionId)}
-                        className={cn(
-                          "rounded-4xl",
-                          option.planVersionId === plan.planVersionId &&
-                            "border-primary",
-                        )}
-                      >
-                        {option.planName}
-                      </Button>
-                    ))}
-                  </div>
-                ) : null}
-              </>
+              <PlanSummaryCard
+                productName={product.name}
+                plan={plan}
+                note={planNote}
+              />
+            ) : plans.length > 0 ? (
+              <Banner tone="warning" title={t("confirm.tierUnavailable")} />
             ) : (
               <EmptyState title={t("noPlans")} />
             )}
+            {showTierFallback && plans.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-sm">
+                <span className="text-body-sm text-muted-foreground">
+                  {t("confirm.pickTier")}
+                </span>
+                {plans.map((option) => (
+                  <Button
+                    key={option.planVersionId}
+                    size="xs"
+                    variant={
+                      option.planVersionId === plan?.planVersionId
+                        ? "secondary"
+                        : "outline"
+                    }
+                    onClick={() => setPickedVersionId(option.planVersionId)}
+                    className={cn(
+                      "rounded-4xl",
+                      option.planVersionId === plan?.planVersionId &&
+                        "border-primary",
+                    )}
+                  >
+                    {option.planName}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
           </PageSection>
 
           <PageSection
@@ -366,7 +393,10 @@ export function SubscribePage() {
               {savings ? (
                 <StatusBadge tone="success">
                   {t("confirm.yearlySave", {
-                    amount: formatMoney(savings.amount, savings.currency),
+                    amount: formatMoney(savings.amount, savings.currency, {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }),
                   })}
                 </StatusBadge>
               ) : null}
@@ -432,22 +462,26 @@ export function SubscribePage() {
                   <>
                     <Button
                       size="xl"
-                      disabled={busy || !price}
+                      disabled={busy || !price || isCurrentPlan}
                       onClick={() => void onSubmit()}
                       className="w-full border-transparent bg-linear-to-r from-gradient-brand-from to-gradient-brand-to text-primary-foreground hover:brightness-110"
                     >
                       {busy ? t("actions.processing") : submitLabel}
                     </Button>
                     <p className="text-body-sm text-content-tertiary">
-                      {isFree
-                        ? t("confirm.fineFree")
-                        : t("confirm.fineOffline")}
+                      {isCurrentPlan
+                        ? t("confirm.alreadyCurrent")
+                        : isFree
+                          ? t("confirm.fineFree")
+                          : t("confirm.fineOffline")}
                     </p>
                   </>
                 )}
               </>
             ) : (
-              <EmptyState title={t("noPlans")} />
+              <EmptyState
+                title={plans.length > 0 ? t("confirm.pickTier") : t("noPlans")}
+              />
             )}
             {error ? <Banner tone="danger" title={error} /> : null}
           </PageSection>
