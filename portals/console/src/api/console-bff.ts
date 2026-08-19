@@ -499,6 +499,8 @@ export interface SubscribePlanOption {
   planVersionId: string;
   tier: string;
   prices: SubscribePlanPrice[];
+  /** Primary component feature list (plan_components.features) — 权益 chips. */
+  features: string[];
 }
 
 export interface SubscribeCurrent {
@@ -522,6 +524,10 @@ export interface PendingOrderSummary {
   amount: string;
   currency: string;
   createdAt: string;
+  /** 付款截止（P4）；已申报/有实收时 null。 */
+  expireAt: string | null;
+  /** 恢复现场用的六态（进付款页直达对应视图）。 */
+  paymentState: OrderState;
 }
 
 export interface SubscribeContext {

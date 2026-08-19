@@ -113,6 +113,8 @@ interface SubscribePlanOption {
   planVersionId: string;
   tier: string;
   prices: SubscribePlanPrice[];
+  /** Primary component feature list (plan_components.features) — 确认订单页的权益 chips。 */
+  features: string[];
 }
 
 interface SubscribeCurrent {
@@ -649,10 +651,11 @@ export class SubscriptionRouter {
       plan_name: string;
       plan_version_id: string;
       tier: string;
+      features: string[] | null;
       prices: SubscribePlanPrice[];
     }>(
       `select pl.id as plan_id, pl.plan_code, pl.plan_name,
-              pv.id as plan_version_id, pc.tier,
+              pv.id as plan_version_id, pc.tier, pc.features,
               coalesce(
                 jsonb_agg(jsonb_build_object(
                   'cycleUnit', pp.cycle_unit, 'cycleCount', pp.cycle_count,
@@ -671,7 +674,7 @@ export class SubscriptionRouter {
           and pl.is_public = true and pl.is_customer_visible = true
          left join product.plan_prices pp on pp.plan_version_id = pv.id
         where prod.product_code = $1 and pc.tier is not null
-        group by pl.id, pl.plan_code, pl.plan_name, pv.id, pc.tier`,
+        group by pl.id, pl.plan_code, pl.plan_name, pv.id, pc.tier, pc.features`,
       [productCode],
     );
     const rank = (t: string) => {
@@ -686,6 +689,7 @@ export class SubscriptionRouter {
         planVersionId: r.plan_version_id,
         tier: r.tier,
         prices: r.prices,
+        features: r.features ?? [],
       }))
       .sort(
         (a: SubscribePlanOption, b: SubscribePlanOption) =>
