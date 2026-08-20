@@ -1911,7 +1911,7 @@
     },
     "card": {
       "productDetail": "产品详情",
-      "version": "版本 v{version}",
+      "version": "最新版 v{version}",
       "manage": "管理",
       "upgrade": "升级",
       "renew": "续订"

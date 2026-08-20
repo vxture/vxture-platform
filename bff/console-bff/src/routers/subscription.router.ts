@@ -398,7 +398,8 @@ export interface SubscribedProductView {
   productCode: string | null;
   productName: string | null;
   productNick: string | null;
-  /** 产品对外发布号（products.release_version）；页面「版本 vX.Y.Z」。 */
+  /** 产品对外发布号（products.release_version）——平台只有一套最新实例，
+   *  恒为当前最新版、随产品更新自动跟进；不存在按订阅冻结的旧版本。 */
   releaseVersion: string | null;
   planName: string;
   tier: string | null;

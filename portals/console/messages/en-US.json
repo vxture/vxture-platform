@@ -1911,7 +1911,7 @@
     },
     "card": {
       "productDetail": "Product details",
-      "version": "Version v{version}",
+      "version": "Latest v{version}",
       "manage": "Manage",
       "upgrade": "Upgrade",
       "renew": "Renew"
