@@ -2478,7 +2478,7 @@
       "content": "Contents",
       "validity": "Validity",
       "validUntil": "Until {date}",
-      "validityDaysFromActivation": "365 days from activation",
+      "validityDaysFromActivation": "{days} days from activation",
       "amountDue": "Amount due",
       "billNo": "Bill no.",
       "createdAt": "Ordered at"

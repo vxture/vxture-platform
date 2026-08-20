@@ -1872,6 +1872,7 @@ export interface ConsoleAddonOrder {
   price: string;
   currency: string;
   status: "pending_payment" | "completed" | "cancelled";
+  validityDays: number;
   paymentDeclared: boolean;
   /** 未申报待支付单的付款截止(ISO);其余为 null */
   expireAt: string | null;

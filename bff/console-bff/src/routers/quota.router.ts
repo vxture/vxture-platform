@@ -167,6 +167,7 @@ export interface AddonOrderView {
   price: string;
   currency: string;
   status: "pending_payment" | "completed" | "cancelled";
+  validityDays: number;
   /** 已申报待运营确认 */
   paymentDeclared: boolean;
   /** 未申报待支付单的付款截止(ISO);其余为 null */
@@ -199,6 +200,7 @@ function mapAddonOrder(r: AddonPurchaseRecord): AddonOrderView {
     price: r.price,
     currency: r.currency,
     status: r.status,
+    validityDays: r.validityDays,
     paymentDeclared: r.paymentDeclared,
     expireAt,
     activatedAt: r.activatedAt ? r.activatedAt.toISOString() : null,

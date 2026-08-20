@@ -235,7 +235,9 @@ export function AddonPayPage({ orderNo }: { orderNo: string }) {
             {order
               ? order.validUntil
                 ? t("summary.validUntil", { date: fmtDate(order.validUntil) })
-                : t("summary.validityDaysFromActivation")
+                : t("summary.validityDaysFromActivation", {
+                    days: order.validityDays,
+                  })
               : "—"}
           </DetailRow>
           <DetailRow label={t("summary.amountDue")}>

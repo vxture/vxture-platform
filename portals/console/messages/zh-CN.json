@@ -2478,7 +2478,7 @@
       "content": "内容",
       "validity": "有效期",
       "validUntil": "至 {date}",
-      "validityDaysFromActivation": "自开通之日起 365 天",
+      "validityDaysFromActivation": "自开通之日起 {days} 天",
       "amountDue": "应付金额",
       "billNo": "账单号",
       "createdAt": "下单时间"
