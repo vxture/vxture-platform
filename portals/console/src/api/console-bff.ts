@@ -2086,3 +2086,14 @@ export async function applyInvoiceReceipt(input: {
     input,
   );
 }
+
+/** 加油包订单详情(支付页数据源);404/权限错回 null,页面渲染缺省态。 */
+export async function fetchAddonOrderDetail(orderNo: string): Promise<{
+  order: ConsoleAddonOrder;
+  paymentChannels: PaymentChannelInfo[];
+} | null> {
+  return readJson<{
+    order: ConsoleAddonOrder;
+    paymentChannels: PaymentChannelInfo[];
+  } | null>(`/api/quota/addon-orders/${encodeURIComponent(orderNo)}`, null);
+}
