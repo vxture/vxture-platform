@@ -166,9 +166,17 @@ for (const p of PACKAGES) {
   }
   let files;
   try {
-    files = JSON.parse(listed.stdout)[0].files.map((f) => f.path);
+    // 从第一个 '[' 起截取:不同 npm 版本 / 不同 loglevel 下 stdout 可能带前缀
+    // 说明行,直接 JSON.parse 整个 stdout 会因环境而异地失败。
+    const raw = listed.stdout ?? "";
+    const start = raw.indexOf("[");
+    if (start < 0) throw new Error("stdout 里没有 JSON 数组");
+    files = JSON.parse(raw.slice(start))[0].files.map((f) => f.path);
   } catch (err) {
-    fail(`${p.name}:解析发布清单失败 —— ${err.message}`);
+    fail(
+      `${p.name}:解析发布清单失败 —— ${err.message}\n` +
+        `  stdout 开头:${(listed.stdout ?? "").slice(0, 200)}`,
+    );
     continue;
   }
 
