@@ -5,6 +5,19 @@
 
 ---
 
+## 6.3.0 — 2026-08-21
+
+跟随 design-tokens 2.2.0（新增具名导出属 minor，050 §2）。
+
+- **新增具名导出：`THEME_CONSTANTS` / `PREFERENCE_CONSTANTS`**（转发自
+  design-tokens 2.2.0）。公开入口快照已同步。
+- **移除依赖：`@vxture/shared`。** 主题/偏好契约键迁入 design-tokens 后，设计
+  三包不再依赖平台通用包——**设计系统自此是自足单元**，可独立于平台仓发布，
+  外部消费者安装时也不再拖入 shared。这是本次拆仓（设计三包留 `@vxture` 作用域、
+  平台仓迁往新组织）的技术前提。
+- 无 API 行为变化：ThemeProvider / themeBootstrapScript / fontSizePreference 的
+  取值与键逐字不变，仅导入来源由 shared 改为 design-tokens。
+
 ## 6.2.0 — 2026-08-21
 
 跟随 design-ui 3.1.0（新增组件向上传导为伞包 minor，050 §2）。
