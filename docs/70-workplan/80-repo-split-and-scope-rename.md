@@ -35,7 +35,7 @@ variable。SSH 私钥、ACR 口令、DNS API token → secret。
 
 |                  | `vxture`（旧）                                                                                  | `vxture-platform`（新） |
 | ---------------- | ----------------------------------------------------------------------------------------------- | ----------------------- |
-| 组织层 secrets   | **12 个**（ACR ×2、Sonar、Tailscale ×3、NODE*AUTH_TOKEN、DEPLOY_WORKER02*\* ×6）                | **0**                   |
+| 组织层 secrets   | **12 个**（ACR ×2、Sonar、Tailscale ×3、`NODE_AUTH_TOKEN`、`DEPLOY_WORKER02_*` ×6）             | **0**                   |
 | 组织层 variables | **4 个**（ACR_REGISTRY / ACR_INTERNAL_HOST / TAILSCALE_OAUTH_CLIENT_TAG / VXTURE_NPM_REGISTRY） | **0**                   |
 | 仓库层 secrets   | 1（CLOUDFLARE_DNS_API_TOKEN）                                                                   | 7                       |
 | 仓库层 variables | 7                                                                                               | 10                      |
