@@ -18,6 +18,12 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-latest
+    # .npmrc 里的 ${NODE_AUTH_TOKEN} 由 pnpm 在**每次调用**时求值——不只是 install。
+    # 不在 job 层给出，其余步骤（build / lint / type-check…）每跑一次 pnpm 就刷两行
+    #   WARN Issue while reading ".npmrc". Failed to replace env in config
+    # 一次 run 几十条，真警告会被淹掉。设在 job 层比逐步骤传更省，也更难漏。
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v6
 
@@ -67,6 +73,12 @@ jobs:
     # 内部步骤可演进，但 job 名（quality-gate / build / test-coverage）改动须同步 ruleset。
     name: quality-gate
     runs-on: ubuntu-latest
+    # .npmrc 里的 ${NODE_AUTH_TOKEN} 由 pnpm 在**每次调用**时求值——不只是 install。
+    # 不在 job 层给出，其余步骤（build / lint / type-check…）每跑一次 pnpm 就刷两行
+    #   WARN Issue while reading ".npmrc". Failed to replace env in config
+    # 一次 run 几十条，真警告会被淹掉。设在 job 层比逐步骤传更省，也更难漏。
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     outputs:
       docs_only: ${{ steps.changes.outputs.docs_only }}
       # 本次变更影响的镜像集（= 构建目标）；build/test 据此只处理受影响组件。
@@ -177,6 +189,12 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    # .npmrc 里的 ${NODE_AUTH_TOKEN} 由 pnpm 在**每次调用**时求值——不只是 install。
+    # 不在 job 层给出，其余步骤（build / lint / type-check…）每跑一次 pnpm 就刷两行
+    #   WARN Issue while reading ".npmrc". Failed to replace env in config
+    # 一次 run 几十条，真警告会被淹掉。设在 job 层比逐步骤传更省，也更难漏。
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     needs: [check]
     # TD-024: auth-bff's RedisService.onModuleInit() awaits a real connection and
     # fails closed by design (it is the central session store) — its boot-smoke
@@ -267,6 +285,12 @@ jobs:
   test:
     name: test-coverage
     runs-on: ubuntu-latest
+    # .npmrc 里的 ${NODE_AUTH_TOKEN} 由 pnpm 在**每次调用**时求值——不只是 install。
+    # 不在 job 层给出，其余步骤（build / lint / type-check…）每跑一次 pnpm 就刷两行
+    #   WARN Issue while reading ".npmrc". Failed to replace env in config
+    # 一次 run 几十条，真警告会被淹掉。设在 job 层比逐步骤传更省，也更难漏。
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
     needs: [check]
     steps:
       - name: Docs-only test gate
