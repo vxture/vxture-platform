@@ -17,12 +17,16 @@
   平台仓迁往新组织）的技术前提。
 - 无 API 行为变化：ThemeProvider / themeBootstrapScript / fontSizePreference 的
   取值与键逐字不变，仅导入来源由 shared 改为 design-tokens。
-- **API 收窄（shell 语言切换）**： 与 的参数由平台的 联合类型放宽为 ——**设计包不拥有平台的语言
-  目录**，支持哪些语言是业务事实，由消费方经 / 给出。
-  随之 缺省为空数组（原先内置 SUPPORTED_LOCALES）。
-  **消费方需在边界处收窄回自己的 Locale**（）；
-  website / opera 本就显式传 options，accounts 的默认值已改由该门户自行构造。
-  改用本包 （与原 等价，取值不变）。
+- **API 收窄（shell 语言切换）**：`LocaleSelectOption.locale` 与
+  `onLocaleChange` 的参数由平台的 `Locale` 联合类型放宽为 `string`——**设计包
+  不拥有平台的语言目录**，支持哪些语言是业务事实，应由消费方经 `options` /
+  `localeOptions` 给出。随之 `DEFAULT_LOCALE_OPTIONS` 缺省为空数组（原先内置
+  `SUPPORTED_LOCALES`）。
+  **消费方须在边界处收窄回自己的 Locale**，例如
+  `onLocaleChange={(next) => fn(next as Locale)}`；website / opera 本就显式传
+  options，accounts 的默认选项已改由该门户自行按平台目录构造。
+- `ShellThemePreference` 改用本包 `ThemeMode`（与原 `Theme | "system"` 取值
+  等价，行为不变）。
 
 ## 6.2.0 — 2026-08-21
 
